@@ -23,7 +23,7 @@ void Fan::init(){
     mTachoPulseCounter.init();
     mGpioFanEnable.setMode(Gpio::Mode::Output);
     mGpioFanPwm.setMode(Gpio::Mode::Output);
-    setEnabled(0);
+    setEnabled(false);
     setSpeed(0.0F);
 }
 

@@ -45,7 +45,7 @@ public:
     static constexpr uint32_t ROTENC_BTN = 1;
 
     // Heatpad
-    static constexpr uint32_t HEAT_ENABLE = 13;
+    static constexpr uint32_t HEATPAD_ENABLE = 13;
 
 };
 

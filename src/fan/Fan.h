@@ -33,7 +33,7 @@ private:
     uint32_t mLastRpmTimeMicros = 0;
     uint32_t mLastRpmValue = 0;
 
-    bool mEnabled = 0;
+    bool mEnabled = false;
     float mSpeed = 0.0F;
 
     TachoPulseCounter mTachoPulseCounter;

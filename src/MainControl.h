@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Timer.h"
+#include "core/SoftwareTimer.h"
 #include "fan/Fan.h"
 
 namespace Garbox {
@@ -23,8 +23,8 @@ private:
     static constexpr uint32_t HeartbeatIntervalMillis = 500;
 
     Fan mFan;
-    Timer mFanStateTimer;
-    Timer mHeartbeatTimer;
+    SoftwareTimer mFanStateTimer;
+    SoftwareTimer mHeartbeatTimer;
 
 };
 
