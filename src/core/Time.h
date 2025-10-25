@@ -19,7 +19,7 @@ public:
     static void BeginTick();
     static void EndTick();
 
-    static constexpr float MICROS_TO_SECONDS = 1.0e-6f;
+    static constexpr float MicrosToSeconds = 1.0e-6f;
     static constexpr float TICK_INTERVAL_MICROS = 10 * 1000; // 10ms
 
     static uint32_t sTickBeginTime;

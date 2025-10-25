@@ -1,6 +1,7 @@
 #include "TachoPulseCounter.h"
 
 #include <Arduino.h> // for gpio config helpers (optional but typical in Arduino env)
+#include "assert/Assert.h"
 
 namespace Garbox {
 
@@ -19,15 +20,13 @@ TachoPulseCounter::TachoPulseCounter(
     // nothing to do
 }
 
-bool TachoPulseCounter::init() {
-    if (mInitialized) {
-        return true;
-    }
+void TachoPulseCounter::init() {
+    AssertExit(!mInitialized, "TachoPulseCounter::init() already initialized");
 
     // pcnt_config_t describes how this channel behaves
     pcnt_config_t cfg = {};
-    cfg.pulse_gpio_num = static_cast<int>(mPin);      // tach signal pin
-    cfg.ctrl_gpio_num  = PCNT_PIN_NOT_USED;           // we don't use a control pin
+    cfg.pulse_gpio_num = static_cast<int>(mPin); // tach signal pin
+    cfg.ctrl_gpio_num  = PCNT_PIN_NOT_USED; // we don't use a control pin
     cfg.unit           = mUnit;
     cfg.channel        = mChannel;
 
@@ -36,8 +35,8 @@ bool TachoPulseCounter::init() {
     // You can pick rising or falling. We'll count FALLING edges.
     //
     // For falling edges, we treat negative edge as "increase":
-    cfg.pos_mode   = PCNT_COUNT_DIS;   // on rising edge, don't change
-    cfg.neg_mode   = PCNT_COUNT_INC;   // on falling edge, increment
+    cfg.pos_mode   = PCNT_COUNT_DIS; // on rising edge, don't change
+    cfg.neg_mode   = PCNT_COUNT_INC; // on falling edge, increment
 
     // Control modes not used (no direction ctrl pin), so KEEP
     cfg.lctrl_mode = PCNT_MODE_KEEP;
@@ -48,65 +47,56 @@ bool TachoPulseCounter::init() {
     cfg.counter_h_lim = mMaxCount;
 
     esp_err_t err = pcnt_unit_config(&cfg);
-    if (err != ESP_OK) {
-        return false;
-    }
+    AssertExit(err == ESP_OK, "TachoPulseCounter::init() has error");
 
     // Optional: add input filter to reject very short glitches/noise.
     // filter_val is in APB clock cycles (~80 MHz default on ESP32),
     // max 1023. Let's pick something modest.
-    //
     // NOTE: you *must* enable filter after setting its value.
-    pcnt_set_filter_value(mUnit, 100);      // ignore pulses shorter than ~100 cycles
+    pcnt_set_filter_value(mUnit, 100); // ignore pulses shorter than ~100 cycles
     pcnt_filter_enable(mUnit);
 
     // By default, pcnt_unit_config disables some events; we don't enable interrupts here.
     // We just do raw counting.
 
     mInitialized = true;
-    return true;
 }
 
-bool TachoPulseCounter::start() {
-    if (!mInitialized) {
-        if (!init()) {
-            return false;
-        }
-    }
+void TachoPulseCounter::start() {
+    AssertExit(mInitialized, "TachoPulseCounter::start() not initialized");
 
-    // Clear and resume the counter
-    if (pcnt_counter_clear(mUnit) != ESP_OK) {
-        return false;
-    }
-    if (pcnt_counter_resume(mUnit) != ESP_OK) {
-        return false;
-    }
+    // clear counter
+    esp_err_t clearCesult = pcnt_counter_clear(mUnit);
+    AssertExit(clearCesult == ESP_OK, "TachoPulseCounter::start() pcnt_counter_clear failed");
 
-    return true;
+    // resume counter
+    esp_err_t resumeResult = pcnt_counter_resume(mUnit);
+    AssertExit(resumeResult == ESP_OK, "TachoPulseCounter::start() pcnt_counter_resume failed");
 }
 
-int TachoPulseCounter::getCount() const {
-    if (!mInitialized) {
-        return 0;
-    }
+int16_t TachoPulseCounter::getCount() const {
+    AssertExit(mInitialized, "TachoPulseCounter::getCount() not initialized");
 
     int16_t val = 0;
     if (pcnt_get_counter_value(mUnit, &val) != ESP_OK) {
+        AssertDebug(mInitialized, "TachoPulseCounter::getCount() pcnt_get_counter_value failed");
         return 0;
     }
-    return static_cast<int>(val);
+    return val;
 }
 
-bool TachoPulseCounter::clearCount() {
+void TachoPulseCounter::clearCount() {
     if (!mInitialized) {
-        return false;
+        AssertExit(mInitialized, "TachoPulseCounter::clearCount() not initialized");
     }
 
-    return (pcnt_counter_clear(mUnit) == ESP_OK);
+    if (pcnt_counter_clear(mUnit) != ESP_OK) {
+        AssertDebug(mInitialized, "TachoPulseCounter::getCount() pcnt_counter_clear failed");
+    }
 }
 
-int TachoPulseCounter::getAndClearCount() {
-    int current = getCount();
+int16_t TachoPulseCounter::getAndClearCount() {
+    int16_t current = getCount();
     clearCount();
     return current;
 }

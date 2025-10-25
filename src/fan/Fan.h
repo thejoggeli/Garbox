@@ -17,18 +17,18 @@ public:
     void tick();
 
     void setEnabled(bool enabled);
-    void setSpeed(float speed);
-
     bool isEnabled();
+
+    void setSpeed(float speed); // range [0.0, 1.0]
     float getSpeed();
 
-    void updateRpm();
+    void updateMeasuredRpm();
     uint32_t getMeasuredRpm();
 
 private:
 
-    static constexpr uint32_t RPM_INTERVAL_MICROS = 500 * 1000; // 2 Hz
-    static constexpr uint32_t PULSES_PER_REVOLUTION = 2;
+    static constexpr uint32_t RpmIntervalSeconds = 500 * 1000; // 2 Hz
+    static constexpr uint32_t PulsesPerRevolution = 2;
 
     uint32_t mLastRpmTimeMicros = 0;
     uint32_t mLastRpmValue = 0;

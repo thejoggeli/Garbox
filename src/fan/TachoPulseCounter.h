@@ -17,27 +17,27 @@ public:
     );
 
     // configure PCNT for this pin (must be called before use)
-    bool init();
+    void init();
 
     // clear counter and start counting
-    bool start();
+    void start();
 
-    // read current count (signed 16-bit in HW, we widen to int)
-    int getCount() const;
+    // read current count
+    int16_t getCount() const;
 
     // clear counter to 0
-    bool clearCount();
+    void clearCount();
 
-    // convenience: read then clear
-    int getAndClearCount();
+    // read then clear
+    int16_t getAndClearCount();
 
 private:
-    uint32_t        mPin;
-    pcnt_unit_t     mUnit;
-    pcnt_channel_t  mChannel;
-    int16_t         mMinCount;
-    int16_t         mMaxCount;
-    bool            mInitialized = false;
+    uint32_t mPin;
+    pcnt_unit_t mUnit;
+    pcnt_channel_t mChannel;
+    int16_t mMinCount;
+    int16_t mMaxCount;
+    bool mInitialized = false;
 };
 
 } // namespace Garbox

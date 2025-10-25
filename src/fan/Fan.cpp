@@ -20,9 +20,7 @@ Fan::Fan() :
 }
 
 void Fan::init(){
-    if(!mTachoPulseCounter.init()){
-        AssertExit(false, "Fan: failed to initialize tacho pulse counter");
-    }
+    mTachoPulseCounter.init();
     mGpioFanEnable.setMode(Gpio::Mode::Output);
     mGpioFanPwm.setMode(Gpio::Mode::Output);
     setEnabled(0);
@@ -36,8 +34,8 @@ void Fan::start(){
 
 void Fan::tick(){
     // update RPM
-    if((Time::GetMicros() - mLastRpmTimeMicros) > RPM_INTERVAL_MICROS){
-        updateRpm();
+    if((Time::GetMicros() - mLastRpmTimeMicros) > RpmIntervalSeconds){
+        updateMeasuredRpm();
     }
 }
 
@@ -45,6 +43,11 @@ void Fan::setEnabled(bool enabled){
     mEnabled = enabled;
     mGpioFanEnable.digitalWrite(mEnabled);
 }
+
+bool Fan::isEnabled(){
+    return mEnabled;
+}
+
 void Fan::setSpeed(float speed){
     mSpeed = MathUtils::clamp(speed, 0.0F, 1.0F);
     // pwm pin logic is inverted
@@ -56,14 +59,11 @@ void Fan::setSpeed(float speed){
     }
 }
 
-bool Fan::isEnabled(){
-    return mEnabled;
-}
 float Fan::getSpeed(){
     return mSpeed;
 }
 
-void Fan::updateRpm(){
+void Fan::updateMeasuredRpm(){
 	// get timestamp and tacho counter
     uint32_t currentTimeMicros = Time::GetMicros();
     int16_t tachoCounter = mTachoPulseCounter.getAndClearCount();
@@ -74,14 +74,14 @@ void Fan::updateRpm(){
         mLastRpmValue = 0;
         mLastRpmTimeMicros = currentTimeMicros;
         return;
-    } 
+    }
 
     // compute delta time
     uint32_t const deltaTimeMicros = currentTimeMicros - mLastRpmTimeMicros;
-    float const deltaTimeSeconds = static_cast<float>(deltaTimeMicros) * Time::MICROS_TO_SECONDS;
+    float const deltaTimeSeconds = static_cast<float>(deltaTimeMicros) * Time::MicrosToSeconds;
 
     // compute rpm
-    constexpr float pulsesPerRevInv = 1.0F / static_cast<float>(PULSES_PER_REVOLUTION);
+    constexpr float pulsesPerRevInv = 1.0F / static_cast<float>(PulsesPerRevolution);
     float const pulsesPerSecond = static_cast<float>(tachoCounter) / deltaTimeSeconds;
     float const rpmFloat = pulsesPerSecond * pulsesPerRevInv * 60.0F;
 
