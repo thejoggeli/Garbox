@@ -14,8 +14,6 @@ public:
     static uint64_t GetMicros64();
     static uint32_t GetMicros();
     static uint32_t GetMillis();
-    static void Init();
-    static void Start();
     static void BeginTick();
     static void EndTick();
 

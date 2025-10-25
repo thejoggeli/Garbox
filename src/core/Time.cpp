@@ -33,14 +33,6 @@ uint32_t Time::GetMillis(){
     return millis();
 }
 
-void Time::Init(){
-    // nothing to do
-}
-
-void Time::Start(){
-    // nothing to do
-}
-
 void Time::BeginTick(){
 
     // remember tick begin time

@@ -1,6 +1,14 @@
 {
     "files.associations": {
         "cstdint": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "system_error": "cpp",
+        "array": "cpp",
+        "optional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     }
 }
