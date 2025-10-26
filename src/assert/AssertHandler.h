@@ -8,7 +8,7 @@ class AssertHandler final {
 
 public:
 
-    using Handler = std::function<void(const char* message)>;;
+    using Handler = std::function<void(const char* message)>;
 
     static void SetDebugHandler(Handler handler);
     static void SetExitHandler(Handler handler);
