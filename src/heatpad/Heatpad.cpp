@@ -54,7 +54,7 @@ float Heatpad::getNextDutyCycle(){
 
 void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
     switch(state){
-        case SoftwarePwm::State::Off:
+        case SoftwarePwm::State::Reset:
         case SoftwarePwm::State::Low:
             setHeatEnabled(false);
             break;

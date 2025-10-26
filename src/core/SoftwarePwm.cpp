@@ -8,8 +8,7 @@ SoftwarePwm::SoftwarePwm(uint32_t periodMillis) :
     // init members
     mPwmTimer(),
     mPeriodDuration(periodMillis),
-    mHighDuration(0),
-    mLowDuration(periodMillis){
+    mHighDuration(0){
     // nothing to do
 }
 
@@ -18,7 +17,9 @@ void SoftwarePwm::setStateChangedHandler(Handler handler){
 }
 
 void SoftwarePwm::reset(){
-    enterState(State::Off);
+    mPwmTimer.reset();
+    applyDutyCycle(0.0f);
+    enterState(State::Reset);
 }
 
 void SoftwarePwm::tick(){
@@ -38,7 +39,7 @@ void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
     mNextDutyCycle = duty;
 
     // start next pwm cycle immediately
-    if(!finishCurrent || mState == State::Off){
+    if(!finishCurrent || mState == State::Reset){
         startNextCycle();
     }
 }
@@ -59,11 +60,16 @@ void SoftwarePwm::runStateMachine(){
     }
 
     switch(mState){
-        case State::Off:
+        case State::Reset:
             break;
         case State::High:
             if(mPwmTimer.getElapsedMillis() >= mHighDuration){
-                enterState(State::Low);
+                if(mCurrentDutyCycle == 1.0f){
+                    startNextCycle();
+                }
+                else {
+                    enterState(State::Low);
+                }
             }
             break;
         case State::Low:
@@ -72,7 +78,7 @@ void SoftwarePwm::runStateMachine(){
             }
             break;
         default:
-            AssertDebug(false, "SoftwarePwm:updateStateMachine() unhandled state");
+            AssertDebug(false, "SoftwarePwm:runStateMachine() unhandled state");
             break;
     }
 }
@@ -80,18 +86,6 @@ void SoftwarePwm::runStateMachine(){
 void SoftwarePwm::enterState(State nextState){
     if(mState == nextState){
         return;
-    }
-    switch(nextState){
-        case State::Off:
-            mPwmTimer.reset();
-            applyDutyCycle(0.0f);
-            break;
-        case State::Low:
-            // nothing to do
-            break;
-        case State::High:
-            // nothing to do
-            break;
     }
     mState = nextState;
     if(mHandler != nullptr){
@@ -106,19 +100,19 @@ void SoftwarePwm::startNextCycle(){
         applyDutyCycle(mNextDutyCycle);
     }
 
-    // enter next state
-    if(mNextDutyCycle == 0.0f){
-        // enter off state
-        enterState(State::Off);
-    }
+    // start timer for next cycle
+    if(mState == State::Reset){
+        mPwmTimer.start(mPeriodDuration);
+    } 
     else {
-        // enter next pwm cycle
-        if(mState == State::Off){
-            mPwmTimer.start(mPeriodDuration);
-        } 
-        else {
-            mPwmTimer.restart();
-        }
+        mPwmTimer.restart();
+    }
+
+    // enter state for next cycle
+    if(mCurrentDutyCycle == 0.0f){
+        enterState(State::Low);
+    } 
+    else {
         enterState(State::High);
     }
 }
@@ -127,7 +121,6 @@ void SoftwarePwm::applyDutyCycle(float duty){
     mCurrentDutyCycle = duty;
     mNextDutyCycle = duty;
     mHighDuration = static_cast<uint32_t>(static_cast<float>(mPeriodDuration) * duty + 0.5f);
-    mLowDuration = mPeriodDuration - mHighDuration;
 }
 
-}
+} // namespace

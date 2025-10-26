@@ -9,7 +9,7 @@ class SoftwarePwm {
 public:
 
     enum class State : uint8_t {
-        Off,
+        Reset,
         High,
         Low,
     };
@@ -44,9 +44,8 @@ private:
     SoftwareTimer mPwmTimer;
     uint32_t mPeriodDuration;
     uint32_t mHighDuration;
-    uint32_t mLowDuration;
 
-    State mState = State::Off;
+    State mState = State::Reset;
     Handler mHandler = nullptr;
     float mCurrentDutyCycle = 0.0f;
     float mNextDutyCycle = 0.0f;
