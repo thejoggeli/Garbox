@@ -40,7 +40,8 @@ void Heatpad::reset(){
 }
 
 void Heatpad::setNextDutyCycle(float duty){
-    mPwm.setNextDutyCycle(duty);
+    bool const finishCurrent = true;
+    mPwm.setDutyCycle(duty, finishCurrent);
 }
 
 float Heatpad::getCurrentDutyCycle(){

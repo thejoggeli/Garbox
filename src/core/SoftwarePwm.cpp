@@ -26,8 +26,32 @@ void SoftwarePwm::tick(){
     runStateMachine();
 }
 
-void SoftwarePwm::runStateMachine(){
 
+void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
+    // duty cycle must be between 0 and 1
+    if(duty < 0.0f || duty > 1.0f){
+        AssertDebug(false, "SoftwarePwm::setNextDutyCycle() invalid duty value");
+        return; 
+    }
+
+    // queue duty cycle for next pwm cycle 
+    mNextDutyCycle = duty;
+
+    // start next pwm cycle immediately
+    if(!finishCurrent || mState == State::Off){
+        startNextCycle();
+    }
+}
+
+float SoftwarePwm::getCurrentDutyCycle(){
+    return mCurrentDutyCycle;
+}
+
+float SoftwarePwm::getNextDutyCycle(){
+    return mNextDutyCycle;
+}
+
+void SoftwarePwm::runStateMachine(){
     // prevent recursive lockup
     if(++mCurrentTickRunsCount > MaxRunsPerTick){
         AssertDebug(false, "SoftwarePwm::runStateMachine() exceeded max runs");
@@ -60,7 +84,7 @@ void SoftwarePwm::enterState(State nextState){
     switch(nextState){
         case State::Off:
             mPwmTimer.reset();
-            updateDutyCycle(0.0f);
+            applyDutyCycle(0.0f);
             break;
         case State::Low:
             // nothing to do
@@ -79,51 +103,27 @@ void SoftwarePwm::enterState(State nextState){
 void SoftwarePwm::startNextCycle(){
     // apply new duty cycle 
     if(mNextDutyCycle != mCurrentDutyCycle){
-        updateDutyCycle(mNextDutyCycle);
+        applyDutyCycle(mNextDutyCycle);
     }
 
     // enter next state
     if(mNextDutyCycle == 0.0f){
-        // entter off state
-        mPwmTimer.reset();
+        // enter off state
         enterState(State::Off);
     }
     else {
         // enter next pwm cycle
-        mPwmTimer.restart();
+        if(mState == State::Off){
+            mPwmTimer.start(mPeriodDuration);
+        } 
+        else {
+            mPwmTimer.restart();
+        }
         enterState(State::High);
     }
 }
 
-void SoftwarePwm::setNextDutyCycle(float duty){
-
-    if(duty < 0.0f || duty > 1.0f){
-        AssertDebug(false, "SoftwarePwm::setNextDutyCycle() invalid duty value");
-        return; 
-    }
-
-    if(mState == State::Off && duty != 0.0f){
-        // turn on
-        updateDutyCycle(duty);
-        mPwmTimer.start(mPeriodDuration);
-        enterState(State::High);
-    }
-    else {
-        // change duty cycle after finishing current cycle
-        mNextDutyCycle = duty;
-    }
-
-}
-
-float SoftwarePwm::getCurrentDutyCycle(){
-    return mCurrentDutyCycle;
-}
-
-float SoftwarePwm::getNextDutyCycle(){
-    return mNextDutyCycle;
-}
-
-void SoftwarePwm::updateDutyCycle(float duty){
+void SoftwarePwm::applyDutyCycle(float duty){
     mCurrentDutyCycle = duty;
     mNextDutyCycle = duty;
     mHighDuration = static_cast<uint32_t>(static_cast<float>(mPeriodDuration) * duty + 0.5f);

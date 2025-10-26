@@ -25,19 +25,19 @@ public:
 
     void tick();
 
-    /// Set duty cycle for future PWM intervals
-    void setNextDutyCycle(float duty);
+    /// Duty value must be in the range [0, 1] 
+    /// Duty=0 enters "Off" state
+    void setDutyCycle(float duty, bool finishCurrent = true);
 
     float getCurrentDutyCycle();
     float getNextDutyCycle();
 
 private:
 
+    void runStateMachine();
     void enterState(State nextState);
     void startNextCycle();
-
-    void updateDutyCycle(float duty);
-    void runStateMachine();
+    void applyDutyCycle(float duty);
 
     static constexpr uint32_t MaxRunsPerTick = 10;
 
