@@ -16,8 +16,13 @@ public:
     void start();
     void tick();
 
-    void setDutyCycle(float duty);
-    void turnOff();
+    /// Set duty cycle for future PWM intervals
+    void setNextDutyCycle(float duty);
+    float getCurrentDutyCycle();
+    float getNextDutyCycle();
+
+    /// Turn off immediately
+    void reset();
 
 private:
 
@@ -27,19 +32,28 @@ private:
         DutyLow,
     };
 
-    void setOutput(bool on);
+    void setHeatEnabled(bool enabled);
+    bool isHeatEnabled();
+
+    void updatePwmDutyCycle(float duty);
+    void updateStateMachine();
+
+    void enterOffState();
+    void enterPwmHighState();
+    void enterPwmLowState();
+    void enterNextPwmCycle();
 
     static constexpr uint32_t PwmTimerIntervalMillis = 5000; // 5 seconds
 
-    State mState;
-
     Gpio mGpioHeatpadEnable;
-
-    float mDutyCycle = 0.0f;
-    uint32_t mHighDuration;
-    uint32_t mLowDuration;
-    uint32_t mFullDuration;
     SoftwareTimer mPwmTimer;
+
+    State mState = State::Off;
+    bool mHeatEnabled = false;
+    float mCurrentDutyCycle = 0.0f;
+    float mNextDutyCycle = 0.0f;
+    uint32_t mPwmHighDuration = 0; // heat on duration
+    uint32_t mPwmLowDuration = PwmTimerIntervalMillis; // heat off duration
 
 };
 
