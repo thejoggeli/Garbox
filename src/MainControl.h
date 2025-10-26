@@ -2,6 +2,7 @@
 
 #include "core/SoftwareTimer.h"
 #include "fan/Fan.h"
+#include "heatpad/Heatpad.h"
 
 namespace Garbox {
 
@@ -23,6 +24,8 @@ private:
     static constexpr uint32_t HeartbeatIntervalMillis = 500;
 
     Fan mFan;
+    Heatpad mHeatpad;
+    
     SoftwareTimer mFanStateTimer;
     SoftwareTimer mHeartbeatTimer;
 

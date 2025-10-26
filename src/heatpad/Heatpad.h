@@ -17,7 +17,7 @@ public:
     void tick();
     void reset();
 
-    void setNextDutyCycle(float duty);
+    void setDutyCycle(float duty);
     float getCurrentDutyCycle();
     float getNextDutyCycle();
 

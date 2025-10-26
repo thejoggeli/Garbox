@@ -10,7 +10,8 @@ namespace Garbox {
 
 MainControl::MainControl() : 
     // init memebers
-    mFan(){
+    mFan(),
+    mHeatpad(){
     // nothing to do
 }
 
@@ -18,10 +19,12 @@ void MainControl::init(){
     mFan.init();
     mFan.setEnabled(0);
     mFan.setSpeed(0.0F);
+    mHeatpad.init();
 }
 
 void MainControl::start(){
     mFan.start();
+    mHeatpad.setDutyCycle(0.5f);
     mFanStateTimer.start(FanStateIntervalMillis);
     mHeartbeatTimer.start(HeartbeatIntervalMillis);
 }
@@ -71,6 +74,9 @@ void MainControl::tick(){
     if(rpmValue != lastRpmValue){
         Serial.println("Fan measured RPM: " + String(rpmValue));
     }
+
+    // heatpd tick
+    mHeatpad.tick();
 }
 
 void MainControl::onAssertDebug(const char* message){

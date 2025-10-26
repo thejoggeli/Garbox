@@ -39,7 +39,7 @@ void Heatpad::reset(){
     setHeatEnabled(false);
 }
 
-void Heatpad::setNextDutyCycle(float duty){
+void Heatpad::setDutyCycle(float duty){
     bool const finishCurrent = true;
     mPwm.setDutyCycle(duty, finishCurrent);
 }
@@ -53,18 +53,11 @@ float Heatpad::getNextDutyCycle(){
 }
 
 void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
-    switch(state){
-        case SoftwarePwm::State::Reset:
-        case SoftwarePwm::State::Low:
-            setHeatEnabled(false);
-            break;
-        case SoftwarePwm::State::High:
-            setHeatEnabled(true);
-            break;
-        default: 
-            setHeatEnabled(false);
-            AssertDebug(false, "Heatpad::handlePwmStateChanged() unhandled state");
-            break;
+    if(state == SoftwarePwm::State::High){
+        setHeatEnabled(true);
+    } 
+    else {
+        setHeatEnabled(false);
     }
 }
 
