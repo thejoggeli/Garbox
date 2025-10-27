@@ -1,5 +1,6 @@
 #include "DebugLeds.h"
 
+#include <Adafruit_NeoPixel.h>
 #include <array>
 #include "assert/Assert.h"
 #include "config/PinConfig.h"
@@ -7,12 +8,20 @@
 
 namespace Garbox {
 
+// Debug LEDs config
+static constexpr size_t NumDebugLeds = 4;
+
+// Debug LEDs PWM config
 static constexpr uint32_t PwmFrequencyHz = 5000;
 static constexpr uint32_t PwmResolutionBits = 10;
 
-static constexpr size_t NumLeds = 4;
+// RGB LED config
+static constexpr uint16_t NumRgbLeds = 1;
 
-static std::array<Garbox::LedcPwm, NumLeds> sLeds = {
+// RGB LED pixel instance
+static Adafruit_NeoPixel gPixel(NumRgbLeds, PinConfig::RgbLed, NEO_GRB + NEO_KHZ800);
+
+static std::array<Garbox::LedcPwm, NumDebugLeds> sLeds = {
     LedcPwm(PinConfig::DebugLed0, LedcPwmConfig::DebugLed0),
     LedcPwm(PinConfig::DebugLed1, LedcPwmConfig::DebugLed1),
     LedcPwm(PinConfig::DebugLed2, LedcPwmConfig::DebugLed2),
@@ -20,15 +29,20 @@ static std::array<Garbox::LedcPwm, NumLeds> sLeds = {
 };
 
 void DebugLeds::Init(){
+
+    // init debug LEDs
     for(LedcPwm& led : sLeds){
         led.init();
         led.setDutyRaw(0);
     }
+
+    // init RGB LED
+    gPixel.begin();
 }
 
 void DebugLeds::ToggleLed(LedId ledId, float brightness){
     size_t const index = static_cast<size_t>(ledId);
-    if(index >= NumLeds){
+    if(index >= NumDebugLeds){
         AssertDebug(false, "DebugLeds::ToggleLed() invalid id");
         return;
     }
@@ -43,7 +57,7 @@ void DebugLeds::ToggleLed(LedId ledId, float brightness){
 
 void DebugLeds::SetLed(LedId ledId, bool enable, float brightness){
     size_t const index = static_cast<size_t>(ledId);
-    if(index >= NumLeds){
+    if(index >= NumDebugLeds){
         AssertDebug(false, "DebugLeds::SetLed() invalid id");
         return;
     }
@@ -66,6 +80,12 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
             led.setDutyRaw(0);
         }
     }
+}
+
+void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b, uint8_t brightness){
+    gPixel.setPixelColor(0, r, g, b);
+    gPixel.setBrightness(brightness);
+    gPixel.show();
 }
 
 }

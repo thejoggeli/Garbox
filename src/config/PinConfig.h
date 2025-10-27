@@ -13,6 +13,9 @@ public:
     static constexpr uint32_t DebugLed2 = 40;           // DEBUG_LED_2
     static constexpr uint32_t DebugLed3 = 39;           // DEBUG_LED_3
 
+    // RGB Led
+    static constexpr uint32_t RgbLed = 48;              // Built-in RGB LED on ESP32-S3-DevkitC-1-U
+
     // Debug GPIOs
     static constexpr uint32_t DebugGpio0 = 44;          // DEBUG_GPIO_0
     static constexpr uint32_t DebugGpio1 = 43;          // DEBUG_GPIO_1

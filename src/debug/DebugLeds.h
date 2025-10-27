@@ -20,6 +20,8 @@ public:
     static void SetLed(LedId ledId, bool enable, float brightness = 1.0);
     static void SetAllLeds(bool enable, float brightness = 1.0);
 
+    static void SetRgbLed(uint8_t r, uint8_t g, uint8_t b, uint8_t brightness = 255);
+
 private:
 
     DebugLeds() = delete;

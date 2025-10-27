@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
+#include "color/ColorMap.h"
+#include "color/Rgb888.h"
 #include "config/DebugLedsConfig.h"
 #include "core/Time.h"
 
@@ -39,9 +41,10 @@ void MainControl::tick(){
     }
 
     // update fan state
+    constexpr uint32_t numFatStates = 6;
     static uint32_t fanState = 0;
     if(mFanStateTimer.isExpired()){
-        if(++fanState > 5){
+        if(++fanState >= numFatStates){
             fanState = 0;
         }
         switch(fanState){
@@ -103,6 +106,16 @@ void MainControl::tick(){
 
     // heatpd tick
     mHeatpad.tick();
+
+    // rgb led tick
+    static ColorMap const colorMap = {
+        RgbFloat(0.0f, 1.0f, 0.0f),
+        RgbFloat(1.0f, 0.0f, 0.0f),
+    };
+    constexpr uint8_t brightness = 5;
+    float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFatStates - 1));
+    Rgb888 rgb = Rgb888::fromHsl(colorMap.interpolateHsl(tColorMap));
+    DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b, brightness);
 }
 
 void MainControl::onAssertDebug(const char* message){
