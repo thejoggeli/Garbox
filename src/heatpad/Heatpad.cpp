@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "assert/Assert.h"
-#include "config/GpioConfig.h"
+#include "config/PinConfig.h"
 #include "core/Time.h"
 #include "utils/MathUtils.h"
 
@@ -11,7 +11,7 @@ namespace Garbox {
 
 Heatpad::Heatpad() : 
     // init members
-    mGpioHeatpadEnable(GpioConfig::HeatpadEnable),
+    mGpioHeatpadEnable(PinConfig::HeatpadEnable),
     mPwm(PwmPeriodMillis){
     // nothing to do
 }

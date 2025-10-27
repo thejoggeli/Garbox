@@ -4,7 +4,7 @@
 
 #include "assert/Assert.h"
 #include "config/GlobalConfig.h"
-#include "config/GpioConfig.h"
+#include "config/PinConfig.h"
 #include "config/LedcPwmConfig.h"
 #include "config/PcntConfig.h"
 #include "core/Time.h"
@@ -15,9 +15,9 @@ namespace Garbox {
 
 Fan::Fan() : 
     // init members
-    mGpioFanEnable(GpioConfig::FanEnable),
-    mLedcPwm(GpioConfig::FanPwm, LedcPwmConfig::FanPwm, FanPwmFrequencyHz, FanPwmResolutionBits),
-    mTachoPulseCounter(GpioConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel){
+    mGpioFanEnable(PinConfig::FanEnable),
+    mLedcPwm(PinConfig::FanPwm, LedcPwmConfig::FanPwm, FanPwmFrequencyHz, FanPwmResolutionBits),
+    mTachoPulseCounter(PinConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel){
     // nothing to do
 }
 

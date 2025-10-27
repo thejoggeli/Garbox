@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-class GpioConfig {
+class PinConfig {
 public:
 
     // Debug Leds

@@ -2,7 +2,7 @@
 
 #include <array>
 #include "assert/Assert.h"
-#include "config/GpioConfig.h"
+#include "config/PinConfig.h"
 #include "config/LedcPwmConfig.h"
 
 namespace Garbox {
@@ -13,10 +13,10 @@ static constexpr uint32_t PwmResolutionBits = 10;
 static constexpr size_t NumLeds = 4;
 
 static std::array<Garbox::LedcPwm, NumLeds> sLeds = {
-    LedcPwm(GpioConfig::DebugLed0, LedcPwmConfig::DebugLed0),
-    LedcPwm(GpioConfig::DebugLed1, LedcPwmConfig::DebugLed1),
-    LedcPwm(GpioConfig::DebugLed2, LedcPwmConfig::DebugLed2),
-    LedcPwm(GpioConfig::DebugLed3, LedcPwmConfig::DebugLed3),
+    LedcPwm(PinConfig::DebugLed0, LedcPwmConfig::DebugLed0),
+    LedcPwm(PinConfig::DebugLed1, LedcPwmConfig::DebugLed1),
+    LedcPwm(PinConfig::DebugLed2, LedcPwmConfig::DebugLed2),
+    LedcPwm(PinConfig::DebugLed3, LedcPwmConfig::DebugLed3),
 };
 
 void DebugLeds::Init(){
