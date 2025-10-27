@@ -63,8 +63,10 @@ void Fan::tick(){
 }
   
 void Fan::setEnabled(bool enabled){
-    mEnabled = enabled;
-    mGpioFanEnable.digitalWrite(mEnabled);
+    if(mEnabled != enabled){
+        mEnabled = enabled;
+        mGpioFanEnable.digitalWrite(mEnabled);
+    }
 }
 
 bool Fan::isEnabled(){

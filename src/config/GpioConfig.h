@@ -8,14 +8,14 @@ class GpioConfig {
 public:
 
     // Debug Leds
-    static constexpr uint32_t DebugLed0 = 7;            // DEBUG_LED_0
-    static constexpr uint32_t DebugLed1 = 6;            // DEBUG_LED_1
-    static constexpr uint32_t DebugLed2 = 39;           // DEBUG_LED_2
-    static constexpr uint32_t DebugLed3 = 40;           // DEBUG_LED_3
+    static constexpr uint32_t DebugLed0 = 47;           // DEBUG_LED_0
+    static constexpr uint32_t DebugLed1 = 21;           // DEBUG_LED_1
+    static constexpr uint32_t DebugLed2 = 40;           // DEBUG_LED_2
+    static constexpr uint32_t DebugLed3 = 39;           // DEBUG_LED_3
 
     // Debug GPIOs
-    static constexpr uint32_t DebugGpio0 = 21;          // DEBUG_GPIO_0
-    static constexpr uint32_t DebugGpio1 = 47;          // DEBUG_GPIO_1
+    static constexpr uint32_t DebugGpio0 = 44;          // DEBUG_GPIO_0
+    static constexpr uint32_t DebugGpio1 = 43;          // DEBUG_GPIO_1
     static constexpr uint32_t DebugGpio2 = 17;          // DEBUG_GPIO_2
     static constexpr uint32_t DebugGpio3 = 18;          // DEBUG_GPIO_3
 
@@ -33,8 +33,8 @@ public:
     static constexpr uint32_t DisplayBlk = 38;          // DISP_BLK
 
     // Sensors (Temperature, Humidity, Brightness)
-    static constexpr uint32_t SensorScl = 9;            // SENS_SCL
-    static constexpr uint32_t SensorSda = 8;            // SENS_SDA
+    static constexpr uint32_t SensorSda = 6;            // SENS_SDA
+    static constexpr uint32_t SensorScl = 7;            // SENS_SCL
 
     // Piezo
     static constexpr uint32_t Piezo = 41;               // PIEZO
@@ -46,6 +46,8 @@ public:
 
     // Heatpad
     static constexpr uint32_t HeatpadEnable = 13;       // HEAT_ENABLE
+    static constexpr uint32_t HeatpadVoltageSense = 8;  // HEAT_USENSE
+    static constexpr uint32_t HeatpadCurrentSense = 9;  // HEAT_ISENSE
 
 };
 

@@ -41,7 +41,7 @@ void MainControl::tick(){
     // update fan state
     static uint32_t fanState = 0;
     if(mFanStateTimer.isExpired()){
-        if(++fanState > 4){
+        if(++fanState > 5){
             fanState = 0;
         }
         switch(fanState){
@@ -75,6 +75,12 @@ void MainControl::tick(){
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.start(8000);
                 DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 1.0f);
+                break;
+            case 5:
+                mFan.setEnabled(1);
+                mFan.setSpeed(0.5f);
+                mFanStateTimer.start(8000);
+                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.5f);
                 break;
             default:
                 // nothing to do
