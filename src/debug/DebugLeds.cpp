@@ -1,44 +1,70 @@
 #include "DebugLeds.h"
 
+#include <array>
 #include "assert/Assert.h"
 #include "config/GpioConfig.h"
+#include "config/LedcPwmConfig.h"
 
 namespace Garbox {
 
-std::array<Gpio, DebugLeds::NumLeds> DebugLeds::sLeds = {
-    Gpio(GpioConfig::DEBUG_LED_0),
-    Gpio(GpioConfig::DEBUG_LED_1),
-    Gpio(GpioConfig::DEBUG_LED_2),
-    Gpio(GpioConfig::DEBUG_LED_3),
+static constexpr uint32_t PwmFrequencyHz = 5000;
+static constexpr uint32_t PwmResolutionBits = 10;
+
+static constexpr size_t NumLeds = 4;
+
+static std::array<Garbox::LedcPwm, NumLeds> sLeds = {
+    LedcPwm(GpioConfig::DebugLed0, LedcPwmConfig::DebugLed0),
+    LedcPwm(GpioConfig::DebugLed1, LedcPwmConfig::DebugLed1),
+    LedcPwm(GpioConfig::DebugLed2, LedcPwmConfig::DebugLed2),
+    LedcPwm(GpioConfig::DebugLed3, LedcPwmConfig::DebugLed3),
 };
 
 void DebugLeds::Init(){
-    for(Gpio& gpio : sLeds){
-        gpio.setMode(Gpio::Mode::Output);
+    for(LedcPwm& led : sLeds){
+        led.init();
+        led.setDutyRaw(0);
     }
 }
 
-void DebugLeds::ToggleLed(LedId led){
-    size_t id = static_cast<size_t>(led);
-    if(id >= NumLeds){
+void DebugLeds::ToggleLed(LedId ledId, float brightness){
+    size_t const index = static_cast<size_t>(ledId);
+    if(index >= NumLeds){
         AssertDebug(false, "DebugLeds::ToggleLed() invalid id");
         return;
     }
-    sLeds[id].toggle();
+    LedcPwm& led = sLeds[index];
+    if(led.getDuty() == 0){
+        led.setDutyNormalized(brightness);
+    }
+    else {
+        led.setDutyRaw(0);
+    }
 }
 
-void DebugLeds::SetLed(LedId led, bool state){
-    size_t id = static_cast<size_t>(led);
-    if(id >= NumLeds){
+void DebugLeds::SetLed(LedId ledId, bool enable, float brightness){
+    size_t const index = static_cast<size_t>(ledId);
+    if(index >= NumLeds){
         AssertDebug(false, "DebugLeds::SetLed() invalid id");
         return;
     }
-    sLeds[id].digitalWrite(state);
+    if(enable){
+        sLeds[index].setDutyNormalized(brightness);
+    }
+    else {
+        sLeds[index].setDutyRaw(0);
+    }
 }
 
-void DebugLeds::SetAllLeds(bool state){
-    for(Gpio& gpio : sLeds){
-        gpio.digitalWrite(state);
+void DebugLeds::SetAllLeds(bool enable, float brightness){
+    if(enable){
+        for(LedcPwm& led : sLeds){
+            led.setDutyNormalized(brightness);
+        }
+    } 
+    else {
+        for(LedcPwm& led : sLeds){
+            led.setDutyRaw(0);
+        }
     }
 }
 

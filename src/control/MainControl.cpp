@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
-#include "debug/DebugLeds.h"
+#include "config/DebugLedsConfig.h"
 #include "core/Time.h"
 
 namespace Garbox {
@@ -24,8 +24,9 @@ void MainControl::init(){
 
 void MainControl::start(){
     mFan.start();
+    mFanStateTimer.reset();
+    mRpmTimer.reset();
     mHeatpad.setDutyCycle(0.5f);
-    mFanStateTimer.start(FanStateIntervalMillis);
     mHeartbeatTimer.start(HeartbeatIntervalMillis);
 }
 
@@ -33,36 +34,53 @@ void MainControl::tick(){
 
     // heartbeat 
     if(mHeartbeatTimer.isExpired()){
-        DebugLeds::ToggleLed(DebugLeds::LedId::Heartbeat);
+        DebugLeds::ToggleLed(DebugLedsConfig::Heartbeat);
         mHeartbeatTimer.restart();
     }
 
     // update fan state
     static uint32_t fanState = 0;
     if(mFanStateTimer.isExpired()){
-        if(++fanState > 2){
+        if(++fanState > 4){
             fanState = 0;
         }
         switch(fanState){
             case 0:
-                mFan.setEnabled(1);
-                mFan.setSpeed(0.0F);
+                mFan.setEnabled(0);
+                mFan.setSpeed(0.0f);
+                DebugLeds::SetLed(DebugLedsConfig::Custom1, false);
+                DebugLeds::SetLed(DebugLedsConfig::Custom2, false);
+                mFanStateTimer.start(4000);
                 break;
             case 1:
                 mFan.setEnabled(1);
-                mFan.setSpeed(1.0F);
+                mFan.setSpeed(0.4f);
+                mFanStateTimer.start(8000);
+                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.4f);
                 break;
             case 2:
-                mFan.setEnabled(0);
-                mFan.setSpeed(0.0F);
+                mFan.setEnabled(1);
+                mFan.setSpeed(0.6f);
+                mFanStateTimer.start(8000);
+                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.6f);
+                break;
+            case 3:
+                mFan.setEnabled(1);
+                mFan.setSpeed(0.8f);
+                mFanStateTimer.start(8000);
+                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.8f);
+                break;
+            case 4:
+                mFan.setEnabled(1);
+                mFan.setSpeed(1.0f);
+                mFanStateTimer.start(8000);
+                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 1.0f);
                 break;
             default:
                 // nothing to do
                 break;
         }
         Serial.println("Fan state: " + String(fanState));
-        Serial.println("Fan measured RPM: " + String(mFan.getMeasuredRpm()));
-        mFanStateTimer.restart();
     }
 
     // fan tick
@@ -71,8 +89,10 @@ void MainControl::tick(){
     // print fan rpm
     static uint32_t lastRpmValue = 0;
     uint32_t const rpmValue = mFan.getMeasuredRpm();
-    if(rpmValue != lastRpmValue){
+    if((rpmValue != lastRpmValue) && mRpmTimer.isExpired()){
         Serial.println("Fan measured RPM: " + String(rpmValue));
+        lastRpmValue = rpmValue;
+        mRpmTimer.start(200);
     }
 
     // heatpd tick
@@ -80,7 +100,7 @@ void MainControl::tick(){
 }
 
 void MainControl::onAssertDebug(const char* message){
-    DebugLeds::SetLed(DebugLeds::LedId::AssertDebug, true);
+    DebugLeds::SetLed(DebugLedsConfig::Assert, true);
 }
 
 void MainControl::onAssertExit(const char* message){

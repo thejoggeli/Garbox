@@ -20,7 +20,6 @@ public:
 
 private:
 
-    static constexpr uint32_t FanStateIntervalMillis = 5000; 
     static constexpr uint32_t HeartbeatIntervalMillis = 500;
 
     Fan mFan;
@@ -28,6 +27,7 @@ private:
     
     SoftwareTimer mFanStateTimer;
     SoftwareTimer mHeartbeatTimer;
+    SoftwareTimer mRpmTimer;
 
 };
 

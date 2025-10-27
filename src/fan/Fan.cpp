@@ -3,7 +3,9 @@
 #include <Arduino.h>
 
 #include "assert/Assert.h"
+#include "config/GlobalConfig.h"
 #include "config/GpioConfig.h"
+#include "config/LedcPwmConfig.h"
 #include "config/PcntConfig.h"
 #include "core/Time.h"
 #include "driver/pcnt.h"
@@ -13,18 +15,29 @@ namespace Garbox {
 
 Fan::Fan() : 
     // init members
-    mTachoPulseCounter(GpioConfig::FAN_TACHO, PcntConfig::FAN_TACHO_UNIT, PcntConfig::FAN_TACHO_CHANNEL),
-    mGpioFanEnable(GpioConfig::FAN_ENABLE),
-    mGpioFanPwm(GpioConfig::FAN_PWM){
+    mGpioFanEnable(GpioConfig::FanEnable),
+    mLedcPwm(GpioConfig::FanPwm, LedcPwmConfig::FanPwm, FanPwmFrequencyHz, FanPwmResolutionBits),
+    mTachoPulseCounter(GpioConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel){
     // nothing to do
 }
 
 void Fan::init(){
-    mTachoPulseCounter.init();
+    // init fan pwm
+    mLedcPwm.init();
+    mLedcPwm.setDutyNormalized(1.0f); // pwm pin logic is inverted
+
+    // init fan enable
     mGpioFanEnable.setMode(Gpio::Mode::Output);
-    mGpioFanPwm.setMode(Gpio::Mode::Output);
-    setEnabled(false);
-    setSpeed(0.0F);
+    mGpioFanEnable.digitalWrite(false);
+
+    // init fan tacho
+    mTachoPulseCounter.init();
+
+    // configure exponential smoothing alpha to reach fraction in given amount of time
+    constexpr float smoothingFraction = 0.99f;
+    constexpr float smoothingSeconds =  1.0f;
+    mSmoothingAlpha = MathUtils::computeAlpha(smoothingFraction, static_cast<uint32_t>(GlobalConfig::targetTickRateHz * smoothingSeconds));
+
 }
 
 void Fan::start(){
@@ -34,11 +47,21 @@ void Fan::start(){
 
 void Fan::tick(){
     // update RPM
-    if((Time::GetMicros() - mLastRpmTimeMicros) > RpmIntervalSeconds){
+    if((Time::GetMicros() - mLastRpmTimeMicros) > RpmIntervalMicros){
         updateMeasuredRpm();
     }
-}
+    
+    // compute smooth rpm value
+    if(mSmoothRpmValue != mLastRpmValue){
+        mSmoothRpmValueFloat = MathUtils::exponentialSmoothing(mSmoothRpmValueFloat, static_cast<float>(mLastRpmValue), mSmoothingAlpha);
+        mSmoothRpmValue = static_cast<uint32_t>(mSmoothRpmValueFloat);
+        if(mSmoothRpmValue == mLastRpmValue){
+            mSmoothRpmValueFloat = static_cast<float>(mSmoothRpmValue);
+        }
+    }
 
+}
+  
 void Fan::setEnabled(bool enabled){
     mEnabled = enabled;
     mGpioFanEnable.digitalWrite(mEnabled);
@@ -49,14 +72,8 @@ bool Fan::isEnabled(){
 }
 
 void Fan::setSpeed(float speed){
-    mSpeed = MathUtils::clamp(speed, 0.0F, 1.0F);
-    // pwm pin logic is inverted
-    if(mSpeed > 0.5F){
-        mGpioFanPwm.digitalWrite(0);
-    } 
-    else {
-        mGpioFanPwm.digitalWrite(1);
-    }
+    mSpeed = MathUtils::clamp(speed, 0.0f, 1.0f);
+    mLedcPwm.setDutyNormalized(1.0f - mSpeed); // pwm pin logic is inverted
 }
 
 float Fan::getSpeed(){
@@ -64,14 +81,22 @@ float Fan::getSpeed(){
 }
 
 void Fan::updateMeasuredRpm(){
+
 	// get timestamp and tacho counter
     uint32_t currentTimeMicros = Time::GetMicros();
-    int16_t tachoCounter = mTachoPulseCounter.getAndClearCount();
+    int16_t tachoCount = mTachoPulseCounter.getAndClearCount();
 
     // tacho counter must not be negative
-    if(tachoCounter < 0){
+    if(tachoCount < 0){
         AssertDebug(false, "Fan tach cnt < 0");
         mLastRpmValue = 0;
+        mLastRpmTimeMicros = currentTimeMicros;
+        mLastTachoCount = 0;
+        return;
+    }
+
+    // ignore +/-1 jumps => this always chooses higher stable value
+    if((mLastTachoCount - 1) == tachoCount){
         mLastRpmTimeMicros = currentTimeMicros;
         return;
     }
@@ -82,16 +107,17 @@ void Fan::updateMeasuredRpm(){
 
     // compute rpm
     constexpr float pulsesPerRevInv = 1.0F / static_cast<float>(PulsesPerRevolution);
-    float const pulsesPerSecond = static_cast<float>(tachoCounter) / deltaTimeSeconds;
+    float const pulsesPerSecond = static_cast<float>(tachoCount) / deltaTimeSeconds;
     float const rpmFloat = pulsesPerSecond * pulsesPerRevInv * 60.0F;
 
     // update rpm
     mLastRpmValue = static_cast<uint32_t>(rpmFloat);
     mLastRpmTimeMicros = currentTimeMicros;
+    mLastTachoCount = tachoCount;
 }
 
 uint32_t Fan::getMeasuredRpm(){
-    return mLastRpmValue;
+    return static_cast<uint32_t>(mSmoothRpmValue);
 }
 
 } // namespace

@@ -11,7 +11,7 @@ namespace Garbox {
 
 Heatpad::Heatpad() : 
     // init members
-    mGpioHeatpadEnable(GpioConfig::HEATPAD_ENABLE),
+    mGpioHeatpadEnable(GpioConfig::HeatpadEnable),
     mPwm(PwmPeriodMillis){
     // nothing to do
 }

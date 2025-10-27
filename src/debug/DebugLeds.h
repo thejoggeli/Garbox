@@ -1,37 +1,29 @@
 #pragma once
 
 #include <cstdint>
-#include <array>
-#include "core/Gpio.h"
 
 namespace Garbox {
-
 
 class DebugLeds {
 public:
 
     enum class LedId : uint8_t {
-        Heartbeat = 0, 
+        Led0 = 0, 
         Led1 = 1, 
         Led2 = 2, 
-        AssertDebug = 3,
+        Led3 = 3,
     };
 
     static void Init();
-    static void Start();
 
-    static void ToggleLed(LedId led);
-    static void SetLed(LedId led, bool state);
-    static void SetAllLeds(bool state);
+    static void ToggleLed(LedId ledId, float brightness = 1.0);
+    static void SetLed(LedId ledId, bool enable, float brightness = 1.0);
+    static void SetAllLeds(bool enable, float brightness = 1.0);
 
 private:
 
     DebugLeds() = delete;
     ~DebugLeds() = delete;
-
-    static constexpr size_t NumLeds = 4;
-
-    static std::array<Garbox::Gpio, NumLeds> sLeds;
 
 };
 
