@@ -40,7 +40,7 @@ private:
     Gpio mGpioFanEnable;
 
     // sends pwm signal to FanPwm pin
-    LedcPwm mLedcPwm;
+    LedcPwm mSpeedPwm;
 
     // counts tacho pulses on FanTacho pin
     TachoPulseCounter mTachoPulseCounter;

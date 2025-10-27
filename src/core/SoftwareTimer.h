@@ -19,13 +19,16 @@ public:
     void restart();
 
     /// extend the timer by duration 
-    void extend (uint32_t durationMillis);
+    void extend(uint32_t durationMillis);
 
     /// returns true if timer ran past its duration or is in reset state
-    bool isExpired();
+    bool isExpired() const ;
 
     // returns the elapsed time since the timer started
     uint32_t getElapsedMillis() const;
+
+    // returns the elapsed time as a fraction since the timer started
+    float getElapsedFraction() const;
 
 private:
 

@@ -14,7 +14,10 @@ public:
     static constexpr LedcPwm::Channel DebugLed3 = LedcPwm::Channel::Channel3;
 
     // Fan
-    static constexpr LedcPwm::Channel FanPwm = LedcPwm::Channel::Channel4;
+    static constexpr LedcPwm::Channel FanSpeed = LedcPwm::Channel::Channel4;
+
+    // Display
+    static constexpr LedcPwm::Channel DisplayBacklight = LedcPwm::Channel::Channel5;
 
 };
 

@@ -29,7 +29,7 @@ static constexpr float RpmFilterThreshold = 0.5f;
 Fan::Fan() : 
     // init members
     mGpioFanEnable(PinConfig::FanEnable),
-    mLedcPwm(PinConfig::FanPwm, LedcPwmConfig::FanPwm, FanPwmFrequencyHz, FanPwmResolutionBits),
+    mSpeedPwm(PinConfig::FanPwm, LedcPwmConfig::FanSpeed, FanPwmFrequencyHz, FanPwmResolutionBits),
     mTachoPulseCounter(PinConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
@@ -37,8 +37,8 @@ Fan::Fan() :
 
 void Fan::init(){
     // init fan pwm
-    mLedcPwm.init();
-    mLedcPwm.setDutyNormalized(1.0f); // pwm pin logic is inverted
+    mSpeedPwm.init();
+    mSpeedPwm.setDutyNormalized(1.0f); // pwm pin logic is inverted
 
     // init fan enable
     mGpioFanEnable.setMode(Gpio::Mode::Output);
@@ -77,8 +77,8 @@ bool Fan::isEnabled(){
 }
 
 void Fan::setSpeed(float speed){
-    mSpeed = MathUtils::clamp(speed, 0.0f, 1.0f);
-    mLedcPwm.setDutyNormalized(1.0f - mSpeed); // pwm pin logic is inverted
+    mSpeed = MathUtils::clamp<float>(speed, 0.0f, 1.0f);
+    mSpeedPwm.setDutyNormalized(1.0f - mSpeed); // pwm pin logic is inverted
 }
 
 float Fan::getSpeed(){

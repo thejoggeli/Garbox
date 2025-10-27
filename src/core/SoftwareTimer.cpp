@@ -1,6 +1,7 @@
 #include "SoftwareTimer.h"
 
 #include "Time.h"
+#include "utils/MathUtils.h"
 
 namespace Garbox {
 
@@ -37,7 +38,7 @@ void SoftwareTimer::extend(uint32_t durationMillis){
     mDurationMillis += durationMillis;
 }
 
-bool SoftwareTimer::isExpired(){
+bool SoftwareTimer::isExpired() const {
     if(mDurationMillis == 0){
         return true;
     }
@@ -49,6 +50,13 @@ bool SoftwareTimer::isExpired(){
 
 uint32_t SoftwareTimer::getElapsedMillis() const {
     return Time::GetMillis() - mStartTimeMillis;
+}
+
+float SoftwareTimer::getElapsedFraction() const {
+    if(mDurationMillis == 0 || isExpired()){
+        return 1.0f;  
+    }
+    return static_cast<float>(getElapsedMillis()) / static_cast<float>(mDurationMillis);
 }
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/SoftwareTimer.h"
+#include "display/Display.h"
 #include "fan/Fan.h"
 #include "heatpad/Heatpad.h"
 
@@ -24,6 +25,7 @@ private:
 
     Fan mFan;
     Heatpad mHeatpad;
+    Display mDisplay;
     
     SoftwareTimer mFanStateTimer;
     SoftwareTimer mHeartbeatTimer;

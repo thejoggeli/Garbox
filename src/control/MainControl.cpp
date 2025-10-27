@@ -13,7 +13,8 @@ namespace Garbox {
 MainControl::MainControl() : 
     // init memebers
     mFan(),
-    mHeatpad(){
+    mHeatpad(),
+    mDisplay(){
     // nothing to do
 }
 
@@ -22,6 +23,7 @@ void MainControl::init(){
     mFan.setEnabled(0);
     mFan.setSpeed(0.0F);
     mHeatpad.init();
+    mDisplay.init();
 }
 
 void MainControl::start(){
@@ -116,6 +118,9 @@ void MainControl::tick(){
     float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFatStates - 1));
     Rgb888 rgb = Rgb888::fromHsl(colorMap.interpolateHsl(tColorMap));
     DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b, brightness);
+
+    // display tick
+    mDisplay.tick();
 }
 
 void MainControl::onAssertDebug(const char* message){

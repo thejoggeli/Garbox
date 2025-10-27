@@ -31,7 +31,7 @@ void LedcPwm::setDutyRaw(uint32_t duty) {
 }
 
 void LedcPwm::setDutyNormalized(float duty) {
-    duty = MathUtils::clamp(duty, 0.0f, 1.0f);
+    duty = MathUtils::clamp<float>(duty, 0.0f, 1.0f);
     uint32_t scaledDuty = static_cast<uint32_t>(duty * mMaxDutyFloat);
     setDutyRaw(scaledDuty);
 }
