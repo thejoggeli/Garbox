@@ -13,11 +13,25 @@
 
 namespace Garbox {
 
+// RPM measure config 
+static constexpr uint32_t RpmIntervalMicros = 1000 * 1000 / 5; // 5 Hz
+static constexpr uint32_t PulsesPerRevolution = 2;
+
+// PWM pin config
+static constexpr uint32_t FanPwmFrequencyHz = 25000;
+static constexpr uint32_t FanPwmResolutionBits = 8;
+
+// Exponential filter config
+static constexpr float RpmFilterFraction = 0.98f;
+static constexpr uint32_t RpmFilterTicks = GlobalConfig::targetTickRateHz/2;
+static constexpr float RpmFilterThreshold = 0.5f;
+
 Fan::Fan() : 
     // init members
     mGpioFanEnable(PinConfig::FanEnable),
     mLedcPwm(PinConfig::FanPwm, LedcPwmConfig::FanPwm, FanPwmFrequencyHz, FanPwmResolutionBits),
-    mTachoPulseCounter(PinConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel){
+    mTachoPulseCounter(PinConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel),
+    mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
 
@@ -33,11 +47,6 @@ void Fan::init(){
     // init fan tacho
     mTachoPulseCounter.init();
 
-    // configure exponential smoothing alpha to reach fraction in given amount of time
-    constexpr float smoothingFraction = 0.99f;
-    constexpr float smoothingSeconds =  1.0f;
-    mSmoothingAlpha = MathUtils::computeAlpha(smoothingFraction, static_cast<uint32_t>(GlobalConfig::targetTickRateHz * smoothingSeconds));
-
 }
 
 void Fan::start(){
@@ -51,14 +60,8 @@ void Fan::tick(){
         updateMeasuredRpm();
     }
     
-    // compute smooth rpm value
-    if(mSmoothRpmValue != mLastRpmValue){
-        mSmoothRpmValueFloat = MathUtils::exponentialSmoothing(mSmoothRpmValueFloat, static_cast<float>(mLastRpmValue), mSmoothingAlpha);
-        mSmoothRpmValue = static_cast<uint32_t>(mSmoothRpmValueFloat);
-        if(mSmoothRpmValue == mLastRpmValue){
-            mSmoothRpmValueFloat = static_cast<float>(mSmoothRpmValue);
-        }
-    }
+    // update filtered rpm value
+    mRpmFilter.update(mLastRpmValue);
 
 }
   
@@ -119,7 +122,7 @@ void Fan::updateMeasuredRpm(){
 }
 
 uint32_t Fan::getMeasuredRpm(){
-    return static_cast<uint32_t>(mSmoothRpmValue);
+    return mRpmFilter.getCurrentValue();
 }
 
 } // namespace

@@ -4,7 +4,8 @@
 
 #include "core/Gpio.h" 
 #include "core/LedcPwm.h"
-#include "TachoPulseCounter.h"
+#include "fan/TachoPulseCounter.h"
+#include "filter/ExponentialFilter.h"
 
 namespace Garbox {
 
@@ -28,18 +29,9 @@ public:
 
 private:
 
-    static constexpr uint32_t RpmIntervalMicros = 1000 * 1000 / 5; // 5 Hz
-    static constexpr uint32_t PulsesPerRevolution = 2;
-    static constexpr uint32_t FanPwmFrequencyHz = 25000;
-    static constexpr uint32_t FanPwmResolutionBits = 8;
-
     uint32_t mLastRpmTimeMicros = 0;
     uint32_t mLastRpmValue = 0;
     int16_t mLastTachoCount = 0;
-
-    uint32_t mSmoothRpmValue = 0;
-    float mSmoothRpmValueFloat = 0.0f;
-    float mSmoothingAlpha = 0.1f;
 
     bool mEnabled = false;
     float mSpeed = 0.0f;
@@ -52,6 +44,9 @@ private:
 
     // counts tacho pulses on FanTacho pin
     TachoPulseCounter mTachoPulseCounter;
+
+    // filter for measured RPM value
+    ExponentialFilter<uint32_t> mRpmFilter;
 
 };
 
