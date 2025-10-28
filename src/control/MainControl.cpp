@@ -14,7 +14,8 @@ MainControl::MainControl() :
     // init memebers
     mFan(),
     mHeatpad(),
-    mDisplay(){
+    mDisplay(),
+    mPiezo(){
     // nothing to do
 }
 
@@ -24,6 +25,7 @@ void MainControl::init(){
     mFan.setSpeed(0.0F);
     mHeatpad.init();
     mDisplay.init();
+    mPiezo.init();
 }
 
 void MainControl::start(){
@@ -121,6 +123,9 @@ void MainControl::tick(){
 
     // display tick
     mDisplay.tick();
+
+    // piezo tick
+    mPiezo.tick();
 }
 
 void MainControl::onAssertDebug(const char* message){

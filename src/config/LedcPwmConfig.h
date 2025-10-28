@@ -19,6 +19,9 @@ public:
     // Display
     static constexpr LedcPwm::Channel DisplayBacklight = LedcPwm::Channel::Channel5;
 
+    // Piezo
+    static constexpr LedcPwm::Channel Piezo = LedcPwm::Channel::Channel6;
+
 };
 
 } // namespace

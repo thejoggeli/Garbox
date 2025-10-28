@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/Gpio.h"
 #include "core/LedcPwm.h"
 #include "core/SoftwareTimer.h"
 

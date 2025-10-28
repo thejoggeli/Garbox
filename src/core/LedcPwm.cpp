@@ -36,6 +36,12 @@ void LedcPwm::setDutyNormalized(float duty) {
     setDutyRaw(scaledDuty);
 }
 
+void LedcPwm::setFrequency(uint32_t frequency, uint8_t resolution){
+    mFrequency = frequency;
+    mResolution = resolution;
+    ledcChangeFrequency(static_cast<uint8_t>(mChannel), mFrequency, mResolution);
+}
+
 uint32_t LedcPwm::getDuty() const {
     return mDuty;
 }
@@ -46,6 +52,10 @@ uint32_t LedcPwm::getFrequency() const {
 
 uint32_t LedcPwm::getMaxDuty() const {
     return mMaxDuty;
+}
+
+uint8_t LedcPwm::getResolution() const {
+    return mResolution;
 }
 
 }  // namespace Garbox

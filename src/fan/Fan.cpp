@@ -19,7 +19,7 @@ static constexpr uint32_t PulsesPerRevolution = 2;
 
 // PWM pin config
 static constexpr uint32_t FanPwmFrequencyHz = 25000;
-static constexpr uint32_t FanPwmResolutionBits = 8;
+static constexpr uint8_t FanPwmResolutionBits = 8;
 
 // Exponential filter config
 static constexpr float RpmFilterFraction = 0.98f;

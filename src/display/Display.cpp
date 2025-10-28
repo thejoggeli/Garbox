@@ -7,7 +7,7 @@ namespace Garbox {
 
 // Backlight Config
 static constexpr uint32_t BacklightPwmFrequencyHz = 5000;
-static constexpr uint32_t BacklightPwmResolutionBits = 10;
+static constexpr uint8_t BacklightPwmResolutionBits = 10;
 
 Display::Display() :
     // init members

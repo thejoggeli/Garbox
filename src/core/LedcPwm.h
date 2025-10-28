@@ -63,11 +63,13 @@ public:
     // control
     void setDutyRaw(uint32_t duty);
     void setDutyNormalized(float percent);
+    void setFrequency(uint32_t frequency, uint8_t mResolution);
 
     // query
     uint32_t getDuty() const;
     uint32_t getFrequency() const;
     uint32_t getMaxDuty() const;
+    uint8_t getResolution() const;
 
 private:
     uint32_t mPin;
