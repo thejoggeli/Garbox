@@ -18,11 +18,17 @@ public:
     /// seamless restart with duration from last start
     void restart();
 
+    /// seamless restart with new duration
+    void restart(uint32_t newDurationMillis);
+
     /// extend the timer by duration 
     void extend(uint32_t durationMillis);
 
-    /// returns true if timer ran past its duration or is in reset state
-    bool isExpired() const ;
+    /// returns true if timer ran past its duration
+    bool isExpired() const;
+
+    /// returns true if timer is in reset state
+    bool isReset() const;
 
     // returns the elapsed time since the timer started
     uint32_t getElapsedMillis() const;

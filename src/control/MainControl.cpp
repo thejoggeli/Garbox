@@ -3,10 +3,10 @@
 #include <Arduino.h>
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
-#include "color/ColorMap.h"
-#include "color/Rgb888.h"
-#include "config/DebugLedsConfig.h"
-#include "core/Time.h"
+#include "core/time/Time.h"
+#include "parts/debugLeds/DebugLeds.h"
+#include "util/color/ColorMap.h"
+#include "util/color/Rgb888.h"
 
 namespace Garbox {
 
@@ -40,7 +40,7 @@ void MainControl::tick(){
 
     // heartbeat 
     if(mHeartbeatTimer.isExpired()){
-        DebugLeds::ToggleLed(DebugLedsConfig::Heartbeat);
+        DebugLeds::ToggleLed(DebugLeds::Id::Heartbeat);
         mHeartbeatTimer.restart();
     }
 
@@ -55,39 +55,39 @@ void MainControl::tick(){
             case 0:
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
-                DebugLeds::SetLed(DebugLedsConfig::Custom1, false);
-                DebugLeds::SetLed(DebugLedsConfig::Custom2, false);
+                DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
+                DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
                 mFanStateTimer.start(4000);
                 break;
             case 1:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.start(8000);
-                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.4f);
+                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
                 break;
             case 2:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.start(8000);
-                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.6f);
+                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.6f);
                 break;
             case 3:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000);
-                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.8f);
+                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.8f);
                 break;
             case 4:
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.start(8000);
-                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 1.0f);
+                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 1.0f);
                 break;
             case 5:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
                 mFanStateTimer.start(8000);
-                DebugLeds::SetLed(DebugLedsConfig::Custom1, true, 0.5f);
+                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.5f);
                 break;
             default:
                 // nothing to do
@@ -129,7 +129,7 @@ void MainControl::tick(){
 }
 
 void MainControl::onAssertDebug(const char* message){
-    DebugLeds::SetLed(DebugLedsConfig::Assert, true);
+    DebugLeds::SetLed(DebugLeds::Id::Assert, true);
 }
 
 void MainControl::onAssertExit(const char* message){

@@ -1,9 +1,11 @@
 #pragma once
 
-#include "core/LedcPwm.h"
-#include "core/SoftwareTimer.h"
+#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
+
+class LedcTimer;
+class LedcChannel;
 
 class Piezo {
 
@@ -20,7 +22,8 @@ public:
 
 private:
 
-    LedcPwm mPwm;
+    LedcTimer& mPwmTimer;
+    LedcChannel& mPwmChannel;
     SoftwareTimer mTestTimer;
 
     bool mEnabled = false;

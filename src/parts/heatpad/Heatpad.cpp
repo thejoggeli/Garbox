@@ -1,11 +1,10 @@
 #include "Heatpad.h"
 
 #include <Arduino.h>
-
 #include "assert/Assert.h"
-#include "config/PinConfig.h"
-#include "core/Time.h"
-#include "utils/MathUtils.h"
+#include "core/time/Time.h"
+#include "global/PinConfig.h"
+#include "util/MathUtils.h"
 
 namespace Garbox {
 

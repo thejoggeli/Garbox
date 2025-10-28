@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/SoftwareTimer.h"
-#include "display/Display.h"
-#include "fan/Fan.h"
-#include "heatpad/Heatpad.h"
-#include "piezo/Piezo.h"
+#include "core/time/SoftwareTimer.h"
+#include "parts/display/Display.h"
+#include "parts/fan/Fan.h"
+#include "parts/heatpad/Heatpad.h"
+#include "parts/piezo/Piezo.h"
 
 namespace Garbox {
 

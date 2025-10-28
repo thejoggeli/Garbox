@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include "core/SoftwareTimer.h"
+#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 

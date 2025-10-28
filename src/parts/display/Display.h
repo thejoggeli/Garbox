@@ -1,9 +1,10 @@
 #pragma once
 
-#include "core/LedcPwm.h"
-#include "core/SoftwareTimer.h"
+#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
+
+class LedcChannel;
 
 class Display {
 
@@ -16,7 +17,7 @@ public:
 
 private:
 
-    LedcPwm mBacklightPwm;
+    LedcChannel& mBacklightPwm;
 
     SoftwareTimer mTestTimer;
 

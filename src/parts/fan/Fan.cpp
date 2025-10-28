@@ -3,13 +3,12 @@
 #include <Arduino.h>
 
 #include "assert/Assert.h"
-#include "config/GlobalConfig.h"
-#include "config/PinConfig.h"
-#include "config/LedcPwmConfig.h"
-#include "config/PcntConfig.h"
-#include "core/Time.h"
-#include "driver/pcnt.h"
-#include "utils/MathUtils.h"
+#include "core/time/Time.h"
+#include "global/AppConfig.h"
+#include "global/PinConfig.h"
+#include "global/PcntConfig.h"
+#include "global/ledc/LedcInstances.h"
+#include "util/MathUtils.h"
 
 namespace Garbox {
 
@@ -17,28 +16,21 @@ namespace Garbox {
 static constexpr uint32_t RpmIntervalMicros = 1000 * 1000 / 5; // 5 Hz
 static constexpr uint32_t PulsesPerRevolution = 2;
 
-// PWM pin config
-static constexpr uint32_t FanPwmFrequencyHz = 25000;
-static constexpr uint8_t FanPwmResolutionBits = 8;
-
 // Exponential filter config
 static constexpr float RpmFilterFraction = 0.98f;
-static constexpr uint32_t RpmFilterTicks = GlobalConfig::targetTickRateHz/2;
+static constexpr uint32_t RpmFilterTicks = AppConfig::targetTickRateHz/2;
 static constexpr float RpmFilterThreshold = 0.5f;
 
 Fan::Fan() : 
     // init members
     mGpioFanEnable(PinConfig::FanEnable),
-    mSpeedPwm(PinConfig::FanPwm, LedcPwmConfig::FanSpeed, FanPwmFrequencyHz, FanPwmResolutionBits),
+    mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mTachoPulseCounter(PinConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
 
 void Fan::init(){
-    // init fan pwm
-    mSpeedPwm.init();
-    mSpeedPwm.setDutyNormalized(1.0f); // pwm pin logic is inverted
 
     // init fan enable
     mGpioFanEnable.setMode(Gpio::Mode::Output);
@@ -62,7 +54,6 @@ void Fan::tick(){
     
     // update filtered rpm value
     mRpmFilter.update(mLastRpmValue);
-
 }
   
 void Fan::setEnabled(bool enabled){
@@ -78,7 +69,7 @@ bool Fan::isEnabled(){
 
 void Fan::setSpeed(float speed){
     mSpeed = MathUtils::clamp<float>(speed, 0.0f, 1.0f);
-    mSpeedPwm.setDutyNormalized(1.0f - mSpeed); // pwm pin logic is inverted
+    mSpeedPwm.setDutyRelative(mSpeed);
 }
 
 float Fan::getSpeed(){

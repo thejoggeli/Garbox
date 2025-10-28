@@ -2,12 +2,13 @@
 
 #include <cstdint>
 
-#include "core/Gpio.h" 
-#include "core/LedcPwm.h"
-#include "fan/TachoPulseCounter.h"
-#include "filter/ExponentialFilter.h"
+#include "core/hardware/gpio/Gpio.h" 
+#include "parts/fan/TachoPulseCounter.h"
+#include "util/filter/ExponentialFilter.h"
 
 namespace Garbox {
+
+class LedcChannel;
 
 class Fan {
 public:
@@ -40,7 +41,7 @@ private:
     Gpio mGpioFanEnable;
 
     // sends pwm signal to FanPwm pin
-    LedcPwm mSpeedPwm;
+    LedcChannel& mSpeedPwm;
 
     // counts tacho pulses on FanTacho pin
     TachoPulseCounter mTachoPulseCounter;

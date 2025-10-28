@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "core/Gpio.h" 
-#include "core/SoftwarePwm.h"
+#include "core/hardware/gpio/Gpio.h" 
+#include "core/time/SoftwarePwm.h"
 
 namespace Garbox {
 

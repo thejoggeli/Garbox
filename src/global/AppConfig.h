@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-class GlobalConfig {
+class AppConfig {
 public:
 
     static constexpr uint32_t targetTickRateHz = 100;

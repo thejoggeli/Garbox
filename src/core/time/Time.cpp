@@ -1,7 +1,7 @@
 #include "Time.h"
 
 #include <Arduino.h>
-#include "config/GlobalConfig.h"
+#include "global/AppConfig.h"
 
 namespace Garbox {
 
@@ -44,8 +44,8 @@ void Time::BeginTick(){
 void Time::EndTick(){
     // sleep for the remaining time to achieve the desired tick frequency
 	uint32_t const passedTimeMicros = micros() - sTickBeginTimeMicros;
-	if(passedTimeMicros < GlobalConfig::targetTickIntervalMicros){
-        uint32_t const remainingTimeMicros = GlobalConfig::targetTickIntervalMicros - passedTimeMicros;
+	if(passedTimeMicros < AppConfig::targetTickIntervalMicros){
+        uint32_t const remainingTimeMicros = AppConfig::targetTickIntervalMicros - passedTimeMicros;
         delayMicroseconds(remainingTimeMicros);
     }
 }
