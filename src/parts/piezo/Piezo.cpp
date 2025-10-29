@@ -15,20 +15,18 @@ Piezo::Piezo() :
 }
 
 void Piezo::init(){
-    mTestTimer.start(1000);
+    mTestTimer.start(1);
 }
 
 void Piezo::tick(){
 
-    static constexpr uint32_t numStates = 7;
+    static constexpr uint32_t numStates = 6;
     static uint32_t state = 0;
 
     if(mTestTimer.isExpired()){
         state = (++state) % numStates;
         switch(state){
             case 0: 
-                setFrequency(1000);
-                setDuty(0.5f);
                 setEnabled(false);
                 mTestTimer.restart(5000);
                 break;
@@ -40,33 +38,19 @@ void Piezo::tick(){
                 break;
             case 2: 
                 setFrequency(1000);
-                setDuty(0.5f);
-                setEnabled(true);
                 mTestTimer.restart(200);
                 break;
             case 3: 
                 setFrequency(1500);
-                setDuty(0.5f);
-                setEnabled(true);
                 mTestTimer.restart(200);
                 break;
             case 4: 
                 setFrequency(1000);
-                setDuty(0.25f);
-                setEnabled(true);
-                mTestTimer.restart(200);
+                mTestTimer.restart(400);
                 break;
             case 5: 
-                setFrequency(1000);
-                setDuty(0.5f);
-                setEnabled(true);
-                mTestTimer.restart(200);
-                break;
-            case 6: 
-                setFrequency(1000);
-                setDuty(0.75f);
-                setEnabled(true);
-                mTestTimer.restart(200);
+                setEnabled(false);
+                mTestTimer.reset();
                 break;
         }
 
