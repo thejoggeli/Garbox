@@ -16,11 +16,11 @@ static LedcTimer* resolveTimer(LedcTimer::Id id) {
     }
 }
 
-static void setupTimer(LedcTimer& timer, LedcConfig::TimerConfig config) {
+static void setupTimer(LedcTimer& timer, LedcConfig::TimerConfig const& config) {
     timer.setup(config.id, config.frequencyHz, config.resolutionBits);
 }
 
-static void setupChannel(LedcChannel& channel, LedcConfig::ChannelConfig config) {
+static void setupChannel(LedcChannel& channel, LedcConfig::ChannelConfig const& config) {
     channel.setup(config.channelId, resolveTimer(config.timerId), config.pin, config.invert);
 }
 
