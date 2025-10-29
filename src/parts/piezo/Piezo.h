@@ -4,12 +4,16 @@
 
 namespace Garbox {
 
-class LedcTimer;
-class LedcChannel;
+class McpwmPair;
 
 class Piezo {
 
 public:
+
+    enum class Volume : uint8_t {
+        Low = 0,
+        High = 1,
+    };
 
     Piezo();
 
@@ -18,18 +22,18 @@ public:
 
     void setFrequency(uint32_t frequency);
     void setEnabled(bool enabled);
-    void setDuty(float duty);
+    void setDutyPercent(float duty);
+    void setVolume(Volume volume);
 
 private:
 
-    LedcTimer& mPwmTimer;
-    LedcChannel& mPwmChannel;
+    void updatePwmEnable();
+
+    McpwmPair& mPwm;
     SoftwareTimer mTestTimer;
 
     bool mEnabled = false;
-    float mDuty = 0.5f;
-    uint32_t mFrequency = 1000;
-    uint8_t mResolutionBits = 10;
+    Volume mVolume = Volume::Low;
 
 };
 

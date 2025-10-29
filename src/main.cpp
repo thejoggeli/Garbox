@@ -4,6 +4,7 @@
 #include "control/MainControl.h"
 #include "core/time/Time.h"
 #include "global/ledc/LedcInstances.h"
+#include "global/mcpwm/McpwmInstances.h"
 #include "parts/debugLeds/DebugLeds.h"
 
 using namespace Garbox;
@@ -30,6 +31,9 @@ void setup() {
 
     // init ledc
     LedcInstances::Init();
+
+    // init mcpwm
+    McpwmInstances::Init();
 
     // init debug leds
     DebugLeds::Init();

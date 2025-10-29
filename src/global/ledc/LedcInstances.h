@@ -2,7 +2,6 @@
 
 #include "core/hardware/ledc/LedcTimer.h"
 #include "core/hardware/ledc/LedcChannel.h"
-#include "global/PinConfig.h"
 
 namespace Garbox {
 

@@ -7,20 +7,17 @@ namespace Garbox {
 class PinConfig {
 public:
 
+    // RGB Led
+    static constexpr uint32_t RgbLed = 48;              // Built-in RGB LED on ESP32-S3-DevkitC-1-U
+
     // Debug Leds
     static constexpr uint32_t DebugLed0 = 47;           // DEBUG_LED_0
     static constexpr uint32_t DebugLed1 = 21;           // DEBUG_LED_1
     static constexpr uint32_t DebugLed2 = 40;           // DEBUG_LED_2
     static constexpr uint32_t DebugLed3 = 39;           // DEBUG_LED_3
 
-    // RGB Led
-    static constexpr uint32_t RgbLed = 48;              // Built-in RGB LED on ESP32-S3-DevkitC-1-U
-
-    // Debug GPIOs
-    static constexpr uint32_t DebugGpio0 = 44;          // DEBUG_GPIO_0
-    static constexpr uint32_t DebugGpio1 = 43;          // DEBUG_GPIO_1
-    static constexpr uint32_t DebugGpio2 = 17;          // DEBUG_GPIO_2
-    static constexpr uint32_t DebugGpio3 = 18;          // DEBUG_GPIO_3
+    // Debug GPIO
+    static constexpr uint32_t DebugGpio = 15;           // DEBUG_GPIO
 
     // Fan
     static constexpr uint32_t FanEnable = 4;            // FAN_ENABLE
@@ -30,17 +27,18 @@ public:
     // Display
     static constexpr uint32_t DisplaySda = 11;          // SPI_MOSI
     static constexpr uint32_t DisplayScl = 12;          // SPI_CLK
-    static constexpr uint32_t DisplayCs = 10;           // SPI_CS0
-    static constexpr uint32_t DisplayDc = 15;           // DISP_DC
-    static constexpr uint32_t DisplayRst = 16;          // DISP_RST
-    static constexpr uint32_t DisplayBlk = 38;          // DISP_BLK
+    static constexpr uint32_t DisplayCs = 17;           // SPI_CS0
+    static constexpr uint32_t DisplayDc = 18;           // DISP_DC
+    static constexpr uint32_t DisplayRst = 10;          // DISP_RST
+    static constexpr uint32_t DisplayBlk = 16;          // DISP_BLK
 
     // Sensors (Temperature, Humidity, Brightness)
     static constexpr uint32_t SensorSda = 6;            // SENS_SDA
     static constexpr uint32_t SensorScl = 7;            // SENS_SCL
 
     // Piezo
-    static constexpr uint32_t Piezo = 41;               // PIEZO
+    static constexpr uint32_t PiezoA = 41;              // PIEZO_A
+    static constexpr uint32_t PiezoB = 38;              // PIEZO_B
 
     // Rotary Encoder
     static constexpr uint32_t RotaryEncoderA = 2;       // ROTENC_A
