@@ -23,7 +23,7 @@ public:
     // Fan
     static constexpr uint32_t FanEnable = 4;            // FAN_ENABLE
     static constexpr uint32_t FanTacho = 5;             // FAN_TACHO
-    static constexpr uint32_t FanPwm = 14;              // FAN_PWM
+    static constexpr uint32_t FanPwm = 13;              // FAN_PWM
 
     // Display
     static constexpr uint32_t DisplaySda = 11;          // SPI_MOSI
@@ -43,10 +43,10 @@ public:
     // Rotary Encoder
     static constexpr uint32_t RotaryEncoderA = 2;       // ROTENC_A
     static constexpr uint32_t RotaryEncoderB = 42;      // ROTENC_B
-    static constexpr uint32_t RotaryEncoderButton = 1;  // ROTENC_BTN
+    static constexpr uint32_t RotaryEncoderC = 1;       // ROTENC_BTN
 
     // Heatpad
-    static constexpr uint32_t HeatpadEnable = 13;       // HEAT_ENABLE
+    static constexpr uint32_t HeatpadEnable = 14;       // HEAT_ENABLE
     static constexpr uint32_t HeatpadVoltageSense = 8;  // HEAT_USENSE
     static constexpr uint32_t HeatpadCurrentSense = 9;  // HEAT_ISENSE
 

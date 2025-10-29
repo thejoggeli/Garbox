@@ -30,7 +30,7 @@ void MainControl::init(){
 
 void MainControl::start(){
     mFan.start();
-    mFanStateTimer.reset();
+    mFanStateTimer.start(1000);
     mRpmTimer.reset();
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatIntervalMillis);

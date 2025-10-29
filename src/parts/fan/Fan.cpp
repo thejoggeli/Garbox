@@ -25,7 +25,7 @@ Fan::Fan() :
     // init members
     mGpioFanEnable(PinConfig::FanEnable),
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
-    mTachoPulseCounter(PinConfig::FanTacho, PcntConfig::FanTachoUnit, PcntConfig::FanTachoChannel),
+    mTachoPulseCounter(PcntConfig::FanTacho.pin, PcntConfig::FanTacho.unit, PcntConfig::FanTacho.channel),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
