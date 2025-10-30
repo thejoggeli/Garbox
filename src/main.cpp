@@ -63,8 +63,8 @@ void loop() {
     static uint32_t lastWake = Time::GetMicros();
     uint32_t now = Time::GetMicros64();
 
-    if (now - lastWake >= AppConfig::targetTickIntervalMicros) {
-        lastWake += AppConfig::targetTickIntervalMicros;
+    if (now - lastWake >= AppConfig::TargetTickIntervalMicros) {
+        lastWake += AppConfig::TargetTickIntervalMicros;
         gMainControl.tick();
     }
     

@@ -5,24 +5,24 @@
 #include "global/AppConfig.h"
 #include "global/PcntConfig.h"
 #include "global/PinConfig.h"
+#include "global/TimerConfig.h"
 #include "global/ledc/LedcInstances.h"
 #include "util/MathUtils.h"
 
 namespace Garbox {
 
 // RPM measure config 
-static constexpr uint32_t RpmIntervalMicros = 1000 * 1000 / 5; // 5 Hz
 static constexpr uint32_t PulsesPerRevolution = 2;
 
 // Exponential filter config
-static constexpr float RpmFilterFraction = 0.98f;
-static constexpr uint32_t RpmFilterTicks = AppConfig::targetTickRateHz/2;
-static constexpr float RpmFilterThreshold = 0.5f;
+static constexpr float RpmFilterFraction = 0.90f;
+static constexpr uint32_t RpmFilterTicks = AppConfig::TargetTickRateHz/2;
+static constexpr float RpmFilterThreshold = 0.1f;
 
 Fan::Fan() : 
     // init members
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
-    mTachoPulseCounter(PcntConfig::FanTachoUnit, PinConfig::FanTacho),
+    mFrequencySensor(PinConfig::FanTacho, TimerConfig::FanTachoGroup, TimerConfig::FanTachoTimer),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
@@ -34,86 +34,70 @@ void Fan::init(){
     mGpioFanEnable.setValue(0);
 
     // init tacho pulse counter
-    PulseCounter::Config pulseCounterConfig;
-    pulseCounterConfig.pinMode = PulseCounter::PinMode::Floating;
-    pulseCounterConfig.filterCycles = 100;
-    mTachoPulseCounter.init(pulseCounterConfig);
+    FrequencySensor::Config config;
+    config.pinMode = FrequencySensor::PinMode::Floating;
+    config.stopTimeoutMicros = 500'000;
+    config.timerFrequencyHz = 10'000'000; // 10 MHz
+    mFrequencySensor.init(config);
 
 }
 
 void Fan::start(){
-    mTachoPulseCounter.start();
-	mLastRpmTimeMicros = Time::GetMicros();
+    // nothing to 
 }
 
 void Fan::tick(){
-    // update RPM
-    if((Time::GetMicros() - mLastRpmTimeMicros) > RpmIntervalMicros){
-        updateMeasuredRpm();
-    }
+
+    if(mEnabled){
+        // measure tacho frequency
+        mFrequencySensor.tick();
     
-    // update filtered rpm value
-    mRpmFilter.update(mLastRpmValue);
+        // update measured rpm 
+        float newFrequency = mFrequencySensor.getFrequencyHz();
+        if(newFrequency != mMeasuredFrequency){
+            mMeasuredFrequency = newFrequency;
+            mMeasuredRpm = newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution);
+        }
+    
+        // filter rpm
+        mRpmFilter.update(mMeasuredRpm);        
+    }
+
 }
   
 void Fan::setEnabled(bool enabled){
-    if(mEnabled != enabled){
-        mEnabled = enabled;
-        mGpioFanEnable.setValue(mEnabled);
+    if(mEnabled == enabled){
+        return;
     }
+    mEnabled = enabled;
+    mGpioFanEnable.setValue(mEnabled);
+    if(!enabled){
+        mMeasuredFrequency = 0;
+        mMeasuredRpm = 0;
+        mRpmFilter.setCurrentValue(0);
+    }
+    mFrequencySensor.setEnabled(enabled);
 }
 
-bool Fan::isEnabled(){
-    return mEnabled;
-}
 
 void Fan::setSpeed(float speed){
     mSpeed = MathUtils::clamp<float>(speed, 0.0f, 1.0f);
     mSpeedPwm.setDutyRelative(mSpeed);
 }
 
+bool Fan::isEnabled(){
+    return mEnabled;
+}
+
 float Fan::getSpeed(){
     return mSpeed;
 }
 
-void Fan::updateMeasuredRpm(){
-
-	// get timestamp and tacho counter
-    uint32_t currentTimeMicros = Time::GetMicros();
-    int32_t tachoCount = mTachoPulseCounter.getAndClearCount();
-
-    // tacho counter must not be negative
-    if(tachoCount < 0){
-        AssertDebug(false, "Fan::updateMeasuredRpm()", "tach cnt < 0");
-        mLastRpmValue = 0;
-        mLastRpmTimeMicros = currentTimeMicros;
-        mLastTachoCount = 0;
-        return;
-    }
-
-    // ignore +/-1 jumps => this always chooses higher stable value
-    if((mLastTachoCount - 1) == tachoCount){
-        mLastRpmTimeMicros = currentTimeMicros;
-        return;
-    }
-
-    // compute delta time
-    uint32_t const deltaTimeMicros = currentTimeMicros - mLastRpmTimeMicros;
-    float const deltaTimeSeconds = static_cast<float>(deltaTimeMicros) * 1e-6f;
-
-    // compute rpm
-    constexpr float pulsesPerRevInv = 1.0F / static_cast<float>(PulsesPerRevolution);
-    float const pulsesPerSecond = static_cast<float>(tachoCount) / deltaTimeSeconds;
-    float const rpmFloat = pulsesPerSecond * pulsesPerRevInv * 60.0f;
-
-    // update rpm
-    mLastRpmValue = static_cast<uint32_t>(rpmFloat);
-    mLastRpmTimeMicros = currentTimeMicros;
-    mLastTachoCount = tachoCount;
-}
-
-uint32_t Fan::getMeasuredRpm(){
-    return mRpmFilter.getCurrentValue();
+float Fan::getMeasuredRpm(bool filtered){
+    if(filtered){
+        return mRpmFilter.getCurrentValue();
+    } 
+    return mMeasuredRpm;
 }
 
 } // namespace

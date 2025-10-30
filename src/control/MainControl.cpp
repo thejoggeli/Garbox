@@ -44,10 +44,10 @@ void MainControl::tick(){
     }
 
     // update fan state
-    constexpr uint32_t numFatStates = 6;
+    constexpr uint32_t numFanStates = 6;
     static uint32_t fanState = 0;
     if(mFanStateTimer.isExpired()){
-        if(++fanState >= numFatStates){
+        if(++fanState >= numFanStates){
             fanState = 0;
         }
         switch(fanState){
@@ -98,12 +98,15 @@ void MainControl::tick(){
     // fan tick
     mFan.tick();
 
-    // print fan rpm
-    static uint32_t lastRpmValue = 0;
-    uint32_t const rpmValue = mFan.getMeasuredRpm();
-    if(((rpmValue != lastRpmValue) && mRpmTimer.isExpired()) || mRpmTimer.isReset()){
-        LogDebug("MainControl", "Measured RPM: %" PRIu32, rpmValue);
-        lastRpmValue = rpmValue;
+    if(mRpmTimer.isExpired() || mRpmTimer.isReset()){
+        // print fan rpm
+        static float lastRpmValue = 0;
+        float const rpmValue = mFan.getMeasuredRpm();
+        float const rpmChange = std::abs(lastRpmValue - rpmValue);
+        if(rpmChange > 5.0f){
+            LogDebug("MainControl", "Measured RPM: %.0f", rpmValue);
+            lastRpmValue = rpmValue;
+        }
         mRpmTimer.start(200_ms);
     }
 
@@ -116,7 +119,7 @@ void MainControl::tick(){
         RgbFloat(1.0f, 0.0f, 0.0f),
     };
     constexpr float brightness = 5.0f / 255.0f;
-    float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFatStates - 1));
+    float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFanStates - 1));
     RgbFloat rgbFloat = RgbFloat::fromHsl(colorMap.interpolateHsl(tColorMap)) * brightness;
     Rgb888 rgb = Rgb888::fromFloat(rgbFloat);
     DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);

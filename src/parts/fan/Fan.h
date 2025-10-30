@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "core/hardware/pcnt/PulseCounter.h"
 #include "core/hardware/gpio/Gpio.h" 
+#include "core/sensor/FrequencySensor.h"
 #include "util/filter/ExponentialFilter.h"
 
 namespace Garbox {
@@ -20,19 +20,16 @@ public:
     void tick();
 
     void setEnabled(bool enabled);
-    bool isEnabled();
-
     void setSpeed(float speed); // range [0.0, 1.0]
-    float getSpeed();
 
-    void updateMeasuredRpm();
-    uint32_t getMeasuredRpm();
+    bool isEnabled();
+    float getSpeed();
+    float getMeasuredRpm(bool filtered = true);
 
 private:
 
-    uint32_t mLastRpmTimeMicros = 0;
-    uint32_t mLastRpmValue = 0;
-    int16_t mLastTachoCount = 0;
+    float mMeasuredFrequency = 0.0f;
+    float mMeasuredRpm = 0;
 
     bool mEnabled = false;
     float mSpeed = 0.0f;
@@ -44,10 +41,10 @@ private:
     LedcChannel& mSpeedPwm;
 
     // counts tacho pulses on FanTacho pin
-    PulseCounter mTachoPulseCounter;
+    FrequencySensor mFrequencySensor;
 
     // filter for measured RPM value
-    ExponentialFilter<uint32_t> mRpmFilter;
+    ExponentialFilter mRpmFilter;
 
 };
 

@@ -19,6 +19,8 @@ void Piezo::init(){
 
 void Piezo::tick(){
 
+    return;
+
     static constexpr uint32_t numStates = 6;
     static uint32_t state = 0;
 
