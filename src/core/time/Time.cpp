@@ -26,10 +26,12 @@ uint32_t Time::GetSecondsSlow() {
     return static_cast<uint32_t>(esp_timer_get_time() / static_cast<uint64_t>(1000000));
 }
 
+/// DO NOT call this fucntion from ISR routine !!! It will mess up the ESP-IDF internal FreeRTOS scheduling
 void Time::DelayMillis(uint32_t millis){
     delay(millis);
 }
 
+/// This is safe to call from ISR.
 void Time::DelayMicros(uint32_t micros){
     delayMicroseconds(micros);
 }

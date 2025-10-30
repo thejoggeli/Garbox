@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "assert/AssertHandler.h"
 #include "control/MainControl.h"
 #include "core/log/Log.h"
