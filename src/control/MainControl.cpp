@@ -103,8 +103,8 @@ void MainControl::tick(){
         static float lastRpmValue = 0;
         float const rpmValue = mFan.getMeasuredRpm();
         float const rpmChange = std::abs(lastRpmValue - rpmValue);
-        if(rpmChange > 5.0f){
-            LogDebug("MainControl", "Measured RPM: %.0f", rpmValue);
+        if(rpmChange > 5.0f){ 
+            LogDebug("MainControl", "Measured RPM: %" PRIu32, static_cast<uint32_t>(rpmValue));
             lastRpmValue = rpmValue;
         }
         mRpmTimer.start(200_ms);
