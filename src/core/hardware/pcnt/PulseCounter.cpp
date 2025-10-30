@@ -3,20 +3,23 @@
 #include "assert/Assert.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
+#include "esp_private/esp_clk.h"
 
 namespace Garbox {
 
-PulseCounter::PulseCounter(uint32_t pin) : mPin(pin){
+PulseCounter::PulseCounter(pcnt_unit_t unit, uint32_t pin) : 
+    // init members
+    mUnit(unit),
+    mPin(pin){
     // nothing to do
 }
 
 bool PulseCounter::init(Config const& config) {
+
     if (mInitialized) {
         AssertExit(false, "PulseCounter::init()", "already initialized");
-        return ESP_FAIL;
+        return false;
     }
-
-    esp_err_t err;
 
     // Configure the input pin
     gpio_config_t io_conf = {};
@@ -42,79 +45,40 @@ bool PulseCounter::init(Config const& config) {
     io_conf.intr_type = GPIO_INTR_DISABLE;
     gpio_config(&io_conf);
 
-    // 1. Create PCNT unit
-    pcnt_unit_config_t unit_cfg = {
-        .low_limit = config.minCount,
-        .high_limit = config.maxCount,
-        .intr_priority = 0,
-        .flags = {
-            .accum_count = false
-        }
-    };
-    err = pcnt_new_unit(&unit_cfg, &mUnitHandle);
-    if (err != ESP_OK) {
-        AssertExit(false, "PulseCounter::init()", "pcnt_new_unit failed");
+    // pcnt_config_t describes how this channel behaves
+    pcnt_config_t cfg = {};
+    cfg.pulse_gpio_num = static_cast<int>(mPin); // tach signal pin
+    cfg.ctrl_gpio_num  = PCNT_PIN_NOT_USED; // we don't use a control pin
+    cfg.unit           = mUnit;
+    cfg.channel        = PCNT_CHANNEL_0;
+
+    // Count on one edge only.
+    // Typical PC fan tacho: open-collector pulsing low twice/rev.
+    // You can pick rising or falling. We'll count FALLING edges.
+    //
+    // For falling edges, we treat negative edge as "increase":
+    cfg.pos_mode   = PCNT_COUNT_DIS; // on rising edge, don't change
+    cfg.neg_mode   = PCNT_COUNT_INC; // on falling edge, increment
+
+    // Control modes not used (no direction ctrl pin), so KEEP
+    cfg.lctrl_mode = PCNT_MODE_KEEP;
+    cfg.hctrl_mode = PCNT_MODE_KEEP;
+
+    // Counter limits (hardware saturates at these)
+    cfg.counter_l_lim = config.minCount;
+    cfg.counter_h_lim = config.maxCount;
+
+    esp_err_t err = pcnt_unit_config(&cfg);
+    if(err != ESP_OK){
+        AssertExit(false, "TachoPulseCounter::init()", "pcnt_unit_config has error");
         return false;
     }
 
-    // 2. Create channel
-    pcnt_chan_config_t chan_cfg = {
-        .edge_gpio_num = static_cast<int>(mPin),
-        .level_gpio_num = -1, // unused
-        .flags = {}
-    };
-    err = pcnt_new_channel(mUnitHandle, &chan_cfg, &mChannelHandle);
-    if (err != ESP_OK) {
-        AssertExit(false, "PulseCounter::init()", "pcnt_new_channel failed");
-        return false;
-    }
+    // setup filter
+    pcnt_set_filter_value(mUnit, config.filterCycles);
+    pcnt_filter_enable(mUnit);
 
-    // 3. Configure counting behavior: count on falling edge
-    err = pcnt_channel_set_edge_action(
-        mChannelHandle,
-        PCNT_CHANNEL_EDGE_ACTION_HOLD,      // rising: no change
-        PCNT_CHANNEL_EDGE_ACTION_INCREASE   // falling: increment
-    );
-    if (err != ESP_OK) {
-        AssertExit(false, "PulseCounter::init()", "pcnt_channel_set_edge_action failed");
-        return false;
-    }
-
-    err = pcnt_channel_set_level_action(
-        mChannelHandle,
-        PCNT_CHANNEL_LEVEL_ACTION_KEEP,     // high: keep
-        PCNT_CHANNEL_LEVEL_ACTION_KEEP      // low: keep
-    );
-    if (err != ESP_OK) {
-        AssertExit(false, "PulseCounter::init()", "pcnt_channel_set_level_action failed");
-        return false;
-    }
-
-    // 4. Configure glitch filter
-    if (config.glitchFilterNanos > 0) {
-        pcnt_glitch_filter_config_t filt_cfg = {
-            .max_glitch_ns = config.glitchFilterNanos
-        };
-        err = pcnt_unit_set_glitch_filter(mUnitHandle, &filt_cfg);
-        if (err != ESP_OK) {
-            AssertExit(false, "PulseCounter::init()", "pcnt_unit_set_glitch_filter failed");
-            return false;
-        }
-    }
-
-    // 5. Enable and clear
-    err = pcnt_unit_enable(mUnitHandle);
-    if (err != ESP_OK) {
-        AssertExit(false, "PulseCounter::init()", "pcnt_unit_enable failed");
-        return false;
-    }
-
-    err = pcnt_unit_clear_count(mUnitHandle);
-    if (err != ESP_OK) {
-        AssertExit(false, "PulseCounter::init()", "pcnt_unit_clear_count failed");
-        return false;
-    }
-
+    // setup complete
     mInitialized = true;
     return true;
 }
@@ -125,13 +89,13 @@ bool PulseCounter::start() {
         return false;
     }
 
-    esp_err_t err = pcnt_unit_clear_count(mUnitHandle);
+    esp_err_t err = pcnt_counter_clear(mUnit);
     if (err != ESP_OK) {
         AssertExit(false, "PulseCounter::start()", "pcnt_unit_clear_count failed");
         return false;
     }
 
-    err = pcnt_unit_start(mUnitHandle);
+    err = pcnt_counter_resume(mUnit);
     if (err != ESP_OK) {
         AssertExit(false, "PulseCounter::start()", "pcnt_unit_start failed");
         return false;
@@ -146,8 +110,8 @@ int32_t PulseCounter::getCount() const {
         return 0;
     }
 
-    int count = 0;
-    esp_err_t err = pcnt_unit_get_count(mUnitHandle, &count);
+    int16_t count = 0;
+    esp_err_t err = pcnt_get_counter_value(mUnit, &count);
     if (err != ESP_OK) {
         AssertDebug(false, "PulseCounter::getCount()", "pcnt_unit_get_count failed");
         return 0;
@@ -173,7 +137,7 @@ void PulseCounter::clearCount() {
         return;
     }
 
-    esp_err_t err = pcnt_unit_clear_count(mUnitHandle);
+    esp_err_t err = pcnt_counter_clear(mUnit);
     if (err != ESP_OK) {
         AssertDebug(false, "PulseCounter::clearCount()", "pcnt_unit_clear_count failed");
     }

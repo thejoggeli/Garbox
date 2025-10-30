@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "driver/pulse_cnt.h"
+#include "driver/pcnt.h"
 
 namespace Garbox {
 
@@ -18,10 +18,10 @@ public:
         PinMode pinMode = PinMode::Floating;
         int16_t minCount = -32768;
         int16_t maxCount = 32767;
-        uint32_t glitchFilterNanos = 1000;  // nanoseconds threshold
+        uint32_t filterCycles = 100;
     };
 
-    explicit PulseCounter(uint32_t pin);
+    explicit PulseCounter(pcnt_unit_t unit, uint32_t pin);
 
     bool init(Config const& config);
     bool start();
@@ -33,10 +33,9 @@ public:
 private:
 
     bool mInitialized = false;
+    
+    pcnt_unit_t mUnit;
     uint32_t mPin;
-
-    pcnt_unit_handle_t mUnitHandle = nullptr;
-    pcnt_channel_handle_t mChannelHandle = nullptr;
 
 };
 

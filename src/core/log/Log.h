@@ -1,15 +1,34 @@
 #pragma once
 
-#include "esp_log.h"
 #include <cstdarg>
 #include <cinttypes>
+#include "esp_log.h"
 
 namespace Garbox {
 
 #define LogInfo(tag, fmt, ...)    esp_log_write(ESP_LOG_INFO, tag, fmt "\n", ##__VA_ARGS__)
-#define LogWarning(tag, fmt, ...)    esp_log_write(ESP_LOG_WARN, tag, fmt "\n", ##__VA_ARGS__)
+#define LogWarning(tag, fmt, ...) esp_log_write(ESP_LOG_WARN, tag, fmt "\n", ##__VA_ARGS__)
 #define LogError(tag, fmt, ...)   esp_log_write(ESP_LOG_ERROR, tag, fmt "\n", ##__VA_ARGS__)
 #define LogDebug(tag, fmt, ...)   esp_log_write(ESP_LOG_DEBUG, tag, fmt "\n", ##__VA_ARGS__)
 #define LogVerbose(tag, fmt, ...) esp_log_write(ESP_LOG_VERBOSE, tag, fmt "\n", ##__VA_ARGS__)
+
+class Log {
+
+public:
+
+    enum class Level : uint8_t {
+        None    = ESP_LOG_NONE,
+        Error   = ESP_LOG_ERROR,
+        Warning = ESP_LOG_WARN,
+        Info    = ESP_LOG_INFO,
+        Debug   = ESP_LOG_DEBUG,
+        Verbose = ESP_LOG_VERBOSE
+    };
+
+    static void Init();
+
+    static void SetLevel(Level level, const char* tag = "*");
+
+};
 
 }

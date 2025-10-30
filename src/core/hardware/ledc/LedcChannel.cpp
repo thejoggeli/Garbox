@@ -59,6 +59,8 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
         AssertExit(false, "LedChannel::setup()", "attach failed");
         return false;
     }
+
+    mInitialized = true;
     return true;
 }
 

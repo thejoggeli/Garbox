@@ -43,6 +43,8 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
         AssertExit(false, "LedcTimer::setup()", "setup failed");
         return false;
     }
+
+    mInitialized = true;
     return true;
 }
 

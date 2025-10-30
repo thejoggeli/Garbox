@@ -3,6 +3,7 @@
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
+#include "global/PcntConfig.h"
 #include "global/PinConfig.h"
 #include "global/ledc/LedcInstances.h"
 #include "util/MathUtils.h"
@@ -21,7 +22,7 @@ static constexpr float RpmFilterThreshold = 0.5f;
 Fan::Fan() : 
     // init members
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
-    mTachoPulseCounter(PinConfig::FanTacho),
+    mTachoPulseCounter(PcntConfig::FanTachoUnit, PinConfig::FanTacho),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
@@ -33,10 +34,9 @@ void Fan::init(){
     mGpioFanEnable.setValue(0);
 
     // init tacho pulse counter
-    PulseCounter::Config pulseCounterConfig = {
-        .pinMode = PulseCounter::PinMode::Floating,
-        .glitchFilterNanos = 1000,
-    };
+    PulseCounter::Config pulseCounterConfig;
+    pulseCounterConfig.pinMode = PulseCounter::PinMode::Floating;
+    pulseCounterConfig.filterCycles = 100;
     mTachoPulseCounter.init(pulseCounterConfig);
 
 }

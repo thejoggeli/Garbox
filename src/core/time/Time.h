@@ -30,9 +30,6 @@ public:
     /// wraps after ~136 years
     static uint32_t GetSecondsSlow();
 
-    /// wait for n milliseconds and release FreeRTOS scheduler
-    static void SleepMillis(uint32_t millis);
-
     /// wait for n milliseconds and block FreeRTOS scheduler
     static void DelayMillis(uint32_t millis);
 

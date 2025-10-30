@@ -1,10 +1,9 @@
+#include <Arduino.h>
 #include "assert/AssertHandler.h"
 #include "control/MainControl.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "global/AppConfig.h"
 #include "global/ledc/LedcInstances.h"
 #include "parts/debugLeds/DebugLeds.h"
 
@@ -13,6 +12,9 @@ using namespace Garbox;
 MainControl gMainControl;
 
 void setup() {
+
+    Log::Init();
+    Log::SetLevel(Log::Level::Verbose);
     
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message){
@@ -58,24 +60,14 @@ void setup() {
     gMainControl.start();
 }
 
-extern "C" void app_main(void){
+void loop() {
+    static uint32_t lastWake = Time::GetMicros();
+    uint32_t now = Time::GetMicros64();
 
-    ESP_LOGI("Main", "System start");
-    
-    setup();
-
-    ESP_LOGI("Main", "Setup complete");
-
-    const TickType_t period = pdMS_TO_TICKS(10);  // 100 Hz
-    TickType_t last_wake = xTaskGetTickCount();
-
-    while (true) {
-        // --- Main control cycle ---
-        // read_sensors();
-        // control_logic();
-        // update_outputs();
-
-        vTaskDelayUntil(&last_wake, period);
+    if (now - lastWake >= AppConfig::targetTickIntervalMicros) {
+        lastWake += AppConfig::targetTickIntervalMicros;
+        gMainControl.tick();
     }
-
+    
+    Time::DelayMillis(1);
 }
