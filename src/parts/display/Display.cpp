@@ -15,7 +15,7 @@ Display::Display() :
 }
 
 void Display::init(){
-    mTestTimer.start(2000);
+    mTestTimer.start(2000_ms);
 }
 
 void Display::tick(){

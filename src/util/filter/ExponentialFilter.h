@@ -110,8 +110,8 @@ private:
 
     float mAlpha;
     float mThreshold;
-    float mCurrentValueFloat;
     T mCurrentValue;
+    float mCurrentValueFloat;
 
 };
 

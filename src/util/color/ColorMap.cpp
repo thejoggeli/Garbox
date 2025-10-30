@@ -19,8 +19,8 @@ ColorMap::ColorMap(std::initializer_list<RgbFloat> colors) :
 
 ColorMap::ColorMap(std::initializer_list<HslColor> colors) : 
     // init members
-    hslMap(colors.begin(), colors.end()),
-    rgbMap(){
+    rgbMap(),
+    hslMap(colors.begin(), colors.end()){
     // constructor body
     rgbMap.reserve(hslMap.size());
     for (const auto& c : hslMap) {

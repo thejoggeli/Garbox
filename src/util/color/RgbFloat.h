@@ -22,6 +22,12 @@ public:
     static RgbFloat fromRgb888(const Rgb888& rgb);
     static RgbFloat fromRgb565(const Rgb565& rgb);
     static RgbFloat fromHsl(const HslColor& hsl);
+
+    // Operator overloads
+    RgbFloat operator*(float scalar) const;
+    RgbFloat operator/(float scalar) const;
+    RgbFloat& operator*=(float scalar);
+    RgbFloat& operator/=(float scalar);
 };
 
-} // namespace
+} // namespace Garbox

@@ -1,12 +1,9 @@
 #include "Fan.h"
 
-#include <Arduino.h>
-
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
 #include "global/PinConfig.h"
-#include "global/PcntConfig.h"
 #include "global/ledc/LedcInstances.h"
 #include "util/MathUtils.h"
 
@@ -23,9 +20,8 @@ static constexpr float RpmFilterThreshold = 0.5f;
 
 Fan::Fan() : 
     // init members
-    mGpioFanEnable(PinConfig::FanEnable),
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
-    mTachoPulseCounter(PcntConfig::FanTacho.pin, PcntConfig::FanTacho.unit, PcntConfig::FanTacho.channel),
+    mTachoPulseCounter(PinConfig::FanTacho),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
@@ -33,11 +29,15 @@ Fan::Fan() :
 void Fan::init(){
 
     // init fan enable
-    mGpioFanEnable.setMode(Gpio::Mode::Output);
-    mGpioFanEnable.digitalWrite(false);
+    mGpioFanEnable.setup(PinConfig::FanEnable, Gpio::Mode::Output);
+    mGpioFanEnable.setValue(0);
 
-    // init fan tacho
-    mTachoPulseCounter.init();
+    // init tacho pulse counter
+    PulseCounter::Config pulseCounterConfig = {
+        .pinMode = PulseCounter::PinMode::Floating,
+        .glitchFilterNanos = 1000,
+    };
+    mTachoPulseCounter.init(pulseCounterConfig);
 
 }
 
@@ -59,7 +59,7 @@ void Fan::tick(){
 void Fan::setEnabled(bool enabled){
     if(mEnabled != enabled){
         mEnabled = enabled;
-        mGpioFanEnable.digitalWrite(mEnabled);
+        mGpioFanEnable.setValue(mEnabled);
     }
 }
 
@@ -80,11 +80,11 @@ void Fan::updateMeasuredRpm(){
 
 	// get timestamp and tacho counter
     uint32_t currentTimeMicros = Time::GetMicros();
-    int16_t tachoCount = mTachoPulseCounter.getAndClearCount();
+    int32_t tachoCount = mTachoPulseCounter.getAndClearCount();
 
     // tacho counter must not be negative
     if(tachoCount < 0){
-        AssertDebug(false, "Fan tach cnt < 0");
+        AssertDebug(false, "Fan::updateMeasuredRpm()", "tach cnt < 0");
         mLastRpmValue = 0;
         mLastRpmTimeMicros = currentTimeMicros;
         mLastTachoCount = 0;
@@ -99,12 +99,12 @@ void Fan::updateMeasuredRpm(){
 
     // compute delta time
     uint32_t const deltaTimeMicros = currentTimeMicros - mLastRpmTimeMicros;
-    float const deltaTimeSeconds = static_cast<float>(deltaTimeMicros) * Time::MicrosToSeconds;
+    float const deltaTimeSeconds = static_cast<float>(deltaTimeMicros) * 1e-6f;
 
     // compute rpm
     constexpr float pulsesPerRevInv = 1.0F / static_cast<float>(PulsesPerRevolution);
     float const pulsesPerSecond = static_cast<float>(tachoCount) / deltaTimeSeconds;
-    float const rpmFloat = pulsesPerSecond * pulsesPerRevInv * 60.0F;
+    float const rpmFloat = pulsesPerSecond * pulsesPerRevInv * 60.0f;
 
     // update rpm
     mLastRpmValue = static_cast<uint32_t>(rpmFloat);

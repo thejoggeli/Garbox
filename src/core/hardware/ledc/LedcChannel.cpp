@@ -10,15 +10,22 @@ LedcChannel::LedcChannel() :
     mId(Id::Channel0), 
     mTimer(nullptr), 
     mGpio(0),
-    mDuty(0){
+    mDuty(0),
+    mInitialized(false){
     // nothing to do
 }
 
 bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 
     // check if setup
-    if(mTimer != nullptr){
-        AssertDebug(false, "LEDC channel already initialized");
+    if(mInitialized){
+        AssertDebug(false, "LedChannel::setup()", "already initialized");
+        return false;
+    }
+
+    // timer must exist
+    if(timer == nullptr){
+        AssertDebug(false, "LedChannel::setup()", "timer is nullptr");
         return false;
     }
 
@@ -49,7 +56,7 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 
     // check result
     if(result != ESP_OK){
-        AssertExit(false, "LEDC channel attach failed");
+        AssertExit(false, "LedChannel::setup()", "attach failed");
         return false;
     }
     return true;
@@ -58,8 +65,8 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check if setup
-    if(mTimer == nullptr){
-        AssertDebug(false, "LEDC channel not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "LedChannel::setDutyRaw()", "not initialized");
         return false;
     }
 
@@ -68,7 +75,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check result
     if (err != ESP_OK){
-        AssertDebug(false, "LEDC setDutyRaw failed");
+        AssertDebug(false, "LedChannel::setDutyRaw()", "setDutyRaw failed");
         return false;
     }
     else {
@@ -85,7 +92,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check result
     if (err != ESP_OK){
-        AssertDebug(false, "LEDC updateDuty failed");
+        AssertDebug(false, "LedChannel::setDutyRaw()", "updateDuty failed");
         return false;
     }
     return true;
@@ -94,8 +101,8 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 bool LedcChannel::setDutyRelative(float ratio, bool update){
 
     // check if setup
-    if(mTimer == nullptr){
-        AssertDebug(false, "LEDC channel not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "LedChannel::setDutyRelative()", "channel not initialized");
         return false;
     }
 

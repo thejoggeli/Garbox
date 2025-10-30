@@ -2,6 +2,7 @@
 
 #include <functional>
 #include "core/time/SoftwareTimer.h"
+#include "TimeLiterals.h"
 
 namespace Garbox {
 
@@ -16,7 +17,7 @@ public:
 
     using Handler = std::function<void(State state)>;
 
-    SoftwarePwm(uint32_t periodMillis);
+    SoftwarePwm(uint32_t periodMicros);
 
     void setStateChangedHandler(Handler handler);
 
@@ -42,8 +43,8 @@ private:
     static constexpr uint32_t MaxRunsPerTick = 10;
 
     SoftwareTimer mPwmTimer;
-    uint32_t mPeriodDuration;
-    uint32_t mHighDuration;
+    uint32_t mPeriodDurationMicros;
+    uint32_t mHighDurationMicros;
 
     State mState = State::Reset;
     Handler mHandler = nullptr;

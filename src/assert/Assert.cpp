@@ -1,18 +1,17 @@
 #include "Assert.h"
 
-#include <Arduino.h>
 #include "AssertHandler.h"
 
 using Garbox::AssertHandler;
 
-void AssertDebug(bool value, const char* message) {
+void AssertDebug(bool value, const char* context, const char* message) {
     if(!value){
-        AssertHandler::InvokeDebug(message);
+        AssertHandler::InvokeDebug(context, message);
     }
 }
 
-void AssertExit(bool value, const char* message) {
+void AssertExit(bool value, const char* context, const char* message) {
     if(!value){
-        AssertHandler::InvokeExit(message);
+        AssertHandler::InvokeExit(context, message);
     }
 }

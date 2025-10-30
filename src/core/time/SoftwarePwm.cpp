@@ -4,11 +4,11 @@
 
 namespace Garbox {
 
-SoftwarePwm::SoftwarePwm(uint32_t periodMillis) : 
+SoftwarePwm::SoftwarePwm(uint32_t periodMicros) : 
     // init members
     mPwmTimer(),
-    mPeriodDuration(periodMillis),
-    mHighDuration(0){
+    mPeriodDurationMicros(periodMicros),
+    mHighDurationMicros(0){
     // nothing to do
 }
 
@@ -31,7 +31,7 @@ void SoftwarePwm::tick(){
 void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
     // duty cycle must be between 0 and 1
     if(duty < 0.0f || duty > 1.0f){
-        AssertDebug(false, "SoftwarePwm::setNextDutyCycle() invalid duty value");
+        AssertDebug(false, "SoftwarePwm::setDutyCycle()", "invalid duty value");
         return; 
     }
 
@@ -55,7 +55,7 @@ float SoftwarePwm::getNextDutyCycle(){
 void SoftwarePwm::runStateMachine(){
     // prevent recursive lockup
     if(++mCurrentTickRunsCount > MaxRunsPerTick){
-        AssertDebug(false, "SoftwarePwm::runStateMachine() exceeded max runs");
+        AssertDebug(false, "SoftwarePwm::runStateMachine()", "exceeded max runs");
         return;
     }
 
@@ -63,7 +63,7 @@ void SoftwarePwm::runStateMachine(){
         case State::Reset:
             break;
         case State::High:
-            if(mPwmTimer.getElapsedMillis() >= mHighDuration){
+            if(mPwmTimer.getElapsedMicros() >= mHighDurationMicros){
                 if(mCurrentDutyCycle == 1.0f){
                     startNextCycle();
                 }
@@ -78,7 +78,7 @@ void SoftwarePwm::runStateMachine(){
             }
             break;
         default:
-            AssertDebug(false, "SoftwarePwm:runStateMachine() unhandled state");
+            AssertDebug(false, "SoftwarePwm:runStateMachine()", "unhandled state");
             break;
     }
 }
@@ -102,7 +102,7 @@ void SoftwarePwm::startNextCycle(){
 
     // start timer for next cycle
     if(mState == State::Reset){
-        mPwmTimer.start(mPeriodDuration);
+        mPwmTimer.start(mPeriodDurationMicros);
     } 
     else {
         mPwmTimer.restart();
@@ -120,7 +120,7 @@ void SoftwarePwm::startNextCycle(){
 void SoftwarePwm::applyDutyCycle(float duty){
     mCurrentDutyCycle = duty;
     mNextDutyCycle = duty;
-    mHighDuration = static_cast<uint32_t>(static_cast<float>(mPeriodDuration) * duty + 0.5f);
+    mHighDurationMicros = static_cast<uint32_t>(static_cast<float>(mPeriodDurationMicros) * duty + 0.5f);
 }
 
 } // namespace

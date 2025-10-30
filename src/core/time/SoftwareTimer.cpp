@@ -9,69 +9,97 @@ SoftwareTimer::SoftwareTimer(){
     // nothing to do
 }
 
-void SoftwareTimer::start(uint32_t durationMillis){
-    mStartTimeMillis = Time::GetMillis();
-    mDurationMillis = durationMillis;
+void SoftwareTimer::start(uint32_t durationMicros){
+    mStartTimeMicros = Time::GetMicros();
+    mDurationMicros = durationMicros;
+    mState = State::Running;
 }
 
 void SoftwareTimer::reset(){
-    mStartTimeMillis = 0;
-    mDurationMillis = 0;
+    mStartTimeMicros = 0;
+    mDurationMicros = 0;
+    mState = State::Reset;
 }
 
 void SoftwareTimer::restart(){
-    uint32_t currentTimeMillis = Time::GetMillis();
 
-    // no duration set
-    if (mDurationMillis == 0) {
+    // cannot restart in reset state
+    if(mState == State::Reset){
         return;
     }
 
+    // no duration set
+    if (mDurationMicros == 0) {
+        mStartTimeMicros = Time::GetMicros();
+        return;
+    }
+
+    // get current time
+    uint32_t currentTimeMicros = Time::GetMicros();
+
     // keep adding full periods until next target is in the future
     // works correctly with uint32_t wrap-around
-    while ((uint32_t)(currentTimeMillis - mStartTimeMillis) >= mDurationMillis) {
-        mStartTimeMillis += mDurationMillis;
+    while ((uint32_t)(currentTimeMicros - mStartTimeMicros) >= mDurationMicros) {
+        mStartTimeMicros += mDurationMicros;
     }
 }
 
-void SoftwareTimer::restart(uint32_t newDurationMillis){
+void SoftwareTimer::restart(uint32_t newDurationMicros){
+    // cannot restart in reset state
+    if(mState == State::Reset){
+        return;
+    }
     restart();
-    mDurationMillis = newDurationMillis;
+    mDurationMicros = newDurationMicros;
 }
 
-void SoftwareTimer::extend(uint32_t durationMillis){
-    mDurationMillis += durationMillis;
+void SoftwareTimer::extend(uint32_t durationMicros){
+    // cannot exted in reset state
+    if(mState == State::Reset){
+        return;
+    }
+    mDurationMicros += durationMicros;
 }
 
 bool SoftwareTimer::isExpired() const {
-    if(mDurationMillis == 0){
+    if(mState == State::Reset){
         return false;
     }
-    else if((Time::GetMillis() - mStartTimeMillis) >= mDurationMillis){
+    if(mDurationMicros == 0){
+        return true;
+    }
+    if((Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
         return true;
     }
     return false;
 }
 
 bool SoftwareTimer::isReset() const {
-    if(mDurationMillis == 0){
-        return true;
-    }
-    return false;
+    return mState == State::Reset;
 }
 
-uint32_t SoftwareTimer::getElapsedMillis() const {
-    return Time::GetMillis() - mStartTimeMillis;
+bool SoftwareTimer::isRunning() const {
+    return mState == State::Running;
+}
+
+uint32_t SoftwareTimer::getElapsedMicros() const {
+    if(mState == State::Reset){
+        return 0;
+    }
+    return Time::GetMicros() - mStartTimeMicros;
 }
 
 float SoftwareTimer::getElapsedFraction() const {
-    if(mDurationMillis == 0){
+    if(mState == State::Reset){
+        return 0.0f;
+    }
+    if(mDurationMicros == 0){
         return 0.0f;
     }
     if(isExpired()){
         return 1.0f;
     }  
-    return static_cast<float>(getElapsedMillis()) / static_cast<float>(mDurationMillis);
+    return static_cast<float>(getElapsedMicros()) / static_cast<float>(mDurationMicros);
 }
 
 }

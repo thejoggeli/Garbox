@@ -1,40 +1,33 @@
 #pragma once
-#include <Arduino.h>
+
+#include "driver/gpio.h"
 #include <cstdint>
 
 namespace Garbox {
 
 class Gpio {
 public:
-
     enum class Mode : uint8_t {
-        Input           = INPUT,
-        Output          = OUTPUT,
-        InputPullup     = INPUT_PULLUP,
-        InputPulldown   = INPUT_PULLDOWN,
-        OutputOpenDrain = OUTPUT_OPEN_DRAIN
+        Uninitialized,
+        Input,
+        Output,
+        InputPullup,
+        InputPulldown,
+        OutputOpenDrain
     };
 
-    explicit Gpio(uint32_t pin);
+    Gpio();
 
-    // setup
-    void setMode(Mode mode);
-
-    // digital I/O
-    void digitalWrite(bool value);
-    bool digitalRead() const;
+    void setup(uint32_t pin, Mode mode, bool invert = false);
+    void setValue(bool value);
+    bool getValue() const;
     void toggle();
-    bool getDigitalState() const;
-
-    // analog I/O
-    int analogRead() const;
-    void analogWrite(uint32_t value);  // value range 0–255 for PWM
 
 private:
-
-    uint32_t mPin;
-    bool mState = false; // tracks last written digital state
-
+    uint32_t mPin = 0;
+    bool mState = false;
+    bool mInvert = false;
+    Mode mMode = Mode::Uninitialized;
 };
 
-}  // namespace Garbox
+} // namespace Garbox

@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
+#include "core/hardware/pcnt/PulseCounter.h"
 #include "core/hardware/gpio/Gpio.h" 
-#include "parts/fan/TachoPulseCounter.h"
 #include "util/filter/ExponentialFilter.h"
 
 namespace Garbox {
@@ -44,7 +44,7 @@ private:
     LedcChannel& mSpeedPwm;
 
     // counts tacho pulses on FanTacho pin
-    TachoPulseCounter mTachoPulseCounter;
+    PulseCounter mTachoPulseCounter;
 
     // filter for measured RPM value
     ExponentialFilter<uint32_t> mRpmFilter;

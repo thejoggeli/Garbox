@@ -7,15 +7,16 @@ namespace Garbox {
 LedcTimer::LedcTimer() : 
     // init members
     mResolutionBits(0),
-    mMaxDuty(0){
+    mMaxDuty(0),
+    mInitialized(false){
     // nothing to do
 }
 
 bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 
     // check if setup
-    if(mResolutionBits != 0){
-        AssertDebug(false, "LEDC timer already initialized");
+    if(mInitialized){
+        AssertExit(false, "LedcTimer::setup()", "already initialized");
         return false;
     }
     
@@ -39,7 +40,7 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 
     // check result
     if(result != ESP_OK){
-        AssertExit(false, "LEDC timer setup failed");
+        AssertExit(false, "LedcTimer::setup()", "setup failed");
         return false;
     }
     return true;
@@ -48,8 +49,8 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
 
     // check if setup
-    if(mResolutionBits == 0){
-        AssertDebug(false, "LEDC timer not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "LedcTimer::setFrequency()", "not initialized");
         return false;
     }
 
@@ -58,7 +59,7 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
 
     // check result
     if(result != ESP_OK){
-        AssertDebug(false, "LEDC timer frequency set failed");
+        AssertDebug(false, "LedcTimer::setFrequency()", "frequency set failed");
         return false;
     }
     return true;

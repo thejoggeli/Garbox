@@ -46,6 +46,16 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "lv_gif.h": "c",
+        "lv_init.h": "c",
+        "lv_timer.h": "c",
+        "lv_conf_internal.h": "c",
+        "lv_timer_private.h": "c",
+        "charconv": "cpp",
+        "format": "cpp",
+        "ratio": "cpp",
+        "regex": "cpp"
+    },
+    "idf.pythonInstallPath": "/usr/bin/python3"
 }

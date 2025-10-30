@@ -41,6 +41,7 @@ private:
     ledc_timer_t mIndex;
     uint8_t mResolutionBits;
     uint32_t mMaxDuty;
+    bool mInitialized;
 
 };
 

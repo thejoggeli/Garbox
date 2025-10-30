@@ -36,4 +36,27 @@ RgbFloat RgbFloat::fromHsl(const HslColor& hsl) {
     return ColorConverter::hslToRgb(hsl);
 }
 
-} // namespace
+// Operator overloads
+RgbFloat RgbFloat::operator*(float scalar) const {
+    return RgbFloat(r * scalar, g * scalar, b * scalar);
+}
+
+RgbFloat RgbFloat::operator/(float scalar) const {
+    return RgbFloat(r / scalar, g / scalar, b / scalar);
+}
+
+RgbFloat& RgbFloat::operator*=(float scalar) {
+    r *= scalar;
+    g *= scalar;
+    b *= scalar;
+    return *this;
+}
+
+RgbFloat& RgbFloat::operator/=(float scalar) {
+    r /= scalar;
+    g /= scalar;
+    b /= scalar;
+    return *this;
+}
+
+} // namespace Garbox

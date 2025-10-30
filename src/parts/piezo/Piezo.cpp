@@ -1,6 +1,5 @@
 #include "Piezo.h"
 
-#include <Arduino.h>
 #include "global/ledc/LedcInstances.h"
 
 namespace Garbox {
@@ -15,7 +14,7 @@ Piezo::Piezo() :
 }
 
 void Piezo::init(){
-    mTestTimer.start(1);
+    mTestTimer.start(0);
 }
 
 void Piezo::tick(){
@@ -24,29 +23,29 @@ void Piezo::tick(){
     static uint32_t state = 0;
 
     if(mTestTimer.isExpired()){
-        state = (++state) % numStates;
+        state = (state+1) % numStates;
         switch(state){
             case 0: 
                 setEnabled(false);
-                mTestTimer.restart(5000);
+                mTestTimer.restart(5000_ms);
                 break;
             case 1: 
                 setFrequency(750);
                 setDuty(0.5f);
                 setEnabled(true);
-                mTestTimer.restart(200);
+                mTestTimer.restart(200_ms);
                 break;
             case 2: 
                 setFrequency(1000);
-                mTestTimer.restart(200);
+                mTestTimer.restart(200_ms);
                 break;
             case 3: 
                 setFrequency(1500);
-                mTestTimer.restart(200);
+                mTestTimer.restart(200_ms);
                 break;
             case 4: 
                 setFrequency(1000);
-                mTestTimer.restart(400);
+                mTestTimer.restart(400_ms);
                 break;
             case 5: 
                 setEnabled(false);

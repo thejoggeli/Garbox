@@ -42,6 +42,7 @@ private:
     ledc_channel_t mChannelIndex;
     ledc_mode_t mMode;
     uint32_t mDuty;
+    bool mInitialized;
 };
 
 } // namespace

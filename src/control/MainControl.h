@@ -17,12 +17,12 @@ public:
     void start();
     void tick();
 
-    void onAssertDebug(const char* message);
-    void onAssertExit(const char* message);
+    void onAssertDebug(const char* context, const char* message);
+    void onAssertExit(const char* context, const char* message);
 
 private:
 
-    static constexpr uint32_t HeartbeatIntervalMillis = 500;
+    static constexpr uint32_t HeartbeatInterval = 500_ms;
 
     Fan mFan;
     Heatpad mHeatpad;

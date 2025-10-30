@@ -1,6 +1,6 @@
 #include "AssertHandler.h"
 
-#include <Arduino.h>
+#include "core/time/Time.h"
 
 namespace Garbox {
 
@@ -15,18 +15,18 @@ void AssertHandler::SetExitHandler(Handler handler){
     sExitHandler = handler;
 }
 
-void AssertHandler::InvokeDebug(const char* message) {
+void AssertHandler::InvokeDebug(const char* context, const char* message) {
     if(sDebugHandler){
-        sDebugHandler(message);
+        sDebugHandler(context, message);
     }
 }
 
-void AssertHandler::InvokeExit(const char* message) {
+void AssertHandler::InvokeExit(const char* context, const char* message) {
     if(sExitHandler){
-        sExitHandler(message);
+        sExitHandler(context, message);
     }
     while (true) {
-        delay(1000);
+        Time::DelayMillis(1000);
     }
 }
 

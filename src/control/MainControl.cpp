@@ -1,8 +1,8 @@
 #include "MainControl.h"
 
-#include <Arduino.h>
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
+#include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/color/ColorMap.h"
@@ -30,10 +30,10 @@ void MainControl::init(){
 
 void MainControl::start(){
     mFan.start();
-    mFanStateTimer.start(1000);
+    mFanStateTimer.start(1_s);
     mRpmTimer.reset();
     mHeatpad.setDutyCycle(0.5f);
-    mHeartbeatTimer.start(HeartbeatIntervalMillis);
+    mHeartbeatTimer.start(HeartbeatInterval);
 }
 
 void MainControl::tick(){
@@ -57,43 +57,43 @@ void MainControl::tick(){
                 mFan.setSpeed(0.0f);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
                 DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
-                mFanStateTimer.start(4000);
+                mFanStateTimer.start(4000_ms);
                 break;
             case 1:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
-                mFanStateTimer.start(8000);
+                mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
                 break;
             case 2:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
-                mFanStateTimer.start(8000);
+                mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.6f);
                 break;
             case 3:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
-                mFanStateTimer.start(8000);
+                mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.8f);
                 break;
             case 4:
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
-                mFanStateTimer.start(8000);
+                mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 1.0f);
                 break;
             case 5:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
-                mFanStateTimer.start(8000);
+                mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.5f);
                 break;
             default:
                 // nothing to do
                 break;
         }
-        Serial.println("Fan state: " + String(fanState));
+        LogDebug("MainControl", "Fan State: %" PRIu32, fanState);
     }
 
     // fan tick
@@ -103,9 +103,9 @@ void MainControl::tick(){
     static uint32_t lastRpmValue = 0;
     uint32_t const rpmValue = mFan.getMeasuredRpm();
     if((rpmValue != lastRpmValue) && mRpmTimer.isExpired()){
-        Serial.println("Fan measured RPM: " + String(rpmValue));
+        LogDebug("MainControl", "Measured RPM: %" PRIu32, rpmValue);
         lastRpmValue = rpmValue;
-        mRpmTimer.start(200);
+        mRpmTimer.start(200_ms);
     }
 
     // heatpd tick
@@ -116,10 +116,11 @@ void MainControl::tick(){
         RgbFloat(0.0f, 1.0f, 0.0f),
         RgbFloat(1.0f, 0.0f, 0.0f),
     };
-    constexpr uint8_t brightness = 5;
+    constexpr float brightness = 5.0f / 255.0f;
     float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFatStates - 1));
-    Rgb888 rgb = Rgb888::fromHsl(colorMap.interpolateHsl(tColorMap));
-    DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b, brightness);
+    RgbFloat rgbFloat = RgbFloat::fromHsl(colorMap.interpolateHsl(tColorMap)) * brightness;
+    Rgb888 rgb = Rgb888::fromFloat(rgbFloat);
+    DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);
 
     // display tick
     mDisplay.tick();
@@ -128,11 +129,11 @@ void MainControl::tick(){
     mPiezo.tick();
 }
 
-void MainControl::onAssertDebug(const char* message){
+void MainControl::onAssertDebug(const char* context, const char* message){
     DebugLeds::SetLed(DebugLeds::Id::Assert, true);
 }
 
-void MainControl::onAssertExit(const char* message){
+void MainControl::onAssertExit(const char* context, const char* message){
     DebugLeds::SetAllLeds(true);
 }
 

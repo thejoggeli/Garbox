@@ -1,6 +1,5 @@
 #include "Heatpad.h"
 
-#include <Arduino.h>
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/PinConfig.h"
@@ -10,13 +9,12 @@ namespace Garbox {
 
 Heatpad::Heatpad() : 
     // init members
-    mGpioHeatpadEnable(PinConfig::HeatpadEnable),
     mPwm(PwmPeriodMillis){
     // nothing to do
 }
 
 void Heatpad::init(){
-    mGpioHeatpadEnable.setMode(Gpio::Mode::Output);
+    mGpioHeatpadEnable.setup(PinConfig::HeatpadEnable, Gpio::Mode::Output);
     setHeatEnabled(false);
 
     // attach pwm state changed handler
@@ -62,7 +60,7 @@ void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
 
 void Heatpad::setHeatEnabled(bool enabled){
     if (mHeatEnabled != enabled) {
-        mGpioHeatpadEnable.digitalWrite(enabled);
+        mGpioHeatpadEnable.setValue(enabled);
         mHeatEnabled = enabled;
     }
 }
