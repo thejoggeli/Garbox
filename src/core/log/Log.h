@@ -6,11 +6,21 @@
 
 namespace Garbox {
 
-#define LogInfo(tag, fmt, ...)    esp_log_write(ESP_LOG_INFO, tag, fmt "\n", ##__VA_ARGS__)
-#define LogWarning(tag, fmt, ...) esp_log_write(ESP_LOG_WARN, tag, fmt "\n", ##__VA_ARGS__)
-#define LogError(tag, fmt, ...)   esp_log_write(ESP_LOG_ERROR, tag, fmt "\n", ##__VA_ARGS__)
-#define LogDebug(tag, fmt, ...)   esp_log_write(ESP_LOG_DEBUG, tag, fmt "\n", ##__VA_ARGS__)
-#define LogVerbose(tag, fmt, ...) esp_log_write(ESP_LOG_VERBOSE, tag, fmt "\n", ##__VA_ARGS__)
+#define LOG_OUTPUT_TAGS 1
+
+#if LOG_OUTPUT_TAGS
+    #define LogError(tag, fmt, ...)   esp_log_write(ESP_LOG_ERROR,   tag, "[ERROR..] (%s) " fmt "\n", tag, ##__VA_ARGS__)
+    #define LogWarning(tag, fmt, ...) esp_log_write(ESP_LOG_WARN,    tag, "[WARNING] (%s) " fmt "\n", tag, ##__VA_ARGS__)
+    #define LogInfo(tag, fmt, ...)    esp_log_write(ESP_LOG_INFO,    tag, "[INFO...] (%s) " fmt "\n", tag, ##__VA_ARGS__)
+    #define LogDebug(tag, fmt, ...)   esp_log_write(ESP_LOG_DEBUG,   tag, "[DEBUG..] (%s) " fmt "\n", tag, ##__VA_ARGS__)
+    #define LogVerbose(tag, fmt, ...) esp_log_write(ESP_LOG_VERBOSE, tag, "[VERBOSE] (%s) " fmt "\n", tag, ##__VA_ARGS__)
+#else 
+    #define LogInfo(tag, fmt, ...)    esp_log_write(ESP_LOG_INFO, tag, fmt "\n", ##__VA_ARGS__)
+    #define LogWarning(tag, fmt, ...) esp_log_write(ESP_LOG_WARN, tag, fmt "\n", ##__VA_ARGS__)
+    #define LogError(tag, fmt, ...)   esp_log_write(ESP_LOG_ERROR, tag, fmt "\n", ##__VA_ARGS__)
+    #define LogDebug(tag, fmt, ...)   esp_log_write(ESP_LOG_DEBUG, tag, fmt "\n", ##__VA_ARGS__)
+    #define LogVerbose(tag, fmt, ...) esp_log_write(ESP_LOG_VERBOSE, tag, fmt "\n", ##__VA_ARGS__)
+#endif
 
 class Log {
 
