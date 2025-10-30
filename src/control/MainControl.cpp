@@ -31,7 +31,6 @@ void MainControl::init(){
 void MainControl::start(){
     mFan.start();
     mFanStateTimer.start(1_s);
-    mRpmTimer.reset();
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
 }
@@ -102,7 +101,7 @@ void MainControl::tick(){
     // print fan rpm
     static uint32_t lastRpmValue = 0;
     uint32_t const rpmValue = mFan.getMeasuredRpm();
-    if((rpmValue != lastRpmValue) && mRpmTimer.isExpired()){
+    if(((rpmValue != lastRpmValue) && mRpmTimer.isExpired()) || mRpmTimer.isReset()){
         LogDebug("MainControl", "Measured RPM: %" PRIu32, rpmValue);
         lastRpmValue = rpmValue;
         mRpmTimer.start(200_ms);
