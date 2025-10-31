@@ -1,13 +1,34 @@
 #include "assert/AssertHandler.h"
 #include "control/MainControl.h"
 #include "core/log/Log.h"
+#include "core/scheduling/TimeSlotScheduler.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
 #include "global/ledc/LedcInstances.h"
 #include "global/timer/TimerInstances.h"
 #include "parts/debugLeds/DebugLeds.h"
+#include "util/StringUtils.h"
 
 using namespace Garbox;
+
+enum SlotIndex : uint8_t {
+    SlotMain,
+    SlotDisplay,
+    SlotLogging,
+};
+
+void mainTask(void);
+void displayTask(void);
+void loggingTask(void);
+
+TimeSlotScheduler gScheduler ({
+    // 10ms Slot
+    {3000, SlotMain,    mainTask},
+    {7000, SlotDisplay, displayTask},
+    // 10ms slot
+    {3000, SlotMain,    mainTask},
+    {7000, SlotLogging, loggingTask}
+});
 
 MainControl gMainControl;
 
@@ -67,13 +88,55 @@ void setup() {
 }
 
 void loop() {
-    static uint32_t lastWake = Time::GetMicros();
-    uint32_t now = Time::GetMicros64();
 
-    if (now - lastWake >= AppConfig::TargetTickIntervalMicros) {
-        lastWake += AppConfig::TargetTickIntervalMicros;
-        gMainControl.tick();
+    Time::Tick();
+    gScheduler.run();
+
+}
+
+void mainTask(){
+    gMainControl.tick();
+}
+
+void displayTask(){
+    // dummy task
+    Time::DelayMicros(2000);
+}
+
+void loggingTask(){
+    // Print diagnostics once per second
+    static uint32_t lastPrintMicros = 0;
+    if (Time::GetTickMicros() - lastPrintMicros >= 5'000'000) {
+        lastPrintMicros = Time::GetTickMicros();
+
+        const TimeSlotScheduler::Diagnostics& dMain = gScheduler.getDiagnostics(SlotMain);
+        const TimeSlotScheduler::Diagnostics& dDisp = gScheduler.getDiagnostics(SlotDisplay);
+        const TimeSlotScheduler::Diagnostics& dLogg = gScheduler.getDiagnostics(SlotLogging);
+
+        uint32_t const maxMain = dMain.maxTimeMicros;
+        uint32_t const maxDisp = dDisp.maxTimeMicros;
+        uint32_t const maxLogg = dLogg.maxTimeMicros;
+
+        uint32_t const maxAllMain = dMain.maxTimeAllMicros;
+        uint32_t const maxAllDisp = dDisp.maxTimeAllMicros;
+        uint32_t const maxAllLogg = dLogg.maxTimeAllMicros;
+
+        float const usageMain = static_cast<float>(dMain.maxTimeAllMicros) / static_cast<float>(dMain.minDurationMicros) * 100.0f;
+        float const usageDisp = static_cast<float>(dDisp.maxTimeAllMicros) / static_cast<float>(dDisp.minDurationMicros) * 100.0f;
+        float const usageLogg = static_cast<float>(dLogg.maxTimeAllMicros) / static_cast<float>(dLogg.minDurationMicros) * 100.0f;
+
+        uint32_t seconds = Time::GetSecondsSlow();
+        static char timeStringBuffer[20];
+        StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
+
+        LogInfo("Main", "============== Diagnostics %s =============", timeStringBuffer);
+        LogInfo("Main", "| Type | freq(Hz) | max(us) | maxall(us) | usage(%%) |");
+        LogInfo("Main", "| High | %8" PRIu32 " | %7" PRIu32 " | %10" PRIu32 " | %8.3f |", dMain.frequencyHz, maxMain, maxAllMain, usageMain);
+        LogInfo("Main", "| Disp | %8" PRIu32 " | %7" PRIu32 " | %10" PRIu32 " | %8.3f |", dDisp.frequencyHz, maxDisp, maxAllDisp, usageDisp);
+        LogInfo("Main", "| Logg | %8" PRIu32 " | %7" PRIu32 " | %10" PRIu32 " | %8.3f |", dLogg.frequencyHz, maxLogg, maxAllLogg, usageLogg);
+        LogInfo("Main", "=====================================================");
+
+        gScheduler.clearMaxTimes();
+
     }
-    
-    Time::DelayMillis(1);
 }

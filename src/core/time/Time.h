@@ -12,6 +12,10 @@ public:
     Time() = delete;
     ~Time() = delete;
 
+    static void Tick();
+    static uint64_t GetTickMicros64();
+    static uint32_t GetTickMicros();
+
     /// get native time in microseconds (64-bit)
     /// wraps after ~584942 years
     static uint64_t GetMicros64();

@@ -10,6 +10,22 @@
 
 namespace Garbox {
 
+static uint64_t sTickMicros64 = 0;
+static uint32_t sTickMicros = 0;
+
+void Time::Tick(){
+    sTickMicros64 = esp_timer_get_time();
+    sTickMicros = static_cast<uint32_t>(sTickMicros64);
+}
+
+uint64_t Time::GetTickMicros64(){
+    return sTickMicros64;
+}
+
+uint32_t Time::GetTickMicros(){
+    return sTickMicros;
+}
+
 uint64_t Time::GetMicros64() {
     return esp_timer_get_time();
 }
