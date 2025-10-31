@@ -2,7 +2,7 @@
 
 #include "AssertHandler.h"
 
-using Garbox::AssertHandler;
+namespace Garbox {
 
 void AssertDebug(bool value, const char* context, const char* message) {
     if(!value){
@@ -15,3 +15,6 @@ void AssertExit(bool value, const char* context, const char* message) {
         AssertHandler::InvokeExit(context, message);
     }
 }
+
+}
+

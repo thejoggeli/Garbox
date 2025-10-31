@@ -13,11 +13,12 @@ Timer::Timer(timer_group_t group, timer_idx_t index, uint32_t frequencyHz):
     // nothing to do
 }
 
-void Timer::init(timer_config_t const& config){
+void Timer::init(timer_config_t const& config, uint64_t maxValue){
 
     AssertExit(!mInitialized, "Timer::init()", "already initialized");
 
     // Compute divider from desired frequency (APB = 80 MHz)
+    AssertExit((AppConfig::ClockFrequency > mFrequencyHz), "Timer::init()", "timer frequency too large");
     AssertExit((AppConfig::ClockFrequency % mFrequencyHz) == 0, "Timer::init()", "not divisible clock frequency");
     uint32_t divider = AppConfig::ClockFrequency / mFrequencyHz;
     AssertExit((divider >= 2) && (divider <= 65536), "Timer::init()", "divider out of range");
@@ -34,6 +35,18 @@ void Timer::init(timer_config_t const& config){
     err = timer_set_counter_value(mGroup, mIndex, 0);
     AssertExit(err == ESP_OK, "Timer::init()", "timer_set_counter_value failed");
 
+    // enable alarm
+    if(config.alarm_en == TIMER_ALARM_EN){
+        AssertExit(maxValue != 0, "Timer::init()", "expected maxValue != 0");
+        err = timer_set_alarm_value(mGroup, mIndex, maxValue);
+        AssertExit(err == ESP_OK, "Timer::init()", "timer_set_alarm_value failed");
+        err = timer_enable_intr(mGroup, mIndex);
+        AssertExit(err == ESP_OK, "Timer::init()", "timer_enable_intr failed");
+    }
+    else {
+        AssertExit(maxValue == 0, "Timer::init()", "expected maxValue == 0");
+    }
+
     err = timer_start(mGroup, mIndex);
     AssertExit(err == ESP_OK, "Timer::init()", "timer_start failed");
 
@@ -42,7 +55,7 @@ void Timer::init(timer_config_t const& config){
     mRunning = true;
 }
 
-void Timer::resume(){
+void Timer::start(){
     if(!mInitialized){
         AssertDebug(false, "Timer::resume()", "not initialized");
         return;
@@ -57,7 +70,7 @@ void Timer::resume(){
     }
 }
 
-void Timer::pause(){
+void Timer::stop(){
     if(!mInitialized){
         AssertDebug(false, "Timer::pause()", "not initialized");
         return;
@@ -70,6 +83,11 @@ void Timer::pause(){
         }
         mRunning = false;
     }
+}
+
+void Timer::reset(){
+    stop();
+    setValue(0u);
 }
 
 void Timer::setValue(uint32_t value){

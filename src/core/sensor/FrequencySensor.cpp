@@ -123,7 +123,8 @@ void FrequencySensor::tick(){
         }
     }
     else if(mState == State::Running){
-        if((mStopTimeoutTicks > 0) && ((mTimer.getValue() - mCurrentEdgeTicks) > mStopTimeoutTicks)){
+        uint32_t nowTicks = static_cast<uint32_t>(mTimer.getValue());
+        if((mStopTimeoutTicks > 0) && ((nowTicks - mCurrentEdgeTicks) > mStopTimeoutTicks)){
             mMeasuredFrequencyHz = 0;
             mState = State::Idle;
         }

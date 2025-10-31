@@ -20,12 +20,14 @@ MainControl::MainControl() :
 }
 
 void MainControl::init(){
+    AssertExit(!mInitialized, "MainControl::init()", "already initialized");
     mFan.init();
     mFan.setEnabled(0);
     mFan.setSpeed(0.0F);
     mHeatpad.init();
     mDisplay.init();
     mPiezo.init();
+    mInitialized = true;
 }
 
 void MainControl::start(){
@@ -132,11 +134,15 @@ void MainControl::tick(){
 }
 
 void MainControl::onAssertDebug(const char* context, const char* message){
-    DebugLeds::SetLed(DebugLeds::Id::Assert, true);
+    if(!mInitialized){
+        return;
+    }
 }
 
 void MainControl::onAssertExit(const char* context, const char* message){
-    DebugLeds::SetAllLeds(true);
+    if(!mInitialized){
+        return;
+    }
 }
 
 }

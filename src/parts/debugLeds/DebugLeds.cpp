@@ -40,30 +40,6 @@ void DebugLeds::Init(){
     gInitialized = true;
 }
 
-void DebugLeds::ToggleLed(Id id, float brightness){
-
-    // check if initialized
-    if(!gInitialized){
-        AssertDebug(false, "DebugLeds::ToggleLed()", "not initialized");
-        return;
-    }
-
-    // check if valid id
-    size_t const index = static_cast<size_t>(id);
-    if(index >= sLeds.size()){
-        AssertDebug(false, "DebugLeds::ToggleLed()", "invalid id");
-        return;
-    }
-
-    // toggle led
-    if(sLeds[index]->getDuty() == 0){
-        sLeds[index]->setDutyRelative(brightness); // set debug led to brightness
-    }
-    else {
-        sLeds[index]->setDutyRaw(0); // turn debug led off
-    }
-}
-
 void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     // check if initialized
@@ -81,6 +57,30 @@ void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     // set led
     if(enable){
+        sLeds[index]->setDutyRelative(brightness); // set debug led to brightness
+    }
+    else {
+        sLeds[index]->setDutyRaw(0); // turn debug led off
+    }
+}
+
+void DebugLeds::ToggleLed(Id id, float brightness){
+
+    // check if initialized
+    if(!gInitialized){
+        AssertDebug(false, "DebugLeds::ToggleLed()", "not initialized");
+        return;
+    }
+
+    // check if valid id
+    size_t const index = static_cast<size_t>(id);
+    if(index >= sLeds.size()){
+        AssertDebug(false, "DebugLeds::ToggleLed()", "invalid id");
+        return;
+    }
+
+    // toggle led
+    if(sLeds[index]->getDuty() == 0){
         sLeds[index]->setDutyRelative(brightness); // set debug led to brightness
     }
     else {
@@ -111,11 +111,30 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
     }
 }
 
+void DebugLeds::ToggleAllLeds(float brightness){
+
+    // check if initialized
+    if(!gInitialized){
+        AssertDebug(false, "DebugLeds::ToggleLed()", "not initialized");
+        return;
+    }
+
+    // toggle all leds
+    for(LedcChannel* led : sLeds){
+        // toggle led
+        if(led->getDuty() == 0){
+            led->setDutyRelative(brightness); // set debug led to brightness
+        }
+        else {
+            led->setDutyRaw(0); // turn debug led off
+        }
+    }
+}
+
 void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b) {
 
     // check if initialized
     if (!gInitialized) {
-        AssertDebug(false, "DebugLeds::SetRgbLed()", "not initialized");
         return;
     }
 

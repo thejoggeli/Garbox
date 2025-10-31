@@ -12,6 +12,7 @@ public:
         timer_idx_t idx;
         timer_config_t cfg;
         uint32_t frequencyHz;
+        uint64_t maxValue = 0;
     };
 
     static constexpr Config FanTachoTimer {
@@ -22,10 +23,12 @@ public:
             .counter_en = TIMER_START,
             .intr_type = TIMER_INTR_LEVEL,
             .counter_dir = TIMER_COUNT_UP,
-            .auto_reload = TIMER_AUTORELOAD_DIS,
+            .auto_reload = TIMER_AUTORELOAD_EN,
+            .divider = 0, // computed from frequencyHz in Timer::init() 
             .clk_src = TIMER_SRC_CLK_APB
         },
         .frequencyHz = 10'000'000,
+        .maxValue = 0,
     };
 
 };

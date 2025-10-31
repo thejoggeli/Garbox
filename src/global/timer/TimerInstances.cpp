@@ -7,7 +7,7 @@
 namespace Garbox {
 
 void TimerInstances::Init(){
-    GetFanTachoTimer().init(TimerConfig::FanTachoTimer.cfg);
+    GetFanTachoTimer().init(TimerConfig::FanTachoTimer.cfg, TimerConfig::FanTachoTimer.maxValue);
 }
 
 Timer& TimerInstances::GetFanTachoTimer(){

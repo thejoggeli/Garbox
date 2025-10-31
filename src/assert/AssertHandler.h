@@ -16,12 +16,6 @@ public:
     static void InvokeDebug(const char* context, const char* message);
     static void InvokeExit(const char* context, const char* message);
 
-
-private:
-
-    static Handler sDebugHandler;
-    static Handler sExitHandler;
-
 };
 
 } // namespace

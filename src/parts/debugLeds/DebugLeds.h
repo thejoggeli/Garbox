@@ -18,9 +18,13 @@ public:
     };
 
     static void Init();
-    static void ToggleLed(Id id, float brightness = 1.0);
+    
     static void SetLed(Id id, bool enable, float brightness = 1.0);
     static void SetAllLeds(bool enable, float brightness = 1.0);
+
+    static void ToggleLed(Id id, float brightness = 1.0);
+    static void ToggleAllLeds(float brightness = 1.0);
+
     static void SetRgbLed(uint8_t r, uint8_t g, uint8_t b);
 
 private:

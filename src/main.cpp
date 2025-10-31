@@ -18,27 +18,30 @@ void setup() {
     
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message){
+        DebugLeds::SetLed(DebugLeds::Id::Assert, true);
         LogWarning("AssertHandler", "AssertDebug! %s %s", context, message);
         gMainControl.onAssertDebug(context, message);
     });
 
     // assert exit handler
     AssertHandler::SetExitHandler([](const char* context, const char* message){
+        DebugLeds::SetAllLeds(true);
         gMainControl.onAssertExit(context, message);
         while(true){
             LogError("AssertHandler", "AssertExit! %s %s", context, message);
             Time::DelayMillis(1000);
+            DebugLeds::ToggleAllLeds();
         }
     });
+
+    // init debug leds
+    DebugLeds::Init();
 
     // init ledc
     LedcInstances::Init();
 
     // init timers
     TimerInstances::Init();
-
-    // init debug leds
-    DebugLeds::Init();
 
     // fade debug leds in
     for(int32_t i = 0; i <= 25; i++){

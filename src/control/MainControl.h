@@ -33,6 +33,8 @@ private:
     SoftwareTimer mHeartbeatTimer;
     SoftwareTimer mRpmTimer;
 
+    bool mInitialized;
+
 };
 
 } // namespace
