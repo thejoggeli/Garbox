@@ -9,7 +9,7 @@ namespace Garbox {
 
 Heatpad::Heatpad() : 
     // init members
-    mPwm(PwmPeriodMillis){
+    mPwm(PwmPeriodMicros){
     // nothing to do
 }
 

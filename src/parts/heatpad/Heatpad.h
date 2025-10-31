@@ -28,7 +28,7 @@ private:
     void setHeatEnabled(bool enabled);
     bool isHeatEnabled();
 
-    static constexpr uint32_t PwmPeriodMillis = 5000; // 5 seconds
+    static constexpr uint32_t PwmPeriodMicros = 5'000'000; // 5 seconds
 
     Gpio mGpioHeatpadEnable;
     SoftwarePwm mPwm;
