@@ -16,8 +16,11 @@ public:
 
     void setValue(uint32_t value);
     void setValue(uint64_t value);
+    void setValueFromIsr(uint32_t value);
+    void setValueFromIsr(uint64_t value);
 
     uint64_t      getValue();
+    uint64_t      getValueFromIsr();
     timer_group_t getGroup();
     timer_idx_t   getIndex();
     uint32_t      getFrequencyHz();

@@ -22,7 +22,10 @@ public:
 
     bool init(Config const& config);
     void tick();
+
     void setEnabled(bool enabled);
+    bool isEnabled();
+
     float getFrequencyHz();
 
 
@@ -31,22 +34,31 @@ private:
     enum class State : uint8_t {
         Idle = 0,
         Running,
+        Disabled 
     };
 
     static void IRAM_ATTR isrHandler(void* arg);
 
     uint32_t mPin;
-    Timer mTimer;
+    Timer& mTimer;
 
+    // state handling
+    bool mInitialized = false;
+    State mState = State::Disabled;
+
+    // ticks until timeout
     uint32_t mStopTimeoutTicks = 0;
+
+    // timer tick frequency
     float mTimerFrequencyHz = 1;
-    volatile State mState = State::Idle;
+
+    // measured frequency
+    float mMeasuredFrequencyHz = 0;
+
+    // used inside ISR
     volatile uint32_t mLastEdgeTicks = 0; // t[n-1]
     volatile uint32_t mCurrentEdgeTicks = 0; // t[n]
     volatile bool mHasNewEdge = false;
-    float mFrequencyHz = 0;
-    bool mInitialized = false;
-    bool mEnabled = false;
 
 };
 

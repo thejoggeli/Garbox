@@ -28,7 +28,7 @@ void Timer::init(timer_config_t const& config){
 
     // Configure hardware timer for 1 µs ticks
     esp_err_t err;
-    err = timer_init(mGroup, mIndex, &config);
+    err = timer_init(mGroup, mIndex, &mConfig);
     AssertExit(err == ESP_OK, "Timer::init()", "timer_init failed");
 
     err = timer_set_counter_value(mGroup, mIndex, 0);
@@ -43,7 +43,10 @@ void Timer::init(timer_config_t const& config){
 }
 
 void Timer::resume(){
-    AssertExit(mInitialized, "Timer::resume()", "not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "Timer::resume()", "not initialized");
+        return;
+    }
     if(!mRunning){
         esp_err_t err = timer_start(mGroup, mIndex);
         if(err != ESP_OK){
@@ -55,7 +58,10 @@ void Timer::resume(){
 }
 
 void Timer::pause(){
-    AssertExit(mInitialized, "Timer::pause()", "not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "Timer::pause()", "not initialized");
+        return;
+    }
     if(mRunning){
         esp_err_t err = timer_pause(mGroup, mIndex);
         if(err != ESP_OK){
@@ -67,26 +73,51 @@ void Timer::pause(){
 }
 
 void Timer::setValue(uint32_t value){
-    AssertExit(mInitialized, "Timer::setValue()", "not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "Timer::setValue()", "not initialized");
+        return;
+    }
     esp_err_t err = timer_set_counter_value(mGroup, mIndex, value);
     AssertDebug(err == ESP_OK, "Timer::setValue()", "setValue failed");
 }
 
 void Timer::setValue(uint64_t value){
-    AssertExit(mInitialized, "Timer::setValue()", "not initialized");
+    if(!mInitialized){
+        AssertDebug(false, "Timer::setValue()", "not initialized");
+        return;
+    }
     esp_err_t err = timer_set_counter_value(mGroup, mIndex, value);
     AssertDebug(err == ESP_OK, "Timer::setValue()", "setValue failed");
 }
 
+void Timer::setValueFromIsr(uint32_t value){
+    if(!mInitialized){
+        return;
+    }
+    timer_group_set_alarm_value_in_isr(mGroup, mIndex, value);
+}
+
+void Timer::setValueFromIsr(uint64_t value){
+    if(!mInitialized){
+        return;
+    }
+    timer_group_set_alarm_value_in_isr(mGroup, mIndex, value);
+}
+
 uint64_t Timer::getValue(){
-    AssertExit(mInitialized, "Timer::getValue()", "not initialized");
-    uint64_t ticks;
-    esp_err_t err = timer_get_counter_value(mGroup, mIndex, &ticks);
-    if(err != ESP_OK){
-        AssertDebug(false, "Timer::getValue()", "getValue failed");
+    if(!mInitialized){
+        AssertDebug(false, "Timer::getValue()", "not initialized");
         return 0;
     }
+    uint64_t ticks = 0;
+    esp_err_t err = timer_get_counter_value(mGroup, mIndex, &ticks);
+    AssertDebug(err == ESP_OK, "Timer::getValue()", "getValue failed");
     return ticks;
+}
+
+uint64_t IRAM_ATTR Timer::getValueFromIsr(){
+    if(!mInitialized) return 0;
+    return timer_group_get_counter_value_in_isr(mGroup, mIndex);
 }
 
 timer_group_t Timer::getGroup(){
@@ -98,6 +129,10 @@ timer_idx_t Timer::getIndex(){
 }
 
 uint32_t Timer::getFrequencyHz(){
+    if(!mInitialized){
+        AssertDebug(false, "Timer::getFrequencyHz()", "not initialized");
+        return 0;
+    }
     return mFrequencyHz;
 }
 

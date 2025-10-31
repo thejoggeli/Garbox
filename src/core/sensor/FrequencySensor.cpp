@@ -4,6 +4,7 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
+#include "core/log/Log.h"
 
 namespace Garbox {
 
@@ -23,6 +24,20 @@ bool FrequencySensor::init(Config const& config) {
     
     // initialize members
     mTimerFrequencyHz = static_cast<float>(mTimer.getFrequencyHz());
+    AssertExit(mTimerFrequencyHz > 0, "FrequencySensor:init()", "invalid timer frequency");
+
+    // initialize stop timeout
+    if(config.stopTimeoutMicros == 0){
+        mStopTimeoutTicks = 0; // no timeout
+    }
+    else {
+        // ticks = time[s] * freq[Hz] = (stopTimeoutMicros/1e6) * timerFrequencyHz
+        float ticksFloat = static_cast<float>(config.stopTimeoutMicros) * 1e-6f * mTimerFrequencyHz;
+        if(ticksFloat < 0 || ticksFloat > static_cast<float>(1'000'000'000)){
+            AssertExit(false, "FrequencySensor::init()", "stopTimeoutMicros invalid value");
+        }
+        mStopTimeoutTicks = static_cast<uint32_t>(ticksFloat);
+    }
 
     // Configure GPIO input
     gpio_config_t ioConf = {};
@@ -76,7 +91,7 @@ bool FrequencySensor::init(Config const& config) {
 
 void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
     auto* self = static_cast<FrequencySensor*>(arg);
-    uint64_t nowTicks64 = self->mTimer.getValue();
+    uint64_t nowTicks64 = self->mTimer.getValueFromIsr();
     self->mLastEdgeTicks = self->mCurrentEdgeTicks;
     self->mCurrentEdgeTicks = static_cast<uint32_t>(nowTicks64);
     self->mHasNewEdge = true;
@@ -88,7 +103,7 @@ void FrequencySensor::tick(){
         return;
     }
 
-    if((mState == State::Idle && !mHasNewEdge) || !mEnabled){
+    if((mState == State::Disabled) || (mState == State::Idle && !mHasNewEdge)){
         return;
     }
 
@@ -104,13 +119,12 @@ void FrequencySensor::tick(){
             mState = State::Running;
             mHasNewEdge = false;
             mLastEdgeTicks = mCurrentEdgeTicks;
-            mFrequencyHz = 0;
+            mMeasuredFrequencyHz = 0;
         }
     }
     else if(mState == State::Running){
-        uint64_t nowTicks64 = mTimer.getValue();
-        if((nowTicks64 - mCurrentEdgeTicks) > mStopTimeoutTicks){
-            mFrequencyHz = 0;
+        if((mStopTimeoutTicks > 0) && ((mTimer.getValue() - mCurrentEdgeTicks) > mStopTimeoutTicks)){
+            mMeasuredFrequencyHz = 0;
             mState = State::Idle;
         }
         else if(mHasNewEdge){
@@ -125,7 +139,7 @@ void FrequencySensor::tick(){
 
     // update frequency
     if(updateFrequency && (deltaTicks > 0)){
-        mFrequencyHz = mTimerFrequencyHz / static_cast<float>(deltaTicks);
+        mMeasuredFrequencyHz = mTimerFrequencyHz / static_cast<float>(deltaTicks);
     }
 }
 
@@ -134,21 +148,29 @@ void FrequencySensor::setEnabled(bool enabled) {
         AssertDebug(false, "FrequencySensor::setEnabled()", "not initialized");
         return;
     }
-    if(enabled == mEnabled){
+
+    if(enabled == isEnabled()){
         return;
     }
-    mEnabled = enabled;
 
     portENTER_CRITICAL(&sFrequencySensorMux);
     if (enabled) {
         gpio_intr_enable(static_cast<gpio_num_t>(mPin));
+        mState = State::Idle;
     } else {
         gpio_intr_disable(static_cast<gpio_num_t>(mPin));
         mHasNewEdge = false;
-        mFrequencyHz = 0;
-        mState = State::Idle;
+        mMeasuredFrequencyHz = 0;
+        mState = State::Disabled;
     }
     portEXIT_CRITICAL(&sFrequencySensorMux);
+}
+
+bool FrequencySensor::isEnabled(){
+    if(mState == State::Disabled){
+        return false;
+    }
+    return true;
 }
 
 float FrequencySensor::getFrequencyHz() {
@@ -156,7 +178,7 @@ float FrequencySensor::getFrequencyHz() {
         AssertDebug(false, "FrequencySensor::getFrequencyHz()", "not initialized");
         return 0;
     }
-    return mFrequencyHz;
+    return mMeasuredFrequencyHz;
 }
 
 } // namespace Garbox

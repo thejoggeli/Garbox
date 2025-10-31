@@ -42,7 +42,7 @@ void Fan::init(){
 }
 
 void Fan::start(){
-    // nothing to 
+    // nothing to do
 }
 
 void Fan::tick(){

@@ -4,6 +4,7 @@
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
 #include "global/ledc/LedcInstances.h"
+#include "global/timer/TimerInstances.h"
 #include "parts/debugLeds/DebugLeds.h"
 
 using namespace Garbox;
@@ -32,6 +33,9 @@ void setup() {
 
     // init ledc
     LedcInstances::Init();
+
+    // init timers
+    TimerInstances::Init();
 
     // init debug leds
     DebugLeds::Init();
