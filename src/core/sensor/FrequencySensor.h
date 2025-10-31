@@ -1,7 +1,6 @@
 #pragma once
 
-#include "driver/gpio.h"
-#include "driver/timer.h"
+#include "core/hardware/timer/Timer.h"
 
 namespace Garbox {
 
@@ -17,10 +16,9 @@ public:
     struct Config {
         PinMode pinMode = PinMode::Floating;
         uint32_t stopTimeoutMicros = 100'000; // default 100 ms -> 10 Hz timeout
-        uint32_t timerFrequencyHz = 1'000'000; // default 1 MHz -> 1 µs per tick
     };
 
-    FrequencySensor(uint32_t pin, timer_group_t timerGroup, timer_idx_t timerId);
+    FrequencySensor(uint32_t pin, Timer& timer);
 
     bool init(Config const& config);
     void tick();
@@ -38,8 +36,7 @@ private:
     static void IRAM_ATTR isrHandler(void* arg);
 
     uint32_t mPin;
-    timer_group_t mTimerGroup;
-    timer_idx_t mTimerId;
+    Timer mTimer;
 
     uint32_t mStopTimeoutTicks = 0;
     float mTimerFrequencyHz = 1;

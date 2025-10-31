@@ -5,8 +5,8 @@
 #include "global/AppConfig.h"
 #include "global/PcntConfig.h"
 #include "global/PinConfig.h"
-#include "global/TimerConfig.h"
 #include "global/ledc/LedcInstances.h"
+#include "global/timer/TimerInstances.h"
 #include "util/MathUtils.h"
 
 namespace Garbox {
@@ -22,7 +22,7 @@ static constexpr float RpmFilterThreshold = 0.1f;
 Fan::Fan() : 
     // init members
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
-    mFrequencySensor(PinConfig::FanTacho, TimerConfig::FanTachoGroup, TimerConfig::FanTachoTimer),
+    mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
     // nothing to do
 }
@@ -37,7 +37,6 @@ void Fan::init(){
     FrequencySensor::Config config;
     config.pinMode = FrequencySensor::PinMode::Floating;
     config.stopTimeoutMicros = 500'000;
-    config.timerFrequencyHz = 10'000'000; // 10 MHz
     mFrequencySensor.init(config);
 
 }

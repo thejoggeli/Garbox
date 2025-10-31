@@ -1,21 +1,19 @@
 #include "FrequencySensor.h"
 
 #include "assert/Assert.h"
-#include "core/time/Time.h"
+#include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
-#include "global/AppConfig.h"
 
 namespace Garbox {
 
 // static so each class instance can share one per-core lock
 static portMUX_TYPE sFrequencySensorMux = portMUX_INITIALIZER_UNLOCKED;
 
-FrequencySensor::FrequencySensor(uint32_t pin, timer_group_t timerGroup, timer_idx_t timerId):
+FrequencySensor::FrequencySensor(uint32_t pin, Timer& timer):
     // init members
     mPin(pin),
-    mTimerGroup(timerGroup),
-    mTimerId(timerId){
+    mTimer(timer){
     // nothing to do
 }
 
@@ -24,38 +22,7 @@ bool FrequencySensor::init(Config const& config) {
     AssertExit(!mInitialized, "FrequencySensor::init()", "already initialized");
     
     // initialize members
-    mTimerFrequencyHz = static_cast<float>(config.timerFrequencyHz);
-
-    // convert to timer ticks
-    // ticks = time[s] * freq[Hz] = (stopTimeoutMicros * freqHz) / 1e6
-    uint64_t ticks64 = (static_cast<uint64_t>(config.stopTimeoutMicros) * config.timerFrequencyHz) / 1'000'000ULL;
-    AssertExit(ticks64 <= 0xFFFFFFFFULL, "FrequencySensor::init()", "stopTimeoutMicros invalid value");
-    mStopTimeoutTicks = static_cast<uint32_t>(ticks64);
-
-    // Compute divider from desired frequency (APB = 80 MHz)
-    AssertExit((AppConfig::ClockFrequency % config.timerFrequencyHz) == 0, "FrequencySensor::init()", "timerFrequencyHz invalid value");
-    uint32_t divider = AppConfig::ClockFrequency / config.timerFrequencyHz;
-    AssertExit((divider >= 2) && (divider <= 65536), "FrequencySensor::init()", "timerFrequencyHz invalid value");
-
-    // Configure hardware timer for 1 µs ticks
-    esp_err_t err;
-    timer_config_t timerConf = {
-        .alarm_en = TIMER_ALARM_DIS,
-        .counter_en = TIMER_START,
-        .intr_type = TIMER_INTR_LEVEL,
-        .counter_dir = TIMER_COUNT_UP,
-        .auto_reload = TIMER_AUTORELOAD_DIS,
-        .divider = static_cast<uint16_t>(divider),
-        .clk_src = TIMER_SRC_CLK_APB
-    };
-    err = timer_init(mTimerGroup, mTimerId, &timerConf);
-    AssertExit(err == ESP_OK, "FrequencySensor::init()", "timer_init failed");
-
-    err = timer_set_counter_value(mTimerGroup, mTimerId, 0);
-    AssertExit(err == ESP_OK, "FrequencySensor::init()", "timer_set_counter_value failed");
-
-    err = timer_start(mTimerGroup, mTimerId);
-    AssertExit(err == ESP_OK, "FrequencySensor::init()", "timer_start failed");
+    mTimerFrequencyHz = static_cast<float>(mTimer.getFrequencyHz());
 
     // Configure GPIO input
     gpio_config_t ioConf = {};
@@ -81,7 +48,7 @@ bool FrequencySensor::init(Config const& config) {
             return false;
     }
 
-    err = gpio_config(&ioConf);
+    esp_err_t err = gpio_config(&ioConf);
     AssertExit(err == ESP_OK, "FrequencySensor::init()", "gpio_config failed");
 
     // Install ISR service once globally (safe to call multiple times)
@@ -109,8 +76,7 @@ bool FrequencySensor::init(Config const& config) {
 
 void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
     auto* self = static_cast<FrequencySensor*>(arg);
-    uint64_t nowTicks64;
-    timer_get_counter_value(self->mTimerGroup, self->mTimerId, &nowTicks64);
+    uint64_t nowTicks64 = self->mTimer.getValue();
     self->mLastEdgeTicks = self->mCurrentEdgeTicks;
     self->mCurrentEdgeTicks = static_cast<uint32_t>(nowTicks64);
     self->mHasNewEdge = true;
@@ -142,8 +108,7 @@ void FrequencySensor::tick(){
         }
     }
     else if(mState == State::Running){
-        uint64_t nowTicks64;
-        timer_get_counter_value(mTimerGroup, mTimerId, &nowTicks64);
+        uint64_t nowTicks64 = mTimer.getValue();
         if((nowTicks64 - mCurrentEdgeTicks) > mStopTimeoutTicks){
             mFrequencyHz = 0;
             mState = State::Idle;
