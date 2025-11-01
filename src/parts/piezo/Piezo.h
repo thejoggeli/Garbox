@@ -14,11 +14,14 @@ public:
     Piezo();
 
     void init();
-    void tick();
 
     void setFrequency(uint32_t frequency);
     void setEnabled(bool enabled);
     void setDuty(float duty);
+    
+    uint32_t getFrequency();
+    bool isEnabled();
+    float getDuty();
 
 private:
 

@@ -11,17 +11,26 @@ class PiezoPlayer {
 public:
     explicit PiezoPlayer(Piezo& piezo);
 
-    void playSequence(const ToneSequence& sequence);
     void stop();
     void tick();
+
+    void playTone(const Tone& tone);
+    void playTone(uint32_t durationMicros, uint16_t frequency);
+    void playTone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd);
+    void playSequence(const ToneSequence& sequence);
     bool isPlaying() const;
 
 private:
-    Piezo& mPiezo;
-    const ToneSequence* mCurrentSeq = nullptr;
 
-    size_t mIndex = 0;
-    uint32_t mLastTime = 0;
+    Piezo& mPiezo;
+
+    Tone mSingleTone = Tone(0, 0); 
+    ToneSequence mSingleSequence = ToneSequence(&mSingleTone, 1);
+
+    const ToneSequence* mCurrentSequence = nullptr;
+
+    size_t mCurrentToneIndex = 0;
+    uint32_t mLastTimeMicros = 0;
     bool mPlaying = false;
 };
 

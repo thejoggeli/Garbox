@@ -106,7 +106,7 @@ void displayTask(){
 void loggingTask(){
     // Print diagnostics once per second
     static uint32_t lastPrintMicros = 0;
-    if (Time::GetTickMicros() - lastPrintMicros >= 5'000'000) {
+    if (Time::GetTickMicros() - lastPrintMicros >= 10'000'000) {
         lastPrintMicros = Time::GetTickMicros();
 
         const TimeSlotScheduler::Diagnostics& dMain = gScheduler.getDiagnostics(SlotMain);

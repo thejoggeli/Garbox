@@ -17,48 +17,6 @@ void Piezo::init(){
     mTestTimer.start(0);
 }
 
-void Piezo::tick(){
-
-    return;
-
-    static constexpr uint32_t numStates = 6;
-    static uint32_t state = 0;
-
-    if(mTestTimer.isExpired()){
-        state = (state+1) % numStates;
-        switch(state){
-            case 0: 
-                setEnabled(false);
-                mTestTimer.restart(5000_ms);
-                break;
-            case 1: 
-                setFrequency(750);
-                setDuty(0.5f);
-                setEnabled(true);
-                mTestTimer.restart(200_ms);
-                break;
-            case 2: 
-                setFrequency(1000);
-                mTestTimer.restart(200_ms);
-                break;
-            case 3: 
-                setFrequency(1500);
-                mTestTimer.restart(200_ms);
-                break;
-            case 4: 
-                setFrequency(1000);
-                mTestTimer.restart(400_ms);
-                break;
-            case 5: 
-                setEnabled(false);
-                mTestTimer.reset();
-                break;
-        }
-
-    }
-
-}
-
 void Piezo::setFrequency(uint32_t frequency){
     mFrequency = frequency;
     mPwmTimer.setFrequency(frequency);
@@ -82,6 +40,18 @@ void Piezo::setDuty(float duty){
     if(mEnabled){
         mPwmChannel.setDutyRelative(mDuty);
     }
+}
+
+uint32_t Piezo::getFrequency(){
+    return mFrequency;
+}
+
+bool Piezo::isEnabled(){
+    return mEnabled;
+}
+
+float Piezo::getDuty(){
+    return mDuty;
 }
 
 } // namespace

@@ -7,8 +7,8 @@ namespace Garbox {
 class PiezoConfig {
 public:
 
-    static const ToneSequence startupSequence;
-    static const ToneSequence buttonSequence;
+    static const ToneSequence StartupSequence;
+    static const ToneSequence ButtonSequence;
     
 };
 

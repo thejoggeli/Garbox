@@ -15,8 +15,8 @@ public:
         // nothing to do
     }
 
-    constexpr const Tone* tones() const { return mTones; }
-    constexpr size_t count() const { return mCount; }
+    constexpr const Tone* getTones() const { return mTones; }
+    constexpr size_t getCount() const { return mCount; }
 
 private:
     const Tone* mTones;

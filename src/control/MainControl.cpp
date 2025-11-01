@@ -4,6 +4,7 @@
 #include "assert/AssertHandler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
+#include "global/PiezoConfig.h"
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/color/ColorMap.h"
 #include "util/color/Rgb888.h"
@@ -15,7 +16,8 @@ MainControl::MainControl() :
     mFan(),
     mHeatpad(),
     mDisplay(),
-    mPiezo(){
+    mPiezo(),
+    mPiezoPlayer(mPiezo){
     // nothing to do
 }
 
@@ -54,44 +56,51 @@ void MainControl::tick(){
         }
         switch(fanState){
             case 0:
+                mPiezoPlayer.playSequence(PiezoConfig::ButtonSequence);
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
+                mFanStateTimer.restart(4000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
                 DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
-                mFanStateTimer.start(4000_ms);
                 break;
             case 1:
+                mPiezoPlayer.playSequence(PiezoConfig::StartupSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
-                mFanStateTimer.start(8000_ms);
+                mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
                 break;
             case 2:
+                mPiezoPlayer.playSequence(PiezoConfig::ButtonSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
-                mFanStateTimer.start(8000_ms);
+                mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.6f);
                 break;
             case 3:
+                mPiezoPlayer.playTone(1000_ms, 3000);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.8f);
                 break;
             case 4:
+                mPiezoPlayer.playTone(1000_ms, 2000);
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
-                mFanStateTimer.start(8000_ms);
+                mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 1.0f);
                 break;
             case 5:
+                mPiezoPlayer.playTone(1000_ms, 1000);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
-                mFanStateTimer.start(8000_ms);
+                mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.5f);
                 break;
             default:
                 // nothing to do
+                AssertDebug(false, "MainControl", "unhandled fan state");
                 break;
         }
         LogDebug("MainControl", "Fan State: %" PRIu32, fanState);
@@ -130,7 +139,7 @@ void MainControl::tick(){
     mDisplay.tick();
 
     // piezo tick
-    mPiezo.tick();
+    mPiezoPlayer.tick();
 }
 
 void MainControl::onAssertDebug(const char* context, const char* message){

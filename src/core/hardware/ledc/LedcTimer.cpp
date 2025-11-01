@@ -56,6 +56,12 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
         return false;
     }
 
+    // zero not allowed
+    if(frequencyHz == 0){
+        AssertDebug(false, "LedcTimer::setFrequency()", "frequencyHz == 0 not allowed");
+        return false;
+    }
+
     // set frequency
     esp_err_t result = ledc_set_freq(mMode, mIndex, frequencyHz);
 

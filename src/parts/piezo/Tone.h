@@ -6,16 +6,38 @@ namespace Garbox {
 class Tone {
 public:
 
-    constexpr Tone(uint16_t freqHz, uint32_t durationMicros) : mFreq(freqHz), mDurationMicros(durationMicros) {}
+    constexpr Tone(uint32_t durationMicros, uint16_t frequency) : 
+        mFrequencyStart(frequency), 
+        mFrequencyEnd(frequency), 
+        mDurationMicros(durationMicros) {
+        // nothing to do
+    }
 
-    constexpr uint16_t freq() const { return mFreq; }
-    constexpr uint32_t durationMicros() const { return mDurationMicros; }
+    constexpr Tone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd) : 
+        mFrequencyStart(frequencyStart), 
+        mFrequencyEnd(frequencyEnd), 
+        mDurationMicros(durationMicros) {
+        // nothing to do
+    }
+
+    constexpr uint16_t getFrequencyStart() const { 
+        return mFrequencyStart; 
+    }
+
+    constexpr uint16_t getFrequencyEnd() const { 
+        return mFrequencyEnd; 
+    }
+
+    constexpr uint32_t getDurationMicros() const { 
+        return mDurationMicros; 
+    }
 
 private:
 
-    uint16_t mFreq;
+    uint16_t mFrequencyStart;
+    uint16_t mFrequencyEnd;
     uint32_t mDurationMicros;
-    
+
 };
 
 } // namespace Garbox
