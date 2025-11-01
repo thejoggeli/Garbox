@@ -1,33 +1,40 @@
 #pragma once
-#include <Arduino.h>
 
-extern "C" {
 #include "driver/spi_master.h"
-#include "esp_heap_caps.h"
-#include "soc/spi_struct.h"
-#include "soc/spi_reg.h"
-}
+
+namespace Garbox {
 
 /**
- * SpiDma - simple asynchronous SPI DMA wrapper for ESP32-S3 and compatible ESP32 variants.
- * 
- * Example usage:
- *   SpiDma spi(SPI2_HOST);
- *   spi.begin(23, 18, 5, 40000000);
- *   spi.queue(data, lenBits, userPtr);
- *   if (spi.poll(&cb, &user)) cb(user);
+ * SpiDma - asynchronous SPI DMA wrapper for ESP32-S3.
  */
 class SpiDma {
 public:
-    explicit SpiDma(spi_host_device_t host = SPI2_HOST);
 
-    bool begin(int mosi, int sclk, int cs, int freqHz = 40000000);
+    struct Config {
+        spi_host_device_t hostDevice;
+        int32_t pinMosi;
+        int32_t pinMiso;
+        int32_t pinClk;
+        int32_t pinCs;
+        int32_t frequencyHz;
+        int32_t maxTransferSize; 
+        int32_t queueSize;
+    };
+
+    explicit SpiDma();
+
+    void setup(Config const& config);
     void queue(const uint8_t* data, size_t lenBits, void* user = nullptr);
     bool poll(void (**callback)(void*), void** user);
     void setCallback(void (*cb)(void*));
 
 private:
+
     spi_host_device_t mHost;
-    spi_device_handle_t mDevice;
-    void (*mDoneCb)(void*);
+    spi_device_handle_t mDevice = nullptr;
+    void (*mDoneCb)(void*) = nullptr;
+
+    bool mInitialized = false;
 };
+
+} // namespace

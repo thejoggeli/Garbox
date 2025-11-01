@@ -4,6 +4,7 @@
 #include "core/scheduling/TimeSlotScheduler.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
+#include "global/bus/SpiInstances.h"
 #include "global/ledc/LedcInstances.h"
 #include "global/timer/TimerInstances.h"
 #include "parts/debugLeds/DebugLeds.h"
@@ -55,14 +56,11 @@ void setup() {
         }
     });
 
-    // init debug leds
+    // init statics
     DebugLeds::Init();
-
-    // init ledc
     LedcInstances::Init();
-
-    // init timers
     TimerInstances::Init();
+    SpiInstances::Init();
 
     // fade debug leds in
     for(int32_t i = 0; i <= 25; i++){

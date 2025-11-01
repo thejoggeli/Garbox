@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace Garbox {
 
 void AssertDebug(bool value, const char* context, const char* message);

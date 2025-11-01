@@ -1,50 +1,64 @@
 #include "Timer.h"
 
 #include "assert/Assert.h"
-#include "global/AppConfig.h"
 
 namespace Garbox {
 
-Timer::Timer(timer_group_t group, timer_idx_t index, uint32_t frequencyHz):
-    // init members
-    mGroup(group),
-    mIndex(index),
-    mFrequencyHz(frequencyHz){
+Timer::Timer() {
     // nothing to do
 }
 
-void Timer::init(timer_config_t const& config, uint64_t maxValue){
+void Timer::init(InitStruct const& initStruct){
 
     AssertExit(!mInitialized, "Timer::init()", "already initialized");
 
-    // Compute divider from desired frequency (APB = 80 MHz)
-    AssertExit((AppConfig::ClockFrequency > mFrequencyHz), "Timer::init()", "timer frequency too large");
-    AssertExit((AppConfig::ClockFrequency % mFrequencyHz) == 0, "Timer::init()", "not divisible clock frequency");
-    uint32_t divider = AppConfig::ClockFrequency / mFrequencyHz;
-    AssertExit((divider >= 2) && (divider <= 65536), "Timer::init()", "divider out of range");
+    // init members
+    mGroup = initStruct.group;
+    mIndex = initStruct.index;
+    mFrequencyHz = initStruct.frequencyHz;
+    mMaxValue = initStruct.maxValue;
+    mConfig = initStruct.config;
 
-    // Create config
-    mConfig = config;
+    // determine clock frequency
+    uint32_t clockFrequency;
+    switch(mConfig.clk_src){
+        case TIMER_SRC_CLK_APB:
+            clockFrequency = APB_CLK_FREQ;
+            break;
+        case TIMER_SRC_CLK_XTAL:
+            clockFrequency = XTAL_CLK_FREQ;
+            break;
+        default:
+            clockFrequency = 0;
+            AssertExit(!mInitialized, "Timer::init()", "unhandled clock source");
+    }
+
+    // compute divider from desired frequency (APB = 80 MHz)
+    AssertExit((clockFrequency > mFrequencyHz), "Timer::init()", "timer frequency too large");
+    AssertExit((clockFrequency % mFrequencyHz) == 0, "Timer::init()", "not divisible clock frequency");
+    uint32_t divider = clockFrequency / mFrequencyHz;
+    AssertExit((divider >= 2) && (divider <= 65536), "Timer::init()", "divider out of range");
     mConfig.divider = divider;
 
-    // Configure hardware timer for 1 µs ticks
+    // configure hardware timer for 1 µs ticks
     esp_err_t err;
     err = timer_init(mGroup, mIndex, &mConfig);
     AssertExit(err == ESP_OK, "Timer::init()", "timer_init failed");
 
+    // set initial counter value
     err = timer_set_counter_value(mGroup, mIndex, 0);
     AssertExit(err == ESP_OK, "Timer::init()", "timer_set_counter_value failed");
 
     // enable alarm
-    if(config.alarm_en == TIMER_ALARM_EN){
-        AssertExit(maxValue != 0, "Timer::init()", "expected maxValue != 0");
-        err = timer_set_alarm_value(mGroup, mIndex, maxValue);
+    if(mConfig.alarm_en == TIMER_ALARM_EN){
+        AssertExit(mMaxValue != 0, "Timer::init()", "expected maxValue != 0");
+        err = timer_set_alarm_value(mGroup, mIndex, mMaxValue);
         AssertExit(err == ESP_OK, "Timer::init()", "timer_set_alarm_value failed");
         err = timer_enable_intr(mGroup, mIndex);
         AssertExit(err == ESP_OK, "Timer::init()", "timer_enable_intr failed");
     }
     else {
-        AssertExit(maxValue == 0, "Timer::init()", "expected maxValue == 0");
+        AssertExit(mMaxValue == 0, "Timer::init()", "expected maxValue == 0");
     }
 
     err = timer_start(mGroup, mIndex);
@@ -152,6 +166,14 @@ uint32_t Timer::getFrequencyHz(){
         return 0;
     }
     return mFrequencyHz;
+}
+
+uint64_t Timer::getMaxValue(){
+    if(!mInitialized){
+        AssertDebug(false, "Timer::getMaxValue()", "not initialized");
+        return 0;
+    }
+    return mMaxValue;
 }
 
 }
