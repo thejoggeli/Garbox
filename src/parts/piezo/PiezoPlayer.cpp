@@ -2,6 +2,7 @@
 
 #include "assert/Assert.h"
 #include "core/time/Time.h"
+#include "parts/debugLeds/DebugLeds.h"
 
 namespace Garbox {
 
@@ -12,9 +13,8 @@ PiezoPlayer::PiezoPlayer(Piezo& piezo, uint32_t deadTimeMicros):
 }
 
 void PiezoPlayer::stop(){
-    if (mPlaying) {
-        mPiezo.setEnabled(false);
-    }
+    DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
+    mPiezo.setEnabled(false);
     mPlaying = false;
     mCurrentSequence = nullptr;
     mCurrentToneIndex = 0;
@@ -179,6 +179,7 @@ void PiezoPlayer::playNextInQueue(){
         }
 
         // initialize state for sequence playback
+        DebugLeds::SetLed(DebugLeds::Id::Custom2, true);
         mCurrentToneIndex = 0;
         mPlaying = true;
         mLastTimeMicros = Time::GetMicros();

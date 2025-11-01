@@ -58,7 +58,6 @@ void MainControl::tick(){
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
-                DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
                 break;
             case 1:
                 mPiezoPlayer.playSequence(PiezoConfig::HelixSequence);
