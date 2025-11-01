@@ -68,7 +68,7 @@ void MainControl::tick(){
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
                 break;
             case 2:
-                mPiezoPlayer.playTone(1000_ms, 500, 3500);
+                mPiezoPlayer.playSequence(PiezoConfig::InterpolatedSequence2);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.restart(8000_ms);

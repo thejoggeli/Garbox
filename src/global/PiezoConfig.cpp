@@ -40,8 +40,17 @@ static constexpr Tone InterpolatedTones[] = {
     Tone( 800_ms, 1500, 750),
 };
 
+static constexpr Tone InterpolatedTones2[] = {
+    Tone(1000_ms, 1000),
+    Tone( 250_ms, 1000, 2000),
+    Tone(1000_ms, 2000),
+    Tone(1000_ms, 1000, 500),
+    Tone(1000_ms, 500),
+};
+
 const ToneSequence PiezoConfig::StartupSequence(StartupTones, ArraySize(StartupTones));
 const ToneSequence PiezoConfig::ButtonSequence(ButtonTones, ArraySize(ButtonTones));
 const ToneSequence PiezoConfig::InterpolatedSequence(InterpolatedTones, ArraySize(InterpolatedTones));
+const ToneSequence PiezoConfig::InterpolatedSequence2(InterpolatedTones2, ArraySize(InterpolatedTones2));
 
 } // namespace
