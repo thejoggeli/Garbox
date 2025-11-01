@@ -9,6 +9,7 @@ public:
 
     static const ToneSequence StartupSequence;
     static const ToneSequence ButtonSequence;
+    static const ToneSequence HelixSequence;
     static const ToneSequence InterpolatedSequence;
     static const ToneSequence InterpolatedSequence2;
     

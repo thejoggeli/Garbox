@@ -11,7 +11,7 @@ namespace Garbox {
 
 static constexpr Tone StartupTones[] = {
     Tone(100_ms, 1000),
-    Tone( 50_ms,    0),
+    Tone( 50_ms),
     Tone(250_ms, 1500),
     Tone(100_ms, 1250),
     Tone(150_ms, 1000),
@@ -24,6 +24,15 @@ static constexpr Tone ButtonTones[] = {
     Tone(250_ms, 2000),
     Tone(125_ms, 1500),
     Tone(125_ms, 2500),
+};
+
+static constexpr Tone HelixTones[] = {
+    Tone(80_ms, 1000, 1000),
+    Tone(80_ms, 1000, 2000),
+    Tone(80_ms, 1000, 3000),
+    Tone(80_ms, 1000, 4000),
+    Tone(80_ms, 1000, 5000),
+    Tone(80_ms, 1000, 6000),
 };
 
 static constexpr Tone InterpolatedTones[] = {
@@ -50,6 +59,7 @@ static constexpr Tone InterpolatedTones2[] = {
 
 const ToneSequence PiezoConfig::StartupSequence(StartupTones, ArraySize(StartupTones));
 const ToneSequence PiezoConfig::ButtonSequence(ButtonTones, ArraySize(ButtonTones));
+const ToneSequence PiezoConfig::HelixSequence(HelixTones, ArraySize(HelixTones));
 const ToneSequence PiezoConfig::InterpolatedSequence(InterpolatedTones, ArraySize(InterpolatedTones));
 const ToneSequence PiezoConfig::InterpolatedSequence2(InterpolatedTones2, ArraySize(InterpolatedTones2));
 

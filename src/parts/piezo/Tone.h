@@ -6,19 +6,25 @@ namespace Garbox {
 class Tone {
 public:
 
-    constexpr Tone(uint32_t durationMicros, uint16_t frequency) : 
-        mFrequencyStart(frequency), 
-        mFrequencyEnd(frequency), 
+    // silent tone
+    constexpr Tone(uint32_t durationMicros) : 
         mDurationMicros(durationMicros),
-        mMonotonic(true){
+        mFrequencyStart(0), 
+        mFrequencyEnd(0){
+        // nothing to do
+    }
+
+    constexpr Tone(uint32_t durationMicros, uint16_t frequency) : 
+        mDurationMicros(durationMicros),
+        mFrequencyStart(frequency), 
+        mFrequencyEnd(frequency){
         // nothing to do
     }
 
     constexpr Tone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd) : 
-        mFrequencyStart(frequencyStart), 
-        mFrequencyEnd(frequencyEnd), 
         mDurationMicros(durationMicros), 
-        mMonotonic(false){
+        mFrequencyStart(frequencyStart), 
+        mFrequencyEnd(frequencyEnd){
         // nothing to do
     }
 
@@ -35,15 +41,18 @@ public:
     }
 
     constexpr bool isMonotonic() const {
-        return mMonotonic;
+        return mFrequencyStart == mFrequencyEnd;
+    }
+
+    constexpr bool isSilent() const {
+        return (mFrequencyStart == 0) || (mFrequencyEnd == 0);
     }
 
 private:
 
+    uint32_t mDurationMicros;
     uint16_t mFrequencyStart;
     uint16_t mFrequencyEnd;
-    uint32_t mDurationMicros;
-    bool mMonotonic;
 
 };
 

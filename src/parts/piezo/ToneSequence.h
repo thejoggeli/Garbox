@@ -15,6 +15,7 @@ public:
         // nothing to do
     }
 
+    constexpr const Tone& getTone(size_t index) const { return mTones[index]; }
     constexpr const Tone* getTones() const { return mTones; }
     constexpr size_t getCount() const { return mCount; }
 

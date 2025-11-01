@@ -1,10 +1,13 @@
 #include "PiezoPlayer.h"
 
+#include "assert/Assert.h"
 #include "core/time/Time.h"
 
 namespace Garbox {
 
-PiezoPlayer::PiezoPlayer(Piezo& piezo) : mPiezo(piezo) {
+PiezoPlayer::PiezoPlayer(Piezo& piezo, uint32_t deadTimeMicros): 
+    mPiezo(piezo),
+    mDeadTimeMicros(deadTimeMicros){
     // nothing to do
 }
 
@@ -25,7 +28,7 @@ void PiezoPlayer::tick(){
     // get current time and  tone
     const uint32_t currentTimeMicros = Time::GetMicros();
     const uint32_t elapsedMicros = currentTimeMicros - mLastTimeMicros;
-    const Tone& currentTone = mCurrentSequence->getTones()[mCurrentToneIndex];
+    const Tone& currentTone = mCurrentSequence->getTone(mCurrentToneIndex);
 
     // check if tone played its duration
     if (elapsedMicros >= currentTone.getDurationMicros()) {
@@ -36,14 +39,13 @@ void PiezoPlayer::tick(){
 
         // end of sequence
         if (mCurrentToneIndex >= mCurrentSequence->getCount()) {
-            stop();
+            playNextInQueue();
             return;
         }
 
         // start next tone
-        const Tone& nextTone = mCurrentSequence->getTones()[mCurrentToneIndex];
-        const bool isFrequencyValid = (nextTone.getFrequencyStart() > 0) && (nextTone.getFrequencyEnd() > 0);
-        if(!isFrequencyValid){
+        const Tone& nextTone = mCurrentSequence->getTone(mCurrentToneIndex);
+        if(nextTone.isSilent()){
             mPiezo.setEnabled(false); 
         }
         else if(currentTone.isMonotonic()){
@@ -68,38 +70,7 @@ void PiezoPlayer::tick(){
     }
 }
 
-void PiezoPlayer::playTone(const Tone& tone){
-    mSingleTone = tone;
-    playSequence(mSingleSequence);
-}
-
-void PiezoPlayer::playTone(uint32_t durationMicros, uint16_t frequency){
-    mSingleTone = Tone(durationMicros, frequency);
-    playSequence(mSingleSequence);
-}
-
-void PiezoPlayer::playTone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd){
-    mSingleTone = Tone(durationMicros, frequencyStart, frequencyEnd);
-    playSequence(mSingleSequence);
-}
-
-void PiezoPlayer::playSequence(const ToneSequence& sequence){
-    mCurrentSequence = &sequence;
-    mCurrentToneIndex = 0;
-    mPlaying = true;
-    mLastTimeMicros = Time::GetMicros();
-
-    const auto& currentTone = sequence.getTones()[0];
-    mPiezo.setFrequency(currentTone.getFrequencyStart());
-    mPiezo.setEnabled(true);
-}
-
-bool PiezoPlayer::isPlaying() const {
-    return mPlaying;
-}
-
 uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMicros){
-
     // start frequency
     if (tone.getDurationMicros() == 0 || tone.isMonotonic())
         return tone.getFrequencyStart();
@@ -116,6 +87,142 @@ uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMic
 
     // cast back to uint16
     return static_cast<uint16_t>(frequency);
+}
+
+void PiezoPlayer::playSequence(const ToneSequence& sequence){
+
+    if(sequence.getCount() == 0){
+        AssertDebug(false, "PiezoPlayer::playSequence()", "invalid sequence tone count == 0");
+        return;
+    }
+
+    // ensure there is enough space for tone + dead time
+    if(!checkQueueCapacity()){
+        return;
+    }
+
+    // add sequence to queue
+    mQueue.push(QueueItem{
+        .type = QueueItemType::ToneSequence,
+        .tone = Tone(0, 0),
+        .sequence = &sequence,
+    });
+
+    // add dead time
+    addDeadTime(mDeadTimeMicros);
+
+    // begin playing sequence
+    if(!mPlaying){
+        playNextInQueue();
+    }
+}
+
+void PiezoPlayer::playTone(const Tone& tone){
+
+    // ensure there is enough space for tone + dead time
+    if(!checkQueueCapacity()){
+        return;
+    }
+
+    // add single tone to queue
+    mQueue.push(QueueItem{
+        .type = QueueItemType::SingleTone,
+        .tone = tone,
+        .sequence = nullptr,
+    });
+
+    // add dead time
+    addDeadTime(mDeadTimeMicros);
+
+    // begin playing sequence
+    if(!mPlaying){
+        playNextInQueue();
+    }
+}
+
+void PiezoPlayer::playTone(uint32_t durationMicros, uint16_t frequency){
+    playTone(Tone(durationMicros, frequency));
+}
+
+void PiezoPlayer::playTone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd){
+    playTone(Tone(durationMicros, frequencyStart, frequencyEnd));
+}
+
+void PiezoPlayer::playNextInQueue(){
+
+    QueueItem* nextItem = mQueue.popPtr();
+    if(nextItem != nullptr){
+
+        // handle queue item type
+        if(nextItem->type == QueueItemType::ToneSequence){
+            mCurrentSequence = nextItem->sequence;
+        }
+        else if(nextItem->type == QueueItemType::SingleTone){ 
+            mSingleTone = nextItem->tone;
+            mCurrentSequence = &mSingleSequence;
+        }
+        else if(nextItem->type == QueueItemType::DeadTime){ 
+            mSingleTone = nextItem->tone;
+            mCurrentSequence = &mSingleSequence;
+        }
+        else {
+            AssertDebug(false, "PiezoPlayer::playNextInQueue()", "invalid queue item type");
+            mCurrentSequence = nullptr;
+        }
+
+        // safety check
+        if(mCurrentSequence == nullptr){
+            AssertDebug(false, "PiezoPlayer::beginSequence()", "sequence == nullptr");
+            clearQueue();
+            stop();
+            return;
+        }
+
+        // initialize state for sequence playback
+        mCurrentToneIndex = 0;
+        mPlaying = true;
+        mLastTimeMicros = Time::GetMicros();
+
+        // play initial tone of sequence
+        const Tone& firstTone = mCurrentSequence->getTone(0);
+        if(firstTone.isSilent()){
+            mPiezo.setEnabled(false); 
+        }
+        else {
+            mPiezo.setFrequency(firstTone.getFrequencyStart());
+            mPiezo.setEnabled(true);
+        }
+    }
+    else {
+        stop();
+    }
+}
+
+void PiezoPlayer::addDeadTime(uint32_t deadTimeMicros){
+    if(deadTimeMicros == 0){
+        return;
+    }
+    mQueue.push(QueueItem{
+        .type = QueueItemType::DeadTime,
+        .tone = Tone(deadTimeMicros),
+        .sequence = nullptr,
+    });
+}
+
+bool PiezoPlayer::isPlaying() const {
+    return mPlaying;
+}
+
+void PiezoPlayer::clearQueue(){
+    mQueue.clear();
+}
+
+bool PiezoPlayer::checkQueueCapacity(){
+    uint8_t const requiredCapacity = (mDeadTimeMicros > 0) ? 2 : 1;
+    if((mQueue.capacity() - mQueue.size()) < requiredCapacity){
+        return false;
+    }
+    return true;
 }
 
 } // namespace Garbox

@@ -37,6 +37,7 @@ void MainControl::start(){
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
+    mPiezoPlayer.playSequence(PiezoConfig::StartupSequence);
 }
 
 void MainControl::tick(){
@@ -53,7 +54,6 @@ void MainControl::tick(){
     if(mFanStateTimer.isExpired()){
         switch(fanState){
             case 0:
-                mPiezoPlayer.playTone(1000_ms, 1000, 2000);
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
@@ -61,35 +61,31 @@ void MainControl::tick(){
                 DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
                 break;
             case 1:
-                mPiezoPlayer.playSequence(PiezoConfig::InterpolatedSequence);
+                mPiezoPlayer.playSequence(PiezoConfig::HelixSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
                 break;
             case 2:
-                mPiezoPlayer.playSequence(PiezoConfig::InterpolatedSequence2);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.6f);
                 break;
             case 3:
-                mPiezoPlayer.playSequence(PiezoConfig::StartupSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.8f);
                 break;
             case 4:
-                mPiezoPlayer.playSequence(PiezoConfig::ButtonSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 1.0f);
                 break;
             case 5:
-                mPiezoPlayer.playTone(1000_ms, 1000);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
                 mFanStateTimer.restart(8000_ms);
