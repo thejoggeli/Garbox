@@ -18,8 +18,6 @@ public:
 
     void playSequence(const ToneSequence& sequence);
     void playTone(const Tone& tone);
-    void playTone(uint32_t durationMicros, uint16_t frequency);
-    void playTone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd);
     bool isPlaying() const;
 
     void addDeadTime(uint32_t deadTimeMicros);

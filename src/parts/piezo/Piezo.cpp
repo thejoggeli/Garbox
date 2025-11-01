@@ -18,6 +18,9 @@ void Piezo::init(){
 }
 
 void Piezo::setFrequency(uint32_t frequency){
+    if(mFrequency == frequency){
+        return;
+    }
     mFrequency = frequency;
     mPwmTimer.setFrequency(frequency);
 }
@@ -36,6 +39,9 @@ void Piezo::setEnabled(bool enabled){
 }
 
 void Piezo::setDuty(float duty){
+    if(mDuty == duty){
+        return;
+    }
     mDuty = duty;
     if(mEnabled){
         mPwmChannel.setDutyRelative(mDuty);
