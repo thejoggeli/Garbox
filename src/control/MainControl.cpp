@@ -34,7 +34,7 @@ void MainControl::init(){
 
 void MainControl::start(){
     mFan.start();
-    mFanStateTimer.start(1_s);
+    mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
 }
@@ -51,12 +51,9 @@ void MainControl::tick(){
     constexpr uint32_t numFanStates = 6;
     static uint32_t fanState = 0;
     if(mFanStateTimer.isExpired()){
-        if(++fanState >= numFanStates){
-            fanState = 0;
-        }
         switch(fanState){
             case 0:
-                mPiezoPlayer.playSequence(PiezoConfig::ButtonSequence);
+                mPiezoPlayer.playTone(1000_ms, 1000, 2000);
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
@@ -64,28 +61,28 @@ void MainControl::tick(){
                 DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
                 break;
             case 1:
-                mPiezoPlayer.playSequence(PiezoConfig::StartupSequence);
+                mPiezoPlayer.playSequence(PiezoConfig::InterpolatedSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
                 break;
             case 2:
-                mPiezoPlayer.playSequence(PiezoConfig::ButtonSequence);
+                mPiezoPlayer.playTone(1000_ms, 500, 3500);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.restart(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.6f);
                 break;
             case 3:
-                mPiezoPlayer.playTone(1000_ms, 3000);
+                mPiezoPlayer.playSequence(PiezoConfig::StartupSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.8f);
                 break;
             case 4:
-                mPiezoPlayer.playTone(1000_ms, 2000);
+                mPiezoPlayer.playSequence(PiezoConfig::ButtonSequence);
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.restart(8000_ms);
@@ -104,6 +101,7 @@ void MainControl::tick(){
                 break;
         }
         LogDebug("MainControl", "Fan State: %" PRIu32, fanState);
+        fanState = (fanState + 1) % numFanStates;
     }
 
     // fan tick

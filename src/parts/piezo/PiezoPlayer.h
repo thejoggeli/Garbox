@@ -22,6 +22,8 @@ public:
 
 private:
 
+    static uint16_t interpolateFrequency(Tone const& tone, uint32_t elapsedMicros);
+
     Piezo& mPiezo;
 
     Tone mSingleTone = Tone(0, 0); 

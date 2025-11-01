@@ -30,8 +30,9 @@ void PiezoPlayer::tick(){
     // check if tone played its duration
     if (elapsedMicros >= currentTone.getDurationMicros()) {
         
+        // start playing next tone in sequence
         mCurrentToneIndex++;
-        mLastTimeMicros = currentTimeMicros;
+        mLastTimeMicros += currentTone.getDurationMicros();
 
         // end of sequence
         if (mCurrentToneIndex >= mCurrentSequence->getCount()) {
@@ -41,13 +42,28 @@ void PiezoPlayer::tick(){
 
         // start next tone
         const Tone& nextTone = mCurrentSequence->getTones()[mCurrentToneIndex];
-        const uint32_t nextFrequency = nextTone.getFrequencyStart();
-        if(nextFrequency == 0){
-            mPiezo.setEnabled(false);
+        const bool isFrequencyValid = (nextTone.getFrequencyStart() > 0) && (nextTone.getFrequencyEnd() > 0);
+        if(!isFrequencyValid){
+            mPiezo.setEnabled(false); 
         }
-        else {
+        else if(currentTone.isMonotonic()){
+            // start playing monotonic tone
             mPiezo.setFrequency(nextTone.getFrequencyStart());
             mPiezo.setEnabled(true);
+        }
+        else {
+            // start playing interpolated tone
+            uint32_t nextElapsedMicros = currentTimeMicros - mLastTimeMicros;
+            uint16_t frequency = interpolateFrequency(nextTone, nextElapsedMicros);
+            mPiezo.setFrequency(frequency);
+            mPiezo.setEnabled(true);
+        }
+    }
+    else {
+        // updated current tone interpolation
+        if(!currentTone.isMonotonic()){
+            uint16_t frequency = interpolateFrequency(currentTone, elapsedMicros);
+            mPiezo.setFrequency(frequency);
         }
     }
 }
@@ -80,6 +96,26 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence){
 
 bool PiezoPlayer::isPlaying() const {
     return mPlaying;
+}
+
+uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMicros){
+
+    // start frequency
+    if (tone.getDurationMicros() == 0 || tone.isMonotonic())
+        return tone.getFrequencyStart();
+
+    // end frequency 
+    if (elapsedMicros >= tone.getDurationMicros())
+        return tone.getFrequencyEnd();
+
+    // compute interpolated frequency as float
+    const float f1 = static_cast<float>(tone.getFrequencyStart());
+    const float f2 = static_cast<float>(tone.getFrequencyEnd());
+    const float t = static_cast<float>(elapsedMicros) / static_cast<float>(tone.getDurationMicros());
+    const float frequency = f1 + (f2 - f1) * t; 
+
+    // cast back to uint16
+    return static_cast<uint16_t>(frequency);
 }
 
 } // namespace Garbox
