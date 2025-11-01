@@ -23,12 +23,12 @@ public:
         bool invert;
     };
 
-    // Timers config                            TimerId                Freq   Bits
+    // Timers config                                   TimerId                Freq   Bits
     inline static constexpr TimerConfig DimmingTimer { LedcTimer::Id::Timer0, 5000,  10 };
     inline static constexpr TimerConfig FanTimer     { LedcTimer::Id::Timer1, 25000, 8  };
-    inline static constexpr TimerConfig PiezoTimer   { LedcTimer::Id::Timer2, 1000,  8  };
+    inline static constexpr TimerConfig PiezoTimer   { LedcTimer::Id::Timer2, 1000,  6  };
 
-    // Channels config                                 TimerId          ChannelId                  Pin                    Invert
+    // Channels config                                        TimerId          ChannelId                  Pin                    Invert
     inline static constexpr ChannelConfig DebugLed0Channel  { DimmingTimer.id, LedcChannel::Id::Channel0, PinConfig::DebugLed0,  false };
     inline static constexpr ChannelConfig DebugLed1Channel  { DimmingTimer.id, LedcChannel::Id::Channel1, PinConfig::DebugLed1,  false };
     inline static constexpr ChannelConfig DebugLed2Channel  { DimmingTimer.id, LedcChannel::Id::Channel2, PinConfig::DebugLed2,  false };

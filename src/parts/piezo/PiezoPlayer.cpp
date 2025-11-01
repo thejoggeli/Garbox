@@ -51,6 +51,7 @@ void PiezoPlayer::tick(){
         else if(currentTone.isMonotonic()){
             // start playing monotonic tone
             mPiezo.setFrequency(nextTone.getFrequencyStart());
+            mPiezo.setDuty(nextTone.getDuty());
             mPiezo.setEnabled(true);
         }
         else {
@@ -58,6 +59,7 @@ void PiezoPlayer::tick(){
             uint32_t nextElapsedMicros = currentTimeMicros - mLastTimeMicros;
             uint16_t frequency = interpolateFrequency(nextTone, nextElapsedMicros);
             mPiezo.setFrequency(frequency);
+            mPiezo.setDuty(nextTone.getDuty());
             mPiezo.setEnabled(true);
         }
     }
@@ -72,7 +74,7 @@ void PiezoPlayer::tick(){
 
 uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMicros){
     // start frequency
-    if (tone.getDurationMicros() == 0 || tone.isMonotonic())
+    if ((elapsedMicros == 0) || tone.isMonotonic())
         return tone.getFrequencyStart();
 
     // end frequency 
@@ -140,14 +142,6 @@ void PiezoPlayer::playTone(const Tone& tone){
     }
 }
 
-void PiezoPlayer::playTone(uint32_t durationMicros, uint16_t frequency){
-    playTone(Tone(durationMicros, frequency));
-}
-
-void PiezoPlayer::playTone(uint32_t durationMicros, uint16_t frequencyStart, uint16_t frequencyEnd){
-    playTone(Tone(durationMicros, frequencyStart, frequencyEnd));
-}
-
 void PiezoPlayer::playNextInQueue(){
 
     QueueItem* nextItem = mQueue.popPtr();
@@ -191,6 +185,7 @@ void PiezoPlayer::playNextInQueue(){
         }
         else {
             mPiezo.setFrequency(firstTone.getFrequencyStart());
+            mPiezo.setDuty(firstTone.getDuty());
             mPiezo.setEnabled(true);
         }
     }

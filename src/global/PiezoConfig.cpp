@@ -27,12 +27,14 @@ static constexpr Tone ButtonTones[] = {
 };
 
 static constexpr Tone HelixTones[] = {
-    Tone(80_ms, 1000, 1000),
-    Tone(80_ms, 1000, 2000),
-    Tone(80_ms, 1000, 3000),
-    Tone(80_ms, 1000, 4000),
-    Tone(80_ms, 1000, 5000),
-    Tone(80_ms, 1000, 6000),
+    Tone(80_ms, 1000, 1000, 0.25f),
+    Tone(80_ms, 1000, 2000, 0.25f),
+    Tone(80_ms, 1000, 3000, 0.25f),
+    Tone(80_ms, 1000, 4000, 0.25f),
+    Tone(80_ms, 1000, 5000, 0.25f),
+    Tone(80_ms, 1000, 6000, 0.25f),
+    Tone(80_ms, 1000, 7000, 0.25f),
+    Tone(80_ms, 1000, 8000, 0.25f),
 };
 
 static constexpr Tone InterpolatedTones[] = {
