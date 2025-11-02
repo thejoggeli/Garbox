@@ -6,9 +6,9 @@
 
 namespace Garbox {
 
-PiezoPlayer::PiezoPlayer(Piezo& piezo, uint32_t deadTimeMicros): 
+PiezoPlayer::PiezoPlayer(Piezo& piezo, uint32_t defaultSilentTimeMicros): 
     mPiezo(piezo),
-    mDeadTimeMicros(deadTimeMicros){
+    mDefaultSilentTimeMicros(defaultSilentTimeMicros){
     // nothing to do
 }
 
@@ -92,26 +92,39 @@ uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMic
 }
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence){
+    playSequence(sequence, mDefaultSilentTimeMicros);
+}
+
+void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTimeMicros){
 
     if(sequence.getCount() == 0){
         AssertDebug(false, "PiezoPlayer::playSequence()", "invalid sequence tone count == 0");
         return;
     }
 
-    // ensure there is enough space for tone + dead time
-    if(!checkQueueCapacity()){
-        return;
-    }
-
     // add sequence to queue
-    mQueue.push(QueueItem{
+    bool result = mQueue.push(QueueItem{
         .type = QueueItemType::ToneSequence,
         .tone = Tone(0, 0),
         .sequence = &sequence,
     });
+    if(!result){
+        AssertDebug(false, "PiezoPlayer::playSequence()", "queue sequence failed");
+        return;
+    }
 
-    // add dead time
-    addDeadTime(mDeadTimeMicros);
+    // add silent time
+    if(silentTimeMicros > 0){
+        result = mQueue.push(QueueItem{
+            .type = QueueItemType::SilentTime,
+            .tone = Tone(silentTimeMicros),
+            .sequence = nullptr,
+        });
+        if(!result){
+            AssertDebug(false, "PiezoPlayer::playSequence()", "queue silence failed");
+            return;
+        }
+    }
 
     // begin playing sequence
     if(!mPlaying){
@@ -120,21 +133,39 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence){
 }
 
 void PiezoPlayer::playTone(const Tone& tone){
+    playTone(tone, mDefaultSilentTimeMicros);
+}
 
-    // ensure there is enough space for tone + dead time
-    if(!checkQueueCapacity()){
+void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
+
+    // ensure there is enough space for tone + Silent time
+    if(mQueue.available() < 2){
         return;
     }
 
     // add single tone to queue
-    mQueue.push(QueueItem{
+    bool result = mQueue.push(QueueItem{
         .type = QueueItemType::SingleTone,
         .tone = tone,
         .sequence = nullptr,
     });
+    if(!result){
+        AssertDebug(false, "PiezoPlayer::playTone()", "queue tone failed");
+        return;
+    }
 
-    // add dead time
-    addDeadTime(mDeadTimeMicros);
+    // add silent time
+    if(silentTimeMicros > 0){
+        result = mQueue.push(QueueItem{
+            .type = QueueItemType::SilentTime,
+            .tone = Tone(silentTimeMicros),
+            .sequence = nullptr,
+        });
+        if(!result){
+            AssertDebug(false, "PiezoPlayer::playTone()", "queue silence failed");
+            return;
+        }
+    }
 
     // begin playing sequence
     if(!mPlaying){
@@ -155,7 +186,7 @@ void PiezoPlayer::playNextInQueue(){
             mSingleTone = nextItem->tone;
             mCurrentSequence = &mSingleSequence;
         }
-        else if(nextItem->type == QueueItemType::DeadTime){ 
+        else if(nextItem->type == QueueItemType::SilentTime){ 
             mSingleTone = nextItem->tone;
             mCurrentSequence = &mSingleSequence;
         }
@@ -194,31 +225,12 @@ void PiezoPlayer::playNextInQueue(){
     }
 }
 
-void PiezoPlayer::addDeadTime(uint32_t deadTimeMicros){
-    if(deadTimeMicros == 0){
-        return;
-    }
-    mQueue.push(QueueItem{
-        .type = QueueItemType::DeadTime,
-        .tone = Tone(deadTimeMicros),
-        .sequence = nullptr,
-    });
-}
-
 bool PiezoPlayer::isPlaying() const {
     return mPlaying;
 }
 
 void PiezoPlayer::clearQueue(){
     mQueue.clear();
-}
-
-bool PiezoPlayer::checkQueueCapacity(){
-    uint8_t const requiredCapacity = (mDeadTimeMicros > 0) ? 2 : 1;
-    if((mQueue.capacity() - mQueue.size()) < requiredCapacity){
-        return false;
-    }
-    return true;
 }
 
 } // namespace Garbox

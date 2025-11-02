@@ -50,6 +50,14 @@ public:
         return true;
     }
 
+    T* peekPtr() {
+        if (isEmpty()){
+            return nullptr;
+        }
+        T* item = &mBuffer[mTail];
+        return item;
+    }
+
     bool isEmpty() const { 
         return mCount == 0; 
     }
@@ -64,6 +72,10 @@ public:
 
     std::size_t capacity() const { 
         return N; 
+    }
+
+    std::size_t available() const {
+        return N - mCount;
     }
 
     void clear() {

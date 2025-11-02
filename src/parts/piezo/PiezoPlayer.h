@@ -10,31 +10,30 @@ namespace Garbox {
 
 class PiezoPlayer {
 public:
-    explicit PiezoPlayer(Piezo& piezo, uint32_t deadTimeMicros = 50'000);
+    explicit PiezoPlayer(Piezo& piezo, uint32_t defaultSilentTimeMicros = 50'000);
 
     void stop();
     void tick();
     void clearQueue();
 
     void playSequence(const ToneSequence& sequence);
+    void playSequence(const ToneSequence& sequence, uint32_t SilentTime);
     void playTone(const Tone& tone);
+    void playTone(const Tone& tone, uint32_t SilentTime);
     bool isPlaying() const;
-
-    void addDeadTime(uint32_t deadTimeMicros);
 
 private:
 
     static uint16_t interpolateFrequency(Tone const& tone, uint32_t elapsedMicros);
 
-    bool checkQueueCapacity();
     void playNextInQueue();
 
-    static constexpr size_t QueueSize = 20; // also includes silent tones for dead time
+    static constexpr size_t QueueSize = 20; // also includes silent tones for Silent time
 
     enum class QueueItemType : uint8_t {
         SingleTone = 0,
         ToneSequence,
-        DeadTime
+        SilentTime
     };
 
     struct QueueItem {
@@ -44,7 +43,7 @@ private:
     };
 
     Piezo& mPiezo;
-    uint32_t mDeadTimeMicros;
+    uint32_t mDefaultSilentTimeMicros;
 
     Tone mSingleTone = Tone(0, 0); 
     const ToneSequence mSingleSequence = ToneSequence(&mSingleTone, 1);

@@ -37,7 +37,8 @@ void MainControl::start(){
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
-    mPiezoPlayer.playSequence(PiezoSequences::Startup);
+    mPiezoPlayer.playSequence(PiezoSequences::Startup, 500_ms);
+    mPiezoPlayer.playSequence(PiezoSequences::Button);
 }
 
 void MainControl::tick(){
@@ -54,13 +55,13 @@ void MainControl::tick(){
     if(mFanStateTimer.isExpired()){
         switch(fanState){
             case 0:
+                mPiezoPlayer.playSequence(PiezoSequences::Helix);
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
                 break;
             case 1:
-                mPiezoPlayer.playSequence(PiezoSequences::Helix);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);
