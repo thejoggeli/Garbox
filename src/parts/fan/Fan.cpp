@@ -3,7 +3,7 @@
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
-#include "global/PcntConfig.h"
+#include "global/pcnt/PcntConfig.h"
 #include "global/PinConfig.h"
 #include "global/ledc/LedcInstances.h"
 #include "global/timer/TimerInstances.h"

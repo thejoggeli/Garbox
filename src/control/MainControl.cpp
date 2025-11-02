@@ -4,7 +4,7 @@
 #include "assert/AssertHandler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/PiezoConfig.h"
+#include "global/piezo/PiezoSequences.h"
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/color/ColorMap.h"
 #include "util/color/Rgb888.h"
@@ -37,7 +37,7 @@ void MainControl::start(){
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
-    mPiezoPlayer.playSequence(PiezoConfig::StartupSequence);
+    mPiezoPlayer.playSequence(PiezoSequences::Startup);
 }
 
 void MainControl::tick(){
@@ -60,7 +60,7 @@ void MainControl::tick(){
                 DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
                 break;
             case 1:
-                mPiezoPlayer.playSequence(PiezoConfig::HelixSequence);
+                mPiezoPlayer.playSequence(PiezoSequences::Helix);
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);

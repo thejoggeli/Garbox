@@ -1,8 +1,8 @@
 #include "SpiInstances.h"
 
 #include "assert/Assert.h"
+#include "global/AppConfig.h"
 #include "global/PinConfig.h"
-#include "SpiConfig.h"
 
 namespace Garbox {
 
@@ -19,7 +19,7 @@ void SpiInstances::Init(){
         .pinClk = PinConfig::DisplayScl,
         .pinCs = PinConfig::DisplayCs,
         .frequencyHz = 40'000'000,
-        .maxTransferSize = static_cast<int32_t>(SpiConfig::SpiDmaMaxTransferSize),
+        .maxTransferSize = static_cast<int32_t>(AppConfig::SpiDmaMaxTransferSize),
         .queueSize = 5,
         .txCompleteTaskPriority = 4,
         .txCompleteTaskStackSize = 4096,
