@@ -1,14 +1,15 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 namespace Garbox {
 
 template <typename T, std::size_t N>
-class RingBuffer {
+class Stack {
 public:
 
-    RingBuffer() : mHead(0), mTail(0), mCount(0) {
+    Stack() : mCount(0) {
         // nothing to do
     }
 
@@ -16,9 +17,7 @@ public:
         if (isFull()){
             return false;
         }
-        mBuffer[mHead] = item;
-        advance(mHead);
-        ++mCount;
+        mBuffer[mCount++] = item;
         return true;
     }
 
@@ -26,9 +25,7 @@ public:
         if (isEmpty()){
             return false;
         }
-        item = mBuffer[mTail];
-        advance(mTail);
-        --mCount;
+        item = mBuffer[--mCount];
         return true;
     }
 
@@ -36,18 +33,26 @@ public:
         if (isEmpty()){
             return nullptr;
         }
-        T* item = &mBuffer[mTail];
-        advance(mTail);
-        --mCount;
-        return item;
+        return &mBuffer[--mCount];
     }
 
     bool peek(T& item) const {
         if (isEmpty()){
             return false;
         }
-        item = mBuffer[mTail];
+        item = mBuffer[mCount - 1];
         return true;
+    }
+
+    const T* peekPtr() const {
+        if (isEmpty()){
+            return nullptr;
+        }
+        return &mBuffer[mCount - 1];
+    }
+
+    void clear() { 
+        mCount = 0; 
     }
 
     bool isEmpty() const { 
@@ -66,23 +71,8 @@ public:
         return N; 
     }
 
-    void clear() {
-        mHead = 0;
-        mTail = 0;
-        mCount = 0;
-    }
-
 private:
-
-    void advance(std::size_t& index) {
-        if (++index == N){
-            index = 0;
-        }
-    }
-
     T mBuffer[N];
-    std::size_t mHead;
-    std::size_t mTail;
     std::size_t mCount;
 };
 

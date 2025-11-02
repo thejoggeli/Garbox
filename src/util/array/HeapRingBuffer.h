@@ -1,21 +1,29 @@
 #pragma once
-
 #include <cstdint>
+#include <cstddef>
 
 namespace Garbox {
 
-template <typename T, std::size_t N>
-class RingBuffer {
+template <typename T>
+class HeapRingBuffer {
 public:
-
-    RingBuffer() : mHead(0), mTail(0), mCount(0) {
+    explicit HeapRingBuffer(std::size_t capacity): 
+        // init members
+        mBuffer(new T[capacity]),
+        mCapacity(capacity),
+        mHead(0),
+        mTail(0),
+        mCount(0){
         // nothing to do
     }
 
+    ~HeapRingBuffer() {
+        delete[] mBuffer;
+    }
+
     bool push(const T& item) {
-        if (isFull()){
+        if (isFull())
             return false;
-        }
         mBuffer[mHead] = item;
         advance(mHead);
         ++mCount;
@@ -23,9 +31,8 @@ public:
     }
 
     bool pop(T& item) {
-        if (isEmpty()){
+        if (isEmpty())
             return false;
-        }
         item = mBuffer[mTail];
         advance(mTail);
         --mCount;
@@ -33,9 +40,8 @@ public:
     }
 
     T* popPtr() {
-        if (isEmpty()){
+        if (isEmpty())
             return nullptr;
-        }
         T* item = &mBuffer[mTail];
         advance(mTail);
         --mCount;
@@ -43,9 +49,8 @@ public:
     }
 
     bool peek(T& item) const {
-        if (isEmpty()){
+        if (isEmpty())
             return false;
-        }
         item = mBuffer[mTail];
         return true;
     }
@@ -55,7 +60,7 @@ public:
     }
 
     bool isFull() const { 
-        return mCount == N; 
+        return mCount == mCapacity; 
     }
 
     std::size_t size() const { 
@@ -63,7 +68,7 @@ public:
     }
 
     std::size_t capacity() const { 
-        return N; 
+        return mCapacity; 
     }
 
     void clear() {
@@ -73,17 +78,20 @@ public:
     }
 
 private:
-
     void advance(std::size_t& index) {
-        if (++index == N){
+        if (++index == mCapacity)
             index = 0;
-        }
     }
 
-    T mBuffer[N];
+    T* mBuffer;
+    std::size_t mCapacity;
     std::size_t mHead;
     std::size_t mTail;
     std::size_t mCount;
+
+    // non-copyable
+    HeapRingBuffer(const HeapRingBuffer&) = delete;
+    HeapRingBuffer& operator=(const HeapRingBuffer&) = delete;
 };
 
-} // namespace
+} // namespace Garbox

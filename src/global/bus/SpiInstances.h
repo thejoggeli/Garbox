@@ -5,10 +5,11 @@
 namespace Garbox {
 
 struct SpiInstances {
+public:
 
     static void Init();
-    
-    static SpiDma& GetDisplaySpiDma();
+
+    static SpiDma& GetSpiDma();
 
 };
 

@@ -2,6 +2,7 @@
 
 #include "assert/Assert.h"
 #include "global/PinConfig.h"
+#include "SpiConfig.h"
 
 namespace Garbox {
 
@@ -11,21 +12,23 @@ void SpiInstances::Init(){
     
     AssertExit(!sInitialized, "SpiInstances::Init()", "already initialized");
 
-    GetDisplaySpiDma().setup({
+    GetSpiDma().setup({
         .hostDevice = SPI2_HOST,
         .pinMosi = PinConfig::DisplaySda,
         .pinMiso = -1,
         .pinClk = PinConfig::DisplayScl,
         .pinCs = PinConfig::DisplayCs,
         .frequencyHz = 40'000'000,
-        .maxTransferSize = 240 * 240 * 2,
-        .queueSize = 3,
+        .maxTransferSize = static_cast<int32_t>(SpiConfig::SpiDmaMaxTransferSize),
+        .queueSize = 5,
+        .txCompleteTaskPriority = 4,
+        .txCompleteTaskStackSize = 4096,
     });
 
     sInitialized = true;
 }
 
-SpiDma& SpiInstances::GetDisplaySpiDma(){
+SpiDma& SpiInstances::GetSpiDma(){
     static SpiDma instance;
     return instance;
 }
