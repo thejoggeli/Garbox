@@ -139,7 +139,7 @@ void SpiDma::setTxCallback(TxCallback callback) {
 }
 
 void SpiDma::completionTaskTrampoline(void* arg) {
-    reinterpret_cast<SpiDma*>(arg)->completionTask();
+    static_cast<SpiDma*>(arg)->completionTask();
 }
 
 void SpiDma::completionTask() {

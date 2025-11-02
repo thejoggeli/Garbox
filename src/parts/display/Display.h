@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/hardware/bus/SpiDma.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
@@ -17,9 +18,11 @@ public:
 
 private:
 
+    SpiDma& mSpi;
     LedcChannel& mBacklightPwm;
-
     SoftwareTimer mTestTimer;
+
+    static void handleTxComplete(void* user);
 
 };
 

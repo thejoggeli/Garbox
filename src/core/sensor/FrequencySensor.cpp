@@ -90,7 +90,7 @@ bool FrequencySensor::init(Config const& config) {
 }
 
 void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
-    auto* self = static_cast<FrequencySensor*>(arg);
+    FrequencySensor* self = static_cast<FrequencySensor*>(arg);
     uint64_t nowTicks64 = self->mTimer.getValueFromIsr();
     self->mLastEdgeTicks = self->mCurrentEdgeTicks;
     self->mCurrentEdgeTicks = static_cast<uint32_t>(nowTicks64);
