@@ -3,20 +3,19 @@
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/PinConfig.h"
+#include "global/gpio/GpioInstances.h"
 #include "util/MathUtils.h"
 
 namespace Garbox {
 
 Heatpad::Heatpad() : 
     // init members
+    mGpioHeatpadEnable(GpioInstances::GetHeatEnable()),
     mPwm(PwmPeriodMicros){
     // nothing to do
 }
 
 void Heatpad::init(){
-    mGpioHeatpadEnable.setup(PinConfig::HeatpadEnable, Gpio::Mode::Output);
-    setHeatEnabled(false);
-
     // attach pwm state changed handler
     mPwm.setStateChangedHandler([this](SoftwarePwm::State state) {
         handlePwmStateChanged(state);

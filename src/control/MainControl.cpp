@@ -38,7 +38,7 @@ void MainControl::start(){
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
     mPiezoPlayer.playSequence(PiezoSequences::Startup, 500_ms);
-    mPiezoPlayer.playSequence(PiezoSequences::Button);
+    mPiezoPlayer.playSequence(PiezoSequences::Button, 500_ms);
 }
 
 void MainControl::tick(){

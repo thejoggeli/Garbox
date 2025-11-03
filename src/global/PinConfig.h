@@ -17,8 +17,8 @@ public:
     static constexpr uint32_t DebugLed3 = 39;           // DEBUG_LED_3
 
     // Debug GPIO
-    static constexpr uint32_t DebugGpio_0 = 41;         // DEBUG_GPIO
-    static constexpr uint32_t DebugGpio_1 = 15;         // PIEZO_B
+    static constexpr uint32_t DebugGpio0 = 41;         // DEBUG_GPIO
+    static constexpr uint32_t DebugGpio1 = 15;         // PIEZO_B
 
     // Fan
     static constexpr uint32_t FanEnable = 4;            // FAN_ENABLE

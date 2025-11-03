@@ -8,7 +8,15 @@ Gpio::Gpio() {
     // nothing to do
 }
 
-void Gpio::setup(uint32_t pin, Mode mode, bool invert) {
+void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
+
+    AssertExit(!mInitialized, "Gpio::setup()", "already initialized");
+
+    mPin = static_cast<gpio_num_t>(pin);
+    mMode = mode;
+    mValue = initivalValue;
+    mInvert = invert;
+
     gpio_config_t cfg = {};
 
     switch (mode) {
@@ -29,75 +37,99 @@ void Gpio::setup(uint32_t pin, Mode mode, bool invert) {
         case Mode::OutputOpenDrain:
             cfg.mode = GPIO_MODE_OUTPUT_OD;
             break;
-        case Mode::Uninitialized:
         default:
-            AssertDebug(false, "Gpio::setup()", "called with invalid mode");
+            AssertDebug(false, "Gpio::setup()", "called with unhandled mode");
             return;
     }
 
     cfg.pin_bit_mask = (1ULL << pin);
     cfg.intr_type = GPIO_INTR_DISABLE;
-    gpio_config(&cfg);
+    if(gpio_config(&cfg) != ESP_OK){
+        AssertDebug(false, "Gpio::setup()", "gpio_config failed");
+    }
 
-    mPin = pin;
-    mMode = mode;
-    mInvert = invert;
+    mValue = initivalValue;
+    if(gpio_set_level(mPin, toPinValue(mValue)) != ESP_OK){
+        AssertDebug(false, "Gpio::setup()", "gpio_set_level failed");
+    }
+
+    mInitialized = true;
 }
 
 void Gpio::setValue(bool value) {
+    if(!mInitialized){
+        AssertDebug(false, "Gpio::setValue()", "not initialized"); 
+        return;
+    }
     switch (mMode) {
         case Mode::Output:
         case Mode::OutputOpenDrain:
-            mState = value;
-            gpio_set_level(static_cast<gpio_num_t>(mPin), (mInvert ? !value : value) ? 1 : 0);
+            if(mValue == value){
+                return;
+            }
+            mValue = value;
+            gpio_set_level(mPin, toPinValue(mValue));
             break;
-
         case Mode::Input:
         case Mode::InputPullup:
         case Mode::InputPulldown:
-        case Mode::Uninitialized:
         default:
-            AssertDebug(false, "Gpio::setValue()", "cannot set value in this mode");
+            AssertDebug(false, "Gpio::setValue()", "unhandled mode");
             break;
     }
 }
 
 bool Gpio::getValue() const {
+    if(!mInitialized){
+        AssertDebug(false, "Gpio::getValue()", "not initialized"); 
+        return false;
+    }
     switch (mMode) {
         case Mode::Input:
         case Mode::InputPullup:
-        case Mode::InputPulldown: {
-            bool raw = gpio_get_level(static_cast<gpio_num_t>(mPin)) != 0;
-            return mInvert ? !raw : raw;
-        }
-
+        case Mode::InputPulldown: 
+            return fromPinValue(gpio_get_level(mPin));
         case Mode::Output:
         case Mode::OutputOpenDrain:
-            return mInvert ? !mState : mState;
-
-        case Mode::Uninitialized:
+            return mValue;
         default:
-            AssertDebug(false, "Gpio::getValue()", "called before setup or with invalid mode");
+            AssertDebug(false, "Gpio::getValue()", "unhandled mode");
             return false;
     }
 }
 
 void Gpio::toggle() {
+    if(!mInitialized){
+        AssertDebug(false, "Gpio::toggle()", "not initialized"); 
+        return;
+    }
     switch (mMode) {
         case Mode::Output:
         case Mode::OutputOpenDrain:
-            mState = !mState;
-            gpio_set_level(static_cast<gpio_num_t>(mPin), (mInvert ? !mState : mState) ? 1 : 0);
+            mValue = !mValue;
+            gpio_set_level(mPin, toPinValue(mValue));
             break;
-
         case Mode::Input:
         case Mode::InputPullup:
         case Mode::InputPulldown:
-        case Mode::Uninitialized:
         default:
-            AssertDebug(false, "Gpio::toggle()", "cannot toggle in this mode");
+            AssertDebug(false, "Gpio::toggle()", "unhandled mode");
             break;
     }
+}
+
+bool Gpio::fromPinValue(int value) const {
+    if(mInvert){
+        return value == 0;
+    }
+    return value != 0; 
+}
+
+int32_t Gpio::toPinValue(bool value) const {
+    if(mInvert){
+        return value ? 0 : 1;
+    }
+    return value ? 1 : 0;
 }
 
 } // namespace Garbox

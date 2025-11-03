@@ -5,6 +5,7 @@
 #include "global/AppConfig.h"
 #include "global/pcnt/PcntConfig.h"
 #include "global/PinConfig.h"
+#include "global/gpio/GpioInstances.h"
 #include "global/ledc/LedcInstances.h"
 #include "global/timer/TimerInstances.h"
 #include "util/MathUtils.h"
@@ -21,6 +22,7 @@ static constexpr float RpmFilterThreshold = 0.1f;
 
 Fan::Fan() : 
     // init members
+    mGpioFanEnable(GpioInstances::GetFanEnable()),
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold){
@@ -28,17 +30,11 @@ Fan::Fan() :
 }
 
 void Fan::init(){
-
-    // init fan enable
-    mGpioFanEnable.setup(PinConfig::FanEnable, Gpio::Mode::Output);
-    mGpioFanEnable.setValue(0);
-
     // init tacho pulse counter
     FrequencySensor::Config config;
     config.pinMode = FrequencySensor::PinMode::Floating;
     config.stopTimeoutMicros = 500'000;
     mFrequencySensor.init(config);
-
 }
 
 void Fan::start(){

@@ -20,8 +20,11 @@ public:
     Rgb888 toRgb888() const;
     HslColor toHsl() const;
 
+    static Rgb565 fromFloat(float r, float g, float b);
     static Rgb565 fromFloat(const RgbFloat& f);
+    static Rgb565 fromRgb888(uint8_t r, uint8_t g, uint8_t b);
     static Rgb565 fromRgb888(const Rgb888& rgb);
+    static Rgb565 fromHsl(float h, float s, float l);
     static Rgb565 fromHsl(const HslColor& hsl);
 };
 

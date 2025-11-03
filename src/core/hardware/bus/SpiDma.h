@@ -1,11 +1,8 @@
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <cstring>
 #include "driver/spi_master.h"
-#include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 namespace Garbox {
 
@@ -15,7 +12,7 @@ namespace Garbox {
 class SpiDma {
 public:
 
-    using TxCallback = void (*)(void* user);
+    using TxCallback = void (*)(void* user, bool success);
 
     struct Config {
         spi_host_device_t hostDevice;
@@ -23,8 +20,9 @@ public:
         int32_t pinMiso = -1;
         int32_t pinClk = -1;
         int32_t pinCs = -1;
+        uint8_t mode = 0;
         int32_t frequencyHz = 40'000'000;
-        int32_t maxTransferSize = 1024;
+        int32_t maxTransferSizeBytes = 1024;
         int32_t queueSize = 3;
         UBaseType_t txCompleteTaskPriority = 5;
         uint32_t txCompleteTaskStackSize = 4096;
@@ -32,10 +30,12 @@ public:
 
     explicit SpiDma();
     ~SpiDma();
-
+    
     void setup(const Config& config);
-    void queue(const uint8_t* data, size_t lenBits, void* user = nullptr, TxCallback callback = nullptr);
     void setTxCallback(TxCallback callback);
+
+    void transferSync(const uint8_t* data, size_t lenBits, void* user = nullptr);
+    void transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, TxCallback callback = nullptr);
 
 private:
     struct TxSlot {
@@ -54,13 +54,16 @@ private:
 
     TaskHandle_t mCompletionTask = nullptr;
 
+    SemaphoreHandle_t mAsyncSem = nullptr;
+    SemaphoreHandle_t mSyncSem = nullptr;
+
     TxSlot* allocFreeSlot();
     void freeSlot(TxSlot* slot);
 
     static void completionTaskTrampoline(void* arg);
     void completionTask();
-    void handleCompletedTransaction(spi_transaction_t* transaction);
-    void invokeCallback(TxSlot* slot, void* user);
+    void handleCompletedTransaction(spi_transaction_t* transaction, bool success);
+    void invokeCallback(TxSlot* slot, void* user, bool success);
 };
 
 } // namespace Garbox

@@ -6,6 +6,7 @@
 #include "global/AppConfig.h"
 #include "global/bus/SpiInstances.h"
 #include "global/ledc/LedcInstances.h"
+#include "global/gpio/GpioInstances.h"
 #include "global/timer/TimerInstances.h"
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/StringUtils.h"
@@ -57,6 +58,7 @@ void setup() {
     });
 
     // init statics
+    GpioInstances::Init();
     DebugLeds::Init();
     LedcInstances::Init();
     TimerInstances::Init();

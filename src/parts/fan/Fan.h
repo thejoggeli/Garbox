@@ -2,12 +2,12 @@
 
 #include <cstdint>
 
-#include "core/hardware/gpio/Gpio.h" 
 #include "core/sensor/FrequencySensor.h"
 #include "util/filter/ExponentialFilter.h"
 
 namespace Garbox {
 
+class Gpio;
 class LedcChannel;
 
 class Fan {
@@ -35,7 +35,7 @@ private:
     float mSpeed = 0.0f;
 
     // sets voltage on FanEnable pin
-    Gpio mGpioFanEnable;
+    Gpio& mGpioFanEnable;
 
     // sends pwm signal to FanPwm pin
     LedcChannel& mSpeedPwm;

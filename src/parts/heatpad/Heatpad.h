@@ -2,10 +2,11 @@
 
 #include <cstdint>
 
-#include "core/hardware/gpio/Gpio.h" 
 #include "core/time/SoftwarePwm.h"
 
 namespace Garbox {
+
+class Gpio;
 
 class Heatpad {
 public:
@@ -30,7 +31,7 @@ private:
 
     static constexpr uint32_t PwmPeriodMicros = 5'000'000; // 5 seconds
 
-    Gpio mGpioHeatpadEnable;
+    Gpio& mGpioHeatpadEnable;
     SoftwarePwm mPwm;
 
     bool mHeatEnabled = false;

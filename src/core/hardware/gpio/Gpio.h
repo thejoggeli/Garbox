@@ -7,8 +7,8 @@ namespace Garbox {
 
 class Gpio {
 public:
+
     enum class Mode : uint8_t {
-        Uninitialized,
         Input,
         Output,
         InputPullup,
@@ -18,16 +18,20 @@ public:
 
     Gpio();
 
-    void setup(uint32_t pin, Mode mode, bool invert = false);
+    void setup(uint32_t pin, Mode mode, bool initivalValue = false, bool invert = false);
     void setValue(bool value);
     bool getValue() const;
     void toggle();
 
 private:
-    uint32_t mPin = 0;
-    bool mState = false;
+    gpio_num_t mPin = gpio_num_t::GPIO_NUM_NC;
+    bool mValue = false;
     bool mInvert = false;
-    Mode mMode = Mode::Uninitialized;
+    Mode mMode;
+    bool mInitialized = false;
+
+    bool fromPinValue(int value) const;
+    int toPinValue(bool value) const;
 };
 
 } // namespace Garbox

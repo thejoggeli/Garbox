@@ -15,8 +15,12 @@ public:
     // FreeRTOS task priorities
     static constexpr uint32_t SpiDmaTaskPriority = 5; 
 
+    // Display
+    static constexpr uint32_t DisplayWidth = 320;
+    static constexpr uint32_t DisplayHeight = 240;
+
     // SPI
-    static constexpr uint32_t SpiDmaMaxTransferSize = ((320 * 240) * 16) / 4;
+    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * sizeof(uint16_t);
 
 };
 

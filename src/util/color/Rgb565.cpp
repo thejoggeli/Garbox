@@ -22,6 +22,10 @@ RgbFloat Rgb565::toFloat() const {
     return RgbFloat(r5 / 31.0f, g6 / 63.0f, b5 / 31.0f);
 }
 
+Rgb565 Rgb565::fromFloat(float r, float g, float b) {
+    return Rgb565::fromFloat(RgbFloat(r, g, b));
+}
+
 Rgb565 Rgb565::fromFloat(const RgbFloat& f) {
     uint8_t r5 = static_cast<uint8_t>(f.r * 31.0f + 0.5f);
     uint8_t g6 = static_cast<uint8_t>(f.g * 63.0f + 0.5f);
@@ -53,11 +57,19 @@ HslColor Rgb565::toHsl() const {
     return ColorConverter::rgbToHsl(rf, gf, bf);
 }
 
+Rgb565 Rgb565::fromRgb888(uint8_t r, uint8_t g, uint8_t b){
+    return Rgb565::fromRgb888(Rgb888(r, g, b));
+}
+
 Rgb565 Rgb565::fromRgb888(const Rgb888& rgb) {
     uint8_t r5 = rgb.r >> 3;
     uint8_t g6 = rgb.g >> 2;
     uint8_t b5 = rgb.b >> 3;
     return Rgb565(r5, g6, b5);
+}
+
+Rgb565 Rgb565::fromHsl(float h, float s, float l){
+    return Rgb565::fromHsl(HslColor(h, s, l));
 }
 
 Rgb565 Rgb565::fromHsl(const HslColor& hsl) {
