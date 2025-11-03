@@ -8,6 +8,7 @@
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/color/ColorMap.h"
 #include "util/color/Rgb888.h"
+#include "util/MathUtils.h"
 
 namespace Garbox {
 
@@ -50,12 +51,21 @@ void MainControl::tick(){
     }
 
     // update fan state
-    constexpr uint32_t numFanStates = 6;
-    static uint32_t fanState = 0;
+    constexpr uint8_t numFanStates = 6;
+    constexpr uint8_t numToneSequences = 5;
+    static uint8_t fanState = 0;
+    static uint8_t tonSequence = 0;
     if(mFanStateTimer.isExpired()){
+
         switch(fanState){
             case 0:
-                mPiezoPlayer.playSequence(PiezoSequences::Helix);
+                switch(tonSequence){
+                    case 0: mPiezoPlayer.playSequence(PiezoSequences::Helix); break;
+                    case 1: mPiezoPlayer.playSequence(PiezoSequences::Button); break;
+                    case 2: mPiezoPlayer.playSequence(PiezoSequences::Interpolated1); break;
+                    case 3: mPiezoPlayer.playSequence(PiezoSequences::Interpolated2); break;
+                    case 4: mPiezoPlayer.playSequence(PiezoSequences::Startup); break;
+                }
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
@@ -97,7 +107,7 @@ void MainControl::tick(){
                 break;
         }
         LogDebug("MainControl", "Fan State: %" PRIu32, fanState);
-        fanState = (fanState + 1) % numFanStates;
+        fanState = MathUtils::Wrap<uint8_t>(fanState+1, numFanStates);
     }
 
     // fan tick

@@ -62,6 +62,7 @@ void Display::init() {
     testFillRect(115, 5, 50, 50, Rgb565::fromFloat(0, 0, 1).value);
 
     // initialization complete
+    mBacklightPwm.setDutyRelative(0.75f);
     mTestTimer.start(2000_ms);
     mInitialized = true;
 }
@@ -163,7 +164,6 @@ void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint1
 void Display::tick() {
     lv_timer_handler(); 
 
-
     static int x = 0;
     x = (x + 1) % 320;
     
@@ -182,8 +182,6 @@ void Display::tick() {
         mTestTimer.restart();
     }
 
-    float duty = std::sin(mTestTimer.getElapsedFraction() * static_cast<float>(M_TWOPI)) * 0.5f + 0.5f;
-    mBacklightPwm.setDutyRelative(duty);
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap) {

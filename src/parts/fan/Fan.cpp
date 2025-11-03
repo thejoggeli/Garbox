@@ -76,7 +76,7 @@ void Fan::setEnabled(bool enabled){
 
 
 void Fan::setSpeed(float speed){
-    mSpeed = MathUtils::clamp<float>(speed, 0.0f, 1.0f);
+    mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
     mSpeedPwm.setDutyRelative(mSpeed);
 }
 
