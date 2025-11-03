@@ -2,29 +2,33 @@
 
 #include <cstring>
 #include "assert/Assert.h"
+#include "esp_heap_caps.h"
 
 namespace Garbox {
 
-portMUX_TYPE mSlotLock = portMUX_INITIALIZER_UNLOCKED;
-
-SpiDma::SpiDma(){
+SpiDma::SpiDma() {
     // nothing to do
 }
 
 SpiDma::~SpiDma() {
-    AssertExit(false, "SpiDma::~SpiDma()", "not implemented");
+    // TODO: stop completion task
+    // TODO: drain transactions
+    // TODO: remove device and free bus
+    // TODO: free allocated memory
+    AssertExit(false, "SpiDma", "not implemented");
 }
 
 void SpiDma::setup(const Config& config) {
-    AssertExit(!mInitialized, "SpiDma::setup()", "already initialized");
+    AssertExit(!mInitialized, "SpiDma", "already initialized");
 
     // init members
     mHost = config.hostDevice;
     mNumSlots = config.queueSize;
+    mMaxTransferSizeBits = static_cast<size_t>(config.maxTransferSizeBytes) * 8;
 
     // allocate memory for tx slots
     mTxSlots = new TxSlot[mNumSlots];
-    AssertExit(mTxSlots != nullptr, "SpiDma::setup()", "TxSlot allocation failed");
+    AssertExit(mTxSlots != nullptr, "SpiDma", "TxSlot allocation failed");
 
     // initialize tx slots
     for (int i = 0; i < mNumSlots; ++i) {
@@ -51,30 +55,57 @@ void SpiDma::setup(const Config& config) {
 
     // initialize bus
     if (spi_bus_initialize(mHost, &busCfg, SPI_DMA_CH_AUTO) != ESP_OK) {
-        AssertExit(false, "SpiDma::setup()", "spi_bus_initialize failed");
+        AssertExit(false, "SpiDma", "spi_bus_initialize failed");
     }
 
     // initialize device
     if (spi_bus_add_device(mHost, &devCfg, &mDevice) != ESP_OK) {
-        AssertExit(false, "SpiDma::setup()", "spi_bus_add_device failed");
+        AssertExit(false, "SpiDma", "spi_bus_add_device failed");
     }
 
-    // counting semaphore: start "full" (all slots available)
-    mAsyncSem = xSemaphoreCreateCounting(mNumSlots, mNumSlots);
-    AssertExit(mAsyncSem != nullptr, "SpiDma::setup()", "failed to create async sem");
-
-    // binary semaphore for sync exclusion
-    mSyncSem = xSemaphoreCreateBinary();
-    AssertExit(mSyncSem != nullptr, "SpiDma::setup()", "failed to create sync sem");
-    xSemaphoreGive(mSyncSem); // set it "unlocked"
-
-    // init complete
     mInitialized = true;
 
     // start background completion task automatically
-    xTaskCreate(completionTaskTrampoline,
-        "SpiDmaDoneTask", config.txCompleteTaskStackSize, this, config.txCompleteTaskPriority, &mCompletionTask
+    BaseType_t taskRes = xTaskCreate(
+        completionTaskTrampoline,
+        "SpiDmaDoneTask",
+        config.txCompleteTaskStackSize,
+        this,
+        config.txCompleteTaskPriority,
+        &mCompletionTask
     );
+
+    if (taskRes != pdPASS || mCompletionTask == nullptr) {
+        AssertExit(false, "SpiDma", "failed to start completion task");
+    }
+}
+
+bool SpiDma::validateTransferArgs(const uint8_t* data, size_t lenBits) {
+    if (!mInitialized) {
+        AssertDebug(false, "SpiDma", "not initialized");
+        return false;
+    }
+    if (data == nullptr) {
+        AssertDebug(false, "SpiDma", "invalid data ptr");
+        return false;
+    }
+    if (!esp_ptr_internal(data) || !esp_ptr_dma_capable(data)) {
+        AssertDebug(false, "SpiDma", "TX buffer not in internal DMA-capable memory");
+        return false;
+    }
+    if (lenBits == 0) {
+        AssertDebug(false, "SpiDma", "len bits must be > 0");
+        return false;
+    }
+    if (lenBits & 0x7) {
+        AssertDebug(false, "SpiDma", "len bits must be divisible by 8");
+        return false;
+    }
+    if (lenBits > mMaxTransferSizeBits) {
+        AssertDebug(false, "SpiDma", "len bits exceed max transfer size");
+        return false;
+    }
+    return true;
 }
 
 SpiDma::TxSlot* SpiDma::allocFreeSlot() {
@@ -94,8 +125,8 @@ SpiDma::TxSlot* SpiDma::allocFreeSlot() {
 }
 
 void SpiDma::freeSlot(TxSlot* slot) {
-    if(slot == nullptr){
-        AssertDebug(false, "SpiDma::freeSlot()", "invalid slot ptr");
+    if (slot == nullptr) {
+        AssertDebug(false, "SpiDma", "invalid slot ptr");
         return;
     }
     // mark slot as free
@@ -105,94 +136,50 @@ void SpiDma::freeSlot(TxSlot* slot) {
     portEXIT_CRITICAL(&mSlotLock);
 }
 
-void SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user) {
-
-    // check initialized
-    if (!mInitialized){
-        AssertDebug(false, "SpiDma::transferSync()", "not initialized");
-        return;
+bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user) {
+    if (!validateTransferArgs(data, lenBits)) {
+        return false;
     }
 
-    // check data ptr
-    if (data == nullptr){
-        AssertDebug(false, "SpiDma::transferSync()", "invalid data ptr");
-        return;
+    if (xTaskGetCurrentTaskHandle() == mCompletionTask) {
+        AssertDebug(false, "SpiDma", "transferSync() not supported from completion callback");
+        return false;
     }
 
-    // check len bits
-    if (lenBits == 0){
-        AssertDebug(false, "SpiDma::transferSync()", "len bits must be > 0");
-        return;
+    esp_err_t res = spi_device_acquire_bus(mDevice, portMAX_DELAY);
+    if (res != ESP_OK) {
+        AssertDebug(false, "SpiDma", "spi_device_acquire_bus failed");
+        return false;
     }
 
-    // get exclusive access
-    xSemaphoreTake(mSyncSem, portMAX_DELAY);
-
-    // wait until all async slots are released
-    for (int i = 0; i < mNumSlots; ++i) {
-        xSemaphoreTake(mAsyncSem, portMAX_DELAY);
-    }
-
-    spi_transaction_t transaction;
-    std::memset(&transaction, 0, sizeof(transaction));
-
+    spi_transaction_t transaction = {};
     transaction.tx_buffer = data;
     transaction.length = lenBits;
     transaction.user = user;
 
-    // perform blocking transfer
-    esp_err_t ret = spi_device_polling_transmit(mDevice, &transaction);
+    res = spi_device_polling_transmit(mDevice, &transaction);
 
-    // release async semaphores 
-    for (int i = 0; i < mNumSlots; ++i) {
-        xSemaphoreGive(mAsyncSem);
+    spi_device_release_bus(mDevice);
+
+    if (res != ESP_OK) {
+        AssertDebug(false, "SpiDma", "spi_device_polling_transmit failed");
+        return false;
     }
 
-    // release sync semaphore
-    xSemaphoreGive(mSyncSem);
-
-    // check result
-    if (ret != ESP_OK) {
-        AssertDebug(false, "SpiDma::transferSync()", "spi_device_polling_transmit failed");
-    }
+    return true;
 }
 
-void SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, TxCallback callback) {
-
-    // check initialized
-    if (!mInitialized){
-        AssertDebug(false, "SpiDma::queue()", "not initialized");
-        return;
+bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, TxCallback callback) {
+    if (!validateTransferArgs(data, lenBits)) {
+        return false;
     }
 
-    // check data ptr
-    if (data == nullptr){
-        AssertDebug(false, "SpiDma::queue()", "invalid data ptr");
-        return;
-    }
-
-    // check len bits
-    if (lenBits == 0){
-        AssertDebug(false, "SpiDma::queue()", "len bits must be > 0");
-        return;
-    }
-
-    // wait for sync lock to ensure no sync transfer is running
-    xSemaphoreTake(mSyncSem, portMAX_DELAY);
-
-    // lock an async slot
-    xSemaphoreTake(mAsyncSem, portMAX_DELAY);
-
-    // get free tx slot
     TxSlot* slot = allocFreeSlot();
-    if (slot == nullptr){
-        xSemaphoreGive(mAsyncSem);
-        xSemaphoreGive(mSyncSem);
-        AssertDebug(false, "SpiDma::queue()", "no free tx slots available");
-        return;
+    if (slot == nullptr) {
+        AssertDebug(false, "SpiDma", "no free tx slots available");
+        return false;
     }
 
-    // setup spi transaction 
     spi_transaction_t& transaction = slot->trans;
     std::memset(&transaction, 0, sizeof(spi_transaction_t));
     transaction.tx_buffer = data;
@@ -200,21 +187,20 @@ void SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, TxCa
     transaction.user = user;
     slot->callback = callback;
 
-    // queue transaction
     esp_err_t ret = spi_device_queue_trans(mDevice, &transaction, portMAX_DELAY);
-
-    // release sync semaphore again
-    xSemaphoreGive(mSyncSem);  
-
     if (ret != ESP_OK) {
-        AssertDebug(false, "SpiDma::queue()", "failed to queue transaction");
-        xSemaphoreGive(mAsyncSem); // release again
+        AssertDebug(false, "SpiDma", "failed to queue transaction");
         freeSlot(slot);
+        return false;
     }
+
+    return true;
 }
 
 void SpiDma::setTxCallback(TxCallback callback) {
+    portENTER_CRITICAL(&mSlotLock);
     mTxCallback = callback;
+    portEXIT_CRITICAL(&mSlotLock);
 }
 
 void SpiDma::completionTaskTrampoline(void* arg) {
@@ -223,28 +209,31 @@ void SpiDma::completionTaskTrampoline(void* arg) {
 
 void SpiDma::completionTask() {
     spi_transaction_t* transaction = nullptr;
+    constexpr TickType_t waitTicks = pdMS_TO_TICKS(1000); // 1s timeout
+
     while (true) {
-        
-        // Wait for the next completed SPI transaction.
-        // This call blocks the task and yields to the FreeRTOS scheduler internally.
-        esp_err_t ret = spi_device_get_trans_result(mDevice, &transaction, portMAX_DELAY);
+        esp_err_t ret = spi_device_get_trans_result(mDevice, &transaction, waitTicks);
 
-        if (ret != ESP_OK) {
-            AssertDebug(false, "SpiDma::completionTask()", "SPI transaction failed");
+        if (ret == ESP_OK) {
+            if (transaction != nullptr) {
+                handleCompletedTransaction(transaction, true);
+            }
+            else {
+                AssertDebug(false, "SpiDma", "got ESP_OK but nullptr transaction");
+            }
         }
-
-        if (transaction != nullptr) {
-            bool success = (ret == ESP_OK);
-            handleCompletedTransaction(transaction, success);
-            xSemaphoreGive(mAsyncSem); // always give back once per transaction
+        else if (ret == ESP_ERR_TIMEOUT) {
+            // No completed transactions within 1s, normal if idle
+            continue;
         }
         else {
-            AssertDebug(false, "SpiDma::completionTask()", "received nullptr");
+            AssertDebug(false, "SpiDma", "spi_device_get_trans_result error");
+            vTaskDelay(pdMS_TO_TICKS(100));
         }
     }
 }
 
-void SpiDma::handleCompletedTransaction(spi_transaction_t* transaction, bool success){
+void SpiDma::handleCompletedTransaction(spi_transaction_t* transaction, bool success) {
     // invoke callback and free transaction slot
     portENTER_CRITICAL(&mSlotLock);
     for (int i = 0; i < mNumSlots; ++i) {
@@ -259,12 +248,15 @@ void SpiDma::handleCompletedTransaction(spi_transaction_t* transaction, bool suc
 }
 
 void SpiDma::invokeCallback(TxSlot* slot, void* user, bool success) {
-    // per-call callback takes priority
+    portENTER_CRITICAL(&mSlotLock);
+    TxCallback globalCb = mTxCallback;
+    portEXIT_CRITICAL(&mSlotLock);
+
     if (slot->callback != nullptr) {
         slot->callback(user, success);
-    } 
-    else if (mTxCallback != nullptr) {
-        mTxCallback(user, success);
+    }
+    else if (globalCb != nullptr) {
+        globalCb(user, success);
     }
 }
 

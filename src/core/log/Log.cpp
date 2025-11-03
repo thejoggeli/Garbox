@@ -8,7 +8,7 @@ static bool mInitialized = false;
 
 void Log::Init() {
     if (mInitialized) {
-        AssertExit(false, "Log::Init()", "already initialized");
+        AssertExit(false, "Log", "already initialized");
         return;
     }
 

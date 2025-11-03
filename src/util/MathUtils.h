@@ -23,40 +23,48 @@ public:
         return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     }
 
-    // unified wrap function 
-    // exclusive endpoint: output will be in the range [a, b)
-    // supported types: unsigned int, signed int, float, double
-    template <typename T>
-    static T Wrap(T value, T a, T b = 0) {
-        if constexpr (std::is_unsigned_v<T>) {
-            // unsigned wrap within [0, a)
-            T wrap = a;
-            if (wrap == 0) return 0;
-            while (value >= wrap)
-                value -= wrap;
-            return value;
 
+    // wraps value into the range [0, max) without using modulo
+    // this function is meant to be used with small changes to value only. it handles at most one overflow
+    template <typename T>
+    static T Wrap(T value, T max) {
+        if (max == 0) return 0;
+        if constexpr (std::is_unsigned_v<T>) {
+            if (value >= max)
+                value -= max;
+            return value;
         } 
         else if constexpr (std::is_signed_v<T> || std::is_floating_point_v<T>) {
-            // signed or floating-point wraps within [a, b)
-            T minVal = a;
-            T maxVal = b;
-
-            if (minVal >= maxVal) return minVal;
-            T range = maxVal - minVal;
-
-            while (value >= maxVal)
-                value -= range;
-            while (value < minVal)
-                value += range;
-
+            if (value >= max)
+                value -= max;
+            else if (value < 0)
+                value += max;
             return value;
-
         } 
-        else {
-            static_assert(std::is_arithmetic_v<T>, "Wrap supports only numeric types");
+        static_assert(std::is_arithmetic_v<T>, "Wrap supports only numeric types");
+    }
+
+    // wraps value into the range [min, max) without using modulo
+    // this function is meant to be used with small changes to value only. it handles at most one over/underflow
+    template <typename T>
+    static T Wrap(T value, T min, T max) {
+        if (min >= max) return min;
+        T range = max - min;
+        if constexpr (std::is_unsigned_v<T>) {
+            if (value >= max)
+                value -= range;
+            else if (value < min)
+                value += range;
             return value;
-        }
+        } 
+        else if constexpr (std::is_signed_v<T> || std::is_floating_point_v<T>) {
+            if (value >= max)
+                value -= range;
+            else if (value < min)
+                value += range;
+            return value;
+        } 
+        static_assert(std::is_arithmetic_v<T>, "Wrap supports only numeric types");
     }
 
 };

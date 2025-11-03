@@ -2,12 +2,16 @@
 
 #include "driver/spi_master.h"
 #include "freertos/task.h"
-#include "freertos/semphr.h"
 
 namespace Garbox {
 
 /**
- * Allocates some heap memory on initialization for transaction queue
+ * SPI DMA helper with queued async transfers and optional callbacks.
+ *
+ * NOTE:
+ *  - Synchronous calls (transferSync) from within the completion callback
+ *    are NOT supported for now. This could be added later using semaphores
+ *    for safe reentry, but is intentionally disabled to keep behavior simple.
  */
 class SpiDma {
 public:
@@ -25,7 +29,7 @@ public:
         int32_t maxTransferSizeBytes = 1024;
         int32_t queueSize = 3;
         UBaseType_t txCompleteTaskPriority = 5;
-        uint32_t txCompleteTaskStackSize = 4096;
+        uint32_t txCompleteTaskStackSize = 1024;
     };
 
     explicit SpiDma();
@@ -34,8 +38,8 @@ public:
     void setup(const Config& config);
     void setTxCallback(TxCallback callback);
 
-    void transferSync(const uint8_t* data, size_t lenBits, void* user = nullptr);
-    void transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, TxCallback callback = nullptr);
+    bool transferSync(const uint8_t* data, size_t lenBits, void* user = nullptr);
+    bool transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, TxCallback callback = nullptr);
 
 private:
     struct TxSlot {
@@ -54,8 +58,10 @@ private:
 
     TaskHandle_t mCompletionTask = nullptr;
 
-    SemaphoreHandle_t mAsyncSem = nullptr;
-    SemaphoreHandle_t mSyncSem = nullptr;
+    portMUX_TYPE mSlotLock = portMUX_INITIALIZER_UNLOCKED;
+    size_t mMaxTransferSizeBits = 0;
+
+    bool validateTransferArgs(const uint8_t* data, size_t lenBits);
 
     TxSlot* allocFreeSlot();
     void freeSlot(TxSlot* slot);

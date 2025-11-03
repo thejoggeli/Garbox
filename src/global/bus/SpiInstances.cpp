@@ -10,7 +10,7 @@ static bool sInitialized = false;
 
 void SpiInstances::Init(){
     
-    AssertExit(!sInitialized, "SpiInstances::Init()", "already initialized");
+    AssertExit(!sInitialized, "SpiInstances", "already initialized");
 
     GetSpiDma().setup({
         .hostDevice = SPI2_HOST,

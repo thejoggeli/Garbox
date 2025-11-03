@@ -13,7 +13,7 @@ static LedcTimer* resolveTimer(LedcTimer::Id id) {
         case LedcConfig::FanTimer.id:     return &LedcInstances::GetFanTimer();
         case LedcConfig::PiezoTimer.id:   return &LedcInstances::GetPiezoTimer();
         default:
-            AssertExit(false, "LedcInstances::resolveTimer()", "Invalid LEDC timer ID");
+            AssertExit(false, "LedcInstances", "Invalid LEDC timer ID");
             return nullptr; // never reached
     }
 }
@@ -28,7 +28,7 @@ static void setupChannel(LedcChannel& channel, LedcConfig::ChannelConfig const& 
 
 void LedcInstances::Init() {
 
-    AssertExit(!sInitialized, "SpiInstances::Init()", "already initialized");
+    AssertExit(!sInitialized, "LedInstances", "already initialized");
 
     // setup timers
     setupTimer(GetDimmingTimer(), LedcConfig::DimmingTimer);

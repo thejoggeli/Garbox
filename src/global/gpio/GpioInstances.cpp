@@ -8,7 +8,7 @@ namespace Garbox {
 static bool sInitialized = false;
 
 void GpioInstances::Init(){
-    AssertExit(!sInitialized, "SpiInstances::Init()", "already initialized");
+    AssertExit(!sInitialized, "SpiInstances", "already initialized");
 
     constexpr bool InitialOff = false;
 

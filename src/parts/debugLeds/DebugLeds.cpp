@@ -28,7 +28,7 @@ static bool gInitialized = false;
 void DebugLeds::Init(){
 
     if (gInitialized) {
-        AssertExit(false, "DebugLeds::Init()", "already initialized");
+        AssertExit(false, "DebugLeds", "already initialized");
         return;
     }
 
@@ -44,14 +44,14 @@ void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     // check if initialized
     if(!gInitialized){
-        AssertDebug(false, "DeubgLeds::SetLed()", "not initialized");
+        AssertDebug(false, "DeubgLeds", "not initialized");
         return;
     }
 
     // check if valid id
     size_t const index = static_cast<size_t>(id);
     if(index >= sLeds.size()){
-        AssertDebug(false, "DebugLeds::SetLed()", "invalid id");
+        AssertDebug(false, "DebugLeds", "invalid id");
         return;
     }
 
@@ -68,14 +68,14 @@ void DebugLeds::ToggleLed(Id id, float brightness){
 
     // check if initialized
     if(!gInitialized){
-        AssertDebug(false, "DebugLeds::ToggleLed()", "not initialized");
+        AssertDebug(false, "DebugLeds", "not initialized");
         return;
     }
 
     // check if valid id
     size_t const index = static_cast<size_t>(id);
     if(index >= sLeds.size()){
-        AssertDebug(false, "DebugLeds::ToggleLed()", "invalid id");
+        AssertDebug(false, "DebugLeds", "invalid id");
         return;
     }
 
@@ -92,7 +92,7 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
 
     // check if initialized
     if(!gInitialized){
-        AssertDebug(false, "DebugLeds::SetAllLeds()", "not initialized");
+        AssertDebug(false, "DebugLeds", "not initialized");
         return;
     }
 
@@ -115,7 +115,7 @@ void DebugLeds::ToggleAllLeds(float brightness){
 
     // check if initialized
     if(!gInitialized){
-        AssertDebug(false, "DebugLeds::ToggleLed()", "not initialized");
+        AssertDebug(false, "DebugLeds", "not initialized");
         return;
     }
 

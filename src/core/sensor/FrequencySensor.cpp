@@ -20,11 +20,11 @@ FrequencySensor::FrequencySensor(uint32_t pin, Timer& timer):
 
 bool FrequencySensor::init(Config const& config) {
 
-    AssertExit(!mInitialized, "FrequencySensor::init()", "already initialized");
+    AssertExit(!mInitialized, "FrequencySensor", "already initialized");
     
     // initialize members
     mTimerFrequencyHz = static_cast<float>(mTimer.getFrequencyHz());
-    AssertExit(mTimerFrequencyHz > 0, "FrequencySensor:init()", "invalid timer frequency");
+    AssertExit(mTimerFrequencyHz > 0, "FrequencySensor", "invalid timer frequency");
 
     // initialize stop timeout
     if(config.stopTimeoutMicros == 0){
@@ -34,7 +34,7 @@ bool FrequencySensor::init(Config const& config) {
         // ticks = time[s] * freq[Hz] = (stopTimeoutMicros/1e6) * timerFrequencyHz
         float ticksFloat = static_cast<float>(config.stopTimeoutMicros) * 1e-6f * mTimerFrequencyHz;
         if(ticksFloat < 0 || ticksFloat > static_cast<float>(1'000'000'000)){
-            AssertExit(false, "FrequencySensor::init()", "stopTimeoutMicros invalid value");
+            AssertExit(false, "FrequencySensor", "stopTimeoutMicros invalid value");
         }
         mStopTimeoutTicks = static_cast<uint32_t>(ticksFloat);
     }
@@ -59,29 +59,29 @@ bool FrequencySensor::init(Config const& config) {
             ioConf.pull_down_en = GPIO_PULLDOWN_ENABLE;
             break;
         default:
-            AssertExit(false, "FrequencySensor::init()", "invalid pinMode");
+            AssertExit(false, "FrequencySensor", "invalid pinMode");
             return false;
     }
 
     esp_err_t err = gpio_config(&ioConf);
-    AssertExit(err == ESP_OK, "FrequencySensor::init()", "gpio_config failed");
+    AssertExit(err == ESP_OK, "FrequencySensor", "gpio_config failed");
 
     // Install ISR service once globally (safe to call multiple times)
     static bool isrServiceInstalled = false;
     if (!isrServiceInstalled) {
         err = gpio_install_isr_service(0);
-        AssertExit(err == ESP_OK, "FrequencySensor::init()", "gpio_install_isr_service failed");
+        AssertExit(err == ESP_OK, "FrequencySensor", "gpio_install_isr_service failed");
         isrServiceInstalled = true;
     }
 
     // Register per-instance ISR (context pointer passed to handler)
     portENTER_CRITICAL(&sFrequencySensorMux);
     err = gpio_isr_handler_add(static_cast<gpio_num_t>(mPin), isrHandler, this);
-    AssertExit(err == ESP_OK, "FrequencySensor::init()", "gpio_isr_handler_add failed");
+    AssertExit(err == ESP_OK, "FrequencySensor", "gpio_isr_handler_add failed");
 
     // Disable interrupt by default
     err = gpio_intr_disable(static_cast<gpio_num_t>(mPin));
-    AssertExit(err == ESP_OK, "FrequencySensor::init()", "gpio_intr_disable failed");
+    AssertExit(err == ESP_OK, "FrequencySensor", "gpio_intr_disable failed");
     portEXIT_CRITICAL(&sFrequencySensorMux);
 
     // finish initialization
@@ -99,7 +99,7 @@ void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
 
 void FrequencySensor::tick(){
     if(!mInitialized){
-        AssertDebug(false, "FrequencySensor::tick()", "not initialized");
+        AssertDebug(false, "FrequencySensor", "not initialized");
         return;
     }
 
@@ -146,7 +146,7 @@ void FrequencySensor::tick(){
 
 void FrequencySensor::setEnabled(bool enabled) {
     if (!mInitialized){
-        AssertDebug(false, "FrequencySensor::setEnabled()", "not initialized");
+        AssertDebug(false, "FrequencySensor", "not initialized");
         return;
     }
 
@@ -176,7 +176,7 @@ bool FrequencySensor::isEnabled(){
 
 float FrequencySensor::getFrequencyHz() {
     if(!mInitialized){
-        AssertDebug(false, "FrequencySensor::getFrequencyHz()", "not initialized");
+        AssertDebug(false, "FrequencySensor", "not initialized");
         return 0;
     }
     return mMeasuredFrequencyHz;

@@ -23,7 +23,7 @@ MainControl::MainControl() :
 }
 
 void MainControl::init(){
-    AssertExit(!mInitialized, "MainControl::init()", "already initialized");
+    AssertExit(!mInitialized, "MainControl", "already initialized");
     mFan.init();
     mFan.setEnabled(0);
     mFan.setSpeed(0.0F);
@@ -42,7 +42,7 @@ void MainControl::start(){
     mPiezoPlayer.playSequence(PiezoSequences::Button, 500_ms);
 }
 
-void MainControl::tick(){
+void MainControl::mainTick(){
 
     // heartbeat 
     if(mHeartbeatTimer.isExpired()){
@@ -66,6 +66,7 @@ void MainControl::tick(){
                     case 3: mPiezoPlayer.playSequence(PiezoSequences::Interpolated2); break;
                     case 4: mPiezoPlayer.playSequence(PiezoSequences::Startup); break;
                 }
+                tonSequence = MathUtils::Wrap<uint8_t>(tonSequence+1, numToneSequences);
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
@@ -140,10 +141,14 @@ void MainControl::tick(){
     DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);
 
     // display tick
-    mDisplay.tick();
+    mDisplay.mainTick();
 
     // piezo tick
     mPiezoPlayer.tick();
+}
+
+void MainControl::displayTxTick(){
+    mDisplay.txTick();
 }
 
 void MainControl::onAssertDebug(const char* context, const char* message){

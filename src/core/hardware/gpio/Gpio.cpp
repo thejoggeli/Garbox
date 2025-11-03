@@ -10,7 +10,7 @@ Gpio::Gpio() {
 
 void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
 
-    AssertExit(!mInitialized, "Gpio::setup()", "already initialized");
+    AssertExit(!mInitialized, "Gpio", "already initialized");
 
     mPin = static_cast<gpio_num_t>(pin);
     mMode = mode;
@@ -38,19 +38,19 @@ void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
             cfg.mode = GPIO_MODE_OUTPUT_OD;
             break;
         default:
-            AssertDebug(false, "Gpio::setup()", "called with unhandled mode");
+            AssertDebug(false, "Gpio", "called with unhandled mode");
             return;
     }
 
     cfg.pin_bit_mask = (1ULL << pin);
     cfg.intr_type = GPIO_INTR_DISABLE;
     if(gpio_config(&cfg) != ESP_OK){
-        AssertDebug(false, "Gpio::setup()", "gpio_config failed");
+        AssertDebug(false, "Gpio", "gpio_config failed");
     }
 
     mValue = initivalValue;
     if(gpio_set_level(mPin, toPinValue(mValue)) != ESP_OK){
-        AssertDebug(false, "Gpio::setup()", "gpio_set_level failed");
+        AssertDebug(false, "Gpio", "gpio_set_level failed");
     }
 
     mInitialized = true;
@@ -58,7 +58,7 @@ void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
 
 void Gpio::setValue(bool value) {
     if(!mInitialized){
-        AssertDebug(false, "Gpio::setValue()", "not initialized"); 
+        AssertDebug(false, "Gpio", "not initialized"); 
         return;
     }
     switch (mMode) {
@@ -74,14 +74,14 @@ void Gpio::setValue(bool value) {
         case Mode::InputPullup:
         case Mode::InputPulldown:
         default:
-            AssertDebug(false, "Gpio::setValue()", "unhandled mode");
+            AssertDebug(false, "Gpio", "unhandled mode");
             break;
     }
 }
 
 bool Gpio::getValue() const {
     if(!mInitialized){
-        AssertDebug(false, "Gpio::getValue()", "not initialized"); 
+        AssertDebug(false, "Gpio", "not initialized"); 
         return false;
     }
     switch (mMode) {
@@ -93,14 +93,14 @@ bool Gpio::getValue() const {
         case Mode::OutputOpenDrain:
             return mValue;
         default:
-            AssertDebug(false, "Gpio::getValue()", "unhandled mode");
+            AssertDebug(false, "Gpio", "unhandled mode");
             return false;
     }
 }
 
 void Gpio::toggle() {
     if(!mInitialized){
-        AssertDebug(false, "Gpio::toggle()", "not initialized"); 
+        AssertDebug(false, "Gpio", "not initialized"); 
         return;
     }
     switch (mMode) {
@@ -113,7 +113,7 @@ void Gpio::toggle() {
         case Mode::InputPullup:
         case Mode::InputPulldown:
         default:
-            AssertDebug(false, "Gpio::toggle()", "unhandled mode");
+            AssertDebug(false, "Gpio", "unhandled mode");
             break;
     }
 }

@@ -19,13 +19,13 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 
     // check if setup
     if(mInitialized){
-        AssertDebug(false, "LedChannel::setup()", "already initialized");
+        AssertDebug(false, "LedChannel", "already initialized");
         return false;
     }
 
     // timer must exist
     if(timer == nullptr){
-        AssertDebug(false, "LedChannel::setup()", "timer is nullptr");
+        AssertDebug(false, "LedChannel", "timer is nullptr");
         return false;
     }
 
@@ -56,7 +56,7 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 
     // check result
     if(result != ESP_OK){
-        AssertExit(false, "LedChannel::setup()", "attach failed");
+        AssertExit(false, "LedChannel", "attach failed");
         return false;
     }
 
@@ -68,7 +68,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check if setup
     if(!mInitialized){
-        AssertDebug(false, "LedChannel::setDutyRaw()", "not initialized");
+        AssertDebug(false, "LedChannel", "not initialized");
         return false;
     }
 
@@ -77,7 +77,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check result
     if (err != ESP_OK){
-        AssertDebug(false, "LedChannel::setDutyRaw()", "setDutyRaw failed");
+        AssertDebug(false, "LedChannel", "setDutyRaw failed");
         return false;
     }
     else {
@@ -94,7 +94,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check result
     if (err != ESP_OK){
-        AssertDebug(false, "LedChannel::setDutyRaw()", "updateDuty failed");
+        AssertDebug(false, "LedChannel", "updateDuty failed");
         return false;
     }
     return true;
@@ -104,7 +104,7 @@ bool LedcChannel::setDutyRelative(float ratio, bool update){
 
     // check if setup
     if(!mInitialized){
-        AssertDebug(false, "LedChannel::setDutyRelative()", "channel not initialized");
+        AssertDebug(false, "LedChannel", "channel not initialized");
         return false;
     }
 

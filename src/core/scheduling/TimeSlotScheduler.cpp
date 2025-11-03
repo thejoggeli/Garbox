@@ -7,7 +7,7 @@ namespace Garbox {
 
 TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
 
-    AssertExit(configs.size() > 0, "TimeSlotScheduler()", "minimum one slot required");
+    AssertExit(configs.size() > 0, "TimeSlotScheduler", "minimum one slot required");
 
     // determine maximum index to size mDiagnostics
     uint8_t maxIndex = 0;

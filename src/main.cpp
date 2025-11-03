@@ -20,16 +20,12 @@ enum SlotIndex : uint8_t {
 };
 
 void mainTask(void);
-void displayTask(void);
+void displayTxTask(void);
 void loggingTask(void);
 
 TimeSlotScheduler gScheduler ({
-    // 10ms Slot
-    {3000, SlotMain,    mainTask},
-    {7000, SlotDisplay, displayTask},
-    // 10ms slot
-    {3000, SlotMain,    mainTask},
-    {7000, SlotLogging, loggingTask}
+    {AppConfig::TaskDurationMicros::Main,      SlotMain,    mainTask},
+    {AppConfig::TaskDurationMicros::DisplayTx, SlotDisplay, displayTxTask},
 });
 
 MainControl gMainControl;
@@ -42,7 +38,7 @@ void setup() {
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message){
         DebugLeds::SetLed(DebugLeds::Id::Assert, true);
-        LogWarning("AssertHandler", "AssertDebug! %s %s", context, message);
+        LogError("AssertHandler", "AssertDebug! %s %s", context, message);
         gMainControl.onAssertDebug(context, message);
     });
 
@@ -88,19 +84,16 @@ void setup() {
 }
 
 void loop() {
-
     Time::Tick();
     gScheduler.run();
-
 }
 
 void mainTask(){
-    gMainControl.tick();
+    gMainControl.mainTick();
 }
 
-void displayTask(){
-    // dummy task
-    Time::DelayMicros(2000);
+void displayTxTask(){
+    gMainControl.displayTxTick();
 }
 
 void loggingTask(){

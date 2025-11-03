@@ -29,7 +29,7 @@ Display::Display():
 
 void Display::init() {
 
-    AssertExit(!mInitialized, "Display::init()", "already initialized");
+    AssertExit(!mInitialized, "Display", "already initialized");
 
     // initialize lvgl
     lv_init();
@@ -41,13 +41,16 @@ void Display::init() {
     lv_tick_set_cb(tickCallback);
 
     // init draw buffer
-    mDrawBuf = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA);
-    AssertExit(mDrawBuf != nullptr, "Display::init()", "mDrawBuf is nullptr");
+    // mDrawBufA = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    // mDrawBufB = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    mDrawBufA = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA);
+    AssertExit(mDrawBufA != nullptr, "Display", "mDrawBufA is nullptr");
 
     // init display
     mLvDisplay = lv_display_create(mWidth, mHeight);
     lv_display_set_user_data(mLvDisplay, this); 
-    lv_display_set_buffers(mLvDisplay, mDrawBuf, nullptr, mBufferSize, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_buffers(mLvDisplay, mDrawBufA, nullptr, mBufferSize, LV_DISPLAY_RENDER_MODE_FULL);
+    // lv_display_set_buffers(mLvDisplay, mDrawBufA, mDrawBufB, mBufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(mLvDisplay, flushTrampoline);
 
     lv_obj_t* label = lv_label_create(lv_screen_active());
@@ -115,6 +118,9 @@ void Display::hardwareInit(){
 }
 
 void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
+
+    return;
+
     uint8_t cmd;
     uint8_t data[4];
 
@@ -161,8 +167,16 @@ void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint1
     }
 }
 
-void Display::tick() {
-    lv_timer_handler(); 
+void Display::mainTick() {
+
+    if(mFlushing){
+        mRenderSkipCount += 1;
+        AssertDebug(false, "Display", "render skipped");
+        LogWarning("Display", "render skipped! count: %u", mRenderSkipCount);
+    }
+    else {
+        lv_timer_handler(); 
+    }
 
     static int x = 0;
     x = (x + 1) % 320;
@@ -184,7 +198,14 @@ void Display::tick() {
 
 }
 
+void Display::txTick(){
+    // todo
+}
+
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap) {
+
+    mFlushing = true;
+    // lv_display_flush_ready(mLvDisplay);
     return;
     
     uint8_t cmd;
@@ -246,13 +267,15 @@ void Display::handleLog(lv_log_level_t level, const char* str){
             break;
         case LV_LOG_LEVEL_WARN:
             LogWarning("LVGL/Warn", "%s", str);
+            AssertDebug(false, "Display", "LVGL Warning");
             break;
         case LV_LOG_LEVEL_ERROR:
             LogError("LVGL/Error", "%s", str);
+            AssertDebug(false, "Display", "LVGL Error");
             break;
         case LV_LOG_LEVEL_USER:        
         default:
-            AssertDebug(false, "Display::logCallback()", "unhandled log level");
+            AssertDebug(false, "Display", "unhandled log level");
             break;
     }
 }

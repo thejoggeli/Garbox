@@ -10,7 +10,7 @@ Timer::Timer() {
 
 void Timer::init(InitStruct const& initStruct){
 
-    AssertExit(!mInitialized, "Timer::init()", "already initialized");
+    AssertExit(!mInitialized, "Timer", "already initialized");
 
     // init members
     mGroup = initStruct.group;
@@ -30,39 +30,39 @@ void Timer::init(InitStruct const& initStruct){
             break;
         default:
             clockFrequency = 0;
-            AssertExit(!mInitialized, "Timer::init()", "unhandled clock source");
+            AssertExit(!mInitialized, "Timer", "unhandled clock source");
     }
 
     // compute divider from desired frequency (APB = 80 MHz)
-    AssertExit((clockFrequency > mFrequencyHz), "Timer::init()", "timer frequency too large");
-    AssertExit((clockFrequency % mFrequencyHz) == 0, "Timer::init()", "not divisible clock frequency");
+    AssertExit((clockFrequency > mFrequencyHz), "Timer", "timer frequency too large");
+    AssertExit((clockFrequency % mFrequencyHz) == 0, "Timer", "not divisible clock frequency");
     uint32_t divider = clockFrequency / mFrequencyHz;
-    AssertExit((divider >= 2) && (divider <= 65536), "Timer::init()", "divider out of range");
+    AssertExit((divider >= 2) && (divider <= 65536), "Timer", "divider out of range");
     mConfig.divider = divider;
 
     // configure hardware timer for 1 µs ticks
     esp_err_t err;
     err = timer_init(mGroup, mIndex, &mConfig);
-    AssertExit(err == ESP_OK, "Timer::init()", "timer_init failed");
+    AssertExit(err == ESP_OK, "Timer", "timer_init failed");
 
     // set initial counter value
     err = timer_set_counter_value(mGroup, mIndex, 0);
-    AssertExit(err == ESP_OK, "Timer::init()", "timer_set_counter_value failed");
+    AssertExit(err == ESP_OK, "Timer", "timer_set_counter_value failed");
 
     // enable alarm
     if(mConfig.alarm_en == TIMER_ALARM_EN){
-        AssertExit(mMaxValue != 0, "Timer::init()", "expected maxValue != 0");
+        AssertExit(mMaxValue != 0, "Timer", "expected maxValue != 0");
         err = timer_set_alarm_value(mGroup, mIndex, mMaxValue);
-        AssertExit(err == ESP_OK, "Timer::init()", "timer_set_alarm_value failed");
+        AssertExit(err == ESP_OK, "Timer", "timer_set_alarm_value failed");
         err = timer_enable_intr(mGroup, mIndex);
-        AssertExit(err == ESP_OK, "Timer::init()", "timer_enable_intr failed");
+        AssertExit(err == ESP_OK, "Timer", "timer_enable_intr failed");
     }
     else {
-        AssertExit(mMaxValue == 0, "Timer::init()", "expected maxValue == 0");
+        AssertExit(mMaxValue == 0, "Timer", "expected maxValue == 0");
     }
 
     err = timer_start(mGroup, mIndex);
-    AssertExit(err == ESP_OK, "Timer::init()", "timer_start failed");
+    AssertExit(err == ESP_OK, "Timer", "timer_start failed");
 
     // init complete
     mInitialized = true;
@@ -71,13 +71,13 @@ void Timer::init(InitStruct const& initStruct){
 
 void Timer::start(){
     if(!mInitialized){
-        AssertDebug(false, "Timer::resume()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return;
     }
     if(!mRunning){
         esp_err_t err = timer_start(mGroup, mIndex);
         if(err != ESP_OK){
-            AssertDebug(false, "Timer::resume()", "resume failed");
+            AssertDebug(false, "Timer", "resume failed");
             return;
         }
         mRunning = true;
@@ -86,13 +86,13 @@ void Timer::start(){
 
 void Timer::stop(){
     if(!mInitialized){
-        AssertDebug(false, "Timer::pause()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return;
     }
     if(mRunning){
         esp_err_t err = timer_pause(mGroup, mIndex);
         if(err != ESP_OK){
-            AssertDebug(false, "Timer::pause()", "pause failed");
+            AssertDebug(false, "Timer", "pause failed");
             return;
         }
         mRunning = false;
@@ -106,20 +106,20 @@ void Timer::reset(){
 
 void Timer::setValue(uint32_t value){
     if(!mInitialized){
-        AssertDebug(false, "Timer::setValue()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return;
     }
     esp_err_t err = timer_set_counter_value(mGroup, mIndex, value);
-    AssertDebug(err == ESP_OK, "Timer::setValue()", "setValue failed");
+    AssertDebug(err == ESP_OK, "Timer", "setValue failed");
 }
 
 void Timer::setValue(uint64_t value){
     if(!mInitialized){
-        AssertDebug(false, "Timer::setValue()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return;
     }
     esp_err_t err = timer_set_counter_value(mGroup, mIndex, value);
-    AssertDebug(err == ESP_OK, "Timer::setValue()", "setValue failed");
+    AssertDebug(err == ESP_OK, "Timer", "setValue failed");
 }
 
 void Timer::setValueFromIsr(uint32_t value){
@@ -138,12 +138,12 @@ void Timer::setValueFromIsr(uint64_t value){
 
 uint64_t Timer::getValue(){
     if(!mInitialized){
-        AssertDebug(false, "Timer::getValue()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return 0;
     }
     uint64_t ticks = 0;
     esp_err_t err = timer_get_counter_value(mGroup, mIndex, &ticks);
-    AssertDebug(err == ESP_OK, "Timer::getValue()", "getValue failed");
+    AssertDebug(err == ESP_OK, "Timer", "getValue failed");
     return ticks;
 }
 
@@ -162,7 +162,7 @@ timer_idx_t Timer::getIndex(){
 
 uint32_t Timer::getFrequencyHz(){
     if(!mInitialized){
-        AssertDebug(false, "Timer::getFrequencyHz()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return 0;
     }
     return mFrequencyHz;
@@ -170,7 +170,7 @@ uint32_t Timer::getFrequencyHz(){
 
 uint64_t Timer::getMaxValue(){
     if(!mInitialized){
-        AssertDebug(false, "Timer::getMaxValue()", "not initialized");
+        AssertDebug(false, "Timer", "not initialized");
         return 0;
     }
     return mMaxValue;

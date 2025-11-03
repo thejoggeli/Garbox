@@ -31,7 +31,7 @@ void SoftwarePwm::tick(){
 void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
     // duty cycle must be between 0 and 1
     if(duty < 0.0f || duty > 1.0f){
-        AssertDebug(false, "SoftwarePwm::setDutyCycle()", "invalid duty value");
+        AssertDebug(false, "SoftwarePwm", "invalid duty value");
         return; 
     }
 
@@ -55,7 +55,7 @@ float SoftwarePwm::getNextDutyCycle(){
 void SoftwarePwm::runStateMachine(){
     // prevent recursive lockup
     if(++mCurrentTickRunsCount > MaxRunsPerTick){
-        AssertDebug(false, "SoftwarePwm::runStateMachine()", "exceeded max runs");
+        AssertDebug(false, "SoftwarePwm", "exceeded max runs");
         return;
     }
 

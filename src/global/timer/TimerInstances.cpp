@@ -8,7 +8,7 @@ namespace Garbox {
 static bool sInitialized = false;
 
 void TimerInstances::Init(){
-    AssertExit(!sInitialized, "SpiInstances::Init()", "already initialized");
+    AssertExit(!sInitialized, "SpiInstances", "already initialized");
 
     GetFanTachoTimer().init({
         .group = TIMER_GROUP_0,

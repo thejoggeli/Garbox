@@ -17,7 +17,8 @@ public:
     Display();
 
     void init();
-    void tick();
+    void mainTick();
+    void txTick();
 
 private:
 
@@ -34,7 +35,10 @@ private:
     bool mInitialized = false;
 
     /* Drawing buffer */
-    uint16_t* mDrawBuf = nullptr;
+    uint16_t* mDrawBufA = nullptr;
+    uint16_t* mDrawBufB = nullptr;
+    volatile bool mFlushing = false;
+    uint32_t mRenderSkipCount = 0;
 
     void hardwareInit();
     void handleFlush(const lv_area_t* area, uint8_t* px_map);

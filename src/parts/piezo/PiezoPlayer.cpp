@@ -98,7 +98,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence){
 void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTimeMicros){
 
     if(sequence.getCount() == 0){
-        AssertDebug(false, "PiezoPlayer::playSequence()", "invalid sequence tone count == 0");
+        AssertDebug(false, "PiezoPlayer", "invalid sequence tone count == 0");
         return;
     }
 
@@ -109,7 +109,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
         .sequence = &sequence,
     });
     if(!result){
-        AssertDebug(false, "PiezoPlayer::playSequence()", "queue sequence failed");
+        AssertDebug(false, "PiezoPlayer", "queue sequence failed");
         return;
     }
 
@@ -121,7 +121,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
             .sequence = nullptr,
         });
         if(!result){
-            AssertDebug(false, "PiezoPlayer::playSequence()", "queue silence failed");
+            AssertDebug(false, "PiezoPlayer", "queue silence failed");
             return;
         }
     }
@@ -150,7 +150,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
         .sequence = nullptr,
     });
     if(!result){
-        AssertDebug(false, "PiezoPlayer::playTone()", "queue tone failed");
+        AssertDebug(false, "PiezoPlayer", "queue tone failed");
         return;
     }
 
@@ -162,7 +162,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
             .sequence = nullptr,
         });
         if(!result){
-            AssertDebug(false, "PiezoPlayer::playTone()", "queue silence failed");
+            AssertDebug(false, "PiezoPlayer", "queue silence failed");
             return;
         }
     }
@@ -191,13 +191,13 @@ void PiezoPlayer::playNextInQueue(){
             mCurrentSequence = &mSingleSequence;
         }
         else {
-            AssertDebug(false, "PiezoPlayer::playNextInQueue()", "invalid queue item type");
+            AssertDebug(false, "PiezoPlayer", "invalid queue item type");
             mCurrentSequence = nullptr;
         }
 
         // safety check
         if(mCurrentSequence == nullptr){
-            AssertDebug(false, "PiezoPlayer::beginSequence()", "sequence == nullptr");
+            AssertDebug(false, "PiezoPlayer", "sequence == nullptr");
             clearQueue();
             stop();
             return;
