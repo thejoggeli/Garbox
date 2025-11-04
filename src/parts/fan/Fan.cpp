@@ -76,12 +76,13 @@ void Fan::tick(){
         // filter rpm
         mRpmFilter.update(mMeasuredRpm);   
         mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();  
-    } 
 
-    // fan monitor tick
-    bool const shouldRun = isEnabled();
-    uint32_t const unfilteredRpm = mMeasuredRpm;
-    mFanMonitor.tick(unfilteredRpm, shouldRun);
+        // fan monitor tick
+        bool const shouldRun = isEnabled();
+        uint32_t const unfilteredRpm = mMeasuredRpm;
+        mFanMonitor.tick(unfilteredRpm, shouldRun);
+    }
+
 }
 
 void Fan::setStateChangedCallback(StateChangedCallback callback){
@@ -96,8 +97,6 @@ void Fan::setEnabled(bool enabled){
     if(enabled == isEnabled()){
         return;
     }
-    mGpioFanEnable.setValue(enabled);
-    mFrequencySensor.setEnabled(enabled);
     if(!enabled){
         enterState(State::Disabled);
     }
@@ -106,28 +105,8 @@ void Fan::setEnabled(bool enabled){
     }
 }
 
-void Fan::setSpeed(float speed){
-    mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
-    mSpeedPwm.setDutyRelative(mSpeed);
-}
-
 bool Fan::isEnabled(){
     return (mState != State::Disabled);
-}
-
-Fan::State Fan::getState(){
-    return mState;
-}
-
-float Fan::getSpeed(){
-    return mSpeed;
-}
-
-float Fan::getMeasuredRpm(bool filtered){
-    if(filtered){
-        return mMeasuredRpmFiltered;
-    } 
-    return mMeasuredRpm;
 }
 
 void Fan::enterState(State newState){
@@ -142,12 +121,15 @@ void Fan::enterState(State newState){
     case State::Disabled:
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
-        mMeasuredRpmFiltered = 0;
         mRpmFilter.setCurrentValue(0);
+        mGpioFanEnable.setValue(false);
+        mFrequencySensor.setEnabled(false);
         break;
     case State::Enabled:
+        mGpioFanEnable.setValue(true);
+        mFrequencySensor.setEnabled(true);
+        break;
     case State::Stalled:
-        // nothing to do
         break;
     default:
         TriggerDebug("Fan", "enter unhandled state");
@@ -194,6 +176,26 @@ const char* Fan::StateToString(State state){
     case State::Stalled:  return "Stalled";
     }
     return "Invalid";
+}
+
+void Fan::setSpeed(float speed){
+    mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
+    mSpeedPwm.setDutyRelative(mSpeed);
+}
+
+Fan::State Fan::getState(){
+    return mState;
+}
+
+float Fan::getSpeed(){
+    return mSpeed;
+}
+
+float Fan::getMeasuredRpm(bool filtered){
+    if(filtered){
+        return mMeasuredRpmFiltered;
+    } 
+    return mMeasuredRpm;
 }
 
 } // namespace
