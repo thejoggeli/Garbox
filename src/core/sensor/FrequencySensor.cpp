@@ -34,7 +34,7 @@ bool FrequencySensor::init(Config const& config) {
         // ticks = time[s] * freq[Hz] = (stopTimeoutMicros/1e6) * timerFrequencyHz
         float ticksFloat = static_cast<float>(config.stopTimeoutMicros) * 1e-6f * mTimerFrequencyHz;
         if(ticksFloat < 0 || ticksFloat > static_cast<float>(1'000'000'000)){
-            AssertExit(false, "FrequencySensor", "stopTimeoutMicros invalid value");
+            FailExit("FrequencySensor", "stopTimeoutMicros invalid value");
         }
         mStopTimeoutTicks = static_cast<uint32_t>(ticksFloat);
     }
@@ -59,7 +59,7 @@ bool FrequencySensor::init(Config const& config) {
             ioConf.pull_down_en = GPIO_PULLDOWN_ENABLE;
             break;
         default:
-            AssertExit(false, "FrequencySensor", "invalid pinMode");
+            FailExit("FrequencySensor", "invalid pinMode");
             return false;
     }
 
@@ -99,7 +99,7 @@ void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
 
 void FrequencySensor::tick(){
     if(!mInitialized){
-        AssertDebug(false, "FrequencySensor", "not initialized");
+        FailDebug("FrequencySensor", "not initialized");
         return;
     }
 
@@ -146,7 +146,7 @@ void FrequencySensor::tick(){
 
 void FrequencySensor::setEnabled(bool enabled) {
     if (!mInitialized){
-        AssertDebug(false, "FrequencySensor", "not initialized");
+        FailDebug("FrequencySensor", "not initialized");
         return;
     }
 
@@ -176,7 +176,7 @@ bool FrequencySensor::isEnabled(){
 
 float FrequencySensor::getFrequencyHz() {
     if(!mInitialized){
-        AssertDebug(false, "FrequencySensor", "not initialized");
+        FailDebug("FrequencySensor", "not initialized");
         return 0;
     }
     return mMeasuredFrequencyHz;

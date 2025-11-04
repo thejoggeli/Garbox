@@ -99,7 +99,7 @@ void mainTask(void* parameter){
 
         // VARIABLE DURATION SECTION
 
-        // update display first to minimize frame jitter
+        // update display 
         // TODO update display 
 
         // logging

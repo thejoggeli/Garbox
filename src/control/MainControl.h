@@ -4,7 +4,6 @@
 #include "parts/display/Display.h"
 #include "parts/fan/Fan.h"
 #include "parts/heatpad/Heatpad.h"
-#include "parts/piezo/Piezo.h"
 #include "parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
@@ -29,7 +28,6 @@ private:
     Heatpad mHeatpad;
     Display mDisplay;
 
-    Piezo mPiezo;
     PiezoPlayer mPiezoPlayer;
     
     SoftwareTimer mFanStateTimer;

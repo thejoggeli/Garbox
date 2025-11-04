@@ -172,7 +172,7 @@ void Display::tick() {
 
     if(mFlushing){
         mRenderSkipCount += 1;
-        AssertDebug(false, "Display", "render skipped");
+        FailDebug("Display", "render skipped");
         LogWarning("Display", "render skipped! count: %u", mRenderSkipCount);
     }
     else {
@@ -268,15 +268,15 @@ void Display::handleLog(lv_log_level_t level, const char* str){
             break;
         case LV_LOG_LEVEL_WARN:
             LogWarning("LVGL/Warn", "%s", str);
-            AssertDebug(false, "Display", "LVGL Warning");
+            FailDebug("Display", "LVGL Warning");
             break;
         case LV_LOG_LEVEL_ERROR:
             LogError("LVGL/Error", "%s", str);
-            AssertExit(false, "Display", "LVGL Error");
+            FailExit("Display", "LVGL Error");
             break;
         case LV_LOG_LEVEL_USER:        
         default:
-            AssertDebug(false, "Display", "unhandled log level");
+            FailDebug("Display", "unhandled log level");
             break;
     }
 }

@@ -16,7 +16,7 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 
     // check if setup
     if(mInitialized){
-        AssertExit(false, "LedcTimer", "already initialized");
+        FailExit("LedcTimer", "already initialized");
         return false;
     }
     
@@ -40,7 +40,7 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 
     // check result
     if(result != ESP_OK){
-        AssertExit(false, "LedcTimer", "setup failed");
+        FailExit("LedcTimer", "setup failed");
         return false;
     }
 
@@ -52,13 +52,13 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
 
     // check if setup
     if(!mInitialized){
-        AssertDebug(false, "LedcTimer", "not initialized");
+        FailDebug("LedcTimer", "not initialized");
         return false;
     }
 
     // zero not allowed
     if(frequencyHz == 0){
-        AssertDebug(false, "LedcTimer", "frequencyHz == 0 not allowed");
+        FailDebug("LedcTimer", "frequencyHz == 0 not allowed");
         return false;
     }
 
@@ -67,7 +67,7 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
 
     // check result
     if(result != ESP_OK){
-        AssertDebug(false, "LedcTimer", "frequency set failed");
+        FailDebug("LedcTimer", "frequency set failed");
         return false;
     }
     return true;

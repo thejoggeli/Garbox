@@ -13,7 +13,7 @@ static LedcTimer* resolveTimer(LedcTimer::Id id) {
         case LedcConfig::FanTimer.id:     return &LedcInstances::GetFanTimer();
         case LedcConfig::PiezoTimer.id:   return &LedcInstances::GetPiezoTimer();
         default:
-            AssertExit(false, "LedcInstances", "Invalid LEDC timer ID");
+            FailExit("LedcInstances", "Invalid LEDC timer ID");
             return nullptr; // never reached
     }
 }

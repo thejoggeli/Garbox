@@ -17,8 +17,7 @@ MainControl::MainControl() :
     mFan(),
     mHeatpad(),
     mDisplay(),
-    mPiezo(),
-    mPiezoPlayer(mPiezo){
+    mPiezoPlayer(){
     // nothing to do
 }
 
@@ -29,7 +28,6 @@ void MainControl::init(){
     mFan.setSpeed(0.0F);
     mHeatpad.init();
     mDisplay.init();
-    mPiezo.init();
     mPiezoPlayer.init();
     mInitialized = true;
 }
@@ -105,7 +103,7 @@ void MainControl::tick(){
                 break;
             default:
                 // nothing to do
-                AssertDebug(false, "MainControl", "unhandled fan state");
+                FailDebug("MainControl", "unhandled fan state");
                 break;
         }
         LogDebug("MainControl", "Fan State: %" PRIu32, fanState);

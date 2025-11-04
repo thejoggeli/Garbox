@@ -13,7 +13,7 @@ namespace Garbox {
 
 class PiezoPlayer {
 public:
-    explicit PiezoPlayer(Piezo& piezo, uint32_t defaultSilentTimeMicros = 50'000);
+    explicit PiezoPlayer(uint32_t defaultSilentTimeMicros = 50'000);
     ~PiezoPlayer();
 
     void init();
@@ -32,7 +32,7 @@ private:
 
     void playNextInQueue();
 
-    static void handleTask(void* self);
+    static void handleTask(void* player);
     void tick();
 
     static constexpr size_t QueueSize = 20; // also includes silent tones for Silent time
@@ -49,7 +49,7 @@ private:
         const ToneSequence* sequence = nullptr;
     };
 
-    Piezo& mPiezo;
+    Piezo mPiezo;
     uint32_t mDefaultSilentTimeMicros;
 
     Tone mSingleTone = Tone(0, 0); 
@@ -63,6 +63,7 @@ private:
     bool mPlaying = false;
     bool mInitialized = false;
     SemaphoreHandle_t mMutex = nullptr;
+    TaskHandle_t mTaskHandle = nullptr;
 };
 
 } // namespace Garbox

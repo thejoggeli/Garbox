@@ -16,6 +16,12 @@ public:
     static constexpr uint32_t MainTaskStackSize = 1024*4;
     static constexpr uint32_t MainTaskCore = 1;
 
+    // Display Task
+    static constexpr const char* DisplayTaskName = "DisplayTask";
+    static constexpr uint32_t DisplayTaskPriority = 8;
+    static constexpr uint32_t DisplayTaskStackSize = 1024;
+    static constexpr uint32_t DisplayTaskCore = 1;
+
     // Piezo Task
     static constexpr const char* PiezoTaskName = "PiezoTask";
     static constexpr uint32_t PiezoTaskFrequencyHz = 200;
