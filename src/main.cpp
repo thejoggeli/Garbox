@@ -89,24 +89,28 @@ void loop(){
 }
 
 void mainTask(void* parameter){
-    const TickType_t cycleTime = pdMS_TO_TICKS(AppConfig::MainTaskDurationMillis);
+    const TickType_t cycleDuration = pdMS_TO_TICKS(AppConfig::MainTaskDurationMillis);
+    const TickType_t updateDisplayDuration = pdMS_TO_TICKS(1000);
     TickType_t lastWakeTime = xTaskGetTickCount();
     while(true){
 
-        // FIXED DURATION SECTION
         Time::Tick();
         gMainControl.tick();
 
-        // VARIABLE DURATION SECTION
-
-        // update display 
-        // TODO update display 
-
         // logging
-        // TODO log some things         
+        // TODO log some things
+
+        // wait until updateDisplayDuration millis are remaining before current cycle is finished
+        // this is done to ensure that the display is always updated at a fixed interval and to 
+        // give it enough time to transfer the previous ui state via SPI
+        vTaskDelayUntil(&lastWakeTime, cycleDuration - updateDisplayDuration);
+
+        // if display is not busy
+        // update ui state
+        // notify display to render new ui state 
         
         // sleep until next tick
-        vTaskDelayUntil(&lastWakeTime, cycleTime);
+        vTaskDelayUntil(&lastWakeTime, cycleDuration);
     }
 }
 
