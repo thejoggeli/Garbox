@@ -22,7 +22,7 @@ public:
 
 private:
 
-    void handleFanStateChanged(Fan::State state);
+    void handleFanStateChanged(Fan::State newState, Fan::State oldState);
     void handleFanStalledAlert(uint32_t counter);
 
     static constexpr uint32_t HeartbeatInterval = 500_ms;

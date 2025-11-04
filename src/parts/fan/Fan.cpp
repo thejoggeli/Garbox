@@ -18,12 +18,12 @@ static constexpr uint32_t PulsesPerRevolution = 2;
 // Exponential filter config
 static constexpr float RpmFilterFraction = 0.90f;
 static constexpr uint32_t RpmFilterTicks = AppConfig::MainTaskFrequencyHz/3;
-static constexpr float RpmFilterThreshold = 0.1f;
+static constexpr float RpmFilterThreshold = 0.05f;
 
 // Fan state monitor config
-static constexpr uint32_t StalledThreshold = 100_ms;
+static constexpr uint32_t StalledThreshold = 1000_ms;
 static constexpr uint32_t StalledCallbackPeriod = 500_ms;
-static constexpr uint32_t MinRpmThreshold = 50;
+static constexpr uint32_t MinRpmThreshold = 10;
 static constexpr uint32_t ReenterStallCooldown = 0_ms;
 
 Fan::Fan() : 
@@ -40,7 +40,7 @@ void Fan::init(){
     // init frequency sensor
     FrequencySensor::Config config;
     config.pinMode = FrequencySensor::PinMode::Floating;
-    config.stopTimeoutMicros = 500'000;
+    config.stopTimeoutMicros = 1000_ms;
 
     // init frequency sensor
     mFrequencySensor.init(config);
@@ -73,13 +73,14 @@ void Fan::tick(){
         }
     
         // filter rpm
-        mRpmFilter.update(mMeasuredRpm);        
+        mRpmFilter.update(mMeasuredRpm);   
+        mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();     
     }
 
     // fan monitor tick
     bool const shouldRun = isEnabled();
-    uint32_t const rpm = static_cast<uint32_t>(getMeasuredRpm());
-    mFanMonitor.tick(rpm, shouldRun);
+    uint32_t const unfilteredRpm = mMeasuredRpm;
+    mFanMonitor.tick(unfilteredRpm, shouldRun);
 }
 
 void Fan::setStateChangedCallback(StateChangedCallback callback){
@@ -123,21 +124,21 @@ float Fan::getSpeed(){
 
 float Fan::getMeasuredRpm(bool filtered){
     if(filtered){
-        return mRpmFilter.getCurrentValue();
+        return mMeasuredRpmFiltered;
     } 
     return mMeasuredRpm;
 }
 
-void Fan::enterState(State state){
-    if(mState == state){
+void Fan::enterState(State newState){
+    State oldState = mState;
+    if(oldState == newState){
         TriggerDebug("Fan", "already in state");
         return;
     }
 
     // handle state transition
-    switch(state){
+    switch(newState){
     case State::Disabled:
-        mState = state;
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
         mRpmFilter.setCurrentValue(0);
@@ -150,11 +151,11 @@ void Fan::enterState(State state){
         TriggerDebug("Fan", "enter unhandled state");
         return;
     }
-    mState = state;
+    mState = newState;
 
     // call state changed callback
     if(mStateChangedCallback){
-        mStateChangedCallback(state);
+        mStateChangedCallback(newState, oldState);
     }
 }
 
@@ -182,6 +183,15 @@ void Fan::handleMonitorStalledAlert(uint32_t counter){
     if(mStalledAlertCallback){
         mStalledAlertCallback(counter);
     }
+}
+
+const char* Fan::StateToString(State state){
+    switch(state){
+    case State::Disabled: return "Disabled";
+    case State::Enabled:  return "Enabled";
+    case State::Stalled:  return "Stalled";
+    }
+    return "Invalid";
 }
 
 } // namespace

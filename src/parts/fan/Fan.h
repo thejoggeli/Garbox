@@ -19,7 +19,7 @@ public:
         Stalled
     };
 
-    using StateChangedCallback = std::function<void(State state)>;
+    using StateChangedCallback = std::function<void(State newState, State oldState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
     Fan();
@@ -38,6 +38,8 @@ public:
     float getSpeed();
     float getMeasuredRpm(bool filtered = true);
 
+    static const char* StateToString(State state);
+
 private:
 
     void enterState(State state);
@@ -49,6 +51,7 @@ private:
     StalledAlertCallback mStalledAlertCallback = nullptr;
     float mMeasuredFrequency = 0.0f;
     float mMeasuredRpm = 0;
+    float mMeasuredRpmFiltered = 0;
     float mSpeed = 0.0f;
 
     // sets voltage on FanEnable pin

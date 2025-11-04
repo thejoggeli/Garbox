@@ -27,6 +27,12 @@ public:
         // nothing to do
     }
 
+    void reset(){
+        mCount = 0;
+        mIndex = 0;
+        mSum = 0;
+    }
+
     void add(T value) {
         if (mCount < N) {
             mValues[mCount++] = value;

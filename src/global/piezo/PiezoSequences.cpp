@@ -20,7 +20,7 @@ static constexpr Tone ButtonTones[] = {
     Tone(200_ms, 1000, 1000, 0.75f),
 };
 
-static constexpr Tone HelixTones[] = {
+static constexpr Tone HelixUpTones[] = {
     Tone(80_ms, 1000, 1000, 0.25f),
     Tone(80_ms, 1000, 2000, 0.25f),
     Tone(80_ms, 1000, 3000, 0.25f),
@@ -29,6 +29,17 @@ static constexpr Tone HelixTones[] = {
     Tone(80_ms, 1000, 6000, 0.25f),
     Tone(80_ms, 1000, 7000, 0.25f),
     Tone(80_ms, 1000, 8000, 0.25f),
+};
+
+static constexpr Tone HelixDownTones[] = {
+    Tone(80_ms, 8000, 1000, 0.25f),
+    Tone(80_ms, 7000, 1000, 0.25f),
+    Tone(80_ms, 6000, 1000, 0.25f),
+    Tone(80_ms, 5000, 1000, 0.25f),
+    Tone(80_ms, 4000, 1000, 0.25f),
+    Tone(80_ms, 3000, 1000, 0.25f),
+    Tone(80_ms, 2000, 1000, 0.25f),
+    Tone(80_ms, 1000, 1000, 0.25f),
 };
 
 static constexpr Tone InterpolatedTones[] = {
@@ -58,7 +69,8 @@ static constexpr Tone FanStalledTones[] = {
 // clean, constexpr, macro-free
 const ToneSequence PiezoSequences::Startup = ToneSequence::from(StartupTones);
 const ToneSequence PiezoSequences::Button = ToneSequence::from(ButtonTones);
-const ToneSequence PiezoSequences::Helix = ToneSequence::from(HelixTones);
+const ToneSequence PiezoSequences::HelixUp = ToneSequence::from(HelixUpTones);
+const ToneSequence PiezoSequences::HelixDown = ToneSequence::from(HelixDownTones);
 const ToneSequence PiezoSequences::Interpolated1 = ToneSequence::from(InterpolatedTones);
 const ToneSequence PiezoSequences::Interpolated2 = ToneSequence::from(InterpolatedTones2);
 const ToneSequence PiezoSequences::FanStalled = ToneSequence::from(FanStalledTones);

@@ -26,8 +26,8 @@ void MainControl::init(){
 
     // init fan
     mFan.init();
-    mFan.setStateChangedCallback([this](Fan::State state){
-        handleFanStateChanged(state);
+    mFan.setStateChangedCallback([this](Fan::State newState, Fan::State oldState){
+        handleFanStateChanged(newState, oldState);
     });
     mFan.setStalledAlertCallback([this](uint32_t counter){
         handleFanStalledAlert(counter);
@@ -47,8 +47,6 @@ void MainControl::start(){
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
-    mPiezoPlayer.playSequence(PiezoSequences::Startup, 500_ms);
-    mPiezoPlayer.playSequence(PiezoSequences::Button, 500_ms);
 }
 
 void MainControl::tick(){
@@ -61,21 +59,10 @@ void MainControl::tick(){
 
     // update fan state
     constexpr uint8_t numFanStates = 6;
-    constexpr uint8_t numToneSequences = 5;
     static uint8_t fanState = 0;
-    static uint8_t tonSequence = 0;
     if(mFanStateTimer.isExpired()){
-
         switch(fanState){
             case 0:
-                switch(tonSequence){
-                    case 0: mPiezoPlayer.playSequence(PiezoSequences::Helix); break;
-                    case 1: mPiezoPlayer.playSequence(PiezoSequences::Button); break;
-                    case 2: mPiezoPlayer.playSequence(PiezoSequences::Interpolated1); break;
-                    case 3: mPiezoPlayer.playSequence(PiezoSequences::Interpolated2); break;
-                    case 4: mPiezoPlayer.playSequence(PiezoSequences::Startup); break;
-                }
-                tonSequence = MathUtils::Wrap<uint8_t>(tonSequence+1, numToneSequences);
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
@@ -165,8 +152,17 @@ void MainControl::onAssertExit(const char* context, const char* message){
     }
 }
 
-void MainControl::handleFanStateChanged(Fan::State state){
-    // nothing to do
+void MainControl::handleFanStateChanged(Fan::State newState, Fan::State oldState){
+    LogDebug("MainControl", "fan state changed: %s => %s", 
+        Fan::StateToString(oldState), 
+        Fan::StateToString(newState)
+    );
+    if(newState == Fan::State::Enabled){
+        mPiezoPlayer.playTone(Tone(500_ms, 500, 2500));
+    }
+    else if(newState == Fan::State::Disabled){
+        mPiezoPlayer.playTone(Tone(500_ms, 2500, 500));
+    }
 }
 
 void MainControl::handleFanStalledAlert(uint32_t counter){
