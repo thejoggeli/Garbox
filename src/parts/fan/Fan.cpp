@@ -160,23 +160,23 @@ void Fan::enterState(State newState){
     }
 }
 
-void Fan::handleMonitorStateChanged(FanMonitor::State state){
-    switch(state){
-    case FanMonitor::State::Idle:
-        break;
-    case FanMonitor::State::Running:
+void Fan::handleMonitorStateChanged(FanMonitor::State monitorState){
+    if(monitorState == FanMonitor::State::Stalled){
+        if(mState == State::Enabled){
+            // enabled => stalled
+            enterState(State::Stalled);
+        }
+    }
+    else if(monitorState == FanMonitor::State::Running){
         if(mState == State::Stalled){
-            enterState(State::Enabled); // transition: Stalled -> Enabled
+            // stalled => enabled
+            enterState(State::Enabled);
         }
-        break;
-    case FanMonitor::State::Stalled:
-        if(mState == State::Enabled){ 
-            enterState(State::Stalled); // transition: Stalled -> Stalled
+    }
+    else if(monitorState == FanMonitor::State::Idle){
+        if(mState != State::Disabled){
+            TriggerDebug("Fan", "invalid idle state change");
         }
-        break;
-    default:
-        TriggerDebug("Fan", "unhandled fan monitor state");
-        return;
     }
 }
 
