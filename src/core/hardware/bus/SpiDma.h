@@ -28,6 +28,7 @@ public:
         int32_t frequencyHz = 40'000'000;
         int32_t maxTransferSizeBytes = 1024;
         int32_t queueSize = 3;
+        const char* txCompleteTaskName;
         UBaseType_t txCompleteTaskPriority = 5;
         uint32_t txCompleteTaskStackSize = 1024;
     };

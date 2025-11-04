@@ -17,7 +17,7 @@ static constexpr uint32_t PulsesPerRevolution = 2;
 
 // Exponential filter config
 static constexpr float RpmFilterFraction = 0.90f;
-static constexpr uint32_t RpmFilterTicks = AppConfig::FanTickFrequencyHz/2;
+static constexpr uint32_t RpmFilterTicks = AppConfig::MainTaskFrequencyHz/2;
 static constexpr float RpmFilterThreshold = 0.1f;
 
 Fan::Fan() : 

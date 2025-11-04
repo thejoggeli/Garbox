@@ -16,13 +16,7 @@ public:
     static constexpr uint32_t MainTaskStackSize = 1024*4;
     static constexpr uint32_t MainTaskCore = 1;
     static constexpr uint32_t MainTaskUpdateDisplayDurationMillis = 5; // ui and display update is triggered this many seconds before each main cycle tick finishes 
-
-    // Display Task
-    static constexpr const char* DisplayTaskName = "DisplayTask";
-    static constexpr uint32_t DisplayTaskPriority = 8;
-    static constexpr uint32_t DisplayTaskStackSize = 1024;
-    static constexpr uint32_t DisplayTaskCore = 1;
-
+    
     // Piezo Task
     static constexpr const char* PiezoTaskName = "PiezoTask";
     static constexpr uint32_t PiezoTaskFrequencyHz = 200;
@@ -31,29 +25,22 @@ public:
     static constexpr uint32_t PiezoTaskPriority = 10;
     static constexpr uint32_t PiezoTaskStackSize = 1024;
     static constexpr uint32_t PiezoTaskCore = 1;
-    
-    // tick rate for specific parts of the app
-    static constexpr uint32_t FanTickFrequencyHz = MainTaskFrequencyHz;
 
     // Display
+    static constexpr const char* DisplayTaskName = "DisplayTask";
+    static constexpr uint32_t DisplayTaskPriority = 8;
+    static constexpr uint32_t DisplayTaskStackSize = 1024;
+    static constexpr uint32_t DisplayTaskCore = 1;
     static constexpr uint32_t DisplayWidth = 320;
     static constexpr uint32_t DisplayHeight = 240;
 
-    // SPI DMA buffer size for display
+    // SPI DMA 
+    static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
+    static constexpr uint32_t SpiDmaTaskPriority = 8;
+    static constexpr uint32_t SpiDmaTaskStackSize = 2048;
     // Due to memory limitations, the buffer can hold a fraction of the display's pixel data 
-    // - Formula: bytes = (width * height) * (2 bytes) * (fraction) 
-    // At an SPI clock frequency of 
-    // - SPI Clock 62.5 MHz bitrate 
-    // - Send rate 80 Hz 
-    // - Fraction of 50%
-    // the result is
-    // - SPI bus utilization 80% of bitrate
-    // - Results in 40 FPS on screen
-    // A fraction slightly above 50% is chosen to account for possible rounding errors and also because there is enough headroom
-    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = static_cast<uint32_t>(
-        // static_cast<float>(DisplayWidth) * static_cast<float>(DisplayHeight) * 2.0f * 0.51f
-        DisplayWidth * DisplayHeight * 2 / 4
-    );
+    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2 / 4;
+    static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
 
 };
 

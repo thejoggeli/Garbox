@@ -19,11 +19,12 @@ void SpiInstances::Init(){
         .pinClk = PinConfig::DisplayScl,
         .pinCs = -1,
         .mode = 3,
-        .frequencyHz = 80'000'000,
+        .frequencyHz = AppConfig::SpiDmaFrequencyHz,
         .maxTransferSizeBytes = static_cast<int32_t>(AppConfig::SpiDmaMaxTransferSizeBytes),
         .queueSize = 5,
-        .txCompleteTaskPriority = 4,
-        .txCompleteTaskStackSize = 4096,
+        .txCompleteTaskName = AppConfig::SpiDmaTaskName,
+        .txCompleteTaskPriority = AppConfig::SpiDmaTaskPriority,
+        .txCompleteTaskStackSize = AppConfig::SpiDmaTaskStackSize,
     });
 
     sInitialized = true;

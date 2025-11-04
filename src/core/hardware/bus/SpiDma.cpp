@@ -68,7 +68,7 @@ void SpiDma::setup(const Config& config) {
     // start background completion task automatically
     BaseType_t taskRes = xTaskCreate(
         completionTaskTrampoline,
-        "SpiDmaDoneTask",
+        config.txCompleteTaskName,
         config.txCompleteTaskStackSize,
         this,
         config.txCompleteTaskPriority,
