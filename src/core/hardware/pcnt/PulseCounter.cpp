@@ -17,7 +17,7 @@ PulseCounter::PulseCounter(pcnt_unit_t unit, uint32_t pin) :
 bool PulseCounter::init(Config const& config) {
 
     if (mInitialized) {
-        FailExit("PulseCounter", "already initialized");
+        TriggerExit("PulseCounter", "already initialized");
         return false;
     }
 
@@ -39,7 +39,7 @@ bool PulseCounter::init(Config const& config) {
             io_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
             break;
         default:
-            FailExit("PulseCounter", "invalid PinMode");
+            TriggerExit("PulseCounter", "invalid PinMode");
             return false;
     }
     io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -70,7 +70,7 @@ bool PulseCounter::init(Config const& config) {
 
     esp_err_t err = pcnt_unit_config(&cfg);
     if(err != ESP_OK){
-        FailExit("TachoPulseCounter", "pcnt_unit_config has error");
+        TriggerExit("TachoPulseCounter", "pcnt_unit_config has error");
         return false;
     }
 
@@ -85,17 +85,17 @@ bool PulseCounter::init(Config const& config) {
 
 bool PulseCounter::start() {
     if (!mInitialized) {
-        FailExit("PulseCounter", "not initialized");
+        TriggerExit("PulseCounter", "not initialized");
         return false;
     }
 
     if (pcnt_counter_clear(mUnit) != ESP_OK) {
-        FailExit("PulseCounter", "pcnt_unit_clear_count failed");
+        TriggerExit("PulseCounter", "pcnt_unit_clear_count failed");
         return false;
     }
 
     if (pcnt_counter_resume(mUnit) != ESP_OK) {
-        FailExit("PulseCounter", "pcnt_unit_start failed");
+        TriggerExit("PulseCounter", "pcnt_unit_start failed");
         return false;
     }
 
@@ -104,14 +104,14 @@ bool PulseCounter::start() {
 
 int32_t PulseCounter::getCount() const {
     if (!mInitialized) {
-        FailDebug("PulseCounter", "not initialized");
+        TriggerDebug("PulseCounter", "not initialized");
         return 0;
     }
 
     int16_t count = 0;
     esp_err_t err = pcnt_get_counter_value(mUnit, &count);
     if (err != ESP_OK) {
-        FailDebug("PulseCounter", "pcnt_unit_get_count failed");
+        TriggerDebug("PulseCounter", "pcnt_unit_get_count failed");
         return 0;
     }
 
@@ -120,7 +120,7 @@ int32_t PulseCounter::getCount() const {
 
 int32_t PulseCounter::getAndClearCount() {
     if (!mInitialized) {
-        FailDebug("PulseCounter", "not initialized");
+        TriggerDebug("PulseCounter", "not initialized");
         return 0;
     }
 
@@ -131,13 +131,13 @@ int32_t PulseCounter::getAndClearCount() {
 
 void PulseCounter::clearCount() {
     if (!mInitialized) {
-        FailDebug("PulseCounter", "not initialized");
+        TriggerDebug("PulseCounter", "not initialized");
         return;
     }
 
     esp_err_t err = pcnt_counter_clear(mUnit);
     if (err != ESP_OK) {
-        FailDebug("PulseCounter", "pcnt_unit_clear_count failed");
+        TriggerDebug("PulseCounter", "pcnt_unit_clear_count failed");
     }
 }
 

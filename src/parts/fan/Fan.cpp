@@ -17,14 +17,14 @@ static constexpr uint32_t PulsesPerRevolution = 2;
 
 // Exponential filter config
 static constexpr float RpmFilterFraction = 0.90f;
-static constexpr uint32_t RpmFilterTicks = AppConfig::MainTaskFrequencyHz/2;
+static constexpr uint32_t RpmFilterTicks = AppConfig::MainTaskFrequencyHz/3;
 static constexpr float RpmFilterThreshold = 0.1f;
 
 // Fan state monitor config
-static constexpr uint32_t stallThreshold = 200_ms;
-static constexpr uint32_t stalledCallbackPeriod = 500_ms;
-static constexpr uint32_t minRpmThreshold = 50;
-static constexpr uint32_t reenterStallCooldown = 0_ms;
+static constexpr uint32_t StalledThreshold = 100_ms;
+static constexpr uint32_t StalledCallbackPeriod = 500_ms;
+static constexpr uint32_t MinRpmThreshold = 50;
+static constexpr uint32_t ReenterStallCooldown = 0_ms;
 
 Fan::Fan() : 
     // init members
@@ -32,20 +32,26 @@ Fan::Fan() :
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold),
-    mFanStateMonitor(stallThreshold, stalledCallbackPeriod, minRpmThreshold, reenterStallCooldown){
+    mFanMonitor(StalledThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
     // nothing to do
 }
 
 void Fan::init(){
-    // init tacho pulse counter
+    // init frequency sensor
     FrequencySensor::Config config;
     config.pinMode = FrequencySensor::PinMode::Floating;
     config.stopTimeoutMicros = 500'000;
+
+    // init frequency sensor
     mFrequencySensor.init(config);
 
     // init fan state monitor
-    mFanStateMonitor.setCallback([this](FanStateMonitor::State state){
-        this->handleFanStateMonitorCallback(state);
+    mFanMonitor.init();
+    mFanMonitor.setStateChangedCallback([this](FanMonitor::State state){
+        this->handleMonitorStateChanged(state);
+    });
+    mFanMonitor.setStalledAlertCallback([this](uint32_t counter){
+        this->handleMonitorStalledAlert(counter);
     });
 }
 
@@ -70,10 +76,18 @@ void Fan::tick(){
         mRpmFilter.update(mMeasuredRpm);        
     }
 
+    // fan monitor tick
+    bool const shouldRun = isEnabled();
+    uint32_t const rpm = static_cast<uint32_t>(getMeasuredRpm());
+    mFanMonitor.tick(rpm, shouldRun);
 }
 
 void Fan::setStateChangedCallback(StateChangedCallback callback){
     mStateChangedCallback = callback;
+}
+
+void Fan::setStalledAlertCallback(StalledAlertCallback callback){
+    mStalledAlertCallback = callback;
 }
 
 void Fan::setEnabled(bool enabled){
@@ -83,17 +97,12 @@ void Fan::setEnabled(bool enabled){
     mGpioFanEnable.setValue(enabled);
     mFrequencySensor.setEnabled(enabled);
     if(!enabled){
-        mState = State::Off;
-        mMeasuredFrequency = 0;
-        mMeasuredRpm = 0;
-        mRpmFilter.setCurrentValue(0);
-        mFanStateMonitor.reset();
+        enterState(State::Disabled);
     }
     else {
-        mState = State::On;
+        enterState(State::Enabled);
     }
 }
-
 
 void Fan::setSpeed(float speed){
     mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
@@ -101,7 +110,11 @@ void Fan::setSpeed(float speed){
 }
 
 bool Fan::isEnabled(){
-    return (mState != State::Off);
+    return (mState != State::Disabled);
+}
+
+Fan::State Fan::getState(){
+    return mState;
 }
 
 float Fan::getSpeed(){
@@ -115,33 +128,59 @@ float Fan::getMeasuredRpm(bool filtered){
     return mMeasuredRpm;
 }
 
-void Fan::handleFanStateMonitorCallback(FanStateMonitor::State state){
-    // determine new fan state
-    State newState;
+void Fan::enterState(State state){
+    if(mState == state){
+        TriggerDebug("Fan", "already in state");
+        return;
+    }
+
+    // handle state transition
     switch(state){
-    case FanStateMonitor::State::Off:
-        newState = State::Off;
+    case State::Disabled:
+        mState = state;
+        mMeasuredFrequency = 0;
+        mMeasuredRpm = 0;
+        mRpmFilter.setCurrentValue(0);
         break;
-    case FanStateMonitor::State::On:
-        newState = State::On;
-        break;
-    case FanStateMonitor::State::Stalled:
-        newState = State::Stalled;
+    case State::Enabled:
+    case State::Stalled:
+        // nothing to do
         break;
     default:
-        FailDebug("Fan", "unhandled fan monitor state");
+        TriggerDebug("Fan", "enter unhandled state");
         return;
     }
+    mState = state;
 
-    // check if fan state is different
-    if(newState == mState){
-        return;
-    }
-    mState = newState;
-
-    // execute callback
+    // call state changed callback
     if(mStateChangedCallback){
-        mStateChangedCallback(mState);
+        mStateChangedCallback(state);
+    }
+}
+
+void Fan::handleMonitorStateChanged(FanMonitor::State state){
+    switch(state){
+    case FanMonitor::State::Idle:
+        break;
+    case FanMonitor::State::Running:
+        if(mState == State::Stalled){
+            enterState(State::Enabled); // transition: Stalled -> Enabled
+        }
+        break;
+    case FanMonitor::State::Stalled:
+        if(mState == State::Enabled){ 
+            enterState(State::Stalled); // transition: Stalled -> Stalled
+        }
+        break;
+    default:
+        TriggerDebug("Fan", "unhandled fan monitor state");
+        return;
+    }
+}
+
+void Fan::handleMonitorStalledAlert(uint32_t counter){
+    if(mStalledAlertCallback){
+        mStalledAlertCallback(counter);
     }
 }
 

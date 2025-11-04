@@ -8,7 +8,7 @@ static bool mInitialized = false;
 
 void Log::Init() {
     if (mInitialized) {
-        FailExit("Log", "already initialized");
+        TriggerExit("Log", "already initialized");
         return;
     }
 

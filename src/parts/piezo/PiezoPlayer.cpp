@@ -19,7 +19,7 @@ PiezoPlayer::PiezoPlayer(uint32_t defaultSilentTimeMicros):
 }
 
 PiezoPlayer::~PiezoPlayer(){
-    FailExit("PiezoPlayer", "deconstructor not implemented");
+    TriggerExit("PiezoPlayer", "deconstructor not implemented");
     // TODO stop task
 }
 
@@ -166,12 +166,12 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence){
 void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTimeMicros){
     Garbox::LockGuard lock(mMutex);
     if(!mInitialized || (mTaskHandle == nullptr)){
-        FailDebug("PiezoPlayer", "invalid state");
+        TriggerDebug("PiezoPlayer", "invalid state");
         return;
     }
     
     if(sequence.getCount() == 0){
-        FailDebug("PiezoPlayer", "invalid sequence tone count == 0");
+        TriggerDebug("PiezoPlayer", "invalid sequence tone count == 0");
         return;
     }
 
@@ -182,7 +182,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
         .sequence = &sequence,
     });
     if(!result){
-        FailDebug("PiezoPlayer", "queue sequence failed");
+        TriggerDebug("PiezoPlayer", "queue sequence failed");
         return;
     }
 
@@ -194,7 +194,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
             .sequence = nullptr,
         });
         if(!result){
-            FailDebug("PiezoPlayer", "queue silence failed");
+            TriggerDebug("PiezoPlayer", "queue silence failed");
             return;
         }
     }
@@ -214,7 +214,7 @@ void PiezoPlayer::playTone(const Tone& tone){
 void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
     Garbox::LockGuard lock(mMutex);
     if(!mInitialized || (mTaskHandle == nullptr)){
-        FailDebug("PiezoPlayer", "invalid state");
+        TriggerDebug("PiezoPlayer", "invalid state");
         return;
     }
 
@@ -230,7 +230,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
         .sequence = nullptr,
     });
     if(!result){
-        FailDebug("PiezoPlayer", "queue tone failed");
+        TriggerDebug("PiezoPlayer", "queue tone failed");
         return;
     }
 
@@ -242,7 +242,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
             .sequence = nullptr,
         });
         if(!result){
-            FailDebug("PiezoPlayer", "queue silence failed");
+            TriggerDebug("PiezoPlayer", "queue silence failed");
             return;
         }
     }
@@ -273,13 +273,13 @@ void PiezoPlayer::playNextInQueue(){
             mCurrentSequence = &mSingleSequence;
         }
         else {
-            FailDebug("PiezoPlayer", "invalid queue item type");
+            TriggerDebug("PiezoPlayer", "invalid queue item type");
             mCurrentSequence = nullptr;
         }
 
         // safety check
         if(mCurrentSequence == nullptr){
-            FailDebug("PiezoPlayer", "sequence == nullptr");
+            TriggerDebug("PiezoPlayer", "sequence == nullptr");
             clearQueue();
             stop();
             return;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "FanStateMonitor.h"
+#include "FanMonitor.h"
 #include "core/sensor/FrequencySensor.h"
 #include "util/filter/ExponentialFilter.h"
 
@@ -14,12 +14,13 @@ class Fan {
 public:
 
     enum class State : uint8_t {
-        Off = 0,
-        On,
+        Disabled = 0,
+        Enabled,
         Stalled
     };
 
     using StateChangedCallback = std::function<void(State state)>;
+    using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
     Fan();
 
@@ -28,19 +29,24 @@ public:
     void tick();
 
     void setStateChangedCallback(StateChangedCallback callback);
+    void setStalledAlertCallback(StalledAlertCallback callback);
     void setEnabled(bool enabled);
     void setSpeed(float speed); // range [0.0, 1.0]
 
     bool isEnabled();
+    State getState();
     float getSpeed();
     float getMeasuredRpm(bool filtered = true);
 
 private:
 
-    void handleFanStateMonitorCallback(FanStateMonitor::State state);
+    void enterState(State state);
+    void handleMonitorStateChanged(FanMonitor::State state);
+    void handleMonitorStalledAlert(uint32_t counter);
 
-    State mState = State::Off;
+    State mState = State::Disabled;
     StateChangedCallback mStateChangedCallback = nullptr;
+    StalledAlertCallback mStalledAlertCallback = nullptr;
     float mMeasuredFrequency = 0.0f;
     float mMeasuredRpm = 0;
     float mSpeed = 0.0f;
@@ -58,7 +64,7 @@ private:
     ExponentialFilter mRpmFilter;
 
     // fan state monitor
-    FanStateMonitor mFanStateMonitor;
+    FanMonitor mFanMonitor;
 
 };
 

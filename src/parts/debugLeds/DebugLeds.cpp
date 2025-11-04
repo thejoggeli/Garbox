@@ -48,14 +48,14 @@ void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     // check if initialized
     if(!sInitialized){
-        FailDebug("DeubgLeds", "not initialized");
+        TriggerDebug("DeubgLeds", "not initialized");
         return;
     }
 
     // check if valid id
     size_t const index = static_cast<size_t>(id);
     if(index >= sLeds.size()){
-        FailDebug("DebugLeds", "invalid id");
+        TriggerDebug("DebugLeds", "invalid id");
         return;
     }
 
@@ -74,14 +74,14 @@ void DebugLeds::ToggleLed(Id id, float brightness){
 
     // check if initialized
     if(!sInitialized){
-        FailDebug("DebugLeds", "not initialized");
+        TriggerDebug("DebugLeds", "not initialized");
         return;
     }
 
     // check if valid id
     size_t const index = static_cast<size_t>(id);
     if(index >= sLeds.size()){
-        FailDebug("DebugLeds", "invalid id");
+        TriggerDebug("DebugLeds", "invalid id");
         return;
     }
 
@@ -100,7 +100,7 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
 
     // check if initialized
     if(!sInitialized){
-        FailDebug("DebugLeds", "not initialized");
+        TriggerDebug("DebugLeds", "not initialized");
         return;
     }
 
@@ -125,7 +125,7 @@ void DebugLeds::ToggleAllLeds(float brightness){
 
     // check if initialized
     if(!sInitialized){
-        FailDebug("DebugLeds", "not initialized");
+        TriggerDebug("DebugLeds", "not initialized");
         return;
     }
 

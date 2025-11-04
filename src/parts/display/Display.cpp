@@ -165,7 +165,7 @@ void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint1
 }
 
 void Display::tick() {
-    
+
     // lv_timer_handler(); 
 
     static int x = 0;
@@ -257,15 +257,15 @@ void Display::handleLog(lv_log_level_t level, const char* str){
             break;
         case LV_LOG_LEVEL_WARN:
             LogWarning("LVGL/Warn", "%s", str);
-            FailDebug("Display", "LVGL Warning");
+            TriggerDebug("Display", "LVGL Warning");
             break;
         case LV_LOG_LEVEL_ERROR:
             LogError("LVGL/Error", "%s", str);
-            FailExit("Display", "LVGL Error");
+            TriggerExit("Display", "LVGL Error");
             break;
         case LV_LOG_LEVEL_USER:        
         default:
-            FailDebug("Display", "unhandled log level");
+            TriggerDebug("Display", "unhandled log level");
             break;
     }
 }

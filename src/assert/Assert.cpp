@@ -4,11 +4,11 @@
 
 namespace Garbox {
 
-void FailDebug(const char* context, const char* message) {
+void TriggerDebug(const char* context, const char* message) {
     AssertHandler::InvokeDebug(context, message);
 }
 
-void FailExit(const char* context, const char* message) {
+void TriggerExit(const char* context, const char* message) {
     AssertHandler::InvokeExit(context, message);
 }
 

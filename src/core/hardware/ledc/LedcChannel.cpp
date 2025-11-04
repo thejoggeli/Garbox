@@ -19,13 +19,13 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 
     // check if setup
     if(mInitialized){
-        FailDebug("LedChannel", "already initialized");
+        TriggerDebug("LedChannel", "already initialized");
         return false;
     }
 
     // timer must exist
     if(timer == nullptr){
-        FailDebug("LedChannel", "timer is nullptr");
+        TriggerDebug("LedChannel", "timer is nullptr");
         return false;
     }
 
@@ -56,7 +56,7 @@ bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
 
     // check result
     if(result != ESP_OK){
-        FailExit("LedChannel", "attach failed");
+        TriggerExit("LedChannel", "attach failed");
         return false;
     }
 
@@ -68,7 +68,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check if setup
     if(!mInitialized){
-        FailDebug("LedChannel", "not initialized");
+        TriggerDebug("LedChannel", "not initialized");
         return false;
     }
 
@@ -77,7 +77,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check result
     if (err != ESP_OK){
-        FailDebug("LedChannel", "setDutyRaw failed");
+        TriggerDebug("LedChannel", "setDutyRaw failed");
         return false;
     }
     else {
@@ -94,7 +94,7 @@ bool LedcChannel::setDutyRaw(uint32_t duty, bool update) {
 
     // check result
     if (err != ESP_OK){
-        FailDebug("LedChannel", "updateDuty failed");
+        TriggerDebug("LedChannel", "updateDuty failed");
         return false;
     }
     return true;
@@ -104,7 +104,7 @@ bool LedcChannel::setDutyRelative(float ratio, bool update){
 
     // check if setup
     if(!mInitialized){
-        FailDebug("LedChannel", "channel not initialized");
+        TriggerDebug("LedChannel", "channel not initialized");
         return false;
     }
 

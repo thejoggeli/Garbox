@@ -15,7 +15,7 @@ SpiDma::~SpiDma() {
     // TODO: drain transactions
     // TODO: remove device and free bus
     // TODO: free allocated memory
-    FailExit("SpiDma", "not implemented");
+    TriggerExit("SpiDma", "not implemented");
 }
 
 void SpiDma::setup(const Config& config) {
@@ -55,12 +55,12 @@ void SpiDma::setup(const Config& config) {
 
     // initialize bus
     if (spi_bus_initialize(mHost, &busCfg, SPI_DMA_CH_AUTO) != ESP_OK) {
-        FailExit("SpiDma", "spi_bus_initialize failed");
+        TriggerExit("SpiDma", "spi_bus_initialize failed");
     }
 
     // initialize device
     if (spi_bus_add_device(mHost, &devCfg, &mDevice) != ESP_OK) {
-        FailExit("SpiDma", "spi_bus_add_device failed");
+        TriggerExit("SpiDma", "spi_bus_add_device failed");
     }
 
     mInitialized = true;
@@ -76,33 +76,33 @@ void SpiDma::setup(const Config& config) {
     );
 
     if (taskRes != pdPASS || mCompletionTask == nullptr) {
-        FailExit("SpiDma", "failed to start completion task");
+        TriggerExit("SpiDma", "failed to start completion task");
     }
 }
 
 bool SpiDma::validateTransferArgs(const uint8_t* data, size_t lenBits) {
     if (!mInitialized) {
-        FailDebug("SpiDma", "not initialized");
+        TriggerDebug("SpiDma", "not initialized");
         return false;
     }
     if (data == nullptr) {
-        FailDebug("SpiDma", "invalid data ptr");
+        TriggerDebug("SpiDma", "invalid data ptr");
         return false;
     }
     if (!esp_ptr_internal(data) || !esp_ptr_dma_capable(data)) {
-        FailDebug("SpiDma", "TX buffer not in internal DMA-capable memory");
+        TriggerDebug("SpiDma", "TX buffer not in internal DMA-capable memory");
         return false;
     }
     if (lenBits == 0) {
-        FailDebug("SpiDma", "len bits must be > 0");
+        TriggerDebug("SpiDma", "len bits must be > 0");
         return false;
     }
     if (lenBits & 0x7) {
-        FailDebug("SpiDma", "len bits must be divisible by 8");
+        TriggerDebug("SpiDma", "len bits must be divisible by 8");
         return false;
     }
     if (lenBits > mMaxTransferSizeBits) {
-        FailDebug("SpiDma", "len bits exceed max transfer size");
+        TriggerDebug("SpiDma", "len bits exceed max transfer size");
         return false;
     }
     return true;
@@ -120,13 +120,13 @@ SpiDma::TxSlot* SpiDma::allocFreeSlot() {
     }
     portEXIT_CRITICAL(&mSlotLock);
     // no free tx slot was found
-    FailDebug("SpiDma::allocFreeSlot()", "no free tx slot found");
+    TriggerDebug("SpiDma::allocFreeSlot()", "no free tx slot found");
     return nullptr;
 }
 
 void SpiDma::freeSlot(TxSlot* slot) {
     if (slot == nullptr) {
-        FailDebug("SpiDma", "invalid slot ptr");
+        TriggerDebug("SpiDma", "invalid slot ptr");
         return;
     }
     // mark slot as free
@@ -142,13 +142,13 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user) {
     }
 
     if (xTaskGetCurrentTaskHandle() == mCompletionTask) {
-        FailDebug("SpiDma", "transferSync() not supported from completion callback");
+        TriggerDebug("SpiDma", "transferSync() not supported from completion callback");
         return false;
     }
 
     esp_err_t res = spi_device_acquire_bus(mDevice, portMAX_DELAY);
     if (res != ESP_OK) {
-        FailDebug("SpiDma", "spi_device_acquire_bus failed");
+        TriggerDebug("SpiDma", "spi_device_acquire_bus failed");
         return false;
     }
 
@@ -162,7 +162,7 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user) {
     spi_device_release_bus(mDevice);
 
     if (res != ESP_OK) {
-        FailDebug("SpiDma", "spi_device_polling_transmit failed");
+        TriggerDebug("SpiDma", "spi_device_polling_transmit failed");
         return false;
     }
 
@@ -176,7 +176,7 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, TxCa
 
     TxSlot* slot = allocFreeSlot();
     if (slot == nullptr) {
-        FailDebug("SpiDma", "no free tx slots available");
+        TriggerDebug("SpiDma", "no free tx slots available");
         return false;
     }
 
@@ -189,7 +189,7 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, TxCa
 
     esp_err_t ret = spi_device_queue_trans(mDevice, &transaction, portMAX_DELAY);
     if (ret != ESP_OK) {
-        FailDebug("SpiDma", "failed to queue transaction");
+        TriggerDebug("SpiDma", "failed to queue transaction");
         freeSlot(slot);
         return false;
     }
@@ -219,7 +219,7 @@ void SpiDma::completionTask() {
                 handleCompletedTransaction(transaction, true);
             }
             else {
-                FailDebug("SpiDma", "got ESP_OK but nullptr transaction");
+                TriggerDebug("SpiDma", "got ESP_OK but nullptr transaction");
             }
         }
         else if (ret == ESP_ERR_TIMEOUT) {
@@ -227,7 +227,7 @@ void SpiDma::completionTask() {
             continue;
         }
         else {
-            FailDebug("SpiDma", "spi_device_get_trans_result error");
+            TriggerDebug("SpiDma", "spi_device_get_trans_result error");
             vTaskDelay(pdMS_TO_TICKS(100));
         }
     }

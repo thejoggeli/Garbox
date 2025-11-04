@@ -16,7 +16,7 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 
     // check if setup
     if(mInitialized){
-        FailExit("LedcTimer", "already initialized");
+        TriggerExit("LedcTimer", "already initialized");
         return false;
     }
     
@@ -37,7 +37,7 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
 
     // set timer configuration
     if(ledc_timer_config(&cfg) != ESP_OK){
-        FailExit("LedcTimer", "setup failed");
+        TriggerExit("LedcTimer", "setup failed");
         return false;
     }
 
@@ -49,13 +49,13 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
 
     // check if setup
     if(!mInitialized){
-        FailDebug("LedcTimer", "not initialized");
+        TriggerDebug("LedcTimer", "not initialized");
         return false;
     }
 
     // zero not allowed
     if(frequencyHz == 0){
-        FailDebug("LedcTimer", "frequencyHz == 0 not allowed");
+        TriggerDebug("LedcTimer", "frequencyHz == 0 not allowed");
         return false;
     }
 
@@ -64,7 +64,7 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
 
     // check result
     if(result != ESP_OK){
-        FailDebug("LedcTimer", "frequency set failed");
+        TriggerDebug("LedcTimer", "frequency set failed");
         return false;
     }
     return true;

@@ -23,12 +23,22 @@ MainControl::MainControl() :
 
 void MainControl::init(){
     AssertExit(!mInitialized, "MainControl", "already initialized");
+
+    // init fan
     mFan.init();
-    mFan.setEnabled(0);
-    mFan.setSpeed(0.0F);
+    mFan.setStateChangedCallback([this](Fan::State state){
+        handleFanStateChanged(state);
+    });
+    mFan.setStalledAlertCallback([this](uint32_t counter){
+        handleFanStalledAlert(counter);
+    });
+
+    // init other
     mHeatpad.init();
     mDisplay.init();
     mPiezoPlayer.init();
+
+    // init complete
     mInitialized = true;
 }
 
@@ -103,7 +113,7 @@ void MainControl::tick(){
                 break;
             default:
                 // nothing to do
-                FailDebug("MainControl", "unhandled fan state");
+                TriggerDebug("MainControl", "unhandled fan state");
                 break;
         }
         LogDebug("MainControl", "Fan State: %" PRIu32, fanState);
@@ -156,9 +166,11 @@ void MainControl::onAssertExit(const char* context, const char* message){
 }
 
 void MainControl::handleFanStateChanged(Fan::State state){
-    if(state == Fan::State::Stalled){
-        mPiezoPlayer.playTone(Tone(250_ms, 900));
-    }
+    // nothing to do
+}
+
+void MainControl::handleFanStalledAlert(uint32_t counter){
+    mPiezoPlayer.playSequence(PiezoSequences::FanStalled);
 }
 
 }

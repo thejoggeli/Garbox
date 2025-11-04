@@ -71,13 +71,13 @@ void Timer::init(InitStruct const& initStruct){
 
 void Timer::start(){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return;
     }
     if(!mRunning){
         esp_err_t err = timer_start(mGroup, mIndex);
         if(err != ESP_OK){
-            FailDebug("Timer", "resume failed");
+            TriggerDebug("Timer", "resume failed");
             return;
         }
         mRunning = true;
@@ -86,13 +86,13 @@ void Timer::start(){
 
 void Timer::stop(){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return;
     }
     if(mRunning){
         esp_err_t err = timer_pause(mGroup, mIndex);
         if(err != ESP_OK){
-            FailDebug("Timer", "pause failed");
+            TriggerDebug("Timer", "pause failed");
             return;
         }
         mRunning = false;
@@ -106,7 +106,7 @@ void Timer::reset(){
 
 void Timer::setValue(uint32_t value){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return;
     }
     esp_err_t err = timer_set_counter_value(mGroup, mIndex, value);
@@ -115,7 +115,7 @@ void Timer::setValue(uint32_t value){
 
 void Timer::setValue(uint64_t value){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return;
     }
     esp_err_t err = timer_set_counter_value(mGroup, mIndex, value);
@@ -138,7 +138,7 @@ void Timer::setValueFromIsr(uint64_t value){
 
 uint64_t Timer::getValue(){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return 0;
     }
     uint64_t ticks = 0;
@@ -162,7 +162,7 @@ timer_idx_t Timer::getIndex(){
 
 uint32_t Timer::getFrequencyHz(){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return 0;
     }
     return mFrequencyHz;
@@ -170,7 +170,7 @@ uint32_t Timer::getFrequencyHz(){
 
 uint64_t Timer::getMaxValue(){
     if(!mInitialized){
-        FailDebug("Timer", "not initialized");
+        TriggerDebug("Timer", "not initialized");
         return 0;
     }
     return mMaxValue;

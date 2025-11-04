@@ -38,19 +38,19 @@ void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
             cfg.mode = GPIO_MODE_OUTPUT_OD;
             break;
         default:
-            FailDebug("Gpio", "called with unhandled mode");
+            TriggerDebug("Gpio", "called with unhandled mode");
             return;
     }
 
     cfg.pin_bit_mask = (1ULL << pin);
     cfg.intr_type = GPIO_INTR_DISABLE;
     if(gpio_config(&cfg) != ESP_OK){
-        FailDebug("Gpio", "gpio_config failed");
+        TriggerDebug("Gpio", "gpio_config failed");
     }
 
     mValue = initivalValue;
     if(gpio_set_level(mPin, toPinValue(mValue)) != ESP_OK){
-        FailDebug("Gpio", "gpio_set_level failed");
+        TriggerDebug("Gpio", "gpio_set_level failed");
     }
 
     mInitialized = true;
@@ -58,7 +58,7 @@ void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
 
 void Gpio::setValue(bool value) {
     if(!mInitialized){
-        FailDebug("Gpio", "not initialized"); 
+        TriggerDebug("Gpio", "not initialized"); 
         return;
     }
     switch (mMode) {
@@ -74,14 +74,14 @@ void Gpio::setValue(bool value) {
         case Mode::InputPullup:
         case Mode::InputPulldown:
         default:
-            FailDebug("Gpio", "unhandled mode");
+            TriggerDebug("Gpio", "unhandled mode");
             break;
     }
 }
 
 bool Gpio::getValue() const {
     if(!mInitialized){
-        FailDebug("Gpio", "not initialized"); 
+        TriggerDebug("Gpio", "not initialized"); 
         return false;
     }
     switch (mMode) {
@@ -93,14 +93,14 @@ bool Gpio::getValue() const {
         case Mode::OutputOpenDrain:
             return mValue;
         default:
-            FailDebug("Gpio", "unhandled mode");
+            TriggerDebug("Gpio", "unhandled mode");
             return false;
     }
 }
 
 void Gpio::toggle() {
     if(!mInitialized){
-        FailDebug("Gpio", "not initialized"); 
+        TriggerDebug("Gpio", "not initialized"); 
         return;
     }
     switch (mMode) {
@@ -113,7 +113,7 @@ void Gpio::toggle() {
         case Mode::InputPullup:
         case Mode::InputPulldown:
         default:
-            FailDebug("Gpio", "unhandled mode");
+            TriggerDebug("Gpio", "unhandled mode");
             break;
     }
 }

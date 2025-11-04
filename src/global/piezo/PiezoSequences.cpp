@@ -49,11 +49,18 @@ static constexpr Tone InterpolatedTones2[] = {
     Tone(1000_ms, 500),
 };
 
+static constexpr Tone FanStalledTones[] = {
+    Tone(100_ms, 1000, 1000),
+    Tone(100_ms),
+    Tone(100_ms, 1000, 1000),
+};
+
 // clean, constexpr, macro-free
 const ToneSequence PiezoSequences::Startup = ToneSequence::from(StartupTones);
 const ToneSequence PiezoSequences::Button = ToneSequence::from(ButtonTones);
 const ToneSequence PiezoSequences::Helix = ToneSequence::from(HelixTones);
 const ToneSequence PiezoSequences::Interpolated1 = ToneSequence::from(InterpolatedTones);
 const ToneSequence PiezoSequences::Interpolated2 = ToneSequence::from(InterpolatedTones2);
+const ToneSequence PiezoSequences::FanStalled = ToneSequence::from(FanStalledTones);
 
 } // namespace Garbox

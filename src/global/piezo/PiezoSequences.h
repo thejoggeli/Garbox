@@ -12,6 +12,7 @@ public:
     static const ToneSequence Helix;
     static const ToneSequence Interpolated1;
     static const ToneSequence Interpolated2;
+    static const ToneSequence FanStalled;
 
 };
 
