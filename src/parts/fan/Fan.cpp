@@ -72,11 +72,11 @@ void Fan::tick(){
             mMeasuredFrequency = newFrequency;
             mMeasuredRpm = newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution);
         }
-    }
 
-    // filter rpm
-    mRpmFilter.update(mMeasuredRpm);   
-    mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();   
+        // filter rpm
+        mRpmFilter.update(mMeasuredRpm);   
+        mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();  
+    } 
 
     // fan monitor tick
     bool const shouldRun = isEnabled();
@@ -142,6 +142,7 @@ void Fan::enterState(State newState){
     case State::Disabled:
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
+        mMeasuredRpmFiltered = 0;
         mRpmFilter.setCurrentValue(0);
         break;
     case State::Enabled:
