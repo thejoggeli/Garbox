@@ -1,7 +1,7 @@
 #include "assert/AssertHandler.h"
 #include "control/MainControl.h"
+#include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
-#include "core/scheduling/TimeSlotScheduler.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
 #include "global/bus/SpiInstances.h"
@@ -16,6 +16,7 @@ using namespace Garbox;
 MainControl gMainControl;
 
 void mainTask(void* parameter);
+void logProfiler();
 
 void setup() {
 
@@ -49,6 +50,10 @@ void setup() {
     LedcInstances::Init();
     TimerInstances::Init();
     SpiInstances::Init();
+
+    // init profiler
+    Profiler::Setup(ProfilerConfig::Count);
+    Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
 
     // fade debug leds in
     for(int32_t i = 0; i <= 25; i++){
@@ -93,63 +98,57 @@ void mainTask(void* parameter){
     const TickType_t updateDisplayDuration = pdMS_TO_TICKS(AppConfig::MainTaskUpdateDisplayDurationMillis);
     TickType_t lastWakeTime = xTaskGetTickCount();
     while(true){
+        // begin main task
+        Profiler::Begin(ProfilerConfig::MainTask);
 
+        // main tick
+        Profiler::Begin(ProfilerConfig::MainTick);
         Time::Tick();
         gMainControl.tick();
+        Profiler::End(ProfilerConfig::MainTick);
 
         // logging
-        // TODO log some things
+        Profiler::Begin(ProfilerConfig::LogTick);
+        logProfiler();
+        Profiler::End(ProfilerConfig::LogTick);
 
         // wait until updateDisplayDuration millis are remaining before current cycle is finished
         // this is done to ensure that the display is always updated at a fixed interval and to 
         // give it enough time to transfer the previous ui state via SPI
         vTaskDelayUntil(&lastWakeTime, cycleDuration - updateDisplayDuration);
 
+        Profiler::Begin(ProfilerConfig::UiTick);
         // if display is not busy
         // TODO update ui state
-        // TODO notify display to render new ui state 
+        // TODO notify display to render new ui state
+        Time::DelayMicros(500); // placeholder delay
+        Profiler::End(ProfilerConfig::UiTick);
         
+        // end main task
         // sleep until next tick
-        vTaskDelayUntil(&lastWakeTime, cycleDuration);
+        vTaskDelayUntil(&lastWakeTime, updateDisplayDuration);
+        Profiler::End(ProfilerConfig::MainTask);
     }
 }
 
-/*
-void loggingTask(){
-    // Print diagnostics once per second
-    static uint32_t lastPrintMicros = 0;
-    if (Time::GetTickMicros() - lastPrintMicros >= 10'000'000) {
-        lastPrintMicros = Time::GetTickMicros();
-
-        const TimeSlotScheduler::Diagnostics& dMain = gScheduler.getDiagnostics(SlotMain);
-        const TimeSlotScheduler::Diagnostics& dDisp = gScheduler.getDiagnostics(SlotDisplay);
-        const TimeSlotScheduler::Diagnostics& dLogg = gScheduler.getDiagnostics(SlotLogging);
-
-        uint32_t const maxMain = dMain.maxTimeMicros;
-        uint32_t const maxDisp = dDisp.maxTimeMicros;
-        uint32_t const maxLogg = dLogg.maxTimeMicros;
-
-        uint32_t const maxAllMain = dMain.maxTimeAllMicros;
-        uint32_t const maxAllDisp = dDisp.maxTimeAllMicros;
-        uint32_t const maxAllLogg = dLogg.maxTimeAllMicros;
-
-        float const usageMain = static_cast<float>(dMain.maxTimeAllMicros) / static_cast<float>(dMain.minDurationMicros) * 100.0f;
-        float const usageDisp = static_cast<float>(dDisp.maxTimeAllMicros) / static_cast<float>(dDisp.minDurationMicros) * 100.0f;
-        float const usageLogg = static_cast<float>(dLogg.maxTimeAllMicros) / static_cast<float>(dLogg.minDurationMicros) * 100.0f;
-
+void logProfiler(){
+    static uint32_t lastPrint = 0;
+    uint32_t now = Time::GetMicros();
+    if (now - lastPrint > 5'000'000) {
+        Profiler::UpdateAll();
+        lastPrint = now;
+        
         uint32_t seconds = Time::GetSecondsSlow();
         static char timeStringBuffer[20];
         StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
-
-        LogInfo("Main", "============== Diagnostics %s =============", timeStringBuffer);
-        LogInfo("Main", "| Type | freq(Hz) | max(us) | maxall(us) | usage(%%) |");
-        LogInfo("Main", "| High | %8" PRIu32 " | %7" PRIu32 " | %10" PRIu32 " | %8.3f |", dMain.frequencyHz, maxMain, maxAllMain, usageMain);
-        LogInfo("Main", "| Disp | %8" PRIu32 " | %7" PRIu32 " | %10" PRIu32 " | %8.3f |", dDisp.frequencyHz, maxDisp, maxAllDisp, usageDisp);
-        LogInfo("Main", "| Logg | %8" PRIu32 " | %7" PRIu32 " | %10" PRIu32 " | %8.3f |", dLogg.frequencyHz, maxLogg, maxAllLogg, usageLogg);
-        LogInfo("Main", "=====================================================");
-
-        gScheduler.clearMaxTimes();
-
+        LogInfo("Main", "==================== Diagnostics %s ===================", timeStringBuffer);
+        LogInfo("Main", " | ProfilerId | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
+        for (uint8_t i = 0; i < ProfilerConfig::Count; ++i) {
+            const Profiler::Record& r = Profiler::GetRecord(i);
+            const char* idStr = ProfilerConfig::IdToString(i);
+            LogInfo("Main", " | %10s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.count, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
+        }
+        LogInfo("Main", "=================================================================");
     }
 }
-*/
+
