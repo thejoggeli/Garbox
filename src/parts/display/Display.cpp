@@ -118,8 +118,6 @@ void Display::hardwareInit(){
 
 void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
 
-    return;
-
     uint8_t cmd;
     uint8_t data[4];
 
@@ -167,17 +165,8 @@ void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint1
 }
 
 void Display::tick() {
-
-    return;
-
-    if(mFlushing){
-        mRenderSkipCount += 1;
-        FailDebug("Display", "render skipped");
-        LogWarning("Display", "render skipped! count: %u", mRenderSkipCount);
-    }
-    else {
-        lv_timer_handler(); 
-    }
+    
+    // lv_timer_handler(); 
 
     static int x = 0;
     x = (x + 1) % 320;

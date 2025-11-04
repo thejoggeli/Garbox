@@ -16,7 +16,7 @@ public:
     static constexpr uint32_t MainTaskStackSize = 1024*4;
     static constexpr uint32_t MainTaskCore = 1;
     static constexpr uint32_t MainTaskUpdateDisplayDurationMillis = 5; // ui and display update is triggered this many seconds before each main cycle tick finishes 
-    
+
     // Piezo Task
     static constexpr const char* PiezoTaskName = "PiezoTask";
     static constexpr uint32_t PiezoTaskFrequencyHz = 200;

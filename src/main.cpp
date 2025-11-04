@@ -106,8 +106,8 @@ void mainTask(void* parameter){
         vTaskDelayUntil(&lastWakeTime, cycleDuration - updateDisplayDuration);
 
         // if display is not busy
-        // update ui state
-        // notify display to render new ui state 
+        // TODO update ui state
+        // TODO notify display to render new ui state 
         
         // sleep until next tick
         vTaskDelayUntil(&lastWakeTime, cycleDuration);
