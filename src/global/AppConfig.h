@@ -22,13 +22,13 @@ public:
     static constexpr uint32_t PiezoTaskFrequencyHz = 200;
     static constexpr uint32_t PiezoTaskDurationMicros = 1'000'000 / PiezoTaskFrequencyHz;
     static constexpr uint32_t PiezoTaskDurationMillis = 1'000 / PiezoTaskFrequencyHz;
-    static constexpr uint32_t PiezoTaskPriority = 10;
+    static constexpr uint32_t PiezoTaskPriority = 15;
     static constexpr uint32_t PiezoTaskStackSize = 1024;
     static constexpr uint32_t PiezoTaskCore = 1;
 
     // Display
     static constexpr const char* DisplayTaskName = "DisplayTask";
-    static constexpr uint32_t DisplayTaskPriority = 8;
+    static constexpr uint32_t DisplayTaskPriority = 10;
     static constexpr uint32_t DisplayTaskStackSize = 1024;
     static constexpr uint32_t DisplayTaskCore = 1;
     static constexpr uint32_t DisplayWidth = 320;
@@ -36,7 +36,7 @@ public:
 
     // SPI DMA 
     static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
-    static constexpr uint32_t SpiDmaTaskPriority = 8;
+    static constexpr uint32_t SpiDmaTaskPriority = 10;
     static constexpr uint32_t SpiDmaTaskStackSize = 2048;
     // Due to memory limitations, the buffer can hold a fraction of the display's pixel data 
     static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2 / 4;
