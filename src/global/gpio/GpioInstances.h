@@ -9,11 +9,6 @@ public:
 
     static void Init();
 
-    static Gpio& GetDebugLed0();
-    static Gpio& GetDebugLed1();
-    static Gpio& GetDebugLed2();
-    static Gpio& GetDebugLed3();
-
     static Gpio& GetDebugGpio0();
     static Gpio& GetDebugGpio1();
 
