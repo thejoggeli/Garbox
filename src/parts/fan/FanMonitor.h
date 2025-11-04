@@ -18,7 +18,8 @@ public:
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
     FanMonitor(
-        uint32_t stallThresholdMicros = 200000,
+        uint32_t idleStallThresholdMicros = 200000,
+        uint32_t runningStallThresholdMicros = 200000,
         uint32_t stalledAlertPeriodMicros = 0,
         uint32_t minRpmThreshold = 50,
         uint32_t reenterStallCooldownMicros = 0
@@ -28,7 +29,8 @@ public:
     void setStateChangedCallback(StateChangedCallback callback);
     void setStalledAlertCallback(StalledAlertCallback callback);
     void setStalledAlertPeriod(uint32_t periodMicros);
-    void setStallThreshold(uint32_t stallThresholdMicros);
+    void setIdleStallThreshold(uint32_t stallThresholdMicros);
+    void setRunningStallThreshold(uint32_t stallThresholdMicros);
     void setMinRpmThreshold(uint32_t rpmThreshold);
     void setReenterStallCooldown(uint32_t cooldownMicros);
     void reset();
@@ -37,8 +39,9 @@ public:
     // called from app tick (e.g. 30 Hz)
     void tick(uint32_t rpmValue, bool shouldRun);
 
-private:
-    uint32_t mStallThresholdMicros;
+private: 
+    uint32_t mIdleStallThresholdMicros; // Idle => Stalled
+    uint32_t mRunningStallThresholdMicros; // Running => Stalled
     uint32_t mStalledAlertPeriodMicros;
     uint32_t mReenterStallCooldownMicros;
     uint32_t mMinRpmThreshold;

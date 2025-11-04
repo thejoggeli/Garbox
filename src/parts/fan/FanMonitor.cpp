@@ -6,12 +6,14 @@
 namespace Garbox {
 
 FanMonitor::FanMonitor(
-    uint32_t stallThresholdMicros,
+    uint32_t idleStallThresholdMicros,
+    uint32_t runningStallThresholdMicros,
     uint32_t stalledAlertPeriodMicros,
     uint32_t minRpmThreshold,
     uint32_t reenterStallCooldownMicros):
     // initialize members
-    mStallThresholdMicros(stallThresholdMicros),
+    mIdleStallThresholdMicros(idleStallThresholdMicros),
+    mRunningStallThresholdMicros(runningStallThresholdMicros),
     mStalledAlertPeriodMicros(stalledAlertPeriodMicros),
     mReenterStallCooldownMicros(reenterStallCooldownMicros),
     mMinRpmThreshold(minRpmThreshold){
@@ -25,7 +27,6 @@ void FanMonitor::init(){
     mPeriodicAlertTimer.reset();
     mReenterCooldownTimer.reset();
     mState = State::Idle;
-
     mInitialized = true;
 }
 
@@ -41,8 +42,12 @@ void FanMonitor::setStalledAlertPeriod(uint32_t periodMicros){
     mStalledAlertPeriodMicros = periodMicros;
 }
 
-void FanMonitor::setStallThreshold(uint32_t stallThresholdMicros){
-    mStallThresholdMicros = stallThresholdMicros;
+void FanMonitor::setIdleStallThreshold(uint32_t stallThresholdMicros){
+    mIdleStallThresholdMicros = stallThresholdMicros;
+}
+
+void FanMonitor::setRunningStallThreshold(uint32_t stallThresholdMicros){
+    mRunningStallThresholdMicros = stallThresholdMicros;
 }
 
 void FanMonitor::setMinRpmThreshold(uint32_t rpmThreshold){
@@ -101,28 +106,37 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldRun){
 
 void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldRun){
     if(shouldRun){
-        enterState(State::Running);
+        if(rpmValue >= mMinRpmThreshold){
+            enterState(State::Running);
+        }
+        else if(mIdleStallThresholdMicros == 0){
+            enterState(State::Stalled);
+        } 
+        else if(mStallTimer.isReset()){
+            mStallTimer.start(mIdleStallThresholdMicros);
+        }
+        else if(mStallTimer.isExpired()){
+            enterState(State::Stalled);
+        }
+    }
+    else if(mStallTimer.isRunning()){
+        mStallTimer.reset();
     }
 }
 
 void FanMonitor::handleRunningState(uint32_t rpmValue, bool shouldRun){
-    if(!shouldRun){
-        enterState(State::Idle);
-        return;
-    }
-
     if(rpmValue < mMinRpmThreshold){
-        if(mReenterStallCooldownMicros > 0 && mReenterCooldownTimer.isRunningAndNotExpired()){
-            return;
-        }
-
-        if(mStallThresholdMicros == 0){
+        if(!shouldRun){
+            enterState(State::Idle);
+        } 
+        else if((mReenterStallCooldownMicros) > 0 && mReenterCooldownTimer.isRunningAndNotExpired()){
+            // in reenter timeout
+        } 
+        else if(mRunningStallThresholdMicros == 0){
             enterState(State::Stalled);
-            return;
-        }
-
-        if(mStallTimer.isReset()){
-            mStallTimer.start(mStallThresholdMicros);
+        } 
+        else if(mStallTimer.isReset()){
+            mStallTimer.start(mRunningStallThresholdMicros);
         }
         else if(mStallTimer.isExpired()){
             enterState(State::Stalled);

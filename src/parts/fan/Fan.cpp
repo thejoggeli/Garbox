@@ -21,9 +21,10 @@ static constexpr uint32_t RpmFilterTicks = AppConfig::MainTaskFrequencyHz/3;
 static constexpr float RpmFilterThreshold = 0.05f;
 
 // Fan state monitor config
-static constexpr uint32_t StalledThreshold = 1000_ms;
+static constexpr uint32_t IdleStallThreshold = 1000_ms;
+static constexpr uint32_t RunningStallThreshold = 0_ms;
 static constexpr uint32_t StalledCallbackPeriod = 500_ms;
-static constexpr uint32_t MinRpmThreshold = 10;
+static constexpr uint32_t MinRpmThreshold = 50;
 static constexpr uint32_t ReenterStallCooldown = 0_ms;
 
 Fan::Fan() : 
@@ -32,7 +33,7 @@ Fan::Fan() :
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold),
-    mFanMonitor(StalledThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
+    mFanMonitor(IdleStallThreshold, RunningStallThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
     // nothing to do
 }
 
@@ -71,11 +72,11 @@ void Fan::tick(){
             mMeasuredFrequency = newFrequency;
             mMeasuredRpm = newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution);
         }
-    
-        // filter rpm
-        mRpmFilter.update(mMeasuredRpm);   
-        mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();     
     }
+
+    // filter rpm
+    mRpmFilter.update(mMeasuredRpm);   
+    mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();   
 
     // fan monitor tick
     bool const shouldRun = isEnabled();
