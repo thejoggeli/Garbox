@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-
+#include "FanStateMonitor.h"
 #include "core/sensor/FrequencySensor.h"
 #include "util/filter/ExponentialFilter.h"
 
@@ -13,12 +13,21 @@ class LedcChannel;
 class Fan {
 public:
 
+    enum class State : uint8_t {
+        Off = 0,
+        On,
+        Stalled
+    };
+
+    using StateChangedCallback = std::function<void(State state)>;
+
     Fan();
 
     void init();
     void start();
     void tick();
 
+    void setStateChangedCallback(StateChangedCallback callback);
     void setEnabled(bool enabled);
     void setSpeed(float speed); // range [0.0, 1.0]
 
@@ -28,10 +37,12 @@ public:
 
 private:
 
+    void handleFanStateMonitorCallback(FanStateMonitor::State state);
+
+    State mState = State::Off;
+    StateChangedCallback mStateChangedCallback = nullptr;
     float mMeasuredFrequency = 0.0f;
     float mMeasuredRpm = 0;
-
-    bool mEnabled = false;
     float mSpeed = 0.0f;
 
     // sets voltage on FanEnable pin
@@ -45,6 +56,9 @@ private:
 
     // filter for measured RPM value
     ExponentialFilter mRpmFilter;
+
+    // fan state monitor
+    FanStateMonitor mFanStateMonitor;
 
 };
 

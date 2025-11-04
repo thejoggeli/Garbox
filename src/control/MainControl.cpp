@@ -155,4 +155,10 @@ void MainControl::onAssertExit(const char* context, const char* message){
     }
 }
 
+void MainControl::handleFanStateChanged(Fan::State state){
+    if(state == Fan::State::Stalled){
+        mPiezoPlayer.playTone(Tone(250_ms, 900));
+    }
+}
+
 }

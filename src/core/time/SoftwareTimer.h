@@ -28,14 +28,17 @@ public:
     /// extend the timer by duration 
     void extend(uint32_t durationMicros);
 
-    /// returns true if timer ran past its duration
-    bool isExpired() const;
-
-    /// returns true if timer is in reset state
+    /// state==reset
     bool isReset() const;
 
-    /// returns true if timer is in running state
+    /// state==running
     bool isRunning() const;
+
+    /// state==running && expired
+    bool isExpired() const;
+
+    /// state==running && !expired
+    bool isRunningAndNotExpired() const;
 
     /// returns the elapsed time since the timer started
     uint32_t getElapsedMicros() const;

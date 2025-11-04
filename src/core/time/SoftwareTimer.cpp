@@ -61,25 +61,39 @@ void SoftwareTimer::extend(uint32_t durationMicros){
     mDurationMicros += durationMicros;
 }
 
-bool SoftwareTimer::isExpired() const {
-    if(mState == State::Reset){
-        return false;
-    }
-    if(mDurationMicros == 0){
-        return true;
-    }
-    if((Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
-        return true;
-    }
-    return false;
-}
-
 bool SoftwareTimer::isReset() const {
     return mState == State::Reset;
 }
 
 bool SoftwareTimer::isRunning() const {
     return mState == State::Running;
+}
+
+bool SoftwareTimer::isExpired() const {
+    if(mState == State::Reset){
+        return false; // timer is not running
+    }
+    if(mDurationMicros == 0){
+        return true; // timer is expired
+    }
+    if((Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
+        return true; // timer is expired
+    }
+    return false; // timer is not expired
+}
+
+bool SoftwareTimer::isRunningAndNotExpired() const {
+    if(mState == State::Reset){
+        return false; // timer is not running
+    }
+    if(mDurationMicros == 0){
+        return false; // timer is expired
+    }
+    if((Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
+        return false; // timer is expired
+    }
+    return true; // timer is not expired
+    
 }
 
 uint32_t SoftwareTimer::getElapsedMicros() const {
