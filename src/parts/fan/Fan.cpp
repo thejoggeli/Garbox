@@ -76,12 +76,12 @@ void Fan::tick(){
         // filter rpm
         mRpmFilter.update(mMeasuredRpm);   
         mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();  
-
-        // fan monitor tick
-        bool const shouldRun = isEnabled();
-        uint32_t const unfilteredRpm = mMeasuredRpm;
-        mFanMonitor.tick(unfilteredRpm, shouldRun);
     }
+
+    // fan monitor tick
+    bool const shouldRun = isEnabled();
+    uint32_t const unfilteredRpm = mMeasuredRpm;
+    mFanMonitor.tick(unfilteredRpm, shouldRun);
 
 }
 
