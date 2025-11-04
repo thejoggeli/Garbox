@@ -36,10 +36,7 @@ bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
     cfg.clk_cfg         = LEDC_AUTO_CLK;
 
     // set timer configuration
-    esp_err_t result = ledc_timer_config(&cfg);
-
-    // check result
-    if(result != ESP_OK){
+    if(ledc_timer_config(&cfg) != ESP_OK){
         FailExit("LedcTimer", "setup failed");
         return false;
     }

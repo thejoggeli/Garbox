@@ -89,14 +89,12 @@ bool PulseCounter::start() {
         return false;
     }
 
-    esp_err_t err = pcnt_counter_clear(mUnit);
-    if (err != ESP_OK) {
+    if (pcnt_counter_clear(mUnit) != ESP_OK) {
         FailExit("PulseCounter", "pcnt_unit_clear_count failed");
         return false;
     }
 
-    err = pcnt_counter_resume(mUnit);
-    if (err != ESP_OK) {
+    if (pcnt_counter_resume(mUnit) != ESP_OK) {
         FailExit("PulseCounter", "pcnt_unit_start failed");
         return false;
     }
