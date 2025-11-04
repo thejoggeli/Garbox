@@ -216,6 +216,9 @@ void FanMonitor::onEnterStalledState(){
 
     if(mStalledAlertPeriodMicros > 0){
         mPeriodicAlertTimer.start(mStalledAlertPeriodMicros);
+        if(mStalledAlertCallback){
+            mStalledAlertCallback(mStallCounter++);
+        }
     }
 }
 
