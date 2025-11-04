@@ -13,22 +13,9 @@
 
 using namespace Garbox;
 
-enum SlotIndex : uint8_t {
-    SlotMain,
-    SlotDisplay,
-    SlotLogging,
-};
-
-void mainTask(void);
-void displayTxTask(void);
-void loggingTask(void);
-
-TimeSlotScheduler gScheduler ({
-    {AppConfig::TaskDurationMicros::Main,      SlotMain,    mainTask},
-    {AppConfig::TaskDurationMicros::DisplayTx, SlotDisplay, displayTxTask},
-});
-
 MainControl gMainControl;
+
+void mainTask(void* parameter);
 
 void setup() {
 
@@ -38,7 +25,10 @@ void setup() {
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message){
         DebugLeds::SetLed(DebugLeds::Id::Assert, true);
+        while(true){
         LogError("AssertHandler", "AssertDebug! %s %s", context, message);
+
+        }
         gMainControl.onAssertDebug(context, message);
     });
 
@@ -81,21 +71,46 @@ void setup() {
 
     // start everything
     gMainControl.start();
+
+    // start main task
+    xTaskCreatePinnedToCore(
+        mainTask,
+        AppConfig::MainTaskName,
+        AppConfig::MainTaskStackSize,
+        NULL, // parameter
+        AppConfig::MainTaskPriority,
+        NULL, // handle
+        AppConfig::MainTaskCore
+    );
 }
 
-void loop() {
-    Time::Tick();
-    gScheduler.run();
+void loop(){
+    Time::DelayMillis(1000);
 }
 
-void mainTask(){
-    gMainControl.mainTick();
+void mainTask(void* parameter){
+    const TickType_t cycleTime = pdMS_TO_TICKS(AppConfig::MainTaskDurationMillis);
+    TickType_t lastWakeTime = xTaskGetTickCount();
+    while(true){
+
+        // FIXED DURATION SECTION
+        Time::Tick();
+        gMainControl.tick();
+
+        // VARIABLE DURATION SECTION
+
+        // update display first to minimize frame jitter
+        // TODO update display 
+
+        // logging
+        // TODO log some things         
+        
+        // sleep until next tick
+        vTaskDelayUntil(&lastWakeTime, cycleTime);
+    }
 }
 
-void displayTxTask(){
-    gMainControl.displayTxTick();
-}
-
+/*
 void loggingTask(){
     // Print diagnostics once per second
     static uint32_t lastPrintMicros = 0;
@@ -133,3 +148,4 @@ void loggingTask(){
 
     }
 }
+*/

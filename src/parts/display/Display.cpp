@@ -41,16 +41,15 @@ void Display::init() {
     lv_tick_set_cb(tickCallback);
 
     // init draw buffer
-    // mDrawBufA = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    // mDrawBufB = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    mDrawBufA = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA);
+    mDrawBufA = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    mDrawBufB = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     AssertExit(mDrawBufA != nullptr, "Display", "mDrawBufA is nullptr");
+    AssertExit(mDrawBufB != nullptr, "Display", "mDrawBufA is nullptr");
 
     // init display
     mLvDisplay = lv_display_create(mWidth, mHeight);
     lv_display_set_user_data(mLvDisplay, this); 
-    lv_display_set_buffers(mLvDisplay, mDrawBufA, nullptr, mBufferSize, LV_DISPLAY_RENDER_MODE_FULL);
-    // lv_display_set_buffers(mLvDisplay, mDrawBufA, mDrawBufB, mBufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(mLvDisplay, mDrawBufA, mDrawBufB, mBufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(mLvDisplay, flushTrampoline);
 
     lv_obj_t* label = lv_label_create(lv_screen_active());
@@ -167,7 +166,9 @@ void Display::testFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint1
     }
 }
 
-void Display::mainTick() {
+void Display::tick() {
+
+    return;
 
     if(mFlushing){
         mRenderSkipCount += 1;
@@ -271,7 +272,7 @@ void Display::handleLog(lv_log_level_t level, const char* str){
             break;
         case LV_LOG_LEVEL_ERROR:
             LogError("LVGL/Error", "%s", str);
-            AssertDebug(false, "Display", "LVGL Error");
+            AssertExit(false, "Display", "LVGL Error");
             break;
         case LV_LOG_LEVEL_USER:        
         default:

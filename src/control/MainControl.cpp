@@ -30,6 +30,7 @@ void MainControl::init(){
     mHeatpad.init();
     mDisplay.init();
     mPiezo.init();
+    mPiezoPlayer.init();
     mInitialized = true;
 }
 
@@ -42,7 +43,7 @@ void MainControl::start(){
     mPiezoPlayer.playSequence(PiezoSequences::Button, 500_ms);
 }
 
-void MainControl::mainTick(){
+void MainControl::tick(){
 
     // heartbeat 
     if(mHeartbeatTimer.isExpired()){
@@ -141,14 +142,7 @@ void MainControl::mainTick(){
     DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);
 
     // display tick
-    mDisplay.mainTick();
-
-    // piezo tick
-    mPiezoPlayer.tick();
-}
-
-void MainControl::displayTxTick(){
-    mDisplay.txTick();
+    mDisplay.tick();
 }
 
 void MainControl::onAssertDebug(const char* context, const char* message){

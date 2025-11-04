@@ -2,7 +2,11 @@
 
 #include "assert/Assert.h"
 #include "core/time/Time.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "global/AppConfig.h"
 #include "parts/debugLeds/DebugLeds.h"
+#include "util/threading/LockGuard.h"
 
 namespace Garbox {
 
@@ -10,6 +14,34 @@ PiezoPlayer::PiezoPlayer(Piezo& piezo, uint32_t defaultSilentTimeMicros):
     mPiezo(piezo),
     mDefaultSilentTimeMicros(defaultSilentTimeMicros){
     // nothing to do
+}
+
+PiezoPlayer::~PiezoPlayer(){
+    AssertExit(false, "PiezoPlayer", "deconstructor not implemented");
+    // TODO stop task
+}
+
+void PiezoPlayer::init(){
+    AssertExit(!mInitialized, "PiezoPlayer", "already initialized");
+
+    // create mutex
+    mMutex = xSemaphoreCreateRecursiveMutex();
+    AssertExit(mMutex != nullptr, "PiezoPlayer", "mutex creation failed");  
+
+    // initialization complete
+    mInitialized = true;
+
+    // start task
+    BaseType_t taskRes = xTaskCreatePinnedToCore(
+        handleTask,
+        AppConfig::PiezoTaskName,
+        AppConfig::PiezoTaskStackSize,
+        this,
+        AppConfig::PiezoTaskPriority,
+        nullptr,
+        AppConfig::PiezoTaskCore
+    );
+    AssertExit(taskRes == pdPASS, "PiezoPlayer", "start task failed");
 }
 
 void PiezoPlayer::stop(){
@@ -20,7 +52,18 @@ void PiezoPlayer::stop(){
     mCurrentToneIndex = 0;
 }
 
+void PiezoPlayer::handleTask(void* self){
+    const TickType_t cycleTime = pdMS_TO_TICKS(AppConfig::PiezoTaskDurationMillis);
+    TickType_t lastWakeTime = xTaskGetTickCount();
+    while(true){
+        static_cast<PiezoPlayer*>(self)->tick();
+        vTaskDelayUntil(&lastWakeTime, cycleTime);
+    }
+}
+
 void PiezoPlayer::tick(){
+    Garbox::LockGuard lock(mMutex);
+
     if (!mPlaying || !mCurrentSequence){
         return;
     }
@@ -92,11 +135,12 @@ uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMic
 }
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence){
+    Garbox::LockGuard lock(mMutex);
     playSequence(sequence, mDefaultSilentTimeMicros);
 }
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTimeMicros){
-
+    Garbox::LockGuard lock(mMutex);
     if(sequence.getCount() == 0){
         AssertDebug(false, "PiezoPlayer", "invalid sequence tone count == 0");
         return;
@@ -133,10 +177,12 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
 }
 
 void PiezoPlayer::playTone(const Tone& tone){
+    Garbox::LockGuard lock(mMutex);
     playTone(tone, mDefaultSilentTimeMicros);
 }
 
 void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
+    Garbox::LockGuard lock(mMutex);
 
     // ensure there is enough space for tone + Silent time
     if(mQueue.available() < 2){
@@ -174,6 +220,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
 }
 
 void PiezoPlayer::playNextInQueue(){
+    Garbox::LockGuard lock(mMutex);
 
     QueueItem* nextItem = mQueue.popPtr();
     if(nextItem != nullptr){
@@ -226,10 +273,12 @@ void PiezoPlayer::playNextInQueue(){
 }
 
 bool PiezoPlayer::isPlaying() const {
+    Garbox::LockGuard lock(mMutex);
     return mPlaying;
 }
 
 void PiezoPlayer::clearQueue(){
+    Garbox::LockGuard lock(mMutex);
     mQueue.clear();
 }
 

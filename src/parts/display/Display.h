@@ -17,7 +17,7 @@ public:
     Display();
 
     void init();
-    void mainTick();
+    void tick();
     void txTick();
 
 private:

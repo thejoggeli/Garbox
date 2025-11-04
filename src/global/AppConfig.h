@@ -7,27 +7,26 @@ namespace Garbox {
 class AppConfig {
 public:
 
-    // target durations for full cycle + all individual tasks
-    struct TaskDurationMicros {
-        static constexpr uint32_t Main = 10'000; // 10 ms 
-        static constexpr uint32_t DisplayTx = 2'500; // 2.5 ms 
-        static constexpr uint32_t FullCycle = TaskDurationMicros::Main + TaskDurationMicros::DisplayTx; // 12.5 ms
-    };
+    // Main Task
+    static constexpr const char* MainTaskName = "MainTask";
+    static constexpr uint32_t MainTaskFrequencyHz = 40;
+    static constexpr uint32_t MainTaskDurationMicros = 1'000'000 / MainTaskFrequencyHz;
+    static constexpr uint32_t MainTaskDurationMillis = 1'000 / MainTaskFrequencyHz;
+    static constexpr uint32_t MainTaskPriority = 5;
+    static constexpr uint32_t MainTaskStackSize = 1024*4;
+    static constexpr uint32_t MainTaskCore = 1;
 
-    // target frequencies for full cycle + all individual tasks
-    struct TaskFrequencyHz {
-        static constexpr uint32_t FullCycle = 1'000'000 / TaskDurationMicros::FullCycle; // 80 Hz
-        static constexpr uint32_t Main = FullCycle; // 80 Hz
-        static constexpr uint32_t DisplayTx = FullCycle; // 80 Hz
-    };
-
+    // Piezo Task
+    static constexpr const char* PiezoTaskName = "PiezoTask";
+    static constexpr uint32_t PiezoTaskFrequencyHz = 200;
+    static constexpr uint32_t PiezoTaskDurationMicros = 1'000'000 / PiezoTaskFrequencyHz;
+    static constexpr uint32_t PiezoTaskDurationMillis = 1'000 / PiezoTaskFrequencyHz;
+    static constexpr uint32_t PiezoTaskPriority = 10;
+    static constexpr uint32_t PiezoTaskStackSize = 1024;
+    static constexpr uint32_t PiezoTaskCore = 1;
+    
     // tick rate for specific parts of the app
-    struct TickFrequencyHz {
-        static constexpr uint32_t Fan = TaskFrequencyHz::Main;
-    };
-
-    // FreeRTOS task priorities
-    static constexpr uint32_t SpiDmaTaskPriority = 5; 
+    static constexpr uint32_t FanTickFrequencyHz = MainTaskFrequencyHz;
 
     // Display
     static constexpr uint32_t DisplayWidth = 320;
@@ -46,7 +45,7 @@ public:
     // A fraction slightly above 50% is chosen to account for possible rounding errors and also because there is enough headroom
     static constexpr uint32_t SpiDmaMaxTransferSizeBytes = static_cast<uint32_t>(
         // static_cast<float>(DisplayWidth) * static_cast<float>(DisplayHeight) * 2.0f * 0.51f
-        DisplayWidth * DisplayHeight * 2
+        DisplayWidth * DisplayHeight * 2 / 4
     );
 
 };

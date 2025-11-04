@@ -16,8 +16,7 @@ public:
 
     void init();
     void start();
-    void mainTick();
-    void displayTxTick();
+    void tick();
 
     void onAssertDebug(const char* context, const char* message);
     void onAssertExit(const char* context, const char* message);
