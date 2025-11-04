@@ -90,7 +90,7 @@ void loop(){
 
 void mainTask(void* parameter){
     const TickType_t cycleDuration = pdMS_TO_TICKS(AppConfig::MainTaskDurationMillis);
-    const TickType_t updateDisplayDuration = pdMS_TO_TICKS(1000);
+    const TickType_t updateDisplayDuration = pdMS_TO_TICKS(AppConfig::MainTaskUpdateDisplayDurationMillis);
     TickType_t lastWakeTime = xTaskGetTickCount();
     while(true){
 
