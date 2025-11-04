@@ -12,6 +12,7 @@ public:
         MainTick,
         LogTick,
         UiTick,
+        PiezoTick,
         Count
     };
 
@@ -21,6 +22,7 @@ public:
             case MainTick: return "MainTick";
             case LogTick: return "LogTick";
             case UiTick: return "UiTick";
+            case PiezoTick: return "PiezoTick";
             case Count: return "Count";
         }
         static_assert("unhandled profiler config id");

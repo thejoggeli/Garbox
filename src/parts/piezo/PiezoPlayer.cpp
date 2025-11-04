@@ -1,13 +1,14 @@
 #include "PiezoPlayer.h"
 
 #include "assert/Assert.h"
+#include "core/diagnostics/Profiler.h"
+#include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "global/AppConfig.h"
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/threading/LockGuard.h"
-#include "core/log/Log.h"
 
 namespace Garbox {
 
@@ -84,6 +85,8 @@ void PiezoPlayer::handleTask(void* player){
 
 void PiezoPlayer::tick(){
     Garbox::LockGuard lock(mMutex);
+
+    Profiler::Scoped(ProfilerConfig::PiezoTick);
 
     if (!mPlaying || !mCurrentSequence){
         return;
