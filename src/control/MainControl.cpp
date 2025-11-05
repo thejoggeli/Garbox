@@ -26,8 +26,8 @@ void MainControl::init(){
 
     // init fan
     mFan.init();
-    mFan.setStateChangedCallback([this](Fan::State newState, Fan::State oldState){
-        handleFanStateChanged(newState, oldState);
+    mFan.setStateChangedCallback([this](Fan::State oldState, Fan::State newState){
+        handleFanStateChanged(oldState, newState);
     });
     mFan.setStalledAlertCallback([this](uint32_t counter){
         handleFanStalledAlert(counter);
@@ -113,10 +113,10 @@ void MainControl::tick(){
     if(mRpmTimer.isExpired() || mRpmTimer.isReset()){
         // print fan rpm
         static float lastRpmValue = 0;
-        float const rpmValue = mFan.getMeasuredRpm();
-        float const rpmChange = std::abs(lastRpmValue - rpmValue);
-        if(rpmChange > 5.0f){ 
-            LogDebug("MainControl", "Measured RPM: %" PRIu32, static_cast<uint32_t>(rpmValue));
+        uint32_t const rpmValue = mFan.getMeasuredRpm();
+        uint32_t const rpmDiff = MathUtils::AbsDiff<uint32_t>(rpmValue, lastRpmValue);
+        if(rpmDiff > 3){ 
+            LogDebug("MainControl", "Measured RPM: %" PRIu32, rpmValue);
             lastRpmValue = rpmValue;
         }
         mRpmTimer.start(200_ms);
@@ -152,16 +152,16 @@ void MainControl::onAssertExit(const char* context, const char* message){
     }
 }
 
-void MainControl::handleFanStateChanged(Fan::State newState, Fan::State oldState){
+void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState){
     LogDebug("MainControl", "fan state changed: %s => %s", 
         Fan::StateToString(oldState), 
         Fan::StateToString(newState)
     );
     if(newState == Fan::State::Enabled){
-        mPiezoPlayer.playTone(Tone(500_ms, 500, 2500));
+        mPiezoPlayer.playSequence(PiezoSequences::FanEnabled);
     }
     else if(newState == Fan::State::Disabled){
-        mPiezoPlayer.playTone(Tone(500_ms, 2500, 500));
+        mPiezoPlayer.playSequence(PiezoSequences::FanDisabled);
     }
 }
 

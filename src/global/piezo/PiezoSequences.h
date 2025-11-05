@@ -14,6 +14,8 @@ public:
     static const ToneSequence Interpolated1;
     static const ToneSequence Interpolated2;
     static const ToneSequence FanStalled;
+    static const ToneSequence FanEnabled;
+    static const ToneSequence FanDisabled;
 };
 
 } // namespace Garbox

@@ -61,9 +61,21 @@ static constexpr Tone InterpolatedTones2[] = {
 };
 
 static constexpr Tone FanStalledTones[] = {
-    Tone(100_ms, 1000, 1000),
+    Tone(100_ms, 1000, 1000).duty(0.75f),
     Tone(100_ms),
-    Tone(100_ms, 1000, 1000),
+    Tone(100_ms, 1000, 1000).duty(0.25f),
+};
+
+static constexpr Tone FanEnabledTones[] = {
+    Tone(200_ms, 500, 1000).duty(0.25f),
+    Tone(200_ms, 1000, 1750).duty(0.5f),
+    Tone(200_ms, 1750, 4000).duty(0.75f),
+};
+
+static constexpr Tone FanDisabledTones[] = {
+    Tone(200_ms, 4000, 1750).duty(0.75f),
+    Tone(200_ms, 1750, 1000).duty(0.5f), 
+    Tone(200_ms, 1000, 500).duty(0.25f),
 };
 
 // clean, constexpr, macro-free
@@ -74,5 +86,7 @@ const ToneSequence PiezoSequences::HelixDown = ToneSequence::from(HelixDownTones
 const ToneSequence PiezoSequences::Interpolated1 = ToneSequence::from(InterpolatedTones);
 const ToneSequence PiezoSequences::Interpolated2 = ToneSequence::from(InterpolatedTones2);
 const ToneSequence PiezoSequences::FanStalled = ToneSequence::from(FanStalledTones);
+const ToneSequence PiezoSequences::FanEnabled = ToneSequence::from(FanEnabledTones);
+const ToneSequence PiezoSequences::FanDisabled = ToneSequence::from(FanDisabledTones);
 
 } // namespace Garbox

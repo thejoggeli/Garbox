@@ -23,6 +23,18 @@ public:
         return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     }
 
+    // returns the absolute difference between two numeric values
+    // works for both signed and unsigned types; avoids undefined behavior for unsigned arithmetic
+    template <typename T>
+    static constexpr T AbsDiff(T a, T b) noexcept {
+        static_assert(std::is_arithmetic_v<T>, "AbsDiff supports only numeric types");
+        if constexpr (std::is_unsigned_v<T>) {
+            return (a > b) ? (a - b) : (b - a);
+        } 
+        else if constexpr (std::is_signed_v<T> || std::is_floating_point_v<T>) {
+            return (a >= b) ? (a - b) : (b - a);
+        }
+    }
 
     // wraps value into the range [0, max) without using modulo
     // this function is meant to be used with small changes to value only. it handles at most one overflow

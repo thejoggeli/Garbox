@@ -3,7 +3,8 @@
 #include <cstdint>
 #include "FanMonitor.h"
 #include "core/sensor/FrequencySensor.h"
-#include "util/filter/ExponentialFilter.h"
+#include "global/AppConfig.h"
+#include "util/filter/MovingAverageFilter.h"
 
 namespace Garbox {
 
@@ -19,7 +20,7 @@ public:
         Stalled
     };
 
-    using StateChangedCallback = std::function<void(State newState, State oldState)>;
+    using StateChangedCallback = std::function<void(State oldState, State newState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
     Fan();
@@ -36,7 +37,7 @@ public:
     bool isEnabled();
     State getState();
     float getSpeed();
-    float getMeasuredRpm(bool filtered = true);
+    uint32_t getMeasuredRpm(bool filtered = true);
 
     static const char* StateToString(State state);
 
@@ -49,10 +50,10 @@ private:
     State mState = State::Disabled;
     StateChangedCallback mStateChangedCallback = nullptr;
     StalledAlertCallback mStalledAlertCallback = nullptr;
-    float mMeasuredFrequency = 0.0f;
-    float mMeasuredRpm = 0;
-    float mMeasuredRpmFiltered = 0;
     float mSpeed = 0.0f;
+    float mMeasuredFrequency = 0.0f;
+    uint32_t mMeasuredRpm = 0;
+    uint32_t mMeasuredRpmFiltered = 0;
 
     // sets voltage on FanEnable pin
     Gpio& mGpioFanEnable;
@@ -64,7 +65,8 @@ private:
     FrequencySensor mFrequencySensor;
 
     // filter for measured RPM value
-    ExponentialFilter mRpmFilter;
+    static constexpr size_t RpmFilterSize = AppConfig::MainTaskFrequencyHz/3;
+    MovingAverageFilter<uint32_t, RpmFilterSize> mRpmFilter;
 
     // fan state monitor
     FanMonitor mFanMonitor;

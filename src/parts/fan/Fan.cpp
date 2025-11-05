@@ -15,11 +15,6 @@ namespace Garbox {
 // RPM measure config 
 static constexpr uint32_t PulsesPerRevolution = 2;
 
-// Exponential filter config
-static constexpr float RpmFilterFraction = 0.90f;
-static constexpr uint32_t RpmFilterTicks = AppConfig::MainTaskFrequencyHz/3;
-static constexpr float RpmFilterThreshold = 0.05f;
-
 // Fan state monitor config
 static constexpr uint32_t IdleStallThreshold = 1000_ms;
 static constexpr uint32_t SpinningStallThreshold = 0_ms;
@@ -32,7 +27,7 @@ Fan::Fan() :
     mGpioFanEnable(GpioInstances::GetFanEnable()),
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
-    mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold),
+    mRpmFilter(),
     mFanMonitor(IdleStallThreshold, SpinningStallThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
     // nothing to do
 }
@@ -70,12 +65,12 @@ void Fan::tick(){
         float newFrequency = mFrequencySensor.getFrequencyHz();
         if(newFrequency != mMeasuredFrequency){
             mMeasuredFrequency = newFrequency;
-            mMeasuredRpm = newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution);
+            mMeasuredRpm = static_cast<uint32_t>(newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution));
         }
 
         // filter rpm
-        mRpmFilter.update(mMeasuredRpm);   
-        mMeasuredRpmFiltered = mRpmFilter.getCurrentValue();  
+        mRpmFilter.add(mMeasuredRpm);   
+        mMeasuredRpmFiltered = mRpmFilter.getAverage();
     }
 
     // fan monitor tick
@@ -122,7 +117,7 @@ void Fan::enterState(State newState){
     case State::Disabled:
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
-        mRpmFilter.setCurrentValue(0);
+        mRpmFilter.reset();
         mGpioFanEnable.setValue(false);
         mFrequencySensor.setEnabled(false);
         break;
@@ -139,7 +134,7 @@ void Fan::enterState(State newState){
 
     // call state changed callback
     if(mStateChangedCallback){
-        mStateChangedCallback(newState, oldState);
+        mStateChangedCallback(oldState, newState);
     }
 }
 
@@ -175,15 +170,6 @@ void Fan::handleMonitorStalledAlert(uint32_t counter){
     }
 }
 
-const char* Fan::StateToString(State state){
-    switch(state){
-    case State::Disabled: return "Disabled";
-    case State::Enabled:  return "Enabled";
-    case State::Stalled:  return "Stalled";
-    }
-    return "Invalid";
-}
-
 void Fan::setSpeed(float speed){
     mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
     mSpeedPwm.setDutyRelative(mSpeed);
@@ -197,11 +183,20 @@ float Fan::getSpeed(){
     return mSpeed;
 }
 
-float Fan::getMeasuredRpm(bool filtered){
+uint32_t Fan::getMeasuredRpm(bool filtered){
     if(filtered){
         return mMeasuredRpmFiltered;
     } 
     return mMeasuredRpm;
+}
+
+const char* Fan::StateToString(State state){
+    switch(state){
+    case State::Disabled: return "Disabled";
+    case State::Enabled:  return "Enabled";
+    case State::Stalled:  return "Stalled";
+    }
+    return "Invalid";
 }
 
 } // namespace
