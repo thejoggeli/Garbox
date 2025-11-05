@@ -15,16 +15,16 @@ Button::~Button(){
 void Button::init(){
     AssertExit(!mInitialized, "Button", "already initialized");
 
+    // init fsm
     mFsm.init(State::Released);
     mFsm.setStateChangedCallback([this](State oldState, State newState){
-            handleFsmStateChanged(oldState, newState);
+        handleFsmStateChanged(oldState, newState);
     });
 
-    // set transition delays and state hold times
-    mFsm.setTransitionDelayMicros(State::Released, State::Pressed, mPressDebounceMicros);
-    mFsm.setTransitionDelayMicros(State::Pressed, State::Released, mReleaseDebounceMicros);
-    mFsm.setTransitionDelayMicros(State::Pressed, State::PressedLong, mLongPressMicros);
-    mFsm.setTransitionDelayMicros(State::PressedLong, State::Released, mReleaseDebounceMicros);
+    // set initial transition delays and state hold times
+    setPressDebounceMicros(mPressDebounceMicros);
+    setReleaseDebounceMicros(mPressDebounceMicros);
+    setLongPressMicros(mLongPressMicros);
 
     mInitialized = true;
 }
@@ -39,41 +39,21 @@ void Button::tick(bool isPressedRaw){
 
     switch(mFsm.getState()){
     case State::Released:
-        if(isPressedRaw){
-            mFsm.transition(State::Pressed);
-        }
+        handleReleasedState(isPressedRaw);
         break;
-
     case State::Pressed:
-        if(!isPressedRaw){
-            mFsm.transition(State::Released);
-        }
-        else {
-            mFsm.transition(State::PressedLong);
-        }
+        handlePressedState(isPressedRaw);
         break;
-
     case State::PressedLong:
-        if(!isPressedRaw){
-            mFsm.transition(State::Released);
-        }
+        handlePressedLongState(isPressedRaw);
         break;
-
     default:
         TriggerDebug("Button", "invalid FSM state");
         break;
     }
 
-    // handle hold logic
-    const bool holdEnabled = (mRepeatHoldDelayMicros > 0);
-    if(!holdEnabled){
-        return;
-    }
-
-    const bool isPressedOrLong = (mFsm.getState() == State::Pressed) ||
-                                 (mFsm.getState() == State::PressedLong);
-
-    if(isPressedOrLong && mHoldTimer.isExpired()){
+    // call handle hold callback
+    if(mHoldTimer.isExpired()){
         if(mHoldCallback){
             uint32_t elapsedMicros = Time::GetMicros() - mHoldStartTimeMicros;
             mHoldCallback(mHoldCounter, elapsedMicros, mUserData);
@@ -83,16 +63,40 @@ void Button::tick(bool isPressedRaw){
     }
 }
 
+void Button::handleReleasedState(bool isPressedRaw){
+    if(isPressedRaw){
+        mFsm.transition(State::Pressed);
+    }
+    else {
+        mFsm.cancelPendingTransition();
+    }
+}
+
+void Button::handlePressedState(bool isPressedRaw){
+    if(!isPressedRaw){
+        mFsm.transition(State::Released);
+    }
+    else {
+        mFsm.transition(State::PressedLong);
+    }
+}
+
+void Button::handlePressedLongState(bool isPressedRaw){
+    if(!isPressedRaw){
+        mFsm.transition(State::Released);
+    }
+    else {
+        mFsm.cancelPendingTransition();
+    }
+}
+    
 void Button::handleFsmStateChanged(State oldState, State newState){
 
-    const bool wasReleased = (oldState == State::Released);
-    const bool becomesPressed = (newState == State::Pressed) || (newState == State::PressedLong);
-    const bool wasPressed = (oldState == State::Pressed) || (oldState == State::PressedLong);
-    const bool becomesReleased = (newState == State::Released);
-
     // setup hold timer on press
-    if(wasReleased && becomesPressed){
-        if(mRepeatHoldDelayMicros > 0){
+    if((mRepeatHoldDelayMicros > 0) && mHoldCallback){
+        const bool wasReleased = (oldState == State::Released);
+        const bool becomesPressed = (newState == State::Pressed) || (newState == State::PressedLong);
+        if(wasReleased && becomesPressed){
             mHoldCounter = 0;
             mHoldStartTimeMicros = Time::GetMicros();
             mHoldTimer.start(mInitialHoldDelayMicros);
@@ -106,10 +110,16 @@ void Button::handleFsmStateChanged(State oldState, State newState){
     }
 
     // reset hold timer on release
-    if(wasPressed && becomesReleased){
-        mHoldTimer.reset();
+    if(mHoldTimer.isRunning() || (mHoldCounter > 0)){
+        const bool wasPressed = (oldState == State::Pressed) || (oldState == State::PressedLong);
+        const bool becomesReleased = (newState == State::Released);
+        if(wasPressed && becomesReleased){
+            mHoldCounter = 0;
+            mHoldTimer.reset();
+        }
     }
 
+    // call state changed callback
     if(mStateChangedCallback){
         mStateChangedCallback(oldState, newState, mUserData);
     }

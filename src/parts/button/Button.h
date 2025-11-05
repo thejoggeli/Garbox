@@ -67,6 +67,10 @@ private:
     uint32_t mHoldCounter = 0;
     uint32_t mHoldStartTimeMicros = 0;
 
+    void handleReleasedState(bool isPressedRaw);
+    void handlePressedState(bool isPressedRaw);
+    void handlePressedLongState(bool isPressedRaw);
+    
     void handleFsmStateChanged(State oldState, State newState);
 };
 
