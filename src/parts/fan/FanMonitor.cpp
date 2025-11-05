@@ -7,13 +7,13 @@ namespace Garbox {
 
 FanMonitor::FanMonitor(
     uint32_t idleStallThresholdMicros,
-    uint32_t runningStallThresholdMicros,
+    uint32_t spinningStallThresholdMicros,
     uint32_t stalledAlertPeriodMicros,
     uint32_t minRpmThreshold,
     uint32_t reenterStallCooldownMicros):
     // initialize members
     mIdleStallThresholdMicros(idleStallThresholdMicros),
-    mRunningStallThresholdMicros(runningStallThresholdMicros),
+    mSpinningStallThresholdMicros(spinningStallThresholdMicros),
     mStalledAlertPeriodMicros(stalledAlertPeriodMicros),
     mReenterStallCooldownMicros(reenterStallCooldownMicros),
     mMinRpmThreshold(minRpmThreshold){
@@ -46,8 +46,8 @@ void FanMonitor::setIdleStallThreshold(uint32_t stallThresholdMicros){
     mIdleStallThresholdMicros = stallThresholdMicros;
 }
 
-void FanMonitor::setRunningStallThreshold(uint32_t stallThresholdMicros){
-    mRunningStallThresholdMicros = stallThresholdMicros;
+void FanMonitor::setSpinningStallThreshold(uint32_t stallThresholdMicros){
+    mSpinningStallThresholdMicros = stallThresholdMicros;
 }
 
 void FanMonitor::setMinRpmThreshold(uint32_t rpmThreshold){
@@ -78,7 +78,7 @@ FanMonitor::State FanMonitor::getState() const {
     return mState;
 }
 
-void FanMonitor::tick(uint32_t rpmValue, bool shouldRun){
+void FanMonitor::tick(uint32_t rpmValue, bool shouldSpin){
     if(!mInitialized){
         TriggerDebug("FanMonitor", "tick() called before init()");
         return;
@@ -90,13 +90,13 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldRun){
 
     switch(mState){
     case State::Idle:
-        handleIdleState(rpmValue, shouldRun);
+        handleIdleState(rpmValue, shouldSpin);
         break;
-    case State::Running:
-        handleRunningState(rpmValue, shouldRun);
+    case State::Spinning:
+        handleSpinningState(rpmValue, shouldSpin);
         break;
     case State::Stalled:
-        handleStalledState(rpmValue, shouldRun);
+        handleStalledState(rpmValue, shouldSpin);
         break;
     default:
         TriggerDebug("FanMonitor", "invalid state");
@@ -104,12 +104,12 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldRun){
     }
 }
 
-void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldRun){
-    if(shouldRun){
-        if(rpmValue >= mMinRpmThreshold){
-            enterState(State::Running);
-        }
-        else if(mIdleStallThresholdMicros == 0){
+void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldSpin){
+    if(rpmValue >= mMinRpmThreshold){
+        enterState(State::Spinning);
+    }
+    else if(shouldSpin){
+        if(mIdleStallThresholdMicros == 0){
             enterState(State::Stalled);
         } 
         else if(mStallTimer.isReset()){
@@ -118,25 +118,25 @@ void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldRun){
         else if(mStallTimer.isExpired()){
             enterState(State::Stalled);
         }
-    }
+    } 
     else if(mStallTimer.isRunning()){
         mStallTimer.reset();
     }
 }
 
-void FanMonitor::handleRunningState(uint32_t rpmValue, bool shouldRun){
+void FanMonitor::handleSpinningState(uint32_t rpmValue, bool shouldSpin){
     if(rpmValue < mMinRpmThreshold){
-        if(!shouldRun){
+        if(!shouldSpin){
             enterState(State::Idle);
         } 
         else if((mReenterStallCooldownMicros) > 0 && mReenterCooldownTimer.isRunningAndNotExpired()){
             // in reenter timeout
         } 
-        else if(mRunningStallThresholdMicros == 0){
+        else if(mSpinningStallThresholdMicros == 0){
             enterState(State::Stalled);
         } 
         else if(mStallTimer.isReset()){
-            mStallTimer.start(mRunningStallThresholdMicros);
+            mStallTimer.start(mSpinningStallThresholdMicros);
         }
         else if(mStallTimer.isExpired()){
             enterState(State::Stalled);
@@ -147,14 +147,14 @@ void FanMonitor::handleRunningState(uint32_t rpmValue, bool shouldRun){
     }
 }
 
-void FanMonitor::handleStalledState(uint32_t rpmValue, bool shouldRun){
-    if(!shouldRun){
+void FanMonitor::handleStalledState(uint32_t rpmValue, bool shouldSpin){
+    if(!shouldSpin){
         enterState(State::Idle);
         return;
     }
 
     if(rpmValue >= mMinRpmThreshold){
-        enterState(State::Running);
+        enterState(State::Spinning);
         return;
     }
 
@@ -174,7 +174,7 @@ void FanMonitor::enterState(State newState){
 
     switch(mState){
     case State::Idle: onLeaveIdleState(); break;
-    case State::Running: onLeaveRunningState(); break;
+    case State::Spinning: onLeaveSpinningState(); break;
     case State::Stalled: onLeaveStalledState(); break;
     default: break;
     }
@@ -183,7 +183,7 @@ void FanMonitor::enterState(State newState){
 
     switch(newState){
     case State::Idle: onEnterIdleState(); break;
-    case State::Running: onEnterRunningState(); break;
+    case State::Spinning: onEnterSpinningState(); break;
     case State::Stalled: onEnterStalledState(); break;
     default: break;
     }
@@ -202,11 +202,11 @@ void FanMonitor::onLeaveIdleState(){
     // nothing to do
 }
 
-void FanMonitor::onEnterRunningState(){
+void FanMonitor::onEnterSpinningState(){
     mStallTimer.reset();
 }
 
-void FanMonitor::onLeaveRunningState(){
+void FanMonitor::onLeaveSpinningState(){
     // nothing to do
 }
 

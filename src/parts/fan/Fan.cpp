@@ -22,7 +22,7 @@ static constexpr float RpmFilterThreshold = 0.05f;
 
 // Fan state monitor config
 static constexpr uint32_t IdleStallThreshold = 1000_ms;
-static constexpr uint32_t RunningStallThreshold = 0_ms;
+static constexpr uint32_t SpinningStallThreshold = 0_ms;
 static constexpr uint32_t StalledCallbackPeriod = 500_ms;
 static constexpr uint32_t MinRpmThreshold = 50;
 static constexpr uint32_t ReenterStallCooldown = 0_ms;
@@ -33,7 +33,7 @@ Fan::Fan() :
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
     mRpmFilter(RpmFilterFraction, RpmFilterTicks, RpmFilterThreshold),
-    mFanMonitor(IdleStallThreshold, RunningStallThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
+    mFanMonitor(IdleStallThreshold, SpinningStallThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
     // nothing to do
 }
 
@@ -79,9 +79,9 @@ void Fan::tick(){
     }
 
     // fan monitor tick
-    bool const shouldRun = isEnabled();
+    bool const shouldSpin = isEnabled();
     uint32_t const unfilteredRpm = mMeasuredRpm;
-    mFanMonitor.tick(unfilteredRpm, shouldRun);
+    mFanMonitor.tick(unfilteredRpm, shouldSpin);
 
 }
 
@@ -117,7 +117,8 @@ void Fan::enterState(State newState){
     }
 
     // handle state transition
-    switch(newState){
+    mState = newState;
+    switch(mState){
     case State::Disabled:
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
@@ -135,7 +136,6 @@ void Fan::enterState(State newState){
         TriggerDebug("Fan", "enter unhandled state");
         return;
     }
-    mState = newState;
 
     // call state changed callback
     if(mStateChangedCallback){
@@ -150,7 +150,7 @@ void Fan::handleMonitorStateChanged(FanMonitor::State monitorState){
             enterState(State::Stalled);
         }
     }
-    else if(monitorState == FanMonitor::State::Running){
+    else if(monitorState == FanMonitor::State::Spinning){
         if(mState == State::Stalled){
             // stalled => enabled
             enterState(State::Enabled);
