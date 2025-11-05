@@ -1,36 +1,31 @@
 #include "FiniteStateMachine.h"
 
+#include "assert/Assert.h"
+
 namespace Garbox {
 
-FiniteStateMachine::FiniteStateMachine(uint8_t numStates) : mNumStates(numStates) {
-    AssertExit(numStates > 0, "FiniteStateMachine", "invalid number of states");
-
-    // zero-initialize transition delay matrix
-    mTransitionDelayMicros = new uint32_t*[mNumStates];
-    for(uint8_t i = 0; i < mNumStates; ++i){
-        mTransitionDelayMicros[i] = new uint32_t[mNumStates];
-        std::memset(mTransitionDelayMicros[i], 0, mNumStates * sizeof(uint32_t));
-    }
-
-    // zero-initialize state hold time vector
-    mStateHoldTimeMicros = new uint32_t[mNumStates];
-    std::memset(mStateHoldTimeMicros, 0, mNumStates * sizeof(uint32_t));
+template<typename StateType, StateType NumStates>
+FiniteStateMachine<StateType, NumStates>::FiniteStateMachine() {
+    AssertExit(static_cast<size_t>(NumStates) > 0, "FiniteStateMachine", "invalid number of states");
 }
 
-FiniteStateMachine::~FiniteStateMachine(){
-    TriggerExit("FiniteStateMachine", "class uses heap, ~ not allowed");
+template<typename StateType, StateType NumStates>
+FiniteStateMachine<StateType, NumStates>::~FiniteStateMachine(){
+    AssertExit(static_cast<size_t>(NumStates) > 0, "FiniteStateMachine", "std::function might use heap");
 }
 
-void FiniteStateMachine::init(uint8_t initialState){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::init(StateType initialState){
     AssertExit(!mInitialized, "FiniteStateMachine", "already initialized");
     mCurrentState = initialState;
     mPendingState = initialState;
     mTransitionTimer.reset();
-    mStateHoldTimer.start(mStateHoldTimeMicros[mCurrentState]);
+    mStateHoldTimer.start(mStateHoldTimeMicros[static_cast<uint8_t>(mCurrentState)]);
     mInitialized = true;
 }
 
-void FiniteStateMachine::tick(){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::tick(){
     if(!mInitialized){
         TriggerDebug("FiniteStateMachine", "not initialized");
         return;
@@ -51,27 +46,31 @@ void FiniteStateMachine::tick(){
 
 }
 
-void FiniteStateMachine::setTransitionDelayMicros(uint8_t from, uint8_t to, uint32_t delayMicros){
-    if((from >= mNumStates) || (to >= mNumStates)){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::setTransitionDelayMicros(StateType from, StateType to, uint32_t delayMicros){
+    if((from >= NumStates) || (to >= NumStates)){
         TriggerDebug("FiniteStateMachine", "invalid transition index");
         return;
     }
-    mTransitionDelayMicros[from][to] = delayMicros;
+    mTransitionDelayMicros[static_cast<uint8_t>(from)][static_cast<uint8_t>(to)] = delayMicros;
 }
 
-void FiniteStateMachine::setStateHoldTimeMicros(uint8_t state, uint32_t holdMicros){
-    if(state >= mNumStates){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::setStateHoldTimeMicros(StateType state, uint32_t holdMicros){
+    if(state >= NumStates){
         TriggerDebug("FiniteStateMachine", "invalid state index");
         return;
     }
     mStateHoldTimeMicros[state] = holdMicros;
 }
 
-void FiniteStateMachine::setStateChangedCallback(StateChangedCallback callback){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::setStateChangedCallback(StateChangedCallback callback){
     mStateChangedCallback = callback;
 }
 
-void FiniteStateMachine::transition(uint8_t newState){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
     if(!mInitialized){
         TriggerDebug("FiniteStateMachine", "not initialized");
         return;
@@ -83,7 +82,7 @@ void FiniteStateMachine::transition(uint8_t newState){
     }
 
     // transition logic
-    const uint32_t delayMicros = mTransitionDelayMicros[mCurrentState][newState];
+    const uint32_t delayMicros = mTransitionDelayMicros[static_cast<uint8_t>(mCurrentState)][static_cast<uint8_t>(newState)];
     if(delayMicros == 0){
         // no transition delay
         const bool holdTimerActive = mStateHoldTimer.isRunningAndNotExpired();
@@ -105,7 +104,8 @@ void FiniteStateMachine::transition(uint8_t newState){
 
 }
 
-void FiniteStateMachine::forceTransition(uint8_t newState){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::forceTransition(StateType newState){
     if(!mInitialized){
         TriggerDebug("FiniteStateMachine", "not initialized");
         return;
@@ -116,8 +116,9 @@ void FiniteStateMachine::forceTransition(uint8_t newState){
     applyTransition(newState);
 }
 
-void FiniteStateMachine::applyTransition(uint8_t newState){
-    uint8_t oldState = mCurrentState;
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::applyTransition(StateType newState){
+    StateType oldState = mCurrentState;
     mCurrentState = newState;
     mPendingState = newState;
 
@@ -125,7 +126,7 @@ void FiniteStateMachine::applyTransition(uint8_t newState){
     mTransitionTimer.reset();
 
     // start state hold timer
-    const uint32_t holdTime = mStateHoldTimeMicros[mCurrentState];
+    const uint32_t holdTime = mStateHoldTimeMicros[static_cast<uint8_t>(mCurrentState)];
     if(holdTime > 0){
         mStateHoldTimer.start(holdTime);
     }
@@ -139,11 +140,13 @@ void FiniteStateMachine::applyTransition(uint8_t newState){
     }
 }
 
-bool FiniteStateMachine::hasPendingTransition(){
+template<typename StateType, StateType NumStates>
+bool FiniteStateMachine<StateType, NumStates>::hasPendingTransition(){
     return (mCurrentState != mPendingState);
 }
 
-void FiniteStateMachine::cancelPendingTransition(){
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::cancelPendingTransition(){
     mPendingState = mCurrentState;
     mTransitionTimer.reset();
 }

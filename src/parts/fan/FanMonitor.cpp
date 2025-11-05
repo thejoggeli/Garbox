@@ -3,18 +3,16 @@
 
 namespace Garbox {
 
-FanMonitor::FanMonitor():
-    // initialize members
-    mFsm(StateToUint(State::Count)){
-    // constructor body
+FanMonitor::FanMonitor(){
+    // nothing to do
 }
 
 void FanMonitor::init(){
     AssertExit(!mInitialized, "FanMonitor", "already initialized");
 
-    // 
-    mFsm.init(StateToUint(State::Idle));
-    mFsm.setStateChangedCallback([this](uint8_t oldState, uint8_t newState){
+    // init fsm
+    mFsm.init(State::Idle);
+    mFsm.setStateChangedCallback([this](State oldState, State newState){
         handleFsmStateChanged(oldState, newState);
     });
 
@@ -29,7 +27,7 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldSpin){
 
     mFsm.tick();
 
-    switch(UintToState(mFsm.getState())){
+    switch(mFsm.getState()){
     case State::Idle:
         handleIdleState(rpmValue, shouldSpin);
         break;
@@ -45,7 +43,7 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldSpin){
     }
 
     // handle periodic alert
-    const bool isStalledState = (mFsm.getState() == StateToUint(State::Stalled));
+    const bool isStalledState = (mFsm.getState() == State::Stalled);
     if(isStalledState && mStalledAlertCallback && (mStalledAlertPeriodMicros > 0) && mStalledAlertTimer.isExpired()){
         mStalledAlertCallback(mStallCounter);
         mStallCounter++;
@@ -58,11 +56,11 @@ void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldSpin){
     const bool isSpinning = (rpmValue >= mMinRpmThreshold);
     if(isSpinning){
         // isSpinning => Spinning (transition)
-        mFsm.transition(StateToUint(State::Spinning));
+        mFsm.transition(State::Spinning);
     }
     else if(shouldSpin){
         // !isSpinning && shouldSpin => Staled (transition)
-        mFsm.transition(StateToUint(State::Stalled));
+        mFsm.transition(State::Stalled);
     }
     else {
         // !isSpinning && !shouldSpin => Idle (stay)
@@ -75,11 +73,11 @@ void FanMonitor::handleSpinningState(uint32_t rpmValue, bool shouldSpin){
     if(!isSpinning){
         if(shouldSpin){
             // !isSpinning && shouldSPin => Stalled (transition)
-            mFsm.transition(StateToUint(State::Stalled));
+            mFsm.transition(State::Stalled);
         } 
         else {
             // !isSpinning && !shouldSPin => Idle (transition)
-            mFsm.transition(StateToUint(State::Idle));
+            mFsm.transition(State::Idle);
         }
     }
     else {
@@ -92,11 +90,11 @@ void FanMonitor::handleStalledState(uint32_t rpmValue, bool shouldSpin){
     const bool isSpinning = (rpmValue >= mMinRpmThreshold);
     if(isSpinning){
         // isSpinning => Spinning (transition)
-        mFsm.transition(StateToUint(State::Spinning));
+        mFsm.transition(State::Spinning);
     }
     else if(!shouldSpin){
         // !isSpinning && !shouldSpin => Idle (transition)
-        mFsm.transition(StateToUint(State::Idle));
+        mFsm.transition(State::Idle);
     }
     else {
         // should spin but is not spinning => Stalled (stay)
@@ -104,16 +102,16 @@ void FanMonitor::handleStalledState(uint32_t rpmValue, bool shouldSpin){
     }
 }
 
-void FanMonitor::handleFsmStateChanged(uint8_t oldState, uint8_t newState){
+void FanMonitor::handleFsmStateChanged(State oldState, State newState){
 
     // leave Stalled
-    if(UintToState(oldState) == State::Stalled){
+    if(oldState == State::Stalled){
         mStallCounter = 0;
         mStalledAlertTimer.reset();
     }
 
     // enter Stalled
-    if(UintToState(newState) == State::Stalled){
+    if(newState == State::Stalled){
         mStallCounter = 0;
         if(mStalledAlertPeriodMicros > 0 || mStalledAlertCallback){
             mStalledAlertCallback(mStallCounter);
@@ -127,7 +125,7 @@ void FanMonitor::handleFsmStateChanged(uint8_t oldState, uint8_t newState){
 
     // call state changed callback
     if(mStateChangedCallback){
-        mStateChangedCallback(UintToState(oldState), UintToState(newState));
+        mStateChangedCallback(oldState, newState);
     }
 }
 
@@ -148,11 +146,11 @@ void FanMonitor::setMinRpmThreshold(uint32_t rpmThreshold){
 }
 
 void FanMonitor::setTransitionDelay(State from, State to, uint32_t delayMicros){
-    mFsm.setTransitionDelayMicros(StateToUint(from), StateToUint(to), delayMicros);
+    mFsm.setTransitionDelayMicros(from, to, delayMicros);
 }
 
 FanMonitor::State FanMonitor::getState() const {
-    return UintToState(mFsm.getState());
+    return mFsm.getState();
 }
 
 const char* FanMonitor::StateToString(State state){

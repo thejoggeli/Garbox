@@ -5,7 +5,6 @@
 #include "core/sensor/FrequencySensor.h"
 #include "global/AppConfig.h"
 #include "util/filter/MovingAverageFilter.h"
-#include "util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
 
@@ -16,12 +15,12 @@ class Fan {
 public:
 
     enum class State : uint8_t {
-        Disabled = 0,
+        Disabled= 0,
         Enabled,
         Stalled,
         Count
     };
-    
+
     static const char* StateToString(State state);
 
     using StateChangedCallback = std::function<void(State oldState, State newState)>;
@@ -35,14 +34,15 @@ public:
 
     void setStateChangedCallback(StateChangedCallback callback);
     void setStalledAlertCallback(StalledAlertCallback callback);
-    void setEnabled(bool enabled);
-    void setSpeed(float speed); // range [0.0, 1.0]
 
-    bool isEnabled();
-    bool isStalled();
-    State getState();
-    float getSpeed();
-    uint32_t getMeasuredRpm(bool filtered = true);
+    void setSpeed(float speed); // range [0.0, 1.0]
+    void setEnabled(bool enabled);
+
+    bool isEnabled() const;
+    bool isStalled() const;
+    State getState() const;
+    float getSpeed() const;
+    uint32_t getMeasuredRpm(bool filtered = true) const;
 
 private:
 
@@ -51,7 +51,11 @@ private:
     void handleMonitorStateChanged(MonitorState oldState, MonitorState newState);
     void handleMonitorStalledAlert(uint32_t counter);
 
+    void updateState();
+
+    State mState = State::Disabled;
     bool mEnabled = false;
+    bool mStalled = false;
     StateChangedCallback mStateChangedCallback = nullptr;
     StalledAlertCallback mStalledAlertCallback = nullptr;
     float mSpeed = 0.0f;

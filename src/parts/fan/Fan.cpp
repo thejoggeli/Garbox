@@ -94,36 +94,50 @@ void Fan::setStalledAlertCallback(StalledAlertCallback callback){
     mStalledAlertCallback = callback;
 }
 
+void Fan::setSpeed(float speed) {
+    mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
+    mSpeedPwm.setDutyRelative(mSpeed);
+}
+
 void Fan::setEnabled(bool enabled){
     if(enabled == isEnabled()){
         return;
     }
     mEnabled = enabled;
-    if(!enabled){
+    if(enabled){
+        mGpioFanEnable.setValue(true);
+        mFrequencySensor.setEnabled(true);
+    }
+    else {
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
         mGpioFanEnable.setValue(false);
         mFrequencySensor.setEnabled(false);
     }
+    updateState();
+}
+
+void Fan::updateState(){
+    const State oldState = mState;
+    if(mEnabled){
+        if(mMonitor.getState() == MonitorState::Stalled){
+            mState = State::Stalled;
+        }
+        else {
+            mState = State::Enabled;
+        }
+    }
     else {
-        mGpioFanEnable.setValue(true);
-        mFrequencySensor.setEnabled(true);
+        mState = State::Disabled;
+    }
+    if((mState != oldState) && mStateChangedCallback){
+        mStateChangedCallback(oldState, mState);
     }
 }
 
-bool Fan::isEnabled(){
-    return mEnabled;
+void Fan::handleMonitorStateChanged(MonitorState oldState, MonitorState newState){
+    updateState();
 }
-
-bool Fan::isStalled(){
-    return (mMonitor.getState() == MonitorState::Stalled);
-}
-
-//     // call state changed callback
-//     if(mStateChangedCallback){
-//         mStateChangedCallback(oldState, newState);
-//     }
-// }
 
 void Fan::handleMonitorStalledAlert(uint32_t counter){
     if(mStalledAlertCallback){
@@ -131,16 +145,23 @@ void Fan::handleMonitorStalledAlert(uint32_t counter){
     }
 }
 
-void Fan::setSpeed(float speed){
-    mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
-    mSpeedPwm.setDutyRelative(mSpeed);
+bool Fan::isEnabled() const {
+    return mEnabled;
 }
 
-float Fan::getSpeed(){
+bool Fan::isStalled() const {
+    return (mState == State::Stalled); 
+}
+
+Fan::State Fan::getState() const {
+    return mState;
+}
+
+float Fan::getSpeed() const {
     return mSpeed;
 }
 
-uint32_t Fan::getMeasuredRpm(bool filtered){
+uint32_t Fan::getMeasuredRpm(bool filtered) const {
     if(filtered){
         return mMeasuredRpmFiltered;
     } 

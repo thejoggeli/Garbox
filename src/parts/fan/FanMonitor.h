@@ -15,8 +15,6 @@ public:
         Count
     };
 
-    static uint8_t StateToUint(State state){ return static_cast<uint8_t>(state); }
-    static State UintToState(uint8_t value){ return static_cast<State>(value); }
     static const char* StateToString(State state);
 
     using StateChangedCallback = std::function<void(State oldState, State newState)>;
@@ -37,7 +35,7 @@ public:
     State getState() const;
 
 private:
-    FiniteStateMachine mFsm;
+    FiniteStateMachine<State, State::Count> mFsm;
     SoftwareTimer mStalledAlertTimer;
 
     StateChangedCallback mStateChangedCallback = nullptr;
@@ -51,7 +49,7 @@ private:
     void handleIdleState(uint32_t rpmValue, bool shouldSpin);
     void handleSpinningState(uint32_t rpmValue, bool shouldSpin);
     void handleStalledState(uint32_t rpmValue, bool shouldSpin);
-    void handleFsmStateChanged(uint8_t oldState, uint8_t newState);
+    void handleFsmStateChanged(State oldState, State newState);
 };
 
 } // namespace Garbox
