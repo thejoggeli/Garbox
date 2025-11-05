@@ -149,11 +149,17 @@ void Fan::handleMonitorStateChanged(FanMonitor::State monitorState){
             // enabled => stalled
             enterState(State::Stalled);
         }
+        else if(mState == State::Stalled){
+            TriggerDebug("Fan", "invalid spinning state change");
+        }
     }
     else if(monitorState == FanMonitor::State::Spinning){
         if(mState == State::Stalled){
             // stalled => enabled
             enterState(State::Enabled);
+        }
+        else if(mState == State::Disabled){
+            TriggerDebug("Fan", "invalid spinning state change");
         }
     }
     else if(monitorState == FanMonitor::State::Idle){
