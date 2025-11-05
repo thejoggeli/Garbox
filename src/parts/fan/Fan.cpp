@@ -36,7 +36,7 @@ void Fan::init(){
 
     // init monitor
     mMonitor.init();
-    mMonitor.setMinRpmThreshold(10);
+    mMonitor.setMinRpmThreshold(100);
     mMonitor.setStalledAlertPeriod(1000_ms);
 
     // set monitor transition delays
@@ -98,76 +98,32 @@ void Fan::setEnabled(bool enabled){
     if(enabled == isEnabled()){
         return;
     }
+    mEnabled = enabled;
     if(!enabled){
-        enterState(State::Disabled);
-    }
-    else {
-        enterState(State::Enabled);
-    }
-}
-
-bool Fan::isEnabled(){
-    return (mState != State::Disabled);
-}
-
-void Fan::enterState(State newState){
-    State oldState = mState;
-    if(oldState == newState){
-        TriggerDebug("Fan", "already in state");
-        return;
-    }
-
-    // handle state transition
-    mState = newState;
-    switch(mState){
-    case State::Disabled:
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
         mGpioFanEnable.setValue(false);
         mFrequencySensor.setEnabled(false);
-        break;
-    case State::Enabled:
+    }
+    else {
         mGpioFanEnable.setValue(true);
         mFrequencySensor.setEnabled(true);
-        break;
-    case State::Stalled:
-        break;
-    default:
-        TriggerDebug("Fan", "enter unhandled state");
-        return;
-    }
-
-    // call state changed callback
-    if(mStateChangedCallback){
-        mStateChangedCallback(oldState, newState);
     }
 }
 
-void Fan::handleMonitorStateChanged(MonitorState oldState, MonitorState newState){
-    if(newState == MonitorState::Stalled){
-        if(mState == State::Enabled){
-            // enabled => stalled
-            enterState(State::Stalled);
-        }
-        else if(mState == State::Stalled){
-            TriggerDebug("Fan", "invalid spinning state change");
-        }
-    }
-    else if(newState == MonitorState::Spinning){
-        if(mState == State::Stalled){
-            // stalled => enabled
-            enterState(State::Enabled);
-        }
-        else if(mState == State::Disabled){
-            TriggerDebug("Fan", "invalid spinning state change");
-        }
-    }
-    else if(newState == MonitorState::Idle){
-        if(mState != State::Disabled){
-            TriggerDebug("Fan", "invalid idle state change");
-        }
-    }
+bool Fan::isEnabled(){
+    return mEnabled;
 }
+
+bool Fan::isStalled(){
+    return (mMonitor.getState() == MonitorState::Stalled);
+}
+
+//     // call state changed callback
+//     if(mStateChangedCallback){
+//         mStateChangedCallback(oldState, newState);
+//     }
+// }
 
 void Fan::handleMonitorStalledAlert(uint32_t counter){
     if(mStalledAlertCallback){
@@ -178,10 +134,6 @@ void Fan::handleMonitorStalledAlert(uint32_t counter){
 void Fan::setSpeed(float speed){
     mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
     mSpeedPwm.setDutyRelative(mSpeed);
-}
-
-Fan::State Fan::getState(){
-    return mState;
 }
 
 float Fan::getSpeed(){
@@ -200,8 +152,9 @@ const char* Fan::StateToString(State state){
     case State::Disabled: return "Disabled";
     case State::Enabled:  return "Enabled";
     case State::Stalled:  return "Stalled";
+    case State::Count:  return "Count";
     }
-    return "Invalid";
+    return "Unknown";
 }
 
 } // namespace

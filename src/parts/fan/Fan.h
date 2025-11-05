@@ -5,6 +5,7 @@
 #include "core/sensor/FrequencySensor.h"
 #include "global/AppConfig.h"
 #include "util/filter/MovingAverageFilter.h"
+#include "util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
 
@@ -17,8 +18,11 @@ public:
     enum class State : uint8_t {
         Disabled = 0,
         Enabled,
-        Stalled
+        Stalled,
+        Count
     };
+    
+    static const char* StateToString(State state);
 
     using StateChangedCallback = std::function<void(State oldState, State newState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
@@ -35,21 +39,19 @@ public:
     void setSpeed(float speed); // range [0.0, 1.0]
 
     bool isEnabled();
+    bool isStalled();
     State getState();
     float getSpeed();
     uint32_t getMeasuredRpm(bool filtered = true);
-
-    static const char* StateToString(State state);
 
 private:
 
     using MonitorState = FanMonitor::State;
 
-    void enterState(State state);
     void handleMonitorStateChanged(MonitorState oldState, MonitorState newState);
     void handleMonitorStalledAlert(uint32_t counter);
 
-    State mState = State::Disabled;
+    bool mEnabled = false;
     StateChangedCallback mStateChangedCallback = nullptr;
     StalledAlertCallback mStalledAlertCallback = nullptr;
     float mSpeed = 0.0f;

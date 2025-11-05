@@ -34,6 +34,8 @@ public:
     void setMinRpmThreshold(uint32_t rpmThreshold);
     void setTransitionDelay(State from, State to, uint32_t delayMicros);
 
+    State getState() const;
+
 private:
     FiniteStateMachine mFsm;
     SoftwareTimer mStalledAlertTimer;

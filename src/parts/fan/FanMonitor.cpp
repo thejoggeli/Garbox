@@ -151,6 +151,10 @@ void FanMonitor::setTransitionDelay(State from, State to, uint32_t delayMicros){
     mFsm.setTransitionDelayMicros(StateToUint(from), StateToUint(to), delayMicros);
 }
 
+FanMonitor::State FanMonitor::getState() const {
+    return UintToState(mFsm.getState());
+}
+
 const char* FanMonitor::StateToString(State state){
     switch(state){
     case State::Idle: return "Idle";
