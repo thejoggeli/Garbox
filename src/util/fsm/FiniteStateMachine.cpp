@@ -31,18 +31,22 @@ void FiniteStateMachine::init(uint8_t initialState){
 
 void FiniteStateMachine::tick(){
     if(!mInitialized){
-        TriggerDebug("FiniteStateMachine", "tick() called before init()");
+        TriggerDebug("FiniteStateMachine", "not initialized");
         return;
     }
 
-    if(mTransitionTimer.isExpired() && (mPendingState != mCurrentState)){
-        applyTransition(mPendingState);
-        mTransitionTimer.reset();
-    }
-
+    // state hold timer expired, reset to signal state change is now possible
     if(mStateHoldTimer.isExpired()){
         mStateHoldTimer.reset();
     }
+
+    // apply pending transition if all conditions are met
+    const bool stateHoldTimerReady = mStateHoldTimer.isReset();
+    const bool transitionTimerReady = (mTransitionTimer.isExpired() || mTransitionTimer.isReset());
+    if(hasPendingTransition() && stateHoldTimerReady && transitionTimerReady){
+        applyTransition(mPendingState);
+    } 
+
 }
 
 void FiniteStateMachine::setTransitionDelayMicros(uint8_t from, uint8_t to, uint32_t delayMicros){
@@ -71,22 +75,25 @@ void FiniteStateMachine::transition(uint8_t newState){
         return;
     }
 
+    // abort if new state equals current state
     if(newState == mCurrentState){
         return;
     }
 
-    if(!mStateHoldTimer.isExpired()){
-        return;
-    }
-
-    uint32_t delayMicros = mTransitionDelayMicros[mCurrentState][newState];
+    // transition logic
+    const uint32_t delayMicros = mTransitionDelayMicros[mCurrentState][newState];
     if(delayMicros == 0){
-        applyTransition(newState);
+        // immediate transition
+        if(!mStateHoldTimer.isRunningAndNotExpired()){
+            applyTransition(newState);
+        }
     }
-    else {
+    else if(mPendingState != newState){
+        // set pending transition
         mPendingState = newState;
         mTransitionTimer.start(delayMicros);
     }
+
 }
 
 void FiniteStateMachine::forceTransition(uint8_t newState){
@@ -104,10 +111,32 @@ void FiniteStateMachine::applyTransition(uint8_t newState){
     uint8_t oldState = mCurrentState;
     mCurrentState = newState;
     mPendingState = newState;
-    mStateHoldTimer.start(mStateHoldTimeMicros[mCurrentState]);
+
+    // reset transition timer
+    mTransitionTimer.reset();
+
+    // start state hold timer
+    const uint32_t holdTime = mStateHoldTimeMicros[mCurrentState];
+    if(holdTime > 0){
+        mStateHoldTimer.start(holdTime);
+    }
+    else {
+        mStateHoldTimer.reset();
+    }
+
+    // call state changed callback
     if(mStateChangedCallback){
         mStateChangedCallback(oldState, newState);
     }
+}
+
+bool FiniteStateMachine::hasPendingTransition(){
+    return (mCurrentState != mPendingState);
+}
+
+void FiniteStateMachine::cancelPendingTransition(){
+    mPendingState = mCurrentState;
+    mTransitionTimer.reset();
 }
 
 } // namespace Garbox

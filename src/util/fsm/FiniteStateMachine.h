@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <functional>
 #include "assert/Assert.h"
 #include "core/time/SoftwareTimer.h"
 
@@ -12,7 +13,7 @@ namespace Garbox {
  */
 class FiniteStateMachine {
 public:
-    using StateChangedCallback = void(*)(uint8_t oldState, uint8_t newState);
+    using StateChangedCallback = std::function<void(uint8_t oldState, uint8_t newState)>;
 
     FiniteStateMachine(uint8_t numStates);
     ~FiniteStateMachine();
@@ -39,6 +40,12 @@ public:
 
     // immediate transition, ignoring hold/delay constraints
     void forceTransition(uint8_t newState);
+
+    // check if there is a pending delayed transition
+    bool hasPendingTransition();
+
+    // cancel the pending delayed transition
+    void cancelPendingTransition();
 
     // current state
     uint8_t getState() const { return mCurrentState; }

@@ -15,20 +15,13 @@ namespace Garbox {
 // RPM measure config 
 static constexpr uint32_t PulsesPerRevolution = 2;
 
-// Fan state monitor config
-static constexpr uint32_t IdleStallThreshold = 1000_ms;
-static constexpr uint32_t SpinningStallThreshold = 0_ms;
-static constexpr uint32_t StalledCallbackPeriod = 500_ms;
-static constexpr uint32_t MinRpmThreshold = 50;
-static constexpr uint32_t ReenterStallCooldown = 0_ms;
-
 Fan::Fan() : 
     // init members
     mGpioFanEnable(GpioInstances::GetFanEnable()),
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
     mRpmFilter(),
-    mFanMonitor(IdleStallThreshold, SpinningStallThreshold, StalledCallbackPeriod, MinRpmThreshold, ReenterStallCooldown){
+    mMonitor(){
     // nothing to do
 }
 
@@ -41,14 +34,27 @@ void Fan::init(){
     // init frequency sensor
     mFrequencySensor.init(config);
 
-    // init fan state monitor
-    mFanMonitor.init();
-    mFanMonitor.setStateChangedCallback([this](FanMonitor::State state){
-        this->handleMonitorStateChanged(state);
+    // init monitor
+    mMonitor.init();
+    mMonitor.setMinRpmThreshold(50);
+    mMonitor.setStalledAlertPeriod(500_ms);
+
+    // set monitor callbacks
+    mMonitor.setStateChangedCallback([this](MonitorState oldState, MonitorState newState){
+        this->handleMonitorStateChanged(oldState, newState);
     });
-    mFanMonitor.setStalledAlertCallback([this](uint32_t counter){
+    mMonitor.setStalledAlertCallback([this](uint32_t counter){
         this->handleMonitorStalledAlert(counter);
     });
+
+    // set initial transition delays
+    mMonitor.setTransitionDelay(MonitorState::Idle,     MonitorState::Stalled,  500_ms); // detect fan not starting 
+    mMonitor.setTransitionDelay(MonitorState::Idle,     MonitorState::Spinning, 250_ms); // debounce Idle => Spinning
+    mMonitor.setTransitionDelay(MonitorState::Spinning, MonitorState::Idle,     0_ms);   // already large delay on rpmValue=0 from FrequencySensor
+    mMonitor.setTransitionDelay(MonitorState::Spinning, MonitorState::Stalled,  0_ms);   // already large delay on rpmValue=0 from FrequencySensor
+    mMonitor.setTransitionDelay(MonitorState::Stalled,  MonitorState::Idle,     0_ms);   // -
+    mMonitor.setTransitionDelay(MonitorState::Stalled,  MonitorState::Spinning, 250_ms); // debounce Stalled => Spinning
+
 }
 
 void Fan::start(){
@@ -72,11 +78,11 @@ void Fan::tick(){
     // filter rpm
     mRpmFilter.add(mMeasuredRpm);   
     mMeasuredRpmFiltered = mRpmFilter.getAverage();
-    
+
     // fan monitor tick
-    bool const shouldSpin = isEnabled();
-    uint32_t const unfilteredRpm = mMeasuredRpm;
-    mFanMonitor.tick(unfilteredRpm, shouldSpin);
+    const bool shouldSpin = isEnabled();
+    const uint32_t unfilteredRpm = mMeasuredRpm;
+    mMonitor.tick(unfilteredRpm, shouldSpin);
 
 }
 
@@ -137,8 +143,8 @@ void Fan::enterState(State newState){
     }
 }
 
-void Fan::handleMonitorStateChanged(FanMonitor::State monitorState){
-    if(monitorState == FanMonitor::State::Stalled){
+void Fan::handleMonitorStateChanged(MonitorState oldState, MonitorState newState){
+    if(newState == MonitorState::Stalled){
         if(mState == State::Enabled){
             // enabled => stalled
             enterState(State::Stalled);
@@ -147,7 +153,7 @@ void Fan::handleMonitorStateChanged(FanMonitor::State monitorState){
             TriggerDebug("Fan", "invalid spinning state change");
         }
     }
-    else if(monitorState == FanMonitor::State::Spinning){
+    else if(newState == MonitorState::Spinning){
         if(mState == State::Stalled){
             // stalled => enabled
             enterState(State::Enabled);
@@ -156,7 +162,7 @@ void Fan::handleMonitorStateChanged(FanMonitor::State monitorState){
             TriggerDebug("Fan", "invalid spinning state change");
         }
     }
-    else if(monitorState == FanMonitor::State::Idle){
+    else if(newState == MonitorState::Idle){
         if(mState != State::Disabled){
             TriggerDebug("Fan", "invalid idle state change");
         }

@@ -43,8 +43,10 @@ public:
 
 private:
 
+    using MonitorState = FanMonitor::State;
+
     void enterState(State state);
-    void handleMonitorStateChanged(FanMonitor::State state);
+    void handleMonitorStateChanged(MonitorState oldState, MonitorState newState);
     void handleMonitorStalledAlert(uint32_t counter);
 
     State mState = State::Disabled;
@@ -69,7 +71,7 @@ private:
     MovingAverageFilter<uint32_t, RpmFilterSize> mRpmFilter;
 
     // fan state monitor
-    FanMonitor mFanMonitor;
+    FanMonitor mMonitor;
 
 };
 

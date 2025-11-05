@@ -1,8 +1,8 @@
 #pragma once
 
-#include <functional>
-#include <stdint.h>
+#include <cstdint>
 #include "core/time/SoftwareTimer.h"
+#include "util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
 
@@ -11,63 +11,45 @@ public:
     enum class State : uint8_t {
         Idle,
         Spinning,
-        Stalled
+        Stalled,
+        Count
     };
 
-    using StateChangedCallback = std::function<void(State state)>;
+    static uint8_t StateToUint(State state){ return static_cast<uint8_t>(state); }
+    static State UintToState(uint8_t value){ return static_cast<State>(value); }
+    static const char* StateToString(State state);
+
+    using StateChangedCallback = std::function<void(State oldState, State newState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
-    FanMonitor(
-        uint32_t idleStallThresholdMicros = 200000,
-        uint32_t spinningStallThresholdMicros = 200000,
-        uint32_t stalledAlertPeriodMicros = 0,
-        uint32_t minRpmThreshold = 50,
-        uint32_t reenterStallCooldownMicros = 0
-    );
+    FanMonitor();
 
     void init();
-    void setStateChangedCallback(StateChangedCallback callback);
-    void setStalledAlertCallback(StalledAlertCallback callback);
-    void setStalledAlertPeriod(uint32_t periodMicros);
-    void setIdleStallThreshold(uint32_t stallThresholdMicros);
-    void setSpinningStallThreshold(uint32_t stallThresholdMicros);
-    void setMinRpmThreshold(uint32_t rpmThreshold);
-    void setReenterStallCooldown(uint32_t cooldownMicros);
-    void reset();
-    State getState() const;
-
-    // called from app tick (e.g. 30 Hz)
     void tick(uint32_t rpmValue, bool shouldSpin);
 
-private: 
-    uint32_t mIdleStallThresholdMicros; // Idle => Stalled
-    uint32_t mSpinningStallThresholdMicros; // Spinning => Stalled
-    uint32_t mStalledAlertPeriodMicros;
-    uint32_t mReenterStallCooldownMicros;
-    uint32_t mMinRpmThreshold;
+    void setStateChangedCallback(StateChangedCallback callback);
+    void setStalledAlertCallback(StalledAlertCallback callback);
 
-    bool mInitialized = false;
-    State mState = State::Idle;
+    void setStalledAlertPeriod(uint32_t periodMicros);
+    void setMinRpmThreshold(uint32_t rpmThreshold);
+    void setTransitionDelay(State from, State to, uint32_t delayMicros);
+
+private:
+    FiniteStateMachine mFsm;
+    SoftwareTimer mStalledAlertTimer;
+
     StateChangedCallback mStateChangedCallback = nullptr;
     StalledAlertCallback mStalledAlertCallback = nullptr;
+
+    bool mInitialized = false;
+    uint32_t mStalledAlertPeriodMicros = 0;
+    uint32_t mMinRpmThreshold = 0;
     uint32_t mStallCounter = 0;
 
-    SoftwareTimer mStallTimer;
-    SoftwareTimer mPeriodicAlertTimer;
-    SoftwareTimer mReenterCooldownTimer;
-
-    void enterState(State newState);
     void handleIdleState(uint32_t rpmValue, bool shouldSpin);
     void handleSpinningState(uint32_t rpmValue, bool shouldSpin);
     void handleStalledState(uint32_t rpmValue, bool shouldSpin);
-
-    // state entry and exit helpers
-    void onEnterIdleState();
-    void onLeaveIdleState();
-    void onEnterSpinningState();
-    void onLeaveSpinningState();
-    void onEnterStalledState();
-    void onLeaveStalledState();
+    void handleFsmStateChanged(uint8_t oldState, uint8_t newState);
 };
 
 } // namespace Garbox
