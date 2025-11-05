@@ -67,15 +67,15 @@ static constexpr Tone FanStalledTones[] = {
 };
 
 static constexpr Tone FanEnabledTones[] = {
-    Tone(200_ms, 500, 1000).duty(0.25f),
-    Tone(200_ms, 1000, 1750).duty(0.5f),
-    Tone(200_ms, 1750, 4000).duty(0.75f),
+    Tone(200_ms, 500, 750).duty(0.25f),
+    Tone(200_ms, 750, 2000).duty(0.5f),
+    Tone(200_ms, 1750, 5000).duty(0.75f),
 };
 
 static constexpr Tone FanDisabledTones[] = {
-    Tone(200_ms, 4000, 1750).duty(0.75f),
-    Tone(200_ms, 1750, 1000).duty(0.5f), 
-    Tone(200_ms, 1000, 500).duty(0.25f),
+    Tone(200_ms, 5000, 1750).duty(0.75f),
+    Tone(200_ms, 2000, 750).duty(0.5f), 
+    Tone(200_ms, 750, 500).duty(0.25f),
 };
 
 // clean, constexpr, macro-free

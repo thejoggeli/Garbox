@@ -67,12 +67,12 @@ void Fan::tick(){
             mMeasuredFrequency = newFrequency;
             mMeasuredRpm = static_cast<uint32_t>(newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution));
         }
-
-        // filter rpm
-        mRpmFilter.add(mMeasuredRpm);   
-        mMeasuredRpmFiltered = mRpmFilter.getAverage();
     }
 
+    // filter rpm
+    mRpmFilter.add(mMeasuredRpm);   
+    mMeasuredRpmFiltered = mRpmFilter.getAverage();
+    
     // fan monitor tick
     bool const shouldSpin = isEnabled();
     uint32_t const unfilteredRpm = mMeasuredRpm;
@@ -117,7 +117,6 @@ void Fan::enterState(State newState){
     case State::Disabled:
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
-        mRpmFilter.reset();
         mGpioFanEnable.setValue(false);
         mFrequencySensor.setEnabled(false);
         break;

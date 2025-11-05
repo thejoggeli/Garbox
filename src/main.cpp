@@ -134,7 +134,7 @@ void mainTask(void* parameter){
 void logProfiler(){
     static uint32_t lastPrint = 0;
     uint32_t now = Time::GetMicros();
-    if (now - lastPrint > 5'000'000) {
+    if (now - lastPrint > 30'000'000) {
         Profiler::UpdateAll();
         lastPrint = now;
         
