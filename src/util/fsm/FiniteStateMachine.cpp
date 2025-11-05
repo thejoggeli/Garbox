@@ -3,6 +3,7 @@
 namespace Garbox {
 
 FiniteStateMachine::FiniteStateMachine(uint8_t numStates) : mNumStates(numStates) {
+    AssertExit(numStates > 0, "FiniteStateMachine", "invalid number of states");
 
     // zero-initialize transition delay matrix
     mTransitionDelayMicros = new uint32_t*[mNumStates];
@@ -43,7 +44,8 @@ void FiniteStateMachine::tick(){
     // apply pending transition if all conditions are met
     const bool stateHoldTimerReady = mStateHoldTimer.isReset();
     const bool transitionTimerReady = (mTransitionTimer.isExpired() || mTransitionTimer.isReset());
-    if(hasPendingTransition() && stateHoldTimerReady && transitionTimerReady){
+    const bool shouldTransition = hasPendingTransition() && stateHoldTimerReady && transitionTimerReady;
+    if(shouldTransition){
         applyTransition(mPendingState);
     } 
 
@@ -75,21 +77,28 @@ void FiniteStateMachine::transition(uint8_t newState){
         return;
     }
 
-    // abort if new state equals current state
-    if(newState == mCurrentState){
+    // abort if new state equals current state or is already pending
+    if((newState == mCurrentState) || (newState == mPendingState)){
         return;
     }
 
     // transition logic
     const uint32_t delayMicros = mTransitionDelayMicros[mCurrentState][newState];
     if(delayMicros == 0){
-        // immediate transition
-        if(!mStateHoldTimer.isRunningAndNotExpired()){
+        // no transition delay
+        const bool holdTimerActive = mStateHoldTimer.isRunningAndNotExpired();
+        if(holdTimerActive){
+            // hold timer still active => set pending transition without transition timer
+            mPendingState = newState;
+            mTransitionTimer.reset();
+        }
+        else {
+            // hold timer not active => immediate transition
             applyTransition(newState);
         }
     }
-    else if(mPendingState != newState){
-        // set pending transition
+    else {
+        // transiton delay => set pending transition with transition timer
         mPendingState = newState;
         mTransitionTimer.start(delayMicros);
     }

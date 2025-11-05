@@ -45,62 +45,81 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldSpin){
     }
 
     // handle periodic alert
-    const bool isStalledState      = (mFsm.getState() == StateToUint(State::Stalled));
-    const bool hasAlertPeriod      = (mStalledAlertPeriodMicros > 0);
-    const bool alertTimerExpired   = mStalledAlertTimer.isExpired();
-    const bool shouldTriggerAlert  = isStalledState && hasAlertPeriod && alertTimerExpired;
-
-    if(shouldTriggerAlert){
-        if(mStalledAlertCallback){
-            mStalledAlertCallback(mStallCounter);
-        }
+    const bool isStalledState = (mFsm.getState() == StateToUint(State::Stalled));
+    if(isStalledState && mStalledAlertCallback && (mStalledAlertPeriodMicros > 0) && mStalledAlertTimer.isExpired()){
+        mStalledAlertCallback(mStallCounter);
         mStallCounter++;
         mStalledAlertTimer.restart(mStalledAlertPeriodMicros);
     }
+    
 }
 
 void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldSpin){
-    if(rpmValue >= mMinRpmThreshold){
+    const bool isSpinning = (rpmValue >= mMinRpmThreshold);
+    if(isSpinning){
+        // isSpinning => Spinning (transition)
         mFsm.transition(StateToUint(State::Spinning));
     }
     else if(shouldSpin){
+        // !isSpinning && shouldSpin => Staled (transition)
         mFsm.transition(StateToUint(State::Stalled));
     }
     else {
+        // !isSpinning && !shouldSpin => Idle (stay)
         mFsm.cancelPendingTransition();
     }
 }
 
 void FanMonitor::handleSpinningState(uint32_t rpmValue, bool shouldSpin){
-    if(!shouldSpin){
-        mFsm.transition(StateToUint(State::Idle));
+    const bool isSpinning = (rpmValue >= mMinRpmThreshold);
+    if(!isSpinning){
+        if(shouldSpin){
+            // !isSpinning && shouldSPin => Stalled (transition)
+            mFsm.transition(StateToUint(State::Stalled));
+        } 
+        else {
+            // !isSpinning && !shouldSPin => Idle (transition)
+            mFsm.transition(StateToUint(State::Idle));
+        }
     }
-    else if(rpmValue < mMinRpmThreshold){
-        mFsm.transition(StateToUint(State::Stalled));
+    else {
+        // isSpinning => Spinning (stay)
+        mFsm.cancelPendingTransition();
     }
 }
 
 void FanMonitor::handleStalledState(uint32_t rpmValue, bool shouldSpin){
-    if(rpmValue >= mMinRpmThreshold){
+    const bool isSpinning = (rpmValue >= mMinRpmThreshold);
+    if(isSpinning){
+        // isSpinning => Spinning (transition)
         mFsm.transition(StateToUint(State::Spinning));
     }
     else if(!shouldSpin){
+        // !isSpinning && !shouldSpin => Idle (transition)
         mFsm.transition(StateToUint(State::Idle));
+    }
+    else {
+        // should spin but is not spinning => Stalled (stay)
+        mFsm.cancelPendingTransition();
     }
 }
 
 void FanMonitor::handleFsmStateChanged(uint8_t oldState, uint8_t newState){
-    if(UintToState(newState) == State::Stalled){
+
+    // leave Stalled
+    if(UintToState(oldState) == State::Stalled){
         mStallCounter = 0;
+        mStalledAlertTimer.reset();
+    }
+
+    // enter Stalled
+    if(UintToState(newState) == State::Stalled){
         if(mStalledAlertPeriodMicros > 0){
             mStalledAlertTimer.start(mStalledAlertPeriodMicros);
         }
     }
-    else {
-        mStalledAlertTimer.reset();
-        mStallCounter = 0;
-    }
 
+    // call state changed callback
     if(mStateChangedCallback){
         mStateChangedCallback(UintToState(oldState), UintToState(newState));
     }
@@ -123,11 +142,7 @@ void FanMonitor::setMinRpmThreshold(uint32_t rpmThreshold){
 }
 
 void FanMonitor::setTransitionDelay(State from, State to, uint32_t delayMicros){
-    mFsm.setTransitionDelayMicros(
-        StateToUint(from),
-        StateToUint(to),
-        delayMicros
-    );
+    mFsm.setTransitionDelayMicros(StateToUint(from), StateToUint(to), delayMicros);
 }
 
 const char* FanMonitor::StateToString(State state){
@@ -135,8 +150,8 @@ const char* FanMonitor::StateToString(State state){
     case State::Idle: return "Idle";
     case State::Spinning: return "Spinning";
     case State::Stalled: return "Stalled";
-    default: return "Unknown";
     }
+    return "Unknown";
 }
 
 } // namespace Garbox
