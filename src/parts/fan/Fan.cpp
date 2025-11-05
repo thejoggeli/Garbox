@@ -36,8 +36,16 @@ void Fan::init(){
 
     // init monitor
     mMonitor.init();
-    mMonitor.setMinRpmThreshold(50);
-    mMonitor.setStalledAlertPeriod(500_ms);
+    mMonitor.setMinRpmThreshold(10);
+    mMonitor.setStalledAlertPeriod(1000_ms);
+
+    // set monitor transition delays
+    mMonitor.setTransitionDelay(MonitorState::Idle,     MonitorState::Stalled,  500_ms); // detect fan not starting 
+    mMonitor.setTransitionDelay(MonitorState::Idle,     MonitorState::Spinning, 100_ms); // debounce Idle => Spinning
+    mMonitor.setTransitionDelay(MonitorState::Spinning, MonitorState::Idle,     0_ms);   // already large delay on rpmValue=0 from FrequencySensor
+    mMonitor.setTransitionDelay(MonitorState::Spinning, MonitorState::Stalled,  0_ms);   // already large delay on rpmValue=0 from FrequencySensor
+    mMonitor.setTransitionDelay(MonitorState::Stalled,  MonitorState::Idle,     0_ms);   // -
+    mMonitor.setTransitionDelay(MonitorState::Stalled,  MonitorState::Spinning, 100_ms); // debounce Stalled => Spinning
 
     // set monitor callbacks
     mMonitor.setStateChangedCallback([this](MonitorState oldState, MonitorState newState){
@@ -46,14 +54,6 @@ void Fan::init(){
     mMonitor.setStalledAlertCallback([this](uint32_t counter){
         this->handleMonitorStalledAlert(counter);
     });
-
-    // set initial transition delays
-    mMonitor.setTransitionDelay(MonitorState::Idle,     MonitorState::Stalled,  500_ms); // detect fan not starting 
-    mMonitor.setTransitionDelay(MonitorState::Idle,     MonitorState::Spinning, 250_ms); // debounce Idle => Spinning
-    mMonitor.setTransitionDelay(MonitorState::Spinning, MonitorState::Idle,     0_ms);   // already large delay on rpmValue=0 from FrequencySensor
-    mMonitor.setTransitionDelay(MonitorState::Spinning, MonitorState::Stalled,  0_ms);   // already large delay on rpmValue=0 from FrequencySensor
-    mMonitor.setTransitionDelay(MonitorState::Stalled,  MonitorState::Idle,     0_ms);   // -
-    mMonitor.setTransitionDelay(MonitorState::Stalled,  MonitorState::Spinning, 250_ms); // debounce Stalled => Spinning
 
 }
 

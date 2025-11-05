@@ -114,8 +114,14 @@ void FanMonitor::handleFsmStateChanged(uint8_t oldState, uint8_t newState){
 
     // enter Stalled
     if(UintToState(newState) == State::Stalled){
-        if(mStalledAlertPeriodMicros > 0){
+        mStallCounter = 0;
+        if(mStalledAlertPeriodMicros > 0 || mStalledAlertCallback){
+            mStalledAlertCallback(mStallCounter);
+            mStallCounter++;
             mStalledAlertTimer.start(mStalledAlertPeriodMicros);
+        }
+        else {
+            mStalledAlertTimer.reset();
         }
     }
 
@@ -150,6 +156,7 @@ const char* FanMonitor::StateToString(State state){
     case State::Idle: return "Idle";
     case State::Spinning: return "Spinning";
     case State::Stalled: return "Stalled";
+    case State::Count: return "Count";
     }
     return "Unknown";
 }
