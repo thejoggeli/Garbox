@@ -4,27 +4,30 @@
 
 namespace Garbox {
 
-class EasingFunction;
+class FunctionIfc;
 class LedcChannel;
 
 class DimmingLed {
 public:
 
-    enum class State : uint8_t {
-        Steady = 0,
-        Transition,
-        Count
-    };
-
     DimmingLed(LedcChannel& ledcChannel);
 
-    void transitionTo(float brightness);
-    void setEasingFunction(const EasingFunction& easingFunction);
+    void init();
+
+    void setBrightness(float brightness);
+    void setCorrectionFunction(const FunctionIfc& function);
+
+    float getBrightness() const;
+    float getBrightnessCorrected() const;
 
 private:
 
     LedcChannel& mLedcChannel;
-    const EasingFunction* mEasingFunction;
+    const FunctionIfc* mCorrectionFunction = nullptr;
+    float mBrightness = 0;
+    float mBrightnessCorrected = 0;
+
+    bool mInitialized;
 
 };
 
