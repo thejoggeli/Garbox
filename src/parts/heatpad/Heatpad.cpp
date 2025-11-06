@@ -4,7 +4,7 @@
 #include "core/time/Time.h"
 #include "global/PinConfig.h"
 #include "global/gpio/GpioInstances.h"
-#include "util/MathUtils.h"
+#include "util/math/MathUtils.h"
 
 namespace Garbox {
 

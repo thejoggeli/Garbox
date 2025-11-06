@@ -8,7 +8,7 @@
 #include "global/gpio/GpioInstances.h"
 #include "global/ledc/LedcInstances.h"
 #include "global/timer/TimerInstances.h"
-#include "util/MathUtils.h"
+#include "util/math/MathUtils.h"
 
 namespace Garbox {
 

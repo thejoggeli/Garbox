@@ -9,7 +9,7 @@
 #include "parts/led/DebugLeds.h"
 #include "util/color/ColorMap.h"
 #include "util/color/Rgb888.h"
-#include "util/MathUtils.h"
+#include "util/math/MathUtils.h"
 
 namespace Garbox {
 

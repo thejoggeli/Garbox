@@ -1,7 +1,7 @@
 #include "SoftwareTimer.h"
 
 #include "Time.h"
-#include "util/MathUtils.h"
+#include "util/math/MathUtils.h"
 
 namespace Garbox {
 

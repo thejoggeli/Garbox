@@ -8,6 +8,9 @@ namespace Garbox {
 class MathUtils {
 public:
 
+    // Prevent instantiation
+    MathUtils() = delete;
+
     /// clamps val to given range [minVal, maxVal]
     template <typename T>
     static T Clamp(T val, T minVal, T maxVal) {

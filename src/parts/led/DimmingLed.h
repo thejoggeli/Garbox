@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-class EasingFunctionIfc;
+class EasingFunction;
 class LedcChannel;
 
 class DimmingLed {
@@ -19,12 +19,12 @@ public:
     DimmingLed(LedcChannel& ledcChannel);
 
     void transitionTo(float brightness);
-    void setEasingFunction(const EasingFunctionIfc& easingFunction);
+    void setEasingFunction(const EasingFunction& easingFunction);
 
 private:
 
     LedcChannel& mLedcChannel;
-    const EasingFunctionIfc* mEasingFunction;
+    const EasingFunction* mEasingFunction;
 
 };
 

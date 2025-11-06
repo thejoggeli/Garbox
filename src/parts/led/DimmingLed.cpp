@@ -12,7 +12,7 @@ void DimmingLed::transitionTo(float brightness){
 
 }
 
-void DimmingLed::setEasingFunction(const EasingFunctionIfc& easingFunction){
+void DimmingLed::setEasingFunction(const EasingFunction& easingFunction){
     mEasingFunction = &easingFunction;
 }
 
