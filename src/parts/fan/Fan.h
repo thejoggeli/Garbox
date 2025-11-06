@@ -15,7 +15,7 @@ class Fan {
 public:
 
     enum class State : uint8_t {
-        Disabled= 0,
+        Disabled = 0,
         Enabled,
         Stalled,
         Count

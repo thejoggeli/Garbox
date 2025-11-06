@@ -83,7 +83,6 @@ void Fan::tick(){
     const bool shouldSpin = isEnabled();
     const uint32_t unfilteredRpm = mMeasuredRpm;
     mMonitor.tick(unfilteredRpm, shouldSpin);
-
 }
 
 void Fan::setStateChangedCallback(StateChangedCallback callback){
@@ -100,7 +99,7 @@ void Fan::setSpeed(float speed) {
 }
 
 void Fan::setEnabled(bool enabled){
-    if(enabled == isEnabled()){
+    if(enabled == mEnabled){
         return;
     }
     mEnabled = enabled;
