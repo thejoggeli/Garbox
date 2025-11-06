@@ -39,12 +39,12 @@ void PiezoPlayer::init(){
     // start task
     BaseType_t taskRes = xTaskCreatePinnedToCore(
         handleTask,
-        AppConfig::PiezoTaskName,
-        AppConfig::PiezoTaskStackSize,
+        AppConfig::PiezoPlayerTaskName,
+        AppConfig::PiezoPlayerTaskStackSize,
         this,
-        AppConfig::PiezoTaskPriority,
+        AppConfig::PiezoPlayerTaskPriority,
         &mTaskHandle,
-        AppConfig::PiezoTaskCore
+        AppConfig::PiezoPlayerTaskCore
     );
     AssertExit((taskRes == pdPASS) && (mTaskHandle != nullptr), "PiezoPlayer", "start task failed");
 }
@@ -64,7 +64,7 @@ void PiezoPlayer::handleTask(void* player){
     PiezoPlayer* self = static_cast<PiezoPlayer*>(player);
 
     // timing
-    const TickType_t period = pdMS_TO_TICKS(AppConfig::PiezoTaskDurationMillis);
+    const TickType_t period = pdMS_TO_TICKS(AppConfig::PiezoPlayerTaskDurationMillis);
     TickType_t lastWake = xTaskGetTickCount();
 
     while(true){
@@ -86,7 +86,7 @@ void PiezoPlayer::handleTask(void* player){
 void PiezoPlayer::tick(){
     Garbox::LockGuard lock(mMutex);
 
-    Profiler::Scoped(ProfilerConfig::PiezoTick);
+    Profiler::Scoped(ProfilerConfig::PiezoPlayerTick);
 
     if (!mPlaying || !mCurrentSequence){
         return;

@@ -49,7 +49,7 @@ void LedAnimationTask::registerLed(AnimatedLedAsync* led){
 }
 
 void LedAnimationTask::tick(){
-    Profiler::Scoped(ProfilerConfig::PiezoTick);
+    Profiler::Scoped(ProfilerConfig::LedAnimationTick);
     for(auto* led : mLeds){
         if(led != nullptr){
             led->tick();

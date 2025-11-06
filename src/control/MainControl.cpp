@@ -74,7 +74,7 @@ void MainControl::tick(){
     if(mHeartbeatTimer.isExpired()){
         static const FunctionIfc& function = FunctionInstances::GetCosSampledNormNeg();
         static constexpr uint32_t numCycles = 1;
-        static constexpr uint32_t durationMicros = HeartbeatInterval/2;
+        static constexpr uint32_t durationMicros = static_cast<uint32_t>(HeartbeatInterval*1.25f);
         DebugLeds::GetLed(DebugLeds::Id::Heartbeat).setPlayback(function, numCycles, durationMicros);
         mHeartbeatTimer.restart();
     }

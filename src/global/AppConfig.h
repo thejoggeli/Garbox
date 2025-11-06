@@ -19,16 +19,16 @@ public:
     static constexpr uint32_t MainTaskCore = 1;
 
     // Piezo Task
-    static constexpr const char* PiezoTaskName = "PiezoTask";
-    static constexpr uint32_t PiezoTaskFrequencyHz = 200;
-    static constexpr uint32_t PiezoTaskDurationMicros = 1'000'000 / PiezoTaskFrequencyHz;
-    static constexpr uint32_t PiezoTaskDurationMillis = 1'000 / PiezoTaskFrequencyHz;
-    static constexpr uint32_t PiezoTaskPriority = 15;
-    static constexpr uint32_t PiezoTaskStackSize = 1024*2;
-    static constexpr uint32_t PiezoTaskCore = 1;
+    static constexpr const char* PiezoPlayerTaskName = "PiezoPlayerTask";
+    static constexpr uint32_t PiezoPlayerTaskFrequencyHz = 200;
+    static constexpr uint32_t PiezoPlayerTaskDurationMicros = 1'000'000 / PiezoPlayerTaskFrequencyHz;
+    static constexpr uint32_t PiezoPlayerTaskDurationMillis = 1'000 / PiezoPlayerTaskFrequencyHz;
+    static constexpr uint32_t PiezoPlayerTaskPriority = 15;
+    static constexpr uint32_t PiezoPlayerTaskStackSize = 1024*2;
+    static constexpr uint32_t PiezoPlayerTaskCore = 1;
 
     // Led Task
-    static constexpr const char* LedAnimationTaskName = "LedTask";
+    static constexpr const char* LedAnimationTaskName = "LedAnimationTask";
     static constexpr uint32_t LedAnimationTaskFrequencyHz = 60;
     static constexpr uint32_t LedAnimationTaskDurationMicros = 1'000'000 / LedAnimationTaskFrequencyHz;
     static constexpr uint32_t LedAnimationTaskDurationMillis = 1'000 / LedAnimationTaskFrequencyHz;
