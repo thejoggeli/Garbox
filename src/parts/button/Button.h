@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include "core/time/SoftwareTimer.h"
 #include "util/fsm/FiniteStateMachine.h"
 
@@ -26,8 +27,8 @@ public:
 
     static const char* StateToString(State state);
 
-    using StateChangedCallback = void(*)(State oldState, State newState, void* userData);
-    using HoldCallback = void(*)(uint32_t counter, uint32_t holdTimeMicros, void* userData);
+    using StateChangedCallback = std::function<void(State oldState, State newState, void* userData)>;
+    using HoldCallback = std::function<void(uint32_t counter, uint32_t holdTimeMicros, void* userData)>;
 
     Button();
     ~Button();
@@ -70,7 +71,7 @@ private:
     void handleReleasedState(bool isPressedRaw);
     void handlePressedState(bool isPressedRaw);
     void handlePressedLongState(bool isPressedRaw);
-    
+
     void handleFsmStateChanged(State oldState, State newState);
 };
 

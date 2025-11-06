@@ -15,7 +15,7 @@ LedcChannel::LedcChannel() :
     // nothing to do
 }
 
-bool LedcChannel::setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert) {
+bool LedcChannel::setup(Id id, LedcTimer* timer, int32_t gpio, bool invert) {
 
     // check if setup
     if(mInitialized){

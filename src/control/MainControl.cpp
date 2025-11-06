@@ -4,6 +4,7 @@
 #include "assert/AssertHandler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
+#include "global/gpio/GpioInstances.h"
 #include "global/piezo/PiezoSequences.h"
 #include "parts/debugLeds/DebugLeds.h"
 #include "util/color/ColorMap.h"
@@ -17,7 +18,8 @@ MainControl::MainControl() :
     mFan(),
     mHeatpad(),
     mDisplay(),
-    mPiezoPlayer(){
+    mPiezoPlayer(),
+    mButton(GpioInstances::GetRotaryEncoderButton()){
     // nothing to do
 }
 
@@ -33,10 +35,20 @@ void MainControl::init(){
         handleFanStalledAlert(counter);
     });
 
+    // init button
+    mButton.init();
+    mButton.setStateChangedCallback([this](Button::State oldState, Button::State newState, void* userData){
+        handleButtonStateChanged(oldState, newState);
+    });
+    mButton.setHoldCallback([this](uint32_t counter, uint32_t holdTimeMicros, void* userData){
+        handleButtonHold(counter, holdTimeMicros);
+    });
+
     // init other
     mHeatpad.init();
     mDisplay.init();
     mPiezoPlayer.init();
+
 
     // init complete
     mInitialized = true;
@@ -150,6 +162,14 @@ void MainControl::onAssertExit(const char* context, const char* message){
     if(!mInitialized){
         return;
     }
+}
+
+void MainControl::handleButtonStateChanged(Button::State oldState, Button::State newState){
+    mPiezoPlayer.playSequence(PiezoSequences::HelixUp);
+}
+
+void MainControl::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
+    mPiezoPlayer.playSequence(PiezoSequences::Startup);
 }
 
 void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState){

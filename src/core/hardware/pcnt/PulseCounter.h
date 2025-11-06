@@ -21,7 +21,7 @@ public:
         uint32_t filterCycles = 100;
     };
 
-    explicit PulseCounter(pcnt_unit_t unit, uint32_t pin);
+    explicit PulseCounter(pcnt_unit_t unit, int32_t pin);
 
     bool init(Config const& config);
     bool start();
@@ -35,7 +35,7 @@ private:
     bool mInitialized = false;
     
     pcnt_unit_t mUnit;
-    uint32_t mPin;
+    int32_t mPin;
 
 };
 

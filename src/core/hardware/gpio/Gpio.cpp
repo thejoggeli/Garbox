@@ -8,14 +8,14 @@ Gpio::Gpio() {
     // nothing to do
 }
 
-void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
+void Gpio::setup(int32_t pin, Mode mode, bool invert, bool initivalValue) {
 
     AssertExit(!mInitialized, "Gpio", "already initialized");
 
     mPin = static_cast<gpio_num_t>(pin);
     mMode = mode;
-    mValue = initivalValue;
     mInvert = invert;
+    mValue = initivalValue;
 
     gpio_config_t cfg = {};
 
@@ -49,11 +49,33 @@ void Gpio::setup(uint32_t pin, Mode mode, bool initivalValue, bool invert) {
     }
 
     mValue = initivalValue;
-    if(gpio_set_level(mPin, toPinValue(mValue)) != ESP_OK){
-        TriggerDebug("Gpio", "gpio_set_level failed");
+    if((mMode == Mode::Output) || (mMode == Mode::OutputOpenDrain)){
+        if(gpio_set_level(mPin, toPinValue(mValue)) != ESP_OK){
+            TriggerDebug("Gpio", "gpio_set_level failed");
+        }
     }
 
     mInitialized = true;
+}
+
+void Gpio::toggle() {
+    if(!mInitialized){
+        TriggerDebug("Gpio", "not initialized"); 
+        return;
+    }
+    switch (mMode) {
+        case Mode::Output:
+        case Mode::OutputOpenDrain:
+            mValue = !mValue;
+            gpio_set_level(mPin, toPinValue(mValue));
+            break;
+        case Mode::Input:
+        case Mode::InputPullup:
+        case Mode::InputPulldown:
+        default:
+            TriggerDebug("Gpio", "unhandled mode");
+            break;
+    }
 }
 
 void Gpio::setValue(bool value) {
@@ -98,24 +120,24 @@ bool Gpio::getValue() const {
     }
 }
 
-void Gpio::toggle() {
-    if(!mInitialized){
-        TriggerDebug("Gpio", "not initialized"); 
-        return;
-    }
-    switch (mMode) {
-        case Mode::Output:
-        case Mode::OutputOpenDrain:
-            mValue = !mValue;
-            gpio_set_level(mPin, toPinValue(mValue));
-            break;
-        case Mode::Input:
-        case Mode::InputPullup:
-        case Mode::InputPulldown:
-        default:
-            TriggerDebug("Gpio", "unhandled mode");
-            break;
-    }
+int32_t Gpio::getPin() const {
+    return static_cast<int32_t>(mPin);
+}
+
+bool Gpio::isInput() const{
+    return (mMode == Mode::Input) || (mMode == Mode::InputPulldown) || (mMode == Mode::InputPullup);
+}
+
+bool Gpio::isOutput() const{
+    return (mMode == Mode::Output) || (mMode == Mode::OutputOpenDrain);
+}
+
+bool Gpio::hasPullup() const{
+    return (mMode == Mode::InputPullup);
+}
+
+bool Gpio::hasPulldown() const{
+    return (mMode == Mode::InputPulldown);
 }
 
 bool Gpio::fromPinValue(int value) const {
@@ -125,7 +147,7 @@ bool Gpio::fromPinValue(int value) const {
     return value != 0; 
 }
 
-int32_t Gpio::toPinValue(bool value) const {
+uint32_t Gpio::toPinValue(bool value) const {
     if(mInvert){
         return value ? 0 : 1;
     }

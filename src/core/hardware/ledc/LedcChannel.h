@@ -23,7 +23,7 @@ public:
 
     LedcChannel();
 
-    bool setup(Id id, LedcTimer* timer, uint32_t gpio, bool invert = false);
+    bool setup(Id id, LedcTimer* timer, int32_t gpio, bool invert = false);
     bool setDutyRaw(uint32_t duty, bool update = true);
     bool setDutyRelative(float ratio, bool update = true);
 
@@ -38,7 +38,7 @@ public:
 private:
     Id mId;
     LedcTimer* mTimer;
-    uint32_t mGpio;
+    int32_t mGpio;
     ledc_channel_t mChannelIndex;
     ledc_mode_t mMode;
     uint32_t mDuty;

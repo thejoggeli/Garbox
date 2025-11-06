@@ -18,10 +18,17 @@ public:
 
     Gpio();
 
-    void setup(uint32_t pin, Mode mode, bool initivalValue = false, bool invert = false);
-    void setValue(bool value);
-    bool getValue() const;
+    void setup(int32_t pin, Mode mode, bool invert = false, bool initivalValue = false);
+
     void toggle();
+    void setValue(bool value);
+
+    bool getValue() const;
+    int32_t getPin() const;
+    bool isInput() const;
+    bool isOutput() const;
+    bool hasPullup() const;
+    bool hasPulldown() const;
 
 private:
     gpio_num_t mPin = gpio_num_t::GPIO_NUM_NC;
@@ -31,7 +38,7 @@ private:
     bool mInitialized = false;
 
     bool fromPinValue(int value) const;
-    int toPinValue(bool value) const;
+    uint32_t toPinValue(bool value) const;
 };
 
 } // namespace Garbox

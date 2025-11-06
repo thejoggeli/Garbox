@@ -20,6 +20,8 @@ public:
 
     static Gpio& GetHeatEnable();
 
+    static Gpio& GetRotaryEncoderButton();
+
 };
 
 } // namespace

@@ -7,7 +7,7 @@
 
 namespace Garbox {
 
-PulseCounter::PulseCounter(pcnt_unit_t unit, uint32_t pin) : 
+PulseCounter::PulseCounter(pcnt_unit_t unit, int32_t pin) : 
     // init members
     mUnit(unit),
     mPin(pin){
@@ -47,7 +47,7 @@ bool PulseCounter::init(Config const& config) {
 
     // pcnt_config_t describes how this channel behaves
     pcnt_config_t cfg = {};
-    cfg.pulse_gpio_num = static_cast<int>(mPin); // tach signal pin
+    cfg.pulse_gpio_num = mPin; // tach signal pin
     cfg.ctrl_gpio_num  = PCNT_PIN_NOT_USED; // we don't use a control pin
     cfg.unit           = mUnit;
     cfg.channel        = PCNT_CHANNEL_0;

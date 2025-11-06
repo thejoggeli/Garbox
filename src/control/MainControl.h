@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/time/SoftwareTimer.h"
+#include "parts/button/InterruptButton.h"
 #include "parts/display/Display.h"
 #include "parts/fan/Fan.h"
 #include "parts/heatpad/Heatpad.h"
@@ -22,6 +23,9 @@ public:
 
 private:
 
+    void handleButtonStateChanged(Button::State oldState, Button::State newState);
+    void handleButtonHold(uint32_t counter, uint32_t holdTimeMicros);
+
     void handleFanStateChanged(Fan::State oldState, Fan::State newState);
     void handleFanStalledAlert(uint32_t counter);
 
@@ -30,12 +34,13 @@ private:
     Fan mFan;
     Heatpad mHeatpad;
     Display mDisplay;
-
     PiezoPlayer mPiezoPlayer;
+    InterruptButton mButton;
     
     SoftwareTimer mFanStateTimer;
     SoftwareTimer mHeartbeatTimer;
     SoftwareTimer mRpmTimer;
+
 
     bool mInitialized;
 
