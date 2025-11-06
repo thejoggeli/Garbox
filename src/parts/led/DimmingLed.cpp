@@ -1,8 +1,8 @@
 #include "DimmingLed.h"
 
 #include "assert/Assert.h"
+#include "core/hardware/ledc/LedcChannel.h"
 #include "global/function/FunctionInstances.h"
-#include "global/ledc/LedcInstances.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {
@@ -20,7 +20,7 @@ void DimmingLed::init(){
     if(mCorrectionFunction == nullptr){
         setCorrectionFunction(FunctionInstances::GetGamma22Sampled());
     }
-    
+
     mInitialized = true;
 }
 

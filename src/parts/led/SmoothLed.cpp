@@ -4,16 +4,13 @@
 #include <cmath>
 #include "DimmingLed.h"
 #include "assert/Assert.h"
+#include "core/hardware/ledc/LedcChannel.h"
 #include "global/function/FunctionInstances.h"
 
 namespace Garbox {
 
-SmoothLed::SmoothLed(DimmingLed& led) : mLed(led){
+SmoothLed::SmoothLed(LedcChannel& ledChannel) : mLed(ledChannel){
     // nothing to do
-}
-
-SmoothLed::~SmoothLed(){
-    TriggerExit("SmoothLed", "heap using classes must not be deconstructed");
 }
 
 void SmoothLed::init(){
@@ -23,6 +20,9 @@ void SmoothLed::init(){
     if(mDefaultFunction == nullptr){
         setDefaultFunction(FunctionInstances::GetEaseInSineSampled());
     }
+
+    // init underlying dimming led
+    mLed.init();
 
     mInitialized = true;
 }
@@ -173,6 +173,10 @@ void SmoothLed::handlePlaybackState(){
             stop();
         }
     }
+}
+
+float SmoothLed::getBrightness() const {
+    return mLed.getBrightness();
 }
 
 SmoothLed::State SmoothLed::getState() const {

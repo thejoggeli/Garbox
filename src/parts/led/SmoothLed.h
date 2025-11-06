@@ -1,12 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include "DimmingLed.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
-class DimmingLed;
 class FunctionIfc;
+class LedcChannel;
 
 class SmoothLed {
 public:
@@ -17,8 +18,7 @@ public:
         Playback
     };
 
-    explicit SmoothLed(DimmingLed& led);
-    ~SmoothLed();
+    explicit SmoothLed(LedcChannel& ledcChannel);
 
     void init();
 
@@ -30,11 +30,12 @@ public:
 
     void stop();
     void tick();
-    
+
+    float getBrightness() const;
     State getState() const;
 
 private:
-    DimmingLed& mLed;
+    DimmingLed mLed;
 
     const FunctionIfc* mDefaultFunction = nullptr;
     const FunctionIfc* mActiveFunction = nullptr;

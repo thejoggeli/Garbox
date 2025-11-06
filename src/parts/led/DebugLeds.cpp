@@ -11,11 +11,11 @@ namespace Garbox {
 
 // Debug LEDs
 static constexpr size_t NumDebugLeds = 4;
-static std::array<Garbox::LedcChannel*, NumDebugLeds> sLeds = {
-    &LedcInstances::GetDebugLed0Channel(),
-    &LedcInstances::GetDebugLed1Channel(),
-    &LedcInstances::GetDebugLed2Channel(),
-    &LedcInstances::GetDebugLed3Channel()
+static std::array<SmoothLedAsync, NumDebugLeds> sLeds = {
+    SmoothLedAsync(LedcInstances::GetDebugLed0Channel()),
+    SmoothLedAsync(LedcInstances::GetDebugLed1Channel()),
+    SmoothLedAsync(LedcInstances::GetDebugLed2Channel()),
+    SmoothLedAsync(LedcInstances::GetDebugLed3Channel()),
 };
 
 // RGB LED
@@ -42,6 +42,23 @@ void DebugLeds::Init(){
     sInitialized = true;
 }
 
+SmoothLed& DebugLeds::GetLed(Id id){
+    // check if initialized
+    if(!sInitialized){
+        TriggerDebug("DeubgLeds", "not initialized");
+        return sLeds[0];
+    }
+
+    // check if valid id
+    size_t const index = static_cast<size_t>(id);
+    if(index >= sLeds.size()){
+        TriggerDebug("DebugLeds", "invalid id");
+        return sLeds[0];
+    }
+
+    return sLeds[index];
+}
+
 void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     Garbox::LockGuard lock(sMutex);
@@ -61,10 +78,10 @@ void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     // set led
     if(enable){
-        sLeds[index]->setDutyRelative(brightness); // set debug led to brightness
+        sLeds[index].setBrightness(brightness); // set debug led to brightness
     }
     else {
-        sLeds[index]->setDutyRaw(0); // turn debug led off
+        sLeds[index].setBrightness(0); // turn debug led off
     }
 }
 
@@ -86,11 +103,12 @@ void DebugLeds::ToggleLed(Id id, float brightness){
     }
 
     // toggle led
-    if(sLeds[index]->getDuty() == 0){
-        sLeds[index]->setDutyRelative(brightness); // set debug led to brightness
+    const float thresh = brightness*0.5f;
+    if(sLeds[index].getBrightness() < thresh){
+        sLeds[index].setBrightness(brightness); // set debug led to brightness
     }
     else {
-        sLeds[index]->setDutyRaw(0); // turn debug led off
+        sLeds[index].setBrightness(0); // turn debug led off
     }
 }
 
@@ -107,14 +125,14 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
     // set leds
     if(enable){
         // set all debug leds to brightness
-        for(LedcChannel* led : sLeds){
-            led->setDutyRelative(brightness);
+        for(SmoothLed& led : sLeds){
+            led.setBrightness(brightness);
         }
     } 
     else {
         // turn all debug leds off
-        for(LedcChannel* led : sLeds){
-            led->setDutyRaw(0);
+        for(SmoothLed& led : sLeds){
+            led.setBrightness(0);
         }
     }
 }
@@ -130,13 +148,14 @@ void DebugLeds::ToggleAllLeds(float brightness){
     }
 
     // toggle all leds
-    for(LedcChannel* led : sLeds){
+    const float thresh = brightness*0.5f;
+    for(SmoothLed& led : sLeds){
         // toggle led
-        if(led->getDuty() == 0){
-            led->setDutyRelative(brightness); // set debug led to brightness
+        if(led.getBrightness() < thresh){
+            led.setBrightness(brightness); // set debug led to brightness
         }
         else {
-            led->setDutyRaw(0); // turn debug led off
+            led.setBrightness(0); // turn debug led off
         }
     }
 }
