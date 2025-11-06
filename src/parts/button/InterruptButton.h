@@ -31,8 +31,8 @@ public:
     void setHoldCallback(Button::HoldCallback callback);
     void setUserData(void* userData);
 
-    void setPressDebounceMicros(uint32_t delayMicros);
-    void setReleaseDebounceMicros(uint32_t delayMicros);
+    void setPressDebounceMicros(uint32_t debounceMicros);
+    void setReleaseDebounceMicros(uint32_t debounceMicros);
     void setLongPressMicros(uint32_t delayMicros);
     void setInitialHoldDelayMicros(uint32_t delayMicros);
     void setRepeatHoldDelayMicros(uint32_t delayMicros);

@@ -37,7 +37,7 @@ void MainControl::init(){
 
     // init button
     mButton.init();
-    mButton.setPressDebounceMicros(0);
+    mButton.setPressDebounceMicros(5_ms);
     mButton.setReleaseDebounceMicros(40_ms);
     mButton.setLongPressMicros(400_ms),
     mButton.setInitialHoldDelayMicros(800_ms);

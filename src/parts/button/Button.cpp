@@ -131,15 +131,14 @@ void Button::setUserData(void* userData){
     mUserData = userData;
 }
 
-void Button::setPressDebounceMicros(uint32_t delayMicros){
-    mPressDebounceMicros = delayMicros;
-    mFsm.setTransitionDelayMicros(State::Released, State::Pressed, delayMicros);
+void Button::setPressDebounceMicros(uint32_t debounceMicros){
+    mPressDebounceMicros = debounceMicros;
+    mFsm.setStateHoldTimeMicros(State::Pressed, debounceMicros);
 }
 
-void Button::setReleaseDebounceMicros(uint32_t delayMicros){
-    mReleaseDebounceMicros = delayMicros;
-    mFsm.setTransitionDelayMicros(State::Pressed, State::Released, delayMicros);
-    mFsm.setTransitionDelayMicros(State::PressedLong, State::Released, delayMicros);
+void Button::setReleaseDebounceMicros(uint32_t debounceMicros){
+    mReleaseDebounceMicros = debounceMicros;
+    mFsm.setStateHoldTimeMicros(State::Released, debounceMicros);
 }
 
 void Button::setLongPressMicros(uint32_t delayMicros){

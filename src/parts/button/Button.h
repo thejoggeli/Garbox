@@ -36,13 +36,19 @@ public:
     void init();
     void tick(bool isPressedRaw);
 
+    // set callbacks
     void setStateChangedCallback(StateChangedCallback callback);
     void setHoldCallback(HoldCallback callback);
     void setUserData(void* userData);
 
-    void setPressDebounceMicros(uint32_t delayMicros);
-    void setReleaseDebounceMicros(uint32_t delayMicros);
+    // set press and release debounce time
+    void setPressDebounceMicros(uint32_t debounceMicros);
+    void setReleaseDebounceMicros(uint32_t debounceMicros);
+
+    // set long press delay time
     void setLongPressMicros(uint32_t delayMicros);
+
+    // set initial and repeating hold time
     void setInitialHoldDelayMicros(uint32_t delayMicros);
     void setRepeatHoldDelayMicros(uint32_t delayMicros);
 

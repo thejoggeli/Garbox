@@ -42,8 +42,7 @@ void FiniteStateMachine<StateType, NumStates>::tick(){
     const bool shouldTransition = hasPendingTransition() && stateHoldTimerReady && transitionTimerReady;
     if(shouldTransition){
         applyTransition(mPendingState);
-    } 
-
+    }
 }
 
 template<typename StateType, StateType NumStates>
@@ -61,7 +60,7 @@ void FiniteStateMachine<StateType, NumStates>::setStateHoldTimeMicros(StateType 
         TriggerDebug("FiniteStateMachine", "invalid state index");
         return;
     }
-    mStateHoldTimeMicros[state] = holdMicros;
+    mStateHoldTimeMicros[static_cast<size_t>(state)] = holdMicros;
 }
 
 template<typename StateType, StateType NumStates>

@@ -117,12 +117,12 @@ void InterruptButton::setUserData(void* userData){
     mButton.setUserData(userData);
 }
 
-void InterruptButton::setPressDebounceMicros(uint32_t delayMicros){
-    mButton.setPressDebounceMicros(delayMicros);
+void InterruptButton::setPressDebounceMicros(uint32_t debounceMicros){
+    mButton.setPressDebounceMicros(debounceMicros);
 }
 
-void InterruptButton::setReleaseDebounceMicros(uint32_t delayMicros){
-    mButton.setReleaseDebounceMicros(delayMicros);
+void InterruptButton::setReleaseDebounceMicros(uint32_t debounceMicros){
+    mButton.setReleaseDebounceMicros(debounceMicros);
 }
 
 void InterruptButton::setLongPressMicros(uint32_t delayMicros){
