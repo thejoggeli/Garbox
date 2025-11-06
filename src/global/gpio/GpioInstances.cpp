@@ -12,6 +12,7 @@ void GpioInstances::Init(){
 
     constexpr bool InitialOff = false;
     constexpr bool NoInvert = false;
+    constexpr bool Invert = true;
 
     GetDebugGpio0         ().setup(PinConfig::DebugGpio0,     Gpio::Mode::Output, NoInvert, InitialOff);
     GetDebugGpio1         ().setup(PinConfig::DebugGpio1,     Gpio::Mode::Output, NoInvert, InitialOff);
@@ -20,7 +21,7 @@ void GpioInstances::Init(){
     GetDisplayCs          ().setup(PinConfig::DisplayCs,      Gpio::Mode::Output, NoInvert, InitialOff);
     GetDisplayRst         ().setup(PinConfig::DisplayRst,     Gpio::Mode::Output, NoInvert, InitialOff);
     GetHeatEnable         ().setup(PinConfig::HeatpadEnable,  Gpio::Mode::Output, NoInvert, InitialOff);
-    GetRotaryEncoderButton().setup(PinConfig::RotaryEncoderC, Gpio::Mode::Input,  NoInvert);
+    GetRotaryEncoderButton().setup(PinConfig::RotaryEncoderC, Gpio::Mode::Input,  Invert);
 
     sInitialized = true;
 }

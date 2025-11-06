@@ -49,10 +49,13 @@ void Gpio::setup(int32_t pin, Mode mode, bool invert, bool initivalValue) {
     }
 
     mValue = initivalValue;
-    if((mMode == Mode::Output) || (mMode == Mode::OutputOpenDrain)){
+    if(isOutput()){
         if(gpio_set_level(mPin, toPinValue(mValue)) != ESP_OK){
             TriggerDebug("Gpio", "gpio_set_level failed");
         }
+    }
+    else if(isInput()){
+        mValue = fromPinValue(gpio_get_level(mPin));
     }
 
     mInitialized = true;
@@ -120,8 +123,31 @@ bool Gpio::getValue() const {
     }
 }
 
+bool Gpio::getRawValue() const {
+    if(!mInitialized){
+        TriggerDebug("Gpio", "not initialized"); 
+        return false;
+    }
+    switch (mMode) {
+        case Mode::Input:
+        case Mode::InputPullup:
+        case Mode::InputPulldown: 
+            return gpio_get_level(mPin) != 0;
+        case Mode::Output:
+        case Mode::OutputOpenDrain:
+            return mValue;
+        default:
+            TriggerDebug("Gpio", "unhandled mode");
+            return false;
+    }
+}
+
 int32_t Gpio::getPin() const {
     return static_cast<int32_t>(mPin);
+}
+
+bool Gpio::isInverted() const{
+    return mInvert;
 }
 
 bool Gpio::isInput() const{

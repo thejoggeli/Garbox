@@ -28,6 +28,14 @@ void InterruptButton::init(){
     mPin = mGpio.getPin();
     AssertExit(mPin >= 0, "InterruptButton", "invalid pin number");
 
+    // set invert flag
+    mInvert = mGpio.isInverted();
+
+    // initial state
+    mCurrentRawState = mGpio.getRawValue();
+    vNewRawState = mCurrentRawState;
+    vEdgeDetected = false;
+
     // initialize internal Button
     mButton.init();
 
@@ -45,16 +53,14 @@ void InterruptButton::init(){
 void IRAM_ATTR InterruptButton::isrHandler(void* arg){
     InterruptButton* self = static_cast<InterruptButton*>(arg);
     uint32_t level = 0;
-
     if(self->mPin < 32){
         level = (GPIO.in >> self->mPin) & 0x1;
     }
     else {
         level = (GPIO.in1.data >> (self->mPin - 32)) & 0x1;
     }
-
-    self->mLastRawState = (level != 0);
-    self->mEdgeDetected = true;
+    self->vNewRawState = (level != 0);
+    self->vEdgeDetected = true;
 }
 
 void InterruptButton::tick(){
@@ -62,13 +68,29 @@ void InterruptButton::tick(){
         TriggerDebug("InterruptButton", "tick() called before init()");
         return;
     }
+    
+    // read ISR variables
+    bool newRawState;
+    bool edgeDetected;
+    portENTER_CRITICAL(&mMux);
+    newRawState = vNewRawState;
+    edgeDetected = vEdgeDetected;
+    vEdgeDetected = false;
+    portEXIT_CRITICAL(&mMux);
 
-
-    if(mEdgeDetected){
-        mEdgeDetected = false;
-        bool isPressedRaw = mLastRawState;
-        mButton.tick(isPressedRaw);
+    // detect missed edge
+    bool missedPulse = false;
+    if(edgeDetected && (mCurrentRawState == newRawState)){
+        missedPulse = true;
     }
+    edgeDetected = false;
+    mCurrentRawState = newRawState;
+
+    // trigger button tick
+    if(missedPulse){
+        mButton.tick(mInvert ? mCurrentRawState : !mCurrentRawState);
+    }
+    mButton.tick(mInvert ? !mCurrentRawState : mCurrentRawState);
 }
 
 bool InterruptButton::isPressed() const {

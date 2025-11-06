@@ -2,14 +2,9 @@
 
 #include "assert/Assert.h"
 #include "driver/gpio.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/portmacro.h"
 #include "core/log/Log.h"
 
 namespace Garbox {
-
-// static so each class instance can share one per-core lock
-static portMUX_TYPE sFrequencySensorMux = portMUX_INITIALIZER_UNLOCKED;
 
 FrequencySensor::FrequencySensor(uint32_t pin, Timer& timer):
     // init members
@@ -75,14 +70,14 @@ bool FrequencySensor::init(Config const& config) {
     }
 
     // Register per-instance ISR (context pointer passed to handler)
-    portENTER_CRITICAL(&sFrequencySensorMux);
+    portENTER_CRITICAL(&mFrequencySensorMux);
     err = gpio_isr_handler_add(static_cast<gpio_num_t>(mPin), isrHandler, this);
     AssertExit(err == ESP_OK, "FrequencySensor", "gpio_isr_handler_add failed");
 
     // Disable interrupt by default
     err = gpio_intr_disable(static_cast<gpio_num_t>(mPin));
     AssertExit(err == ESP_OK, "FrequencySensor", "gpio_intr_disable failed");
-    portEXIT_CRITICAL(&sFrequencySensorMux);
+    portEXIT_CRITICAL(&mFrequencySensorMux);
 
     // finish initialization
     mInitialized = true;
@@ -92,9 +87,9 @@ bool FrequencySensor::init(Config const& config) {
 void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
     FrequencySensor* self = static_cast<FrequencySensor*>(arg);
     uint64_t nowTicks64 = self->mTimer.getValueFromIsr();
-    self->mLastEdgeTicks = self->mCurrentEdgeTicks;
-    self->mCurrentEdgeTicks = static_cast<uint32_t>(nowTicks64);
-    self->mHasNewEdge = true;
+    self->vLastEdgeTicks = self->vCurrentEdgeTicks;
+    self->vCurrentEdgeTicks = static_cast<uint32_t>(nowTicks64);
+    self->vHasNewEdge = true;
 }
 
 void FrequencySensor::tick(){
@@ -103,7 +98,7 @@ void FrequencySensor::tick(){
         return;
     }
 
-    if((mState == State::Disabled) || (mState == State::Idle && !mHasNewEdge)){
+    if((mState == State::Disabled) || (mState == State::Idle && !vHasNewEdge)){
         return;
     }
 
@@ -111,32 +106,32 @@ void FrequencySensor::tick(){
     uint32_t deltaTicks = 0;
 
     // disable edge detection briefly
-    portENTER_CRITICAL(&sFrequencySensorMux);
+    portENTER_CRITICAL(&mFrequencySensorMux);
 
     // update state
     if(mState == State::Idle){
-        if(mHasNewEdge){
+        if(vHasNewEdge){
             mState = State::Running;
-            mHasNewEdge = false;
-            mLastEdgeTicks = mCurrentEdgeTicks;
+            vHasNewEdge = false;
+            vLastEdgeTicks = vCurrentEdgeTicks;
             mMeasuredFrequencyHz = 0;
         }
     }
     else if(mState == State::Running){
         uint32_t nowTicks = static_cast<uint32_t>(mTimer.getValue());
-        if((mStopTimeoutTicks > 0) && ((nowTicks - mCurrentEdgeTicks) > mStopTimeoutTicks)){
+        if((mStopTimeoutTicks > 0) && ((nowTicks - vCurrentEdgeTicks) > mStopTimeoutTicks)){
             mMeasuredFrequencyHz = 0;
             mState = State::Idle;
         }
-        else if(mHasNewEdge){
-            deltaTicks = mCurrentEdgeTicks - mLastEdgeTicks;
+        else if(vHasNewEdge){
+            deltaTicks = vCurrentEdgeTicks - vLastEdgeTicks;
             updateFrequency = true;
-            mHasNewEdge = false;
+            vHasNewEdge = false;
         }
     }
 
     // re-enable edge detection 
-    portEXIT_CRITICAL(&sFrequencySensorMux);
+    portEXIT_CRITICAL(&mFrequencySensorMux);
 
     // update frequency
     if(updateFrequency && (deltaTicks > 0)){
@@ -154,17 +149,17 @@ void FrequencySensor::setEnabled(bool enabled) {
         return;
     }
 
-    portENTER_CRITICAL(&sFrequencySensorMux);
+    portENTER_CRITICAL(&mFrequencySensorMux);
     if (enabled) {
         gpio_intr_enable(static_cast<gpio_num_t>(mPin));
         mState = State::Idle;
     } else {
         gpio_intr_disable(static_cast<gpio_num_t>(mPin));
-        mHasNewEdge = false;
+        vHasNewEdge = false;
         mMeasuredFrequencyHz = 0;
         mState = State::Disabled;
     }
-    portEXIT_CRITICAL(&sFrequencySensorMux);
+    portEXIT_CRITICAL(&mFrequencySensorMux);
 }
 
 bool FrequencySensor::isEnabled(){

@@ -3,6 +3,8 @@
 #include <cstdint>
 #include "Button.h"
 #include "core/hardware/gpio/Gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/portmacro.h"
 
 namespace Garbox {
 
@@ -40,11 +42,15 @@ private:
 
     Gpio& mGpio;
     Button mButton;
-    int32_t mPin;
 
-    volatile bool mLastRawState = false;
-    volatile bool mEdgeDetected = false;
-    
+    int32_t mPin = -1;
+    bool mInvert = false;
+
+    bool mCurrentRawState = false;
+    volatile bool vNewRawState = false;
+    volatile bool vEdgeDetected = false;    
+    portMUX_TYPE mMux = portMUX_INITIALIZER_UNLOCKED;
+
     bool mInitialized = false;
 };
 

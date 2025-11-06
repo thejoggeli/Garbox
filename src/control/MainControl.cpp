@@ -37,6 +37,11 @@ void MainControl::init(){
 
     // init button
     mButton.init();
+    mButton.setPressDebounceMicros(0);
+    mButton.setReleaseDebounceMicros(40_ms);
+    mButton.setLongPressMicros(400_ms),
+    mButton.setInitialHoldDelayMicros(800_ms);
+    mButton.setRepeatHoldDelayMicros(200_ms);
     mButton.setStateChangedCallback([this](Button::State oldState, Button::State newState, void* userData){
         handleButtonStateChanged(oldState, newState);
     });
@@ -68,6 +73,9 @@ void MainControl::tick(){
         DebugLeds::ToggleLed(DebugLeds::Id::Heartbeat);
         mHeartbeatTimer.restart();
     }
+
+    // button tick
+    mButton.tick();
 
     // update fan state
     constexpr uint8_t numFanStates = 6;
@@ -165,11 +173,29 @@ void MainControl::onAssertExit(const char* context, const char* message){
 }
 
 void MainControl::handleButtonStateChanged(Button::State oldState, Button::State newState){
-    mPiezoPlayer.playSequence(PiezoSequences::HelixUp);
+    LogDebug("MainControl", "button state changed: %s => %s", Button::StateToString(oldState), Button::StateToString(newState));
+    const uint32_t deadTime = 0;
+    switch(newState){
+        case Button::State::Pressed:
+            mPiezoPlayer.playTone(Tone(80_ms, 2000), deadTime);
+            break;
+        case Button::State::PressedLong:
+            mPiezoPlayer.playTone(Tone(80_ms, 3000), deadTime);
+            break;
+        case Button::State::Released:
+            mPiezoPlayer.playTone(Tone(80_ms, 1000), deadTime);
+            break;
+        default:
+            // nothing to do
+            break;
+    }
 }
 
 void MainControl::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
-    mPiezoPlayer.playSequence(PiezoSequences::Startup);
+    const uint32_t frequency = 300 + counter * 100;
+    const uint32_t deadTime = 0;
+    mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
+    LogDebug("MainControl", "button hold: %u" PRIu32 " | %u" PRIu32, counter, holdTimeMicros); 
 }
 
 void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState){

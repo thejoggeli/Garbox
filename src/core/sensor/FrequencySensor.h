@@ -1,6 +1,8 @@
 #pragma once
 
 #include "core/hardware/timer/Timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/portmacro.h"
 
 namespace Garbox {
 
@@ -56,9 +58,10 @@ private:
     float mMeasuredFrequencyHz = 0;
 
     // used inside ISR
-    volatile uint32_t mLastEdgeTicks = 0; // t[n-1]
-    volatile uint32_t mCurrentEdgeTicks = 0; // t[n]
-    volatile bool mHasNewEdge = false;
+    volatile uint32_t vLastEdgeTicks = 0; // t[n-1]
+    volatile uint32_t vCurrentEdgeTicks = 0; // t[n]
+    volatile bool vHasNewEdge = false;
+    portMUX_TYPE mFrequencySensorMux = portMUX_INITIALIZER_UNLOCKED;
 
 };
 

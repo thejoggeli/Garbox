@@ -24,7 +24,10 @@ public:
     void setValue(bool value);
 
     bool getValue() const;
+    bool getRawValue() const;
+    
     int32_t getPin() const;
+    bool isInverted() const;
     bool isInput() const;
     bool isOutput() const;
     bool hasPullup() const;

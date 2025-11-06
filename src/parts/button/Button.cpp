@@ -55,6 +55,9 @@ void Button::tick(bool isPressedRaw){
     // call handle hold callback
     if(mHoldTimer.isExpired()){
         if(mHoldCallback){
+            if(mHoldCounter == 0){
+                mHoldStartTimeMicros = Time::GetMicros();
+            }
             uint32_t elapsedMicros = Time::GetMicros() - mHoldStartTimeMicros;
             mHoldCallback(mHoldCounter, elapsedMicros, mUserData);
         }
@@ -98,14 +101,7 @@ void Button::handleFsmStateChanged(State oldState, State newState){
         const bool becomesPressed = (newState == State::Pressed) || (newState == State::PressedLong);
         if(wasReleased && becomesPressed){
             mHoldCounter = 0;
-            mHoldStartTimeMicros = Time::GetMicros();
             mHoldTimer.start(mInitialHoldDelayMicros);
-
-            // first hold fires immediately
-            if(mHoldCallback){
-                mHoldCallback(mHoldCounter, 0, mUserData);
-            }
-            mHoldCounter++;
         }
     }
 
