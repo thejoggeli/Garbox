@@ -194,8 +194,9 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
 void MainControl::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
     const uint32_t frequency = 300 + counter * 100;
     const uint32_t deadTime = 0;
-    mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
-    LogDebug("MainControl", "button hold: %u" PRIu32 " | %u" PRIu32, counter, holdTimeMicros); 
+    if(!mPiezoPlayer.isPlaying()){
+        mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
+    }
 }
 
 void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState){
