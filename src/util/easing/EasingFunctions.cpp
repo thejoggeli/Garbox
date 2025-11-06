@@ -60,7 +60,7 @@ float EasingFunctions::EaseInOutSine(float t, const void* p) {
 // -------------------- Elastic easings --------------------
 
 float EasingFunctions::EaseInElastic(float t, const void* p) {
-    const ElasticParams* e = static_cast<const ElasticParams*>(p);
+    const ElasticParams* e = (p != nullptr) ? static_cast<const ElasticParams*>(p) : GetElasticMediumParams();
     const float amplitude = e ? e->amplitude : 1.0f;
     const float period = e ? e->period : 0.3f;
 
@@ -73,7 +73,7 @@ float EasingFunctions::EaseInElastic(float t, const void* p) {
 }
 
 float EasingFunctions::EaseOutElastic(float t, const void* p) {
-    const ElasticParams* e = static_cast<const ElasticParams*>(p);
+    const ElasticParams* e = (p != nullptr) ? static_cast<const ElasticParams*>(p) : GetElasticMediumParams();
     const float amplitude = e ? e->amplitude : 1.0f;
     const float period = e ? e->period : 0.3f;
 
@@ -86,7 +86,7 @@ float EasingFunctions::EaseOutElastic(float t, const void* p) {
 }
 
 float EasingFunctions::EaseInOutElastic(float t, const void* p) {
-    const ElasticParams* e = static_cast<const ElasticParams*>(p);
+    const ElasticParams* e = (p != nullptr) ? static_cast<const ElasticParams*>(p) : GetElasticMediumParams();
     const float amplitude = e ? e->amplitude : 1.0f;
     const float period = e ? e->period : 0.3f;
 
