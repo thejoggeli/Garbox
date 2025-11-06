@@ -15,6 +15,7 @@ public:
 
     static const SampledFunction& GetCosSampled();
     static const SampledFunction& GetCosSampledNorm();
+    static const SampledFunction& GetCosSampledNormNeg();
 
     static const DirectFunction& GetEaseLinearDirect();
     static const DirectFunction& GetEaseInQuadDirect();

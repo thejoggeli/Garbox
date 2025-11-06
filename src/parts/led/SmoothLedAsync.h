@@ -16,7 +16,7 @@ public:
     void setDefaultFunction(const FunctionIfc& fn);
     void setBrightness(float brightness);
     void setBrightnessSmooth(float brightness, float speedBrightnessPerSec, const FunctionIfc* fn = nullptr);
-    void setPlayback(const FunctionIfc& fn, uint32_t cycles = 1, float speedHz = 1.0f, float minBrightness = 0.0f, float maxBrightness = 1.0f);
+    void setPlayback(const FunctionIfc& fn, uint32_t cycles = 0, float speedHz = 1.0f, float minBrightness = 0.0f, float maxBrightness = 1.0f);
 
     void stop();
     void tick();

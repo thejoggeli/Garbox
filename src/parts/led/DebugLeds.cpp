@@ -34,6 +34,11 @@ void DebugLeds::Init(){
 
     AssertExit(!sInitialized, "DebugLeds", "already initialized");
 
+    // initialize leds
+    for(SmoothLed& led : sLeds){
+        led.init();
+    }
+
     // init RGB LED
     sPixel.begin();
     sPixel.setBrightness(255);
@@ -45,7 +50,7 @@ void DebugLeds::Init(){
 SmoothLed& DebugLeds::GetLed(Id id){
     // check if initialized
     if(!sInitialized){
-        TriggerDebug("DeubgLeds", "not initialized");
+        TriggerDebug("DebugLeds", "not initialized");
         return sLeds[0];
     }
 

@@ -4,6 +4,7 @@
 #include "assert/AssertHandler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
+#include "global/function/FunctionInstances.h"
 #include "global/gpio/GpioInstances.h"
 #include "global/piezo/PiezoSequences.h"
 #include "parts/led/DebugLeds.h"
@@ -64,15 +65,19 @@ void MainControl::start(){
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
+
+    DebugLeds::GetLed(DebugLeds::Id::Heartbeat).setPlayback(FunctionInstances::GetCosSampledNormNeg(), 0, 1.0f);
 }
 
 void MainControl::tick(){
 
+    DebugLeds::GetLed(DebugLeds::Id::Heartbeat).tick();
+
     // heartbeat 
-    if(mHeartbeatTimer.isExpired()){
-        DebugLeds::ToggleLed(DebugLeds::Id::Heartbeat);
-        mHeartbeatTimer.restart();
-    }
+    // if(mHeartbeatTimer.isExpired()){
+    //     DebugLeds::ToggleLed(DebugLeds::Id::Heartbeat);
+    //     mHeartbeatTimer.restart();
+    // }
 
     // button tick
     mButton.tick();

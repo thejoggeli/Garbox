@@ -51,7 +51,11 @@ const SampledFunction& FunctionInstances::GetCosSampled(){
 }
 
 const SampledFunction& FunctionInstances::GetCosSampledNorm(){
-    return GetSampled([](float x){ return 0.5f * (cosf(x * MathConstants::TwoPi) + 1.0f); }, SineSamples);
+    return GetSampled([](float x){ return 0.5f * cosf(x * MathConstants::TwoPi) + 0.5f; }, SineSamples);
+}
+
+const SampledFunction& FunctionInstances::GetCosSampledNormNeg(){
+    return GetSampled([](float x){ return -0.5f * cosf(x * MathConstants::TwoPi) + 0.5f; }, SineSamples);
 }
 
 const DirectFunction& FunctionInstances::GetEaseLinearDirect(){
