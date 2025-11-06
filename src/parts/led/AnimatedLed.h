@@ -9,7 +9,7 @@ namespace Garbox {
 class FunctionIfc;
 class LedcChannel;
 
-class SmoothLed {
+class AnimatedLed {
 public:
 
     enum class State : uint8_t {
@@ -18,15 +18,15 @@ public:
         Playback
     };
 
-    explicit SmoothLed(LedcChannel& ledcChannel);
+    explicit AnimatedLed(LedcChannel& ledcChannel);
 
     void init();
 
     void setDefaultFunction(const FunctionIfc& fn);
 
     void setBrightness(float brightness);
-    void setBrightnessSmooth(float brightness, float speedBrightnessPerSec, const FunctionIfc* fn = nullptr);
-    void setPlayback(const FunctionIfc& fn, uint32_t cycles = 0, float speedHz = 1.0f, float minBrightness = 0.0f, float maxBrightness = 1.0f);
+    void setBrightnessSmooth(float brightness, uint32_t durationMicros, const FunctionIfc* fn = nullptr);
+    void setPlayback(const FunctionIfc& fn, uint32_t cycles = 0, uint32_t periodMicros = 1'000'000, float minBrightness = 0.0f, float maxBrightness = 1.0f);
 
     void stop();
     void tick();

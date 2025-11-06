@@ -2,6 +2,7 @@
 
 #include <Adafruit_NeoPixel.h>
 #include <array>
+#include "LedAnimationTask.h"
 #include "assert/Assert.h"
 #include "global/PinConfig.h"
 #include "global/ledc/LedcInstances.h"
@@ -11,16 +12,19 @@ namespace Garbox {
 
 // Debug LEDs
 static constexpr size_t NumDebugLeds = 4;
-static std::array<SmoothLedAsync, NumDebugLeds> sLeds = {
-    SmoothLedAsync(LedcInstances::GetDebugLed0Channel()),
-    SmoothLedAsync(LedcInstances::GetDebugLed1Channel()),
-    SmoothLedAsync(LedcInstances::GetDebugLed2Channel()),
-    SmoothLedAsync(LedcInstances::GetDebugLed3Channel()),
+static std::array<AnimatedLedAsync, NumDebugLeds> sLeds = {
+    AnimatedLedAsync(LedcInstances::GetDebugLed0Channel()),
+    AnimatedLedAsync(LedcInstances::GetDebugLed1Channel()),
+    AnimatedLedAsync(LedcInstances::GetDebugLed2Channel()),
+    AnimatedLedAsync(LedcInstances::GetDebugLed3Channel()),
 };
 
 // RGB LED
 static constexpr uint16_t NumRgbLeds = 1;
 static Adafruit_NeoPixel sPixel(NumRgbLeds, PinConfig::RgbLed, NEO_GRB + NEO_KHZ800);
+
+// LED animation task
+static LedAnimationTask sAnimationTask(NumDebugLeds);
 
 // initialized flag
 static bool sInitialized = false;
@@ -35,7 +39,7 @@ void DebugLeds::Init(){
     AssertExit(!sInitialized, "DebugLeds", "already initialized");
 
     // initialize leds
-    for(SmoothLed& led : sLeds){
+    for(AnimatedLed& led : sLeds){
         led.init();
     }
 
@@ -43,11 +47,17 @@ void DebugLeds::Init(){
     sPixel.begin();
     sPixel.setBrightness(255);
 
+    // setup and start animation task
+    for(AnimatedLedAsync& led : sLeds){
+        sAnimationTask.registerLed(&led);
+    }
+    sAnimationTask.start();
+
     // init complete
     sInitialized = true;
 }
 
-SmoothLed& DebugLeds::GetLed(Id id){
+AnimatedLed& DebugLeds::GetLed(Id id){
     // check if initialized
     if(!sInitialized){
         TriggerDebug("DebugLeds", "not initialized");
@@ -130,13 +140,13 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
     // set leds
     if(enable){
         // set all debug leds to brightness
-        for(SmoothLed& led : sLeds){
+        for(AnimatedLed& led : sLeds){
             led.setBrightness(brightness);
         }
     } 
     else {
         // turn all debug leds off
-        for(SmoothLed& led : sLeds){
+        for(AnimatedLed& led : sLeds){
             led.setBrightness(0);
         }
     }
@@ -154,7 +164,7 @@ void DebugLeds::ToggleAllLeds(float brightness){
 
     // toggle all leds
     const float thresh = brightness*0.5f;
-    for(SmoothLed& led : sLeds){
+    for(AnimatedLed& led : sLeds){
         // toggle led
         if(led.getBrightness() < thresh){
             led.setBrightness(brightness); // set debug led to brightness

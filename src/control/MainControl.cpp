@@ -14,6 +14,8 @@
 
 namespace Garbox {
 
+static constexpr uint32_t HeartbeatInterval = 2000_ms;
+
 MainControl::MainControl() : 
     // init memebers
     mFan(),
@@ -65,20 +67,18 @@ void MainControl::start(){
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
     mHeartbeatTimer.start(HeartbeatInterval);
-
-    DebugLeds::GetLed(DebugLeds::Id::Heartbeat).setPlayback(FunctionInstances::GetCosSampledNormNeg(), 0, 1.0f);
 }
 
 void MainControl::tick(){
 
-    DebugLeds::GetLed(DebugLeds::Id::Heartbeat).tick();
-
-    // heartbeat 
-    // if(mHeartbeatTimer.isExpired()){
-    //     DebugLeds::ToggleLed(DebugLeds::Id::Heartbeat);
-    //     mHeartbeatTimer.restart();
-    // }
-
+    if(mHeartbeatTimer.isExpired()){
+        static const FunctionIfc& function = FunctionInstances::GetCosSampledNormNeg();
+        static constexpr uint32_t numCycles = 1;
+        static constexpr uint32_t durationMicros = HeartbeatInterval/2;
+        DebugLeds::GetLed(DebugLeds::Id::Heartbeat).setPlayback(function, numCycles, durationMicros);
+        mHeartbeatTimer.restart();
+    }
+    
     // button tick
     mButton.tick();
 

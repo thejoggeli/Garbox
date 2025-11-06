@@ -5,23 +5,24 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "assert/Assert.h"
-#include "SmoothLedAsync.h"
+#include "AnimatedLedAsync.h"
 
 namespace Garbox {
 
-class SmoothLedTask {
+class LedAnimationTask {
 public:
-    explicit SmoothLedTask(uint8_t maxLeds);
-    ~SmoothLedTask();
+    explicit LedAnimationTask(uint8_t maxLeds);
+    ~LedAnimationTask();
 
     void start(uint32_t frequencyHz = 60);
-    void registerLed(SmoothLedAsync* led);
+    void registerLed(AnimatedLedAsync* led);
 
 private:
-    std::vector<SmoothLedAsync*> mLeds;
+    std::vector<AnimatedLedAsync*> mLeds;
     uint32_t mPeriodMillis = 0;
     TaskHandle_t mTaskHandle = nullptr;
 
+    void tick();
     static void taskLoop(void* arg);
 };
 

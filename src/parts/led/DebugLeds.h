@@ -5,7 +5,7 @@
 #include "assert/Assert.h"
 #include "global/PinConfig.h"
 #include "global/ledc/LedcInstances.h"
-#include "SmoothLedAsync.h"
+#include "AnimatedLedAsync.h"
 
 namespace Garbox {
 
@@ -20,7 +20,7 @@ public:
 
     static void Init();
 
-    static SmoothLed& GetLed(Id id);
+    static AnimatedLed& GetLed(Id id);
     
     static void SetLed(Id id, bool enable, float brightness = 1.0);
     static void SetAllLeds(bool enable, float brightness = 1.0);

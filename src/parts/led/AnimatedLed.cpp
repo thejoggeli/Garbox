@@ -1,4 +1,4 @@
-#include "SmoothLed.h"
+#include "AnimatedLed.h"
 
 #include <algorithm>
 #include <cmath>
@@ -9,12 +9,12 @@
 
 namespace Garbox {
 
-SmoothLed::SmoothLed(LedcChannel& ledChannel) : mLed(ledChannel){
+AnimatedLed::AnimatedLed(LedcChannel& ledChannel) : mLed(ledChannel){
     // nothing to do
 }
 
-void SmoothLed::init(){
-    AssertExit(!mInitialized, "SmoothLed", "already initialized");
+void AnimatedLed::init(){
+    AssertExit(!mInitialized, "AnimatedLed", "already initialized");
     
     // set default smoothing function
     if(mDefaultFunction == nullptr){
@@ -27,22 +27,22 @@ void SmoothLed::init(){
     mInitialized = true;
 }
 
-void SmoothLed::setDefaultFunction(const FunctionIfc& fn){
+void AnimatedLed::setDefaultFunction(const FunctionIfc& fn){
     mDefaultFunction = &fn;
 }
 
-void SmoothLed::setBrightness(float brightness){
+void AnimatedLed::setBrightness(float brightness){
     if(!mInitialized){
-        TriggerDebug("SmoothLed", "not initialized");
+        TriggerDebug("AnimatedLed", "not initialized");
         return;
     }
     stop();
     mLed.setBrightness(brightness);
 }
 
-void SmoothLed::setBrightnessSmooth(float brightness, float speedBrightnessPerSec, const FunctionIfc* fn){
+void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros, const FunctionIfc* fn){
     if(!mInitialized){
-        TriggerDebug("SmoothLed", "not initialized");
+        TriggerDebug("AnimatedLed", "not initialized");
         return;
     }
 
@@ -51,7 +51,7 @@ void SmoothLed::setBrightnessSmooth(float brightness, float speedBrightnessPerSe
     }
 
     if(fn == nullptr){
-        TriggerDebug("SmoothLed", "no function provided or set as default");
+        TriggerDebug("AnimatedLed", "no function provided or set as default");
         setBrightness(brightness);
         return;
     }
@@ -64,9 +64,6 @@ void SmoothLed::setBrightnessSmooth(float brightness, float speedBrightnessPerSe
         return;
     }
 
-    const float durationSeconds = delta / speedBrightnessPerSec;
-    const uint32_t durationMicros = static_cast<uint32_t>(durationSeconds * 1e6f);
-
     mActiveFunction = fn;
     mStartBrightness = current;
     mTargetBrightness = target;
@@ -75,36 +72,31 @@ void SmoothLed::setBrightnessSmooth(float brightness, float speedBrightnessPerSe
     enterState(State::Smoothing);
 }
 
-void SmoothLed::setPlayback(const FunctionIfc& fn, uint32_t cycles, float speedHz, float minBrightness, float maxBrightness){
+void AnimatedLed::setPlayback(const FunctionIfc& fn, uint32_t cycles, uint32_t periodMicros, float minBrightness, float maxBrightness){
     if(!mInitialized){
-        TriggerDebug("SmoothLed", "not initialized");
+        TriggerDebug("AnimatedLed", "not initialized");
         return;
     }
-
-    speedHz = (speedHz <= 0.0f) ? 1.0f : speedHz;
 
     mActiveFunction = &fn;
     mRemainingCycles = cycles;
     mMinBrightness = std::clamp(minBrightness, 0.0f, 1.0f);
     mMaxBrightness = std::clamp(maxBrightness, 0.0f, 1.0f);
 
-    const float periodSeconds = 1.0f / speedHz;
-    const uint32_t periodMicros = static_cast<uint32_t>(periodSeconds * 1e6f);
-
     mTimer.start(periodMicros);
     enterState(State::Playback);
 }
 
-void SmoothLed::stop(){
+void AnimatedLed::stop(){
     if(mState == State::Static){
         return;
     }
     enterState(State::Static);
 }
 
-void SmoothLed::tick(){
+void AnimatedLed::tick(){
     if(!mInitialized){
-        TriggerDebug("SmoothLed", "not initialized");
+        TriggerDebug("AnimatedLed", "not initialized");
         return;
     }
 
@@ -118,12 +110,12 @@ void SmoothLed::tick(){
             handlePlaybackState();
             break;
         default:
-            TriggerDebug("SmoothLed", "tick() unhandled state");
+            TriggerDebug("AnimatedLed", "tick() unhandled state");
             break;
     }
 }
 
-void SmoothLed::enterState(State state){
+void AnimatedLed::enterState(State state){
     mState = state;
     if(state == State::Static){
         mActiveFunction = nullptr;
@@ -131,7 +123,7 @@ void SmoothLed::enterState(State state){
     }
 }
 
-void SmoothLed::handleSmoothingState(){
+void AnimatedLed::handleSmoothingState(){
     if((mActiveFunction == nullptr) || !mTimer.isRunning()){
         stop();
         return;
@@ -149,7 +141,7 @@ void SmoothLed::handleSmoothingState(){
     }
 }
 
-void SmoothLed::handlePlaybackState(){
+void AnimatedLed::handlePlaybackState(){
     if(mActiveFunction == nullptr){
         stop();
         return;
@@ -175,11 +167,11 @@ void SmoothLed::handlePlaybackState(){
     }
 }
 
-float SmoothLed::getBrightness() const {
+float AnimatedLed::getBrightness() const {
     return mLed.getBrightness();
 }
 
-SmoothLed::State SmoothLed::getState() const {
+AnimatedLed::State AnimatedLed::getState() const {
     return mState;
 }
 

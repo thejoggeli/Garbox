@@ -14,7 +14,7 @@ DimmingLed::DimmingLed(LedcChannel& ledcChannel):
 }
 
 void DimmingLed::init(){
-    AssertExit(!mInitialized, "SmoothLed", "already initialized");
+    AssertExit(!mInitialized, "AnimatedLed", "already initialized");
     
     // set default correction function
     if(mCorrectionFunction == nullptr){
