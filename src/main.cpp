@@ -147,11 +147,11 @@ void logProfiler(){
         static char timeStringBuffer[20];
         StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
         LogInfo("Main", "======================== Diagnostics %s =======================", timeStringBuffer);
-        LogInfo("Main", " | ProfilerId | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
+        LogInfo("Main", " | ProfilerId         | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
         for (uint8_t i = 0; i < ProfilerConfig::Count; ++i) {
             const Profiler::Record& r = Profiler::GetRecord(i);
             const char* idStr = ProfilerConfig::IdToString(i);
-            LogInfo("Main", " | %18s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
+            LogInfo("Main", " | %-18s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
         }
         LogInfo("Main", "=========================================================================");
     }

@@ -20,7 +20,7 @@ public:
 
     // Piezo Task
     static constexpr const char* PiezoPlayerTaskName = "PiezoPlayerTask";
-    static constexpr uint32_t PiezoPlayerTaskFrequencyHz = 200;
+    static constexpr uint32_t PiezoPlayerTaskFrequencyHz = 120;
     static constexpr uint32_t PiezoPlayerTaskDurationMicros = 1'000'000 / PiezoPlayerTaskFrequencyHz;
     static constexpr uint32_t PiezoPlayerTaskDurationMillis = 1'000 / PiezoPlayerTaskFrequencyHz;
     static constexpr uint32_t PiezoPlayerTaskPriority = 15;

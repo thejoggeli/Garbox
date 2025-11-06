@@ -14,11 +14,12 @@ public:
     explicit LedAnimationTask(uint8_t maxLeds);
     ~LedAnimationTask();
 
-    void start(uint32_t frequencyHz = 60);
+    void start();
     void registerLed(AnimatedLedAsync* led);
 
 private:
     std::vector<AnimatedLedAsync*> mLeds;
+    uint32_t mFrequencyHz;
     uint32_t mPeriodMillis = 0;
     TaskHandle_t mTaskHandle = nullptr;
 

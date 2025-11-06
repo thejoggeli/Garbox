@@ -6,7 +6,9 @@
 
 namespace Garbox {
 
-LedAnimationTask::LedAnimationTask(uint8_t maxLeds){
+LedAnimationTask::LedAnimationTask(uint8_t maxLeds):
+    // init members
+    mFrequencyHz(AppConfig::LedAnimationTaskFrequencyHz){
     AssertExit(maxLeds > 0, "LedAnimationTask", "maxLeds must be > 0");
 
     // reserve LED vector capacity once
@@ -17,11 +19,11 @@ LedAnimationTask::~LedAnimationTask(){
     TriggerExit("LedAnimationTask", "heap using classes must not be deconstructed");
 }
 
-void LedAnimationTask::start(uint32_t frequencyHz){
-    AssertExit(frequencyHz > 0, "LedAnimationTask", "frequency must be > 0");
+void LedAnimationTask::start(){
+    AssertExit(mFrequencyHz > 0, "LedAnimationTask", "frequency must be > 0");
     AssertExit(mTaskHandle == nullptr, "LedAnimationTask", "already started");
 
-    mPeriodMillis = static_cast<uint32_t>(1000.0f / static_cast<float>(frequencyHz));
+    mPeriodMillis = static_cast<uint32_t>(1000.0f / static_cast<float>(mFrequencyHz));
 
     BaseType_t result = xTaskCreatePinnedToCore(
         taskLoop,
