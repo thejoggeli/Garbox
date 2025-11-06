@@ -5,6 +5,7 @@
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
 #include "global/bus/SpiInstances.h"
+#include "global/function/FunctionInstances.h"
 #include "global/ledc/LedcInstances.h"
 #include "global/gpio/GpioInstances.h"
 #include "global/timer/TimerInstances.h"
@@ -50,6 +51,10 @@ void setup() {
     LedcInstances::Init();
     TimerInstances::Init();
     SpiInstances::Init();
+
+    // init functions
+    FunctionInstances::GetGamma22Sampled();
+    FunctionInstances::GetEaseInOutSineSampled();
 
     // init profiler
     Profiler::Setup(ProfilerConfig::Count);

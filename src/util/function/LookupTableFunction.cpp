@@ -1,0 +1,97 @@
+#include "LookupTableFunction.h"
+
+#include <cstring>
+#include "assert/Assert.h"
+
+namespace Garbox {
+
+LookupTableFunction::LookupTableFunction(){
+    // nothing to do
+}
+
+LookupTableFunction::~LookupTableFunction(){
+    if(mHeapAllocated){
+        // runtime destruction of heap-based lookup tables is not allowed
+        TriggerExit("LookupTableFunction", "heap using classes must not be deconstructed");
+    }
+}
+
+void LookupTableFunction::init(Point* points, bool copy, uint32_t pointCount){
+    AssertExit(!mInitialized, "LookupTableFunction", "already initialized");
+    AssertExit(points != nullptr, "LookupTableFunction", "null point buffer");
+    AssertExit(pointCount >= 2, "LookupTableFunction", "at least two points required");
+
+    mPointCount = pointCount;
+    mLastIndex = mPointCount - 1;
+    mHeapAllocated = copy;
+
+    if(copy){
+        mPoints = new Point[mPointCount];
+        std::memcpy(mPoints, points, mPointCount * sizeof(Point));
+    }
+    else {
+        mPoints = points;
+    }
+
+    mInitialized = true;
+}
+
+void LookupTableFunction::init(std::initializer_list<Point> points){
+    AssertExit(!mInitialized, "LookupTableFunction", "already initialized");
+    AssertExit(points.size() >= 2, "LookupTableFunction", "at least two points required");
+
+    mPointCount = static_cast<uint32_t>(points.size());
+    mLastIndex = mPointCount - 1;
+    mHeapAllocated = true;
+
+    mPoints = new Point[mPointCount];
+    uint32_t index = 0;
+    for(const Point& p : points){
+        mPoints[index++] = p;
+    }
+
+    mInitialized = true;
+}
+
+float LookupTableFunction::evaluate(float x) const {
+    if(!mInitialized){
+        TriggerDebug("LookupTableFunction", "evaluate() called before init()");
+        return 0.0f;
+    }
+
+    // clamp to range edges
+    if(x <= mPoints[0].x){
+        return mPoints[0].y;
+    }
+    else if(x >= mPoints[mLastIndex].x){
+        return mPoints[mLastIndex].y;
+    }
+
+    // binary search to find the surrounding interval
+    uint32_t low = 0;
+    uint32_t high = mLastIndex;
+
+    while((high - low) > 1){
+        const uint32_t mid = (low + high) / 2;
+
+        // narrow search range based on midpoint comparison
+        if(x < mPoints[mid].x){
+            high = mid;
+        }
+        else {
+            low = mid;
+        }
+    }
+
+    // interpolate between the two surrounding points
+    const Point& p0 = mPoints[low];
+    const Point& p1 = mPoints[high];
+
+    // compute normalized interpolation factor within the interval
+    const float t = (x - p0.x) / (p1.x - p0.x);
+
+    // linearly interpolate between p0.y and p1.y
+    return p0.y + (p1.y - p0.y) * t;
+}
+
+} // namespace Garbox
