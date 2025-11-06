@@ -16,6 +16,7 @@ template <typename T, std::size_t N>
 class MovingAverageFilter {
 
     static_assert(std::is_integral<T>::value, "T must be an integral type");
+    static_assert(N > 0, "N must be greater than zero");
 
 public:
 
