@@ -8,7 +8,7 @@
 #include "global/ledc/LedcInstances.h"
 #include "global/gpio/GpioInstances.h"
 #include "global/timer/TimerInstances.h"
-#include "parts/debugLeds/DebugLeds.h"
+#include "parts/led/DebugLeds.h"
 #include "util/StringUtils.h"
 
 using namespace Garbox;

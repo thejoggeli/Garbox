@@ -7,7 +7,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "global/AppConfig.h"
-#include "parts/debugLeds/DebugLeds.h"
+#include "parts/led/DebugLeds.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {

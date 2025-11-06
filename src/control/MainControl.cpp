@@ -6,7 +6,7 @@
 #include "core/time/Time.h"
 #include "global/gpio/GpioInstances.h"
 #include "global/piezo/PiezoSequences.h"
-#include "parts/debugLeds/DebugLeds.h"
+#include "parts/led/DebugLeds.h"
 #include "util/color/ColorMap.h"
 #include "util/color/Rgb888.h"
 #include "util/MathUtils.h"
