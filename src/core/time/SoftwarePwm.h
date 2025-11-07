@@ -6,6 +6,12 @@
 
 namespace Garbox {
 
+/**
+ * Software-based PWM generator intended for low-frequency control tasks such as heater or fan modulation.
+ * - Produces a periodic on/off signal
+ * - The duty cycle defines the high-time fraction of each period. 
+ * - The mode determines whether the cycle starts with the high or low phase. 
+ */
 class SoftwarePwm {
 public:
 
@@ -14,10 +20,10 @@ public:
         High,
         Low,
     };
-
+    
     enum class Mode : uint8_t {
-        HighLow,
-        LowHigh,
+        StartHigh,
+        StartLow,
     };
 
     using Handler = std::function<void(State state)>;
@@ -30,7 +36,7 @@ public:
 
     void setDutyCycle(float duty, bool finishCurrent = true); // duty value must be in the range [0, 1] 
     void setPeriodDurationMicros(uint32_t durationMicros, bool finishCurrent = true);
-    void setMode(Mode mode);
+    void setMode(Mode hase);
     void setStateChangedHandler(Handler handler);
 
     float getCurrentDutyCycle() const;
@@ -59,7 +65,7 @@ private:
     float mNextDutyCycle;
 
     State mState = State::Reset;
-    Mode mMode = Mode::HighLow;
+    Mode mMode = Mode::StartLow;
     Handler mHandler = nullptr;
 
 };

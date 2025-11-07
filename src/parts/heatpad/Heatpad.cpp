@@ -26,7 +26,7 @@ void Heatpad::init(){
     });
 
     // software pwm setup
-    mPwm.setMode(SoftwarePwm::Mode::HighLow);
+    mPwm.setMode(SoftwarePwm::Mode::StartHigh);
 }
 
 void Heatpad::start(){

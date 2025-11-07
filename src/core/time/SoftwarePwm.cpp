@@ -84,54 +84,38 @@ void SoftwarePwm::startNextCycle(){
 }
 
 void SoftwarePwm::updateState(){
-    
-    // next state to be entered
+
     State newState = mState;
 
-    // in reset state
-    if(mTimer.isReset()){
+    // timer not running
+    if (mTimer.isReset()) {
         newState = State::Reset;
     }
-    // handle edge case duty = 1
-    else if(mCurrentDutyCycle >= 1.0f){
+    // 100% duty => always high
+    else if (mCurrentDutyCycle == 1.0f) {
         newState = State::High;
     }
-    // handle edge case duty = 0
-    else if(mCurrentDutyCycle <= 0.0f){
+    // 0% duty => always low
+    else if (mCurrentDutyCycle == 0.0f) {
         newState = State::Low;
     }
-    // first half of cycle
-    else if(mTimer.getElapsedMicros() < mThresholdMicros){
-        switch(mMode){
-        case Mode::HighLow:
-            newState = State::High;
-            break;
-        case Mode::LowHigh:
-            newState = State::Low;
-            break;
-        default:
-            TriggerDebug("SoftwarePwm", "unhandled mode");
-            break;
-        }
-    }
-    // second half of cycle
     else {
-        switch(mMode){
-        case Mode::HighLow:
-            newState = State::Low;
-            break;
-        case Mode::LowHigh:
-            newState = State::High;
-            break;
-        default:
-            TriggerDebug("SoftwarePwm", "unhandled mode");
-            break;
+        // first or second phase of the pwm cycle
+        bool inFirstPhase = (mTimer.getElapsedMicros() < mThresholdMicros);
+
+        // start with high phase
+        if (mMode == Mode::StartHigh) {
+            newState = inFirstPhase ? State::High : State::Low;
+        }
+        // start with low phase
+        else {
+            newState = inFirstPhase ? State::Low : State::High;
         }
     }
 
-    // enter new state
     enterState(newState);
 }
+
 
 void SoftwarePwm::enterState(State state){
     if(mState == state){
@@ -144,7 +128,8 @@ void SoftwarePwm::enterState(State state){
 }
 
 void SoftwarePwm::updateThreshold(){
-    mThresholdMicros = static_cast<uint32_t>(static_cast<float>(mCurrentPeriodDurationMicros) * mCurrentDutyCycle + 0.5f);
+    float phaseFraction = (mMode == Mode::StartHigh) ? (mCurrentDutyCycle) : (1.0f - mCurrentDutyCycle);
+    mThresholdMicros = static_cast<uint32_t>(static_cast<float>(mCurrentPeriodDurationMicros) * phaseFraction + 0.5f);
 }
 
 void SoftwarePwm::setPeriodDurationMicros(uint32_t durationMicros, bool finishCurrent){
@@ -181,6 +166,7 @@ void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
 
 void SoftwarePwm::setMode(Mode mode){
     mMode = mode;
+    updateThreshold();
     updateState();
 }
 
