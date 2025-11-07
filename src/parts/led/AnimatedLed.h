@@ -65,7 +65,6 @@ private:
     uint8_t mCurrentFrame = 0;
 
     void enterState(State state);
-    void handleSmoothingState();
     void handlePlaybackState();
 };
 
