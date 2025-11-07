@@ -56,6 +56,8 @@ private:
     uint32_t mStartTimeMicros = 0;
     uint32_t mDurationMicros = 0;
     State mState = State::Reset;
+
+    void restartInner();
     
 };
 

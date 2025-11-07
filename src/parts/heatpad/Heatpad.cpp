@@ -8,22 +8,30 @@
 
 namespace Garbox {
 
+static constexpr uint32_t InitialPwmDuty = 0.5f;
+static constexpr uint32_t InitialPwmPeriodMicros = 5'000'000; // 5 seconds
+
 Heatpad::Heatpad() : 
     // init members
     mGpioHeatpadEnable(GpioInstances::GetHeatEnable()),
-    mPwm(PwmPeriodMicros){
+    mPwm(InitialPwmDuty, InitialPwmPeriodMicros){
     // nothing to do
 }
 
 void Heatpad::init(){
-    // attach pwm state changed handler
+    
+    // software pwm attach state changed handler
     mPwm.setStateChangedHandler([this](SoftwarePwm::State state) {
         handlePwmStateChanged(state);
     });
+
+    // software pwm setup
+    mPwm.setMode(SoftwarePwm::Mode::HighLow);
 }
 
 void Heatpad::start(){
-    // nothing to do
+    // start software pwm
+    mPwm.start();
 }
 
 void Heatpad::tick(){
@@ -31,7 +39,7 @@ void Heatpad::tick(){
 }
 
 void Heatpad::reset(){
-    mPwm.reset();
+    mPwm.stop();
     setHeatEnabled(false);
 }
 
@@ -40,12 +48,9 @@ void Heatpad::setDutyCycle(float duty){
     mPwm.setDutyCycle(duty, finishCurrent);
 }
 
-float Heatpad::getCurrentDutyCycle(){
-    return mPwm.getCurrentDutyCycle();
-}
-
-float Heatpad::getNextDutyCycle(){
-    return mPwm.getNextDutyCycle();
+void Heatpad::setPeriodDurationMicros(float durationMicros){
+    bool const finishCurrent = true;
+    mPwm.setPeriodDurationMicros(durationMicros, finishCurrent);
 }
 
 void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
@@ -66,6 +71,22 @@ void Heatpad::setHeatEnabled(bool enabled){
 
 bool Heatpad::isHeatEnabled(){
     return mHeatEnabled;
+}
+
+float Heatpad::getCurrentDutyCycle() const {
+    return mPwm.getCurrentDutyCycle();
+}
+
+float Heatpad::getNextDutyCycle() const {
+    return mPwm.getNextDutyCycle();
+}
+
+uint32_t Heatpad::getCurrentPeriodDurationMicros() const {
+    return mPwm.getNextPeriodDurationMicros();
+}
+
+uint32_t Heatpad::getNextPeriodDurationMicros() const {
+    return mPwm.getNextPeriodDurationMicros();
 }
 
 } // namespace

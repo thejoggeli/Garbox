@@ -22,13 +22,26 @@ void SoftwareTimer::reset(){
 }
 
 void SoftwareTimer::restart(){
-
-    // cannot restart in reset state
     if(mState == State::Reset){
+        // start and expired immediately
+        start(0);
         return;
     }
+    restartInner();
+}
 
-    // no duration set
+void SoftwareTimer::restart(uint32_t newDurationMicros){
+    if(mState == State::Reset){
+        // start with new duration
+        start(newDurationMicros);
+        return;
+    }
+    restartInner();
+    mDurationMicros = newDurationMicros;
+}
+
+void SoftwareTimer::restartInner(){
+    // reset start time only
     if (mDurationMicros == 0) {
         mStartTimeMicros = Time::GetMicros();
         return;
@@ -42,15 +55,6 @@ void SoftwareTimer::restart(){
     while ((uint32_t)(currentTimeMicros - mStartTimeMicros) >= mDurationMicros) {
         mStartTimeMicros += mDurationMicros;
     }
-}
-
-void SoftwareTimer::restart(uint32_t newDurationMicros){
-    // cannot restart in reset state
-    if(mState == State::Reset){
-        return;
-    }
-    restart();
-    mDurationMicros = newDurationMicros;
 }
 
 void SoftwareTimer::extend(uint32_t durationMicros){

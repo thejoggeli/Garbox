@@ -15,42 +15,54 @@ public:
         Low,
     };
 
+    enum class Mode : uint8_t {
+        HighLow,
+        LowHigh,
+    };
+
     using Handler = std::function<void(State state)>;
 
-    SoftwarePwm(uint32_t periodMicros);
+    SoftwarePwm(float duty, uint32_t periodMicros);
 
-    void setStateChangedHandler(Handler handler);
-
-    /// Turn off immediately
-    void reset();
-
+    void start();
+    void stop();
     void tick();
 
-    /// Duty value must be in the range [0, 1] 
-    /// Duty=0 enters "Off" state
+    // duty value must be in the range [0, 1] 
+    // duty=0 enters "Off" state
     void setDutyCycle(float duty, bool finishCurrent = true);
+    void setPeriodDurationMicros(uint32_t durationMicros, bool finishCurrent = true);
+    void setMode(Mode mode);
+    void setStateChangedHandler(Handler handler);
 
-    float getCurrentDutyCycle();
-    float getNextDutyCycle();
+    float getCurrentDutyCycle() const;
+    float getNextDutyCycle() const;
+    uint32_t getCurrentPeriodDurationMicros() const;
+    uint32_t getNextPeriodDurationMicros() const;
+
+    State getState() const;
+    bool isReset() const;
+    bool isRunning() const;
 
 private:
 
-    void runStateMachine();
-    void enterState(State nextState);
     void startNextCycle();
-    void applyDutyCycle(float duty);
+    void updateState();
+    void enterState(State state);
+    void updateThreshold();
 
-    static constexpr uint32_t MaxRunsPerTick = 10;
+    SoftwareTimer mTimer;
 
-    SoftwareTimer mPwmTimer;
-    uint32_t mPeriodDurationMicros;
-    uint32_t mHighDurationMicros;
+    uint32_t mCurrentPeriodDurationMicros;
+    uint32_t mNextPeriodDurationMicros;
+    uint32_t mThresholdMicros = 0;
+
+    float mCurrentDutyCycle;
+    float mNextDutyCycle;
 
     State mState = State::Reset;
+    Mode mMode = Mode::HighLow;
     Handler mHandler = nullptr;
-    float mCurrentDutyCycle = 0.0f;
-    float mNextDutyCycle = 0.0f;
-    uint32_t mCurrentTickRunsCount = 0;
 
 };
 

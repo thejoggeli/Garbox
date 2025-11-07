@@ -19,8 +19,12 @@ public:
     void reset();
 
     void setDutyCycle(float duty);
-    float getCurrentDutyCycle();
-    float getNextDutyCycle();
+    void setPeriodDurationMicros(float durationMicros);
+
+    float getCurrentDutyCycle() const;
+    float getNextDutyCycle() const;
+    uint32_t getCurrentPeriodDurationMicros() const;
+    uint32_t getNextPeriodDurationMicros() const;
 
 private:
 
@@ -28,8 +32,6 @@ private:
 
     void setHeatEnabled(bool enabled);
     bool isHeatEnabled();
-
-    static constexpr uint32_t PwmPeriodMicros = 5'000'000; // 5 seconds
 
     Gpio& mGpioHeatpadEnable;
     SoftwarePwm mPwm;
