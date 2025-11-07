@@ -101,37 +101,37 @@ void MainControl::tick(){
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.0f, 400_ms);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.0f, 600_ms);
                 break;
             case 1:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.4f, 100_ms);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.4f, 600_ms);
                 break;
             case 2:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.6f, 100_ms);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.6f, 600_ms);
                 break;
             case 3:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.8f, 100_ms);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.8f, 600_ms);
                 break;
             case 4:
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(1.0f, 100_ms);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(1.0f, 600_ms);
                 break;
             case 5:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.5f, 200_ms);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.5f, 600_ms);
                 break;
             default:
                 // nothing to do
