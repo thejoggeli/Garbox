@@ -33,6 +33,12 @@ public:
     bool hasPullup() const;
     bool hasPulldown() const;
 
+    // Disallow copy and move 
+    Gpio(const Gpio&) = delete;
+    Gpio& operator=(const Gpio&) = delete;
+    Gpio(Gpio&&) = delete;
+    Gpio& operator=(Gpio&&) = delete;
+
 private:
     gpio_num_t mPin = gpio_num_t::GPIO_NUM_NC;
     bool mValue = false;

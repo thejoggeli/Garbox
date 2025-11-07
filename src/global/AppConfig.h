@@ -48,8 +48,7 @@ public:
     static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
     static constexpr uint32_t SpiDmaTaskPriority = 10;
     static constexpr uint32_t SpiDmaTaskStackSize = 2048;
-    // Due to memory limitations, the buffer can hold a fraction of the display's pixel data 
-    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2 / 4;
+    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2;
     static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
 
 };

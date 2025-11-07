@@ -15,7 +15,7 @@ public:
     // -------------------------------------------------------------
     // Command register definitions (DC = 0 when sending)
     // -------------------------------------------------------------
-    enum Command : uint8_t {
+    enum class Command : uint8_t {
         NOP        = 0x00, // No operation
         SWRESET    = 0x01, // Software reset (same as hardware RST)
         RDDID      = 0x04, // Read display ID
@@ -71,7 +71,7 @@ public:
         RGB666 = 0x66  // 18-bit color (6 bits per channel)
     };
 
-    static constexpr uint8_t makeColmodValue(ColorMode mode) {
+    static constexpr uint8_t makeCololorModeValue(ColorMode mode) {
         return static_cast<uint8_t>(mode);
     }
 
@@ -92,24 +92,24 @@ public:
     // Depending on panel wiring, flipX/flipY may need to be swapped
     // if the image flips in the wrong direction.
 
-    static constexpr uint8_t PortraitRGB(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makePortraitRGB(bool flipX = false, bool flipY = false) {
         return (flipY ? MY : 0) |
                (flipX ? MX : 0);
     }
 
-    static constexpr uint8_t PortraitBGR(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makePortraitBGR(bool flipX = false, bool flipY = false) {
         return (flipY ? MY : 0) |
                (flipX ? MX : 0) |
                BGR;
     }
 
-    static constexpr uint8_t LandscapeRGB(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makeLandscapeRGB(bool flipX = false, bool flipY = false) {
         return MV |
                (flipY ? MX : 0) | // swapped axis note
                (flipX ? MY : 0);
     }
 
-    static constexpr uint8_t LandscapeBGR(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makeLandscapeBGR(bool flipX = false, bool flipY = false) {
         return MV |
                (flipY ? MX : 0) |
                (flipX ? MY : 0) |
