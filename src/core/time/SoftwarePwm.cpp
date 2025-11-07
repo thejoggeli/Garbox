@@ -12,6 +12,9 @@ SoftwarePwm::SoftwarePwm(float duty, uint32_t periodMicros):
     mCurrentDutyCycle(duty),
     mNextDutyCycle(duty){
     // constructor body
+    AssertExit(periodMicros > 0, "SoftwarePwm", "invalid period value");
+    AssertExit(duty >= 0.0f, "SoftwarePwm", "invalid duty value < 0");
+    AssertExit(duty <= 1.0f, "SoftwarePwm", "invalid duty value > 1");
     updateThreshold();
 }
 
@@ -27,7 +30,7 @@ void SoftwarePwm::stop(){
         return;
     }
     mTimer.reset();
-    updateState();
+    enterState(State::Reset);
 }
 
 void SoftwarePwm::tick(){
@@ -37,7 +40,7 @@ void SoftwarePwm::tick(){
         return;
     }
 
-    // cycle timer expired, start nexct cycle
+    // cycle timer expired, start next cycle
     if(mTimer.isExpired()){
         startNextCycle();
     }
@@ -89,6 +92,14 @@ void SoftwarePwm::updateState(){
     if(mTimer.isReset()){
         newState = State::Reset;
     }
+    // handle edge case duty = 1
+    else if(mCurrentDutyCycle >= 1.0f){
+        newState = State::High;
+    }
+    // handle edge case duty = 0
+    else if(mCurrentDutyCycle <= 0.0f){
+        newState = State::Low;
+    }
     // first half of cycle
     else if(mTimer.getElapsedMicros() < mThresholdMicros){
         switch(mMode){
@@ -133,7 +144,7 @@ void SoftwarePwm::enterState(State state){
 }
 
 void SoftwarePwm::updateThreshold(){
-    mThresholdMicros = static_cast<uint32_t>(static_cast<float>(mCurrentPeriodDurationMicros) * mCurrentDutyCycle);
+    mThresholdMicros = static_cast<uint32_t>(static_cast<float>(mCurrentPeriodDurationMicros) * mCurrentDutyCycle + 0.5f);
 }
 
 void SoftwarePwm::setPeriodDurationMicros(uint32_t durationMicros, bool finishCurrent){

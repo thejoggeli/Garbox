@@ -28,9 +28,7 @@ public:
     void stop();
     void tick();
 
-    // duty value must be in the range [0, 1] 
-    // duty=0 enters "Off" state
-    void setDutyCycle(float duty, bool finishCurrent = true);
+    void setDutyCycle(float duty, bool finishCurrent = true); // duty value must be in the range [0, 1] 
     void setPeriodDurationMicros(uint32_t durationMicros, bool finishCurrent = true);
     void setMode(Mode mode);
     void setStateChangedHandler(Handler handler);
