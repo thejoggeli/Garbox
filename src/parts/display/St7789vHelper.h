@@ -78,12 +78,12 @@ public:
     // -------------------------------------------------------------
     // MADCTL bit masks
     // -------------------------------------------------------------
-    static constexpr uint8_t MY  = 0x80; // Row address order (flip Y)
-    static constexpr uint8_t MX  = 0x40; // Column address order (flip X)
-    static constexpr uint8_t MV  = 0x20; // Row/column exchange (swap X/Y)
-    static constexpr uint8_t ML  = 0x10; // Vertical refresh order
-    static constexpr uint8_t BGR = 0x08; // Color order select (1=BGR, 0=RGB)
-    static constexpr uint8_t MH  = 0x04; // Horizontal refresh order
+    static constexpr uint8_t MY  = 0b1000'0000; // Row address order (flip Y)
+    static constexpr uint8_t MX  = 0b0100'0000; // Column address order (flip X)
+    static constexpr uint8_t MV  = 0b0010'0000; // Row/column exchange (swap X/Y)
+    static constexpr uint8_t ML  = 0b0001'0000; // Vertical refresh order
+    static constexpr uint8_t BGR = 0b0000'1000; // Color order select (1=BGR, 0=RGB)
+    static constexpr uint8_t MH  = 0b0000'0100; // Horizontal refresh order
 
     // -------------------------------------------------------------
     // Ready-to-use MADCTL preset values
@@ -93,27 +93,19 @@ public:
     // if the image flips in the wrong direction.
 
     static constexpr uint8_t makePortraitRGB(bool flipX = false, bool flipY = false) {
-        return (flipY ? MY : 0) |
-               (flipX ? MX : 0);
+        return (flipY ? MY : 0) | (flipX ? MX : 0);
     }
 
     static constexpr uint8_t makePortraitBGR(bool flipX = false, bool flipY = false) {
-        return (flipY ? MY : 0) |
-               (flipX ? MX : 0) |
-               BGR;
+        return (flipY ? MY : 0) | (flipX ? MX : 0) | BGR;
     }
 
     static constexpr uint8_t makeLandscapeRGB(bool flipX = false, bool flipY = false) {
-        return MV |
-               (flipY ? MX : 0) | // swapped axis note
-               (flipX ? MY : 0);
+        return MV | (flipY ? MX : 0) | (flipX ? MY : 0);
     }
 
     static constexpr uint8_t makeLandscapeBGR(bool flipX = false, bool flipY = false) {
-        return MV |
-               (flipY ? MX : 0) |
-               (flipX ? MY : 0) |
-               BGR;
+        return MV | (flipY ? MX : 0) | (flipX ? MY : 0) | BGR;
     }
 };
 
