@@ -70,12 +70,10 @@ void MainControl::start(){
 
     // setup heartbeat led animation
     mHeartbeatLed.animationClear();
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 200_ms, 0.0f,  1.0f);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 0.0f,  1.0f);
     mHeartbeatLed.animationAddDelay(200_ms);
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 400_ms, 1.0f,  0.15f);
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 200_ms, 0.15f, 0.5f);
-    mHeartbeatLed.animationAddDelay(200_ms);
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 400_ms, 0.5f,  0.0f);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 1.0f,  0.0f);
+    mHeartbeatLed.animationStart();
     
     // start heartbeat timer
     mHeartbeatTimer.start(HeartbeatInterval);

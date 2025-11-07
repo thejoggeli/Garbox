@@ -3,6 +3,20 @@
 #include <cstring>
 #include "assert/Assert.h"
 
+namespace {
+
+// checks if x-values are strictly increasing
+bool isMonotonicIncreasing(const Garbox::LookupTableFunction::Point* points, uint32_t count){
+    for(uint32_t i = 1; i < count; ++i){
+        if(points[i].x <= points[i - 1].x){
+            return false;
+        }
+    }
+    return true;
+}
+
+} // namespace
+
 namespace Garbox {
 
 LookupTableFunction::LookupTableFunction(){
@@ -16,14 +30,16 @@ LookupTableFunction::~LookupTableFunction(){
     }
 }
 
-void LookupTableFunction::init(Point* points, bool copy, uint32_t pointCount){
+void LookupTableFunction::init(Point* points, bool copy, uint32_t pointCount, Mode mode){
     AssertExit(!mInitialized, "LookupTableFunction", "already initialized");
     AssertExit(points != nullptr, "LookupTableFunction", "null point buffer");
     AssertExit(pointCount >= 2, "LookupTableFunction", "at least two points required");
+    AssertExit(isMonotonicIncreasing(points, pointCount), "LookupTableFunction", "x-values must be strictly increasing");
 
     mPointCount = pointCount;
     mLastIndex = mPointCount - 1;
     mHeapAllocated = copy;
+    mMode = mode;
 
     if(copy){
         mPoints = new Point[mPointCount];
@@ -36,13 +52,15 @@ void LookupTableFunction::init(Point* points, bool copy, uint32_t pointCount){
     mInitialized = true;
 }
 
-void LookupTableFunction::init(std::initializer_list<Point> points){
+void LookupTableFunction::init(std::initializer_list<Point> points, Mode mode){
     AssertExit(!mInitialized, "LookupTableFunction", "already initialized");
     AssertExit(points.size() >= 2, "LookupTableFunction", "at least two points required");
+    AssertExit(isMonotonicIncreasing(points.begin(), points.size()), "LookupTableFunction", "x-values must be strictly increasing");
 
     mPointCount = static_cast<uint32_t>(points.size());
     mLastIndex = mPointCount - 1;
     mHeapAllocated = true;
+    mMode = mode;
 
     mPoints = new Point[mPointCount];
     uint32_t index = 0;
@@ -73,8 +91,6 @@ float LookupTableFunction::evaluate(float x) const {
 
     while((high - low) > 1){
         const uint32_t mid = (low + high) / 2;
-
-        // narrow search range based on midpoint comparison
         if(x < mPoints[mid].x){
             high = mid;
         }
@@ -83,14 +99,16 @@ float LookupTableFunction::evaluate(float x) const {
         }
     }
 
-    // interpolate between the two surrounding points
     const Point& p0 = mPoints[low];
     const Point& p1 = mPoints[high];
 
-    // compute normalized interpolation factor within the interval
-    const float t = (x - p0.x) / (p1.x - p0.x);
+    if(mMode == Mode::Hold){
+        // zero-order hold: return left sample
+        return p0.y;
+    }
 
-    // linearly interpolate between p0.y and p1.y
+    // linear interpolation
+    const float t = (x - p0.x) / (p1.x - p0.x);
     return p0.y + (p1.y - p0.y) * t;
 }
 

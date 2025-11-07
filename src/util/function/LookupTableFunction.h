@@ -8,22 +8,24 @@ namespace Garbox {
 
 class LookupTableFunction : public FunctionIfc {
 public:
+
     struct Point {
         float x;
         float y;
     };
 
+    enum class Mode : uint8_t {
+        Linear, // standard linear interpolation
+        Hold    // zero-order hold (step)
+    };
+
     LookupTableFunction();
     ~LookupTableFunction();
 
-    // Initialize from external point buffer
-    void init(Point* points, bool copy, uint32_t pointCount);
+    void init(Point* points, bool copy, uint32_t pointCount, Mode mode = Mode::Linear);
+    void init(std::initializer_list<Point> points, Mode mode = Mode::Linear);
 
-    // Initialize from initializer list (copied into internal buffer)
-    void init(std::initializer_list<Point> points);
-
-    // Evaluate with linear interpolation between stored points
-    float evaluate(float x) const final;
+    float evaluate(float x) const;
 
 private:
     Point* mPoints = nullptr;
@@ -31,6 +33,7 @@ private:
     uint32_t mLastIndex = 0;
     bool mHeapAllocated = false;
     bool mInitialized = false;
+    Mode mMode = Mode::Linear;
 };
 
 } // namespace Garbox

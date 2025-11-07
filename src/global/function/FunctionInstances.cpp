@@ -2,6 +2,9 @@
 
 #include <math.h>
 #include "assert/Assert.h"
+#include "util/function/DirectFunction.h"
+#include "util/function/LookupTableFunction.h"
+#include "util/function/SampledFunction.h"
 #include "util/math/EasingFunctions.h"
 #include "util/math/MathConstants.h"
 
@@ -39,12 +42,56 @@ static const FunctionIfc& GetSampled(Func func, uint32_t sampleCount){
     return instance;
 }
 
+static const FunctionIfc& GetLookup(LookupTableFunction::Point* points, size_t numPoints, LookupTableFunction::Mode mode){
+    static LookupTableFunction instance;
+    static bool initialized = false;
+    if(!initialized){
+        instance.init(points, false, numPoints, mode);
+        initialized = true;
+    }
+    return instance;
+}
+
 const FunctionIfc& FunctionInstances::GetConstantZero(){
     return GetDirect([](float x){ return 0.0f; });
 }
 
 const FunctionIfc& FunctionInstances::GetConstantOne(){
     return GetDirect([](float x){ return 1.0f; });
+}
+
+const FunctionIfc& FunctionInstances::GetLinear(){
+    return GetDirect([](float x){ return x; });
+}
+
+const FunctionIfc& FunctionInstances::GetQuadratic(){
+    return GetDirect([](float x){ return x*x; });
+}
+
+const FunctionIfc& FunctionInstances::GetRectangleStep(){
+    static LookupTableFunction::Point points[] = {
+        {0.0f, 0.0f},
+        {0.5f, 1.0f},
+    };
+    return GetLookup(points, sizeof(points)/sizeof(LookupTableFunction::Point), LookupTableFunction::Mode::Hold);
+}
+
+const FunctionIfc& FunctionInstances::GetRectanglePulse(){
+    static LookupTableFunction::Point points[] = {
+        {0.0f, 0.0f},
+        {0.25f, 1.0f},
+        {0.75f, 0.0f},
+    };
+    return GetLookup(points, sizeof(points)/sizeof(LookupTableFunction::Point), LookupTableFunction::Mode::Hold);
+}
+
+const FunctionIfc& FunctionInstances::GetTrianglePulse(){
+    static LookupTableFunction::Point points[] = {
+        {0.0f, 0.0f},
+        {0.5f, 1.0f},
+        {1.0f, 0.0f},
+    };
+    return GetLookup(points, sizeof(points)/sizeof(LookupTableFunction::Point), LookupTableFunction::Mode::Linear);
 }
 
 const FunctionIfc& FunctionInstances::GetGamma22Sampled(){
@@ -69,10 +116,6 @@ const FunctionIfc& FunctionInstances::GetCosSampledNorm(){
 
 const FunctionIfc& FunctionInstances::GetCosSampledNormNeg(){
     return GetSampled([](float x){ return -0.5f * cosf(x * MathConstants::TwoPi) + 0.5f; }, SineSamples);
-}
-
-const FunctionIfc& FunctionInstances::GetEaseLinearDirect(){
-    return GetDirect(EasingFunctions::EaseLinear);
 }
 
 const FunctionIfc& FunctionInstances::GetEaseInQuadDirect(){

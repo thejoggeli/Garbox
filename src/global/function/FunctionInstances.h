@@ -1,7 +1,6 @@
 #pragma once
 
-#include "util/function/DirectFunction.h"
-#include "util/function/SampledFunction.h"
+#include "util/function/FunctionIfc.h"
 
 namespace Garbox {
 
@@ -10,6 +9,13 @@ public:
 
     static const FunctionIfc& GetConstantZero();
     static const FunctionIfc& GetConstantOne();
+    static const FunctionIfc& GetLinear();
+    static const FunctionIfc& GetQuadratic();
+
+    static const FunctionIfc& GetRectangleStep();
+    static const FunctionIfc& GetRectanglePulse();
+    
+    static const FunctionIfc& GetTrianglePulse();
 
     static const FunctionIfc& GetGamma22Sampled();
 
@@ -20,7 +26,6 @@ public:
     static const FunctionIfc& GetCosSampledNorm();
     static const FunctionIfc& GetCosSampledNormNeg();
 
-    static const FunctionIfc& GetEaseLinearDirect();
     static const FunctionIfc& GetEaseInQuadDirect();
     static const FunctionIfc& GetEaseOutQuadDirect();
     static const FunctionIfc& GetEaseInOutQuadDirect();
