@@ -8,35 +8,38 @@ namespace Garbox {
 class FunctionInstances {
 public:
 
-    static const SampledFunction& GetGamma22Sampled();
+    static const FunctionIfc& GetConstantZero();
+    static const FunctionIfc& GetConstantOne();
 
-    static const SampledFunction& GetSinSampled();
-    static const SampledFunction& GetSinSampledNorm();
+    static const FunctionIfc& GetGamma22Sampled();
 
-    static const SampledFunction& GetCosSampled();
-    static const SampledFunction& GetCosSampledNorm();
-    static const SampledFunction& GetCosSampledNormNeg();
+    static const FunctionIfc& GetSinSampled();
+    static const FunctionIfc& GetSinSampledNorm();
 
-    static const DirectFunction& GetEaseLinearDirect();
-    static const DirectFunction& GetEaseInQuadDirect();
-    static const DirectFunction& GetEaseOutQuadDirect();
-    static const DirectFunction& GetEaseInOutQuadDirect();
+    static const FunctionIfc& GetCosSampled();
+    static const FunctionIfc& GetCosSampledNorm();
+    static const FunctionIfc& GetCosSampledNormNeg();
 
-    static const SampledFunction& GetEaseInSineSampled();
-    static const SampledFunction& GetEaseOutSineSampled();
-    static const SampledFunction& GetEaseInOutSineSampled();
+    static const FunctionIfc& GetEaseLinearDirect();
+    static const FunctionIfc& GetEaseInQuadDirect();
+    static const FunctionIfc& GetEaseOutQuadDirect();
+    static const FunctionIfc& GetEaseInOutQuadDirect();
 
-    static const SampledFunction& GetEaseInElasticLightSampled();
-    static const SampledFunction& GetEaseInElasticMediumSampled();
-    static const SampledFunction& GetEaseInElasticStrongSampled();
+    static const FunctionIfc& GetEaseInSineSampled();
+    static const FunctionIfc& GetEaseOutSineSampled();
+    static const FunctionIfc& GetEaseInOutSineSampled();
 
-    static const SampledFunction& GetEaseOutElasticLightSampled();
-    static const SampledFunction& GetEaseOutElasticMediumSampled();
-    static const SampledFunction& GetEaseOutElasticStrongSampled();
+    static const FunctionIfc& GetEaseInElasticLightSampled();
+    static const FunctionIfc& GetEaseInElasticMediumSampled();
+    static const FunctionIfc& GetEaseInElasticStrongSampled();
 
-    static const SampledFunction& GetEaseInOutElasticLightSampled();
-    static const SampledFunction& GetEaseInOutElasticMediumSampled();
-    static const SampledFunction& GetEaseInOutElasticStrongSampled();
+    static const FunctionIfc& GetEaseOutElasticLightSampled();
+    static const FunctionIfc& GetEaseOutElasticMediumSampled();
+    static const FunctionIfc& GetEaseOutElasticStrongSampled();
+
+    static const FunctionIfc& GetEaseInOutElasticLightSampled();
+    static const FunctionIfc& GetEaseInOutElasticMediumSampled();
+    static const FunctionIfc& GetEaseInOutElasticStrongSampled();
 
 };
 

@@ -18,6 +18,7 @@ static constexpr uint32_t HeartbeatInterval = 2000_ms;
 
 MainControl::MainControl() : 
     // init memebers
+    mHeartbeatLed(DebugLeds::GetLed(DebugLeds::Id::Heartbeat)),
     mFan(),
     mHeatpad(),
     mDisplay(),
@@ -66,16 +67,25 @@ void MainControl::start(){
     mFan.start();
     mFanStateTimer.start(0);
     mHeatpad.setDutyCycle(0.5f);
+
+    // setup heartbeat led animation
+    mHeartbeatLed.animationClear();
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 200_ms, 0.0f,  1.0f);
+    mHeartbeatLed.animationAddDelay(200_ms);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 400_ms, 1.0f,  0.15f);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 200_ms, 0.15f, 0.5f);
+    mHeartbeatLed.animationAddDelay(200_ms);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 400_ms, 0.5f,  0.0f);
+    
+    // start heartbeat timer
     mHeartbeatTimer.start(HeartbeatInterval);
+
 }
 
 void MainControl::tick(){
 
     if(mHeartbeatTimer.isExpired()){
-        static const FunctionIfc& function = FunctionInstances::GetCosSampledNormNeg();
-        static constexpr uint32_t numCycles = 1;
-        static constexpr uint32_t durationMicros = static_cast<uint32_t>(HeartbeatInterval*0.65f);
-        DebugLeds::GetLed(DebugLeds::Id::Heartbeat).setPlayback(function, numCycles, durationMicros);
+        mHeartbeatLed.animationStart();
         mHeartbeatTimer.restart();
     }
     
@@ -91,37 +101,37 @@ void MainControl::tick(){
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
-                DebugLeds::SetLed(DebugLeds::Id::Custom1, false);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.0f, 400_ms);
                 break;
             case 1:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.4f);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.4f, 100_ms);
                 break;
             case 2:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.6f);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.6f, 100_ms);
                 break;
             case 3:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000_ms);
-                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.8f);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.8f, 100_ms);
                 break;
             case 4:
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 1.0f);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(1.0f, 100_ms);
                 break;
             case 5:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::SetLed(DebugLeds::Id::Custom1, true, 0.5f);
+                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.5f, 200_ms);
                 break;
             default:
                 // nothing to do

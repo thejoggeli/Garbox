@@ -8,10 +8,6 @@ DirectFunction::DirectFunction(){
     // nothing to do
 }
 
-DirectFunction::~DirectFunction(){
-    // nothing to do
-}
-
 void DirectFunction::init(FuncPtr func){
     AssertExit(!mInitialized, "DirectFunction", "already initialized");
     AssertExit(func != nullptr, "DirectFunction", "null function pointer");

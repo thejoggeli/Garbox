@@ -2,28 +2,25 @@
 
 #include <algorithm>
 #include <cmath>
-#include "DimmingLed.h"
 #include "assert/Assert.h"
 #include "core/hardware/ledc/LedcChannel.h"
 #include "global/function/FunctionInstances.h"
 
 namespace Garbox {
 
-AnimatedLed::AnimatedLed(LedcChannel& ledChannel) : mLed(ledChannel){
+AnimatedLed::AnimatedLed(LedcChannel& ledChannel):
+    mLed(ledChannel){
     // nothing to do
 }
 
 void AnimatedLed::init(){
     AssertExit(!mInitialized, "AnimatedLed", "already initialized");
-    
-    // set default smoothing function
+
     if(mDefaultFunction == nullptr){
         setDefaultFunction(FunctionInstances::GetEaseInSineSampled());
     }
 
-    // init underlying dimming led
     mLed.init();
-
     mInitialized = true;
 }
 
@@ -56,35 +53,80 @@ void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros,
         return;
     }
 
-    const float current = mLed.getBrightness();
-    const float target = std::clamp(brightness, 0.0f, 1.0f);
-    const float delta = std::fabs(target - current);
+    const float start = mLed.getBrightness();
+    const float end = std::clamp(brightness, 0.0f, 1.0f);
 
-    if(delta <= 0.0001f){
+    animationClear();
+    animationAddFrame(*fn, durationMicros, start, end);
+    animationStart(1);
+}
+
+void AnimatedLed::setAnimation(const FunctionIfc& fn, uint32_t cycles, uint32_t durationMicros, float yStart, float yEnd){
+    if(mFrameCount >= MaxPlaybackFrames){
+        TriggerDebug("AnimatedLed", "playback buffer full");
+        return;
+    }
+    animationClear();
+    animationAddFrame(fn, durationMicros, yStart, yEnd);
+    animationStart(cycles);
+}
+
+void AnimatedLed::animationAddFrame(const FunctionIfc& fn, uint32_t durationMicros, float yStart, float yEnd){
+    if(mFrameCount >= MaxPlaybackFrames){
+        TriggerDebug("AnimatedLed", "playback buffer full");
+        return;
+    }
+    if(durationMicros == 0){
+        TriggerDebug("AnimatedLed", "added duration=0 frame");
         return;
     }
 
-    mActiveFunction = fn;
-    mStartBrightness = current;
-    mTargetBrightness = target;
-    mTimer.start(durationMicros);
-
-    enterState(State::Smoothing);
+    PlaybackFrame& frame = mFrames[mFrameCount++];
+    frame.function = &fn;
+    frame.yStart = std::clamp(yStart, 0.0f, 1.0f);
+    frame.yEnd = std::clamp(yEnd, 0.0f, 1.0f);
+    frame.durationMicros = durationMicros;
 }
 
-void AnimatedLed::setPlayback(const FunctionIfc& fn, uint32_t cycles, uint32_t periodMicros, float minBrightness, float maxBrightness){
+void AnimatedLed::animationAddDelay(uint32_t durationMicros){
+    if(mFrameCount >= MaxPlaybackFrames){
+        TriggerDebug("AnimatedLed", "playback buffer full");
+        return;
+    }
+    if(durationMicros == 0){
+        TriggerDebug("AnimatedLed", "added duration=0 frame");
+        return;
+    }
+
+    PlaybackFrame& frame = mFrames[mFrameCount++];
+    frame.function = nullptr;
+    frame.durationMicros = durationMicros;
+}
+
+void AnimatedLed::animationStart(uint32_t cycles){
     if(!mInitialized){
         TriggerDebug("AnimatedLed", "not initialized");
         return;
     }
 
-    mActiveFunction = &fn;
-    mRemainingCycles = cycles;
-    mMinBrightness = std::clamp(minBrightness, 0.0f, 1.0f);
-    mMaxBrightness = std::clamp(maxBrightness, 0.0f, 1.0f);
+    if(mFrameCount == 0){
+        TriggerDebug("AnimatedLed", "no playback frames added");
+        return;
+    }
 
-    mTimer.start(periodMicros);
-    enterState(State::Playback);
+    mRemainingCycles = cycles;
+    mCurrentFrame = 0;
+
+    // start playback timer
+    mTimer.start(mFrames[mCurrentFrame].durationMicros);
+
+    enterState(State::Animating);
+}
+
+void AnimatedLed::animationClear(){
+    mFrameCount = 0;
+    mCurrentFrame = 0;
+    stop();
 }
 
 void AnimatedLed::stop(){
@@ -103,10 +145,7 @@ void AnimatedLed::tick(){
     switch(mState){
         case State::Static:
             break;
-        case State::Smoothing:
-            handleSmoothingState();
-            break;
-        case State::Playback:
+        case State::Animating:
             handlePlaybackState();
             break;
         default:
@@ -118,52 +157,50 @@ void AnimatedLed::tick(){
 void AnimatedLed::enterState(State state){
     mState = state;
     if(state == State::Static){
-        mActiveFunction = nullptr;
+        mCurrentFrame = 0;
         mTimer.reset();
     }
 }
 
-void AnimatedLed::handleSmoothingState(){
-    if((mActiveFunction == nullptr) || !mTimer.isRunning()){
-        stop();
-        return;
-    }
-
-    const float t = std::clamp(mTimer.getElapsedFraction(), 0.0f, 1.0f);
-    const float eased = mActiveFunction->evaluate(t);
-    const float brightness = mStartBrightness + (mTargetBrightness - mStartBrightness) * eased;
-
-    mLed.setBrightness(brightness);
-
-    if(mTimer.isExpired()){
-        mLed.setBrightness(mTargetBrightness);
-        stop();
-    }
-}
-
 void AnimatedLed::handlePlaybackState(){
-    if(mActiveFunction == nullptr){
+    if(mFrameCount == 0){
         stop();
         return;
     }
 
-    const float t = std::clamp(mTimer.getElapsedFraction(), 0.0f, 1.0f);
-    const float y = mActiveFunction->evaluate(t);
-    const float brightness = mMinBrightness + (mMaxBrightness - mMinBrightness) * std::clamp(y, 0.0f, 1.0f);
+    PlaybackFrame& frame = mFrames[mCurrentFrame];
 
-    mLed.setBrightness(brightness);
+    if(frame.function != nullptr){
+        const float x = mTimer.getElapsedFraction(true);
+        const float y = frame.function->evaluate(x);
+        const float brightness = frame.yStart + (frame.yEnd - frame.yStart) * y;
+        mLed.setBrightness(brightness);
+    }
 
-    if(mTimer.isExpired()){
-        if(mRemainingCycles == 0){
-            // infinite repeat
-            mTimer.restart();
+    // handle frame finished
+    const bool frameFinished = mTimer.isExpired();
+    if(frameFinished){
+        mCurrentFrame++;
+
+        // handle cycle finished
+        const bool cycleFinished = mCurrentFrame >= mFrameCount; 
+        if(cycleFinished){
+
+            // check if animation finished
+            const bool isInfinite = (mRemainingCycles == 0);
+            const bool lastCycle = (mRemainingCycles == 1);
+            if(lastCycle && !isInfinite){
+                stop();
+                return;
+            }
+
+            // start next cycle
+            mCurrentFrame = 0;
+            mRemainingCycles--;
         }
-        else if(--mRemainingCycles > 0){
-            mTimer.restart();
-        }
-        else {
-            stop();
-        }
+
+        // restart timer for next frame
+        mTimer.restart(mFrames[mCurrentFrame].durationMicros);
     }
 }
 

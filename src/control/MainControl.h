@@ -9,6 +9,8 @@
 
 namespace Garbox {
 
+class AnimatedLed;
+
 class MainControl {
 public:
 
@@ -28,6 +30,8 @@ private:
 
     void handleFanStateChanged(Fan::State oldState, Fan::State newState);
     void handleFanStalledAlert(uint32_t counter);
+
+    AnimatedLed& mHeartbeatLed;
 
     Fan mFan;
     Heatpad mHeatpad;

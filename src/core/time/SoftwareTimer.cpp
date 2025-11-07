@@ -103,14 +103,14 @@ uint32_t SoftwareTimer::getElapsedMicros() const {
     return Time::GetMicros() - mStartTimeMicros;
 }
 
-float SoftwareTimer::getElapsedFraction() const {
+float SoftwareTimer::getElapsedFraction(bool clamp) const {
     if(mState == State::Reset){
         return 0.0f;
     }
     if(mDurationMicros == 0){
         return 0.0f;
     }
-    if(isExpired()){
+    if(clamp && isExpired()){
         return 1.0f;
     }  
     return static_cast<float>(getElapsedMicros()) / static_cast<float>(mDurationMicros);

@@ -44,7 +44,7 @@ public:
     uint32_t getElapsedMicros() const;
 
     /// returns the elapsed time as a fraction since the timer started
-    float getElapsedFraction() const;
+    float getElapsedFraction(bool clamp = true) const;
 
 private:
 

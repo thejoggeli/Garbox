@@ -27,10 +27,7 @@ void setup() {
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message){
         DebugLeds::SetLed(DebugLeds::Id::Assert, true);
-        while(true){
         LogError("AssertHandler", "AssertDebug! %s %s", context, message);
-
-        }
         gMainControl.onAssertDebug(context, message);
     });
 

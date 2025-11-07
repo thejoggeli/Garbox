@@ -32,9 +32,29 @@ void AnimatedLedAsync::setBrightnessSmooth(float brightness, uint32_t durationMi
     AnimatedLed::setBrightnessSmooth(brightness, durationMicros, fn);
 }
 
-void AnimatedLedAsync::setPlayback(const FunctionIfc& fn, uint32_t cycles, uint32_t periodMicros, float minBrightness, float maxBrightness){
+void AnimatedLedAsync::setAnimation(const FunctionIfc& fn, uint32_t cycles, uint32_t durationMicros, float yStart, float yEnd){
     LockGuard guard(mMutex);
-    AnimatedLed::setPlayback(fn, cycles, periodMicros, minBrightness, maxBrightness);
+    AnimatedLed::setAnimation(fn, cycles, durationMicros, yStart, yEnd);
+}
+
+void AnimatedLedAsync::animationAddFrame(const FunctionIfc& fn, uint32_t durationMicros, float yStart, float yEnd){
+    LockGuard guard(mMutex);
+    AnimatedLed::animationAddFrame(fn, durationMicros, yStart, yEnd);
+}
+
+void AnimatedLedAsync::animationAddDelay(uint32_t durationMicros){
+    LockGuard guard(mMutex);
+    AnimatedLed::animationAddDelay(durationMicros);
+}
+
+void AnimatedLedAsync::animationStart(uint32_t cycles){
+    LockGuard guard(mMutex);
+    AnimatedLed::animationStart(cycles);
+}
+
+void AnimatedLedAsync::animationClear(){
+    LockGuard guard(mMutex);
+    AnimatedLed::animationClear();
 }
 
 void AnimatedLedAsync::stop(){

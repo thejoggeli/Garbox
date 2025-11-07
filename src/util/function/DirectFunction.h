@@ -10,7 +10,6 @@ public:
     using FuncPtr = float (*)(float x);
 
     DirectFunction();
-    ~DirectFunction();
 
     // Initialize the function
     void init(FuncPtr func);
