@@ -31,18 +31,18 @@ void Display::init() {
 
     // init st7789v
     mSt7789v.init(AppConfig::DisplayWidth, AppConfig::DisplayHeight);
-    mSt7789v.reset();
 
     // register st7789v handlers
-    mSt7789v.setSendSyncHandler([&](const uint8_t* data, size_t numBytes){
+    mSt7789v.setSendSyncHandler([this](const uint8_t* data, size_t numBytes){
         handleSt7789vSendSync(data, numBytes);
     });
-    mSt7789v.setSendAsyncHandler([&](const uint8_t* data, size_t numBytes){
+    mSt7789v.setSendAsyncHandler([this](const uint8_t* data, size_t numBytes){
         handleSt7789vSendAsync(data, numBytes);
     });
 
     // send display init sequence
-    mSt7789v.sendInitSequence();
+    mSt7789v.sendReset();
+    mSt7789v.sendInit();
 
     // initialize lvgl
     lv_init();
@@ -66,7 +66,8 @@ void Display::init() {
     lv_obj_center(label);
 
     // send init commands to display
-    mSt7789v.sendFillColor(Rgb565::fromFloat(1.0f, 0.0f, 1.0f).value);
+    const Rgb565 clearColor = Rgb565::fromFloat(0, 0, 0);
+    mSt7789v.sendFillColor(clearColor.value);
     mSt7789v.sendFillRect(5,   5, 50, 50, Rgb565::fromFloat(1, 0, 0).value);
     mSt7789v.sendFillRect(60,  5, 50, 50, Rgb565::fromFloat(0, 1, 0).value);
     mSt7789v.sendFillRect(115, 5, 50, 50, Rgb565::fromFloat(0, 0, 1).value);
@@ -75,7 +76,6 @@ void Display::init() {
     mSt7789v.setBrightness(0.75f);
     mTestTimer.start(2000_ms);
     mInitialized = true;
-
 }
 
 void Display::tick() {
@@ -106,53 +106,57 @@ void Display::tick() {
     if (mTestTimer.isExpired()) {
         mTestTimer.restart();
     }
-
 }
 
-void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap) {
+void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 
-    return;
+    LogDebug("Display", "handleFlush");
 
-    mFlushing = true;
+    // send buffer to st7789v
+    const uint32_t width = area->x2 - area->x1 + 1;
+    const uint32_t height = area->y2 - area->y1 + 1;
+    const uint32_t sizeBytes = width * height * 2;
+    const bool async = false;
+    mSt7789v.sendDrawBufferXXYY(area->x1, area->x2, area->y1, area->y2, pixelMap, sizeBytes, async);
+    
+    // notify lvgl that transfer is complete
     lv_display_flush_ready(mLvDisplay);
+}
 
-    uint32_t const width = area->x2 - area->x1 + 1;
-    uint32_t const height = area->y2 - area->y1 + 1;
-    uint32_t const sizeBytes = width * height * 2;
-    mSt7789v.sendDrawBufferXXYY(area->x1, area->x2, area->y1, area->y2, pixelMap, sizeBytes, false);
+void Display::handleSt7789vSendSync(const uint8_t* data, size_t numBytes){
+    mSpi.transferSync(data, numBytes*8);
+    // LogDebug("Display", "sending %u bytes (sync)", numBytes);
+}
 
-    // notify lvgl
-    lv_display_flush_ready(mLvDisplay);
+void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
+    mSpi.transferSync(data, numBytes*8);
+    // LogDebug("Display", "sending %u bytes (async)", numBytes);
 }
 
 void Display::handleTxComplete(bool success) {
     // nothing to do
 }
 
-uint32_t Display::lvglTickProvider() {
-    return Time::GetMillisSlow();
-}
-
 void Display::handleLog(lv_log_level_t level, const char* str){
     switch(level){
-        case LV_LOG_LEVEL_TRACE:
-            LogDebug("LVGL/Trace", "%s", str);
-            break;
-        case LV_LOG_LEVEL_INFO:
-            LogInfo("LVGL/Info", "%s", str);
-            break;
-        case LV_LOG_LEVEL_WARN:
-            LogWarning("LVGL/Warn", "%s", str);
-            TriggerDebug("Display", "LVGL Warning");
-            break;
-        case LV_LOG_LEVEL_ERROR:
-            LogError("LVGL/Error", "%s", str);
-            TriggerExit("Display", "LVGL Error");
-            break;
-        case LV_LOG_LEVEL_USER:        
-        default:
-            TriggerDebug("Display", "unhandled log level");
-            break;
+    case LV_LOG_LEVEL_TRACE:
+        LogDebug("LVGL/Trace", "%s", str);
+        break;
+    case LV_LOG_LEVEL_INFO:
+        LogInfo("LVGL/Info", "%s", str);
+        break;
+    case LV_LOG_LEVEL_WARN:
+        LogWarning("LVGL/Warn", "%s", str);
+        TriggerDebug("Display", "LVGL Warning");
+        break;
+    case LV_LOG_LEVEL_ERROR:
+        LogError("LVGL/Error", "%s", str);
+        TriggerExit("Display", "LVGL Error");
+        break;
+    case LV_LOG_LEVEL_USER:        
+    default:
+        TriggerDebug("Display", "unhandled log level");
+        break;
     }
 }
 
@@ -167,12 +171,8 @@ void Display::txCompleteTrampoline(void* user, bool success) {
     static_cast<Display*>(user)->handleTxComplete(success);
 }
 
-void Display::handleSt7789vSendSync(const uint8_t* data, size_t numBytes){
-    mSpi.transferSync(data, numBytes*8);
-}
-
-void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
-    mSpi.transferSync(data, numBytes*8);
+uint32_t Display::lvglTickProvider() {
+    return Time::GetMillisSlow();
 }
 
 }  // namespace Garbox

@@ -35,14 +35,28 @@ void St7789v::init(uint16_t width, uint16_t height) {
     mInitialized = true;
 }
 
-void St7789v::reset() {
+void St7789v::setSendSyncHandler(SendSyncHandler handler){
+    mSendSyncHandler = handler;
+}
+
+void St7789v::setSendAsyncHandler(SendAsyncHandler handler){
+    mSendAsyncHandler = handler;
+}
+
+void St7789v::setBrightness(float brightness){
+    const FunctionIfc& correctionFunction = FunctionInstances::GetGamma22Sampled();
+    float brightnessCorrected = correctionFunction.evaluate(brightness);
+    mPwmBlk.setDutyRelative(brightnessCorrected);
+}
+
+void St7789v::sendReset() {
     mGpioRst.setValue(false);
     Time::DelayMillis(20);
     mGpioRst.setValue(true);
     Time::DelayMillis(120);
 }
 
-void St7789v::sendInitSequence(){
+void St7789v::sendInit(){
 
     Command cmd;
     uint8_t data;
@@ -70,68 +84,41 @@ void St7789v::sendInitSequence(){
     sendCommand(cmd);
 }
 
-void St7789v::setSendSyncHandler(SendSyncHandler handler){
-    mSendSyncHandler = handler;
+void St7789v::sendFillColor(uint16_t color){
+    sendFillRect(0, 0, mWidth, mHeight, color);
 }
 
-void St7789v::setSendAsyncHandler(SendAsyncHandler handler){
-    mSendAsyncHandler = handler;
+void St7789v::sendDrawBufferXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, uint8_t* buffer, size_t sizeBytes, bool async){
+    sendXXYY(x1, x2, y1, y2);
+    sendDrawBufferInner(buffer, sizeBytes, async);
 }
 
-void St7789v::setBrightness(float brightness){
-    const FunctionIfc& correctionFunction = FunctionInstances::GetGamma22Sampled();
-    float brightnessCorrected = correctionFunction.evaluate(brightness);
-    mPwmBlk.setDutyRelative(brightnessCorrected);
+void St7789v::sendDrawBufferXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t* buffer, size_t sizeBytes, bool async){
+    sendXYWH(x, y, w, h);
+    sendDrawBufferInner(buffer, sizeBytes, async);
 }
 
-uint16_t St7789v::getWidth() const {
-    return mWidth;
+void St7789v::sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async){
+    sendCommand(Command::RAMWR);
+    invokeHandler(buffer, sizeBytes, async);
 }
 
-uint16_t St7789v::getHeight() const {
-    return mHeight;
-}
+void St7789v::sendFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
+    sendXYWH(x, y, w, h);
+    sendCommand(Command::RAMWR);
 
-void St7789v::sendCommand(St7789vHelper::Command cmd, bool async) {
-    sendCommandInner(cmd, nullptr, 0, async);
-}
+    // Fill with the chosen color
+    uint32_t const pixelCount = (uint32_t)w * h;
+    constexpr size_t blockPixels = 64;
+    uint16_t block[blockPixels];
+    for (size_t i = 0; i < blockPixels; ++i)
+        block[i] = __builtin_bswap16(color); // ensure MSB first
 
-void St7789v::sendCommand(St7789vHelper::Command cmd, uint8_t value, bool async) {
-    sendCommandInner(cmd, &value, 1, async);
-}
-
-void St7789v::sendCommand(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async) {
-    sendCommandInner(cmd, buffer, sizeBytes, async);
-}
-
-
-void St7789v::sendCommandInner(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async){
-    if(!mInitialized){
-        TriggerDebug("St7789v", "not initialized");
-        return;
-    }
-    if(!mSendSyncHandler){
-        TriggerDebug("St7789v", "not send sync handler set");
-        return;
-    }
-
-    // send command
-    const uint8_t cmdval = static_cast<uint8_t>(cmd);
-    mGpioDc.setValue(false);
-    mSendSyncHandler(&cmdval, sizeBytes);
-
-    // check if there is data to send
-    if(buffer == nullptr || sizeBytes == 0){
-        return;
-    }
-
-    // send data
-    mGpioDc.setValue(true);
-    if(async && mSendAsyncHandler){
-        mSendAsyncHandler(&cmdval, sizeBytes);
-    }
-    else {
-        mSendSyncHandler(&cmdval, sizeBytes);
+    uint32_t remaining = pixelCount;
+    while (remaining) {
+        size_t n = std::min(remaining, (uint32_t)blockPixels);
+        invokeHandler((uint8_t*)block, n*2, false);
+        remaining -= n;
     }
 }
 
@@ -164,22 +151,44 @@ void St7789v::sendXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2){
     sendCommand(cmd, data, 4);
 }
 
-void St7789v::sendFillColor(uint16_t color){
-    sendFillRect(0, 0, mWidth, mHeight, color);
+void St7789v::sendCommand(St7789vHelper::Command cmd, bool async) {
+    sendCommandInner(cmd, nullptr, 0, async);
 }
 
-void St7789v::sendDrawBufferXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, uint8_t* buffer, size_t sizeBytes, bool async){
-    sendXXYY(x1, x2, y1, y2);
-    sendDrawBufferInner(buffer, sizeBytes, async);
+void St7789v::sendCommand(St7789vHelper::Command cmd, uint8_t value, bool async) {
+    sendCommandInner(cmd, &value, 1, async);
 }
 
-void St7789v::sendDrawBufferXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t* buffer, size_t sizeBytes, bool async){
-    sendXYWH(x, y, w, h);
-    sendDrawBufferInner(buffer, sizeBytes, async);
+void St7789v::sendCommand(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async) {
+    sendCommandInner(cmd, buffer, sizeBytes, async);
 }
 
-void St7789v::sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async){
-    sendCommand(Command::RAMWR);
+void St7789v::sendCommandInner(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async){
+    if(!mInitialized){
+        TriggerDebug("St7789v", "not initialized");
+        return;
+    }
+
+    // send command
+    const uint8_t cmdval = static_cast<uint8_t>(cmd);
+    mGpioDc.setValue(false);
+    invokeHandler(&cmdval, 1, false);
+    mGpioDc.setValue(true);
+
+    // check if there is data to send
+    if(buffer == nullptr || sizeBytes == 0){
+        return;
+    }
+
+    // send data
+    invokeHandler(buffer, sizeBytes, async);
+}
+
+void St7789v::invokeHandler(const uint8_t* buffer, size_t sizeBytes, bool async){
+    if(!mSendSyncHandler){
+        TriggerDebug("St7789v", "not send sync handler set");
+        return;
+    }
     if(async && mSendAsyncHandler){
         mSendAsyncHandler(buffer, sizeBytes);
     }
@@ -188,23 +197,12 @@ void St7789v::sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async)
     }
 }
 
-void St7789v::sendFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
-    sendXYWH(x, y, w, h);
-    sendCommand(Command::RAMWR);
+uint16_t St7789v::getWidth() const {
+    return mWidth;
+}
 
-    // Fill with the chosen color
-    uint32_t const pixelCount = (uint32_t)w * h;
-    constexpr size_t blockPixels = 64;
-    uint16_t block[blockPixels];
-    for (size_t i = 0; i < blockPixels; ++i)
-        block[i] = __builtin_bswap16(color); // ensure MSB first
-
-    uint32_t remaining = pixelCount;
-    while (remaining) {
-        size_t n = std::min(remaining, (uint32_t)blockPixels);
-        mSendSyncHandler((uint8_t*)block, n*2); // 2 bytes per pixel
-        remaining -= n;
-    }
+uint16_t St7789v::getHeight() const {
+    return mHeight;
 }
 
 } // namespace Garbox

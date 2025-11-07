@@ -2,7 +2,6 @@
 
 #include <functional>
 #include "St7789vHelper.h"
-#include "core/hardware/gpio/Gpio.h"
 
 namespace Garbox {
 
@@ -19,8 +18,6 @@ public:
     ~St7789v();
 
     void init(uint16_t width, uint16_t height);
-    void reset();
-    void sendInitSequence();
 
     void setSendSyncHandler(SendSyncHandler handler);
     void setSendAsyncHandler(SendAsyncHandler handler);
@@ -29,10 +26,9 @@ public:
 
     uint16_t getWidth() const;
     uint16_t getHeight() const;
-    
-    void sendCommand(St7789vHelper::Command cmd, bool async=false);
-    void sendCommand(St7789vHelper::Command cmd, uint8_t value, bool async=false);
-    void sendCommand(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async=false);
+
+    void sendReset();
+    void sendInit();
 
     void sendFillColor(uint16_t color);
     void sendFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
@@ -54,11 +50,17 @@ private:
 
     bool mInitialized = false;
 
+    void sendCommand(St7789vHelper::Command cmd, bool async = false);
+    void sendCommand(St7789vHelper::Command cmd, uint8_t value, bool async = false);
+    void sendCommand(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async = false);
     void sendCommandInner(St7789vHelper::Command cmd, uint8_t* buffer, size_t sizeBytes, bool async);
-    void sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async);
+
     void sendXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
     void sendXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2);
 
+    void sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async);
+
+    void invokeHandler(const uint8_t* buffer, size_t sizeBytes, bool async);
 };
 
 } // namespace

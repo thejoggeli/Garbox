@@ -33,7 +33,6 @@ private:
 
     /* Drawing buffer */
     uint16_t* mDrawBuffer = nullptr;
-    volatile bool mFlushing = false;
     uint32_t mRenderSkipCount = 0;
 
     void handleFlush(const lv_area_t* area, uint8_t* px_map);
