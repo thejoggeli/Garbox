@@ -118,6 +118,10 @@ const FunctionIfc& FunctionInstances::GetCosSampledNormNeg(){
     return GetSampled([](float x){ return -0.5f * cosf(x * MathConstants::TwoPi) + 0.5f; }, SineSamples);
 }
 
+const FunctionIfc& FunctionInstances::GetEaseLinearDirect(){
+    return GetDirect(EasingFunctions::EaseLinear);
+}
+
 const FunctionIfc& FunctionInstances::GetEaseInQuadDirect(){
     return GetDirect(EasingFunctions::EaseInQuad);
 }
