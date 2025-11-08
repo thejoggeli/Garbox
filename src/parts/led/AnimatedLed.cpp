@@ -212,4 +212,8 @@ AnimatedLed::State AnimatedLed::getState() const {
     return mState;
 }
 
+bool AnimatedLed::isInitialized() const { 
+    return mInitialized; 
+}
+
 } // namespace Garbox

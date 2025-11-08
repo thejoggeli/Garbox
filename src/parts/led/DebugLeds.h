@@ -23,7 +23,7 @@ public:
     static void Init();
 
     static AnimatedLed& GetLed(Id id);    
-    static Span<AnimatedLed> GetAllLeds();
+    static Span<AnimatedLed*> GetAllLeds();
     
     static void SetLed(Id id, bool enable, float brightness = 1.0);
     static void SetAllLeds(bool enable, float brightness = 1.0);
@@ -32,6 +32,8 @@ public:
     static void ToggleAllLeds(float brightness = 1.0);
 
     static void SetRgbLed(uint8_t r, uint8_t g, uint8_t b);
+
+    static bool IsInitialized();
 
 private:
     DebugLeds() = delete;

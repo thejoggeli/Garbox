@@ -11,7 +11,7 @@
 namespace Garbox {
 
 // Debug LEDs
-static constexpr size_t NumDebugLeds = 4;
+static constexpr size_t NumDebugLeds = static_cast<size_t>(DebugLeds::Id::Count);
 static std::array<AnimatedLedAsync, NumDebugLeds> sLeds = {
     AnimatedLedAsync(LedcInstances::GetDebugLed0Channel()),
     AnimatedLedAsync(LedcInstances::GetDebugLed1Channel()),
@@ -74,18 +74,24 @@ AnimatedLed& DebugLeds::GetLed(Id id){
     return sLeds[index];
 }
 
-Garbox::Span<AnimatedLed> DebugLeds::GetAllLeds(){
+Garbox::Span<AnimatedLed*> DebugLeds::GetAllLeds(){
 
     Garbox::LockGuard lock(sMutex);
 
-    // check if initialized
     if(!sInitialized){
         TriggerDebug("DebugLeds", "not initialized");
-        return Garbox::Span<AnimatedLed>(nullptr, 0);
+        return Garbox::Span<AnimatedLed*>(nullptr, 0);
     }
 
-    // return span over static array
-    return Garbox::Span<AnimatedLed>(sLeds.data(), sLeds.size());
+    // static array of pointers to base type
+    static std::array<AnimatedLed*, NumDebugLeds> sLedPtrs;
+
+    // fill with base class pointers
+    for(size_t i = 0; i < sLeds.size(); ++i){
+        sLedPtrs[i] = &sLeds[i];
+    }
+
+    return Garbox::Span<AnimatedLed*>(sLedPtrs.data(), sLedPtrs.size());
 }
 
 void DebugLeds::SetLed(Id id, bool enable, float brightness){
@@ -201,6 +207,10 @@ void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b) {
     // set pixel color
     sPixel.setPixelColor(0, r, g, b);
     sPixel.show();    
+}
+
+bool DebugLeds::IsInitialized() {
+    return sInitialized;
 }
 
 }

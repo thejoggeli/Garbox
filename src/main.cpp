@@ -26,30 +26,36 @@ void setup() {
     
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message){
-        DebugLeds::SetLed(DebugLeds::Id::Assert, true);
         LogError("AssertHandler", "AssertDebug! %s %s", context, message);
+        if(DebugLeds::IsInitialized()){
+            DebugLeds::SetLed(DebugLeds::Id::Assert, true);
+        }
         gMainControl.onAssertDebug(context, message);
     });
 
     // assert exit handler
     AssertHandler::SetExitHandler([](const char* context, const char* message){
-        DebugLeds::SetAllLeds(true);
+        LogError("AssertHandler", "AssertExit! %s %s", context, message);
+        if(DebugLeds::IsInitialized()){
+            DebugLeds::SetLed(DebugLeds::Id::Assert, true);
+        }
         gMainControl.onAssertExit(context, message);
         while(true){
             LogError("AssertHandler", "AssertExit! %s %s", context, message);
+            if(DebugLeds::IsInitialized()){
+                DebugLeds::ToggleAllLeds();
+            }
             Time::DelayMillis(1000);
-            DebugLeds::ToggleAllLeds();
         }
     });
 
-    // init statics
+    // init hardware instances
     GpioInstances::Init();
-    DebugLeds::Init();
     LedcInstances::Init();
     TimerInstances::Init();
     SpiInstances::Init();
 
-    // init functions
+    // init function instances
     FunctionInstances::GetGamma22Sampled();
     FunctionInstances::GetEaseInOutSineSampled();
 
@@ -57,10 +63,13 @@ void setup() {
     Profiler::Setup(ProfilerConfig::Count);
     Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
 
+    // init debug leds
+    DebugLeds::Init();
+
     // fade debug leds in
-    for(AnimatedLed& led : DebugLeds::GetAllLeds()){
-        led.setBrightness(0);
-        led.setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 0.0f, 1.0f);
+    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
+        led->setBrightness(0);
+        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 0.0f, 1.0f);
     }
     Time::DelayMillis(250);
 
@@ -69,9 +78,8 @@ void setup() {
     gMainControl.init();
 
     // fade debug leds out
-    for(AnimatedLed& led : DebugLeds::GetAllLeds()){
-        led.setBrightness(0);
-        led.setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 1.0f, 0.0f);
+    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
+        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 1.0f, 0.0f);
     }
     Time::DelayMillis(250);
 

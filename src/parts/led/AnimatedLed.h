@@ -37,6 +37,7 @@ public:
 
     float getBrightness() const;
     State getState() const;
+    bool isInitialized() const;
 
 private:
 
