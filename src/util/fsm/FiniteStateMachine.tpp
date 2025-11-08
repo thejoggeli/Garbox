@@ -20,7 +20,7 @@ void FiniteStateMachine<StateType, NumStates>::init(StateType initialState){
     mCurrentState = initialState;
     mPendingState = initialState;
     mTransitionTimer.reset();
-    mStateHoldTimer.start(mStateHoldTimeMicros[static_cast<uint8_t>(mCurrentState)]);
+    mStateHoldTimer.start(mStateHoldTimeMicros[static_cast<size_t>(mCurrentState)]);
     mInitialized = true;
 }
 
@@ -51,7 +51,7 @@ void FiniteStateMachine<StateType, NumStates>::setTransitionDelayMicros(StateTyp
         TriggerDebug("FiniteStateMachine", "invalid transition index");
         return;
     }
-    mTransitionDelayMicros[static_cast<uint8_t>(from)][static_cast<uint8_t>(to)] = delayMicros;
+    mTransitionDelayMicros[static_cast<size_t>(from)][static_cast<size_t>(to)] = delayMicros;
 }
 
 template<typename StateType, StateType NumStates>
@@ -81,7 +81,7 @@ void FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
     }
 
     // transition logic
-    const uint32_t delayMicros = mTransitionDelayMicros[static_cast<uint8_t>(mCurrentState)][static_cast<uint8_t>(newState)];
+    const uint32_t delayMicros = mTransitionDelayMicros[static_cast<size_t>(mCurrentState)][static_cast<size_t>(newState)];
     if(delayMicros == 0){
         // no transition delay
         const bool holdTimerActive = mStateHoldTimer.isRunningAndNotExpired();
@@ -125,7 +125,7 @@ void FiniteStateMachine<StateType, NumStates>::applyTransition(StateType newStat
     mTransitionTimer.reset();
 
     // start state hold timer
-    const uint32_t holdTime = mStateHoldTimeMicros[static_cast<uint8_t>(mCurrentState)];
+    const uint32_t holdTime = mStateHoldTimeMicros[static_cast<size_t>(mCurrentState)];
     if(holdTime > 0){
         mStateHoldTimer.start(holdTime);
     }
@@ -149,5 +149,29 @@ void FiniteStateMachine<StateType, NumStates>::cancelPendingTransition(){
     mPendingState = mCurrentState;
     mTransitionTimer.reset();
 }
+
+template<typename StateType, StateType NumStates>
+StateType FiniteStateMachine<StateType, NumStates>::getState() const {
+    return mCurrentState;
+}
+
+template<typename StateType, StateType NumStates>
+uint32_t FiniteStateMachine<StateType, NumStates>::getTransitionDelayMicros(StateType from, StateType to) const {
+    if((from >= NumStates) || (to >= NumStates)){
+        TriggerDebug("FiniteStateMachine", "invalid transition index");
+        return 0;
+    }
+    return mTransitionDelayMicros[static_cast<size_t>(from)][static_cast<size_t>(to)];
+}
+
+template<typename StateType, StateType NumStates>
+uint32_t FiniteStateMachine<StateType, NumStates>::getStateHoldTimeMicros(StateType state) const {
+    if(state >= NumStates){
+        TriggerDebug("FiniteStateMachine", "invalid transition index");
+        return 0;
+    }
+    return mStateHoldTimeMicros[static_cast<size_t>(state)];
+}
+
 
 } // namespace Garbox

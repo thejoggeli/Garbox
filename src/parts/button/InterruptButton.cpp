@@ -61,6 +61,8 @@ void IRAM_ATTR InterruptButton::isrHandler(void* arg){
     }
     self->vNewRawState = (level != 0);
     self->vEdgeDetected = true;
+    self->vLastEdgeTimeMicros = self->vCurrentEdgeTimeMicros;
+    self->vCurrentEdgeTimeMicros = Time::GetMicros();
 }
 
 void InterruptButton::tick(){
@@ -70,26 +72,37 @@ void InterruptButton::tick(){
     }
     
     // read ISR variables
-    bool newRawState;
-    bool edgeDetected;
-    portENTER_CRITICAL(&mMux);
-    newRawState = vNewRawState;
-    edgeDetected = vEdgeDetected;
-    vEdgeDetected = false;
-    portEXIT_CRITICAL(&mMux);
+    if(vEdgeDetected){
 
-    // detect missed edge
-    bool missedPulse = false;
-    if(edgeDetected && (mCurrentRawState == newRawState)){
-        missedPulse = true;
-    }
-    edgeDetected = false;
-    mCurrentRawState = newRawState;
+        // variables to be copied
+        bool newRawState;
+        bool edgeDetected;
+        uint32_t lastEdgeTimeMicros;
+        uint32_t currentEdgeTimeMicros;
 
-    // trigger button tick
-    if(missedPulse){
-        mButton.tick(mInvert ? mCurrentRawState : !mCurrentRawState);
+        // copy variables
+        portENTER_CRITICAL(&mMux);
+        newRawState = vNewRawState;
+        edgeDetected = vEdgeDetected;
+        lastEdgeTimeMicros = vLastEdgeTimeMicros;
+        currentEdgeTimeMicros = vCurrentEdgeTimeMicros;
+        vEdgeDetected = false;
+        portEXIT_CRITICAL(&mMux);
+
+        // detect missed pulse
+        const bool inputStateSame = (mCurrentRawState == newRawState);
+        const bool missedPulse = edgeDetected && inputStateSame;
+        if(missedPulse){
+            // handle missed pulse
+            const uint32_t missedPulseDuration = currentEdgeTimeMicros - lastEdgeTimeMicros;
+            const bool missedPulseState = mInvert ? mCurrentRawState : !mCurrentRawState;
+            mButton.handleMissedPulse(missedPulseState, missedPulseDuration);
+        }
+
+        // apply new input state
+        mCurrentRawState = newRawState;
     }
+    
     mButton.tick(mInvert ? !mCurrentRawState : mCurrentRawState);
 }
 

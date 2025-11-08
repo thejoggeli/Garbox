@@ -47,6 +47,8 @@ private:
     bool mInvert = false;
 
     bool mCurrentRawState = false;
+    volatile uint32_t vLastEdgeTimeMicros = 0;
+    volatile uint32_t vCurrentEdgeTimeMicros = 0;
     volatile bool vNewRawState = false;
     volatile bool vEdgeDetected = false;    
     portMUX_TYPE mMux = portMUX_INITIALIZER_UNLOCKED;

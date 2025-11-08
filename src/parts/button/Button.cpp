@@ -64,6 +64,28 @@ void Button::tick(bool isPressedRaw){
     }
 }
 
+void Button::handleMissedPulse(bool isPressedRaw, uint32_t pulseDuration){
+    const State currentState = mFsm.getState();
+    // Released => Pressed
+    if(currentState == State::Released){
+        if(pulseDuration >= mFsm.getTransitionDelayMicros(State::Released, State::Pressed)){
+            mFsm.forceTransition(State::Pressed);    
+        }
+    }
+    // Pressed => Released
+    else if(currentState == State::Pressed){
+        if(pulseDuration >= mFsm.getTransitionDelayMicros(State::Pressed, State::Released)){
+            mFsm.forceTransition(State::Released);
+        }
+    }
+    // PressedLong => Released
+    else if(currentState == State::PressedLong){
+        if(pulseDuration >= mFsm.getTransitionDelayMicros(State::PressedLong, State::Released)){
+            mFsm.forceTransition(State::Released);
+        }
+    }
+}
+
 void Button::handleReleasedState(bool isPressedRaw){
     if(isPressedRaw){
         mFsm.transition(State::Pressed);

@@ -74,6 +74,20 @@ AnimatedLed& DebugLeds::GetLed(Id id){
     return sLeds[index];
 }
 
+Garbox::Span<AnimatedLed> DebugLeds::GetAllLeds(){
+
+    Garbox::LockGuard lock(sMutex);
+
+    // check if initialized
+    if(!sInitialized){
+        TriggerDebug("DebugLeds", "not initialized");
+        return Garbox::Span<AnimatedLed>(nullptr, 0);
+    }
+
+    // return span over static array
+    return Garbox::Span<AnimatedLed>(sLeds.data(), sLeds.size());
+}
+
 void DebugLeds::SetLed(Id id, bool enable, float brightness){
 
     Garbox::LockGuard lock(sMutex);

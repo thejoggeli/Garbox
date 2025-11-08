@@ -47,8 +47,10 @@ public:
     // cancel the pending delayed transition
     void cancelPendingTransition();
 
-    // current state
-    StateType getState() const { return mCurrentState; }
+    // getters
+    StateType getState() const;
+    uint32_t getTransitionDelayMicros(StateType from, StateType to) const;
+    uint32_t getStateHoldTimeMicros(StateType state) const;
 
 private:
 

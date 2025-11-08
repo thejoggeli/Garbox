@@ -52,6 +52,9 @@ public:
     void setInitialHoldDelayMicros(uint32_t delayMicros);
     void setRepeatHoldDelayMicros(uint32_t delayMicros);
 
+    // handle a missed pulse (e.g. button was pressed and released between two ticks, detected by interrupt)
+    void handleMissedPulse(bool isPressedRaw, uint32_t pulseDuration);
+
     bool isPressed() const;
     bool isLongPressed() const;
     bool isReleased() const;
