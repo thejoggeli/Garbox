@@ -128,7 +128,8 @@ void InterruptButton::tick(){
     #if GarboxDebugInterruptButton
         LogDebug("InterruptButton", "state=%" PRIu32, mCurrentRawState);
     #endif
-    mButton.tick(mInvert ? !mCurrentRawState : mCurrentRawState);
+
+    mButton.tick(mGpio.getValue());
 }
 
 bool InterruptButton::isPressed() const {
