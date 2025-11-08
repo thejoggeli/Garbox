@@ -6,16 +6,15 @@ namespace Garbox {
 
 class PiezoSequences {
 public:
-
-    static const ToneSequence Startup;
-    static const ToneSequence Button;
-    static const ToneSequence HelixUp;
-    static const ToneSequence HelixDown;
-    static const ToneSequence Interpolated1;
-    static const ToneSequence Interpolated2;
-    static const ToneSequence FanStalled;
-    static const ToneSequence FanEnabled;
-    static const ToneSequence FanDisabled;
+    static const ToneSequence& GetStartup();
+    static const ToneSequence& GetButton();
+    static const ToneSequence& GetHelixUp();
+    static const ToneSequence& GetHelixDown();
+    static const ToneSequence& GetInterpolated1();
+    static const ToneSequence& GetInterpolated2();
+    static const ToneSequence& GetFanStalled();
+    static const ToneSequence& GetFanEnabled();
+    static const ToneSequence& GetFanDisabled();
 };
 
 } // namespace Garbox

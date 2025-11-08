@@ -63,12 +63,7 @@ void MainControl::init(){
 
     // init piezo player
     mPiezoPlayer.init();
-
-    // init heartbeat led animation
-    mHeartbeatLed.animationClear();
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 0.0f,  1.0f);
-    mHeartbeatLed.animationAddDelay(200_ms);
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 1.0f,  0.0f);
+    mPiezoPlayer.playSequence(PiezoSequences::GetStartup());
 
     // init complete
     mInitialized = true;
@@ -84,6 +79,10 @@ void MainControl::start(){
     mHeatpad.start();
 
     // start heartbeat led animation
+    mHeartbeatLed.animationClear();
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 0.0f,  1.0f);
+    mHeartbeatLed.animationAddDelay(200_ms);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 1.0f,  0.0f);
     mHeartbeatLed.animationStart();
     
     // start heartbeat timer
@@ -247,15 +246,15 @@ void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState
         Fan::StateToString(newState)
     );
     if(newState == Fan::State::Enabled){
-        mPiezoPlayer.playSequence(PiezoSequences::FanEnabled);
+        // mPiezoPlayer.playSequence(PiezoSequences::GetFanEnabled());
     }
     else if(newState == Fan::State::Disabled){
-        mPiezoPlayer.playSequence(PiezoSequences::FanDisabled);
+        // mPiezoPlayer.playSequence(PiezoSequences::GetFanDisabled());
     }
 }
 
 void MainControl::handleFanStalledAlert(uint32_t counter){
-    mPiezoPlayer.playSequence(PiezoSequences::FanStalled);
+    mPiezoPlayer.playSequence(PiezoSequences::GetFanStalled());
 }
 
 }
