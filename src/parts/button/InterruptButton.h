@@ -54,8 +54,8 @@ private:
     volatile bool vRawReferenceState = false;
     volatile bool vEdgeAwayDetected = false;    
     volatile bool vEdgeReturnDetected = false;
-    volatile uint32_t vEdgeAwayMicros = 0;
-    volatile uint32_t vEdgeReturnMicros = 0;
+    volatile uint32_t vEdgeAwayCpuCycles = 0;
+    volatile uint32_t vEdgeReturnCpuCycles = 0;
 
     portMUX_TYPE mMux = portMUX_INITIALIZER_UNLOCKED;
 

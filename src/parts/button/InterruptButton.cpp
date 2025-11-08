@@ -67,12 +67,12 @@ void IRAM_ATTR InterruptButton::isrHandler(void* arg){
     if(level != self->vRawReferenceState){
         if(!self->vEdgeAwayDetected){
             self->vEdgeAwayDetected = true;
-            self->vEdgeAwayMicros = Time::GetMicros();
+            self->vEdgeAwayCpuCycles = Time::GetCpuCycles();
         }
     }
     // signal changed towards reference
     else {
-        self->vEdgeReturnMicros = Time::GetMicros();
+        self->vEdgeReturnCpuCycles = Time::GetCpuCycles();
         self->vEdgeReturnDetected = true;
     }
 
@@ -95,8 +95,8 @@ void InterruptButton::tick(){
         bool newRawState = vNewRawState;
         bool edgeAwayDetected = vEdgeAwayDetected;
         bool edgeReturnDetected = vEdgeReturnDetected;
-        uint32_t edgeAwayMicros = vEdgeAwayMicros;
-        uint32_t edgeReturnMicros = vEdgeReturnMicros;
+        uint32_t edgeAwayCpuCycles = vEdgeAwayCpuCycles;
+        uint32_t edgeReturnCpuCycles = vEdgeReturnCpuCycles;
 
         // set new state for ISR
         vRawReferenceState = newRawState;
@@ -110,7 +110,7 @@ void InterruptButton::tick(){
         const bool missedPulse = edgeAwayDetected && edgeReturnDetected && (mCurrentRawState == newRawState);
         if(missedPulse){
             // handle missed pulse
-            const uint32_t missedPulseDuration = edgeReturnMicros - edgeAwayMicros;
+            const uint32_t missedPulseDuration = Time::CpuCyclesToMicros(edgeReturnCpuCycles - edgeAwayCpuCycles);
             const bool missedPulseState = mInvert ? mCurrentRawState : !mCurrentRawState;
             mButton.handleMissedPulse(missedPulseState, missedPulseDuration);
             #if GarboxDebugInterruptButton

@@ -60,15 +60,7 @@ bool FrequencySensor::init(Config const& config) {
 
     esp_err_t err = gpio_config(&ioConf);
     AssertExit(err == ESP_OK, "FrequencySensor", "gpio_config failed");
-
-    // Install ISR service once globally (safe to call multiple times)
-    static bool isrServiceInstalled = false;
-    if (!isrServiceInstalled) {
-        err = gpio_install_isr_service(0);
-        AssertExit(err == ESP_OK, "FrequencySensor", "gpio_install_isr_service failed");
-        isrServiceInstalled = true;
-    }
-
+    
     // Register per-instance ISR (context pointer passed to handler)
     portENTER_CRITICAL(&mFrequencySensorMux);
     err = gpio_isr_handler_add(static_cast<gpio_num_t>(mPin), isrHandler, this);

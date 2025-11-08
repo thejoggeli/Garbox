@@ -49,6 +49,12 @@ void setup() {
         }
     });
 
+    // install ISR service once globally (safe to call multiple times)
+    static bool isrServiceInstalled = false;
+    if (gpio_install_isr_service(0) != ESP_OK){
+        TriggerExit("Main", "gpio_install_isr_service failed");
+    }
+
     // init hardware instances
     GpioInstances::Init();
     LedcInstances::Init();
@@ -116,7 +122,7 @@ void mainTask(void* parameter){
         // if display is not busy
         // TODO update ui state
         // TODO notify display to render new ui state
-        Time::DelayMicros(500); // placeholder delay
+        Time::BlockMicros(1000); // placeholder delay
         Profiler::End(ProfilerConfig::UiTick);
         
         // end main task
@@ -133,7 +139,7 @@ void logProfiler(){
         Profiler::UpdateAll();
         lastPrint = now;
         
-        uint32_t seconds = Time::GetSecondsSlow();
+        uint32_t seconds = Time::GetSeconds();
         static char timeStringBuffer[20];
         StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
         LogInfo("Main", "======================== Diagnostics %s =======================", timeStringBuffer);

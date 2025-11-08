@@ -7,6 +7,9 @@ namespace Garbox {
 class AppConfig {
 public:
 
+    // Global
+    static constexpr uint32_t NumCpuCores = 2;
+
     // Main Task
     static constexpr const char* MainTaskName = "MainTask";
     static constexpr uint32_t MainTaskFrequencyHz = 30;

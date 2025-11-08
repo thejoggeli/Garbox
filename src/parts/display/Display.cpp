@@ -172,7 +172,7 @@ void Display::txCompleteTrampoline(void* user, bool success) {
 }
 
 uint32_t Display::lvglTickProvider() {
-    return Time::GetMillisSlow();
+    return Time::GetMillis();
 }
 
 }  // namespace Garbox

@@ -80,7 +80,7 @@ bool SoftwareTimer::isExpired() const {
     if(mDurationMicros == 0){
         return true; // timer is expired
     }
-    if((Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
+    if((uint32_t)(Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
         return true; // timer is expired
     }
     return false; // timer is not expired
@@ -93,7 +93,7 @@ bool SoftwareTimer::isRunningAndNotExpired() const {
     if(mDurationMicros == 0){
         return false; // timer is expired
     }
-    if((Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
+    if((uint32_t)(Time::GetMicros() - mStartTimeMicros) >= mDurationMicros){
         return false; // timer is expired
     }
     return true; // timer is not expired
