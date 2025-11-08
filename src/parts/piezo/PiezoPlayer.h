@@ -6,8 +6,7 @@
 #include "freertos/semphr.h"
 #include "Piezo.h"
 #include "ToneSequence.h"
-#include "util/array/RingBuffer.h"
-
+#include "util/container/RingBuffer.h"
 
 namespace Garbox {
 
