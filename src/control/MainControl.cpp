@@ -51,10 +51,12 @@ void MainControl::init(){
 
     // init button
     mButton.init();
-    mButton.setPressDebounceMicros(5_ms);
-    mButton.setReleaseDebounceMicros(40_ms);
-    mButton.setLongPressMicros(400_ms),
-    mButton.setInitialHoldDelayMicros(800_ms);
+    mButton.setPressedToReleasedDelayMicros(1_ms);
+    mButton.setReleasedToPressedDelayMicros(1_ms);
+    mButton.setPressedHoldTimeMicros(10_ms);
+    mButton.setReleasedHoldTimeMicros(40_ms);
+    mButton.setLongPressMicros(800_ms),
+    mButton.setInitialHoldDelayMicros(1600_ms);
     mButton.setRepeatHoldDelayMicros(200_ms);
     mButton.setStateChangedCallback([this](Button::State oldState, Button::State newState, void* userData){
         handleButtonStateChanged(oldState, newState);

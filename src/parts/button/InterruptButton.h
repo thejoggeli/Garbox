@@ -31,8 +31,11 @@ public:
     void setHoldCallback(Button::HoldCallback callback);
     void setUserData(void* userData);
 
-    void setPressDebounceMicros(uint32_t debounceMicros);
-    void setReleaseDebounceMicros(uint32_t debounceMicros);
+    void setPressedToReleasedDelayMicros(uint32_t micros); // minumum stable signal time before "Pressed => Released" transition is realized
+    void setReleasedToPressedDelayMicros(uint32_t micros); // minumum stable signal time before "Released => Pressed" transition is realized
+    void setPressedHoldTimeMicros(uint32_t micros);        // minumum time the "Pressed"  state will be held once entered
+    void setReleasedHoldTimeMicros(uint32_t micros);       // minumum time the "Released" state will be held once entered
+
     void setLongPressMicros(uint32_t delayMicros);
     void setInitialHoldDelayMicros(uint32_t delayMicros);
     void setRepeatHoldDelayMicros(uint32_t delayMicros);
@@ -45,12 +48,15 @@ private:
 
     int32_t mPin = -1;
     bool mInvert = false;
-
     bool mCurrentRawState = false;
-    volatile uint32_t vLastEdgeTimeMicros = 0;
-    volatile uint32_t vCurrentEdgeTimeMicros = 0;
+
     volatile bool vNewRawState = false;
-    volatile bool vEdgeDetected = false;    
+    volatile bool vRawReferenceState = false;
+    volatile bool vEdgeAwayDetected = false;    
+    volatile bool vEdgeReturnDetected = false;
+    volatile uint32_t vEdgeAwayMicros = 0;
+    volatile uint32_t vEdgeReturnMicros = 0;
+
     portMUX_TYPE mMux = portMUX_INITIALIZER_UNLOCKED;
 
     bool mInitialized = false;

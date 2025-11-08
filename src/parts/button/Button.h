@@ -41,9 +41,11 @@ public:
     void setHoldCallback(HoldCallback callback);
     void setUserData(void* userData);
 
-    // set press and release debounce time
-    void setPressDebounceMicros(uint32_t debounceMicros);
-    void setReleaseDebounceMicros(uint32_t debounceMicros);
+    // set debouce times
+    void setPressedToReleasedDelayMicros(uint32_t micros); // minumum stable signal time before "Pressed => Released" transition is realized
+    void setReleasedToPressedDelayMicros(uint32_t micros); // minumum stable signal time before "Released => Pressed" transition is realized
+    void setPressedHoldTimeMicros(uint32_t micros);        // minumum time the "Pressed"  state will be held once entered
+    void setReleasedHoldTimeMicros(uint32_t micros);       // minumum time the "Released" state will be held once entered
 
     // set long press delay time
     void setLongPressMicros(uint32_t delayMicros);
@@ -68,9 +70,7 @@ private:
     void* mUserData = nullptr;
 
     bool mInitialized = false;
-    uint32_t mPressDebounceMicros = 0;
-    uint32_t mReleaseDebounceMicros = 0;
-    uint32_t mLongPressMicros = 400_ms;
+    uint32_t mLongPressMicros = 0;
     uint32_t mInitialHoldDelayMicros = 0;
     uint32_t mRepeatHoldDelayMicros = 0;
 

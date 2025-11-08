@@ -1,6 +1,7 @@
 #include "InterruptButton.h"
 
 #include "assert/Assert.h"
+#include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
@@ -8,6 +9,8 @@
 #include "soc/gpio_reg.h"
 
 namespace Garbox {
+
+#define GarboxDebugInterruptButton 0
 
 InterruptButton::InterruptButton(Gpio& gpio):
     // initialize members
@@ -34,7 +37,7 @@ void InterruptButton::init(){
     // initial state
     mCurrentRawState = mGpio.getRawValue();
     vNewRawState = mCurrentRawState;
-    vEdgeDetected = false;
+    vRawReferenceState = mCurrentRawState;
 
     // initialize internal Button
     mButton.init();
@@ -52,17 +55,29 @@ void InterruptButton::init(){
 
 void IRAM_ATTR InterruptButton::isrHandler(void* arg){
     InterruptButton* self = static_cast<InterruptButton*>(arg);
-    uint32_t level = 0;
+    bool level;
     if(self->mPin < 32){
-        level = (GPIO.in >> self->mPin) & 0x1;
+        level = ((GPIO.in >> self->mPin) & 0x1) != 0;
     }
     else {
-        level = (GPIO.in1.data >> (self->mPin - 32)) & 0x1;
+        level = ((GPIO.in1.data >> (self->mPin - 32)) & 0x1) != 0;
     }
-    self->vNewRawState = (level != 0);
-    self->vEdgeDetected = true;
-    self->vLastEdgeTimeMicros = self->vCurrentEdgeTimeMicros;
-    self->vCurrentEdgeTimeMicros = Time::GetMicros();
+
+    // signal changed away from reference
+    if(level != self->vRawReferenceState){
+        if(!self->vEdgeAwayDetected){
+            self->vEdgeAwayDetected = true;
+            self->vEdgeAwayMicros = Time::GetMicros();
+        }
+    }
+    // signal changed towards reference
+    else {
+        self->vEdgeReturnMicros = Time::GetMicros();
+        self->vEdgeReturnDetected = true;
+    }
+
+    // store new raw state
+    self->vNewRawState = level;
 }
 
 void InterruptButton::tick(){
@@ -71,38 +86,48 @@ void InterruptButton::tick(){
         return;
     }
     
-    // read ISR variables
-    if(vEdgeDetected){
+    // handle detected edge
+    // critical section
+    portENTER_CRITICAL(&mMux);
+    if(vEdgeAwayDetected){
 
-        // variables to be copied
-        bool newRawState;
-        bool edgeDetected;
-        uint32_t lastEdgeTimeMicros;
-        uint32_t currentEdgeTimeMicros;
+        // copy ISR variables
+        bool newRawState = vNewRawState;
+        bool edgeAwayDetected = vEdgeAwayDetected;
+        bool edgeReturnDetected = vEdgeReturnDetected;
+        uint32_t edgeAwayMicros = vEdgeAwayMicros;
+        uint32_t edgeReturnMicros = vEdgeReturnMicros;
 
-        // copy variables
-        portENTER_CRITICAL(&mMux);
-        newRawState = vNewRawState;
-        edgeDetected = vEdgeDetected;
-        lastEdgeTimeMicros = vLastEdgeTimeMicros;
-        currentEdgeTimeMicros = vCurrentEdgeTimeMicros;
-        vEdgeDetected = false;
+        // set new state for ISR
+        vRawReferenceState = newRawState;
+        vEdgeAwayDetected = false;
+        vEdgeReturnDetected = false;
+
+        // leave critical section
         portEXIT_CRITICAL(&mMux);
 
         // detect missed pulse
-        const bool inputStateSame = (mCurrentRawState == newRawState);
-        const bool missedPulse = edgeDetected && inputStateSame;
+        const bool missedPulse = edgeAwayDetected && edgeReturnDetected && (mCurrentRawState == newRawState);
         if(missedPulse){
             // handle missed pulse
-            const uint32_t missedPulseDuration = currentEdgeTimeMicros - lastEdgeTimeMicros;
+            const uint32_t missedPulseDuration = edgeReturnMicros - edgeAwayMicros;
             const bool missedPulseState = mInvert ? mCurrentRawState : !mCurrentRawState;
             mButton.handleMissedPulse(missedPulseState, missedPulseDuration);
+            #if GarboxDebugInterruptButton
+                LogDebug("InterruptButton", "detected missed pulse state=%" PRIu32 ", duration=%" PRIu32 "us", missedPulseState, missedPulseDuration);
+            #endif
         }
 
         // apply new input state
         mCurrentRawState = newRawState;
     }
-    
+    else {
+        portEXIT_CRITICAL(&mMux);
+    }
+
+    #if GarboxDebugInterruptButton
+        LogDebug("InterruptButton", "state=%" PRIu32, mCurrentRawState);
+    #endif
     mButton.tick(mInvert ? !mCurrentRawState : mCurrentRawState);
 }
 
@@ -130,12 +155,20 @@ void InterruptButton::setUserData(void* userData){
     mButton.setUserData(userData);
 }
 
-void InterruptButton::setPressDebounceMicros(uint32_t debounceMicros){
-    mButton.setPressDebounceMicros(debounceMicros);
+void InterruptButton::setPressedToReleasedDelayMicros(uint32_t micros){
+    mButton.setPressedToReleasedDelayMicros(micros);
 }
 
-void InterruptButton::setReleaseDebounceMicros(uint32_t debounceMicros){
-    mButton.setReleaseDebounceMicros(debounceMicros);
+void InterruptButton::setReleasedToPressedDelayMicros(uint32_t micros){
+    mButton.setReleasedToPressedDelayMicros(micros);
+}
+
+void InterruptButton::setPressedHoldTimeMicros(uint32_t micros){
+    mButton.setPressedHoldTimeMicros(micros);
+}
+
+void InterruptButton::setReleasedHoldTimeMicros(uint32_t micros){
+    mButton.setReleasedHoldTimeMicros(micros);
 }
 
 void InterruptButton::setLongPressMicros(uint32_t delayMicros){

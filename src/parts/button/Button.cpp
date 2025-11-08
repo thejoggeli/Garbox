@@ -4,8 +4,17 @@
 
 namespace Garbox {
 
+static constexpr uint32_t InitialPressedToReleasedDelayMicros = 1_ms;   // Pressed     state will be entered after a 1ms stable "pressed" signal
+static constexpr uint32_t InitialReleasedToPressedDelayMicros = 1_ms;   // Released    state will be entered after a 1ms stable "released" signal
+static constexpr uint32_t InitialPressedHoldTimeMicros = 10_ms;         // Pressed     state will be held for at least 10ms (debouncing) 
+static constexpr uint32_t InitialReleasedHoldTimeMicros = 40_ms;        // Released    state will be held for at least 40ms (debouncing) 
+static constexpr uint32_t InitialLongPressMicros = 800_ms;              // LongPressed state will be entered after 800ms 
+
 Button::Button(){
-    // constructor body
+    // set initial transition delays and state hold times
+    setPressedToReleasedDelayMicros(InitialPressedToReleasedDelayMicros);
+    setReleasedToPressedDelayMicros(InitialReleasedToPressedDelayMicros);
+    setLongPressMicros(InitialLongPressMicros);
 }
 
 Button::~Button(){
@@ -20,11 +29,6 @@ void Button::init(){
     mFsm.setStateChangedCallback([this](State oldState, State newState){
         handleFsmStateChanged(oldState, newState);
     });
-
-    // set initial transition delays and state hold times
-    setPressDebounceMicros(mPressDebounceMicros);
-    setReleaseDebounceMicros(mPressDebounceMicros);
-    setLongPressMicros(mLongPressMicros);
 
     mInitialized = true;
 }
@@ -153,14 +157,22 @@ void Button::setUserData(void* userData){
     mUserData = userData;
 }
 
-void Button::setPressDebounceMicros(uint32_t debounceMicros){
-    mPressDebounceMicros = debounceMicros;
-    mFsm.setStateHoldTimeMicros(State::Pressed, debounceMicros);
+void Button::setPressedToReleasedDelayMicros(uint32_t micros){
+    mFsm.setTransitionDelayMicros(State::Pressed, State::Released, micros);
+    mFsm.setTransitionDelayMicros(State::PressedLong, State::Released, micros);
 }
 
-void Button::setReleaseDebounceMicros(uint32_t debounceMicros){
-    mReleaseDebounceMicros = debounceMicros;
-    mFsm.setStateHoldTimeMicros(State::Released, debounceMicros);
+void Button::setReleasedToPressedDelayMicros(uint32_t micros){
+    mFsm.setTransitionDelayMicros(State::Released, State::Pressed, micros);
+}
+
+void Button::setPressedHoldTimeMicros(uint32_t micros){
+    mFsm.setStateHoldTimeMicros(State::Pressed, micros);
+    mFsm.setStateHoldTimeMicros(State::PressedLong, micros);
+}
+
+void Button::setReleasedHoldTimeMicros(uint32_t micros){
+    mFsm.setStateHoldTimeMicros(State::Released, micros);
 }
 
 void Button::setLongPressMicros(uint32_t delayMicros){
