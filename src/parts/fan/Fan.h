@@ -73,7 +73,7 @@ private:
     FrequencySensor mFrequencySensor;
 
     // filter for measured RPM value
-    static constexpr size_t RpmFilterSize = AppConfig::MainTaskFrequencyHz/3;
+    static constexpr size_t RpmFilterSize = std::max(1u, AppConfig::MainTaskFrequencyHz/3);
     MovingAverageFilter<uint32_t, RpmFilterSize> mRpmFilter;
 
     // fan state monitor

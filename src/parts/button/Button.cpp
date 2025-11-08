@@ -8,7 +8,7 @@ static constexpr uint32_t InitialPressedToReleasedDelayMicros = 1_ms;   // Press
 static constexpr uint32_t InitialReleasedToPressedDelayMicros = 1_ms;   // Released    state will be entered after a 1ms stable "released" signal
 static constexpr uint32_t InitialPressedHoldTimeMicros = 10_ms;         // Pressed     state will be held for at least 10ms (debouncing) 
 static constexpr uint32_t InitialReleasedHoldTimeMicros = 40_ms;        // Released    state will be held for at least 40ms (debouncing) 
-static constexpr uint32_t InitialLongPressMicros = 800_ms;              // LongPressed state will be entered after 800ms 
+static constexpr uint32_t InitialLongPressMicros = 600_ms;              // LongPressed state will be entered after 600ms 
 
 Button::Button(){
     // set initial transition delays and state hold times

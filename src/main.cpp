@@ -50,7 +50,6 @@ void setup() {
     });
 
     // install ISR service once globally (safe to call multiple times)
-    static bool isrServiceInstalled = false;
     if (gpio_install_isr_service(0) != ESP_OK){
         TriggerExit("Main", "gpio_install_isr_service failed");
     }

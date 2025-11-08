@@ -55,9 +55,9 @@ void MainControl::init(){
     mButton.setReleasedToPressedDelayMicros(1_ms);
     mButton.setPressedHoldTimeMicros(10_ms);
     mButton.setReleasedHoldTimeMicros(40_ms);
-    mButton.setLongPressMicros(800_ms),
-    mButton.setInitialHoldDelayMicros(1600_ms);
-    mButton.setRepeatHoldDelayMicros(200_ms);
+    mButton.setLongPressMicros(600_ms),
+    mButton.setInitialHoldDelayMicros(1200_ms);
+    mButton.setRepeatHoldDelayMicros(300_ms);
     mButton.setStateChangedCallback([this](Button::State oldState, Button::State newState, void* userData){
         handleButtonStateChanged(oldState, newState);
     });
@@ -240,7 +240,7 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
     static float duty = 0.5f;
     switch(newState){
         case Button::State::Pressed:
-            mPiezoPlayer.playTone(Tone(80_ms, 2000), deadTime);
+            mPiezoPlayer.playTone(Tone(40_ms, 2000), deadTime);
             break;
         case Button::State::PressedLong:
             mPiezoPlayer.playTone(Tone(80_ms, 3000), deadTime);
