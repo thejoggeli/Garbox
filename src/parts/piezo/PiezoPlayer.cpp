@@ -7,7 +7,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "global/AppConfig.h"
-#include "parts/led/DebugLeds.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {
@@ -50,7 +49,6 @@ void PiezoPlayer::init(){
 }
 
 void PiezoPlayer::stop(){
-    DebugLeds::SetLed(DebugLeds::Id::Custom2, false);
     mPiezo.setEnabled(false);
     mPlaying = false;
     mCurrentSequence = nullptr;
@@ -286,7 +284,6 @@ void PiezoPlayer::playNextInQueue(){
         }
 
         // initialize state for sequence playback
-        DebugLeds::SetLed(DebugLeds::Id::Custom2, true);
         mCurrentToneIndex = 0;
         mPlaying = true;
         mLastTimeMicros = Time::GetMicros();
