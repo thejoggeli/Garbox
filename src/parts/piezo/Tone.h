@@ -57,13 +57,15 @@ public:
     }
 
     // chainable sweep modifier (const and non-const)
-    constexpr Tone sweep(uint16_t frequencyEnd) const {
+    constexpr Tone sweep(uint16_t frequencyStart, uint16_t frequencyEnd) const {
         Tone t = *this;
+        t.mFrequencyStart = frequencyStart;
         t.mFrequencyEnd = frequencyEnd;
         return t;
     }
 
-    constexpr Tone& sweep(uint16_t frequencyEnd) {
+    constexpr Tone& sweep(uint16_t frequencyStart, uint16_t frequencyEnd) {
+        mFrequencyStart = frequencyStart;
         mFrequencyEnd = frequencyEnd;
         return *this;
     }

@@ -30,6 +30,16 @@ MainControl::MainControl() :
 void MainControl::init(){
     AssertExit(!mInitialized, "MainControl", "already initialized");
 
+    // init piezo player and play sweep in
+    mPiezoPlayer.init();
+    mPiezoPlayer.playTone(Tone(250_ms).sweep(300, 1000).duty(0.25f));
+
+    // fade debug leds in
+    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
+        led->setBrightness(0);
+        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 0.0f, 1.0f);
+    }
+
     // init fan
     mFan.init();
     mFan.setStateChangedCallback([this](Fan::State oldState, Fan::State newState){
@@ -61,9 +71,39 @@ void MainControl::init(){
     // init display
     mDisplay.init();
 
-    // init piezo player
-    mPiezoPlayer.init();
-    mPiezoPlayer.playSequence(PiezoSequences::GetStartup());
+    // wait until led animation complete (fade in animation might still be ongoing)
+    while(mHeartbeatLed.isAnimationPlaying()){
+        Time::DelayMillis(1);
+    }
+
+    // wait until piezo player complete (sweep in might still be playing)
+    while(mPiezoPlayer.isPlaying()){
+        Time::DelayMillis(1);
+    }
+
+    // piezo play sweep out
+    mPiezoPlayer.playTone(Tone(250_ms).sweep(1000, 300).duty(0.25f));
+
+    // fade debug leds out
+    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
+        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 1.0f, 0.0f);
+    }
+
+    // wait until led fade out complete
+    while(mHeartbeatLed.isAnimationPlaying()){
+        Time::DelayMillis(1);
+    }
+
+    // wait until piezo play sweep out complete
+    while(mPiezoPlayer.isPlaying()){
+        Time::DelayMillis(1);
+    }
+
+    // setup heartbeat led animation
+    mHeartbeatLed.animationClear();
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 0.0f,  1.0f);
+    mHeartbeatLed.animationAddDelay(200_ms);
+    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 1.0f,  0.0f);
 
     // init complete
     mInitialized = true;
@@ -79,10 +119,6 @@ void MainControl::start(){
     mHeatpad.start();
 
     // start heartbeat led animation
-    mHeartbeatLed.animationClear();
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 0.0f,  1.0f);
-    mHeartbeatLed.animationAddDelay(200_ms);
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 1.0f,  0.0f);
     mHeartbeatLed.animationStart();
     
     // start heartbeat timer
@@ -257,4 +293,4 @@ void MainControl::handleFanStalledAlert(uint32_t counter){
     mPiezoPlayer.playSequence(PiezoSequences::GetFanStalled());
 }
 
-}
+} // namespace

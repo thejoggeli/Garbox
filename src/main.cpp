@@ -66,22 +66,8 @@ void setup() {
     // init debug leds
     DebugLeds::Init();
 
-    // fade debug leds in
-    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
-        led->setBrightness(0);
-        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 0.0f, 1.0f);
-    }
-    Time::DelayMillis(250);
-
     // init main app
-    // leds must not be used in main app init() functions 
     gMainControl.init();
-
-    // fade debug leds out
-    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
-        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 1.0f, 0.0f);
-    }
-    Time::DelayMillis(250);
 
     // start main app
     gMainControl.start();

@@ -216,4 +216,8 @@ bool AnimatedLed::isInitialized() const {
     return mInitialized; 
 }
 
+bool AnimatedLed::isAnimationPlaying() const {
+    return (mState == State::Animating);
+}
+
 } // namespace Garbox
