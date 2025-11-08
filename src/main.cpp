@@ -58,25 +58,24 @@ void setup() {
     Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
 
     // fade debug leds in
-    for(int32_t i = 0; i <= 25; i++){
-        float brightness = static_cast<float>(i) * (1.0f/25.0f);
-        DebugLeds::SetAllLeds(true, brightness);
-        Time::DelayMillis(10);
+    for(AnimatedLed& led : DebugLeds::GetAllLeds()){
+        led.setBrightness(0);
+        led.setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 0.0f, 1.0f);
     }
     Time::DelayMillis(250);
 
-    // fade debug leds out
-    for(int32_t i = 25; i >= 0; i--){
-        float brightness = static_cast<float>(i) * (1.0f/25.0f);
-        DebugLeds::SetAllLeds(true, brightness);
-        Time::DelayMillis(10);
-    }
-    Time::DelayMillis(250);
-
-    // init everything
+    // init main app
+    // leds must not be used in main app init() functions 
     gMainControl.init();
 
-    // start everything
+    // fade debug leds out
+    for(AnimatedLed& led : DebugLeds::GetAllLeds()){
+        led.setBrightness(0);
+        led.setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 1.0f, 0.0f);
+    }
+    Time::DelayMillis(250);
+
+    // start main app
     gMainControl.start();
 
     // start main task
