@@ -59,7 +59,7 @@ void FanMonitor::handleIdleState(uint32_t rpmValue, bool shouldSpin){
         mFsm.transition(State::Spinning);
     }
     else if(shouldSpin){
-        // !isSpinning && shouldSpin => Staled (transition)
+        // !isSpinning && shouldSpin => Stalled (transition)
         mFsm.transition(State::Stalled);
     }
     else {
@@ -97,7 +97,7 @@ void FanMonitor::handleStalledState(uint32_t rpmValue, bool shouldSpin){
         mFsm.transition(State::Idle);
     }
     else {
-        // should spin but is not spinning => Stalled (stay)
+        // !isSpinning && shouldSpin => Stalled (stay)
         mFsm.cancelPendingTransition();
     }
 }
