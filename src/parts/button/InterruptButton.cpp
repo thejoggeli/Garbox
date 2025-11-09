@@ -35,9 +35,9 @@ void InterruptButton::init(){
     mInvert = mGpio.isInverted();
 
     // initial state
-    mCurrentRawState = mGpio.getRawValue();
-    vNewRawState = mCurrentRawState;
-    vRawReferenceState = mCurrentRawState;
+    const bool initialLevelRaw = mGpio.readLevelRaw();
+    mCurrentLevelRaw = initialLevelRaw; 
+    vIsrReferenceLevelRaw = mCurrentLevelRaw;
 
     // initialize internal Button
     mButton.init();
@@ -64,20 +64,18 @@ void IRAM_ATTR InterruptButton::isrHandler(void* arg){
     }
 
     // signal changed away from reference
-    if(level != self->vRawReferenceState){
-        if(!self->vEdgeAwayDetected){
-            self->vEdgeAwayDetected = true;
-            self->vEdgeAwayCpuCycles = Time::GetCpuCycles();
+    if(level != self->vIsrReferenceLevelRaw){
+        if(!self->vIsrPulseStartDetected){
+            self->vIsrPulseStartDetected = true;
+            self->vIsrPulseStartCpuCycles = Time::GetCpuCycles();
         }
     }
     // signal changed towards reference
     else {
-        self->vEdgeReturnCpuCycles = Time::GetCpuCycles();
-        self->vEdgeReturnDetected = true;
+        self->vIsrPulseEndCpuCycles = Time::GetCpuCycles();
+        self->vIsrPulseEndDetected = true;
     }
 
-    // store new raw state
-    self->vNewRawState = level;
 }
 
 void InterruptButton::tick(){
@@ -89,29 +87,31 @@ void InterruptButton::tick(){
     // handle detected edge
     // critical section
     portENTER_CRITICAL(&mMux);
-    if(vEdgeAwayDetected){
+    if(vIsrPulseStartDetected){
 
         // copy ISR variables
-        bool newRawState = vNewRawState;
-        bool edgeAwayDetected = vEdgeAwayDetected;
-        bool edgeReturnDetected = vEdgeReturnDetected;
-        uint32_t edgeAwayCpuCycles = vEdgeAwayCpuCycles;
-        uint32_t edgeReturnCpuCycles = vEdgeReturnCpuCycles;
+        bool edgeAwayDetected = vIsrPulseStartDetected;
+        bool edgeReturnDetected = vIsrPulseEndDetected;
+        uint32_t edgeAwayCpuCycles = vIsrPulseStartCpuCycles;
+        uint32_t edgeReturnCpuCycles = vIsrPulseEndCpuCycles;
 
-        // set new state for ISR
-        vRawReferenceState = newRawState;
-        vEdgeAwayDetected = false;
-        vEdgeReturnDetected = false;
+        // reset ISR pulse state
+        vIsrPulseStartDetected = false;
+        vIsrPulseEndDetected = false;
+
+        // read gpio level
+        bool newLevelRaw = mGpio.readLevelRaw(); 
+        vIsrReferenceLevelRaw = newLevelRaw;
 
         // leave critical section
         portEXIT_CRITICAL(&mMux);
 
         // detect missed pulse
-        const bool missedPulse = edgeAwayDetected && edgeReturnDetected && (mCurrentRawState == newRawState);
+        const bool missedPulse = edgeAwayDetected && edgeReturnDetected && (mCurrentLevelRaw == newLevelRaw);
         if(missedPulse){
             // handle missed pulse
             const uint32_t missedPulseDuration = Time::CpuCyclesToMicros(edgeReturnCpuCycles - edgeAwayCpuCycles);
-            const bool missedPulseState = mInvert ? mCurrentRawState : !mCurrentRawState;
+            const bool missedPulseState = mInvert ? mCurrentLevelRaw : !mCurrentLevelRaw;
             mButton.handleMissedPulse(missedPulseState, missedPulseDuration);
             #if GarboxDebugInterruptButton
                 LogDebug("InterruptButton", "detected missed pulse state=%" PRIu32 ", duration=%" PRIu32 "us", missedPulseState, missedPulseDuration);
@@ -119,9 +119,12 @@ void InterruptButton::tick(){
         }
 
         // apply new input state
-        mCurrentRawState = newRawState;
+        mCurrentLevelRaw = newLevelRaw;
     }
     else {
+        bool newLevelRaw = mGpio.readLevelRaw(); 
+        vIsrReferenceLevelRaw = newLevelRaw;
+        mCurrentLevelRaw = newLevelRaw;
         portEXIT_CRITICAL(&mMux);
     }
 
@@ -129,7 +132,7 @@ void InterruptButton::tick(){
         LogDebug("InterruptButton", "state=%" PRIu32, mCurrentRawState);
     #endif
 
-    mButton.tick(mGpio.getValue());
+    mButton.tick(mInvert ? !mCurrentLevelRaw : mCurrentLevelRaw);
 }
 
 bool InterruptButton::isPressed() const {

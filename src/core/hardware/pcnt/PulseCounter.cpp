@@ -43,7 +43,9 @@ bool PulseCounter::init(Config const& config) {
             return false;
     }
     io_conf.intr_type = GPIO_INTR_DISABLE;
-    gpio_config(&io_conf);
+    if(gpio_config(&io_conf) != ESP_OK){
+        TriggerExit("PulseCounter", "gpio_config failed");        
+    }
 
     // pcnt_config_t describes how this channel behaves
     pcnt_config_t cfg = {};
@@ -68,15 +70,19 @@ bool PulseCounter::init(Config const& config) {
     cfg.counter_l_lim = config.minCount;
     cfg.counter_h_lim = config.maxCount;
 
-    esp_err_t err = pcnt_unit_config(&cfg);
-    if(err != ESP_OK){
-        TriggerExit("TachoPulseCounter", "pcnt_unit_config has error");
-        return false;
+    // setup unit
+    if(pcnt_unit_config(&cfg) != ESP_OK){
+        TriggerExit("PulseCounter", "pcnt_unit_config failed");
     }
 
     // setup filter
-    pcnt_set_filter_value(mUnit, config.filterCycles);
-    pcnt_filter_enable(mUnit);
+    if(pcnt_set_filter_value(mUnit, config.filterCycles) != ESP_OK){
+        TriggerExit("PulseCounter", "pcnt_set_filter_value failed");
+    }
+
+    if(pcnt_filter_enable(mUnit) != ESP_OK){
+        TriggerExit("PulseCounter", "pcnt_filter_enable failed");
+    }
 
     // setup complete
     mInitialized = true;

@@ -104,13 +104,13 @@ void Fan::setEnabled(bool enabled){
     }
     mEnabled = enabled;
     if(enabled){
-        mGpioFanEnable.setValue(true);
+        mGpioFanEnable.writeLevel(true);
         mFrequencySensor.setEnabled(true);
     }
     else {
         mMeasuredFrequency = 0;
         mMeasuredRpm = 0;
-        mGpioFanEnable.setValue(false);
+        mGpioFanEnable.writeLevel(false);
         mFrequencySensor.setEnabled(false);
     }
     updateState();

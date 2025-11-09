@@ -9,8 +9,7 @@ namespace Garbox {
 class PcntConfig {
 public:
 
-    static constexpr pcnt_unit_t FanTachoUnit = PCNT_UNIT_0;
-    static constexpr pcnt_unit_t RotaryEncoderUnit = PCNT_UNIT_1;
+    static constexpr pcnt_unit_t RotaryEncoderUnit = PCNT_UNIT_0;
 
 };
 

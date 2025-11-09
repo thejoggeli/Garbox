@@ -50,9 +50,9 @@ void St7789v::setBrightness(float brightness){
 }
 
 void St7789v::sendReset() {
-    mGpioRst.setValue(false);
+    mGpioRst.writeLevel(false);
     Time::DelayMillis(20);
-    mGpioRst.setValue(true);
+    mGpioRst.writeLevel(true);
     Time::DelayMillis(120);
 }
 
@@ -171,9 +171,9 @@ void St7789v::sendCommandInner(St7789vHelper::Command cmd, uint8_t* buffer, size
 
     // send command
     const uint8_t cmdval = static_cast<uint8_t>(cmd);
-    mGpioDc.setValue(false);
+    mGpioDc.writeLevel(false);
     invokeHandler(&cmdval, 1, false);
-    mGpioDc.setValue(true);
+    mGpioDc.writeLevel(true);
 
     // check if there is data to send
     if(buffer == nullptr || sizeBytes == 0){

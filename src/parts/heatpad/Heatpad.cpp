@@ -64,7 +64,7 @@ void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
 
 void Heatpad::setHeatEnabled(bool enabled){
     if (mHeatEnabled != enabled) {
-        mGpioHeatpadEnable.setValue(enabled);
+        mGpioHeatpadEnable.writeLevel(enabled);
         mHeatEnabled = enabled;
     }
 }

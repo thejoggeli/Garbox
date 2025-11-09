@@ -48,14 +48,13 @@ private:
 
     int32_t mPin = -1;
     bool mInvert = false;
-    bool mCurrentRawState = false;
+    bool mCurrentLevelRaw = false;
 
-    volatile bool vNewRawState = false;
-    volatile bool vRawReferenceState = false;
-    volatile bool vEdgeAwayDetected = false;    
-    volatile bool vEdgeReturnDetected = false;
-    volatile uint32_t vEdgeAwayCpuCycles = 0;
-    volatile uint32_t vEdgeReturnCpuCycles = 0;
+    volatile bool vIsrReferenceLevelRaw = false;
+    volatile bool vIsrPulseStartDetected = false;    
+    volatile bool vIsrPulseEndDetected = false;
+    volatile uint32_t vIsrPulseStartCpuCycles = 0;
+    volatile uint32_t vIsrPulseEndCpuCycles = 0;
 
     portMUX_TYPE mMux = portMUX_INITIALIZER_UNLOCKED;
 
