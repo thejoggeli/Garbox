@@ -5,7 +5,7 @@
 #include "LedAnimationTask.h"
 #include "assert/Assert.h"
 #include "global/PinConfig.h"
-#include "global/ledc/LedcInstances.h"
+#include "global/hardware/ledc/LedcInstances.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {
@@ -27,7 +27,7 @@ static Adafruit_NeoPixel sPixel(NumRgbLeds, PinConfig::RgbLed, NEO_GRB + NEO_KHZ
 static LedAnimationTask sAnimationTask(NumDebugLeds);
 
 // initialized flag
-static bool sInitialized = false;
+static bool gInitialized = false;
 
 // mutex for thread safety
 static SemaphoreHandle_t sMutex = xSemaphoreCreateMutex();
@@ -36,7 +36,7 @@ void DebugLeds::Init(){
 
     Garbox::LockGuard lock(sMutex);
 
-    AssertExit(!sInitialized, "DebugLeds", "already initialized");
+    AssertExit(!gInitialized, "DebugLeds", "already initialized");
 
     // initialize leds
     for(AnimatedLed& led : sLeds){
@@ -54,12 +54,12 @@ void DebugLeds::Init(){
     sAnimationTask.start();
 
     // init complete
-    sInitialized = true;
+    gInitialized = true;
 }
 
 AnimatedLed& DebugLeds::GetLed(Id id){
     // check if initialized
-    if(!sInitialized){
+    if(!gInitialized){
         TriggerDebug("DebugLeds", "not initialized");
         return sLeds[0];
     }
@@ -78,7 +78,7 @@ Garbox::Span<AnimatedLed*> DebugLeds::GetAllLeds(){
 
     Garbox::LockGuard lock(sMutex);
 
-    if(!sInitialized){
+    if(!gInitialized){
         TriggerDebug("DebugLeds", "not initialized");
         return Garbox::Span<AnimatedLed*>(nullptr, 0);
     }
@@ -99,7 +99,7 @@ void DebugLeds::SetLed(Id id, bool enable, float brightness){
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
-    if(!sInitialized){
+    if(!gInitialized){
         TriggerDebug("DeubgLeds", "not initialized");
         return;
     }
@@ -125,7 +125,7 @@ void DebugLeds::ToggleLed(Id id, float brightness){
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
-    if(!sInitialized){
+    if(!gInitialized){
         TriggerDebug("DebugLeds", "not initialized");
         return;
     }
@@ -152,7 +152,7 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
-    if(!sInitialized){
+    if(!gInitialized){
         TriggerDebug("DebugLeds", "not initialized");
         return;
     }
@@ -177,7 +177,7 @@ void DebugLeds::ToggleAllLeds(float brightness){
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
-    if(!sInitialized){
+    if(!gInitialized){
         TriggerDebug("DebugLeds", "not initialized");
         return;
     }
@@ -200,7 +200,7 @@ void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b) {
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
-    if (!sInitialized) {
+    if (!gInitialized) {
         return;
     }
 
@@ -210,7 +210,7 @@ void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 bool DebugLeds::IsInitialized() {
-    return sInitialized;
+    return gInitialized;
 }
 
 }

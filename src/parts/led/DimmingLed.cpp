@@ -2,7 +2,7 @@
 
 #include "assert/Assert.h"
 #include "core/hardware/ledc/LedcChannel.h"
-#include "global/function/FunctionInstances.h"
+#include "global/util/FunctionInstances.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {

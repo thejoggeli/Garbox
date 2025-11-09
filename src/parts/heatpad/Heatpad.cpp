@@ -3,7 +3,7 @@
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/PinConfig.h"
-#include "global/gpio/GpioInstances.h"
+#include "global/hardware/gpio/GpioInstances.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {

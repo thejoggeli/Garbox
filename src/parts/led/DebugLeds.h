@@ -5,7 +5,7 @@
 #include "AnimatedLedAsync.h"
 #include "assert/Assert.h"
 #include "global/PinConfig.h"
-#include "global/ledc/LedcInstances.h"
+#include "global/hardware/ledc/LedcInstances.h"
 #include "util/container/Span.h"
 
 namespace Garbox {

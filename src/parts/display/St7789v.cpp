@@ -4,7 +4,7 @@
 #include "core/hardware/gpio/Gpio.h"
 #include "core/hardware/ledc/LedcChannel.h"
 #include "core/time/Time.h"
-#include "global/function/FunctionInstances.h"
+#include "global/util/FunctionInstances.h"
 #include "util/ByteUtils.h"
 
 namespace Garbox {

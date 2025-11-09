@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-static bool sInitialized = false;
+static bool gInitialized = false;
 
 static LedcTimer* resolveTimer(LedcTimer::Id id) {
     switch (id) {
@@ -28,7 +28,7 @@ static void setupChannel(LedcChannel& channel, LedcConfig::ChannelConfig const& 
 
 void LedcInstances::Init() {
 
-    AssertExit(!sInitialized, "LedInstances", "already initialized");
+    AssertExit(!gInitialized, "LedInstances", "already initialized");
 
     // setup timers
     setupTimer(GetDimmingTimer(), LedcConfig::DimmingTimer);
@@ -44,7 +44,7 @@ void LedcInstances::Init() {
     setupChannel(GetFanControlChannel(), LedcConfig::FanControlChannel);
     setupChannel(GetPiezoChannel(),      LedcConfig::PiezoChannel);
 
-    sInitialized = true;
+    gInitialized = true;
 }
 
 LedcTimer& LedcInstances::GetDimmingTimer() { static LedcTimer instance; return instance; }

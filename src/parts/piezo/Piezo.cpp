@@ -1,6 +1,6 @@
 #include "Piezo.h"
 
-#include "global/ledc/LedcInstances.h"
+#include "global/hardware/ledc/LedcInstances.h"
 
 namespace Garbox {
 

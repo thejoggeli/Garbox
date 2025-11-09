@@ -4,14 +4,16 @@
 #include "assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/bus/SpiInstances.h"
-#include "global/color/ColorMaps.h"
-#include "global/gpio/GpioInstances.h"
-#include "global/ledc/LedcInstances.h"
+#include "global/hardware/bus/SpiInstances.h"
+#include "global/util/ColorMaps.h"
+#include "global/hardware/gpio/GpioInstances.h"
+#include "global/hardware/ledc/LedcInstances.h"
 #include "util/ByteUtils.h"
 #include "util/color/Rgb565.h"
 
 namespace Garbox {
+
+static uint32_t gCbCount = 0;
 
 Display::Display(): 
     // init members 
@@ -80,7 +82,9 @@ void Display::init() {
 
 void Display::tick() {
 
-    // lv_timer_handler(); 
+    lv_timer_handler(); 
+
+    LogDebug("Display", "handleFlush %u", gCbCount);
 
     // advance x
     static int x = 0;
@@ -110,6 +114,7 @@ void Display::tick() {
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 
+    gCbCount++;
     LogDebug("Display", "handleFlush");
 
     // send buffer to st7789v

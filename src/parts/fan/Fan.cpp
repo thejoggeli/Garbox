@@ -3,11 +3,11 @@
 #include "assert/Assert.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
-#include "global/pcnt/PcntConfig.h"
+#include "global/hardware/pcnt/PcntConfig.h"
 #include "global/PinConfig.h"
-#include "global/gpio/GpioInstances.h"
-#include "global/ledc/LedcInstances.h"
-#include "global/timer/TimerInstances.h"
+#include "global/hardware/gpio/GpioInstances.h"
+#include "global/hardware/ledc/LedcInstances.h"
+#include "global/hardware/timer/TimerInstances.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {

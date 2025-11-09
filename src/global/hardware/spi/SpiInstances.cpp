@@ -6,11 +6,11 @@
 
 namespace Garbox {
 
-static bool sInitialized = false;
+static bool gInitialized = false;
 
 void SpiInstances::Init(){
     
-    AssertExit(!sInitialized, "SpiInstances", "already initialized");
+    AssertExit(!gInitialized, "SpiInstances", "already initialized");
 
     GetSpiDma().setup({
         .hostDevice = SPI2_HOST,
@@ -27,7 +27,7 @@ void SpiInstances::Init(){
         .txCompleteTaskStackSize = AppConfig::SpiDmaTaskStackSize,
     });
 
-    sInitialized = true;
+    gInitialized = true;
 }
 
 SpiDma& SpiInstances::GetSpiDma(){
