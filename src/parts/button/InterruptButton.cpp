@@ -90,10 +90,10 @@ void InterruptButton::tick(){
     if(vIsrPulseStartDetected){
 
         // copy ISR variables
-        bool edgeAwayDetected = vIsrPulseStartDetected;
-        bool edgeReturnDetected = vIsrPulseEndDetected;
-        uint32_t edgeAwayCpuCycles = vIsrPulseStartCpuCycles;
-        uint32_t edgeReturnCpuCycles = vIsrPulseEndCpuCycles;
+        bool     pulseStartDetected  = vIsrPulseStartDetected;
+        bool     pulseEndDetected    = vIsrPulseEndDetected;
+        uint32_t pulseStartCpuCycles = vIsrPulseStartCpuCycles;
+        uint32_t pulseEndCpuCycles   = vIsrPulseEndCpuCycles;
 
         // reset ISR pulse state
         vIsrPulseStartDetected = false;
@@ -107,10 +107,10 @@ void InterruptButton::tick(){
         portEXIT_CRITICAL(&mMux);
 
         // detect missed pulse
-        const bool missedPulse = edgeAwayDetected && edgeReturnDetected && (mCurrentLevelRaw == newLevelRaw);
+        const bool missedPulse = pulseStartDetected && pulseEndDetected && (mCurrentLevelRaw == newLevelRaw);
         if(missedPulse){
             // handle missed pulse
-            const uint32_t missedPulseDuration = Time::CpuCyclesToMicros(edgeReturnCpuCycles - edgeAwayCpuCycles);
+            const uint32_t missedPulseDuration = Time::CpuCyclesToMicros(pulseEndCpuCycles - pulseStartCpuCycles);
             const bool missedPulseState = mInvert ? mCurrentLevelRaw : !mCurrentLevelRaw;
             mButton.handleMissedPulse(missedPulseState, missedPulseDuration);
             #if GarboxDebugInterruptButton
@@ -131,7 +131,7 @@ void InterruptButton::tick(){
     #if GarboxDebugInterruptButton
         LogDebug("InterruptButton", "state=%" PRIu32, mCurrentRawState);
     #endif
-
+    
     mButton.tick(mInvert ? !mCurrentLevelRaw : mCurrentLevelRaw);
 }
 
