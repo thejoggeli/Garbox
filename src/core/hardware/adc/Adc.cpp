@@ -1,0 +1,116 @@
+#include "Adc.h"
+
+#include "assert/Assert.h"
+#include "core/time/Time.h"
+#include "esp_err.h"
+
+namespace Garbox {
+
+Adc::Adc(){
+    // nothing to do
+}
+
+void Adc::init(const Config& config){
+    AssertExit(!mInitialized, "Adc", "already initialized");
+    AssertExit((config.pin >= 0), "Adc", "invalid pin number");
+
+    mPin = config.pin;
+    mChannel = config.channel;
+    mAttenuation = config.attenuation;
+    mBitWidth = config.bitWidth;
+    mVrefMillivolts = config.vrefMillivolts;
+
+    if(adc1_config_width(mBitWidth) != ESP_OK){
+        TriggerExit("Adc", "adc1_config_width failed");
+    }
+
+    if(adc1_config_channel_atten(mChannel, mAttenuation) != ESP_OK){
+        TriggerExit("Adc", "adc1_config_channel_atten failed");
+    }
+
+    if(config.enableCalibration){
+        esp_adc_cal_value_t calType = esp_adc_cal_characterize(
+            ADC_UNIT_1,
+            mAttenuation,
+            mBitWidth,
+            mVrefMillivolts,
+            &mAdcChars
+        );
+
+        if((calType == ESP_ADC_CAL_VAL_EFUSE_TP) || (calType == ESP_ADC_CAL_VAL_EFUSE_VREF)){
+            mCalibrated = true;
+        }
+        else {
+            mCalibrated = false;
+            TriggerDebug("Adc", "no eFuse calibration data, using default Vref");
+        }
+    }
+
+    mInitialized = true;
+}
+
+void Adc::tick(){
+    if(!mInitialized){
+        TriggerDebug("Adc", "not initialized");
+        return;
+    }
+
+    int rawValue = adc1_get_raw(mChannel);
+    if(rawValue < 0){
+        TriggerDebug("Adc", "adc1_get_raw failed");
+        return;
+    }
+
+    mLastRaw = static_cast<uint16_t>(rawValue);
+    mLastVolts = convertRawToVoltage(mLastRaw);
+}
+
+uint16_t Adc::getRaw() const{
+    if(!mInitialized){
+        TriggerDebug("Adc", "not initialized");
+        return 0;
+    }
+    return mLastRaw;
+}
+
+float Adc::getVolts() const{
+    if(!mInitialized){
+        TriggerDebug("Adc", "not initialized");
+        return 0.0f;
+    }
+    return mLastVolts;
+}
+
+float Adc::convertRawToVoltage(uint16_t raw) const{
+    if(mCalibrated){
+        // use Espressif calibration for precise conversion
+        uint32_t millivolts = esp_adc_cal_raw_to_voltage(raw, &mAdcChars);
+        return static_cast<float>(millivolts) / 1000.0f;
+    }
+
+    // fallback approximate conversion
+    const uint16_t maxValue = (1U << mBitWidth) - 1U;
+    float vrefVolts = 3.3f;
+
+    switch(mAttenuation){
+    case ADC_ATTEN_DB_0:
+        vrefVolts = 0.75f;
+        break;
+    case ADC_ATTEN_DB_2_5:
+        vrefVolts = 1.05f;
+        break;
+    case ADC_ATTEN_DB_6:
+        vrefVolts = 1.30f;
+        break;
+    case ADC_ATTEN_DB_11:
+        vrefVolts = 2.50f;
+        break;
+    default:
+        vrefVolts = 3.3f;
+        break;
+    }
+
+    return (static_cast<float>(raw) / static_cast<float>(maxValue)) * vrefVolts;
+}
+
+} // namespace Garbox
