@@ -30,23 +30,28 @@ Heatpad::Heatpad() :
 void Heatpad::init(){
 
     // init voltage sense filter
+    mVoltageSenseConditioner.setInputThreshold(0.005f); // ignore 5mV changes
+    mVoltageSenseConditioner.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
+    mVoltageSenseConditioner.setSnapping(0.1f, 0.5f); // 0.1V snapping
+
     // U_Adc = U_In / AttenuationFactor
     // U_In = U_Adc * AttenuationFactor 
     const float AttenuationFactor = 11.0f;
-    mVoltageSenseFilter.setCalibrationPoints({0.0f, 0.0f}, {1.0f, 1.0f * AttenuationFactor});
-    mVoltageSenseFilter.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
-    mVoltageSenseFilter.setSnapResolution(0.1f); // 0.1V precision
+    const float VoltageAtOneAdcVolt = AttenuationFactor;
+    mVoltageSenseConditioner.setCalibrationPoints({0.0f, 0.0f}, {1.0f, VoltageAtOneAdcVolt});
 
     // init current sense filter
-    // U_Adc = U_Shunt * AmpFactor
-    // U_Shunt = U_Adc / AmpFactor
-    // I_Shunt = U_Shunt * R_Shunt
+    mCurrentSenseConditioner.setInputThreshold(0.005f); // ignore 5mV changes
+    mCurrentSenseConditioner.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
+    mCurrentSenseConditioner.setSnapping(0.05f, 0.5f); // 50mA snapping
+
+    // U_Adc = U_Shunt * AmpFactor => U_Shunt = U_Adc / AmpFactor
+    // I_Shunt = U_Shunt / R_Shunt
     // I_Shunt = (U_Adc / AmpFactor) * R_Shunt
     const float R_Shunt = 0.002f;
     const float AmpFactor = 200.0f;
-    mCurrentSenseFilter.setCalibrationPoints({0.0f, 0.0f}, {1.0f, (1.0f / AmpFactor) * R_Shunt});
-    mCurrentSenseFilter.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
-    mCurrentSenseFilter.setSnapResolution(0.1f); // 100mA precision
+    const float CurrentAtOneAdcVolt = (1.0f / AmpFactor) / R_Shunt; 
+    mCurrentSenseConditioner.setCalibrationPoints({0.0f, 0.0f}, {1.0f, CurrentAtOneAdcVolt});
     
     // software pwm attach state changed handler
     mPwm.setStateChangedHandler([this](SoftwarePwm::State state) {
@@ -72,19 +77,19 @@ void Heatpad::tick(){
     mVoltageSenseAdc.sample();
     mCurrentSenseAdc.sample();
 
-    // update sensor filters
-    mVoltageSenseFilter.update(mVoltageSenseAdc.getVolts());
-    mCurrentSenseFilter.update(mVoltageSenseAdc.getVolts());
+    // condition adc voltages (filter + transform to actual units)
+    mVoltageSenseConditioner.process(mVoltageSenseAdc.getVolts());
+    mCurrentSenseConditioner.process(mCurrentSenseAdc.getVolts());
 
     // log adc voltages
     if(mLogTimer.isExpired()){
         
         // get most recent adc voltages
-        const float measuredVoltage = mVoltageSenseFilter.getValue();
-        const float measuredCurrent = mCurrentSenseFilter.getValue();
+        const float voltage = mVoltageSenseConditioner.getFilteredValue();
+        const float current = mCurrentSenseConditioner.getFilteredValue();
 
         // print voltages if changed
-        LogDebug("Heatpad", "usense=%6.3f V, isense=%5.3f A", measuredVoltage, measuredCurrent);
+        LogDebug("Heatpad", "usense=%6.3f V, isense=%5.3f A", voltage, current);
 
         // restart timer
         mLogTimer.restart();

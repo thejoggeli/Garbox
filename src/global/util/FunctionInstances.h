@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/function/FunctionIfc.h"
+#include "util/transform/function/FunctionIfc.h"
 
 namespace Garbox {
 
@@ -26,10 +26,10 @@ public:
     static const FunctionIfc& GetCosSampledNorm();
     static const FunctionIfc& GetCosSampledNormNeg();
 
-    static const FunctionIfc& GetEaseLinearDirect();
-    static const FunctionIfc& GetEaseInQuadDirect();
-    static const FunctionIfc& GetEaseOutQuadDirect();
-    static const FunctionIfc& GetEaseInOutQuadDirect();
+    static const FunctionIfc& GetEaseLinearAnalytic();
+    static const FunctionIfc& GetEaseInQuadAnalytic();
+    static const FunctionIfc& GetEaseOutQuadAnalytic();
+    static const FunctionIfc& GetEaseInOutQuadAnalytic();
 
     static const FunctionIfc& GetEaseInSineSampled();
     static const FunctionIfc& GetEaseOutSineSampled();

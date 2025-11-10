@@ -3,8 +3,7 @@
 #include <cstdint>
 #include "FanMonitor.h"
 #include "core/sensor/FrequencySensor.h"
-#include "global/AppConfig.h"
-#include "util/filter/MovingAverageFilter.h"
+#include "util/conditioner/TachoConditioner.h"
 
 namespace Garbox {
 
@@ -42,7 +41,7 @@ public:
     bool isStalled() const;
     State getState() const;
     float getSpeed() const;
-    uint32_t getMeasuredRpm(bool filtered = true) const;
+    float getMeasuredRpm() const;
 
 private:
 
@@ -60,8 +59,6 @@ private:
     StalledAlertCallback mStalledAlertCallback = nullptr;
     float mSpeed = 0.0f;
     float mMeasuredFrequency = 0.0f;
-    uint32_t mMeasuredRpm = 0;
-    uint32_t mMeasuredRpmFiltered = 0;
 
     // sets voltage on FanEnable pin
     Gpio& mGpioFanEnable;
@@ -73,8 +70,7 @@ private:
     FrequencySensor mFrequencySensor;
 
     // filter for measured RPM value
-    static constexpr size_t RpmFilterSize = std::max(1u, AppConfig::MainTaskFrequencyHz/3);
-    MovingAverageFilter<uint32_t, RpmFilterSize> mRpmFilter;
+    TachoConditioner mTachoConditioner;
 
     // fan state monitor
     FanMonitor mMonitor;

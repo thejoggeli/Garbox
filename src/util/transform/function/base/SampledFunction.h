@@ -2,13 +2,25 @@
 
 #include <cstdint>
 #include <initializer_list>
-#include "FunctionIfc.h"
+#include "util/transform/function/FunctionIfc.h"
 
 namespace Garbox {
 
 /**
- * Assumes even sampling of x  
+ * @brief Discrete sampled function with uniform x-spacing.
+ *
+ * Represents a continuous function by a fixed number of evenly spaced samples.
+ * Evaluates using linear interpolation between stored samples.
+ *
+ * Supports three initialization modes:
+ *  - From an analytic function (auto-generated samples)
+ *  - From an external buffer (copied or referenced)
+ *  - From an initializer list
+ *
+ * Suitable for approximating slow-changing or nonlinear analytic functions 
+ * without runtime computation cost.
  */
+
 class SampledFunction : public FunctionIfc {
 public:
     using FuncPtr = float (*)(float x);

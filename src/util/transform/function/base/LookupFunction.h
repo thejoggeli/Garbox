@@ -2,11 +2,20 @@
 
 #include <cstdint>
 #include <initializer_list>
-#include "FunctionIfc.h"
+#include "util/transform/function/FunctionIfc.h"
 
 namespace Garbox {
 
-class LookupTableFunction : public FunctionIfc {
+/**
+ * @brief Sparse lookup table for arbitrary (x, y) mappings.
+ *
+ * Evaluates using either linear interpolation or zero-order hold between stored points.
+ * 
+ * X-values must be strictly increasing.
+ *
+ * Typical use cases include calibration curves, sensor correction maps and piecewise-defined transfer characteristics.
+ */
+class LookupFunction : public FunctionIfc {
 public:
 
     struct Point {
@@ -19,8 +28,8 @@ public:
         Hold    // zero-order hold (step)
     };
 
-    LookupTableFunction();
-    ~LookupTableFunction();
+    LookupFunction();
+    ~LookupFunction();
 
     void init(Point* points, bool copy, uint32_t pointCount, Mode mode = Mode::Linear);
     void init(std::initializer_list<Point> points, Mode mode = Mode::Linear);

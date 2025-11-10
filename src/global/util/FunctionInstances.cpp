@@ -2,9 +2,10 @@
 
 #include <math.h>
 #include "assert/Assert.h"
-#include "util/function/DirectFunction.h"
-#include "util/function/LookupTableFunction.h"
-#include "util/function/SampledFunction.h"
+#include "util/transform/function/base/AnalyticFunction.h"
+#include "util/transform/function/base/ConstantFunction.h"
+#include "util/transform/function/base/LookupFunction.h"
+#include "util/transform/function/base/SampledFunction.h"
 #include "util/math/EasingFunctions.h"
 #include "util/math/MathConstants.h"
 
@@ -21,8 +22,8 @@ static constexpr ElasticParams ElasticMedium = {1.0f, 0.4f};
 static constexpr ElasticParams ElasticStrong = {1.2f, 0.3f};
 
 template<typename Func>
-static const FunctionIfc& GetDirect(Func func){
-    static DirectFunction instance;
+static const FunctionIfc& GetAnalytic(Func func){
+    static AnalyticFunction instance;
     static bool initialized = false;
     if(!initialized){
         instance.init(func);
@@ -42,8 +43,8 @@ static const FunctionIfc& GetSampled(Func func, uint32_t sampleCount){
     return instance;
 }
 
-static const FunctionIfc& GetLookup(LookupTableFunction::Point* points, size_t numPoints, LookupTableFunction::Mode mode){
-    static LookupTableFunction instance;
+static const FunctionIfc& GetLookup(LookupFunction::Point* points, size_t numPoints, LookupFunction::Mode mode){
+    static LookupFunction instance;
     static bool initialized = false;
     if(!initialized){
         instance.init(points, false, numPoints, mode);
@@ -53,45 +54,47 @@ static const FunctionIfc& GetLookup(LookupTableFunction::Point* points, size_t n
 }
 
 const FunctionIfc& FunctionInstances::GetConstantZero(){
-    return GetDirect([](float x){ return 0.0f; });
+    static ConstantFunction instance(0.0f);
+    return instance;
 }
 
 const FunctionIfc& FunctionInstances::GetConstantOne(){
-    return GetDirect([](float x){ return 1.0f; });
+    static ConstantFunction instance(1.0f);
+    return instance;
 }
 
 const FunctionIfc& FunctionInstances::GetLinear(){
-    return GetDirect([](float x){ return x; });
+    return GetAnalytic([](float x){ return x; });
 }
 
 const FunctionIfc& FunctionInstances::GetQuadratic(){
-    return GetDirect([](float x){ return x*x; });
+    return GetAnalytic([](float x){ return x*x; });
 }
 
 const FunctionIfc& FunctionInstances::GetRectangleStep(){
-    static LookupTableFunction::Point points[] = {
+    static LookupFunction::Point points[] = {
         {0.0f, 0.0f},
         {0.5f, 1.0f},
     };
-    return GetLookup(points, sizeof(points)/sizeof(LookupTableFunction::Point), LookupTableFunction::Mode::Hold);
+    return GetLookup(points, sizeof(points)/sizeof(LookupFunction::Point), LookupFunction::Mode::Hold);
 }
 
 const FunctionIfc& FunctionInstances::GetRectanglePulse(){
-    static LookupTableFunction::Point points[] = {
+    static LookupFunction::Point points[] = {
         {0.0f, 0.0f},
         {0.25f, 1.0f},
         {0.75f, 0.0f},
     };
-    return GetLookup(points, sizeof(points)/sizeof(LookupTableFunction::Point), LookupTableFunction::Mode::Hold);
+    return GetLookup(points, sizeof(points)/sizeof(LookupFunction::Point), LookupFunction::Mode::Hold);
 }
 
 const FunctionIfc& FunctionInstances::GetTrianglePulse(){
-    static LookupTableFunction::Point points[] = {
+    static LookupFunction::Point points[] = {
         {0.0f, 0.0f},
         {0.5f, 1.0f},
         {1.0f, 0.0f},
     };
-    return GetLookup(points, sizeof(points)/sizeof(LookupTableFunction::Point), LookupTableFunction::Mode::Linear);
+    return GetLookup(points, sizeof(points)/sizeof(LookupFunction::Point), LookupFunction::Mode::Linear);
 }
 
 const FunctionIfc& FunctionInstances::GetGamma22Sampled(){
@@ -118,20 +121,20 @@ const FunctionIfc& FunctionInstances::GetCosSampledNormNeg(){
     return GetSampled([](float x){ return -0.5f * cosf(x * MathConstants::TwoPi) + 0.5f; }, SineSamples);
 }
 
-const FunctionIfc& FunctionInstances::GetEaseLinearDirect(){
-    return GetDirect(EasingFunctions::EaseLinear);
+const FunctionIfc& FunctionInstances::GetEaseLinearAnalytic(){
+    return GetAnalytic(EasingFunctions::EaseLinear);
 }
 
-const FunctionIfc& FunctionInstances::GetEaseInQuadDirect(){
-    return GetDirect(EasingFunctions::EaseInQuad);
+const FunctionIfc& FunctionInstances::GetEaseInQuadAnalytic(){
+    return GetAnalytic(EasingFunctions::EaseInQuad);
 }
 
-const FunctionIfc& FunctionInstances::GetEaseOutQuadDirect(){
-    return GetDirect(EasingFunctions::EaseOutQuad);
+const FunctionIfc& FunctionInstances::GetEaseOutQuadAnalytic(){
+    return GetAnalytic(EasingFunctions::EaseOutQuad);
 }
 
-const FunctionIfc& FunctionInstances::GetEaseInOutQuadDirect(){
-    return GetDirect(EasingFunctions::EaseInOutQuad);
+const FunctionIfc& FunctionInstances::GetEaseInOutQuadAnalytic(){
+    return GetAnalytic(EasingFunctions::EaseInOutQuad);
 }
 
 const FunctionIfc& FunctionInstances::GetEaseInSineSampled(){

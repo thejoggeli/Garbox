@@ -62,10 +62,6 @@ void setup() {
     SpiInstances::Init();
     AdcInstances::Init();
 
-    // init function instances
-    FunctionInstances::GetGamma22Sampled();
-    FunctionInstances::GetEaseInOutSineSampled();
-
     // init profiler
     Profiler::Setup(ProfilerConfig::Count);
     Profiler::SetEnabled(ProfilerConfig::EnableProfiler);

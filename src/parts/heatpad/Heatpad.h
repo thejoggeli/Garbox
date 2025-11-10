@@ -4,7 +4,7 @@
 
 #include "core/time/SoftwarePwm.h"
 #include "core/time/SoftwareTimer.h"
-#include "util/filter/SensorFilter.h"
+#include "util/conditioner/AdcConditioner.h"
 
 namespace Garbox {
 
@@ -44,8 +44,8 @@ private:
     SoftwareTimer mLogTimer;
 
     // adc filters
-    SensorFilter mVoltageSenseFilter;
-    SensorFilter mCurrentSenseFilter;
+    AdcConditioner mVoltageSenseConditioner;
+    AdcConditioner mCurrentSenseConditioner;
 
     bool mHeatEnabled = false;
 

@@ -1,4 +1,4 @@
-#include "LookupTableFunction.h"
+#include "LookupFunction.h"
 
 #include <cstring>
 #include "assert/Assert.h"
@@ -6,7 +6,7 @@
 namespace {
 
 // checks if x-values are strictly increasing
-bool isMonotonicIncreasing(const Garbox::LookupTableFunction::Point* points, uint32_t count){
+bool isMonotonicIncreasing(const Garbox::LookupFunction::Point* points, uint32_t count){
     for(uint32_t i = 1; i < count; ++i){
         if(points[i].x <= points[i - 1].x){
             return false;
@@ -19,22 +19,22 @@ bool isMonotonicIncreasing(const Garbox::LookupTableFunction::Point* points, uin
 
 namespace Garbox {
 
-LookupTableFunction::LookupTableFunction(){
+LookupFunction::LookupFunction(){
     // nothing to do
 }
 
-LookupTableFunction::~LookupTableFunction(){
+LookupFunction::~LookupFunction(){
     if(mHeapAllocated){
         // runtime destruction of heap-based lookup tables is not allowed
-        TriggerExit("LookupTableFunction", "heap using classes must not be deconstructed");
+        TriggerExit("LookupFunction", "heap using classes must not be deconstructed");
     }
 }
 
-void LookupTableFunction::init(Point* points, bool copy, uint32_t pointCount, Mode mode){
-    AssertExit(!mInitialized, "LookupTableFunction", "already initialized");
-    AssertExit(points != nullptr, "LookupTableFunction", "null point buffer");
-    AssertExit(pointCount >= 2, "LookupTableFunction", "at least two points required");
-    AssertExit(isMonotonicIncreasing(points, pointCount), "LookupTableFunction", "x-values must be strictly increasing");
+void LookupFunction::init(Point* points, bool copy, uint32_t pointCount, Mode mode){
+    AssertExit(!mInitialized, "LookupFunction", "already initialized");
+    AssertExit(points != nullptr, "LookupFunction", "null point buffer");
+    AssertExit(pointCount >= 2, "LookupFunction", "at least two points required");
+    AssertExit(isMonotonicIncreasing(points, pointCount), "LookupFunction", "x-values must be strictly increasing");
 
     mPointCount = pointCount;
     mLastIndex = mPointCount - 1;
@@ -52,10 +52,10 @@ void LookupTableFunction::init(Point* points, bool copy, uint32_t pointCount, Mo
     mInitialized = true;
 }
 
-void LookupTableFunction::init(std::initializer_list<Point> points, Mode mode){
-    AssertExit(!mInitialized, "LookupTableFunction", "already initialized");
-    AssertExit(points.size() >= 2, "LookupTableFunction", "at least two points required");
-    AssertExit(isMonotonicIncreasing(points.begin(), points.size()), "LookupTableFunction", "x-values must be strictly increasing");
+void LookupFunction::init(std::initializer_list<Point> points, Mode mode){
+    AssertExit(!mInitialized, "LookupFunction", "already initialized");
+    AssertExit(points.size() >= 2, "LookupFunction", "at least two points required");
+    AssertExit(isMonotonicIncreasing(points.begin(), points.size()), "LookupFunction", "x-values must be strictly increasing");
 
     mPointCount = static_cast<uint32_t>(points.size());
     mLastIndex = mPointCount - 1;
@@ -71,9 +71,9 @@ void LookupTableFunction::init(std::initializer_list<Point> points, Mode mode){
     mInitialized = true;
 }
 
-float LookupTableFunction::evaluate(float x) const {
+float LookupFunction::evaluate(float x) const {
     if(!mInitialized){
-        TriggerDebug("LookupTableFunction", "evaluate() called before init()");
+        TriggerDebug("LookupFunction", "evaluate() called before init()");
         return 0.0f;
     }
 

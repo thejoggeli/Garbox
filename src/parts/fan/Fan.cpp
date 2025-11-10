@@ -15,12 +15,15 @@ namespace Garbox {
 // RPM measure config 
 static constexpr uint32_t PulsesPerRevolution = 2;
 
+// RPM filter config
+static constexpr size_t RpmConditionerSize = std::max(1u, AppConfig::MainTaskFrequencyHz/3);
+
 Fan::Fan() : 
     // init members
     mGpioFanEnable(GpioInstances::GetFanEnable()),
     mSpeedPwm(LedcInstances::GetFanControlChannel()),
     mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
-    mRpmFilter(),
+    mTachoConditioner(RpmConditionerSize),
     mMonitor(){
     // nothing to do
 }
@@ -30,6 +33,12 @@ void Fan::init(){
     FrequencySensor::Config config;
     config.pinMode = FrequencySensor::PinMode::Floating;
     config.stopTimeoutMicros = 1000_ms;
+
+    // init rpm conditioner
+    mTachoConditioner.setFixedPointScaling(1000.0f); // gives theoretical 0.001 RPM resolution
+    mTachoConditioner.setInputThreshold(0.1f); // ignore 0.1 RPM input changes
+    mTachoConditioner.setInputScaling(60.0f / static_cast<float>(PulsesPerRevolution));
+    mTachoConditioner.setOutputSnapping(5.0f, 0.5);  // snap to 5 RPM
 
     // init frequency sensor
     mFrequencySensor.init(config);
@@ -71,18 +80,15 @@ void Fan::tick(){
         float newFrequency = mFrequencySensor.getFrequencyHz();
         if(newFrequency != mMeasuredFrequency){
             mMeasuredFrequency = newFrequency;
-            mMeasuredRpm = static_cast<uint32_t>(newFrequency * 60.0f / static_cast<float>(PulsesPerRevolution));
         }
     }
 
-    // filter rpm
-    mRpmFilter.add(mMeasuredRpm);   
-    mMeasuredRpmFiltered = static_cast<uint32_t>(mRpmFilter.getAverage() + 0.5f);
+    // filter rpm even if fan is not enabled for smooth transition to 0 RPM
+    mTachoConditioner.process(mMeasuredFrequency);   
 
     // fan monitor tick
     const bool shouldSpin = isEnabled();
-    const uint32_t unfilteredRpm = mMeasuredRpm;
-    mMonitor.tick(unfilteredRpm, shouldSpin);
+    mMonitor.tick(getMeasuredRpm(), shouldSpin);
 }
 
 void Fan::setStateChangedCallback(StateChangedCallback callback){
@@ -109,7 +115,7 @@ void Fan::setEnabled(bool enabled){
     }
     else {
         mMeasuredFrequency = 0;
-        mMeasuredRpm = 0;
+        mTachoConditioner.reset();
         mGpioFanEnable.writeLevel(false);
         mFrequencySensor.setEnabled(false);
     }
@@ -160,11 +166,8 @@ float Fan::getSpeed() const {
     return mSpeed;
 }
 
-uint32_t Fan::getMeasuredRpm(bool filtered) const {
-    if(filtered){
-        return mMeasuredRpmFiltered;
-    } 
-    return mMeasuredRpm;
+float Fan::getMeasuredRpm() const {
+    return mTachoConditioner.getFilteredValue();
 }
 
 const char* Fan::StateToString(State state){

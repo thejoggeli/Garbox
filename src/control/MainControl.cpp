@@ -194,10 +194,10 @@ void MainControl::tick(){
     if(mRpmTimer.isExpired() || mRpmTimer.isReset()){
         // print fan rpm
         static float lastRpmValue = 0;
-        uint32_t const rpmValue = mFan.getMeasuredRpm();
-        uint32_t const rpmDiff = MathUtils::AbsDiff<uint32_t>(rpmValue, lastRpmValue);
-        if(rpmDiff > 3){ 
-            LogDebug("MainControl", "Measured RPM: %" PRIu32, rpmValue);
+        float const rpmValue = mFan.getMeasuredRpm();
+        float const rpmDiff = std::fabs(rpmValue - lastRpmValue);
+        if(rpmDiff > 0.0f){ 
+            LogDebug("MainControl", "Measured RPM: %.0f", rpmValue);
             lastRpmValue = rpmValue;
         }
         mRpmTimer.start(200_ms);
