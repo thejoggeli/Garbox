@@ -77,7 +77,7 @@ void Fan::tick(){
 
     // filter rpm
     mRpmFilter.add(mMeasuredRpm);   
-    mMeasuredRpmFiltered = mRpmFilter.getAverage();
+    mMeasuredRpmFiltered = static_cast<uint32_t>(mRpmFilter.getAverage() + 0.5f);
 
     // fan monitor tick
     const bool shouldSpin = isEnabled();

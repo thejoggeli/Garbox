@@ -4,11 +4,12 @@
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "global/AppConfig.h"
-#include "global/hardware/bus/SpiInstances.h"
-#include "global/util/FunctionInstances.h"
+#include "global/hardware/adc/AdcInstances.h"
 #include "global/hardware/ledc/LedcInstances.h"
 #include "global/hardware/gpio/GpioInstances.h"
+#include "global/hardware/spi/SpiInstances.h"
 #include "global/hardware/timer/TimerInstances.h"
+#include "global/util/FunctionInstances.h"
 #include "parts/led/DebugLeds.h"
 #include "util/StringUtils.h"
 
@@ -59,6 +60,7 @@ void setup() {
     LedcInstances::Init();
     TimerInstances::Init();
     SpiInstances::Init();
+    AdcInstances::Init();
 
     // init function instances
     FunctionInstances::GetGamma22Sampled();

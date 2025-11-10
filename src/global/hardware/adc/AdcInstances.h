@@ -9,8 +9,8 @@ public:
 
     static void Init();
 
-    static Adc& GetVoltageSense();
-    static Adc& GetCurrentSense();
+    static Adc& GetHeatpadVoltage();
+    static Adc& GetHeatpadCurrent();
 
 private:
 

@@ -5,6 +5,8 @@
 
 namespace Garbox {
 
+static constexpr bool DebugTriggersExit = true;
+
 static bool sExitTriggered = false;
 
 static AssertHandler::Handler sDebugHandler = nullptr;
@@ -19,6 +21,10 @@ void AssertHandler::SetExitHandler(Handler handler){
 }
 
 void AssertHandler::InvokeDebug(const char* context, const char* message) {
+    // if(DebugTriggersExit){
+    //     InvokeExit(context, message);
+    //     return;
+    // }
     if(sExitTriggered){
         return;
     }

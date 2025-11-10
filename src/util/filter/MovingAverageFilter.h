@@ -23,6 +23,7 @@ public:
     MovingAverageFilter() : 
         // init members
         mCount(0), 
+        mCountFloat(0.0f), 
         mIndex(0), 
         mSum(0){
         // nothing to do
@@ -30,13 +31,16 @@ public:
 
     void reset(){
         mCount = 0;
+        mCountFloat = 0.0f;
         mIndex = 0;
         mSum = 0;
     }
 
     void add(T value) {
         if (mCount < N) {
-            mValues[mCount++] = value;
+            mValues[mCount] = value;
+            mCount++;
+            mCountFloat = static_cast<float>(mCount);
             mSum += value;
         } 
         else {
@@ -47,10 +51,11 @@ public:
         }
     }
 
-    T getAverage() const {
-        if (mCount == 0)
-            return static_cast<T>(0);
-        return mSum / static_cast<T>(mCount);
+    float getAverage() const {
+        if (mCount == 0){
+            return 0.0f;
+        }
+        return static_cast<float>(mSum) / mCountFloat;
     }
 
     T getSum() const {
@@ -65,6 +70,7 @@ private:
 
     std::array<T, N> mValues;
     size_t mCount;
+    float mCountFloat;
     size_t mIndex;
     T mSum;
 

@@ -4,7 +4,7 @@
 #include "assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/hardware/bus/SpiInstances.h"
+#include "global/hardware/spi/SpiInstances.h"
 #include "global/util/ColorMaps.h"
 #include "global/hardware/gpio/GpioInstances.h"
 #include "global/hardware/ledc/LedcInstances.h"
@@ -84,7 +84,11 @@ void Display::tick() {
 
     lv_timer_handler(); 
 
-    LogDebug("Display", "handleFlush %u", gCbCount);
+    static uint32_t gCbCountPrev = 0;
+    if(gCbCount != gCbCountPrev){
+        LogDebug("Display", "handleFlush %u", gCbCount);
+        gCbCountPrev = gCbCount;
+    }
 
     // advance x
     static int x = 0;
@@ -116,6 +120,8 @@ void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 
     gCbCount++;
     LogDebug("Display", "handleFlush");
+
+    return; // TODO
 
     // send buffer to st7789v
     const uint32_t width = area->x2 - area->x1 + 1;

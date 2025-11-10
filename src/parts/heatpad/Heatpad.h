@@ -3,9 +3,12 @@
 #include <cstdint>
 
 #include "core/time/SoftwarePwm.h"
+#include "core/time/SoftwareTimer.h"
+#include "util/filter/ExponentialFilter.h"
 
 namespace Garbox {
 
+class Adc;
 class Gpio;
 
 class Heatpad {
@@ -32,9 +35,22 @@ private:
 
     void setHeatEnabled(bool enabled);
     bool isHeatEnabled();
-
+    
     Gpio& mGpioHeatpadEnable;
+    Adc& mVoltageSenseAdc;
+    Adc& mCurrentSenseAdc;
+
     SoftwarePwm mPwm;
+    SoftwareTimer mLogTimer;
+
+    // adc filters
+    ExponentialFilter mVoltageSenseFilter;
+    ExponentialFilter mCurrentSenseFilter;
+
+    // sensor filters
+    // TODO
+    // SensorFilter mVoltageSenseFilter;
+    // SensorFilter mCurrentSenseFilter;
 
     bool mHeatEnabled = false;
 

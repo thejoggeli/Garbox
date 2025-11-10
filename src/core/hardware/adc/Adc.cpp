@@ -28,6 +28,7 @@ void Adc::init(const Config& config){
         TriggerExit("Adc", "adc1_config_channel_atten failed");
     }
 
+    // Always characterize calibration data, even if eFuse values are missing
     if(config.enableCalibration){
         esp_adc_cal_value_t calType = esp_adc_cal_characterize(
             ADC_UNIT_1,
@@ -37,19 +38,23 @@ void Adc::init(const Config& config){
             &mAdcChars
         );
 
-        if((calType == ESP_ADC_CAL_VAL_EFUSE_TP) || (calType == ESP_ADC_CAL_VAL_EFUSE_VREF)){
+        switch(calType){
+        case ESP_ADC_CAL_VAL_EFUSE_TP:
+        case ESP_ADC_CAL_VAL_EFUSE_VREF:
+        case ESP_ADC_CAL_VAL_EFUSE_TP_FIT:
+        case ESP_ADC_CAL_VAL_DEFAULT_VREF:
             mCalibrated = true;
-        }
-        else {
+            break;
+        default:
             mCalibrated = false;
-            TriggerDebug("Adc", "no eFuse calibration data, using default Vref");
+            break;
         }
     }
 
     mInitialized = true;
 }
 
-void Adc::tick(){
+void Adc::sample(){
     if(!mInitialized){
         TriggerDebug("Adc", "not initialized");
         return;
@@ -65,7 +70,7 @@ void Adc::tick(){
     mLastVolts = convertRawToVoltage(mLastRaw);
 }
 
-uint16_t Adc::getRaw() const{
+uint16_t Adc::getRaw() const {
     if(!mInitialized){
         TriggerDebug("Adc", "not initialized");
         return 0;
@@ -73,7 +78,7 @@ uint16_t Adc::getRaw() const{
     return mLastRaw;
 }
 
-float Adc::getVolts() const{
+float Adc::getVolts() const {
     if(!mInitialized){
         TriggerDebug("Adc", "not initialized");
         return 0.0f;
@@ -81,9 +86,12 @@ float Adc::getVolts() const{
     return mLastVolts;
 }
 
+bool Adc::isCalibrated() const {
+    return mCalibrated;
+}
+
 float Adc::convertRawToVoltage(uint16_t raw) const{
     if(mCalibrated){
-        // use Espressif calibration for precise conversion
         uint32_t millivolts = esp_adc_cal_raw_to_voltage(raw, &mAdcChars);
         return static_cast<float>(millivolts) / 1000.0f;
     }
@@ -94,16 +102,16 @@ float Adc::convertRawToVoltage(uint16_t raw) const{
 
     switch(mAttenuation){
     case ADC_ATTEN_DB_0:
-        vrefVolts = 0.75f;
+        vrefVolts = 0.95f;
         break;
     case ADC_ATTEN_DB_2_5:
-        vrefVolts = 1.05f;
+        vrefVolts = 1.25f;
         break;
     case ADC_ATTEN_DB_6:
-        vrefVolts = 1.30f;
+        vrefVolts = 1.75f;
         break;
-    case ADC_ATTEN_DB_11:
-        vrefVolts = 2.50f;
+    case ADC_ATTEN_DB_12:
+        vrefVolts = 3.10f;
         break;
     default:
         vrefVolts = 3.3f;

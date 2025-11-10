@@ -1,40 +1,39 @@
 #include "ExponentialFilter.h"
+
+#include <algorithm>
 #include <cmath>
 
 namespace Garbox {
 
-ExponentialFilter::ExponentialFilter(float alpha, float threshold)
-    : mAlpha(clampAlpha(alpha)),
-      mThreshold(threshold),
-      mCurrentValue(0.0f)
-{
+ExponentialFilter::ExponentialFilter(){
+    // constructor body
 }
 
-ExponentialFilter::ExponentialFilter(float fraction, uint32_t ticks, float threshold)
-    : mAlpha(computeAlpha(fraction, ticks)),
-      mThreshold(threshold),
-      mCurrentValue(0.0f)
-{
-}
-
-void ExponentialFilter::setCurrentValue(float value) {
-    mCurrentValue = value;
+ExponentialFilter::ExponentialFilter(float alpha, float threshold): 
+    // init members
+    mAlpha(alpha),
+    mThreshold(threshold){
+    // constructor body
 }
 
 void ExponentialFilter::update(float targetValue) {
-    if(mCurrentValue == targetValue){
-        // nothing to do
+    const float delta = targetValue - mFilteredValue;
+
+    if(std::fabs(delta) < mThreshold){
+        // change too small, ignore noise
+        return;
     }
-    else if (std::fabs(targetValue - mCurrentValue)){
-        mCurrentValue = targetValue;
-    }
-    else {
-        mCurrentValue = mAlpha * targetValue + (1.0f - mAlpha) * mCurrentValue;
-    }
+
+    // exponential smoothing
+    mFilteredValue += mAlpha * delta;
 }
 
-float ExponentialFilter::getCurrentValue() const {
-    return mCurrentValue;
+void ExponentialFilter::setFilteredValue(float value) {
+    mFilteredValue = value;
+}
+
+float ExponentialFilter::getFilteredValue() const {
+    return mFilteredValue;
 }
 
 float ExponentialFilter::getAlpha() const {
@@ -47,6 +46,10 @@ float ExponentialFilter::getThreshold() const {
 
 void ExponentialFilter::setAlpha(float alpha) {
     mAlpha = clampAlpha(alpha);
+}
+
+void ExponentialFilter::setAlphaComputed(float fraction, uint32_t ticks) {
+    mAlpha = computeAlpha(fraction, ticks);
 }
 
 void ExponentialFilter::setThreshold(float threshold) {
@@ -62,7 +65,8 @@ float ExponentialFilter::computeAlpha(float fraction, uint32_t ticks) {
         return 1.0f;
 
     float remaining = 1.0f - fraction;
-    return 1.0f - std::pow(remaining, 1.0f / static_cast<float>(ticks));
+    float alpha = 1.0f - std::pow(remaining, 1.0f / static_cast<float>(ticks));
+    return std::clamp(alpha, 0.0f, 1.0f);
 }
 
 float ExponentialFilter::clampAlpha(float alpha) {

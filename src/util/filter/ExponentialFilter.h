@@ -13,17 +13,18 @@ namespace Garbox {
  */
 class ExponentialFilter {
 public:
-    explicit ExponentialFilter(float alpha, float threshold = 0.1f);
-    ExponentialFilter(float fraction, uint32_t ticks, float threshold = 0.1f);
+    ExponentialFilter();
+    ExponentialFilter(float alpha, float threshold);
 
-    void setCurrentValue(float value);
     void update(float targetValue);
+    void setFilteredValue(float value);
 
-    float getCurrentValue() const;
+    float getFilteredValue() const;
     float getAlpha() const;
     float getThreshold() const;
 
     void setAlpha(float alpha);
+    void setAlphaComputed(float fraction, uint32_t ticks);
     void setThreshold(float threshold);
 
     static float computeAlpha(float fraction, uint32_t ticks);
@@ -31,9 +32,9 @@ public:
 private:
     static float clampAlpha(float alpha);
 
-    float mAlpha;
-    float mThreshold;
-    float mCurrentValue;
+    float mAlpha = 0.9f;
+    float mThreshold = 0.01f;
+    float mFilteredValue = 0.0f;
 };
 
 } // namespace Garbox

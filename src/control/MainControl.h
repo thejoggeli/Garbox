@@ -38,11 +38,10 @@ private:
     Display mDisplay;
     PiezoPlayer mPiezoPlayer;
     InterruptButton mButton;
-    
+
     SoftwareTimer mFanStateTimer;
     SoftwareTimer mHeartbeatTimer;
     SoftwareTimer mRpmTimer;
-
 
     bool mInitialized;
 

@@ -28,7 +28,7 @@ void AdcInstances::Init(){
     
     AssertExit(!gInitialized, "SpiInstances", "already initialized");
 
-    GetVoltageSense().init(Adc::Config {
+    GetHeatpadVoltage().init(Adc::Config {
         .pin = PinConfig::HeatpadVoltageSense,
         .channel = GpioToAdc1Channel<PinConfig::HeatpadVoltageSense>(), 
         .attenuation = ADC_ATTEN_DB_6,
@@ -36,10 +36,10 @@ void AdcInstances::Init(){
         .enableCalibration = true,
     });
 
-    GetVoltageSense().init(Adc::Config {
+    GetHeatpadCurrent().init(Adc::Config {
         .pin = PinConfig::HeatpadCurrentSense,
         .channel = GpioToAdc1Channel<PinConfig::HeatpadCurrentSense>(),
-        .attenuation = ADC_ATTEN_DB_6,
+        .attenuation = ADC_ATTEN_DB_12,
         .bitWidth = ADC_WIDTH_BIT_12,
         .enableCalibration = true,
     });
@@ -47,12 +47,12 @@ void AdcInstances::Init(){
     gInitialized = true;
 }
 
-Adc& AdcInstances::GetVoltageSense(){
+Adc& AdcInstances::GetHeatpadVoltage(){
     static Adc instance;
     return instance;
 }
 
-Adc& AdcInstances::GetCurrentSense(){
+Adc& AdcInstances::GetHeatpadCurrent(){
     static Adc instance;
     return instance;
 }
