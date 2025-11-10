@@ -37,7 +37,6 @@ private:
     float mStickiness = 0.5f;     // fraction of resolution required to trigger snap
     float mHalfStickRange = 0.0f; // precomputed 0.5 * stickiness * resolution
 
-    float snapValue(float value) const;
     void updateStickRange();
 };
 

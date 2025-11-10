@@ -41,7 +41,7 @@ public:
     bool isStalled() const;
     State getState() const;
     float getSpeed() const;
-    float getMeasuredRpm() const;
+    float getMeasuredRpm(bool filtered = true) const;
 
 private:
 
@@ -58,7 +58,6 @@ private:
     StateChangedCallback mStateChangedCallback = nullptr;
     StalledAlertCallback mStalledAlertCallback = nullptr;
     float mSpeed = 0.0f;
-    float mMeasuredFrequency = 0.0f;
 
     // sets voltage on FanEnable pin
     Gpio& mGpioFanEnable;

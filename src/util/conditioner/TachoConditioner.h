@@ -20,14 +20,13 @@ namespace Garbox {
  */
 class TachoConditioner {
 public:
-    TachoConditioner(uint32_t windowSize, float fixedPointScaleFactor = 1000.0f);
+    TachoConditioner(uint32_t windowSize, float fixedPointScaling = 1000.0f);
     ~TachoConditioner() = default;
 
     // reset
     void reset();
 
     // configuration
-    void setInputThreshold(float threshold);
     void setInputScaling(float scaling);
     void setFixedPointScaling(float scaling);
     void setOutputSnapping(float resolution, float stickiness);
@@ -38,6 +37,7 @@ public:
     // getters
     float getFilteredValue() const;
     float getRawValue() const;
+    float getUnfilteredValue() const; // get scaled but otherwise unfiltered value
 
 private:
     static constexpr size_t NumFilters = 3;
@@ -47,6 +47,7 @@ private:
     SnapFilter mSnapFilter;
 
     TransformIfc* mChain[NumFilters];
+    float mResults[NumFilters];
     CompositeFilter mCompositeFilter;
 };
 

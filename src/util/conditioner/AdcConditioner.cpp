@@ -3,24 +3,20 @@
 
 namespace Garbox {
 
-AdcConditioner::AdcConditioner():
+AdcConditioner::AdcConditioner(uint32_t windowSize, float fixedPointScaling):
     // initialize members
     mLinearFunction(),
-    mExponentialFilter(),
+    mMovingAverageFilter(windowSize, fixedPointScaling),
     mSnapFilter(),
-    mChain{ &mLinearFunction, &mExponentialFilter, &mSnapFilter },
-    mCompositeFilter(mChain, NumFilters){
+    mChain{ &mLinearFunction, &mMovingAverageFilter, &mSnapFilter },
+    mCompositeFilter(mChain, mResults, NumFilters){
     // nothing to do
 }
 
 void AdcConditioner::reset(){
     mCompositeFilter.reset(0.0f);
-    mExponentialFilter.reset(0.0f);
+    mMovingAverageFilter.reset(0.0f);
     mSnapFilter.reset(0.0f);
-}
-
-void AdcConditioner::setInputThreshold(float threshold){
-    mCompositeFilter.setInputThreshold(threshold);
 }
 
 void AdcConditioner::setCalibrationPoints(LinearFunction::Point p1, LinearFunction::Point p2){
@@ -31,12 +27,8 @@ void AdcConditioner::setCalibrationPoints(float x1, float y1, float x2, float y2
     mLinearFunction.setPoints(x1, y1, x2, y2);
 }
 
-void AdcConditioner::setAlpha(float alpha){
-    mExponentialFilter.setAlpha(alpha);
-}
-
-void AdcConditioner::setAlphaComputed(float fraction, uint32_t ticks){
-    mExponentialFilter.setAlphaComputed(fraction, ticks);
+void AdcConditioner::setFixedPointScaling(float scaleFactor){
+    mMovingAverageFilter.setScaleFactor(scaleFactor);
 }
 
 void AdcConditioner::setSnapping(float resolution, float stickiness){
@@ -54,6 +46,10 @@ float AdcConditioner::getFilteredValue() const {
 
 float AdcConditioner::getRawValue() const {
     return mCompositeFilter.getRawValue();
+}
+
+float AdcConditioner::getUnfilteredValue() const {
+    return mResults[0];
 }
 
 } // namespace Garbox

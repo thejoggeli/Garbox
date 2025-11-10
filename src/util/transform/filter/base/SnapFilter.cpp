@@ -18,7 +18,7 @@ SnapFilter::SnapFilter(float resolution, float stickiness):
 }
 
 void SnapFilter::setResolution(float resolution){
-    mResolution = (resolution > 0.0f) ? resolution : 0.0f;
+    mResolution = std::max(0.0f, resolution);
     updateStickRange();
 }
 
@@ -43,7 +43,7 @@ float SnapFilter::onProcess(float value){
         return value;
     }
 
-    const float snappedValue = snapValue(value);
+    const float snappedValue = std::round(value / mResolution) * mResolution;
     const float delta = std::fabs(snappedValue - mLastFiltered);
 
     if(delta <= mHalfStickRange){
@@ -52,14 +52,7 @@ float SnapFilter::onProcess(float value){
     }
 
     // move to new snapped value
-    return mLastFiltered;
-}
-
-float SnapFilter::snapValue(float value) const{
-    if(mResolution <= 0.0f){
-        return value;
-    }
-    return std::round(value / mResolution) * mResolution;
+    return snappedValue;
 }
 
 void SnapFilter::updateStickRange(){

@@ -37,15 +37,17 @@ private:
     bool isHeatEnabled();
     
     Gpio& mGpioHeatpadEnable;
+
+    // adc pins
     Adc& mVoltageSenseAdc;
     Adc& mCurrentSenseAdc;
-
-    SoftwarePwm mPwm;
-    SoftwareTimer mLogTimer;
 
     // adc filters
     AdcConditioner mVoltageSenseConditioner;
     AdcConditioner mCurrentSenseConditioner;
+
+    SoftwarePwm mPwm;
+    SoftwareTimer mLogTimer;
 
     bool mHeatEnabled = false;
 

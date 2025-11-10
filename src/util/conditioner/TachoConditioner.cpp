@@ -9,7 +9,7 @@ TachoConditioner::TachoConditioner(uint32_t windowSize, float fixedPointScaleFac
     mMovingAverageFilter(windowSize, fixedPointScaleFactor),
     mSnapFilter(),
     mChain{ &mScaleFunction, &mMovingAverageFilter, &mSnapFilter },
-    mCompositeFilter(mChain, NumFilters){
+    mCompositeFilter(mChain, mResults, NumFilters){
     // nothing to do
 }
 
@@ -20,12 +20,8 @@ void TachoConditioner::reset(){
     mSnapFilter.reset(0.0f);
 }
 
-void TachoConditioner::setInputThreshold(float threshold){
-    mCompositeFilter.setInputThreshold(threshold);
-}
-
 void TachoConditioner::setInputScaling(float scaling){
-    mScaleFunction.setScale(1.0f);
+    mScaleFunction.setScale(scaling);
 }
 
 void TachoConditioner::setFixedPointScaling(float scaleFactor){
@@ -47,6 +43,10 @@ float TachoConditioner::getFilteredValue() const {
 
 float TachoConditioner::getRawValue() const {
     return mCompositeFilter.getRawValue();
+}
+
+float TachoConditioner::getUnfilteredValue() const {
+    return mResults[0];
 }
 
 } // namespace Garbox

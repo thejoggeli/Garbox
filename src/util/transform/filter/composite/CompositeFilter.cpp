@@ -4,9 +4,10 @@
 
 namespace Garbox {
 
-CompositeFilter::CompositeFilter(TransformIfc** transforms, uint32_t count):
+CompositeFilter::CompositeFilter(TransformIfc** transforms, float* results, uint32_t count):
     // initialize members
     mTransforms(transforms),
+    mResults(results),
     mCount(count){
 
     // constructor body
@@ -16,7 +17,8 @@ CompositeFilter::CompositeFilter(TransformIfc** transforms, uint32_t count):
     mHeapAllocated = false;
 }
 
-CompositeFilter::CompositeFilter(std::initializer_list<TransformIfc*> transforms):
+
+CompositeFilter::CompositeFilter(std::initializer_list<TransformIfc*> transforms, bool storeResults):
     // initialize members
     mCount(static_cast<uint32_t>(transforms.size())){
 
@@ -29,6 +31,10 @@ CompositeFilter::CompositeFilter(std::initializer_list<TransformIfc*> transforms
     uint32_t i = 0;
     for(TransformIfc* t : transforms){
         mTransforms[i++] = t;
+    }
+
+    if(storeResults){
+        mResults = static_cast<float*>(std::calloc(mCount, sizeof(float)));
     }
 
     mHeapAllocated = true;
@@ -48,19 +54,42 @@ float CompositeFilter::onProcess(float value){
     }
 
     float result = value;
-    for(uint32_t i = 0; i < mCount; ++i){
-        result = mTransforms[i]->apply(result);
+
+    // traverse transforms and store results in array
+    if(mResults != nullptr){
+        for(uint32_t i = 0; i < mCount; ++i){
+            result = mTransforms[i]->apply(result);
+            mResults[i] = result;
+        }
+    }
+    // traverse transforms without storing
+    else {
+        for(uint32_t i = 0; i < mCount; ++i){
+            result = mTransforms[i]->apply(result);
+        }
     }
 
     return result;
 }
 
-void CompositeFilter::setInputThreshold(float epsilon){
-    mInputThreshold = (epsilon >= 0.0f) ? epsilon : 0.0f;
+void CompositeFilter::setInputThreshold(float threshold){
+    mInputThreshold = std::max(0.0f, threshold);
 }
 
 float CompositeFilter::getInputThreshold() const{
     return mInputThreshold;
+}
+
+float CompositeFilter::getResult(size_t index) const {
+    if(mResults == nullptr){
+        TriggerDebug("CompositeFilters", "results is nullptr");
+        return 0.0f;
+    }
+    if(index >= mCount){
+        TriggerDebug("CompositeFilters", "invalid results index");
+        return 0.0f;
+    }
+    return mResults[index];
 }
 
 } // namespace Garbox

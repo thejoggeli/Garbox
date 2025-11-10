@@ -27,24 +27,26 @@ namespace Garbox {
 class CompositeFilter : public FilterAbs {
 public:
     // external constructor (no heap)
-    CompositeFilter(TransformIfc** transforms, uint32_t count);
+    CompositeFilter(TransformIfc** transforms, float* results, uint32_t count);
 
     // heap-based constructor
-    CompositeFilter(std::initializer_list<TransformIfc*> transforms);
+    CompositeFilter(std::initializer_list<TransformIfc*> transforms, bool storeResults = true);
 
     ~CompositeFilter();
 
     // configuration
     void setInputThreshold(float epsilon);
     float getInputThreshold() const;
+    float getResult(size_t index) const;
 
 protected:
     float onProcess(float value) override;
 
 private:
     TransformIfc** mTransforms = nullptr;
+    float* mResults = nullptr;
     uint32_t mCount = 0;
-    float mInputThreshold = 1e-4f;
+    float mInputThreshold = 0.0f;
 
     bool mHeapAllocated = false;
 };

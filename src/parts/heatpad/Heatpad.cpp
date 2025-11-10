@@ -11,9 +11,7 @@
 
 namespace Garbox {
 
-static constexpr float AdcFilterFration = 0.925f;
-static constexpr uint32_t AdcFilterTicks = AppConfig::MainTaskFrequencyHz/2;
-static constexpr uint32_t AdcFilterThreshold = 0.01f;
+static constexpr uint32_t AdcConditionerWindowSize = static_cast<uint32_t>(AppConfig::MainTaskFrequencyHz * 1.0f);
 
 static constexpr uint32_t InitialPwmDuty = 0.5f;
 static constexpr uint32_t InitialPwmPeriodMicros = 5'000'000; // 5 seconds
@@ -23,6 +21,8 @@ Heatpad::Heatpad() :
     mGpioHeatpadEnable(GpioInstances::GetHeatEnable()),
     mVoltageSenseAdc(AdcInstances::GetHeatpadVoltage()),
     mCurrentSenseAdc(AdcInstances::GetHeatpadCurrent()),
+    mVoltageSenseConditioner(AdcConditionerWindowSize),
+    mCurrentSenseConditioner(AdcConditionerWindowSize),
     mPwm(InitialPwmDuty, InitialPwmPeriodMicros){
     // nothing to do
 }
@@ -30,9 +30,8 @@ Heatpad::Heatpad() :
 void Heatpad::init(){
 
     // init voltage sense filter
-    mVoltageSenseConditioner.setInputThreshold(0.005f); // ignore 5mV changes
-    mVoltageSenseConditioner.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
-    mVoltageSenseConditioner.setSnapping(0.1f, 0.5f); // 0.1V snapping
+    mVoltageSenseConditioner.setFixedPointScaling(1000.0f); // theoretical 1mV resolution
+    mVoltageSenseConditioner.setSnapping(0.1f, 0.8f); // 100mV snapping
 
     // U_Adc = U_In / AttenuationFactor
     // U_In = U_Adc * AttenuationFactor 
@@ -41,9 +40,8 @@ void Heatpad::init(){
     mVoltageSenseConditioner.setCalibrationPoints({0.0f, 0.0f}, {1.0f, VoltageAtOneAdcVolt});
 
     // init current sense filter
-    mCurrentSenseConditioner.setInputThreshold(0.005f); // ignore 5mV changes
-    mCurrentSenseConditioner.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
-    mCurrentSenseConditioner.setSnapping(0.05f, 0.5f); // 50mA snapping
+    mCurrentSenseConditioner.setFixedPointScaling(1000.0f); // theoretical 1mA resolution
+    mCurrentSenseConditioner.setSnapping(0.1f, 0.8f); // 100mA snapping
 
     // U_Adc = U_Shunt * AmpFactor => U_Shunt = U_Adc / AmpFactor
     // I_Shunt = U_Shunt / R_Shunt
@@ -88,8 +86,16 @@ void Heatpad::tick(){
         const float voltage = mVoltageSenseConditioner.getFilteredValue();
         const float current = mCurrentSenseConditioner.getFilteredValue();
 
-        // print voltages if changed
-        LogDebug("Heatpad", "usense=%6.3f V, isense=%5.3f A", voltage, current);
+        static float oldVoltage = 0.0f;
+        static float oldCurrent = 0.0f;
+
+        // print usense and isense values if changed
+        if((oldVoltage != voltage) || (oldCurrent != current)){
+            const float power = std::round(voltage * current / 0.1f) * 0.1f;
+            oldVoltage = voltage;
+            oldCurrent = current;
+            LogDebug("Heatpad", "usense=%4.1f V, isense=%3.1f A, psense=%4.1f W", voltage, current, power);
+        }
 
         // restart timer
         mLogTimer.restart();

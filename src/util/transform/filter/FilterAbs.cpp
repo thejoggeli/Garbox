@@ -13,8 +13,8 @@ void FilterAbs::reset(float value){
 }
 
 float FilterAbs::process(float value){
-    mLastRaw = value;
     mLastFiltered = onProcess(value);
+    mLastRaw = value;
     return mLastFiltered;
 }
 
