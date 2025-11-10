@@ -11,7 +11,7 @@
 
 namespace Garbox {
 
-static constexpr float AdcFilterFration = 0.90f;
+static constexpr float AdcFilterFration = 0.925f;
 static constexpr uint32_t AdcFilterTicks = AppConfig::MainTaskFrequencyHz/2;
 static constexpr uint32_t AdcFilterThreshold = 0.01f;
 
@@ -29,11 +29,24 @@ Heatpad::Heatpad() :
 
 void Heatpad::init(){
 
-    // init adc filters
+    // init voltage sense filter
+    // U_Adc = U_In / AttenuationFactor
+    // U_In = U_Adc * AttenuationFactor 
+    const float AttenuationFactor = 11.0f;
+    mVoltageSenseFilter.setCalibrationPoints({0.0f, 0.0f}, {1.0f, 1.0f * AttenuationFactor});
     mVoltageSenseFilter.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
+    mVoltageSenseFilter.setSnapResolution(0.1f); // 0.1V precision
+
+    // init current sense filter
+    // U_Adc = U_Shunt * AmpFactor
+    // U_Shunt = U_Adc / AmpFactor
+    // I_Shunt = U_Shunt * R_Shunt
+    // I_Shunt = (U_Adc / AmpFactor) * R_Shunt
+    const float R_Shunt = 0.002f;
+    const float AmpFactor = 200.0f;
+    mCurrentSenseFilter.setCalibrationPoints({0.0f, 0.0f}, {1.0f, (1.0f / AmpFactor) * R_Shunt});
     mCurrentSenseFilter.setAlphaComputed(AdcFilterFration, AdcFilterTicks);
-    mVoltageSenseFilter.setThreshold(AdcFilterThreshold);
-    mCurrentSenseFilter.setThreshold(AdcFilterThreshold);
+    mCurrentSenseFilter.setSnapResolution(0.1f); // 100mA precision
     
     // software pwm attach state changed handler
     mPwm.setStateChangedHandler([this](SoftwarePwm::State state) {
@@ -59,42 +72,19 @@ void Heatpad::tick(){
     mVoltageSenseAdc.sample();
     mCurrentSenseAdc.sample();
 
+    // update sensor filters
     mVoltageSenseFilter.update(mVoltageSenseAdc.getVolts());
-    mCurrentSenseFilter.update(mCurrentSenseAdc.getVolts());
+    mCurrentSenseFilter.update(mVoltageSenseAdc.getVolts());
 
     // log adc voltages
     if(mLogTimer.isExpired()){
         
         // get most recent adc voltages
-        const float voltageSenseVolts = mVoltageSenseFilter.getFilteredValue();
-        const float currentSenseVolts = mCurrentSenseFilter.getFilteredValue();
-
-        // check if voltages changed since last log
-        static float prevVoltageSenseVolts = 0.0f;
-        static float prevCurrentSenseVolts = 0.0f;
-        
-        // compute voltage errors
-        const float voltageSensorError = prevVoltageSenseVolts - voltageSenseVolts;
-        const float currentSensorError = prevCurrentSenseVolts - currentSenseVolts;
-
-        // integrate errors
-        static float voltageSenseErrorIntegrated = 0.0f;
-        static float currentSenseErrorIntegrated = 0.0f;
-        voltageSenseErrorIntegrated += voltageSensorError;
-        currentSenseErrorIntegrated += currentSensorError;
-        
-        // check if voltage changed by enough or large integrated error accumulated
-        bool voltageSenseChanged = (std::fabs(voltageSenseErrorIntegrated) > 0.05f); 
-        bool currentSenseChanged = (std::fabs(currentSenseErrorIntegrated) > 0.05f); 
+        const float measuredVoltage = mVoltageSenseFilter.getValue();
+        const float measuredCurrent = mCurrentSenseFilter.getValue();
 
         // print voltages if changed
-        if(voltageSenseChanged || currentSenseChanged){
-            prevVoltageSenseVolts = voltageSenseVolts;
-            prevCurrentSenseVolts = currentSenseVolts;
-            voltageSenseErrorIntegrated = 0.0f;
-            currentSenseErrorIntegrated = 0.0f;
-            LogDebug("Heatpad", "voltages usense=%5.3f V, isense=%5.3f V", voltageSenseVolts, currentSenseVolts);
-        }
+        LogDebug("Heatpad", "usense=%6.3f V, isense=%5.3f A", measuredVoltage, measuredCurrent);
 
         // restart timer
         mLogTimer.restart();
