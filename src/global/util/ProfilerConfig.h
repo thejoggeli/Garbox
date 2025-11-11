@@ -11,7 +11,7 @@ public:
         MainTask = 0,
         MainTick,
         LogTick,
-        UiTick,
+        DisplayTick,
         PiezoPlayerTick,
         LedAnimationTick,
         Count
@@ -22,7 +22,7 @@ public:
             case MainTask: return "MainTask";
             case MainTick: return "MainTick";
             case LogTick: return "LogTick";
-            case UiTick: return "UiTick";
+            case DisplayTick: return "DisplayTick";
             case PiezoPlayerTick: return "PiezoPlayerTick";
             case LedAnimationTick: return "LedAnimationTick";
             case Count: return "Count";

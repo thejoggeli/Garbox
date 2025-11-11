@@ -43,6 +43,21 @@ bool Profiler::Setup(uint8_t num) {
     return true;
 }
 
+void Profiler::Start() {
+    if (!sInitialized) return;
+    LockGuard lock(sMutex);
+    sLastUpdateTime = Time::GetMicros();
+    sEnabled = true;
+
+    // Optionally reset per-frame counters so first tick is clean
+    for (uint8_t i = 0; i < sNumRecords; ++i) {
+        sRecords[i].countCurrent = 0;
+        sRecords[i].totalTime = 0;
+        sRecords[i].minDurationCurrent = 0xFFFFFFFF;
+        sRecords[i].maxDurationCurrent = 0;
+    }
+}
+
 void Profiler::SetEnabled(bool on) {
     LockGuard lock(sMutex);
     sEnabled = on;

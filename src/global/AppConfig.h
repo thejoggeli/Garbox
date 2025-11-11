@@ -51,8 +51,10 @@ public:
     static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
     static constexpr uint32_t SpiDmaTaskPriority = 10;
     static constexpr uint32_t SpiDmaTaskStackSize = 2048;
-    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2;
     static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
+    // Max SPI DMA size is limited to 32KB on ESP32-S3
+    // Dividing by 8 allows sets to buffer to ~19KB
+    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2 / 8; 
 
 };
 

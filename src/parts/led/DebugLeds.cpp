@@ -33,7 +33,6 @@ static bool gInitialized = false;
 static SemaphoreHandle_t sMutex = xSemaphoreCreateMutex();
 
 void DebugLeds::Init(){
-
     Garbox::LockGuard lock(sMutex);
 
     AssertExit(!gInitialized, "DebugLeds", "already initialized");
@@ -58,11 +57,7 @@ void DebugLeds::Init(){
 }
 
 AnimatedLed& DebugLeds::GetLed(Id id){
-    // check if initialized
-    if(!gInitialized){
-        TriggerDebug("DebugLeds", "not initialized");
-        return sLeds[0];
-    }
+    Garbox::LockGuard lock(sMutex);
 
     // check if valid id
     size_t const index = static_cast<size_t>(id);
@@ -75,13 +70,7 @@ AnimatedLed& DebugLeds::GetLed(Id id){
 }
 
 Garbox::Span<AnimatedLed*> DebugLeds::GetAllLeds(){
-
     Garbox::LockGuard lock(sMutex);
-
-    if(!gInitialized){
-        TriggerDebug("DebugLeds", "not initialized");
-        return Garbox::Span<AnimatedLed*>(nullptr, 0);
-    }
 
     // static array of pointers to base type
     static std::array<AnimatedLed*, NumDebugLeds> sLedPtrs;
@@ -95,7 +84,6 @@ Garbox::Span<AnimatedLed*> DebugLeds::GetAllLeds(){
 }
 
 void DebugLeds::SetLed(Id id, bool enable, float brightness){
-
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
@@ -121,7 +109,6 @@ void DebugLeds::SetLed(Id id, bool enable, float brightness){
 }
 
 void DebugLeds::ToggleLed(Id id, float brightness){
-
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
@@ -148,7 +135,6 @@ void DebugLeds::ToggleLed(Id id, float brightness){
 }
 
 void DebugLeds::SetAllLeds(bool enable, float brightness){
-
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
@@ -173,7 +159,6 @@ void DebugLeds::SetAllLeds(bool enable, float brightness){
 }
 
 void DebugLeds::ToggleAllLeds(float brightness){
-
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
@@ -196,11 +181,11 @@ void DebugLeds::ToggleAllLeds(float brightness){
 }
 
 void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b) {
-
     Garbox::LockGuard lock(sMutex);
 
     // check if initialized
     if (!gInitialized) {
+        TriggerDebug("DebugLeds", "not initialized");
         return;
     }
 

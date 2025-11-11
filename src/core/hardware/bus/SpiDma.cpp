@@ -148,7 +148,7 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user) {
 
     esp_err_t res = spi_device_acquire_bus(mDevice, portMAX_DELAY);
     if (res != ESP_OK) {
-        TriggerDebug("SpiDma", "spi_device_acquire_bus failed");
+        TriggerDebug("SpiDma", "spi_device_acquire_bus failed", static_cast<int32_t>(res));
         return false;
     }
 
@@ -162,7 +162,7 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user) {
     spi_device_release_bus(mDevice);
 
     if (res != ESP_OK) {
-        TriggerDebug("SpiDma", "spi_device_polling_transmit failed");
+        TriggerDebug("SpiDma", "spi_device_polling_transmit failed", static_cast<int32_t>(res));
         return false;
     }
 
@@ -187,9 +187,9 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, TxCa
     transaction.user = user;
     slot->callback = callback;
 
-    esp_err_t ret = spi_device_queue_trans(mDevice, &transaction, portMAX_DELAY);
-    if (ret != ESP_OK) {
-        TriggerDebug("SpiDma", "failed to queue transaction");
+    esp_err_t res = spi_device_queue_trans(mDevice, &transaction, portMAX_DELAY);
+    if (res != ESP_OK) {
+        TriggerDebug("SpiDma", "failed to queue transaction", static_cast<int32_t>(res) );
         freeSlot(slot);
         return false;
     }

@@ -35,7 +35,6 @@ void Fan::init(){
     config.stopTimeoutMicros = 1000_ms;
 
     // init rpm conditioner
-    constexpr float InputThresholdRpm = 1.0f; // ignore 1 RPM input changes
     constexpr float HzToRpmFactor = 60.0f / static_cast<float>(PulsesPerRevolution);
     mTachoConditioner.setFixedPointScaling(1000.0f); // gives theoretical 0.001 RPM resolution
     mTachoConditioner.setInputScaling(HzToRpmFactor);

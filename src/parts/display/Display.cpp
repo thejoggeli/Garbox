@@ -13,8 +13,6 @@
 
 namespace Garbox {
 
-static uint32_t gCbCount = 0;
-
 Display::Display(): 
     // init members 
     mSpi(SpiInstances::GetSpiDma()),
@@ -53,26 +51,24 @@ void Display::init() {
     lv_log_register_print_cb(handleLog);
     lv_tick_set_cb(lvglTickProvider);
 
-    // init draw buffer
-    mDrawBuffer = (uint16_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    AssertExit(mDrawBuffer != nullptr, "Display", "mDrawBuffer is nullptr");
+    // init draw buffers
+    mDrawBuffer1 = allocDrawBuffer();
+    mDrawBuffer2 = allocDrawBuffer();
 
     // init display
     mLvDisplay = lv_display_create(mSt7789v.getWidth(), mSt7789v.getHeight());
     lv_display_set_user_data(mLvDisplay, this); 
-    lv_display_set_buffers(mLvDisplay, mDrawBuffer, nullptr, mBufferSize, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_buffers(mLvDisplay, mDrawBuffer1, mDrawBuffer2, mBufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(mLvDisplay, flushTrampoline);
 
     lv_obj_t* label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Garbox Display");
-    lv_obj_center(label);
+    lv_obj_set_style_text_font(label, &lv_font_montserrat_30, LV_PART_MAIN);
+    lv_obj_set_align(label, lv_align_t::LV_ALIGN_TOP_MID);
 
-    // send init commands to display
+    // send initial commands to display
     const Rgb565 clearColor = Rgb565::fromFloat(0, 0, 0);
     mSt7789v.sendFillColor(clearColor.value);
-    mSt7789v.sendFillRect(5,   5, 50, 50, Rgb565::fromFloat(1, 0, 0).value);
-    mSt7789v.sendFillRect(60,  5, 50, 50, Rgb565::fromFloat(0, 1, 0).value);
-    mSt7789v.sendFillRect(115, 5, 50, 50, Rgb565::fromFloat(0, 0, 1).value);
 
     // initialization complete
     mSt7789v.setBrightness(0.75f);
@@ -80,15 +76,20 @@ void Display::init() {
     mInitialized = true;
 }
 
+uint8_t* Display::allocDrawBuffer(){
+    uint8_t* buffer = (uint8_t*) heap_caps_malloc(mBufferSize, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    AssertExit(buffer != nullptr, "Display", "mDrawBuffer is nullptr");
+    if (!(heap_caps_get_allocated_size(buffer) && heap_caps_get_largest_free_block(MALLOC_CAP_DMA))) {
+        multi_heap_info_t info;
+        heap_caps_get_info(&info, MALLOC_CAP_DMA);
+        TriggerExit("Display", "DMA allocation failed", static_cast<int32_t>(info.total_free_bytes));
+    }
+    return buffer;
+}
+
 void Display::tick() {
 
     lv_timer_handler(); 
-
-    static uint32_t gCbCountPrev = 0;
-    if(gCbCount != gCbCountPrev){
-        LogDebug("Display", "handleFlush %u", gCbCount);
-        gCbCountPrev = gCbCount;
-    }
 
     // advance x
     static int x = 0;
@@ -117,17 +118,15 @@ void Display::tick() {
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
-
-    gCbCount++;
-    LogDebug("Display", "handleFlush");
-
-    return; // TODO
+    
+    AssertExit((mDrawBuffer1 == pixelMap) || (mDrawBuffer2 == pixelMap), "Display", "unexpected buffer");
 
     // send buffer to st7789v
     const uint32_t width = area->x2 - area->x1 + 1;
     const uint32_t height = area->y2 - area->y1 + 1;
     const uint32_t sizeBytes = width * height * 2;
     const bool async = false;
+
     mSt7789v.sendDrawBufferXXYY(area->x1, area->x2, area->y1, area->y2, pixelMap, sizeBytes, async);
     
     // notify lvgl that transfer is complete

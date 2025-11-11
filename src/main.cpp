@@ -26,8 +26,8 @@ void setup() {
     Log::SetLevel(Log::Level::Verbose);
     
     // assert debug handler
-    AssertHandler::SetDebugHandler([](const char* context, const char* message){
-        LogError("AssertHandler", "AssertDebug! %s %s", context, message);
+    AssertHandler::SetDebugHandler([](const char* context, const char* message, int32_t arg){
+        LogError("AssertHandler", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
         if(DebugLeds::IsInitialized()){
             DebugLeds::SetLed(DebugLeds::Id::Assert, true);
         }
@@ -35,14 +35,14 @@ void setup() {
     });
 
     // assert exit handler
-    AssertHandler::SetExitHandler([](const char* context, const char* message){
-        LogError("AssertHandler", "AssertExit! %s %s", context, message);
+    AssertHandler::SetExitHandler([](const char* context, const char* message, int32_t arg){
+        LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
         if(DebugLeds::IsInitialized()){
             DebugLeds::SetLed(DebugLeds::Id::Assert, true);
         }
         gMainControl.onAssertExit(context, message);
         while(true){
-            LogError("AssertHandler", "AssertExit! %s %s", context, message);
+            LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
             if(DebugLeds::IsInitialized()){
                 DebugLeds::ToggleAllLeds();
             }
@@ -74,6 +74,9 @@ void setup() {
 
     // start main app
     gMainControl.start();
+
+    // start profiler
+    Profiler::Start();
 
     // start main task
     xTaskCreatePinnedToCore(
@@ -114,13 +117,6 @@ void mainTask(void* parameter){
         // this is done to ensure that the display is always updated at a fixed interval and to 
         // give it enough time to transfer the previous ui state via SPI
         vTaskDelayUntil(&lastWakeTime, cycleDuration - updateDisplayDuration);
-
-        Profiler::Begin(ProfilerConfig::UiTick);
-        // if display is not busy
-        // TODO update ui state
-        // TODO notify display to render new ui state
-        Time::BlockMicros(1000); // placeholder delay
-        Profiler::End(ProfilerConfig::UiTick);
         
         // end main task
         // sleep until next tick

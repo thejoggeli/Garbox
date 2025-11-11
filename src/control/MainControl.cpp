@@ -2,6 +2,7 @@
 
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
+#include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "global/util/FunctionInstances.h"
@@ -218,7 +219,9 @@ void MainControl::tick(){
     DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);
 
     // display tick
+    Profiler::Begin(ProfilerConfig::DisplayTick);
     mDisplay.tick();
+    Profiler::End(ProfilerConfig::DisplayTick);
 }
 
 void MainControl::onAssertDebug(const char* context, const char* message){
@@ -239,9 +242,11 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
     static uint32_t periodMicros = 5000_ms;
     static float duty = 0.5f;
     switch(newState){
-        case Button::State::Pressed:
+        case Button::State::Pressed: {
             mPiezoPlayer.playTone(Tone(40_ms, 2000), deadTime);
+            DebugLeds::GetLed(DebugLeds::Id::Custom2).setBrightness(1.0f);
             break;
+        }
         case Button::State::PressedLong:
             mPiezoPlayer.playTone(Tone(80_ms, 3000), deadTime);
             // update heatpad duty on long press
@@ -252,8 +257,9 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
                 mHeatpad.getNextPeriodDurationMicros()/1000
             );
             break;
-        case Button::State::Released:
+        case Button::State::Released: {
             mPiezoPlayer.playTone(Tone(80_ms, 1000), deadTime);
+            DebugLeds::GetLed(DebugLeds::Id::Custom2).setAnimation(FunctionInstances::GetEaseOutSineSampled(), 1, 125_ms, 1.0f, 0.0f);
             // update heatpad period on click
             if(oldState == Button::State::Pressed){
                 periodMicros = MathUtils::Wrap(periodMicros + 1000_ms, 1000_ms, 8000_ms);
@@ -264,6 +270,7 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
                 );
             }
             break;
+        }
         default:
             // nothing to do
             break;

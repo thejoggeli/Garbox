@@ -4,23 +4,23 @@
 
 namespace Garbox {
 
-void TriggerDebug(const char* context, const char* message) {
-    AssertHandler::InvokeDebug(context, message);
+void TriggerDebug(const char* context, const char* message, int32_t arg) {
+    AssertHandler::InvokeDebug(context, message, arg);
 }
 
-void TriggerExit(const char* context, const char* message) {
-    AssertHandler::InvokeExit(context, message);
+void TriggerExit(const char* context, const char* message, int32_t arg) {
+    AssertHandler::InvokeExit(context, message, arg);
 }
 
-void AssertDebug(bool value, const char* context, const char* message) {
+void AssertDebug(bool value, const char* context, const char* message, int32_t arg) {
     if(!value){
-        AssertHandler::InvokeDebug(context, message);
+        AssertHandler::InvokeDebug(context, message, arg);
     }
 }
 
-void AssertExit(bool value, const char* context, const char* message) {
+void AssertExit(bool value, const char* context, const char* message, int32_t arg) {
     if(!value){
-        AssertHandler::InvokeExit(context, message);
+        AssertHandler::InvokeExit(context, message, arg);
     }
 }
 

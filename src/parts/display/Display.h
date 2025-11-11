@@ -32,8 +32,11 @@ private:
     bool mInitialized = false;
 
     /* Drawing buffer */
-    uint16_t* mDrawBuffer = nullptr;
+    uint8_t* mDrawBuffer1 = nullptr;
+    uint8_t* mDrawBuffer2 = nullptr;
     uint32_t mRenderSkipCount = 0;
+
+    uint8_t* allocDrawBuffer();
 
     void handleFlush(const lv_area_t* area, uint8_t* px_map);
     void handleTxComplete(bool success);

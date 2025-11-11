@@ -43,6 +43,7 @@ public:
     };
 
     static bool Setup(uint8_t num);
+    static void Start();
     static void SetEnabled(bool on);
     static bool IsEnabled();
 
