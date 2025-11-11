@@ -36,6 +36,8 @@ private:
     uint8_t* mDrawBuffer2 = nullptr;
     uint32_t mRenderSkipCount = 0;
 
+    lv_obj_t* mLabel;
+
     uint8_t* allocDrawBuffer();
 
     void handleFlush(const lv_area_t* area, uint8_t* px_map);

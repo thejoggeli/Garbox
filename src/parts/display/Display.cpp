@@ -61,10 +61,10 @@ void Display::init() {
     lv_display_set_buffers(mLvDisplay, mDrawBuffer1, mDrawBuffer2, mBufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(mLvDisplay, flushTrampoline);
 
-    lv_obj_t* label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "Garbox Display");
-    lv_obj_set_style_text_font(label, &lv_font_montserrat_30, LV_PART_MAIN);
-    lv_obj_set_align(label, lv_align_t::LV_ALIGN_TOP_MID);
+    mLabel = lv_label_create(lv_screen_active());
+    lv_label_set_text(mLabel, "Garbox Display");
+    lv_obj_set_style_text_font(mLabel, &lv_font_unscii_16, LV_PART_MAIN);
+    lv_obj_set_align(mLabel, lv_align_t::LV_ALIGN_TOP_MID);
 
     // send initial commands to display
     const Rgb565 clearColor = Rgb565::fromFloat(0, 0, 0);
@@ -88,6 +88,9 @@ uint8_t* Display::allocDrawBuffer(){
 }
 
 void Display::tick() {
+
+    const uint32_t millis = static_cast<float>(Time::GetMillis());
+    lv_label_set_text_fmt(mLabel, "%04u.%03u", millis/1000, millis%1000);
 
     lv_timer_handler(); 
 
