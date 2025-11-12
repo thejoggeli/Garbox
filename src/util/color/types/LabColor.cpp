@@ -1,6 +1,7 @@
 #include "LabColor.h"
 
 #include "util/color/ColorConverter.h"
+#include "util/color/types/RgbFloat.h"
 
 namespace Garbox {
 
@@ -10,6 +11,14 @@ LabColor::LabColor() : L(100.0f), a(0.0f), b(0.0f) {
 
 LabColor::LabColor(float LVal, float aVal, float bVal) : L(LVal), a(aVal), b(bVal){
     // constructor body
+}
+
+RgbFloat LabColor::toStandardRGB() const {
+    return ColorConverter::ToRgbFloat(*this).toStandardRGB();
+}
+
+RgbFloat LabColor::toLinearRGB() const {
+    return ColorConverter::ToRgbFloat(*this); // already in linear space
 }
 
 LabColor LabColor::From(const RgbFloat& linearRgb) {

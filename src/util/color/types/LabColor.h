@@ -13,6 +13,9 @@ public:
     LabColor();
     LabColor(float L, float a, float b);
 
+    RgbFloat toStandardRGB() const;
+    RgbFloat toLinearRGB() const;
+
     static LabColor From(const RgbFloat& linearRgb);
 };
 

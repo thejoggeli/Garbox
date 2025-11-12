@@ -107,15 +107,23 @@ void Display::tick() {
 
     // draw rectangle with hsl rainbow
     Rgb565 rgb1 = Rgb565::FromHsl(t, 1.0f, 0.5f);
-    mSt7789v.sendFillRect(x, 100, 1, 40, rgb1.value);
+    mSt7789v.sendFillRect(x, 40, 1, 30, rgb1.value);
 
     // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb2 = Rgb565::From(colorMap.interpolateRgb(t));
-    mSt7789v.sendFillRect(x, 150, 1, 40, rgb2.value);
+    Rgb565 rgb2 = Rgb565::From(colorMap.interpolateStandardRgb(t));
+    mSt7789v.sendFillRect(x, 80, 1, 30, rgb2.value);
+
+    // draw rectangle with colormap (rgb interpolation)
+    Rgb565 rgb3 = Rgb565::From(colorMap.interpolateLinearRgb(t).toStandardRGB());
+    mSt7789v.sendFillRect(x, 120, 1, 30, rgb3.value);
 
     // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb3 = Rgb565::From(colorMap.interpolateHsl(t));
-    mSt7789v.sendFillRect(x, 200, 1, 40, rgb3.value);
+    Rgb565 rgb4 = Rgb565::From(colorMap.interpolateHsl(t));
+    mSt7789v.sendFillRect(x, 160, 1, 30, rgb4.value);
+
+    // draw rectangle with colormap (hsl interpolation)
+    Rgb565 rgb5 = Rgb565::From(colorMap.interpolateLab(t).toStandardRGB());
+    mSt7789v.sendFillRect(x, 200, 1, 30, rgb5.value);
 
     // test timer
     if (mTestTimer.isExpired()) {

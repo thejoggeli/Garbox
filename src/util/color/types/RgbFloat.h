@@ -4,6 +4,7 @@
 
 namespace Garbox {
 
+class FunctionIfc;
 class HslColor;
 class LabColor;
 class Rgb888;
@@ -17,6 +18,9 @@ public:
 
     RgbFloat();
     RgbFloat(float r, float g, float b);
+
+    RgbFloat toStandardRGB() const;
+    RgbFloat toLinearRGB() const;
 
     static RgbFloat From(const HslColor& hsl);
     static RgbFloat From(const LabColor& lab);
