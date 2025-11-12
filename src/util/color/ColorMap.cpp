@@ -13,7 +13,7 @@ ColorMap::ColorMap(std::initializer_list<RgbFloat> colors) :
     // constructor body
     hslMap.reserve(rgbMap.size());
     for (const auto& c : rgbMap) {
-        hslMap.push_back(c.toHsl());
+        hslMap.push_back(HslColor::From(c));
     }
 }
 
@@ -24,7 +24,7 @@ ColorMap::ColorMap(std::initializer_list<HslColor> colors) :
     // constructor body
     rgbMap.reserve(hslMap.size());
     for (const auto& c : hslMap) {
-        rgbMap.push_back(c.toRgb());
+        rgbMap.push_back(RgbFloat::From(c));
     }
 }
 

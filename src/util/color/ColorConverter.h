@@ -1,15 +1,42 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Garbox {
 
-class RgbFloat;
 class HslColor;
+class LabColor;
+class RgbFloat;
+class Rgb888;
+class Rgb565;
 
 class ColorConverter {
 public:
-    static HslColor rgbToHsl(float r, float g, float b);
-    static HslColor rgbToHsl(const RgbFloat& rgb);
-    static RgbFloat hslToRgb(const HslColor& hsl);
+
+    // any => Rgb565
+    static Rgb565 ToRgb565(const HslColor& hsl);      // converts (HslColor => Rgb565) - Output in standard RGB (sRGB) space
+    static Rgb565 ToRgb565(const Rgb888& rgb);        // converts (Rgb888   => Rgb565) - Output in will be in same color space as input
+    static Rgb565 ToRgb565(const RgbFloat& rgb);      // converts (RgbFloat => Rgb565) - Output in will be in same color space as input
+
+    // any => Rgb888
+    static Rgb888 ToRgb888(const HslColor& hsl);      // converts (HslColor => Rgb888) - Output in standard RGB (sRGB) space
+    static Rgb888 ToRgb888(const Rgb565& rgb);        // converts (Rgb565   => Rgb888) - Output in will be in same color space as input
+    static Rgb888 ToRgb888(const RgbFloat& rgb);      // converts (RgbFloat => Rgb888) - Output in will be in same color space as input
+
+    // any => RgbFloat
+    static RgbFloat ToRgbFloat(const HslColor& hsl);  // converts (HslColor => RgbFloat) - Output in standard RGB (sRGB) space
+    static RgbFloat ToRgbFloat(const Rgb888& rgb);    // converts (Rgb888   => RgbFloat) - Output in will be in same color space as input
+    static RgbFloat ToRgbFloat(const Rgb565& rgb);    // converts (Rgb565   => RgbFloat) - Output in will be in same color space as input
+
+    // any => HslColor
+    static HslColor ToHsl(const RgbFloat& sRgb);      // converts (HslColor => RgbFloat) - Expects RGB to be in standard RGB (sRGB) space
+    static HslColor ToHsl(const Rgb888& sRgb);        // converts (HslColor => Rgb888)   - Expects RGB to be in standard RGB (sRGB) space
+    static HslColor ToHsl(const Rgb565& sRgb);        // converts (HslColor => Rgb565)   - Expects RGB to be in standard RGB (sRGB) space
+
+    // LabColor <=> Linear RGB 
+    static LabColor ToLab(const RgbFloat& linearRgb); // converts (RgbFloat => LabColor) - Expects RGB to be in linear space
+    static RgbFloat ToRgbFloat(const LabColor& lab);  // converts (LabColor => RgbFloat) - Output in will be in linear space
+
 };
 
 } // namespace

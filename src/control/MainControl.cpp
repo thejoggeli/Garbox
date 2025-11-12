@@ -9,7 +9,7 @@
 #include "global/piezo/PiezoSequences.h"
 #include "parts/led/DebugLeds.h"
 #include "util/color/ColorMap.h"
-#include "util/color/Rgb888.h"
+#include "util/color/types/Rgb888.h"
 #include "util/function/default/EasingFunctions.h"
 #include "util/math/MathUtils.h"
 
@@ -214,8 +214,8 @@ void MainControl::tick(){
     };
     constexpr float brightness = 5.0f / 255.0f;
     float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFanStates - 1));
-    RgbFloat rgbFloat = RgbFloat::fromHsl(colorMap.interpolateHsl(tColorMap)) * brightness;
-    Rgb888 rgb = Rgb888::fromFloat(rgbFloat);
+    RgbFloat rgbFloat = RgbFloat::From(colorMap.interpolateHsl(tColorMap)) * brightness;
+    Rgb888 rgb = Rgb888::From(rgbFloat);
     DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);
 
     // display tick

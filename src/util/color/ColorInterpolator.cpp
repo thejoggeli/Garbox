@@ -1,6 +1,9 @@
 #include "ColorInterpolator.h"
 
 #include <cmath>
+#include "util/color/types/HslColor.h"
+#include "util/color/types/LabColor.h"
+#include "util/color/types/RgbFloat.h"
 
 namespace Garbox {
 
@@ -32,6 +35,14 @@ HslColor ColorInterpolator::interpolateHsl(const HslColor& a, const HslColor& b,
     float l = a.l + (b.l - a.l) * t;
 
     return HslColor(h, s, l);
+}
+
+LabColor ColorInterpolator::interpolateLab(const LabColor& a, const LabColor& b, float t) {
+    // linear interpolation in Lab space
+    const float l = a.L + (b.L - a.L) * t;
+    const float A = a.a + (b.a - a.a) * t;
+    const float B = a.b + (b.b - a.b) * t;
+    return LabColor(l, A, B);
 }
 
 } // namespace

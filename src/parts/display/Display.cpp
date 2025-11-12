@@ -5,11 +5,11 @@
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "global/hardware/spi/SpiInstances.h"
-#include "global/util/ColorMaps.h"
 #include "global/hardware/gpio/GpioInstances.h"
 #include "global/hardware/ledc/LedcInstances.h"
+#include "global/util/ColorMaps.h"
 #include "util/ByteUtils.h"
-#include "util/color/Rgb565.h"
+#include "util/color/types/Rgb565.h"
 
 namespace Garbox {
 
@@ -67,7 +67,7 @@ void Display::init() {
     lv_obj_set_align(mLabel, lv_align_t::LV_ALIGN_TOP_MID);
 
     // send initial commands to display
-    const Rgb565 clearColor = Rgb565::fromFloat(0, 0, 0);
+    const Rgb565 clearColor = Rgb565::FromRgbFloat(0, 0, 0);
     mSt7789v.sendFillColor(clearColor.value);
 
     // initialization complete
@@ -102,16 +102,19 @@ void Display::tick() {
     static float t = 0.0f;
     t = std::fmod(t + 0.005f, 1.0f);
 
+    // get a colormap for interpolation
+    static const ColorMap& colorMap = ColorMaps::Test;
+
     // draw rectangle with hsl rainbow
-    Rgb565 rgb1 = Rgb565::fromHsl(t, 1.0f, 0.5f);
+    Rgb565 rgb1 = Rgb565::FromHsl(t, 1.0f, 0.5f);
     mSt7789v.sendFillRect(x, 100, 1, 40, rgb1.value);
 
     // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb2 = Rgb565::fromFloat(ColorMaps::Test.interpolateRgb(t));
+    Rgb565 rgb2 = Rgb565::From(colorMap.interpolateRgb(t));
     mSt7789v.sendFillRect(x, 150, 1, 40, rgb2.value);
 
     // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb3 = Rgb565::fromHsl(ColorMaps::Test.interpolateHsl(t));
+    Rgb565 rgb3 = Rgb565::From(colorMap.interpolateHsl(t));
     mSt7789v.sendFillRect(x, 200, 1, 40, rgb3.value);
 
     // test timer

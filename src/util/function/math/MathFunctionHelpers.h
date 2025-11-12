@@ -20,11 +20,11 @@ inline static const MathFunctionIfc& GetAnalytic(Func func){
 }
 
 template<typename Func>
-inline static const MathFunctionIfc& GetSampled(Func func, uint32_t sampleCount){
+inline static const MathFunctionIfc& GetSampled(Func func, uint32_t sampleCount, float xMin = 0.0f, float xMax = 1.0f){
     static SampledFunction instance;
     static bool initialized = false;
     if(!initialized){
-        instance.init(func, sampleCount, 0.0f, 1.0f);
+        instance.init(func, sampleCount, xMin, xMax);
         initialized = true;
     }
     return instance;

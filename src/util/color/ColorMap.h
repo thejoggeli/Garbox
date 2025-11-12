@@ -2,8 +2,8 @@
 
 #include <vector>
 #include <cstddef>
-#include "RgbFloat.h"
-#include "HslColor.h"
+#include "types/RgbFloat.h"
+#include "types/HslColor.h"
 
 namespace Garbox {
 
