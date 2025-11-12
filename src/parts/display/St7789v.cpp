@@ -4,8 +4,8 @@
 #include "core/hardware/gpio/Gpio.h"
 #include "core/hardware/ledc/LedcChannel.h"
 #include "core/time/Time.h"
-#include "global/util/FunctionInstances.h"
 #include "util/ByteUtils.h"
+#include "util/function/default/GammaFunctions.h"
 
 namespace Garbox {
 
@@ -44,7 +44,7 @@ void St7789v::setSendAsyncHandler(SendAsyncHandler handler){
 }
 
 void St7789v::setBrightness(float brightness){
-    const FunctionIfc& correctionFunction = FunctionInstances::GetGamma22Sampled();
+    const MathFunctionIfc& correctionFunction = GammaFunctions::GetGamma22();
     float brightnessCorrected = correctionFunction.evaluate(brightness);
     mPwmBlk.setDutyRelative(brightnessCorrected);
 }

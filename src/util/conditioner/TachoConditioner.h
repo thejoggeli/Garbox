@@ -1,9 +1,9 @@
 #pragma once
 
-#include "util/transform/filter/composite/CompositeFilter.h"
-#include "util/transform/filter/base/SnapFilter.h"
-#include "util/transform/filter/base/MovingAverageFilter.h"
-#include "util/transform/function/math/ScaleFunction.h"
+#include "util/function/filter/composite/CompositeFilter.h"
+#include "util/function/filter/filters/SnapFilter.h"
+#include "util/function/filter/filters/MovingAverageFilter.h"
+#include "util/function/math/standard/ScaleFunction.h"
 
 namespace Garbox {
 
@@ -46,7 +46,7 @@ private:
     MovingAverageFilter mMovingAverageFilter;
     SnapFilter mSnapFilter;
 
-    TransformIfc* mChain[NumFilters];
+    FunctionIfc* mChain[NumFilters];
     float mResults[NumFilters];
     CompositeFilter mCompositeFilter;
 };

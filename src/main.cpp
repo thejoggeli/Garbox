@@ -9,7 +9,6 @@
 #include "global/hardware/gpio/GpioInstances.h"
 #include "global/hardware/spi/SpiInstances.h"
 #include "global/hardware/timer/TimerInstances.h"
-#include "global/util/FunctionInstances.h"
 #include "parts/led/DebugLeds.h"
 #include "util/StringUtils.h"
 

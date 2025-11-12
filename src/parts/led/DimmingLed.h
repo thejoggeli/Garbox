@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-class FunctionIfc;
+class MathFunctionIfc;
 class LedcChannel;
 
 class DimmingLed {
@@ -15,7 +15,7 @@ public:
     void init();
 
     void setBrightness(float brightness);
-    void setCorrectionFunction(const FunctionIfc& function);
+    void setCorrectionFunction(const MathFunctionIfc& function);
 
     float getBrightness() const;
     float getBrightnessCorrected() const;
@@ -23,7 +23,7 @@ public:
 private:
 
     LedcChannel& mLedcChannel;
-    const FunctionIfc* mCorrectionFunction = nullptr;
+    const MathFunctionIfc* mCorrectionFunction = nullptr;
     float mBrightness = 0;
     float mBrightnessCorrected = 0;
 

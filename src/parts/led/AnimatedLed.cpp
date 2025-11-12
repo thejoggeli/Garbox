@@ -4,7 +4,7 @@
 #include <cmath>
 #include "assert/Assert.h"
 #include "core/hardware/ledc/LedcChannel.h"
-#include "global/util/FunctionInstances.h"
+#include "util/function/default/EasingFunctions.h"
 
 namespace Garbox {
 
@@ -17,14 +17,14 @@ void AnimatedLed::init(){
     AssertExit(!mInitialized, "AnimatedLed", "already initialized");
 
     if(mDefaultFunction == nullptr){
-        setDefaultFunction(FunctionInstances::GetEaseInSineSampled());
+        setDefaultFunction(EasingFunctions::GetOutSine());
     }
 
     mLed.init();
     mInitialized = true;
 }
 
-void AnimatedLed::setDefaultFunction(const FunctionIfc& fn){
+void AnimatedLed::setDefaultFunction(const MathFunctionIfc& fn){
     mDefaultFunction = &fn;
 }
 
@@ -37,7 +37,7 @@ void AnimatedLed::setBrightness(float brightness){
     mLed.setBrightness(brightness);
 }
 
-void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros, const FunctionIfc* fn){
+void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros, const MathFunctionIfc* fn){
     if(!mInitialized){
         TriggerDebug("AnimatedLed", "not initialized");
         return;
@@ -61,7 +61,7 @@ void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros,
     animationStart(1);
 }
 
-void AnimatedLed::setAnimation(const FunctionIfc& fn, uint32_t cycles, uint32_t durationMicros, float yStart, float yEnd){
+void AnimatedLed::setAnimation(const MathFunctionIfc& fn, uint32_t cycles, uint32_t durationMicros, float yStart, float yEnd){
     if(mFrameCount >= MaxPlaybackFrames){
         TriggerDebug("AnimatedLed", "playback buffer full");
         return;
@@ -71,7 +71,7 @@ void AnimatedLed::setAnimation(const FunctionIfc& fn, uint32_t cycles, uint32_t 
     animationStart(cycles);
 }
 
-void AnimatedLed::animationAddFrame(const FunctionIfc& fn, uint32_t durationMicros, float yStart, float yEnd){
+void AnimatedLed::animationAddFrame(const MathFunctionIfc& fn, uint32_t durationMicros, float yStart, float yEnd){
     if(mFrameCount >= MaxPlaybackFrames){
         TriggerDebug("AnimatedLed", "playback buffer full");
         return;

@@ -5,12 +5,12 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/util/FunctionInstances.h"
 #include "global/hardware/gpio/GpioInstances.h"
 #include "global/piezo/PiezoSequences.h"
 #include "parts/led/DebugLeds.h"
 #include "util/color/ColorMap.h"
 #include "util/color/Rgb888.h"
+#include "util/function/default/EasingFunctions.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {
@@ -38,7 +38,7 @@ void MainControl::init(){
     // fade debug leds in
     for(AnimatedLed* led : DebugLeds::GetAllLeds()){
         led->setBrightness(0);
-        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 0.0f, 1.0f);
+        led->setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 0.0f, 1.0f);
     }
 
     // init fan
@@ -89,7 +89,7 @@ void MainControl::init(){
 
     // fade debug leds out
     for(AnimatedLed* led : DebugLeds::GetAllLeds()){
-        led->setAnimation(FunctionInstances::GetEaseInOutSineSampled(), 1, 250_ms, 1.0f, 0.0f);
+        led->setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 1.0f, 0.0f);
     }
 
     // wait until led fade out complete
@@ -104,9 +104,9 @@ void MainControl::init(){
 
     // setup heartbeat led animation
     mHeartbeatLed.animationClear();
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 0.0f,  1.0f);
+    mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 0.0f,  1.0f);
     mHeartbeatLed.animationAddDelay(200_ms);
-    mHeartbeatLed.animationAddFrame(FunctionInstances::GetEaseInOutSineSampled(), 800_ms, 1.0f,  0.0f);
+    mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 1.0f,  0.0f);
 
     // init complete
     mInitialized = true;
@@ -259,7 +259,7 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
             break;
         case Button::State::Released: {
             mPiezoPlayer.playTone(Tone(80_ms, 1000), deadTime);
-            DebugLeds::GetLed(DebugLeds::Id::Custom2).setAnimation(FunctionInstances::GetEaseOutSineSampled(), 1, 125_ms, 1.0f, 0.0f);
+            DebugLeds::GetLed(DebugLeds::Id::Custom2).setAnimation(EasingFunctions::GetOutSine(), 1, 125_ms, 1.0f, 0.0f);
             // update heatpad period on click
             if(oldState == Button::State::Pressed){
                 periodMicros = MathUtils::Wrap(periodMicros + 1000_ms, 1000_ms, 8000_ms);
