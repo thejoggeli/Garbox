@@ -39,6 +39,15 @@ void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uin
     mAnimationTask.start(handleAnimationTask, this);
 }
 
+
+void AnimatedLedGroup::stopTask(){
+    LockGuard lock(mMutex);
+    if(!mAnimationTask.isRunning()){
+        return;
+    }
+    mAnimationTask.stop();
+}
+
 void AnimatedLedGroup::handleAnimationTask(void* self){
     static_cast<AnimatedLedGroup*>(self)->tick();
 }

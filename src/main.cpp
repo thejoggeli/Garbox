@@ -13,6 +13,7 @@
 #include "global/hardware/spi/SpiInstances.h"
 #include "global/hardware/timer/TimerInstances.h"
 #include "global/providers/PartsProvider.h"
+#include "parts/piezo/PiezoPlayer.h"
 #include "util/StringUtils.h"
 
 using namespace Garbox;
@@ -84,7 +85,7 @@ void setup() {
     Profiler::Setup(ProfilerConfig::Count);
     Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
 
-    // init status leds
+    // init and start status leds
     StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
     statusLeds.init();
     statusLeds.startTask(
@@ -93,6 +94,17 @@ void setup() {
         AppConfig::StatusLedsTaskStackSize,
         AppConfig::StatusLedsTaskPriority,
         AppConfig::StatusLedsTaskCore
+    );
+
+    // init and start piezo player
+    PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
+    piezoPlayer.init();
+    piezoPlayer.startTask(
+        AppConfig::PiezoPlayerTaskName,
+        AppConfig::PiezoPlayerTaskFrequencyHz,
+        AppConfig::PiezoPlayerTaskStackSize,
+        AppConfig::PiezoPlayerTaskPriority,
+        AppConfig::PiezoPlayerTaskCore
     );
 
     // init main app

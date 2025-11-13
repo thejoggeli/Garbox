@@ -22,13 +22,8 @@ public:
     void init();
     void tick();
 
-    void startTask(
-        const char* taskName,
-        uint32_t frequencyHz,
-        uint32_t stackSize,
-        UBaseType_t priority,
-        BaseType_t coreId
-    );
+    void startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
+    void stopTask();
 
     AnimatedLed& getLed(uint8_t index);
     Garbox::Span<AnimatedLed>& getAllLeds();

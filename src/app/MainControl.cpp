@@ -47,7 +47,6 @@ void MainControl::init(){
     AssertExit(!mInitialized, "MainControl", "already initialized");
 
     // init piezo player and play sweep in
-    mPiezoPlayer.init();
     mPiezoPlayer.playTone(Tone(250_ms).sweep(300, 1000).duty(0.25f));
 
     // fade debug leds in

@@ -76,4 +76,8 @@ void PeriodicTask::taskLoop(void* arg){
     }
 }
 
+TaskHandle_t& PeriodicTask::getHandle(){
+    return mTaskHandle;
+}
+
 } // namespace Garbox

@@ -35,18 +35,33 @@ void PiezoPlayer::init(uint32_t defaultSilentTimeMicros){
 
     // initialization complete
     mInitialized = true;
+}
 
-    // start task
-    BaseType_t taskRes = xTaskCreatePinnedToCore(
-        handleTask,
-        AppConfig::PiezoPlayerTaskName,
-        AppConfig::PiezoPlayerTaskStackSize,
-        this,
-        AppConfig::PiezoPlayerTaskPriority,
-        &mTaskHandle,
-        AppConfig::PiezoPlayerTaskCore
-    );
-    AssertExit((taskRes == pdPASS) && (mTaskHandle != nullptr), "PiezoPlayer", "start task failed");
+void PiezoPlayer::startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId){
+    LockGuard lock(mMutex);
+
+    AssertExit(mInitialized, "PiezoPlayer", "not initialized");
+    AssertExit(frequencyHz > 0, "PiezoPlayer", "frequency must be > 0");
+    AssertExit(!mPeriodicTask.isRunning(), "PiezoPlayer", "task already running");
+
+    // configure and start task
+    mPeriodicTask.configure(taskName, frequencyHz, stackSize, priority, coreId);
+    mPeriodicTask.start(handlePeriodicTask, this);
+}
+
+void PiezoPlayer::stopTask(){
+    LockGuard lock(mMutex);
+    if(!mPeriodicTask.isRunning()){
+        return;
+    }
+
+    // stop task
+    mPeriodicTask.stop();
+
+    // stop playing
+    if(mPlaying){
+        stop();
+    }
 }
 
 void PiezoPlayer::stop(){
@@ -54,9 +69,10 @@ void PiezoPlayer::stop(){
     mPlaying = false;
     mCurrentSequence = nullptr;
     mCurrentToneIndex = 0;
+    clearQueue();
 }
 
-void PiezoPlayer::handleTask(void* player){
+void PiezoPlayer::handlePeriodicTask(void* player){
     
     // get self
     AssertExit(player != nullptr, "PiezoPlayer", "player is nullptr");
@@ -164,7 +180,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence){
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTimeMicros){
     Garbox::LockGuard lock(mMutex);
-    if(!mInitialized || (mTaskHandle == nullptr)){
+    if(!mInitialized || !mPeriodicTask.isRunning()){
         TriggerDebug("PiezoPlayer", "invalid state");
         return;
     }
@@ -201,7 +217,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
     // begin playing sequence
     if(!mPlaying){
         playNextInQueue();
-        xTaskNotifyGive(mTaskHandle);
+        xTaskNotifyGive(mPeriodicTask.getHandle());
     }
 }
 
@@ -212,7 +228,7 @@ void PiezoPlayer::playTone(const Tone& tone){
 
 void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
     Garbox::LockGuard lock(mMutex);
-    if(!mInitialized || (mTaskHandle == nullptr)){
+    if(!mInitialized || !mPeriodicTask.isRunning()){
         TriggerDebug("PiezoPlayer", "invalid state");
         return;
     }
@@ -249,7 +265,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
     // begin playing sequence
     if(!mPlaying){
         playNextInQueue();
-        xTaskNotifyGive(mTaskHandle);
+        xTaskNotifyGive(mPeriodicTask.getHandle());
     }
 }
 

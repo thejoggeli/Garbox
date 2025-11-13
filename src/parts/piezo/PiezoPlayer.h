@@ -1,11 +1,13 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
 #include "Piezo.h"
 #include "ToneSequence.h"
+
+#include <cstddef>
+#include <cstdint>
+#include "core/rtos/PeriodicTask.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 #include "util/container/RingBuffer.h"
 
 namespace Garbox {
@@ -21,6 +23,9 @@ public:
     void init(uint32_t defaultSilentTimeMicros = 50'000);
     void stop();
     void clearQueue();
+
+    void startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
+    void stopTask();
 
     void playSequence(const ToneSequence& sequence);
     void playSequence(const ToneSequence& sequence, uint32_t SilentTime);
@@ -40,7 +45,7 @@ private:
 
     void playNextInQueue();
 
-    static void handleTask(void* player);
+    static void handlePeriodicTask(void* self);
     void tick();
 
     static constexpr size_t QueueSize = 20; // also includes silent tones for Silent time
@@ -59,19 +64,19 @@ private:
 
     Piezo mPiezo;
     uint32_t mDefaultSilentTimeMicros = 0;
+    bool mInitialized = false;
 
     Tone mSingleTone = Tone(0, 0); 
     const ToneSequence mSingleSequence = ToneSequence(&mSingleTone, 1);
     const ToneSequence* mCurrentSequence = nullptr;
 
     RingBuffer<QueueItem, QueueSize> mQueue;
-
     size_t mCurrentToneIndex = 0;
     uint32_t mLastTimeMicros = 0;
     bool mPlaying = false;
-    bool mInitialized = false;
+
     SemaphoreHandle_t mMutex = nullptr;
-    TaskHandle_t mTaskHandle = nullptr;
+    PeriodicTask mPeriodicTask;
 };
 
 } // namespace Garbox
