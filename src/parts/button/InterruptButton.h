@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "ButtonIfc.h"
-#include "PollingButton.h"
+#include "FsmButton.h"
 #include "core/hardware/gpio/Gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
@@ -12,39 +12,38 @@ namespace Garbox {
 /**
  * Interrupt-based Button implementation.
  * 
- * Uses GPIO interrupts to detect state changes and forwards them to the PollingButton state machine.
+ * Uses GPIO interrupts to detect state changes and forwards them to the FsmButton state machine.
  */
 class InterruptButton : ButtonIfc {
 public:
     InterruptButton(Gpio& gpio);
-    ~InterruptButton();
 
-    void init();
-    void tick();
+    void init() final;
+    void tick() final;
 
-    // delegate PollingButton API
-    bool isPressed() const;
-    bool isReleased() const;
-    bool isLongPressed() const;
+    // delegate FsmButton API
+    bool isPressed() const final;
+    bool isReleased() const final;
+    bool isLongPressed() const final;
 
-    void setStateChangedCallback(ButtonIfc::StateChangedCallback callback);
-    void setHoldCallback(ButtonIfc::HoldCallback callback);
-    void setUserData(void* userData);
+    void setStateChangedCallback(ButtonIfc::StateChangedCallback callback) final;
+    void setHoldCallback(ButtonIfc::HoldCallback callback) final;
+    void setUserData(void* userData) final;
 
-    void setPressedToReleasedDelayMicros(uint32_t micros); // minumum stable signal time before "Pressed => Released" transition is realized
-    void setReleasedToPressedDelayMicros(uint32_t micros); // minumum stable signal time before "Released => Pressed" transition is realized
-    void setPressedHoldTimeMicros(uint32_t micros);        // minumum time the "Pressed"  state will be held once entered
-    void setReleasedHoldTimeMicros(uint32_t micros);       // minumum time the "Released" state will be held once entered
+    void setPressedToReleasedDelayMicros(uint32_t micros) final;
+    void setReleasedToPressedDelayMicros(uint32_t micros) final;
+    void setPressedHoldTimeMicros(uint32_t micros) final;
+    void setReleasedHoldTimeMicros(uint32_t micros) final;
 
-    void setLongPressMicros(uint32_t delayMicros);
-    void setInitialHoldDelayMicros(uint32_t delayMicros);
-    void setRepeatHoldDelayMicros(uint32_t delayMicros);
+    void setLongPressMicros(uint32_t delayMicros) final;
+    void setInitialHoldDelayMicros(uint32_t delayMicros) final;
+    void setRepeatHoldDelayMicros(uint32_t delayMicros) final;
 
 private:
     static void IRAM_ATTR isrHandler(void* arg);
 
     Gpio& mGpio;
-    PollingButton mButton;
+    FsmButton mButton;
 
     int32_t mPin = -1;
     bool mInvert = false;

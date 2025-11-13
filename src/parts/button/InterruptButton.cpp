@@ -19,10 +19,6 @@ InterruptButton::InterruptButton(Gpio& gpio):
     // constructor body
 }
 
-InterruptButton::~InterruptButton(){
-    TriggerExit("InterruptButton", "heap using classes must not be deconstructed");
-}
-
 void InterruptButton::init(){
     AssertExit(!mInitialized, "InterruptButton", "already initialized");
     AssertExit(mGpio.isInput(), "InterruptButton", "gpio must be configured as input");
@@ -111,8 +107,7 @@ void InterruptButton::tick(){
         if(missedPulse){
             // handle missed pulse
             const uint32_t missedPulseDuration = Time::CpuCyclesToMicros(pulseEndCpuCycles - pulseStartCpuCycles);
-            const bool missedPulseState = mInvert ? mCurrentLevelRaw : !mCurrentLevelRaw;
-            mButton.handleMissedPulse(missedPulseState, missedPulseDuration);
+            mButton.handleMissedPulse(missedPulseDuration);
             #if GarboxDebugInterruptButton
                 LogDebug("InterruptButton", "detected missed pulse state=%" PRIu32 ", duration=%" PRIu32 "us", missedPulseState, missedPulseDuration);
             #endif
@@ -132,7 +127,9 @@ void InterruptButton::tick(){
         LogDebug("InterruptButton", "state=%" PRIu32, mCurrentRawState);
     #endif
     
-    mButton.tick(mInvert ? !mCurrentLevelRaw : mCurrentLevelRaw);
+    bool pressed = mInvert ? !mCurrentLevelRaw : mCurrentLevelRaw;
+    mButton.setPhysicalButtonState(pressed);
+    mButton.tick();
 }
 
 bool InterruptButton::isPressed() const {

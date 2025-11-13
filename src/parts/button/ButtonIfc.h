@@ -32,7 +32,7 @@ public:
         Count
     };
 
-    inline const char* StateToString(State state){
+    inline static const char* StateToString(State state){
         switch(state){
         case State::Released: return "Released";
         case State::Pressed: return "Pressed";
@@ -45,7 +45,7 @@ public:
     using HoldCallback = std::function<void(uint32_t counter, uint32_t holdTimeMicros, void* userData)>;
 
     virtual void init() = 0;
-    virtual void tick(bool isPressedRaw) = 0;
+    virtual void tick() = 0;
 
     // set callbacks
     virtual void setStateChangedCallback(StateChangedCallback callback) = 0;

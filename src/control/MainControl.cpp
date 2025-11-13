@@ -59,7 +59,7 @@ void MainControl::init(){
     mButton.setLongPressMicros(600_ms),
     mButton.setInitialHoldDelayMicros(1200_ms);
     mButton.setRepeatHoldDelayMicros(300_ms);
-    mButton.setStateChangedCallback([this](Button::State oldState, Button::State newState, void* userData){
+    mButton.setStateChangedCallback([this](ButtonIfc::State oldState, ButtonIfc::State newState, void* userData){
         handleButtonStateChanged(oldState, newState);
     });
     mButton.setHoldCallback([this](uint32_t counter, uint32_t holdTimeMicros, void* userData){
@@ -236,18 +236,18 @@ void MainControl::onAssertExit(const char* context, const char* message){
     }
 }
 
-void MainControl::handleButtonStateChanged(Button::State oldState, Button::State newState){
-    LogDebug("MainControl", "button state changed: %s => %s", Button::StateToString(oldState), Button::StateToString(newState));
+void MainControl::handleButtonStateChanged(ButtonIfc::State oldState, ButtonIfc::State newState){
+    LogDebug("MainControl", "button state changed: %s => %s", ButtonIfc::StateToString(oldState), ButtonIfc::StateToString(newState));
     const uint32_t deadTime = 0;
     static uint32_t periodMicros = 5000_ms;
     static float duty = 0.5f;
     switch(newState){
-        case Button::State::Pressed: {
+        case ButtonIfc::State::Pressed: {
             mPiezoPlayer.playTone(Tone(40_ms, 2000), deadTime);
             DebugLeds::GetLed(DebugLeds::Id::Custom2).setBrightness(1.0f);
             break;
         }
-        case Button::State::PressedLong:
+        case ButtonIfc::State::PressedLong:
             mPiezoPlayer.playTone(Tone(80_ms, 3000), deadTime);
             // update heatpad duty on long press
             duty = MathUtils::Wrap(duty + 0.25f, 0.25f, 1.0f);
@@ -257,11 +257,11 @@ void MainControl::handleButtonStateChanged(Button::State oldState, Button::State
                 mHeatpad.getNextPeriodDurationMicros()/1000
             );
             break;
-        case Button::State::Released: {
+        case ButtonIfc::State::Released: {
             mPiezoPlayer.playTone(Tone(80_ms, 1000), deadTime);
             DebugLeds::GetLed(DebugLeds::Id::Custom2).setAnimation(EasingFunctions::GetOutSine(), 1, 125_ms, 1.0f, 0.0f);
             // update heatpad period on click
-            if(oldState == Button::State::Pressed){
+            if(oldState == ButtonIfc::State::Pressed){
                 periodMicros = MathUtils::Wrap(periodMicros + 1000_ms, 1000_ms, 8000_ms);
                 mHeatpad.setPeriodDurationMicros(periodMicros);
                 LogDebug("MainControl", "Heatpad set to: pwm=%2.0f%%, period=%" PRIu32 "ms", 
