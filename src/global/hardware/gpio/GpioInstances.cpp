@@ -6,7 +6,6 @@
 
 namespace Garbox {
 
-constexpr bool InitialAny = false;
 constexpr bool InitialLow = false;
 constexpr bool InitialHigh = true;
 
@@ -43,7 +42,7 @@ void GpioInstances::Init(){
 
     // fan
     InitGpio(GetFanEnable(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
-    InitGpio(GetFanTacho(),  { Mode::Input,  Pull::Disable, Interrupt::Disable, NonInverted }, InitialAny);
+    InitGpio(GetFanTacho(),  { Mode::Input,  Pull::Disable, Interrupt::Disable, NonInverted });
 
     // display
     InitGpio(GetDisplayDc(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
@@ -54,7 +53,10 @@ void GpioInstances::Init(){
     InitGpio(GetHeatEnable(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
     
     // rotary encoder
-    InitGpio(GetEncoderButton(), { Mode::Input, Pull::Disable, Interrupt::Disable, Inverted }, InitialLow);
+    InitGpio(GetEncoderButton(), { Mode::Input, Pull::Disable, Interrupt::Disable, Inverted });
+    
+    // rgb led
+    InitGpio(GetRgbLed(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
 
     // initialization complete
     gInitialized = true;
@@ -78,5 +80,8 @@ Gpio& GpioInstances::GetHeatEnable(){ return GetGpioInstance<PinConfig::HeatpadE
 
 // rotary encoder
 Gpio& GpioInstances::GetEncoderButton(){ return GetGpioInstance<PinConfig::RotaryEncoderC>(); }
+
+// rgb led
+Gpio& GpioInstances::GetRgbLed(){ return GetGpioInstance<PinConfig::RgbLed>(); }
 
 } // namespace

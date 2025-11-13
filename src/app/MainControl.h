@@ -6,12 +6,15 @@
 
 namespace Garbox {
 
-class AnimatedLed;
 class ButtonIfc;
 class Display;
 class Fan;
 class Heatpad;
 class PiezoPlayer;
+
+class AnimatedLed;
+class RgbLed;
+class StatusLeds;
 
 class MainControl {
 public:
@@ -33,7 +36,11 @@ private:
     void handleFanStateChanged(Fan::State oldState, Fan::State newState);
     void handleFanStalledAlert(uint32_t counter);
 
+    RgbLed& mRgbLed;
+    StatusLeds& mStatusLeds;
     AnimatedLed& mHeartbeatLed;
+    AnimatedLed& mFanStatusLed;
+    AnimatedLed& mButtonStatusLed;
 
     Fan& mFan;
     Heatpad& mHeatpad;

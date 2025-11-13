@@ -22,6 +22,8 @@ public:
     static Gpio& GetHeatEnable();
 
     static Gpio& GetEncoderButton();
+    
+    static Gpio& GetRgbLed();
 
 };
 

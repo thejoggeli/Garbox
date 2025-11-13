@@ -20,6 +20,12 @@ public:
     float getBrightness() const;
     float getBrightnessCorrected() const;
 
+    // Disallow copy and move 
+    DimmingLed(const DimmingLed&) = delete;
+    DimmingLed& operator=(const DimmingLed&) = delete;
+    DimmingLed(DimmingLed&&) = delete;
+    DimmingLed& operator=(DimmingLed&&) = delete;
+
 private:
 
     LedcChannel& mLedcChannel;

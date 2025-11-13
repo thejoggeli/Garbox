@@ -8,6 +8,9 @@ class Fan;
 class Heatpad;
 class PiezoPlayer;
 
+class StatusLeds;
+class RgbLed;
+
 class PartsProvider {
 public:
 
@@ -16,6 +19,9 @@ public:
     static Display& GetDisplay(); 
     static PiezoPlayer& GetPiezoPlayer(); 
     static ButtonIfc& GetEncoderButton(); 
+
+    static StatusLeds& GetStatusLeds(); 
+    static RgbLed& GetRgbLed();
 
 };
 

@@ -1,15 +1,18 @@
+
+#include "app/MainControl.h"
+#include "app/StatusLeds.h"
 #include "assert/AssertHandler.h"
-#include "control/MainControl.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "global/config/AppConfig.h"
+#include "global/config/StatusLedsConfig.h"
 #include "global/hardware/adc/AdcInstances.h"
 #include "global/hardware/ledc/LedcInstances.h"
 #include "global/hardware/gpio/GpioInstances.h"
 #include "global/hardware/spi/SpiInstances.h"
 #include "global/hardware/timer/TimerInstances.h"
-#include "parts/led/DebugLeds.h"
+#include "global/providers/PartsProvider.h"
 #include "util/StringUtils.h"
 
 using namespace Garbox;
@@ -26,25 +29,41 @@ void setup() {
     
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message, int32_t arg){
+
+        // print error to log
         LogError("AssertHandler", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
-        if(DebugLeds::IsInitialized()){
-            DebugLeds::SetLed(DebugLeds::Id::Assert, true);
+
+        // turn on error led
+        StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+        if(statusLeds.isInitialized()){
+            AnimatedLed& errorLed = statusLeds.getLed(StatusLed::Error);
+            errorLed.setBrightness(1.0f);
         }
+
+        // trigger main controll assert debug handler
         gMainControl.onAssertDebug(context, message);
     });
 
     // assert exit handler
     AssertHandler::SetExitHandler([](const char* context, const char* message, int32_t arg){
+
+        // print error to log
         LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
-        if(DebugLeds::IsInitialized()){
-            DebugLeds::SetLed(DebugLeds::Id::Assert, true);
+        
+        // turn on all status leds
+        StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+        if(statusLeds.isInitialized()){
+            for(AnimatedLed& led : statusLeds.getAllLeds()){
+                led.setBrightness(1.0f);
+            }
         }
+
+        // trigger main control assert exit handler
         gMainControl.onAssertExit(context, message);
+
+        // enter endless loop and periodically print error to log
         while(true){
             LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
-            if(DebugLeds::IsInitialized()){
-                DebugLeds::ToggleAllLeds();
-            }
             Time::DelayMillis(1000);
         }
     });
@@ -65,8 +84,16 @@ void setup() {
     Profiler::Setup(ProfilerConfig::Count);
     Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
 
-    // init debug leds
-    DebugLeds::Init();
+    // init status leds
+    StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+    statusLeds.init();
+    statusLeds.startTask(
+        AppConfig::StatusLedsTaskName,
+        AppConfig::StatusLedsTaskFrequencyHz,
+        AppConfig::StatusLedsTaskStackSize,
+        AppConfig::StatusLedsTaskPriority,
+        AppConfig::StatusLedsTaskCore
+    );
 
     // init main app
     gMainControl.init();

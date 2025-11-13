@@ -31,13 +31,11 @@ public:
     static constexpr uint32_t PiezoPlayerTaskCore = 1;
 
     // Led Task
-    static constexpr const char* LedAnimationTaskName = "LedAnimationTask";
-    static constexpr uint32_t LedAnimationTaskFrequencyHz = 60;
-    static constexpr uint32_t LedAnimationTaskDurationMicros = 1'000'000 / LedAnimationTaskFrequencyHz;
-    static constexpr uint32_t LedAnimationTaskDurationMillis = 1'000 / LedAnimationTaskFrequencyHz;
-    static constexpr uint32_t LedAnimationTaskPriority = 14;
-    static constexpr uint32_t LedAnimationTaskStackSize = 1024*2;
-    static constexpr uint32_t LedAnimationTaskCore = 1;
+    static constexpr const char* StatusLedsTaskName = "LedAnimationTask";
+    static constexpr uint32_t StatusLedsTaskFrequencyHz = 60;
+    static constexpr uint32_t StatusLedsTaskPriority = 14;
+    static constexpr uint32_t StatusLedsTaskStackSize = 1024*2;
+    static constexpr uint32_t StatusLedsTaskCore = 1;
 
     // Display
     static constexpr const char* DisplayTaskName = "DisplayTask";

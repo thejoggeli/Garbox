@@ -1,5 +1,7 @@
 #include "MainControl.h"
 
+#include "app/StatusLeds.h"
+
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
 
@@ -7,12 +9,13 @@
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 
+#include "global/config/StatusLedsConfig.h"
 #include "global/providers/PartsProvider.h"
 #include "global/providers/PiezoSequences.h"
 
 #include "parts/display/Display.h"
 #include "parts/heatpad/Heatpad.h"
-#include "parts/led/DebugLeds.h"
+#include "parts/led/rgb/RgbLed.h"
 #include "parts/piezo/PiezoPlayer.h"
 
 #include "util/color/ColorMap.h"
@@ -27,7 +30,11 @@ static constexpr uint32_t HeartbeatInterval = 2000_ms;
 
 MainControl::MainControl() : 
     // init memebers
-    mHeartbeatLed(DebugLeds::GetLed(DebugLeds::Id::Heartbeat)),
+    mRgbLed(PartsProvider::GetRgbLed()),
+    mStatusLeds(PartsProvider::GetStatusLeds()),
+    mHeartbeatLed(mStatusLeds.getLed(StatusLed::Heartbeat)),
+    mFanStatusLed(mStatusLeds.getLed(StatusLed::Custom1)),
+    mButtonStatusLed(mStatusLeds.getLed(StatusLed::Custom2)),
     mFan(PartsProvider::GetFan()),
     mHeatpad(PartsProvider::GetHeatpad()),
     mDisplay(PartsProvider::GetDisplay()),
@@ -44,9 +51,9 @@ void MainControl::init(){
     mPiezoPlayer.playTone(Tone(250_ms).sweep(300, 1000).duty(0.25f));
 
     // fade debug leds in
-    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
-        led->setBrightness(0);
-        led->setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 0.0f, 1.0f);
+    for(AnimatedLed& led : mStatusLeds.getAllLeds()){
+        led.setBrightness(0);
+        led.setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 0.0f, 1.0f);
     }
 
     // init fan
@@ -96,8 +103,8 @@ void MainControl::init(){
     mPiezoPlayer.playTone(Tone(250_ms).sweep(1000, 300).duty(0.25f));
 
     // fade debug leds out
-    for(AnimatedLed* led : DebugLeds::GetAllLeds()){
-        led->setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 1.0f, 0.0f);
+    for(AnimatedLed& led : mStatusLeds.getAllLeds()){
+        led.setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 1.0f, 0.0f);
     }
 
     // wait until led fade out complete
@@ -156,37 +163,37 @@ void MainControl::tick(){
                 mFan.setEnabled(0);
                 mFan.setSpeed(0.0f);
                 mFanStateTimer.restart(4000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.0f, 600_ms);
+                mFanStatusLed.setBrightnessSmooth(0.0f, 600_ms);
                 break;
             case 1:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.4f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.4f, 600_ms);
+                mFanStatusLed.setBrightnessSmooth(0.4f, 600_ms);
                 break;
             case 2:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.6f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.6f, 600_ms);
+                mFanStatusLed.setBrightnessSmooth(0.6f, 600_ms);
                 break;
             case 3:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.8f);
                 mFanStateTimer.start(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.8f, 600_ms);
+                mFanStatusLed.setBrightnessSmooth(0.8f, 600_ms);
                 break;
             case 4:
                 mFan.setEnabled(1);
                 mFan.setSpeed(1.0f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(1.0f, 600_ms);
+                mFanStatusLed.setBrightnessSmooth(1.0f, 600_ms);
                 break;
             case 5:
                 mFan.setEnabled(1);
                 mFan.setSpeed(0.5f);
                 mFanStateTimer.restart(8000_ms);
-                DebugLeds::GetLed(DebugLeds::Id::Custom1).setBrightnessSmooth(0.5f, 600_ms);
+                mFanStatusLed.setBrightnessSmooth(0.5f, 600_ms);
                 break;
             default:
                 // nothing to do
@@ -224,7 +231,7 @@ void MainControl::tick(){
     float const tColorMap = mHeatpad.getMeasuredVoltage() / 17.0f;
     HslColor hslColor = colorMap.interpolateHsl(tColorMap);
     hslColor.l = brightness;
-    DebugLeds::SetRgbLed(hslColor.toLinearRgb());
+    mRgbLed.setColor(hslColor.toLinearRgb());
 
     // display tick
     Profiler::Begin(ProfilerConfig::DisplayTick);
@@ -252,7 +259,7 @@ void MainControl::handleButtonStateChanged(ButtonIfc::State oldState, ButtonIfc:
     switch(newState){
         case ButtonIfc::State::Pressed: {
             mPiezoPlayer.playTone(Tone(40_ms, 2000), deadTime);
-            DebugLeds::GetLed(DebugLeds::Id::Custom2).setBrightness(1.0f);
+            mButtonStatusLed.setBrightness(1.0f);
             break;
         }
         case ButtonIfc::State::PressedLong:
@@ -267,7 +274,7 @@ void MainControl::handleButtonStateChanged(ButtonIfc::State oldState, ButtonIfc:
             break;
         case ButtonIfc::State::Released: {
             mPiezoPlayer.playTone(Tone(80_ms, 1000), deadTime);
-            DebugLeds::GetLed(DebugLeds::Id::Custom2).setAnimation(EasingFunctions::GetOutSine(), 1, 125_ms, 1.0f, 0.0f);
+            mButtonStatusLed.setAnimation(EasingFunctions::GetOutSine(), 1, 125_ms, 1.0f, 0.0f);
             // update heatpad period on click
             if(oldState == ButtonIfc::State::Pressed){
                 periodMicros = MathUtils::Wrap(periodMicros + 1000_ms, 1000_ms, 8000_ms);
