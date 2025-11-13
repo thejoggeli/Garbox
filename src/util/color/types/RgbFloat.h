@@ -19,8 +19,8 @@ public:
     RgbFloat();
     RgbFloat(float r, float g, float b);
 
-    RgbFloat toStandardRGB() const;
-    RgbFloat toLinearRGB() const;
+    RgbFloat toStandardRgb() const;
+    RgbFloat toLinearRgb() const;
 
     static RgbFloat From(const HslColor& hsl);
     static RgbFloat From(const LabColor& lab);

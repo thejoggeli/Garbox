@@ -17,7 +17,7 @@ ColorMap::ColorMap(std::initializer_list<RgbFloat> stops){
     // create color sample entry for each stop
     for(const RgbFloat& srgb : stops){
         const HslColor hsl = HslColor::From(srgb);
-        const RgbFloat linearRgb = srgb.toLinearRGB();
+        const RgbFloat linearRgb = srgb.toLinearRgb();
         const LabColor lab = LabColor::From(linearRgb);
         mSamples.emplace_back(srgb, linearRgb, hsl, lab);
     }
@@ -32,7 +32,7 @@ ColorMap::ColorMap(std::initializer_list<HslColor> stops){
     // create color sample entry for each stop
     for(const HslColor& hsl : stops){
         const RgbFloat sRgb = RgbFloat::From(hsl);
-        const RgbFloat linearRgb = sRgb.toLinearRGB();
+        const RgbFloat linearRgb = sRgb.toLinearRgb();
         const LabColor lab = LabColor::From(linearRgb);
         mSamples.emplace_back(sRgb, linearRgb, hsl, lab);
     }
@@ -61,7 +61,7 @@ void ColorMap::initializeFromRgbStops(std::initializer_list<RgbStop> stops){
     auto it = stops.begin();
     float tPrev = it->t;
     RgbFloat srgbPrev = it->color;
-    RgbFloat linPrev = srgbPrev.toLinearRGB();
+    RgbFloat linPrev = srgbPrev.toLinearRgb();
     HslColor hslPrev = HslColor::From(srgbPrev);
     LabColor labPrev = LabColor::From(linPrev);
 
@@ -70,7 +70,7 @@ void ColorMap::initializeFromRgbStops(std::initializer_list<RgbStop> stops){
 
         // get current stop color
         const RgbFloat srgbCurr = it->color;
-        const RgbFloat linCurr = srgbCurr.toLinearRGB();
+        const RgbFloat linCurr = srgbCurr.toLinearRgb();
         const HslColor hslCurr = HslColor::From(srgbCurr);
         const LabColor labCurr = LabColor::From(linCurr);
 
@@ -121,7 +121,7 @@ void ColorMap::initializeFromHslStops(std::initializer_list<HslStop> stops){
     float tPrev = it->t;
     HslColor hslPrev = it->color;
     RgbFloat srgbPrev = RgbFloat::From(hslPrev);
-    RgbFloat linPrev = srgbPrev.toLinearRGB();
+    RgbFloat linPrev = srgbPrev.toLinearRgb();
     LabColor labPrev = LabColor::From(linPrev);
 
     while(++it != stops.end()){
@@ -130,7 +130,7 @@ void ColorMap::initializeFromHslStops(std::initializer_list<HslStop> stops){
         // add current stop color
         const HslColor hslCurr = it->color;
         const RgbFloat srgbCurr = RgbFloat::From(hslCurr);
-        const RgbFloat linCurr = srgbCurr.toLinearRGB();
+        const RgbFloat linCurr = srgbCurr.toLinearRgb();
         const LabColor labCurr = LabColor::From(linCurr);
         
         // last sample, no further interpolation

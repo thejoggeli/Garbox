@@ -13,11 +13,11 @@ LabColor::LabColor(float LVal, float aVal, float bVal) : L(LVal), a(aVal), b(bVa
     // constructor body
 }
 
-RgbFloat LabColor::toStandardRGB() const {
-    return ColorConverter::ToRgbFloat(*this).toStandardRGB();
+RgbFloat LabColor::toStandardRgb() const {
+    return ColorConverter::ToRgbFloat(*this).toStandardRgb();
 }
 
-RgbFloat LabColor::toLinearRGB() const {
+RgbFloat LabColor::toLinearRgb() const {
     return ColorConverter::ToRgbFloat(*this); // already in linear space
 }
 

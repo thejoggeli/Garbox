@@ -13,12 +13,12 @@ HslColor::HslColor(float hVal, float sVal, float lVal) : h(hVal), s(sVal), l(lVa
     // constructor body
 }
 
-RgbFloat HslColor::toStandardRGB() const {
+RgbFloat HslColor::toStandardRgb() const {
     return ColorConverter::ToRgbFloat(*this); // already in sRGB space
 }
 
-RgbFloat HslColor::toLinearRGB() const {
-    return ColorConverter::ToRgbFloat(*this).toLinearRGB();
+RgbFloat HslColor::toLinearRgb() const {
+    return ColorConverter::ToRgbFloat(*this).toLinearRgb();
 }
 
 HslColor HslColor::From(const RgbFloat& rgb) {

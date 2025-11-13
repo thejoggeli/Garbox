@@ -212,11 +212,11 @@ void MainControl::tick(){
         RgbFloat(1.0f, 0.0f, 0.0f), // red
         RgbFloat(0.0f, 0.0f, 1.0f), // blue
     };
-    constexpr float brightness = 0.18f;
+    constexpr float brightness = 0.14f;
     float const tColorMap = mHeatpad.getMeasuredVoltage() / 17.0f;
     HslColor hslColor = colorMap.interpolateHsl(tColorMap);
     hslColor.l = brightness;
-    DebugLeds::SetRgbLed(hslColor.toLinearRGB());
+    DebugLeds::SetRgbLed(hslColor.toLinearRgb());
 
     // display tick
     Profiler::Begin(ProfilerConfig::DisplayTick);

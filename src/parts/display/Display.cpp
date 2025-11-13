@@ -114,7 +114,7 @@ void Display::tick() {
     mSt7789v.sendFillRect(x, 80, 1, 30, rgb2.value);
 
     // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb3 = Rgb565::From(colorMap.interpolateLinearRgb(t).toStandardRGB());
+    Rgb565 rgb3 = Rgb565::From(colorMap.interpolateLinearRgb(t).toStandardRgb());
     mSt7789v.sendFillRect(x, 120, 1, 30, rgb3.value);
 
     // draw rectangle with colormap (hsl interpolation)
@@ -122,7 +122,7 @@ void Display::tick() {
     mSt7789v.sendFillRect(x, 160, 1, 30, rgb4.value);
 
     // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb5 = Rgb565::From(colorMap.interpolateLab(t).toStandardRGB());
+    Rgb565 rgb5 = Rgb565::From(colorMap.interpolateLab(t).toStandardRgb());
     mSt7789v.sendFillRect(x, 200, 1, 30, rgb5.value);
 
     // test timer

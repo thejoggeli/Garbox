@@ -16,7 +16,7 @@ RgbFloat::RgbFloat(float rVal, float gVal, float bVal) : r(rVal), g(gVal), b(bVa
     // constructor body
 }
 
-RgbFloat RgbFloat::toStandardRGB() const {
+RgbFloat RgbFloat::toStandardRgb() const {
     static const MathFunctionIfc& gammaInverse = GammaFunctions::GetGammaInverse22();
     return RgbFloat(
         gammaInverse.evaluate(r),
@@ -25,7 +25,7 @@ RgbFloat RgbFloat::toStandardRGB() const {
     );
 }
 
-RgbFloat RgbFloat::toLinearRGB() const {
+RgbFloat RgbFloat::toLinearRgb() const {
     static const MathFunctionIfc& gamma = GammaFunctions::GetGamma22();
     return RgbFloat(
         gamma.evaluate(r),

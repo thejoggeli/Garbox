@@ -16,8 +16,8 @@ public:
     HslColor();
     HslColor(float h, float s, float l);
 
-    RgbFloat toStandardRGB() const;
-    RgbFloat toLinearRGB() const;
+    RgbFloat toStandardRgb() const;
+    RgbFloat toLinearRgb() const;
 
     static HslColor From(const RgbFloat& rgb);
     static HslColor From(const Rgb888& rgb);
