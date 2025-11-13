@@ -1,13 +1,11 @@
 #include "Fan.h"
 
 #include "assert/Assert.h"
+#include "core/hardware/gpio/Gpio.h"
+#include "core/hardware/ledc/LedcChannel.h"
+#include "core/hardware/timer/Timer.h"
 #include "core/time/Time.h"
-#include "global/AppConfig.h"
-#include "global/hardware/pcnt/PcntConfig.h"
-#include "global/PinConfig.h"
-#include "global/hardware/gpio/GpioInstances.h"
-#include "global/hardware/ledc/LedcInstances.h"
-#include "global/hardware/timer/TimerInstances.h"
+#include "global/config/AppConfig.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {
@@ -18,20 +16,21 @@ static constexpr uint32_t PulsesPerRevolution = 2;
 // RPM filter config
 static constexpr size_t TachoConditionerWindowSize = std::max(1u, AppConfig::MainTaskFrequencyHz/3);
 
-Fan::Fan() : 
+Fan::Fan(Gpio& gpioEnable, LedcChannel& speedPwm, Gpio& gpioTacho, Timer& timerTacho): 
     // init members
-    mGpioFanEnable(GpioInstances::GetFanEnable()),
-    mSpeedPwm(LedcInstances::GetFanControlChannel()),
-    mFrequencySensor(PinConfig::FanTacho, TimerInstances::GetFanTachoTimer()),
+    mGpioFanEnable(gpioEnable),
+    mSpeedPwm(speedPwm),
+    mFrequencySensor(gpioTacho, timerTacho),
     mTachoConditioner(TachoConditionerWindowSize),
     mMonitor(){
     // nothing to do
 }
 
 void Fan::init(){
+    AssertExit(!mInitialized, "Fan", "already initialized");
+
     // init frequency sensor
     FrequencySensor::Config config;
-    config.pinMode = FrequencySensor::PinMode::Floating;
     config.stopTimeoutMicros = 1000_ms;
 
     // init rpm conditioner
@@ -64,13 +63,22 @@ void Fan::init(){
         this->handleMonitorStalledAlert(counter);
     });
 
+    // init complete
+    mInitialized = true;
 }
 
 void Fan::start(){
-    // nothing to do
+    if(!mInitialized){
+        TriggerDebug("Fan", "not initialized");
+        return;
+    }
 }
 
 void Fan::tick(){
+    if(!mInitialized){
+        TriggerDebug("Fan", "not initialized");
+        return;
+    }
 
     if(isEnabled()){
         // measure tacho frequency
@@ -100,11 +108,19 @@ void Fan::setStalledAlertCallback(StalledAlertCallback callback){
 }
 
 void Fan::setSpeed(float speed) {
+    if(!mInitialized){
+        TriggerDebug("Fan", "not initialized");
+        return;
+    }
     mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
     mSpeedPwm.setDutyRelative(mSpeed);
 }
 
 void Fan::setEnabled(bool enabled){
+    if(!mInitialized){
+        TriggerDebug("Fan", "not initialized");
+        return;
+    }
     if(enabled == mEnabled){
         return;
     }

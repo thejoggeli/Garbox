@@ -4,7 +4,7 @@
 #include "core/time/Time.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
-#include "global/util/ProfilerConfig.h"
+#include "global/config/ProfilerConfig.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {

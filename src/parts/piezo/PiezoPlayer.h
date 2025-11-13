@@ -10,12 +10,15 @@
 
 namespace Garbox {
 
+class LedcTimer;
+class LedcChannel;
+
 class PiezoPlayer {
 public:
-    explicit PiezoPlayer(uint32_t defaultSilentTimeMicros = 50'000);
+    explicit PiezoPlayer(LedcTimer& timer, LedcChannel& channel);
     ~PiezoPlayer();
 
-    void init();
+    void init(uint32_t defaultSilentTimeMicros = 50'000);
     void stop();
     void clearQueue();
 
@@ -24,6 +27,12 @@ public:
     void playTone(const Tone& tone);
     void playTone(const Tone& tone, uint32_t SilentTime);
     bool isPlaying() const;
+
+    // Disallow copy and move 
+    PiezoPlayer(const PiezoPlayer&) = delete;
+    PiezoPlayer& operator=(const PiezoPlayer&) = delete;
+    PiezoPlayer(PiezoPlayer&&) = delete;
+    PiezoPlayer& operator=(PiezoPlayer&&) = delete;
 
 private:
 
@@ -49,7 +58,7 @@ private:
     };
 
     Piezo mPiezo;
-    uint32_t mDefaultSilentTimeMicros;
+    uint32_t mDefaultSilentTimeMicros = 0;
 
     Tone mSingleTone = Tone(0, 0); 
     const ToneSequence mSingleSequence = ToneSequence(&mSingleTone, 1);

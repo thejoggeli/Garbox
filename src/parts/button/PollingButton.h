@@ -12,7 +12,7 @@ namespace Garbox {
  * 
  * Uses GPIO polling to detect state changes and forwards them to the FsmButton state machine.
  */
-class PollingButton : ButtonIfc {
+class PollingButton : public ButtonIfc {
 public:
     PollingButton(Gpio& gpio);
 
@@ -36,6 +36,12 @@ public:
     void setLongPressMicros(uint32_t delayMicros) final;
     void setInitialHoldDelayMicros(uint32_t delayMicros) final;
     void setRepeatHoldDelayMicros(uint32_t delayMicros) final;
+
+    // Disallow copy and move 
+    PollingButton(const PollingButton&) = delete;
+    PollingButton& operator=(const PollingButton&) = delete;
+    PollingButton(PollingButton&&) = delete;
+    PollingButton& operator=(PollingButton&&) = delete;
 
 private:
 

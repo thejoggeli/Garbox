@@ -25,7 +25,7 @@ public:
     using StateChangedCallback = std::function<void(State oldState, State newState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
-    Fan();
+    Fan(Gpio& enableGpio, LedcChannel& speedPwm, Gpio& tachoGpio, Timer& tachoTimer);
 
     void init();
     void start();
@@ -43,6 +43,12 @@ public:
     float getSpeed() const;
     float getMeasuredRpm(bool filtered = true) const;
 
+    // Disallow copy and move 
+    Fan(const Fan&) = delete;
+    Fan& operator=(const Fan&) = delete;
+    Fan(Fan&&) = delete;
+    Fan& operator=(Fan&&) = delete;
+
 private:
 
     using MonitorState = FanMonitor::State;
@@ -51,6 +57,8 @@ private:
     void handleMonitorStalledAlert(uint32_t counter);
 
     void updateState();
+
+    bool mInitialized = false;
 
     State mState = State::Disabled;
     bool mEnabled = false;

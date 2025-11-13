@@ -2,16 +2,24 @@
 
 #include "assert/Assert.h"
 #include "assert/AssertHandler.h"
+
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/hardware/gpio/GpioInstances.h"
-#include "global/piezo/PiezoSequences.h"
+
+#include "global/providers/PartsProvider.h"
+#include "global/providers/PiezoSequences.h"
+
+#include "parts/display/Display.h"
+#include "parts/heatpad/Heatpad.h"
 #include "parts/led/DebugLeds.h"
+#include "parts/piezo/PiezoPlayer.h"
+
 #include "util/color/ColorMap.h"
 #include "util/color/types/Rgb888.h"
 #include "util/function/default/EasingFunctions.h"
 #include "util/math/MathUtils.h"
+
 
 namespace Garbox {
 
@@ -20,11 +28,11 @@ static constexpr uint32_t HeartbeatInterval = 2000_ms;
 MainControl::MainControl() : 
     // init memebers
     mHeartbeatLed(DebugLeds::GetLed(DebugLeds::Id::Heartbeat)),
-    mFan(),
-    mHeatpad(),
-    mDisplay(),
-    mPiezoPlayer(),
-    mButton(GpioInstances::GetRotaryEncoderButton()){
+    mFan(PartsProvider::GetFan()),
+    mHeatpad(PartsProvider::GetHeatpad()),
+    mDisplay(PartsProvider::GetDisplay()),
+    mPiezoPlayer(PartsProvider::GetPiezoPlayer()),
+    mButton(PartsProvider::GetEncoderButton()){
     // nothing to do
 }
 

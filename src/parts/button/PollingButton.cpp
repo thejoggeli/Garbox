@@ -20,7 +20,7 @@ void PollingButton::init(){
     AssertExit(mGpio.isInput(), "PollingButton", "gpio must be configured as input");
 
     // get gpio pin number
-    mPin = mGpio.getPin();
+    mPin = mGpio.getPinNumber();
     AssertExit(mPin >= 0, "PollingButton", "invalid pin number");
 
     mInitialized = true;

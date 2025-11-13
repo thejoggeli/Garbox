@@ -2,11 +2,11 @@
 
 #include <cmath>
 #include "assert/Assert.h"
+#include "core/hardware/adc/Adc.h"
+#include "core/hardware/gpio/Gpio.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/AppConfig.h"
-#include "global/hardware/adc/AdcInstances.h"
-#include "global/hardware/gpio/GpioInstances.h"
+#include "global/config/AppConfig.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {
@@ -16,11 +16,11 @@ static constexpr uint32_t AdcConditionerWindowSize = static_cast<uint32_t>(AppCo
 static constexpr uint32_t InitialPwmDuty = 0.5f;
 static constexpr uint32_t InitialPwmPeriodMicros = 5'000'000; // 5 seconds
 
-Heatpad::Heatpad() : 
+Heatpad::Heatpad(Gpio& enableGpio, Adc& voltageSenseAdc, Adc& currentSenseAdc): 
     // init members
-    mGpioHeatpadEnable(GpioInstances::GetHeatEnable()),
-    mVoltageSenseAdc(AdcInstances::GetHeatpadVoltage()),
-    mCurrentSenseAdc(AdcInstances::GetHeatpadCurrent()),
+    mGpioHeatpadEnable(enableGpio),
+    mVoltageSenseAdc(voltageSenseAdc),
+    mCurrentSenseAdc(currentSenseAdc),
     mVoltageSenseConditioner(AdcConditionerWindowSize),
     mCurrentSenseConditioner(AdcConditionerWindowSize),
     mPwm(InitialPwmDuty, InitialPwmPeriodMicros){

@@ -9,7 +9,7 @@ public:
 
     static void Init();
 
-    static Timer& GetFanTachoTimer();
+    static Timer& GetFanTacho();
 
 };
 

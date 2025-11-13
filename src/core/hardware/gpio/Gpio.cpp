@@ -5,54 +5,105 @@
 
 namespace Garbox {
 
-Gpio::Gpio() {
-    // nothing to do
+Gpio::Gpio(int32_t pin):
+    // init members
+    mPin(static_cast<gpio_num_t>(pin)){
+    // constructor body
+    AssertExit((pin >= 0) && (pin < static_cast<int32_t>(gpio_num_t::GPIO_NUM_MAX)), "Gpio", "invalid pin number");
 }
 
-void Gpio::init(int32_t pin, Mode mode, bool invert, bool initialLevel) {
-
+void Gpio::init(const Config& config, bool initialLevel) {
     AssertExit(!mInitialized, "Gpio", "already initialized");
-    AssertExit((pin >= 0) && (pin < static_cast<int32_t>(gpio_num_t::GPIO_NUM_MAX)), "Gpio", "invalid pin number");
-
-    mPin = static_cast<gpio_num_t>(pin);
-    mMode = mode;
-    mInvert = invert;
     mLogicalLevel = initialLevel;
+    mInitialized = true;
+    applyConfig(config);
+}
 
+void Gpio::applyConfig(const Config& config){
+    if(!mInitialized){
+        TriggerDebug("Gpio", "not initialized"); 
+        return;
+    }
+    
+    // store config 
+    mConfig = config;
 
-    gpio_config_t cfg = {};
+    // create gpio config 
+    gpio_config_t cfg = {
+        .pin_bit_mask = (1ULL << static_cast<int32_t>(mPin)),
+        .mode = GPIO_MODE_DISABLE,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
 
-    switch (mode) {
+    // configure mode
+    switch (mConfig.mode) {
+    case Mode::Disable:
+        cfg.mode = GPIO_MODE_DISABLE;
+        break;
     case Mode::Input:
         cfg.mode = GPIO_MODE_INPUT;
         break;
     case Mode::Output:
         cfg.mode = GPIO_MODE_OUTPUT;
         break;
-    case Mode::InputPullup:
-        cfg.mode = GPIO_MODE_INPUT;
-        cfg.pull_up_en = GPIO_PULLUP_ENABLE;
-        break;
-    case Mode::InputPulldown:
-        cfg.mode = GPIO_MODE_INPUT;
-        cfg.pull_down_en = GPIO_PULLDOWN_ENABLE;
-        break;
     case Mode::OutputOpenDrain:
         cfg.mode = GPIO_MODE_OUTPUT_OD;
         break;
     default:
         TriggerExit("Gpio", "init unhandled mode");
-        return;
     }
 
-    cfg.pin_bit_mask = (1ULL << pin);
-    cfg.intr_type = GPIO_INTR_DISABLE;
+    // configure pullup and pulldown
+    switch(mConfig.pull){
+    case Pull::Up:
+        cfg.pull_up_en = GPIO_PULLUP_ENABLE;
+        cfg.pull_down_en = GPIO_PULLDOWN_DISABLE;
+        break;
+    case Pull::Down:
+        cfg.pull_up_en = GPIO_PULLUP_DISABLE;
+        cfg.pull_down_en = GPIO_PULLDOWN_ENABLE;
+        break;
+    case Pull::Disable:
+        cfg.pull_up_en = GPIO_PULLUP_DISABLE;
+        cfg.pull_down_en = GPIO_PULLDOWN_DISABLE;
+        break;
+    default:
+        TriggerExit("Gpio", "init unhandled pull mode");
+    }
+
+    // configure interrupt type
+    switch(mConfig.interrupt){
+    case Interrupt::Disable:
+        cfg.intr_type = GPIO_INTR_DISABLE;
+        break;
+    case Interrupt::PositiveEdge:
+        cfg.intr_type = GPIO_INTR_POSEDGE;
+        break;
+    case Interrupt::NegativeEdge:
+        cfg.intr_type = GPIO_INTR_NEGEDGE;
+        break;
+    case Interrupt::AnyEdge:
+        cfg.intr_type = GPIO_INTR_ANYEDGE;
+        break;
+    case Interrupt::HighLevel:
+        cfg.intr_type = GPIO_INTR_HIGH_LEVEL;
+        break;
+    case Interrupt::LowLevel:
+        cfg.intr_type = GPIO_INTR_LOW_LEVEL;
+        break;
+    default:
+        TriggerExit("Gpio", "init unhandled interrupt mode");
+    }
+
+    // apply gpio config
     if(gpio_config(&cfg) != ESP_OK){
         TriggerExit("Gpio", "gpio_config failed");
     }
-
+    
+    // apply level
     if(isOutput()){
-        mLogicalLevel = initialLevel;
         if(gpio_set_level(mPin, logicalToRaw(mLogicalLevel)) != ESP_OK){
             TriggerExit("Gpio", "gpio_set_level failed");
         }
@@ -60,8 +111,10 @@ void Gpio::init(int32_t pin, Mode mode, bool invert, bool initialLevel) {
     else if(isInput()){
         mLogicalLevel = rawToLogical(gpio_get_level(mPin));
     }
+}
 
-    mInitialized = true;
+Gpio::Config Gpio::getCurrentConfig() const {
+    return mConfig;
 }
 
 void Gpio::toggle() {
@@ -69,7 +122,7 @@ void Gpio::toggle() {
         TriggerDebug("Gpio", "not initialized"); 
         return;
     }
-    switch (mMode) {
+    switch (mConfig.mode) {
     case Mode::Output:
     case Mode::OutputOpenDrain:
         mLogicalLevel = !mLogicalLevel;
@@ -77,9 +130,6 @@ void Gpio::toggle() {
             TriggerDebug("Gpio", "toggle gpio_set_level failed");
         }
         break;
-    case Mode::Input:
-    case Mode::InputPullup:
-    case Mode::InputPulldown:
     default:
         TriggerDebug("Gpio", "toggle unhandled mode");
         break;
@@ -91,7 +141,7 @@ void Gpio::writeLevel(bool logicalLevel) {
         TriggerDebug("Gpio", "not initialized"); 
         return;
     }
-    switch (mMode) {
+    switch (mConfig.mode) {
     case Mode::Output:
     case Mode::OutputOpenDrain:
         if(mLogicalLevel == logicalLevel){
@@ -102,9 +152,6 @@ void Gpio::writeLevel(bool logicalLevel) {
             TriggerDebug("Gpio", "writeLevel gpio_set_level failed");
         }
         break;
-    case Mode::Input:
-    case Mode::InputPullup:
-    case Mode::InputPulldown:
     default:
         TriggerDebug("Gpio", "writeLevel unhandled mode");
         break;
@@ -116,7 +163,7 @@ void Gpio::writeLevelRaw(bool rawLevel) {
         TriggerDebug("Gpio", "not initialized"); 
         return;
     }
-    switch (mMode) {
+    switch (mConfig.mode) {
     case Mode::Output:
     case Mode::OutputOpenDrain: {
         bool logicalLevel = rawToLogical(rawLevel);
@@ -129,9 +176,6 @@ void Gpio::writeLevelRaw(bool rawLevel) {
         }
         break;
     }
-    case Mode::Input:
-    case Mode::InputPullup:
-    case Mode::InputPulldown:
     default:
         TriggerDebug("Gpio", "writeLevelRaw unhandled mode");
         break;
@@ -143,10 +187,8 @@ bool Gpio::readLevel() const {
         TriggerDebug("Gpio", "not initialized"); 
         return false;
     }
-    switch (mMode) {
+    switch (mConfig.mode) {
     case Mode::Input:
-    case Mode::InputPullup:
-    case Mode::InputPulldown: 
         return rawToLogical(gpio_get_level(mPin));
     case Mode::Output:
     case Mode::OutputOpenDrain:
@@ -162,10 +204,8 @@ bool Gpio::readLevelRaw() const {
         TriggerDebug("Gpio", "not initialized"); 
         return false;
     }
-    switch (mMode) {
+    switch (mConfig.mode) {
     case Mode::Input:
-    case Mode::InputPullup:
-    case Mode::InputPulldown: 
         return gpio_get_level(mPin) != 0;
     case Mode::Output:
     case Mode::OutputOpenDrain:
@@ -176,36 +216,67 @@ bool Gpio::readLevelRaw() const {
     }
 }
 
-int32_t Gpio::getPin() const {
+bool Gpio::addInterruptHandler(InterruptHandler handler, void* user){
+    esp_err_t err = gpio_isr_handler_add(mPin, handler, user);
+    if(err != ESP_OK){
+        TriggerDebug("Gpio", "gpio_isr_handler_add failed", err);
+        return false;
+    } 
+    return true;
+}
+
+bool Gpio::setInterruptEnabled(bool enabled){
+    if(enabled){
+        esp_err_t err = gpio_intr_enable(mPin);
+        if(err != ESP_OK){
+            TriggerDebug("Gpio", "gpio_intr_enable failed", err);
+            return false;
+        } 
+    }
+    else {
+        esp_err_t err = gpio_intr_disable(mPin);
+        if(err != ESP_OK){
+            TriggerDebug("Gpio", "gpio_intr_disable failed", err);
+            return false;
+        } 
+    }
+    return true;
+}
+
+int32_t Gpio::getPinNumber() const {
     return static_cast<int32_t>(mPin);
 }
 
-bool Gpio::isInverted() const{
-    return mInvert;
+bool Gpio::isInverted() const {
+    return mConfig.invert;
 }
 
-bool Gpio::isInput() const{
-    return (mMode == Mode::Input) || (mMode == Mode::InputPulldown) || (mMode == Mode::InputPullup);
+bool Gpio::isInput() const {
+    return (mConfig.mode == Mode::Input);
 }
 
-bool Gpio::isOutput() const{
-    return (mMode == Mode::Output) || (mMode == Mode::OutputOpenDrain);
+bool Gpio::isOutput() const {
+    return (mConfig.mode == Mode::Output) || (mConfig.mode == Mode::OutputOpenDrain);
 }
 
-bool Gpio::hasPullup() const{
-    return (mMode == Mode::InputPullup);
+bool Gpio::hasPullup() const {
+    return (mConfig.pull == Pull::Up);
 }
 
-bool Gpio::hasPulldown() const{
-    return (mMode == Mode::InputPulldown);
+bool Gpio::hasPulldown() const {
+    return (mConfig.pull == Pull::Down);
+}
+
+bool Gpio::isInitialized() const {
+    return mInitialized;
 }
 
 bool Gpio::rawToLogical(int rawLevel) const {
-    return (rawLevel != 0) ^ mInvert;
+    return (rawLevel != 0) ^ mConfig.invert;
 }
 
 uint32_t Gpio::logicalToRaw(bool logicalLevel) const {
-    return static_cast<uint32_t>(logicalLevel ^ mInvert);
+    return static_cast<uint32_t>(logicalLevel ^ mConfig.invert);
 }
 
 } // namespace Garbox

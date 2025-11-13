@@ -2,7 +2,7 @@
 
 #include "core/diagnostics/Profiler.h"
 #include "core/time/Time.h"
-#include "global/AppConfig.h"
+#include "global/config/AppConfig.h"
 
 namespace Garbox {
 

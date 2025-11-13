@@ -1,42 +1,82 @@
 #include "GpioInstances.h"
 
 #include "assert/Assert.h"
-#include "global/PinConfig.h"
+#include "core/hardware/gpio/Gpio.h"
+#include "global/config/PinConfig.h"
 
 namespace Garbox {
 
+constexpr bool InitialAny = false;
+constexpr bool InitialLow = false;
+constexpr bool InitialHigh = true;
+
+constexpr bool NonInverted = false;
+constexpr bool Inverted = true;
+
+using Config = Gpio::Config;
 using Mode = Gpio::Mode;
+using Pull = Gpio::Pull;
+using Interrupt = Gpio::Interrupt;
+
+template<int32_t Pin>
+Gpio& GetGpioInstance() {
+    static Gpio instance(Pin);
+    return instance;
+}
+
+static void InitGpio(Gpio& gpio, const Config& config, bool initialLevel = InitialLow){
+    if(!gpio.isInitialized()){
+        gpio.init(config);
+    }
+}
 
 static bool gInitialized = false;
-inline static void InitGpio(Gpio& gpio, int32_t pin, Mode mode, bool invert = false, bool initialLevel = false){
-    gpio.init(pin, mode, invert, initialLevel);
-}
+
+// void GpioInstances::Init(){
 
 void GpioInstances::Init(){
     AssertExit(!gInitialized, "GpioInstances", "already initialized");
 
-    // init input gpios                Pin                        Mode         Invert
-    InitGpio(GetRotaryEncoderButton(), PinConfig::RotaryEncoderC, Mode::Input, true);
+    // debug gpios
+    InitGpio(GetDebugGpio0(), { Mode::Disable, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    InitGpio(GetDebugGpio1(), { Mode::Disable, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
 
-    // init output gpios      Pin                       Mode          Invert  Level
-    InitGpio(GetDebugGpio0(), PinConfig::DebugGpio0,    Mode::Output, false,  false);
-    InitGpio(GetDebugGpio1(), PinConfig::DebugGpio1,    Mode::Output, false,  false);
-    InitGpio(GetFanEnable(),  PinConfig::FanEnable,     Mode::Output, false,  false);
-    InitGpio(GetDisplayDc(),  PinConfig::DisplayDc,     Mode::Output, false,  false);
-    InitGpio(GetDisplayCs(),  PinConfig::DisplayCs,     Mode::Output, false,  false);
-    InitGpio(GetDisplayRst(), PinConfig::DisplayRst,    Mode::Output, false,  false);
-    InitGpio(GetHeatEnable(), PinConfig::HeatpadEnable, Mode::Output, false,  false);
+    // fan
+    InitGpio(GetFanEnable(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    InitGpio(GetFanTacho(),  { Mode::Input,  Pull::Disable, Interrupt::Disable, NonInverted }, InitialAny);
 
+    // display
+    InitGpio(GetDisplayDc(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    InitGpio(GetDisplayCs(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    InitGpio(GetDisplayRst(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+
+    // heatpad
+    InitGpio(GetHeatEnable(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    
+    // rotary encoder
+    InitGpio(GetEncoderButton(), { Mode::Input, Pull::Disable, Interrupt::Disable, Inverted }, InitialLow);
+
+    // initialization complete
     gInitialized = true;
 }
 
-Gpio& GpioInstances::GetDebugGpio0(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetDebugGpio1(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetFanEnable(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetDisplayDc(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetDisplayCs(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetDisplayRst(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetHeatEnable(){ static Gpio instance; return instance; }
-Gpio& GpioInstances::GetRotaryEncoderButton() { static Gpio instance; return instance; }
+// debug gpios
+Gpio& GpioInstances::GetDebugGpio0(){ return GetGpioInstance<PinConfig::DebugGpio0>(); }
+Gpio& GpioInstances::GetDebugGpio1(){ return GetGpioInstance<PinConfig::DebugGpio1>(); }
+
+// fan
+Gpio& GpioInstances::GetFanEnable(){ return GetGpioInstance<PinConfig::FanEnable>(); }
+Gpio& GpioInstances::GetFanTacho() { return GetGpioInstance<PinConfig::FanTacho>(); }
+
+// display
+Gpio& GpioInstances::GetDisplayDc() { return GetGpioInstance<PinConfig::DisplayDc>(); }
+Gpio& GpioInstances::GetDisplayCs() { return GetGpioInstance<PinConfig::DisplayCs>(); }
+Gpio& GpioInstances::GetDisplayRst(){ return GetGpioInstance<PinConfig::DisplayRst>(); }
+
+// heatpad
+Gpio& GpioInstances::GetHeatEnable(){ return GetGpioInstance<PinConfig::HeatpadEnable>(); }
+
+// rotary encoder
+Gpio& GpioInstances::GetEncoderButton(){ return GetGpioInstance<PinConfig::RotaryEncoderC>(); }
 
 } // namespace

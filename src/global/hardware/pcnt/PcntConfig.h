@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "driver/pcnt.h"
-#include "global/PinConfig.h"
+#include "global/config/PinConfig.h"
 
 namespace Garbox {
 

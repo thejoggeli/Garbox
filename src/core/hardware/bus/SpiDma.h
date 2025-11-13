@@ -42,6 +42,12 @@ public:
     bool transferSync(const uint8_t* data, size_t lenBits, void* user = nullptr);
     bool transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, TxCallback callback = nullptr);
 
+    // Disallow copy and move 
+    SpiDma(const SpiDma&) = delete;
+    SpiDma& operator=(const SpiDma&) = delete;
+    SpiDma(SpiDma&&) = delete;
+    SpiDma& operator=(SpiDma&&) = delete;
+
 private:
     struct TxSlot {
         spi_transaction_t trans;

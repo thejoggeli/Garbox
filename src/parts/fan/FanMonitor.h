@@ -34,6 +34,12 @@ public:
 
     State getState() const;
 
+    // Disallow copy and move 
+    FanMonitor(const FanMonitor&) = delete;
+    FanMonitor& operator=(const FanMonitor&) = delete;
+    FanMonitor(FanMonitor&&) = delete;
+    FanMonitor& operator=(FanMonitor&&) = delete;
+
 private:
     FiniteStateMachine<State, State::Count> mFsm;
     SoftwareTimer mStalledAlertTimer;

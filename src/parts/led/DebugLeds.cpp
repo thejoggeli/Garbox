@@ -4,7 +4,7 @@
 #include <array>
 #include "LedAnimationTask.h"
 #include "assert/Assert.h"
-#include "global/PinConfig.h"
+#include "global/config/PinConfig.h"
 #include "global/hardware/ledc/LedcInstances.h"
 #include "util/color/types/Rgb888.h"
 #include "util/color/types/RgbFloat.h"

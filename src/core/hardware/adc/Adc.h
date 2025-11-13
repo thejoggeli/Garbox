@@ -40,6 +40,12 @@ public:
     float getVolts() const;
     bool isCalibrated() const;
 
+    // Disallow copy and move 
+    Adc(const Adc&) = delete;
+    Adc& operator=(const Adc&) = delete;
+    Adc(Adc&&) = delete;
+    Adc& operator=(Adc&&) = delete;
+
 private:
     int32_t mPin = -1;
     adc1_channel_t mChannel = ADC1_CHANNEL_0;

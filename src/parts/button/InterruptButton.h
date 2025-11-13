@@ -14,7 +14,7 @@ namespace Garbox {
  * 
  * Uses GPIO interrupts to detect state changes and forwards them to the FsmButton state machine.
  */
-class InterruptButton : ButtonIfc {
+class InterruptButton : public ButtonIfc {
 public:
     InterruptButton(Gpio& gpio);
 
@@ -38,6 +38,12 @@ public:
     void setLongPressMicros(uint32_t delayMicros) final;
     void setInitialHoldDelayMicros(uint32_t delayMicros) final;
     void setRepeatHoldDelayMicros(uint32_t delayMicros) final;
+
+    // Disallow copy and move 
+    InterruptButton(const InterruptButton&) = delete;
+    InterruptButton& operator=(const InterruptButton&) = delete;
+    InterruptButton(InterruptButton&&) = delete;
+    InterruptButton& operator=(InterruptButton&&) = delete;
 
 private:
     static void IRAM_ATTR isrHandler(void* arg);

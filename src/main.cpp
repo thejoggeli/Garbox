@@ -3,7 +3,7 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/AppConfig.h"
+#include "global/config/AppConfig.h"
 #include "global/hardware/adc/AdcInstances.h"
 #include "global/hardware/ledc/LedcInstances.h"
 #include "global/hardware/gpio/GpioInstances.h"

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/hardware/gpio/Gpio.h"
-
 namespace Garbox {
+
+class Gpio;
 
 struct GpioInstances {
 public:
@@ -13,6 +13,7 @@ public:
     static Gpio& GetDebugGpio1();
 
     static Gpio& GetFanEnable();
+    static Gpio& GetFanTacho();
 
     static Gpio& GetDisplayDc();
     static Gpio& GetDisplayCs();
@@ -20,7 +21,7 @@ public:
 
     static Gpio& GetHeatEnable();
 
-    static Gpio& GetRotaryEncoderButton();
+    static Gpio& GetEncoderButton();
 
 };
 

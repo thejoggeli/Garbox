@@ -1,7 +1,7 @@
 #include "TimerInstances.h"
 
 #include "assert/Assert.h"
-#include "global/AppConfig.h"
+#include "global/config/AppConfig.h"
 
 namespace Garbox {
     
@@ -10,7 +10,7 @@ static bool sInitialized = false;
 void TimerInstances::Init(){
     AssertExit(!sInitialized, "SpiInstances", "already initialized");
 
-    GetFanTachoTimer().init({
+    GetFanTacho().init({
         .group = TIMER_GROUP_0,
         .index = TIMER_0,
         .frequencyHz = 10'000'000,
@@ -29,7 +29,7 @@ void TimerInstances::Init(){
     sInitialized = true;
 }
 
-Timer& TimerInstances::GetFanTachoTimer(){
+Timer& TimerInstances::GetFanTacho(){
     static Timer instance;
     return instance;
 }

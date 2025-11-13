@@ -6,24 +6,25 @@
 #include "core/time/Time.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "global/AppConfig.h"
+#include "global/config/AppConfig.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {
 
-PiezoPlayer::PiezoPlayer(uint32_t defaultSilentTimeMicros): 
-    mPiezo(),
-    mDefaultSilentTimeMicros(defaultSilentTimeMicros){
+PiezoPlayer::PiezoPlayer(LedcTimer& pwmTimer, LedcChannel& pwmChannel): 
+    mPiezo(pwmTimer, pwmChannel){
     // nothing to do
 }
 
 PiezoPlayer::~PiezoPlayer(){
     TriggerExit("PiezoPlayer", "deconstructor not implemented");
-    // TODO stop task
 }
 
-void PiezoPlayer::init(){
+void PiezoPlayer::init(uint32_t defaultSilentTimeMicros){
     AssertExit(!mInitialized, "PiezoPlayer", "already initialized");
+
+    // init members
+    mDefaultSilentTimeMicros = defaultSilentTimeMicros;
 
     // init piezo
     mPiezo.init();

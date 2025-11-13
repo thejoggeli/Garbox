@@ -1,7 +1,7 @@
 #include "AdcInstances.h"
 
 #include "assert/Assert.h"
-#include "global/PinConfig.h"
+#include "global/config/PinConfig.h"
 
 namespace Garbox {
 

@@ -1,15 +1,17 @@
 #pragma once
 
 #include "core/time/SoftwareTimer.h"
-#include "parts/button/InterruptButton.h"
-#include "parts/display/Display.h"
+#include "parts/button/ButtonIfc.h"
 #include "parts/fan/Fan.h"
-#include "parts/heatpad/Heatpad.h"
-#include "parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 
 class AnimatedLed;
+class ButtonIfc;
+class Display;
+class Fan;
+class Heatpad;
+class PiezoPlayer;
 
 class MainControl {
 public:
@@ -33,11 +35,11 @@ private:
 
     AnimatedLed& mHeartbeatLed;
 
-    Fan mFan;
-    Heatpad mHeatpad;
-    Display mDisplay;
-    PiezoPlayer mPiezoPlayer;
-    InterruptButton mButton;
+    Fan& mFan;
+    Heatpad& mHeatpad;
+    Display& mDisplay;
+    PiezoPlayer& mPiezoPlayer;
+    ButtonIfc& mButton;
 
     SoftwareTimer mFanStateTimer;
     SoftwareTimer mHeartbeatTimer;

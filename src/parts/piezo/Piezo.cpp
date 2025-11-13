@@ -1,16 +1,16 @@
 #include "Piezo.h"
 
-#include "global/hardware/ledc/LedcInstances.h"
+#include "core/hardware/ledc/LedcChannel.h"
+#include "core/hardware/ledc/LedcTimer.h"
 
 namespace Garbox {
 
-Piezo::Piezo() :
+Piezo::Piezo(LedcTimer& pwmTimer, LedcChannel& pwmChannel) :
     // init members
-    mPwmTimer(LedcInstances::GetPiezoTimer()),
-    mPwmChannel(LedcInstances::GetPiezoChannel()),
+    mPwmTimer(pwmTimer),
+    mPwmChannel(pwmChannel),
     mTestTimer() {
     // constructor body
-    // nothing to do
 }
 
 void Piezo::init(){

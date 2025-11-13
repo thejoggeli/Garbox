@@ -11,7 +11,7 @@ class Piezo {
 
 public:
 
-    Piezo();
+    Piezo(LedcTimer& pwmTimer, LedcChannel& pwmChannel);
 
     void init();
 
@@ -22,6 +22,12 @@ public:
     uint32_t getFrequency();
     bool isEnabled();
     float getDuty();
+
+    // Disallow copy and move 
+    Piezo(const Piezo&) = delete;
+    Piezo& operator=(const Piezo&) = delete;
+    Piezo(Piezo&&) = delete;
+    Piezo& operator=(Piezo&&) = delete;
 
 private:
 

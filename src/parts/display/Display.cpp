@@ -3,24 +3,19 @@
 #include <cmath>
 #include "assert/Assert.h"
 #include "core/log/Log.h"
+#include "core/hardware/bus/SpiDma.h"
 #include "core/time/Time.h"
-#include "global/hardware/spi/SpiInstances.h"
-#include "global/hardware/gpio/GpioInstances.h"
-#include "global/hardware/ledc/LedcInstances.h"
-#include "global/util/ColorMaps.h"
+#include "esp_heap_caps.h"
+#include "global/providers/ColorMaps.h"
 #include "util/ByteUtils.h"
 #include "util/color/types/Rgb565.h"
 
 namespace Garbox {
 
-Display::Display(): 
+Display::Display(SpiDma& spi, Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk): 
     // init members 
-    mSpi(SpiInstances::GetSpiDma()),
-    mSt7789v(
-        GpioInstances::GetDisplayRst(),
-        GpioInstances::GetDisplayDc(),
-        LedcInstances::GetBacklightChannel()
-    ),
+    mSpi(spi),
+    mSt7789v(gpioRst, gpioDc, pwmBlk),
     mBufferSize(AppConfig::SpiDmaMaxTransferSizeBytes){
     // nothing to do
 }

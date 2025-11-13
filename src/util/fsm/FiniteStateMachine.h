@@ -52,6 +52,12 @@ public:
     uint32_t getTransitionDelayMicros(StateType from, StateType to) const;
     uint32_t getStateHoldTimeMicros(StateType state) const;
 
+    // Disallow copy and move 
+    FiniteStateMachine(const FiniteStateMachine&) = delete;
+    FiniteStateMachine& operator=(const FiniteStateMachine&) = delete;
+    FiniteStateMachine(FiniteStateMachine&&) = delete;
+    FiniteStateMachine& operator=(FiniteStateMachine&&) = delete;
+
 private:
 
     StateType mCurrentState = static_cast<StateType>(0);

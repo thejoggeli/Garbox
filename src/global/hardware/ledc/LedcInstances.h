@@ -2,7 +2,6 @@
 
 #include "core/hardware/ledc/LedcTimer.h"
 #include "core/hardware/ledc/LedcChannel.h"
-#include "global/PinConfig.h"
 
 namespace Garbox {
 
@@ -19,8 +18,8 @@ public:
     static LedcChannel& GetDebugLed1Channel();
     static LedcChannel& GetDebugLed2Channel();
     static LedcChannel& GetDebugLed3Channel();
-    static LedcChannel& GetBacklightChannel();
-    static LedcChannel& GetFanControlChannel();
+    static LedcChannel& GetDisplayBacklightChannel();
+    static LedcChannel& GetFanSpeedChannel();
     static LedcChannel& GetPiezoChannel();
 
 };

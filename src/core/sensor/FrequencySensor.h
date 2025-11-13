@@ -6,23 +6,18 @@
 
 namespace Garbox {
 
+class Gpio;
+
 class FrequencySensor {
 public:
 
-    enum class PinMode : uint8_t {
-        Pullup,   // internal pull-up enabled
-        Pulldown, // internal pull-down enabled
-        Floating, // no internal pull
-    };
-
     struct Config {
-        PinMode pinMode = PinMode::Floating;
         uint32_t stopTimeoutMicros = 100'000; // default 100 ms -> 10 Hz timeout
     };
 
-    FrequencySensor(uint32_t pin, Timer& timer);
+    FrequencySensor(Gpio& gpio, Timer& timer);
 
-    bool init(Config const& config);
+    void init(Config const& config);
     void tick();
 
     void setEnabled(bool enabled);
@@ -30,6 +25,11 @@ public:
 
     float getFrequencyHz();
 
+    // Disallow copy and move 
+    FrequencySensor(const FrequencySensor&) = delete;
+    FrequencySensor& operator=(const FrequencySensor&) = delete;
+    FrequencySensor(FrequencySensor&&) = delete;
+    FrequencySensor& operator=(FrequencySensor&&) = delete;
 
 private:
 
@@ -41,8 +41,10 @@ private:
 
     static void IRAM_ATTR isrHandler(void* arg);
 
-    uint32_t mPin;
+    Gpio& mGpio;
     Timer& mTimer;
+
+    int32_t mPin = -1;
 
     // state handling
     bool mInitialized = false;

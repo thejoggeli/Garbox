@@ -1,6 +1,7 @@
 #include "LedcInstances.h"
 
 #include "assert/Assert.h"
+#include "global/config/PinConfig.h"
 #include "LedcConfig.h"
 
 namespace Garbox {
@@ -40,8 +41,8 @@ void LedcInstances::Init() {
     setupChannel(GetDebugLed1Channel(),  LedcConfig::DebugLed1Channel);
     setupChannel(GetDebugLed2Channel(),  LedcConfig::DebugLed2Channel);
     setupChannel(GetDebugLed3Channel(),  LedcConfig::DebugLed3Channel);
-    setupChannel(GetBacklightChannel(),  LedcConfig::BacklightChannel);
-    setupChannel(GetFanControlChannel(), LedcConfig::FanControlChannel);
+    setupChannel(GetDisplayBacklightChannel(),  LedcConfig::BacklightChannel);
+    setupChannel(GetFanSpeedChannel(), LedcConfig::FanControlChannel);
     setupChannel(GetPiezoChannel(),      LedcConfig::PiezoChannel);
 
     gInitialized = true;
@@ -55,8 +56,8 @@ LedcChannel& LedcInstances::GetDebugLed0Channel()  { static LedcChannel instance
 LedcChannel& LedcInstances::GetDebugLed1Channel()  { static LedcChannel instance; return instance; }
 LedcChannel& LedcInstances::GetDebugLed2Channel()  { static LedcChannel instance; return instance; }
 LedcChannel& LedcInstances::GetDebugLed3Channel()  { static LedcChannel instance; return instance; }
-LedcChannel& LedcInstances::GetBacklightChannel()  { static LedcChannel instance; return instance; }
-LedcChannel& LedcInstances::GetFanControlChannel() { static LedcChannel instance; return instance; }
+LedcChannel& LedcInstances::GetDisplayBacklightChannel()  { static LedcChannel instance; return instance; }
+LedcChannel& LedcInstances::GetFanSpeedChannel() { static LedcChannel instance; return instance; }
 LedcChannel& LedcInstances::GetPiezoChannel()      { static LedcChannel instance; return instance; }
 
 } // namespace

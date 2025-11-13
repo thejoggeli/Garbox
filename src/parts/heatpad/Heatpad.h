@@ -14,7 +14,7 @@ class Gpio;
 class Heatpad {
 public:
 
-    Heatpad();
+    Heatpad(Gpio& enableGpio, Adc& voltageSenseAdc, Adc& currentSenseAdc);
 
     void init();
     void start();
@@ -30,6 +30,12 @@ public:
     uint32_t getNextPeriodDurationMicros() const;
     float getMeasuredVoltage() const;
     float getMeasuredCurrent() const;
+
+    // Disallow copy and move 
+    Heatpad(const Heatpad&) = delete;
+    Heatpad& operator=(const Heatpad&) = delete;
+    Heatpad(Heatpad&&) = delete;
+    Heatpad& operator=(Heatpad&&) = delete;
 
 private:
 

@@ -1,23 +1,29 @@
 #pragma once
 
 #include "core/time/SoftwareTimer.h"
-#include "global/AppConfig.h"
+#include "global/config/AppConfig.h"
 #include "lvgl.h"
 #include "St7789v.h"
 
 namespace Garbox {
 
-class SpiDma;
 class LedcChannel;
 class Gpio;
+class SpiDma;
 
 class Display {
 public:
 
-    Display();
+    Display(SpiDma& spi, Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk);
 
     void init();
     void tick();
+
+    // Disallow copy and move 
+    Display(const Display&) = delete;
+    Display& operator=(const Display&) = delete;
+    Display(Display&&) = delete;
+    Display& operator=(Display&&) = delete;
 
 private:
 

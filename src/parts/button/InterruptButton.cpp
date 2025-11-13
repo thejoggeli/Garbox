@@ -24,7 +24,7 @@ void InterruptButton::init(){
     AssertExit(mGpio.isInput(), "InterruptButton", "gpio must be configured as input");
 
     // get gpio pin number
-    mPin = mGpio.getPin();
+    mPin = mGpio.getPinNumber();
     AssertExit(mPin >= 0, "InterruptButton", "invalid pin number");
 
     // set invert flag

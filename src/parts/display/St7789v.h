@@ -35,6 +35,12 @@ public:
     void sendDrawBufferXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t* buffer, size_t sizeBytes, bool async = false);
     void sendDrawBufferXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, uint8_t* buffer, size_t sizeBytes, bool async = false);
 
+    // Disallow copy and move 
+    St7789v(const St7789v&) = delete;
+    St7789v& operator=(const St7789v&) = delete;
+    St7789v(St7789v&&) = delete;
+    St7789v& operator=(St7789v&&) = delete;
+
 private:
 
     Gpio& mGpioRst;

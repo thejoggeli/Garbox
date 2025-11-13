@@ -1,23 +1,24 @@
 #include "FrequencySensor.h"
 
 #include "assert/Assert.h"
-#include "driver/gpio.h"
+#include "core/hardware/gpio/Gpio.h"
 #include "core/log/Log.h"
 
 namespace Garbox {
 
-FrequencySensor::FrequencySensor(uint32_t pin, Timer& timer):
+FrequencySensor::FrequencySensor(Gpio& gpio, Timer& timer):
     // init members
-    mPin(pin),
+    mGpio(gpio),
     mTimer(timer){
     // nothing to do
 }
 
-bool FrequencySensor::init(Config const& config) {
+void FrequencySensor::init(Config const& config) {
 
     AssertExit(!mInitialized, "FrequencySensor", "already initialized");
     
     // initialize members
+    mPin = mGpio.getPinNumber();
     mTimerFrequencyHz = static_cast<float>(mTimer.getFrequencyHz());
     AssertExit(mTimerFrequencyHz > 0, "FrequencySensor", "invalid timer frequency");
 
@@ -34,46 +35,29 @@ bool FrequencySensor::init(Config const& config) {
         mStopTimeoutTicks = static_cast<uint32_t>(ticksFloat);
     }
 
-    // Configure GPIO input
-    gpio_config_t ioConf = {};
-    ioConf.intr_type = GPIO_INTR_POSEDGE;
-    ioConf.mode = GPIO_MODE_INPUT;
-    ioConf.pin_bit_mask = 1ULL << mPin;
+    // configure gpio
+    Gpio::Config gpioConfig = mGpio.getCurrentConfig();
+    gpioConfig.mode = Gpio::Mode::Input;
+    gpioConfig.interrupt = Gpio::Interrupt::PositiveEdge;
+    mGpio.applyConfig(gpioConfig);
 
-    switch(config.pinMode){
-        case PinMode::Floating:
-            ioConf.pull_up_en = GPIO_PULLUP_DISABLE;
-            ioConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            break;
-        case PinMode::Pullup:
-            ioConf.pull_up_en = GPIO_PULLUP_ENABLE;
-            ioConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            break;
-        case PinMode::Pulldown:
-            ioConf.pull_up_en = GPIO_PULLUP_DISABLE;
-            ioConf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-            break;
-        default:
-            TriggerExit("FrequencySensor", "invalid pinMode");
-            return false;
-    }
-
-    esp_err_t err = gpio_config(&ioConf);
-    AssertExit(err == ESP_OK, "FrequencySensor", "gpio_config failed");
+    // add ISR handler to gpio
+    mGpio.addInterruptHandler(isrHandler, this);
     
     // Register per-instance ISR (context pointer passed to handler)
     portENTER_CRITICAL(&mFrequencySensorMux);
-    err = gpio_isr_handler_add(static_cast<gpio_num_t>(mPin), isrHandler, this);
-    AssertExit(err == ESP_OK, "FrequencySensor", "gpio_isr_handler_add failed");
+    if(!mGpio.addInterruptHandler(isrHandler, this)){
+        TriggerExit("FrequencySensor", "add interrupt handler failed");
+    }
 
     // Disable interrupt by default
-    err = gpio_intr_disable(static_cast<gpio_num_t>(mPin));
-    AssertExit(err == ESP_OK, "FrequencySensor", "gpio_intr_disable failed");
+    if(!mGpio.setInterruptEnabled(false)){
+        TriggerExit("FrequencySensor", "disable interrupt failed");
+    }
     portEXIT_CRITICAL(&mFrequencySensorMux);
 
     // finish initialization
     mInitialized = true;
-    return true;
 }
 
 void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
@@ -143,10 +127,10 @@ void FrequencySensor::setEnabled(bool enabled) {
 
     portENTER_CRITICAL(&mFrequencySensorMux);
     if (enabled) {
-        gpio_intr_enable(static_cast<gpio_num_t>(mPin));
+        mGpio.setInterruptEnabled(true);
         mState = State::Idle;
     } else {
-        gpio_intr_disable(static_cast<gpio_num_t>(mPin));
+        mGpio.setInterruptEnabled(false);
         vHasNewEdge = false;
         mMeasuredFrequencyHz = 0;
         mState = State::Disabled;
