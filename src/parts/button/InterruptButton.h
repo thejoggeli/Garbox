@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "Button.h"
+#include "ButtonIfc.h"
+#include "PollingButton.h"
 #include "core/hardware/gpio/Gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
@@ -9,12 +10,11 @@
 namespace Garbox {
 
 /**
- * Interrupt-based Button wrapper.
+ * Interrupt-based Button implementation.
  * 
- * Uses GPIO interrupts to detect state changes and forwards
- * them to the Button state machine.
+ * Uses GPIO interrupts to detect state changes and forwards them to the PollingButton state machine.
  */
-class InterruptButton {
+class InterruptButton : ButtonIfc {
 public:
     InterruptButton(Gpio& gpio);
     ~InterruptButton();
@@ -22,13 +22,13 @@ public:
     void init();
     void tick();
 
-    // delegate Button API
+    // delegate PollingButton API
     bool isPressed() const;
     bool isReleased() const;
     bool isLongPressed() const;
 
-    void setStateChangedCallback(Button::StateChangedCallback callback);
-    void setHoldCallback(Button::HoldCallback callback);
+    void setStateChangedCallback(ButtonIfc::StateChangedCallback callback);
+    void setHoldCallback(ButtonIfc::HoldCallback callback);
     void setUserData(void* userData);
 
     void setPressedToReleasedDelayMicros(uint32_t micros); // minumum stable signal time before "Pressed => Released" transition is realized
@@ -44,7 +44,7 @@ private:
     static void IRAM_ATTR isrHandler(void* arg);
 
     Gpio& mGpio;
-    Button mButton;
+    PollingButton mButton;
 
     int32_t mPin = -1;
     bool mInvert = false;

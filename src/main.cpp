@@ -14,7 +14,7 @@
 
 using namespace Garbox;
 
-MainControl gMainControl;
+static MainControl gMainControl;
 
 void mainTask(void* parameter);
 void logProfiler();

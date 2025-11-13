@@ -1,28 +1,22 @@
-#include "Button.h"
+#include "PollingButton.h"
 #include "core/time/Time.h"
 #include "assert/Assert.h"
 
 namespace Garbox {
 
-static constexpr uint32_t InitialPressedToReleasedDelayMicros = 1_ms;   // Pressed     state will be entered after a 1ms stable "pressed" signal
-static constexpr uint32_t InitialReleasedToPressedDelayMicros = 1_ms;   // Released    state will be entered after a 1ms stable "released" signal
-static constexpr uint32_t InitialPressedHoldTimeMicros = 10_ms;         // Pressed     state will be held for at least 10ms (debouncing) 
-static constexpr uint32_t InitialReleasedHoldTimeMicros = 40_ms;        // Released    state will be held for at least 40ms (debouncing) 
-static constexpr uint32_t InitialLongPressMicros = 600_ms;              // LongPressed state will be entered after 600ms 
-
-Button::Button(){
+PollingButton::PollingButton(){
     // set initial transition delays and state hold times
     setPressedToReleasedDelayMicros(InitialPressedToReleasedDelayMicros);
     setReleasedToPressedDelayMicros(InitialReleasedToPressedDelayMicros);
     setLongPressMicros(InitialLongPressMicros);
 }
 
-Button::~Button(){
-    TriggerExit("Button", "heap using classes must not be deconstructed");
+PollingButton::~PollingButton(){
+    TriggerExit("PollingButton", "heap using classes must not be deconstructed");
 }
 
-void Button::init(){
-    AssertExit(!mInitialized, "Button", "already initialized");
+void PollingButton::init(){
+    AssertExit(!mInitialized, "PollingButton", "already initialized");
 
     // init fsm
     mFsm.init(State::Released);
@@ -33,9 +27,9 @@ void Button::init(){
     mInitialized = true;
 }
 
-void Button::tick(bool isPressedRaw){
+void PollingButton::tick(bool isPressedRaw){
     if(!mInitialized){
-        TriggerDebug("Button", "tick() called before init()");
+        TriggerDebug("PollingButton", "tick() called before init()");
         return;
     }
 
@@ -52,7 +46,7 @@ void Button::tick(bool isPressedRaw){
         handlePressedLongState(isPressedRaw);
         break;
     default:
-        TriggerDebug("Button", "invalid FSM state");
+        TriggerDebug("PollingButton", "invalid FSM state");
         break;
     }
 
@@ -68,7 +62,7 @@ void Button::tick(bool isPressedRaw){
     }
 }
 
-void Button::handleMissedPulse(bool isPressedRaw, uint32_t pulseDuration){
+void PollingButton::handleMissedPulse(bool isPressedRaw, uint32_t pulseDuration){
     const State currentState = mFsm.getState();
     // Released => Pressed
     if(currentState == State::Released){
@@ -90,7 +84,7 @@ void Button::handleMissedPulse(bool isPressedRaw, uint32_t pulseDuration){
     }
 }
 
-void Button::handleReleasedState(bool isPressedRaw){
+void PollingButton::handleReleasedState(bool isPressedRaw){
     if(isPressedRaw){
         mFsm.transition(State::Pressed);
     }
@@ -99,7 +93,7 @@ void Button::handleReleasedState(bool isPressedRaw){
     }
 }
 
-void Button::handlePressedState(bool isPressedRaw){
+void PollingButton::handlePressedState(bool isPressedRaw){
     if(!isPressedRaw){
         mFsm.transition(State::Released);
     }
@@ -108,7 +102,7 @@ void Button::handlePressedState(bool isPressedRaw){
     }
 }
 
-void Button::handlePressedLongState(bool isPressedRaw){
+void PollingButton::handlePressedLongState(bool isPressedRaw){
     if(!isPressedRaw){
         mFsm.transition(State::Released);
     }
@@ -117,7 +111,7 @@ void Button::handlePressedLongState(bool isPressedRaw){
     }
 }
     
-void Button::handleFsmStateChanged(State oldState, State newState){
+void PollingButton::handleFsmStateChanged(State oldState, State newState){
 
     // setup hold timer on press
     if((mRepeatHoldDelayMicros > 0) && mHoldCallback){
@@ -145,69 +139,60 @@ void Button::handleFsmStateChanged(State oldState, State newState){
     }
 }
 
-void Button::setStateChangedCallback(StateChangedCallback callback){
+void PollingButton::setStateChangedCallback(StateChangedCallback callback){
     mStateChangedCallback = callback;
 }
 
-void Button::setHoldCallback(HoldCallback callback){
+void PollingButton::setHoldCallback(HoldCallback callback){
     mHoldCallback = callback;
 }
 
-void Button::setUserData(void* userData){
+void PollingButton::setUserData(void* userData){
     mUserData = userData;
 }
 
-void Button::setPressedToReleasedDelayMicros(uint32_t micros){
+void PollingButton::setPressedToReleasedDelayMicros(uint32_t micros){
     mFsm.setTransitionDelayMicros(State::Pressed, State::Released, micros);
     mFsm.setTransitionDelayMicros(State::PressedLong, State::Released, micros);
 }
 
-void Button::setReleasedToPressedDelayMicros(uint32_t micros){
+void PollingButton::setReleasedToPressedDelayMicros(uint32_t micros){
     mFsm.setTransitionDelayMicros(State::Released, State::Pressed, micros);
 }
 
-void Button::setPressedHoldTimeMicros(uint32_t micros){
+void PollingButton::setPressedHoldTimeMicros(uint32_t micros){
     mFsm.setStateHoldTimeMicros(State::Pressed, micros);
     mFsm.setStateHoldTimeMicros(State::PressedLong, micros);
 }
 
-void Button::setReleasedHoldTimeMicros(uint32_t micros){
+void PollingButton::setReleasedHoldTimeMicros(uint32_t micros){
     mFsm.setStateHoldTimeMicros(State::Released, micros);
 }
 
-void Button::setLongPressMicros(uint32_t delayMicros){
+void PollingButton::setLongPressMicros(uint32_t delayMicros){
     mLongPressMicros = delayMicros;
     mFsm.setTransitionDelayMicros(State::Pressed, State::PressedLong, delayMicros);
 }
 
-void Button::setInitialHoldDelayMicros(uint32_t delayMicros){
+void PollingButton::setInitialHoldDelayMicros(uint32_t delayMicros){
     mInitialHoldDelayMicros = delayMicros;
 }
 
-void Button::setRepeatHoldDelayMicros(uint32_t delayMicros){
+void PollingButton::setRepeatHoldDelayMicros(uint32_t delayMicros){
     mRepeatHoldDelayMicros = delayMicros;
 }
 
-bool Button::isPressed() const {
+bool PollingButton::isPressed() const {
     State state = mFsm.getState();
     return (state == State::Pressed) || (state == State::PressedLong);
 }
 
-bool Button::isLongPressed() const {
+bool PollingButton::isLongPressed() const {
     return (mFsm.getState() == State::PressedLong);
 }
 
-bool Button::isReleased() const {
+bool PollingButton::isReleased() const {
     return (mFsm.getState() == State::Released);
-}
-
-const char* Button::StateToString(State state){
-    switch(state){
-    case State::Released: return "Released";
-    case State::Pressed: return "Pressed";
-    case State::PressedLong: return "PressedLong";
-    default: return "Unknown";
-    }
 }
 
 } // namespace Garbox

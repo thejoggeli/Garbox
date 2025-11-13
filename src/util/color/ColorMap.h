@@ -43,10 +43,10 @@ public:
 
     // Non-uniform RGB stops (explicit t)
     // Assumes RGB colors in standard RGB (sRGB) color space
-    ColorMap(std::initializer_list<RgbStop> stops);
+    ColorMap(std::initializer_list<RgbStop> stops); // BROKEN! DO NOT USE!
 
     // Non-uniform HSL stops (explicit t)
-    ColorMap(std::initializer_list<HslStop> stops);
+    ColorMap(std::initializer_list<HslStop> stops); // BROKEN! DO NOT USE!
 
     ~ColorMap();
 

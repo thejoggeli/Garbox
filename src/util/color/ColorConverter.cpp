@@ -58,9 +58,9 @@ static inline void rgbFloatToXyz(const RgbFloat& rgbLinear, float& x, float& y, 
 
 static inline RgbFloat xyzToRgbFloat(float x, float y, float z){
     // Normalize from percent
-    x /= 100.0f;
-    y /= 100.0f;
-    z /= 100.0f;
+    x *= 0.01f;
+    y *= 0.01f;
+    z *= 0.01f;
 
     // Inverse sRGB D65 matrix
     float rLin =  3.2404542f * x - 1.5371385f * y - 0.4985314f * z;
