@@ -66,6 +66,11 @@ const MathFunctionIfc& MathFunctions::GetSinNorm270(){
     return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 1.5f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
 }
 
+const MathFunctionIfc& MathFunctions::GetSinAnim(){
+    return GetSinNorm270();
+}
+
+
 const MathFunctionIfc& MathFunctions::GetGamma22(){
     return GetSampled([](float x){ return powf(x, 2.2f); }, Samples::Gamma);
 }

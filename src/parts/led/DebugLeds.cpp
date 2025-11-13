@@ -6,6 +6,8 @@
 #include "assert/Assert.h"
 #include "global/PinConfig.h"
 #include "global/hardware/ledc/LedcInstances.h"
+#include "util/color/types/Rgb888.h"
+#include "util/color/types/RgbFloat.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {
@@ -192,6 +194,13 @@ void DebugLeds::SetRgbLed(uint8_t r, uint8_t g, uint8_t b) {
     // set pixel color
     sPixel.setPixelColor(0, r, g, b);
     sPixel.show();    
+}
+
+void DebugLeds::SetRgbLed(const Rgb888& rgb){
+    SetRgbLed(rgb.r, rgb.g, rgb.b);
+}
+void DebugLeds::SetRgbLed(const RgbFloat& rgb){
+    SetRgbLed(Rgb888::From(rgb));
 }
 
 bool DebugLeds::IsInitialized() {

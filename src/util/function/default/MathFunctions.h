@@ -28,6 +28,9 @@ public:
     static const MathFunctionIfc& GetSinNorm270();  // x [0, 1] and y [0, 1] => phase shifted by 180 degrees => -cos(x) => starts at +0.0
 
     // sampled
+    static const MathFunctionIfc& GetSinAnim(); // alias for GetSinNorm270() as it's very useful for simple animations
+
+    // sampled
     static const MathFunctionIfc& GetSqrt(); // square root
     static const MathFunctionIfc& GetCbrt(); // cube root
     

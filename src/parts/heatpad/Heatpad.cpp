@@ -153,4 +153,12 @@ uint32_t Heatpad::getNextPeriodDurationMicros() const {
     return mPwm.getNextPeriodDurationMicros();
 }
 
+float Heatpad::getMeasuredVoltage() const {
+    return mVoltageSenseConditioner.getFilteredValue();
+}
+
+float Heatpad::getMeasuredCurrent() const {
+    return mCurrentSenseConditioner.getFilteredValue();
+}
+
 } // namespace

@@ -10,6 +10,9 @@
 
 namespace Garbox {
 
+class Rgb888;
+class RgbFloat;
+
 class DebugLeds {
 public:
     enum class Id : uint8_t {
@@ -32,6 +35,8 @@ public:
     static void ToggleAllLeds(float brightness = 1.0);
 
     static void SetRgbLed(uint8_t r, uint8_t g, uint8_t b);
+    static void SetRgbLed(const Rgb888& rgb);
+    static void SetRgbLed(const RgbFloat& rgb);
 
     static bool IsInitialized();
 

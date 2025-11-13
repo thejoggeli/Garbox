@@ -28,6 +28,8 @@ public:
     float getNextDutyCycle() const;
     uint32_t getCurrentPeriodDurationMicros() const;
     uint32_t getNextPeriodDurationMicros() const;
+    float getMeasuredVoltage() const;
+    float getMeasuredCurrent() const;
 
 private:
 

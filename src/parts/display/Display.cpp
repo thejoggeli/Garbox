@@ -100,10 +100,10 @@ void Display::tick() {
     
     // advance t
     static float t = 0.0f;
-    t = std::fmod(t + 0.005f, 1.0f);
+    t = std::fmod(t + 0.002f, 1.0f);
 
     // get a colormap for interpolation
-    static const ColorMap& colorMap = ColorMaps::Test;
+    static const ColorMap& colorMap = ColorMaps::GetTestDisplay();
 
     // draw rectangle with hsl rainbow
     Rgb565 rgb1 = Rgb565::FromHsl(t, 1.0f, 0.5f);

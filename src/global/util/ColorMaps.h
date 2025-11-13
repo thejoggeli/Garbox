@@ -7,7 +7,8 @@ namespace Garbox {
 class ColorMaps {
 public:
 
-    static const ColorMap Test;
+    static const ColorMap& GetTestLed();
+    static const ColorMap& GetTestDisplay();
 
 };
 

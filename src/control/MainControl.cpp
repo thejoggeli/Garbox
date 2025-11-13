@@ -208,15 +208,15 @@ void MainControl::tick(){
     mHeatpad.tick();
 
     // rgb led tick
-    static ColorMap const colorMap = {
-        RgbFloat(0.0f, 1.0f, 0.0f),
-        RgbFloat(1.0f, 0.0f, 0.0f),
+    static const ColorMap colorMap = {
+        RgbFloat(1.0f, 0.0f, 0.0f), // red
+        RgbFloat(0.0f, 0.0f, 1.0f), // blue
     };
-    constexpr float brightness = 5.0f / 255.0f;
-    float const tColorMap = static_cast<float>(fanState) * (1.0f / static_cast<float>(numFanStates - 1));
-    RgbFloat rgbFloat = RgbFloat::From(colorMap.interpolateHsl(tColorMap)) * brightness;
-    Rgb888 rgb = Rgb888::From(rgbFloat);
-    DebugLeds::SetRgbLed(rgb.r, rgb.g, rgb.b);
+    constexpr float brightness = 0.18f;
+    float const tColorMap = mHeatpad.getMeasuredVoltage() / 17.0f;
+    HslColor hslColor = colorMap.interpolateHsl(tColorMap);
+    hslColor.l = brightness;
+    DebugLeds::SetRgbLed(hslColor.toLinearRGB());
 
     // display tick
     Profiler::Begin(ProfilerConfig::DisplayTick);
