@@ -36,4 +36,17 @@ const ColorMap& ColorMaps::GetTestRBR_NonUniform(){
     return instance;   
 }
 
+const ColorMap& ColorMaps::GetViridis(){
+    static const ColorMapEntry entries[] = {
+        RgbFloat::FromHex(0xfde725),
+        RgbFloat::FromHex(0x5ec962),
+        RgbFloat::FromHex(0x21918c),
+        RgbFloat::FromHex(0x3b528b),
+        RgbFloat::FromHex(0x440154),
+    };
+    static const Span span(entries);
+    static const ColorMap instance(span);
+    return instance;   
+}
+
 } // namespace

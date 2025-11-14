@@ -18,6 +18,7 @@ public:
     float b;
 
     RgbFloat();
+    RgbFloat();
     RgbFloat(float r, float g, float b);
 
     RgbFloat toStandardRgb() const;
@@ -31,6 +32,7 @@ public:
     static RgbFloat FromHsl(float h, float s, float l);          // returns RgbFloat in StandardRGB format
     static RgbFloat FromLab(float L, float a, float b);          // returns RgbFloat in LinearRGB format
     static RgbFloat FromRgb888(uint8_t r, uint8_t g, uint8_t b); // returns RgbFloat in StandardRGB format
+    static RgbFloat FromHex(uint32_t hex);
 
     // Operator overloads
     RgbFloat operator*(float scalar) const;

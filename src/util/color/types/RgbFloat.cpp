@@ -51,6 +51,10 @@ RgbFloat RgbFloat::FromRgb888(uint8_t r, uint8_t g, uint8_t b){
     return ColorConverter::ToRgbFloat(Rgb888(r, g, b));
 }
 
+RgbFloat RgbFloat::FromHex(uint32_t hex){
+    return RgbFloat::From(Rgb888(hex));
+}
+
 // Operator overloads
 RgbFloat RgbFloat::operator*(float scalar) const {
     return RgbFloat(r * scalar, g * scalar, b * scalar);
