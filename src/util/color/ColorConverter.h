@@ -27,15 +27,17 @@ public:
     static RgbFloat ToRgbFloat(const HslColor& hsl);  // converts (HslColor => RgbFloat) - Output in standard RGB (sRGB) space
     static RgbFloat ToRgbFloat(const Rgb888& rgb);    // converts (Rgb888   => RgbFloat) - Output in will be in same color space as input
     static RgbFloat ToRgbFloat(const Rgb565& rgb);    // converts (Rgb565   => RgbFloat) - Output in will be in same color space as input
+    static RgbFloat ToRgbFloat(const LabColor& lab);  // converts (LabColor => RgbFloat) - Output in will be in linear RGB space
 
     // any => HslColor
-    static HslColor ToHsl(const RgbFloat& sRgb);      // converts (HslColor => RgbFloat) - Expects RGB to be in standard RGB (sRGB) space
-    static HslColor ToHsl(const Rgb888& sRgb);        // converts (HslColor => Rgb888)   - Expects RGB to be in standard RGB (sRGB) space
-    static HslColor ToHsl(const Rgb565& sRgb);        // converts (HslColor => Rgb565)   - Expects RGB to be in standard RGB (sRGB) space
+    static HslColor ToHsl(const RgbFloat& sRgb); // converts (RgbFloat => HslColor) - Expects RGB to be in standard RGB (sRGB) space
+    static HslColor ToHsl(const Rgb888& sRgb);   // converts (Rgb888   => HslColor) - Expects RGB to be in standard RGB (sRGB) space
+    static HslColor ToHsl(const Rgb565& sRgb);   // converts (Rgb565   => HslColor) - Expects RGB to be in standard RGB (sRGB) space
+    static HslColor ToHsl(const LabColor& lab);  // converts (LabColor => HslColor) - Output in HSL format
 
-    // LabColor <=> Linear RGB 
-    static LabColor ToLab(const RgbFloat& linearRgb); // converts (RgbFloat => LabColor) - Expects RGB to be in linear RGB space
-    static RgbFloat ToRgbFloat(const LabColor& lab);  // converts (LabColor => RgbFloat) - Output in will be in linear RGB space
+    // any => LabColor 
+    static LabColor ToLab(const RgbFloat& linearRgb); // converts (RgbFloat => LabColor) - Expects RGB to be in linear RGB space 
+    static LabColor ToLab(const HslColor& hsl);       // converts (RgbFloat => LabColor) - Input in HSL format
 
     // Standard RGB <=> Linear RGB
     static RgbFloat ToLinearRgb(const HslColor& hsl);   // converts (HslColor => RgbFloat)

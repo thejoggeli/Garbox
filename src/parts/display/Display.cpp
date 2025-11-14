@@ -34,7 +34,7 @@ Display::Display(SpiDma& spi, Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk):
     AssertExit(mBufferSize == (mWidth * mHeight * mBytesPerPixel / mPartialFactor), "Display", "frame size inconsistent with constants");
 }
 
-void Display::init() {
+void Display::init(){
 
     AssertExit(!mInitialized, "Display", "already initialized");
 
@@ -97,12 +97,7 @@ void Display::init() {
     mInitialized = true;
 }
 
-void Display::tick() {
-
-    const uint32_t millis = static_cast<float>(Time::GetMillis());
-    lv_label_set_text_fmt(mLabel, "%04u.%03u", millis/1000, millis%1000);
-
-    lv_timer_handler(); 
+void Display::tick(){
 
     // advance x
     static int x = 0;
@@ -110,33 +105,38 @@ void Display::tick() {
     
     // advance t
     static float t = 0.0f;
-    t = std::fmod(t + 0.002f, 1.0f);
+    t = std::fmod(t + 0.004f, 1.0f);
+
+    lv_label_set_text_fmt(mLabel, "0.%03u", static_cast<uint32_t>(t*1000.0f));
+
+    lv_timer_handler(); 
 
     // get a colormap for interpolation
-    static const ColorMap& colorMap = ColorMaps::GetTestDisplay();
+    static const ColorMap& colorMap1 = ColorMaps::GetTestRBR_Uniform();
+    static const ColorMap& colorMap2 = ColorMaps::GetTestRBR_NonUniform();
 
     // draw rectangle with hsl rainbow
     Rgb565 rgb1 = Rgb565::FromHsl(t, 1.0f, 0.5f);
     mSt7789v.sendFillRect(x, 40, 1, 30, rgb1.value);
 
     // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb2 = Rgb565::From(colorMap.interpolateStandardRgb(t));
+    Rgb565 rgb2 = Rgb565::From(colorMap1.interpolateLinearRgb(t).toStandardRgb());
     mSt7789v.sendFillRect(x, 80, 1, 30, rgb2.value);
 
     // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb3 = Rgb565::From(colorMap.interpolateLinearRgb(t).toStandardRgb());
+    Rgb565 rgb3 = Rgb565::From(colorMap1.interpolateHsl(t));
     mSt7789v.sendFillRect(x, 120, 1, 30, rgb3.value);
 
     // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb4 = Rgb565::From(colorMap.interpolateHsl(t));
+    Rgb565 rgb4 = Rgb565::From(colorMap2.interpolateLinearRgb(t).toStandardRgb());
     mSt7789v.sendFillRect(x, 160, 1, 30, rgb4.value);
 
     // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb5 = Rgb565::From(colorMap.interpolateLab(t).toStandardRgb());
+    Rgb565 rgb5 = Rgb565::From(colorMap2.interpolateHsl(t));
     mSt7789v.sendFillRect(x, 200, 1, 30, rgb5.value);
 
     // test timer
-    if (mTestTimer.isExpired()) {
+    if (mTestTimer.isExpired()){
         mTestTimer.restart();
     }
 }
@@ -145,7 +145,7 @@ void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 
 #if GarboxDebugDisplay
     if(pixelMap == mDrawBufferData1){
-        LogDebug("Display", "buffer1");
+        LogDebug("Display", "buffer-1");
     }
     else if(pixelMap == mDrawBufferData2){
         LogDebug("Display", "buffer-2");
@@ -184,7 +184,7 @@ void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
     // LogDebug("Display", "sending %u bytes (async)", numBytes);
 }
 
-void Display::handleTxComplete(bool success) {
+void Display::handleTxComplete(bool success){
     // nothing to do
 }
 
@@ -225,11 +225,11 @@ void Display::flushWaitTrampoline(lv_display_t* disp){
     }
 }
 
-void Display::txCompleteTrampoline(void* user, bool success) {
+void Display::txCompleteTrampoline(void* user, bool success){
     static_cast<Display*>(user)->handleTxComplete(success);
 }
 
-uint32_t Display::lvglTickProvider() {
+uint32_t Display::lvglTickProvider(){
     return Time::GetMillis();
 }
 
@@ -240,7 +240,7 @@ uint8_t* Display::allocDrawBufferData(uint32_t size){
     
     // check if alloc success
     AssertExit(buffer != nullptr, "Display", "mDrawBuffer is nullptr");
-    if (!(heap_caps_get_allocated_size(buffer) && heap_caps_get_largest_free_block(MALLOC_CAP_DMA))) {
+    if (!(heap_caps_get_allocated_size(buffer) && heap_caps_get_largest_free_block(MALLOC_CAP_DMA))){
         multi_heap_info_t info;
         heap_caps_get_info(&info, MALLOC_CAP_DMA);
         TriggerExit("Display", "DMA allocation failed", static_cast<int32_t>(info.total_free_bytes));

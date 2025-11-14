@@ -1,6 +1,7 @@
 #include "HslColor.h"
 
 #include "util/color/ColorConverter.h"
+#include "util/color/types/LabColor.h"
 #include "util/color/types/RgbFloat.h"
 
 namespace Garbox {
@@ -11,6 +12,10 @@ HslColor::HslColor() : h(0.0f), s(0.0f), l(0.0f) {
 
 HslColor::HslColor(float hVal, float sVal, float lVal) : h(hVal), s(sVal), l(lVal){
     // constructor body
+}
+
+LabColor HslColor::toLab() const {
+    return ColorConverter::ToLab(*this);
 }
 
 RgbFloat HslColor::toStandardRgb() const {
@@ -31,6 +36,10 @@ HslColor HslColor::From(const Rgb888& rgb) {
 
 HslColor HslColor::From(const Rgb565& rgb) {
     return ColorConverter::ToHsl(rgb);
+}
+
+HslColor HslColor::From(const LabColor& lab) {
+    return ColorConverter::ToHsl(lab);
 }
 
 } // namespace

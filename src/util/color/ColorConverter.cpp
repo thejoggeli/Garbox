@@ -314,6 +314,12 @@ RgbFloat ColorConverter::ToRgbFloat(const Rgb565& src){
     return rgb888ToRgbFloat(c888);
 }
 
+RgbFloat ColorConverter::ToRgbFloat(const LabColor& src){
+    float x, y, z;
+    labToXyz(src, x, y, z);
+    return xyzToRgbFloat(x, y, z);
+}
+
 // ----------------------------------------------------------------------------------
 // --- any => HslColor  -------------------------------------------------------------
 // ----------------------------------------------------------------------------------
@@ -333,8 +339,13 @@ HslColor ColorConverter::ToHsl(const Rgb565& src){
     return rgbToHsl(rf);
 }
 
+HslColor ColorConverter::ToHsl(const LabColor& src){
+    const RgbFloat srgb = ToStandardRgb(src); // convert Lab to sRGB
+    return rgbToHsl(srgb); // convert sRGB to HSL
+}
+
 // ----------------------------------------------------------------------------------
-// --- LabColor <=> Linear RGB  -----------------------------------------------------
+// --- any <=> LabColor -------------------------------------------------------------
 // ----------------------------------------------------------------------------------
 
 LabColor ColorConverter::ToLab(const RgbFloat& src){
@@ -343,10 +354,9 @@ LabColor ColorConverter::ToLab(const RgbFloat& src){
     return xyzToLab(x, y, z);
 }
 
-RgbFloat ColorConverter::ToRgbFloat(const LabColor& src){
-    float x, y, z;
-    labToXyz(src, x, y, z);
-    return xyzToRgbFloat(x, y, z);
+LabColor ColorConverter::ToLab(const HslColor& src){
+    const RgbFloat linear = ToLinearRgb(src); // convert Hsl to linear RGB
+    return ToLab(linear); // convert linear RGB to Lab
 }
 
 // ----------------------------------------------------------------------------------
@@ -376,8 +386,8 @@ RgbFloat ColorConverter::ToStandardRgb(const HslColor& hsl){
 }
 
 RgbFloat ColorConverter::ToStandardRgb(const LabColor& lab){
-    RgbFloat linearRgb = ColorConverter::ToRgbFloat(lab);
-    return ColorConverter::ToStandardRgb(linearRgb);
+    RgbFloat linearRgb = ColorConverter::ToRgbFloat(lab); // convert Lab to linear RGB
+    return ColorConverter::ToStandardRgb(linearRgb); // convert linear RGB to sRGB
 }
 
 RgbFloat ColorConverter::ToStandardRgb(const RgbFloat& rgb){

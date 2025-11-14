@@ -1,93 +1,88 @@
 #pragma once
 
-#include <vector>
+#include <cstddef>
 #include "util/color/types/HslColor.h"
 #include "util/color/types/LabColor.h"
 #include "util/color/types/RgbFloat.h"
+#include "util/container/Span.h"
 
 namespace Garbox {
 
+/*
+    Lightweight non-owning interpolation helper.
+    The user supplies an external array of Entries. Each entry contains t and
+    precomputed representations in multiple color spaces. The class uses a
+    small lookup table for faster segment resolution and supports interpolation
+    in standard RGB, linear RGB, HSL and Lab.
+*/
 class ColorMap {
 public:
 
-    struct ColorSample {
-        const RgbFloat sRgb;   // Standard RGB 
-        const RgbFloat linear; // Linear RGB 
+    struct Entry {
+        const float t;
+        const RgbFloat standardRgb;
+        const RgbFloat linearRgb;
         const HslColor hsl;
         const LabColor lab;
-        ColorSample(const RgbFloat& sRgbVal, const RgbFloat& linearVal, const HslColor& hslVal, const LabColor& labVal):
-            // initialize members
-            sRgb(sRgbVal), linear(linearVal), hsl(hslVal), lab(labVal){
-            // constructor body
-        }
+
+        // t distribution set by user
+        Entry(float t, const HslColor& hslColor);
+        Entry(float t, const RgbFloat& rgbColor); // expects values in standard RGB (sRGB) format
+
+        // t distributed uniformly
+        Entry(const HslColor& hslColor);
+        Entry(const RgbFloat& rgbColor); // expects values in standard RGB (sRGB) format
     };
 
-    // color must be in sRGB color space
-    struct RgbStop {
-        const float t;
-        const RgbFloat color;
-    };
-
-    // color must be in HSL color space
-    struct HslStop {
-        const float t;
-        const HslColor color;
-    };
-
-    // Uniform RGB stops (implicitly t = 0..1)
-    // Assumes RGB colors in standard RGB (sRGB) color space
-    ColorMap(std::initializer_list<RgbFloat> stops);
-
-    // Uniform HSL stops (implicitly t = 0..1)
-    ColorMap(std::initializer_list<HslColor> stops);
-
-    // Non-uniform RGB stops (explicit t)
-    // Assumes RGB colors in standard RGB (sRGB) color space
-    ColorMap(std::initializer_list<RgbStop> stops); // BROKEN! DO NOT USE!
-
-    // Non-uniform HSL stops (explicit t)
-    ColorMap(std::initializer_list<HslStop> stops); // BROKEN! DO NOT USE!
-
+    ColorMap(const Span<const Entry> entries);
     ~ColorMap();
 
+    const Entry& getEntry(size_t index) const;
+    size_t size() const;
+
+    RgbFloat interpolateStandardRgb(float t) const;
+    RgbFloat interpolateLinearRgb(float t) const;
+    HslColor interpolateHsl(float t) const;
+    LabColor interpolateLab(float t) const; 
+
+    // Disallow copy and move 
     ColorMap(const ColorMap&) = delete;
     ColorMap& operator=(const ColorMap&) = delete;
     ColorMap(ColorMap&&) = delete;
     ColorMap& operator=(ColorMap&&) = delete;
 
-    // Pre-sampled access
-    const ColorSample& getSample(size_t index) const;
-    size_t size() const; // returns number of samples
-    float step() const; // returns step between samples
-
-    // Runtime interpolation between pre-samples
-    RgbFloat interpolateStandardRgb(float t) const; // returns color in standard RGB (sRGB) space
-    RgbFloat interpolateLinearRgb(float t) const;   // returns color in linear RGB space
-    HslColor interpolateHsl(float t) const;         // returns color in HSL space
-    LabColor interpolateLab(float t) const;         // returns color in Lab space
-
 private:
 
-    static constexpr float MinSamplingStep = 0.05f; // minimum allowed sample step
+    struct LookupBucket {
+        uint8_t startIndex;
+        uint8_t endIndex;
+    };
 
-    std::vector<ColorSample> mSamples;
-    float mSampleStep = 0.0f;
-    size_t mLastIndex = 0;
-    float m_tMin = 0.0f;
-    float m_tMax = 1.0f;
+    struct SegmentInfo {
+        const Entry* a;
+        const Entry* b;
+        float frac;
+    };
 
-    // Setup
-    template<typename StopType>
-    void initializeFromStops(std::initializer_list<StopType> stops);
-    void initializeUniform(size_t size);
-    void prepareSamples(size_t count);
+    static constexpr size_t BucketCount = 16U;
+    static constexpr float BucketStep = 1.0f / static_cast<float>(BucketCount);
 
-    // Builders (operate directly on the initializer_list, no copies)
-    void initializeFromRgbStops(std::initializer_list<RgbStop> stops);
-    void initializeFromHslStops(std::initializer_list<HslStop> stops);
+    const Span<const Entry> mEntries;
 
-    // Interp helper on pre-samples
-    void indexAndFrac(float t, size_t& i0, size_t& i1, float& frac) const;
+    LookupBucket mLookup[BucketCount];
+    bool mInitialized = false;
+    bool mUniform = false;
+    float mUniformStep = 0.0f;
+
+    // initialization 
+    void init();
+    bool checkUniform() const ;
+    void buildLookupBuckets();
+
+    // interpolation
+    void findEntryIndexUniform(float t, size_t* index, float* frac) const;
+    void findEntryIndex(float t, size_t* index) const;
+    void resolveSegment(float t, SegmentInfo* segmentInfo) const;
 };
 
 } // namespace Garbox

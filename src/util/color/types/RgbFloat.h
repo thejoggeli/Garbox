@@ -12,6 +12,7 @@ class Rgb565;
 
 class RgbFloat {
 public:
+
     float r;
     float g;
     float b;
@@ -22,14 +23,14 @@ public:
     RgbFloat toStandardRgb() const;
     RgbFloat toLinearRgb() const;
 
-    static RgbFloat From(const HslColor& hsl);
-    static RgbFloat From(const LabColor& lab);
-    static RgbFloat From(const Rgb888& rgb);
-    static RgbFloat From(const Rgb565& rgb);
+    static RgbFloat From(const HslColor& hsl); // returns RgbFloat in StandardRGB format
+    static RgbFloat From(const LabColor& lab); // returns RgbFloat in LinearRGB format
+    static RgbFloat From(const Rgb888& rgb);   // returns RgbFloat in StandardRGB format
+    static RgbFloat From(const Rgb565& rgb);   // returns RgbFloat in StandardRGB format
 
-    static RgbFloat FromHsl(float h, float s, float l);
-    static RgbFloat FromLab(float L, float a, float b);
-    static RgbFloat FromRgb888(uint8_t r, uint8_t g, uint8_t b);
+    static RgbFloat FromHsl(float h, float s, float l);          // returns RgbFloat in StandardRGB format
+    static RgbFloat FromLab(float L, float a, float b);          // returns RgbFloat in LinearRGB format
+    static RgbFloat FromRgb888(uint8_t r, uint8_t g, uint8_t b); // returns RgbFloat in StandardRGB format
 
     // Operator overloads
     RgbFloat operator*(float scalar) const;

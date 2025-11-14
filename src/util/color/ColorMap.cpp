@@ -4,310 +4,292 @@
 #include <cmath>
 #include "assert/Assert.h"
 #include "util/color/ColorInterpolator.h"
-#include "util/function/default/GammaFunctions.h"
 
 namespace Garbox {
 
-// Uniform RGB
-ColorMap::ColorMap(std::initializer_list<RgbFloat> stops){
-
-    // prepare samples
-    initializeUniform(stops.size());
-
-    // create color sample entry for each stop
-    for(const RgbFloat& srgb : stops){
-        const HslColor hsl = HslColor::From(srgb);
-        const RgbFloat linearRgb = srgb.toLinearRgb();
-        const LabColor lab = LabColor::From(linearRgb);
-        mSamples.emplace_back(srgb, linearRgb, hsl, lab);
-    }
+ColorMap::Entry::Entry(float tValue, const HslColor& hslColor):
+    // initialize members (from hsl color)
+    t(tValue),
+    standardRgb(RgbFloat::From(hslColor)),
+    linearRgb(standardRgb.toLinearRgb()),
+    hsl(hslColor),
+    lab(LabColor::From(linearRgb)){
+    // nothing to do
 }
 
-// Uniform HSL
-ColorMap::ColorMap(std::initializer_list<HslColor> stops){
-
-    // prepare samples
-    initializeUniform(stops.size());
-
-    // create color sample entry for each stop
-    for(const HslColor& hsl : stops){
-        const RgbFloat sRgb = RgbFloat::From(hsl);
-        const RgbFloat linearRgb = sRgb.toLinearRgb();
-        const LabColor lab = LabColor::From(linearRgb);
-        mSamples.emplace_back(sRgb, linearRgb, hsl, lab);
-    }
+ColorMap::Entry::Entry(float tValue, const RgbFloat& rgbColor):
+    // initialize members (from standard rgb color)
+    t(tValue),
+    standardRgb(rgbColor),
+    linearRgb(rgbColor.toLinearRgb()),
+    hsl(HslColor::From(rgbColor)),
+    lab(LabColor::From(linearRgb)){
+    // nothing to do
 }
 
-// Non-uniform RGB
-ColorMap::ColorMap(std::initializer_list<RgbStop> stops){
-
-    // constructor body
-    initializeFromRgbStops(stops);
+ColorMap::Entry::Entry(const HslColor& hslColor):
+    // initialize members (from standard rgb color)
+    t(0.0f),
+    standardRgb(RgbFloat::From(hslColor)),
+    linearRgb(standardRgb.toLinearRgb()),
+    hsl(hslColor),
+    lab(LabColor::From(linearRgb)){
+    // nothing to do
 }
 
-// Non-uniform HSL
-ColorMap::ColorMap(std::initializer_list<HslStop> stops){
-
-    // constructor body
-    initializeFromHslStops(stops);
+ColorMap::Entry::Entry(const RgbFloat& rgbColor):
+    // initialize members (from standard rgb color)
+    t(0.0f),
+    standardRgb(rgbColor),
+    linearRgb(rgbColor.toLinearRgb()),
+    hsl(HslColor::From(standardRgb)),
+    lab(LabColor::From(linearRgb)){
+    // nothing to do
 }
 
-void ColorMap::initializeFromRgbStops(std::initializer_list<RgbStop> stops){
-
-    initializeFromStops(stops);
-    const size_t expectedSize = mSamples.capacity();
-
-    // initialize first stop
-    auto it = stops.begin();
-    float tPrev = it->t;
-    RgbFloat srgbPrev = it->color;
-    RgbFloat linPrev = srgbPrev.toLinearRgb();
-    HslColor hslPrev = HslColor::From(srgbPrev);
-    LabColor labPrev = LabColor::From(linPrev);
-
-    while(++it != stops.end()){
-        const float tCurr = it->t;
-
-        // get current stop color
-        const RgbFloat srgbCurr = it->color;
-        const RgbFloat linCurr = srgbCurr.toLinearRgb();
-        const HslColor hslCurr = HslColor::From(srgbCurr);
-        const LabColor labCurr = LabColor::From(linCurr);
-
-        // last sample, no further interpolation
-        if(it == stops.end()){
-            mSamples.emplace_back(srgbCurr, linCurr, hslCurr, labCurr);
-            break;
-        }
-
-        // add interpolated colors (interpolate from current stop to next step)
-        const size_t segSamples = static_cast<size_t>(std::round((tCurr - tPrev) / mSampleStep));
-        for(size_t s = 0; s < segSamples; ++s){
-            const float t = tPrev + static_cast<float>(s) * mSampleStep;
-            const float frac = (t - tPrev) / mSampleStep;
-
-            // interpolate colors
-            const RgbFloat sRgb = ColorInterpolator::interpolateRgb(srgbPrev, srgbCurr, frac);
-            const RgbFloat linearRgb = ColorInterpolator::interpolateRgb(linPrev, linCurr, frac);
-            const HslColor hsl = ColorInterpolator::interpolateHsl(hslPrev, hslCurr, frac);
-            const LabColor lab = ColorInterpolator::interpolateLab(labPrev, labCurr, frac);
-
-            // add interpolated colors to samples vector
-            mSamples.emplace_back(sRgb, linearRgb, hsl, lab);
-        }
-
-        // shift
-        tPrev = tCurr;
-        srgbPrev = srgbCurr;
-        linPrev = linCurr;
-        hslPrev = hslCurr;
-        labPrev = labCurr;
-    }
-
-    // add last stop
-    mSamples.emplace_back(srgbPrev, linPrev, hslPrev, labPrev);
-
-    // ensure vector size did not change
-    AssertExit(expectedSize == mSamples.size(), "ColorMap", "samples size must remain unchanged");
-}
-
-void ColorMap::initializeFromHslStops(std::initializer_list<HslStop> stops){
-
-    initializeFromStops(stops);
-    const size_t expectedSize = mSamples.capacity();
-
-    // initialize first stop
-    auto it = stops.begin();
-    float tPrev = it->t;
-    HslColor hslPrev = it->color;
-    RgbFloat srgbPrev = RgbFloat::From(hslPrev);
-    RgbFloat linPrev = srgbPrev.toLinearRgb();
-    LabColor labPrev = LabColor::From(linPrev);
-
-    while(++it != stops.end()){
-        const float tCurr = it->t;
-
-        // add current stop color
-        const HslColor hslCurr = it->color;
-        const RgbFloat srgbCurr = RgbFloat::From(hslCurr);
-        const RgbFloat linCurr = srgbCurr.toLinearRgb();
-        const LabColor labCurr = LabColor::From(linCurr);
-        
-        // last sample, no further interpolation
-        if(it == stops.end()){
-            break;
-        }
-
-        // add interpolated colors (interpolate from current stop to next step)
-        const size_t segSamples = static_cast<size_t>(std::round((tCurr - tPrev) / mSampleStep));
-        for(size_t s = 0; s < segSamples; ++s){
-            const float t = tPrev + static_cast<float>(s) * mSampleStep;
-            const float frac = (t - tPrev) / mSampleStep;
-
-            // interpolate colors
-            const HslColor hsl       = ColorInterpolator::interpolateHsl(hslPrev, hslCurr, frac);
-            const RgbFloat sRgb      = ColorInterpolator::interpolateRgb(srgbPrev, srgbCurr, frac);
-            const RgbFloat linearRgb = ColorInterpolator::interpolateRgb(linPrev, linCurr, frac);
-            const LabColor lab       = ColorInterpolator::interpolateLab(labPrev, labCurr, frac);
-
-            // add interpolated colors to samples vector
-            mSamples.emplace_back(sRgb, linearRgb, hsl, lab);
-        }
-
-        // shift
-        tPrev = tCurr;
-        hslPrev = hslCurr;
-        srgbPrev = srgbCurr;
-        linPrev = linCurr;
-        labPrev = labCurr;
-    }
-
-    // add last stop
-    mSamples.emplace_back(srgbPrev, linPrev, hslPrev, labPrev);
-
-    // ensure vector size did not change
-    AssertExit(expectedSize == mSamples.size(), "ColorMap", "samples size must remain unchanged");
+ColorMap::ColorMap(const Span<const Entry> entries) : mEntries(entries){
+    init();
 }
 
 ColorMap::~ColorMap(){
     TriggerExit("ColorMap", "heap using classes must not be deconstructed");
 }
 
-const ColorMap::ColorSample& ColorMap::getSample(size_t index) const {
-    const size_t clamped = std::min(index, (mSamples.size() > 0 ? mLastIndex : 0));
-    return mSamples[clamped];
+void ColorMap::init(){
+    AssertExit(!mInitialized, "ColorMap", "already initialized");
+
+    const size_t numEntries = mEntries.size();
+    AssertExit((numEntries >= 2u), "ColorMap", "need at least two entries");
+    AssertExit((numEntries <= 256U), "ColorMap", "max 256 entries allowed");
+
+    // check if t uniform
+    mUniform = checkUniform();
+
+    // handle uniform
+    if(mUniform){
+        mUniformStep = 1.0f / static_cast<float>(numEntries - 1);
+    }
+    // handle non-uniform
+    else {
+
+        // check if t is strictly monotonic 
+        for(size_t i = 1u; i < numEntries; ++i){
+            AssertExit((mEntries[i].t >= mEntries[i - 1].t), "ColorMap", "t values must be monotonic");
+        }
+
+        // build lookup buckets 
+        buildLookupBuckets();
+    }
+
+    mInitialized = true;
+}
+
+bool ColorMap::checkUniform() const {
+
+    const size_t numEntries = mEntries.size();
+
+    // check if all t values are zero
+    bool allZero = true;
+    for(size_t i = 0; i < numEntries; ++i){
+        if(mEntries[i].t != 0.0f){
+            allZero = false;
+        }
+    }
+
+    // all zero => uniform distribution
+    if(allZero){
+        return true;
+    }
+
+    // check if all steps sizes are sime
+    const float tolerance = 1e-4f;
+
+    // check lower boundary
+    if(std::fabs(mEntries.front().t - 0.0f) > tolerance){
+        return false;
+    }
+
+    // check upper boundary
+    if(std::fabs(mEntries.back().t - 1.0f) > tolerance){
+        return false;
+    }
+
+    // check if all steps sizes are same
+    const float step = mEntries[1].t - mEntries[0].t;
+    for(size_t i = 1; i < numEntries; ++i){
+        float delta = mEntries[i].t - mEntries[i - 1].t;
+        if(std::fabs(delta - step) > tolerance){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void ColorMap::buildLookupBuckets(){
+    const size_t numEntries = mEntries.size();
+    const size_t lastSeg = numEntries - 2;
+
+    size_t entryIndexA = 0; // segment index for start
+    size_t entryIndexB = 0; // segment index for end
+
+    for(size_t b = 0; b < BucketCount; ++b){
+        const float t0 = static_cast<float>(b) * BucketStep;
+        const float t1 = t0 + BucketStep;
+
+        // advance A while the upper bound is still <= t0
+        while(entryIndexA < lastSeg && mEntries[entryIndexA + 1].t <= t0){
+            entryIndexA++;
+        }
+
+        // advance B while the lower bound is < t1
+        while(entryIndexB < lastSeg && mEntries[entryIndexB].t < t1){
+            entryIndexB++;
+        }
+
+        size_t bucketStartIndex = entryIndexA;
+        size_t bucketEndIndex = entryIndexB + 1; // one-past-last segment
+
+        // upper limit for start index
+        if(bucketStartIndex > (numEntries-2)){
+            bucketStartIndex = numEntries-2;
+        }
+
+        // upper limit for end index
+        if(bucketEndIndex > (numEntries-1)){
+            bucketEndIndex = numEntries-1;
+        }
+
+        mLookup[b].startIndex = static_cast<uint8_t>(bucketStartIndex);
+        mLookup[b].endIndex = static_cast<uint8_t>(bucketEndIndex);
+    }
+}
+
+void ColorMap::findEntryIndexUniform(float t, size_t* index, float* frac) const {
+    float pos = t / mUniformStep;
+    size_t idx = static_cast<size_t>(pos);
+
+    const size_t maxIndex = mEntries.size() - 2;
+    if(idx > maxIndex){
+        idx = maxIndex;
+    }
+
+    *index = idx;
+    *frac = pos - static_cast<float>(idx);
+}
+
+void ColorMap::findEntryIndex(float t, size_t* index) const {
+    float tClamped = std::clamp(t, 0.0f, 1.0f);
+
+    size_t bucket = static_cast<size_t>(tClamped * static_cast<float>(BucketCount));
+    if(bucket >= BucketCount){
+        bucket = BucketCount - 1u;
+    }
+
+    const LookupBucket& b = mLookup[bucket];
+    size_t startIndex = b.startIndex;
+    size_t endIndex = b.endIndex;
+
+    size_t idx = startIndex;
+
+    if(endIndex > startIndex){
+        bool found = false;
+        for(size_t i = startIndex; i < endIndex; ++i){
+            if(tClamped >= mEntries[i].t && tClamped <= mEntries[i + 1u].t){
+                idx = i;
+                found = true;
+                break;
+            }
+        }
+
+        if(!found){
+            if(endIndex > 0u){
+                idx = endIndex - 1u;
+            }
+            else {
+                idx = 0u;
+            }
+        }
+    }
+
+    const size_t maxIndex = mEntries.size() - 2u;
+    if(idx > maxIndex){
+        idx = maxIndex;
+    }
+
+    *index = idx;
+}
+
+
+void ColorMap::resolveSegment(float t, SegmentInfo* segmentInfo) const {
+    float tClamped = std::clamp(t, 0.0f, 1.0f);
+
+    size_t idx = 0u;
+
+    if(mUniform){
+        findEntryIndexUniform(tClamped, &idx, &segmentInfo->frac);
+        segmentInfo->a = &mEntries[idx];
+        segmentInfo->b = &mEntries[idx+1];
+    }
+    else {
+        findEntryIndex(tClamped, &idx);
+        const Entry& entryA = mEntries[idx];
+        const Entry& entryB = mEntries[idx + 1u];
+        float frac = (tClamped - entryA.t) / (entryB.t - entryA.t);
+        segmentInfo->a = &entryA;
+        segmentInfo->b = &entryB;
+        segmentInfo->frac = frac;
+    }
+}
+
+const ColorMap::Entry& ColorMap::getEntry(size_t index) const {
+    const size_t lastIndex = mEntries.size() - 1u;
+    const size_t clamped = (index < mEntries.size() ? index : lastIndex);
+    return mEntries[clamped];
 }
 
 size_t ColorMap::size() const {
-    return mSamples.size();
-}
-
-float ColorMap::step() const {
-    return mSampleStep;
+    return mEntries.size();
 }
 
 RgbFloat ColorMap::interpolateStandardRgb(float t) const {
-    size_t i0, i1;
-    float frac;
-    indexAndFrac(t, i0, i1, frac);
-    return ColorInterpolator::interpolateRgb(mSamples[i0].sRgb, mSamples[i1].sRgb, frac);
+    SegmentInfo seg;
+    resolveSegment(t, &seg);
+    return ColorInterpolator::interpolateRgb(
+        seg.a->standardRgb, 
+        seg.b->standardRgb, 
+        seg.frac
+    );
 }
 
 RgbFloat ColorMap::interpolateLinearRgb(float t) const {
-    size_t i0, i1;
-    float frac;
-    indexAndFrac(t, i0, i1, frac);
-    return ColorInterpolator::interpolateRgb(mSamples[i0].linear, mSamples[i1].linear, frac);
+    SegmentInfo seg;
+    resolveSegment(t, &seg);
+    return ColorInterpolator::interpolateRgb(
+        seg.a->linearRgb, 
+        seg.b->linearRgb, 
+        seg.frac
+    );
 }
 
 HslColor ColorMap::interpolateHsl(float t) const {
-    size_t i0, i1;
-    float frac;
-    indexAndFrac(t, i0, i1, frac);
-    return ColorInterpolator::interpolateHsl(mSamples[i0].hsl, mSamples[i1].hsl, frac);
+    SegmentInfo seg;
+    resolveSegment(t, &seg);
+    return ColorInterpolator::interpolateHsl(
+        seg.a->hsl, 
+        seg.b->hsl, 
+        seg.frac
+    );
 }
 
 LabColor ColorMap::interpolateLab(float t) const {
-    size_t i0, i1;
-    float frac;
-    indexAndFrac(t, i0, i1, frac);
-    return ColorInterpolator::interpolateLab(mSamples[i0].lab, mSamples[i1].lab, frac);
-}
-
-// ---------------- Helpers ----------------
-
-void ColorMap::initializeUniform(size_t count){
-
-    AssertExit((count >= 2), "ColorMap", "at least two colors required");
-    
-    // init members
-    m_tMin = 0.0f;
-    m_tMax = 1.0f;
-    mSampleStep = 1.0f / static_cast<float>(count - 1);
-
-    // init samples vector
-    prepareSamples(count);
-}
-
-template<typename StopType>
-void ColorMap::initializeFromStops(std::initializer_list<StopType> stops){
-
-    AssertExit((stops.size() >= 2), "ColorMap", "at least two stops required");
-
-    // compute sample step
-    {
-        auto it = stops.begin();
-        float prev = it->t;
-        ++it;
-
-        // check if t are monotonic 
-        for(; it != stops.end(); ++it){
-            const float cur = it->t;
-            AssertExit((prev <= cur), "ColorMap", "t must be strictly monotonic");
-            prev = cur;
-        }
-
-        // find min step size => min(t[n] - t[n-1])
-        float minStep = 1.0f;
-        for(; it != stops.end(); ++it){
-            const float cur = it->t;
-            const float step = (cur - prev);
-            if(step < minStep){
-                minStep = step;
-            }
-            prev = cur;
-        }
-
-        // set sample step to min step
-        mSampleStep = minStep;
-        AssertExit((mSampleStep >= MinSamplingStep), "ColorMap", "sampling step too small");
-    }
-
-    // compute tMin and tMax
-    {
-        m_tMin = stops.begin()->t;
-        m_tMax = std::prev(stops.end())->t;
-    }
-
-    // compute number of samples
-    const size_t numSamples = static_cast<size_t>(std::round((m_tMax - m_tMin) / mSampleStep) + 1.0f);
-
-    // init samples vector
-    prepareSamples(numSamples);
-}
-
-void ColorMap::prepareSamples(size_t count){
-    AssertExit(mSamples.capacity() == 0, "ColorMap", "expected unused vector");
-    mSamples.reserve(count);
-    mLastIndex = count - 1;
-}
-
-// Map t to neighboring pre-samples and fractional position
-void ColorMap::indexAndFrac(float t, size_t& i0, size_t& i1, float& frac) const {
-
-    // clamp t to [0,1]
-    const float tClamped = std::clamp(t, 0.0f, 1.0f);
-
-    // example:
-    // tClamped = 0.85 and mSampleStep = 0.2
-    // => 0.85 / 0.2 = 4.25 
-    // => idx = 4
-    // => frac = 0.25 
-    const float pos = tClamped / mSampleStep; 
-    const size_t idx = static_cast<size_t>(pos);
-
-    // arrived at end samples vector
-    // works if t is not in range [0, 1]
-    if(idx >= mLastIndex){
-        i0 = mLastIndex - 1;
-        i1 = mLastIndex;
-        frac = 1.0f;
-        return;
-    }
-
-    i0 = idx;
-    i1 = idx + 1;
-    frac = pos - static_cast<float>(idx);
+    SegmentInfo seg;
+    resolveSegment(t, &seg);
+    return ColorInterpolator::interpolateLab(
+        seg.a->lab,
+        seg.b->lab,
+        seg.frac
+    );
 }
 
 } // namespace Garbox

@@ -10,6 +10,7 @@
 #include "core/time/Time.h"
 
 #include "global/config/StatusLedsConfig.h"
+#include "global/providers/ColorMaps.h"
 #include "global/providers/PartsProvider.h"
 #include "global/providers/PiezoSequences.h"
 
@@ -228,10 +229,7 @@ void MainControl::tick(){
     mHeatpad.tick();
 
     // rgb led tick
-    static const ColorMap colorMap = {
-        RgbFloat(1.0f, 0.0f, 0.0f), // red
-        RgbFloat(0.0f, 0.0f, 1.0f), // blue
-    };
+    static const ColorMap& colorMap = ColorMaps::GetRedBlue();
     constexpr float brightness = 0.14f;
     float const tColorMap = mHeatpad.getMeasuredVoltage() / 17.0f;
     HslColor hslColor = colorMap.interpolateHsl(tColorMap);
