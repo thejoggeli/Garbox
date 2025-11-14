@@ -15,10 +15,14 @@
 #include "global/providers/PartsProvider.h"
 #include "parts/piezo/PiezoPlayer.h"
 #include "util/StringUtils.h"
+#include "util/threading/LockGuard.h"
 
 using namespace Garbox;
 
 static MainControl gMainControl;
+static SemaphoreHandle_t gAssertDebugHandlerMutex = nullptr;
+static SemaphoreHandle_t gAssertExitHandlerMutex = nullptr;
+static TaskHandle_t gMainTaskHandle = nullptr;
 
 void mainTask(void* parameter);
 void logProfiler();
@@ -30,6 +34,7 @@ void setup() {
     
     // assert debug handler
     AssertHandler::SetDebugHandler([](const char* context, const char* message, int32_t arg){
+        LockGuard lock(gAssertDebugHandlerMutex);
 
         // print error to log
         LogError("AssertHandler", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
@@ -47,17 +52,49 @@ void setup() {
 
     // assert exit handler
     AssertHandler::SetExitHandler([](const char* context, const char* message, int32_t arg){
-
+        LockGuard lock(gAssertExitHandlerMutex);
+        
         // print error to log
         LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
-        
-        // turn on all status leds
-        StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
-        if(statusLeds.isInitialized()){
-            for(AnimatedLed& led : statusLeds.getAllLeds()){
-                led.setBrightness(1.0f);
-            }
+
+        // get the handler task context 
+        TaskHandle_t currentTask = xTaskGetCurrentTaskHandle();
+
+        // stop main task 
+        if(currentTask != gMainTaskHandle){
+            vTaskDelete(gMainTaskHandle);
         }
+
+        // stop status leds task
+        StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+        if(currentTask != statusLeds.getTaskHandle()){
+            statusLeds.stopTask();
+        }
+
+        // stop piezo task
+        PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
+        if(currentTask != piezoPlayer.getTaskHandle()){
+            piezoPlayer.stopTask();
+        }
+        
+        // turn off all status leds
+        statusLeds.setAllLeds(0.0f);
+
+        // play short blink + beep
+        for(uint32_t i = 0; i < 3; i++){
+            // leds + tone on
+            statusLeds.setAllLeds(1.0f);
+            piezoPlayer.setPiezoTone(3500, 0.66f);
+            Time::BlockMillis(400);
+
+            // leds + tone off
+            statusLeds.setAllLeds(0.0f);
+            piezoPlayer.setPiezoEnabled(false);
+            Time::BlockMillis(400);
+        }
+
+        // turn leds on again
+        statusLeds.setAllLeds(1.0f);
 
         // trigger main control assert exit handler
         gMainControl.onAssertExit(context, message);
@@ -121,9 +158,9 @@ void setup() {
         mainTask,
         AppConfig::MainTaskName,
         AppConfig::MainTaskStackSize,
-        NULL, // parameter
+        nullptr, // parameter
         AppConfig::MainTaskPriority,
-        NULL, // handle
+        &gMainTaskHandle,
         AppConfig::MainTaskCore
     );
 }

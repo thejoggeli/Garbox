@@ -48,6 +48,10 @@ void AnimatedLedGroup::stopTask(){
     mAnimationTask.stop();
 }
 
+TaskHandle_t AnimatedLedGroup::getTaskHandle(){
+    return mAnimationTask.getHandle();
+}
+
 void AnimatedLedGroup::handleAnimationTask(void* self){
     static_cast<AnimatedLedGroup*>(self)->tick();
 }

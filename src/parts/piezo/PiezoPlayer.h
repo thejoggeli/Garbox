@@ -24,9 +24,17 @@ public:
     void stop();
     void clearQueue();
 
+    // periodc task
     void startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void stopTask();
+    TaskHandle_t getTaskHandle();
 
+    // directly piezo control, bypassing the player logic. should only be used when the task is not running 
+    void setPiezoEnabled(bool enabled);
+    void setPiezoTone(uint32_t frequency, float duty); 
+    void setPiezoTone(const Tone& tone); 
+
+    // playback
     void playSequence(const ToneSequence& sequence);
     void playSequence(const ToneSequence& sequence, uint32_t SilentTime);
     void playTone(const Tone& tone);

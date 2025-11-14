@@ -43,6 +43,18 @@ public:
     }
 
     // chainable frequency modifier (const and non-const)
+    constexpr Tone duration(uint16_t durationMicros) const {
+        Tone t = *this;
+        t.mDurationMicros = durationMicros;
+        return t;
+    }
+
+    constexpr Tone& duration(uint16_t durationMicros) {
+        mDurationMicros = durationMicros;
+        return *this;
+    }
+
+    // chainable frequency modifier (const and non-const)
     constexpr Tone frequency(uint16_t frequencyStart) const {
         Tone t = *this;
         t.mFrequencyStart = frequencyStart;

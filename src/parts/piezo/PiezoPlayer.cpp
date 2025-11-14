@@ -64,6 +64,10 @@ void PiezoPlayer::stopTask(){
     }
 }
 
+TaskHandle_t PiezoPlayer::getTaskHandle(){
+    return mPeriodicTask.getHandle();
+}
+
 void PiezoPlayer::stop(){
     mPiezo.setEnabled(false);
     mPlaying = false;
@@ -171,6 +175,33 @@ uint16_t PiezoPlayer::interpolateFrequency(Tone const& tone, uint32_t elapsedMic
 
     // cast back to uint16
     return static_cast<uint16_t>(frequency);
+}
+
+void PiezoPlayer::setPiezoEnabled(bool enabled){
+    if(!mInitialized || mPeriodicTask.isRunning()){
+        TriggerDebug("PiezoPlayer", "setPiezoEnabled invalid state");
+        return;
+    }
+    mPiezo.setEnabled(enabled);
+}
+
+void PiezoPlayer::setPiezoTone(uint32_t frequency, float duty){
+    if(!mInitialized || mPeriodicTask.isRunning()){
+        TriggerDebug("PiezoPlayer", "setPiezoTone invalid state");
+        return;
+    }
+    if(frequency == 0 || duty <= 0.0f || duty >= 1.0f){
+        mPiezo.setEnabled(false);
+    }
+    else {
+        mPiezo.setEnabled(true);
+        mPiezo.setFrequency(frequency);
+        mPiezo.setDuty(duty);
+    }
+}
+
+void PiezoPlayer::setPiezoTone(const Tone& tone){
+    setPiezoTone(tone.getFrequencyStart(), tone.getDuty());
 }
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence){

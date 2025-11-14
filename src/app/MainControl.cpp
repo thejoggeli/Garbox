@@ -248,6 +248,8 @@ void MainControl::onAssertExit(const char* context, const char* message){
     if(!mInitialized){
         return;
     }
+    // TODO disable heatpad
+    // TODO disable fan
 }
 
 void MainControl::handleButtonStateChanged(ButtonIfc::State oldState, ButtonIfc::State newState){
@@ -294,7 +296,10 @@ void MainControl::handleButtonStateChanged(ButtonIfc::State oldState, ButtonIfc:
 void MainControl::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
     const uint32_t frequency = 300 + counter * 100;
     const uint32_t deadTime = 0;
-    if(!mPiezoPlayer.isPlaying()){
+    if(frequency > 3000){
+        TriggerExit("MainControl", "Testing");
+    }
+    else if(!mPiezoPlayer.isPlaying()){
         mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
     }
 }
@@ -304,12 +309,6 @@ void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState
         Fan::StateToString(oldState), 
         Fan::StateToString(newState)
     );
-    if(newState == Fan::State::Enabled){
-        // mPiezoPlayer.playSequence(PiezoSequences::GetFanEnabled());
-    }
-    else if(newState == Fan::State::Disabled){
-        // mPiezoPlayer.playSequence(PiezoSequences::GetFanDisabled());
-    }
 }
 
 void MainControl::handleFanStalledAlert(uint32_t counter){
