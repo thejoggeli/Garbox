@@ -80,8 +80,8 @@ private:
     void buildLookupBuckets();
 
     // interpolation
-    void findEntryIndexUniform(float t, size_t* index, float* frac) const;
-    void findEntryIndex(float t, size_t* index) const;
+    void findEntryIndicesUniform(float t, size_t* index1, size_t* index2, float* frac) const;
+    void findEntryIndices(float t, size_t* index1, size_t* index2) const;
     void resolveSegment(float t, SegmentInfo* segmentInfo) const;
 };
 

@@ -165,7 +165,7 @@ void ColorMap::buildLookupBuckets(){
     }
 }
 
-void ColorMap::findEntryIndexUniform(float t, size_t* index, float* frac) const {
+void ColorMap::findEntryIndicesUniform(float t, size_t* index1, size_t* index2, float* frac) const {
     float pos = t / mUniformStep;
     size_t idx = static_cast<size_t>(pos);
 
@@ -174,11 +174,12 @@ void ColorMap::findEntryIndexUniform(float t, size_t* index, float* frac) const 
         idx = maxIndex;
     }
 
-    *index = idx;
+    *index1 = idx;
+    *index2 = idx+1;
     *frac = pos - static_cast<float>(idx);
 }
 
-void ColorMap::findEntryIndex(float t, size_t* index) const {
+void ColorMap::findEntryIndices(float t, size_t* index1, size_t* index2) const {
     float tClamped = std::clamp(t, 0.0f, 1.0f);
 
     size_t bucket = static_cast<size_t>(tClamped * static_cast<float>(BucketCount));
@@ -217,28 +218,34 @@ void ColorMap::findEntryIndex(float t, size_t* index) const {
         idx = maxIndex;
     }
 
-    *index = idx;
+    *index1 = idx;
+    *index2 = idx+1;
 }
 
 
 void ColorMap::resolveSegment(float t, SegmentInfo* segmentInfo) const {
     float tClamped = std::clamp(t, 0.0f, 1.0f);
 
-    size_t idx = 0u;
+    size_t idx1 = 0u;
+    size_t idx2 = 0u;
 
     if(mUniform){
-        findEntryIndexUniform(tClamped, &idx, &segmentInfo->frac);
-        segmentInfo->a = &mEntries[idx];
-        segmentInfo->b = &mEntries[idx+1];
+        findEntryIndicesUniform(tClamped, &idx1, &idx2, &segmentInfo->frac);
+        segmentInfo->a = &mEntries[idx1];
+        segmentInfo->b = &mEntries[idx2];
     }
     else {
-        findEntryIndex(tClamped, &idx);
-        const Entry& entryA = mEntries[idx];
-        const Entry& entryB = mEntries[idx + 1u];
-        float frac = (tClamped - entryA.t) / (entryB.t - entryA.t);
+        findEntryIndices(tClamped, &idx1, &idx2);
+        const Entry& entryA = mEntries[idx1];
+        const Entry& entryB = mEntries[idx2];
         segmentInfo->a = &entryA;
         segmentInfo->b = &entryB;
-        segmentInfo->frac = frac;
+        if(idx1 == idx2){
+            segmentInfo->frac = 1.0f;
+        }
+        else {
+            segmentInfo->frac = (tClamped - entryA.t) / (entryB.t - entryA.t);
+        }
     }
 }
 
