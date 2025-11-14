@@ -165,8 +165,8 @@ void ColorMap::buildLookupBuckets(){
     }
 }
 
-void ColorMap::findEntryIndicesUniform(float t, size_t* index1, size_t* index2, float* frac) const {
-    float pos = t / mUniformStep;
+void ColorMap::resolveSegmentUniform(float tClamped, SegmentInfo* segmentInfo) const {
+    float pos = tClamped / mUniformStep;
     size_t idx = static_cast<size_t>(pos);
 
     const size_t maxIndex = mEntries.size() - 2;
@@ -174,26 +174,29 @@ void ColorMap::findEntryIndicesUniform(float t, size_t* index1, size_t* index2, 
         idx = maxIndex;
     }
 
-    *index1 = idx;
-    *index2 = idx+1;
-    *frac = pos - static_cast<float>(idx);
+    segmentInfo->a = &mEntries[idx];
+    segmentInfo->b = &mEntries[idx+1];
+    segmentInfo->frac = pos - static_cast<float>(idx);
 }
 
-void ColorMap::findEntryIndices(float t, size_t* index1, size_t* index2) const {
-    float tClamped = std::clamp(t, 0.0f, 1.0f);
+void ColorMap::resolveSegmentNonUniform(float tClamped, SegmentInfo* segmentInfo) const {
 
+    // find lookup bucket index
     size_t bucket = static_cast<size_t>(tClamped * static_cast<float>(BucketCount));
     if(bucket >= BucketCount){
         bucket = BucketCount - 1u;
     }
 
+    // get entry start and end bounding indices from bucket
     const LookupBucket& b = mLookup[bucket];
     size_t startIndex = b.startIndex;
     size_t endIndex = b.endIndex;
 
+    // find entry index
     size_t idx = startIndex;
-
     if(endIndex > startIndex){
+
+        // search for correct entry
         bool found = false;
         for(size_t i = startIndex; i < endIndex; ++i){
             if(tClamped >= mEntries[i].t && tClamped <= mEntries[i + 1u].t){
@@ -203,13 +206,9 @@ void ColorMap::findEntryIndices(float t, size_t* index1, size_t* index2) const {
             }
         }
 
+        // if not found, choose last index in bucket
         if(!found){
-            if(endIndex > 0u){
-                idx = endIndex - 1u;
-            }
-            else {
-                idx = 0u;
-            }
+            idx = endIndex - 1u;
         }
     }
 
@@ -218,34 +217,22 @@ void ColorMap::findEntryIndices(float t, size_t* index1, size_t* index2) const {
         idx = maxIndex;
     }
 
-    *index1 = idx;
-    *index2 = idx+1;
+    const Entry& entryA = mEntries[idx];
+    const Entry& entryB = mEntries[idx+1];
+    segmentInfo->a = &entryA;
+    segmentInfo->b = &entryB;
+    segmentInfo->frac = (tClamped - entryA.t) / (entryB.t - entryA.t);
 }
 
 
 void ColorMap::resolveSegment(float t, SegmentInfo* segmentInfo) const {
     float tClamped = std::clamp(t, 0.0f, 1.0f);
 
-    size_t idx1 = 0u;
-    size_t idx2 = 0u;
-
     if(mUniform){
-        findEntryIndicesUniform(tClamped, &idx1, &idx2, &segmentInfo->frac);
-        segmentInfo->a = &mEntries[idx1];
-        segmentInfo->b = &mEntries[idx2];
+        resolveSegmentUniform(tClamped, segmentInfo);
     }
     else {
-        findEntryIndices(tClamped, &idx1, &idx2);
-        const Entry& entryA = mEntries[idx1];
-        const Entry& entryB = mEntries[idx2];
-        segmentInfo->a = &entryA;
-        segmentInfo->b = &entryB;
-        if(idx1 == idx2){
-            segmentInfo->frac = 1.0f;
-        }
-        else {
-            segmentInfo->frac = (tClamped - entryA.t) / (entryB.t - entryA.t);
-        }
+        resolveSegmentNonUniform(tClamped, segmentInfo);
     }
 }
 
