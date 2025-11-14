@@ -64,18 +64,24 @@ void MainControl::init(){
         handleFanStalledAlert(counter);
     });
 
-    // init button
+    // button debouncing
     mButton.init();
     mButton.setPressedToReleasedDelayMicros(1_ms);
     mButton.setReleasedToPressedDelayMicros(1_ms);
     mButton.setPressedHoldTimeMicros(10_ms);
     mButton.setReleasedHoldTimeMicros(40_ms);
+
+    // button long press
     mButton.setLongPressMicros(600_ms),
-    mButton.setInitialHoldDelayMicros(1200_ms);
-    mButton.setRepeatHoldDelayMicros(300_ms);
+
+    // button state changed
     mButton.setStateChangedCallback([this](ButtonIfc::State oldState, ButtonIfc::State newState, void* userData){
         handleButtonStateChanged(oldState, newState);
     });
+
+    // button holding
+    mButton.setInitialHoldDelayMicros(1200_ms);
+    mButton.setRepeatHoldDelayMicros(300_ms);
     mButton.setHoldCallback([this](uint32_t counter, uint32_t holdTimeMicros, void* userData){
         handleButtonHold(counter, holdTimeMicros);
     });
