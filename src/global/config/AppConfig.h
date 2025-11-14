@@ -37,13 +37,19 @@ public:
     static constexpr uint32_t StatusLedsTaskStackSize = 1024*2;
     static constexpr uint32_t StatusLedsTaskCore = 1;
 
-    // Display
+    // Display Task
     static constexpr const char* DisplayTaskName = "DisplayTask";
     static constexpr uint32_t DisplayTaskPriority = 10;
     static constexpr uint32_t DisplayTaskStackSize = 1024*2;
     static constexpr uint32_t DisplayTaskCore = 1;
+
+    // Display
     static constexpr uint32_t DisplayWidth = 320;
     static constexpr uint32_t DisplayHeight = 240;
+    static constexpr uint32_t DisplayPartialFactor = 8;
+    static constexpr uint32_t DisplayBytesPerPixel = 2;
+    static constexpr uint32_t DisplayBytesPerFrame = DisplayWidth * DisplayHeight * DisplayBytesPerPixel;
+    static constexpr uint32_t DisplayBytesPerFlush = DisplayBytesPerFrame / DisplayPartialFactor;
 
     // SPI DMA 
     static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
@@ -52,7 +58,7 @@ public:
     static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
     // Max SPI DMA size is limited to 32KB on ESP32-S3
     // Dividing by 8 allows sets to buffer to ~19KB
-    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayWidth * DisplayHeight * 2 / 8; 
+    static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayBytesPerFlush;
 
 };
 
