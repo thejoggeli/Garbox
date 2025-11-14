@@ -12,6 +12,8 @@
 
 namespace Garbox {
 
+#define GarboxDebugDisplay 1
+
 Display::Display(SpiDma& spi, Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk): 
     // init members 
     mSpi(spi),
@@ -140,6 +142,21 @@ void Display::tick() {
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
+
+#if GarboxDebugDisplay
+    if(pixelMap == mDrawBufferData1){
+        LogDebug("Display", "buffer1");
+    }
+    else if(pixelMap == mDrawBufferData2){
+        LogDebug("Display", "buffer-2");
+    }
+    else if(pixelMap == mDrawBufferData3){
+        LogDebug("Display", "buffer-3");
+    }
+    else {
+        LogDebug("Display", "buffer-invalid");
+    }
+#endif
     
     // send buffer to st7789v
     const uint32_t width = area->x2 - area->x1 + 1;
