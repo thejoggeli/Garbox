@@ -37,6 +37,12 @@ ColorMap::Entry::Entry(const HslColor& hslColor):
     // nothing to do
 }
 
+void ColorMap::LookupBucket::set(uint8_t startIndexVal, uint8_t endIndexVal){
+    startIndex = startIndexVal;
+    endIndex = endIndexVal;
+    size = endIndex - startIndex;
+}
+
 ColorMap::Entry::Entry(const RgbFloat& rgbColor):
     // initialize members (from standard rgb color)
     t(0.0f),
@@ -130,25 +136,25 @@ void ColorMap::buildLookupBuckets(){
     const size_t numEntries = mEntries.size();
     const size_t lastSeg = numEntries - 2;
 
-    size_t entryIndexA = 0; // segment index for start
-    size_t entryIndexB = 0; // segment index for end
+    size_t entryIndexLower = 0; // segment index for lower bound
+    size_t entryIndexUpper = 0; // segment index for upper bound
 
     for(size_t b = 0; b < BucketCount; ++b){
         const float t0 = static_cast<float>(b) * BucketStep;
         const float t1 = t0 + BucketStep;
 
-        // advance A while the upper bound is still <= t0
-        while(entryIndexA < lastSeg && mEntries[entryIndexA + 1].t <= t0){
-            entryIndexA++;
+        // advance lower bound to just before the bucket boundary
+        while(entryIndexLower < lastSeg && mEntries[entryIndexLower+1].t <= t0){
+            entryIndexLower++;
         }
 
-        // advance B while the lower bound is < t1
-        while(entryIndexB < lastSeg && mEntries[entryIndexB].t < t1){
-            entryIndexB++;
+        // advance upper bound to just after the boucket boundary
+        while(entryIndexUpper < lastSeg && mEntries[entryIndexUpper].t < t1){
+            entryIndexUpper++;
         }
 
-        size_t bucketStartIndex = entryIndexA;
-        size_t bucketEndIndex = entryIndexB + 1; // one-past-last segment
+        size_t bucketStartIndex = entryIndexLower;
+        size_t bucketEndIndex = entryIndexUpper + 1;
 
         // upper limit for start index
         if(bucketStartIndex > (numEntries-2)){
@@ -160,8 +166,7 @@ void ColorMap::buildLookupBuckets(){
             bucketEndIndex = numEntries-1;
         }
 
-        mLookup[b].startIndex = static_cast<uint8_t>(bucketStartIndex);
-        mLookup[b].endIndex = static_cast<uint8_t>(bucketEndIndex);
+        mLookup[b].set(static_cast<uint8_t>(bucketStartIndex), static_cast<uint8_t>(bucketEndIndex));
     }
 }
 
@@ -182,43 +187,38 @@ void ColorMap::resolveSegmentUniform(float tClamped, SegmentInfo* segmentInfo) c
 void ColorMap::resolveSegmentNonUniform(float tClamped, SegmentInfo* segmentInfo) const {
 
     // find lookup bucket index
-    size_t bucket = static_cast<size_t>(tClamped * static_cast<float>(BucketCount));
-    if(bucket >= BucketCount){
-        bucket = BucketCount - 1u;
+    size_t bucketIndex = static_cast<size_t>(tClamped * static_cast<float>(BucketCount));
+    if(bucketIndex >= BucketCount){
+        bucketIndex = BucketCount - 1u;
     }
 
     // get entry start and end bounding indices from bucket
-    const LookupBucket& b = mLookup[bucket];
-    size_t startIndex = b.startIndex;
-    size_t endIndex = b.endIndex;
+    const LookupBucket& bucket = mLookup[bucketIndex];
+    size_t startIndex = bucket.startIndex;
+    size_t endIndex = bucket.endIndex;
 
     // find entry index
-    size_t idx = startIndex;
-    if(endIndex > startIndex){
-
-        // search for correct entry
-        bool found = false;
+    size_t entryIndex = endIndex;
+    if(bucket.size > 1){
+        // loop until entry pair found were tLower <= t <= tUpper
+        // if no entry found, entryIndex will be last entry in bucket
         for(size_t i = startIndex; i < endIndex; ++i){
             if(tClamped >= mEntries[i].t && tClamped <= mEntries[i + 1u].t){
-                idx = i;
-                found = true;
+                entryIndex = i;
                 break;
             }
         }
-
-        // if not found, choose last index in bucket
-        if(!found){
-            idx = endIndex - 1u;
-        }
     }
 
-    const size_t maxIndex = mEntries.size() - 2u;
-    if(idx > maxIndex){
-        idx = maxIndex;
+    // constraint upper index
+    const size_t maxIndex = mEntries.size() - 2;
+    if(entryIndex > maxIndex){
+        entryIndex = maxIndex;
     }
 
-    const Entry& entryA = mEntries[idx];
-    const Entry& entryB = mEntries[idx+1];
+    // create segment
+    const Entry& entryA = mEntries[entryIndex];
+    const Entry& entryB = mEntries[entryIndex+1];
     segmentInfo->a = &entryA;
     segmentInfo->b = &entryB;
     segmentInfo->frac = (tClamped - entryA.t) / (entryB.t - entryA.t);

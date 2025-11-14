@@ -56,6 +56,8 @@ private:
     struct LookupBucket {
         uint8_t startIndex;
         uint8_t endIndex;
+        uint8_t size;
+        void set(uint8_t startIndex, uint8_t endIndex);
     };
 
     struct SegmentInfo {
