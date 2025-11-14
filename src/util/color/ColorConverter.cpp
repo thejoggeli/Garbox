@@ -11,6 +11,7 @@
 #include "types/Rgb888.h"
 #include "types/RgbFloat.h"
 #include "util/color/ColorFunctions.h"
+#include "util/function/default/GammaFunctions.h"
 
 namespace Garbox {
 
@@ -346,6 +347,46 @@ RgbFloat ColorConverter::ToRgbFloat(const LabColor& src){
     float x, y, z;
     labToXyz(src, x, y, z);
     return xyzToRgbFloat(x, y, z);
+}
+
+// ----------------------------------------------------------------------------------
+// --- Linear RGB <=> Standard RGB  -------------------------------------------------
+// ----------------------------------------------------------------------------------
+
+RgbFloat ColorConverter::ToLinearRgb(const HslColor& hsl){
+    RgbFloat standardRgb = ColorConverter::ToRgbFloat(hsl);
+    return ColorConverter::ToLinearRgb(standardRgb);
+}
+
+RgbFloat ColorConverter::ToLinearRgb(const LabColor& lab){
+    return ColorConverter::ToRgbFloat(lab);
+}
+
+RgbFloat ColorConverter::ToLinearRgb(const RgbFloat& rgb){
+    static const MathFunctionIfc& gamma = GammaFunctions::GetGamma22();
+    return RgbFloat(
+        gamma.evaluate(rgb.r),
+        gamma.evaluate(rgb.g),
+        gamma.evaluate(rgb.b)
+    );
+}
+
+RgbFloat ColorConverter::ToStandardRgb(const HslColor& hsl){
+    return ColorConverter::ToRgbFloat(hsl);
+}
+
+RgbFloat ColorConverter::ToStandardRgb(const LabColor& lab){
+    RgbFloat linearRgb = ColorConverter::ToRgbFloat(lab);
+    return ColorConverter::ToStandardRgb(linearRgb);
+}
+
+RgbFloat ColorConverter::ToStandardRgb(const RgbFloat& rgb){
+    static const MathFunctionIfc& gammaInverse = GammaFunctions::GetGammaInverse22();
+    return RgbFloat(
+        gammaInverse.evaluate(rgb.r),
+        gammaInverse.evaluate(rgb.g),
+        gammaInverse.evaluate(rgb.b)
+    );
 }
 
 } // namespace

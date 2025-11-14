@@ -34,8 +34,16 @@ public:
     static HslColor ToHsl(const Rgb565& sRgb);        // converts (HslColor => Rgb565)   - Expects RGB to be in standard RGB (sRGB) space
 
     // LabColor <=> Linear RGB 
-    static LabColor ToLab(const RgbFloat& linearRgb); // converts (RgbFloat => LabColor) - Expects RGB to be in linear space
-    static RgbFloat ToRgbFloat(const LabColor& lab);  // converts (LabColor => RgbFloat) - Output in will be in linear space
+    static LabColor ToLab(const RgbFloat& linearRgb); // converts (RgbFloat => LabColor) - Expects RGB to be in linear RGB space
+    static RgbFloat ToRgbFloat(const LabColor& lab);  // converts (LabColor => RgbFloat) - Output in will be in linear RGB space
+
+    // Standard RGB <=> Linear RGB
+    static RgbFloat ToLinearRgb(const HslColor& hsl);   // converts (HslColor => RgbFloat)
+    static RgbFloat ToLinearRgb(const LabColor& lab);   // converts (LabColor => RgbFloat)
+    static RgbFloat ToLinearRgb(const RgbFloat& rgb);   // converts (RgbFloat => RgbFloat) - Expects input to be in standard RGB (sRGB) space
+    static RgbFloat ToStandardRgb(const HslColor& hsl); // converts (HslColor => RgbFloat)
+    static RgbFloat ToStandardRgb(const LabColor& lab); // converts (LabColor => RgbFloat)
+    static RgbFloat ToStandardRgb(const RgbFloat& rgb); // converts (RgbFloat => RgbFloat) - Expects input to be in linear RGB space
 
 };
 

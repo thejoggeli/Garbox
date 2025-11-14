@@ -4,7 +4,6 @@
 #include "LabColor.h"
 #include "Rgb888.h"
 #include "util/color/ColorConverter.h"
-#include "util/function/default/GammaFunctions.h"
 
 namespace Garbox {
 
@@ -17,21 +16,11 @@ RgbFloat::RgbFloat(float rVal, float gVal, float bVal) : r(rVal), g(gVal), b(bVa
 }
 
 RgbFloat RgbFloat::toStandardRgb() const {
-    static const MathFunctionIfc& gammaInverse = GammaFunctions::GetGammaInverse22();
-    return RgbFloat(
-        gammaInverse.evaluate(r),
-        gammaInverse.evaluate(g),
-        gammaInverse.evaluate(b)
-    );
+    return ColorConverter::ToStandardRgb(*this);
 }
 
 RgbFloat RgbFloat::toLinearRgb() const {
-    static const MathFunctionIfc& gamma = GammaFunctions::GetGamma22();
-    return RgbFloat(
-        gamma.evaluate(r),
-        gamma.evaluate(g),
-        gamma.evaluate(b)
-    );
+    return ColorConverter::ToLinearRgb(*this);
 }
 
 RgbFloat RgbFloat::From(const HslColor& hsl){
