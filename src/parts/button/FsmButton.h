@@ -9,7 +9,7 @@
 namespace Garbox {
 
 /**
- * FsmButton class using FiniteStateMachine to manage debounce, press, long-press, and hold logic.
+ * ButtonIfc implementation using FiniteStateMachine to manage debounce, press, long-press, and hold logic.
  */
 class FsmButton : public ButtonIfc{
 public:

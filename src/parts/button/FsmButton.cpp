@@ -8,6 +8,8 @@ FsmButton::FsmButton(){
     // set initial transition delays and state hold times
     setPressedToReleasedDelayMicros(InitialPressedToReleasedDelayMicros);
     setReleasedToPressedDelayMicros(InitialReleasedToPressedDelayMicros);
+    setPressedHoldTimeMicros(InitialPressedHoldTimeMicros);
+    setReleasedHoldTimeMicros(InitialReleasedHoldTimeMicros);
     setLongPressMicros(InitialLongPressMicros);
 }
 

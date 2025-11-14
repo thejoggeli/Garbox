@@ -17,13 +17,16 @@ namespace Garbox {
  * - All timing in microseconds
  */
 class ButtonIfc {
-public:
+protected:
 
     static constexpr uint32_t InitialPressedToReleasedDelayMicros = 1_ms; // Pressed     state will be entered after a 1ms stable "pressed" signal
     static constexpr uint32_t InitialReleasedToPressedDelayMicros = 1_ms; // Released    state will be entered after a 1ms stable "released" signal
     static constexpr uint32_t InitialPressedHoldTimeMicros = 10_ms;       // Pressed     state will be held for at least 10ms (debouncing) 
     static constexpr uint32_t InitialReleasedHoldTimeMicros = 40_ms;      // Released    state will be held for at least 40ms (debouncing) 
     static constexpr uint32_t InitialLongPressMicros = 600_ms;            // LongPressed state will be entered after 600ms 
+
+public:
+
 
     enum class State : uint8_t {
         Released,
