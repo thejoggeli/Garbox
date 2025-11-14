@@ -11,11 +11,11 @@ AnimatedLed& StatusLeds::getLed(StatusLed index){
 }
 
 void StatusLeds::setLed(StatusLed index, float brightness){
-    return AnimatedLedGroup::setLed(static_cast<uint8_t>(index), brightness);
+    AnimatedLedGroup::setLed(static_cast<uint8_t>(index), brightness);
 }
 
 void StatusLeds::toggleLed(StatusLed index){
-    return AnimatedLedGroup::toggleLed(static_cast<uint8_t>(index));
+    AnimatedLedGroup::toggleLed(static_cast<uint8_t>(index));
 }
 
 } // namespace

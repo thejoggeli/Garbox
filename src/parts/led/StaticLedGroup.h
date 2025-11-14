@@ -6,10 +6,6 @@
 
 namespace Garbox {
 
-class Gpio;
-class RgbFloat;
-class Rgb888;
-
 class StaticLedGroup {
 public:
     StaticLedGroup(Span<StaticLed> staticLeds);
