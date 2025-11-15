@@ -67,7 +67,6 @@ private:
     };
 
     static constexpr size_t BucketCount = 16U;
-    static constexpr float BucketStep = 1.0f / static_cast<float>(BucketCount);
 
     const Span<const Entry> mEntries;
 

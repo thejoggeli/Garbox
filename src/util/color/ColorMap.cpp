@@ -138,13 +138,14 @@ bool ColorMap::checkUniform() const {
 void ColorMap::buildLookupBuckets(){
     const size_t numEntries = mEntries.size();
     const size_t lastSeg = numEntries - 2;
+    const float bucketStep = 1.0f / static_cast<float>(BucketCount);
 
     size_t entryIndexLower = 0; // segment index for lower bound
     size_t entryIndexUpper = 0; // segment index for upper bound
 
     for(size_t b = 0; b < BucketCount; ++b){
-        const float t0 = static_cast<float>(b) * BucketStep;
-        const float t1 = t0 + BucketStep;
+        const float t0 = static_cast<float>(b) * bucketStep;
+        const float t1 = t0 + bucketStep;
 
         // advance lower bound to just before the bucket boundary
         while(entryIndexLower < lastSeg && mEntries[entryIndexLower+1].t <= t0){
