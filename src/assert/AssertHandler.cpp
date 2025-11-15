@@ -3,26 +3,38 @@
 #include "assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
+#include "util/threading/LockGuard.h"
 
 namespace Garbox {
 
+// exit on assert debug
 static constexpr bool DebugTriggersExit = true;
 
-static bool sExitTriggered = false;
+// exit already triggered flag to prevent infinite recursion if a handler triggers another assert
+static bool gExitTriggered = false;
 
-static AssertHandler::Handler sDebugHandler = nullptr;
-static AssertHandler::Handler sExitHandler = nullptr;
+// custom handlers
+static AssertHandler::Handler gDebugHandler = nullptr;
+static AssertHandler::Handler gExitHandler = nullptr;
 
+// handler mutex
+static SemaphoreHandle_t gAssertDebugHandlerMutex = nullptr;
+static SemaphoreHandle_t gAssertExitHandlerMutex = nullptr;
+
+// set debug handler
 void AssertHandler::SetDebugHandler(Handler handler){
-    sDebugHandler = handler;
+    gDebugHandler = handler;
 }
 
+// set exit handler
 void AssertHandler::SetExitHandler(Handler handler){
-    sExitHandler = handler;
+    gExitHandler = handler;
 }
 
 void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg){
-    if(sExitTriggered){
+
+    // abort if exit already triggerd to prevent infinite recursive calls
+    if(gExitTriggered){
         return;
     }
 
@@ -33,23 +45,27 @@ void AssertHandler::InvokeDebug(const char* context, const char* message, int32_
     }
 
     // invoke debug handler
-    if(sDebugHandler){
-        sDebugHandler(context, message, arg);
+    if(gDebugHandler){
+        LockGuard lock(gAssertDebugHandlerMutex);
+        gDebugHandler(context, message, arg);
     }
     else {
-        LogError("AssertHandler", "AssertDebug! %s %s", context, message);
+        LogError("AssertHandler", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
     }
 }
 
 void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg){
-    if(sExitTriggered){
+
+    // abort if exit already triggerd to prevent infinite recursive calls
+    if(gExitTriggered){
         return;
     }
-    sExitTriggered = true;
+    gExitTriggered = true;
 
     // call exit handler
-    if(sExitHandler){
-        sExitHandler(context, message, arg);
+    if(gExitHandler){
+        LockGuard lock(gAssertExitHandlerMutex);
+        gExitHandler(context, message, arg);
     }
 
     // default exit handler

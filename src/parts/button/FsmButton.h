@@ -2,8 +2,8 @@
 
 #include <cstdint>
 #include <functional>
-#include "ButtonIfc.h"
 #include "core/time/SoftwareTimer.h"
+#include "parts/button/ButtonIfc.h"
 #include "util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
@@ -14,7 +14,7 @@ namespace Garbox {
 class FsmButton : public ButtonIfc{
 public:
 
-    using StateChangedCallback = std::function<void(State oldState, State newState, void* userData)>;
+    using StateChangedCallback = std::function<void(ButtonState oldState, ButtonState newState, void* userData)>;
     using HoldCallback = std::function<void(uint32_t counter, uint32_t holdTimeMicros, void* userData)>;
 
     FsmButton();
@@ -59,7 +59,7 @@ public:
 
 private:
 
-    FiniteStateMachine<State, State::Count> mFsm;
+    FiniteStateMachine<ButtonState, ButtonState::Count> mFsm;
     SoftwareTimer mHoldTimer;
 
     bool mIsPressedPhysical;
@@ -80,7 +80,7 @@ private:
     void handlePressedState();
     void handlePressedLongState();
 
-    void handleFsmStateChanged(State oldState, State newState);
+    void handleFsmStateChanged(ButtonState oldState, ButtonState newState);
 };
 
 } // namespace Garbox

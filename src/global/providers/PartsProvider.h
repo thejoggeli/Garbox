@@ -14,6 +14,8 @@ class RgbLed;
 class PartsProvider {
 public:
 
+    static void Init();
+
     static Fan& GetFan(); 
     static Heatpad& GetHeatpad(); 
     static Display& GetDisplay(); 

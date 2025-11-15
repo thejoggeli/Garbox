@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include "ButtonIfc.h"
-#include "FsmButton.h"
 #include "core/hardware/gpio/Gpio.h"
+#include "parts/button/ButtonIfc.h"
+#include "parts/button/FsmButton.h"
 
 namespace Garbox {
 
@@ -24,8 +24,8 @@ public:
     bool isReleased() const final;
     bool isLongPressed() const final;
 
-    void setStateChangedCallback(ButtonIfc::StateChangedCallback callback) final;
-    void setHoldCallback(ButtonIfc::HoldCallback callback) final;
+    void setStateChangedCallback(StateChangedCallback callback) final;
+    void setHoldCallback(HoldCallback callback) final;
     void setUserData(void* userData) final;
 
     void setPressedToReleasedDelayMicros(uint32_t micros) final;

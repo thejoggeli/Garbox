@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
 #include <functional>
 #include "core/time/TimeLiterals.h"
+#include "parts/button/ButtonState.h"
 
 namespace Garbox {
 
@@ -27,24 +27,7 @@ protected:
 
 public:
 
-
-    enum class State : uint8_t {
-        Released,
-        Pressed,
-        PressedLong,
-        Count
-    };
-
-    inline static const char* StateToString(State state){
-        switch(state){
-        case State::Released: return "Released";
-        case State::Pressed: return "Pressed";
-        case State::PressedLong: return "PressedLong";
-        default: return "Unknown";
-        }
-    }
-
-    using StateChangedCallback = std::function<void(State oldState, State newState, void* userData)>;
+    using StateChangedCallback = std::function<void(ButtonState oldState, ButtonState newState, void* userData)>;
     using HoldCallback = std::function<void(uint32_t counter, uint32_t holdTimeMicros, void* userData)>;
 
     virtual void init() = 0;

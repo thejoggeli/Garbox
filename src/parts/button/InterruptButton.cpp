@@ -144,11 +144,11 @@ bool InterruptButton::isLongPressed() const {
     return mButton.isLongPressed();
 }
 
-void InterruptButton::setStateChangedCallback(ButtonIfc::StateChangedCallback callback){
+void InterruptButton::setStateChangedCallback(StateChangedCallback callback){
     mButton.setStateChangedCallback(callback);
 }
 
-void InterruptButton::setHoldCallback(ButtonIfc::HoldCallback callback){
+void InterruptButton::setHoldCallback(HoldCallback callback){
     mButton.setHoldCallback(callback);
 }
 

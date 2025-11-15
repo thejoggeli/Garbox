@@ -30,7 +30,7 @@ public:
 
 private:
 
-    void handleButtonStateChanged(ButtonIfc::State oldState, ButtonIfc::State newState);
+    void handleButtonStateChanged(ButtonState oldState, ButtonState newState);
     void handleButtonHold(uint32_t counter, uint32_t holdTimeMicros);
 
     void handleFanStateChanged(Fan::State oldState, Fan::State newState);

@@ -18,6 +18,30 @@
 
 namespace Garbox {
 
+void PartsProvider::Init(){
+
+    // init fan
+    GetFan().init();
+
+    // init headpad
+    GetHeatpad().init();
+
+    // init display
+    GetDisplay().init();
+
+    // init piezo player
+    GetPiezoPlayer().init();
+
+    // init encoder button
+    GetEncoderButton().init();
+
+    // init status leds
+    GetStatusLeds().init();
+
+    // init rgb led
+    GetRgbLed().init();
+}
+
 Fan& PartsProvider::GetFan(){
     static Fan instance(
         GpioInstances::GetFanEnable(),

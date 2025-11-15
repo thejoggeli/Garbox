@@ -6,28 +6,28 @@
 
 namespace Garbox {
 
-static AssertHandler::Handler sDebugHandler = nullptr;
-static AssertHandler::Handler sExitHandler = nullptr;
+static AssertHandler::Handler gDebugHandler = nullptr;
+static AssertHandler::Handler gExitHandler = nullptr;
 
 void AssertHandler::SetDebugHandler(Handler handler){
-    sDebugHandler = handler;
+    gDebugHandler = handler;
 }
 
 void AssertHandler::SetExitHandler(Handler handler){
-    sExitHandler = handler;
+    gExitHandler = handler;
 }
 
 void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg){
     printf("[ASSERT-DEBUG] %s: %s (arg=%u)\n", context, message, arg);
-    if(sDebugHandler){
-        sDebugHandler(context, message, arg);
+    if(gDebugHandler){
+        gDebugHandler(context, message, arg);
     }
 }
 
 void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg){
     printf("[ASSERT-EXIT] %s: %s (arg=%u)\n", context, message, arg);
-    if(sExitHandler){
-        sExitHandler(context, message, arg);
+    if(gExitHandler){
+        gExitHandler(context, message, arg);
     }
 }
 

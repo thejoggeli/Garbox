@@ -48,11 +48,11 @@ bool PollingButton::isLongPressed() const {
     return mButton.isLongPressed();
 }
 
-void PollingButton::setStateChangedCallback(ButtonIfc::StateChangedCallback callback){
+void PollingButton::setStateChangedCallback(StateChangedCallback callback){
     mButton.setStateChangedCallback(callback);
 }
 
-void PollingButton::setHoldCallback(ButtonIfc::HoldCallback callback){
+void PollingButton::setHoldCallback(HoldCallback callback){
     mButton.setHoldCallback(callback);
 }
 

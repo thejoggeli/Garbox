@@ -130,6 +130,7 @@ void Display::stopTask(){
         vTaskDelete(mTaskHandle);
         mTaskHandle = nullptr;
         // TODO stop all spi activity
+        // TODO leave display in a defined state after stopping
     }
 }
 

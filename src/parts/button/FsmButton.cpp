@@ -21,8 +21,8 @@ void FsmButton::init(){
     AssertExit(!mInitialized, "FsmButton", "already initialized");
 
     // init fsm
-    mFsm.init(State::Released);
-    mFsm.setStateChangedCallback([this](State oldState, State newState){
+    mFsm.init(ButtonState::Released);
+    mFsm.setStateChangedCallback([this](ButtonState oldState, ButtonState newState){
         handleFsmStateChanged(oldState, newState);
     });
 
@@ -38,13 +38,13 @@ void FsmButton::tick(){
     mFsm.tick();
 
     switch(mFsm.getState()){
-    case State::Released:
+    case ButtonState::Released:
         handleReleasedState();
         break;
-    case State::Pressed:
+    case ButtonState::Pressed:
         handlePressedState();
         break;
-    case State::PressedLong:
+    case ButtonState::PressedLong:
         handlePressedLongState();
         break;
     default:
@@ -69,30 +69,30 @@ void FsmButton::setPhysicalButtonState(bool pressed){
 }
 
 void FsmButton::handleMissedPulse(uint32_t pulseDuration){
-    const State currentState = mFsm.getState();
+    const ButtonState currentState = mFsm.getState();
     // Released => Pressed
-    if(currentState == State::Released){
-        if(pulseDuration >= mFsm.getTransitionDelayMicros(State::Released, State::Pressed)){
-            mFsm.forceTransition(State::Pressed);    
+    if(currentState == ButtonState::Released){
+        if(pulseDuration >= mFsm.getTransitionDelayMicros(ButtonState::Released, ButtonState::Pressed)){
+            mFsm.forceTransition(ButtonState::Pressed);    
         }
     }
     // Pressed => Released
-    else if(currentState == State::Pressed){
-        if(pulseDuration >= mFsm.getTransitionDelayMicros(State::Pressed, State::Released)){
-            mFsm.forceTransition(State::Released);
+    else if(currentState == ButtonState::Pressed){
+        if(pulseDuration >= mFsm.getTransitionDelayMicros(ButtonState::Pressed, ButtonState::Released)){
+            mFsm.forceTransition(ButtonState::Released);
         }
     }
     // PressedLong => Released
-    else if(currentState == State::PressedLong){
-        if(pulseDuration >= mFsm.getTransitionDelayMicros(State::PressedLong, State::Released)){
-            mFsm.forceTransition(State::Released);
+    else if(currentState == ButtonState::PressedLong){
+        if(pulseDuration >= mFsm.getTransitionDelayMicros(ButtonState::PressedLong, ButtonState::Released)){
+            mFsm.forceTransition(ButtonState::Released);
         }
     }
 }
 
 void FsmButton::handleReleasedState(){
     if(mIsPressedPhysical){
-        mFsm.transition(State::Pressed);
+        mFsm.transition(ButtonState::Pressed);
     }
     else {
         mFsm.cancelPendingTransition();
@@ -101,28 +101,28 @@ void FsmButton::handleReleasedState(){
 
 void FsmButton::handlePressedState(){
     if(!mIsPressedPhysical){
-        mFsm.transition(State::Released);
+        mFsm.transition(ButtonState::Released);
     }
     else {
-        mFsm.transition(State::PressedLong);
+        mFsm.transition(ButtonState::PressedLong);
     }
 }
 
 void FsmButton::handlePressedLongState(){
     if(!mIsPressedPhysical){
-        mFsm.transition(State::Released);
+        mFsm.transition(ButtonState::Released);
     }
     else {
         mFsm.cancelPendingTransition();
     }
 }
     
-void FsmButton::handleFsmStateChanged(State oldState, State newState){
+void FsmButton::handleFsmStateChanged(ButtonState oldState, ButtonState newState){
 
     // setup hold timer on press
     if((mRepeatHoldDelayMicros > 0) && mHoldCallback){
-        const bool wasReleased = (oldState == State::Released);
-        const bool becomesPressed = (newState == State::Pressed) || (newState == State::PressedLong);
+        const bool wasReleased = (oldState == ButtonState::Released);
+        const bool becomesPressed = (newState == ButtonState::Pressed) || (newState == ButtonState::PressedLong);
         if(wasReleased && becomesPressed){
             mHoldCounter = 0;
             mHoldTimer.start(mInitialHoldDelayMicros);
@@ -131,8 +131,8 @@ void FsmButton::handleFsmStateChanged(State oldState, State newState){
 
     // reset hold timer on release
     if(mHoldTimer.isRunning() || (mHoldCounter > 0)){
-        const bool wasPressed = (oldState == State::Pressed) || (oldState == State::PressedLong);
-        const bool becomesReleased = (newState == State::Released);
+        const bool wasPressed = (oldState == ButtonState::Pressed) || (oldState == ButtonState::PressedLong);
+        const bool becomesReleased = (newState == ButtonState::Released);
         if(wasPressed && becomesReleased){
             mHoldCounter = 0;
             mHoldTimer.reset();
@@ -158,26 +158,26 @@ void FsmButton::setUserData(void* userData){
 }
 
 void FsmButton::setPressedToReleasedDelayMicros(uint32_t micros){
-    mFsm.setTransitionDelayMicros(State::Pressed, State::Released, micros);
-    mFsm.setTransitionDelayMicros(State::PressedLong, State::Released, micros);
+    mFsm.setTransitionDelayMicros(ButtonState::Pressed, ButtonState::Released, micros);
+    mFsm.setTransitionDelayMicros(ButtonState::PressedLong, ButtonState::Released, micros);
 }
 
 void FsmButton::setReleasedToPressedDelayMicros(uint32_t micros){
-    mFsm.setTransitionDelayMicros(State::Released, State::Pressed, micros);
+    mFsm.setTransitionDelayMicros(ButtonState::Released, ButtonState::Pressed, micros);
 }
 
 void FsmButton::setPressedHoldTimeMicros(uint32_t micros){
-    mFsm.setStateHoldTimeMicros(State::Pressed, micros);
-    mFsm.setStateHoldTimeMicros(State::PressedLong, micros);
+    mFsm.setStateHoldTimeMicros(ButtonState::Pressed, micros);
+    mFsm.setStateHoldTimeMicros(ButtonState::PressedLong, micros);
 }
 
 void FsmButton::setReleasedHoldTimeMicros(uint32_t micros){
-    mFsm.setStateHoldTimeMicros(State::Released, micros);
+    mFsm.setStateHoldTimeMicros(ButtonState::Released, micros);
 }
 
 void FsmButton::setLongPressMicros(uint32_t delayMicros){
     mLongPressMicros = delayMicros;
-    mFsm.setTransitionDelayMicros(State::Pressed, State::PressedLong, delayMicros);
+    mFsm.setTransitionDelayMicros(ButtonState::Pressed, ButtonState::PressedLong, delayMicros);
 }
 
 void FsmButton::setInitialHoldDelayMicros(uint32_t delayMicros){
@@ -189,16 +189,16 @@ void FsmButton::setRepeatHoldDelayMicros(uint32_t delayMicros){
 }
 
 bool FsmButton::isPressed() const {
-    State state = mFsm.getState();
-    return (state == State::Pressed) || (state == State::PressedLong);
+    ButtonState state = mFsm.getState();
+    return (state == ButtonState::Pressed) || (state == ButtonState::PressedLong);
 }
 
 bool FsmButton::isLongPressed() const {
-    return (mFsm.getState() == State::PressedLong);
+    return (mFsm.getState() == ButtonState::PressedLong);
 }
 
 bool FsmButton::isReleased() const {
-    return (mFsm.getState() == State::Released);
+    return (mFsm.getState() == ButtonState::Released);
 }
 
 } // namespace Garbox
