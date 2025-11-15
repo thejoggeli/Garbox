@@ -31,15 +31,6 @@ void SystemTasks::StartAll(){
         AppConfig::PiezoPlayerTaskCore
     );
 
-    // start spi dma task
-    SpiDma& spiDma = SpiInstances::GetSpiDma();
-    spiDma.startTask(
-        AppConfig::SpiDmaTaskName,
-        AppConfig::SpiDmaTaskStackSize,
-        AppConfig::SpiDmaTaskPriority,
-        AppConfig::SpiDmaTaskCore
-    );
-
     // start render task (won't do anything until render trigger notify)
     Display& display = PartsProvider::GetDisplay();
     display.startTask(
@@ -47,6 +38,15 @@ void SystemTasks::StartAll(){
         AppConfig::DisplayTaskStackSize,
         AppConfig::DisplayTaskPriority,
         AppConfig::DisplayTaskCore
+    );
+
+    // start spi dma task
+    SpiDma& spiDma = SpiInstances::GetSpiDma();
+    spiDma.startTask(
+        AppConfig::SpiDmaTaskName,
+        AppConfig::SpiDmaTaskStackSize,
+        AppConfig::SpiDmaTaskPriority,
+        AppConfig::SpiDmaTaskCore
     );
 }
 
@@ -73,9 +73,8 @@ void SystemTasks::StopAll(TaskHandle_t exclude){
     // stop spi dma task
     SpiDma& spiDma = SpiInstances::GetSpiDma();
     if(exclude != spiDma.getTaskHandle()){
-        spiDma.stopTask();
-    }
+        spiDma.stopTask();    }
 
 }
 
-}
+} // namespace

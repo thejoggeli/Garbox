@@ -95,7 +95,7 @@ void setup(){
     
     // assert handlers
     AssertHandler::SetDebugHandler(handleAssertDebug);
-    AssertHandler::SetDebugHandler(handleAssertExit);
+    AssertHandler::SetExitHandler(handleAssertExit);
 
     // install ISR service once globally (safe to call multiple times)
     if (gpio_install_isr_service(0) != ESP_OK){
