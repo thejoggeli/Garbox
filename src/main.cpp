@@ -102,16 +102,16 @@ void setup(){
         TriggerExit("Main", "gpio_install_isr_service failed");
     }
 
+    // init profiler
+    Profiler::Setup(ProfilerConfig::Count);
+    Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
+
     // init hardware instances
     GpioInstances::Init();
     LedcInstances::Init();
     TimerInstances::Init();
     SpiInstances::Init();
     AdcInstances::Init();
-
-    // init profiler
-    Profiler::Setup(ProfilerConfig::Count);
-    Profiler::SetEnabled(ProfilerConfig::EnableProfiler);
 
     // init all parts
     PartsProvider::Init();
