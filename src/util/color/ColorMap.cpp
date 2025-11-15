@@ -78,9 +78,12 @@ void ColorMap::init(){
     // handle non-uniform
     else {
 
+        AssertExit(mEntries[0].t == 0.0f, "ColorMap", "first t must to 0.0");
+        AssertExit((mEntries.end()-1)->t == 1.0f, "ColorMap", "last t must be 1.0");
+
         // check if t is strictly monotonic 
         for(size_t i = 1u; i < numEntries; ++i){
-            AssertExit((mEntries[i].t >= mEntries[i - 1].t), "ColorMap", "t values must be monotonic");
+            AssertExit((mEntries[i].t > mEntries[i - 1].t), "ColorMap", "t values must be monotonic");
         }
 
         // build lookup buckets 

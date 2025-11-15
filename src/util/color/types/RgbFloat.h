@@ -18,7 +18,6 @@ public:
     float b;
 
     RgbFloat();
-    RgbFloat();
     RgbFloat(float r, float g, float b);
 
     RgbFloat toStandardRgb() const;
