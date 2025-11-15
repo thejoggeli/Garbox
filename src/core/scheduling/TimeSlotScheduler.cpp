@@ -11,7 +11,7 @@ TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
 
     // determine maximum index to size mDiagnostics
     uint8_t maxIndex = 0;
-    for (const SlotConfig& cfg : configs) {
+    for (const SlotConfig& cfg : configs){
         if (cfg.diagnosticsIndex > maxIndex){
             maxIndex = cfg.diagnosticsIndex;
         }
@@ -19,7 +19,7 @@ TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
     mDiagnostics.resize(maxIndex + 1);
 
     // initialize mDiagnostics
-    for (Diagnostics& diagnostics : mDiagnostics) {
+    for (Diagnostics& diagnostics : mDiagnostics){
         diagnostics.maxTimeMicros = 0;
         diagnostics.maxTimeAllMicros = 0;
         diagnostics.frequencyCount = 0;
@@ -29,23 +29,23 @@ TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
 
     // copy slot configurations
     mSlots.reserve(configs.size());
-    for (const SlotConfig& cfg : configs) {
+    for (const SlotConfig& cfg : configs){
         mSlots.push_back({cfg.durationMicros, cfg.diagnosticsIndex, cfg.handler});
 
         // track minimum duration per diagnostics index
         Diagnostics& diag = mDiagnostics[cfg.diagnosticsIndex];
-        if (cfg.durationMicros < diag.minDurationMicros) {
+        if (cfg.durationMicros < diag.minDurationMicros){
             diag.minDurationMicros = cfg.durationMicros;
         }
 
         // track maximum duration per diagnostics index
-        if (cfg.durationMicros > diag.maxDurationMicros) {
+        if (cfg.durationMicros > diag.maxDurationMicros){
             diag.maxDurationMicros = cfg.durationMicros;
         }
     }
 
     // normalize cases where no slots existed for some index
-    for (Diagnostics& diagnostics : mDiagnostics) {
+    for (Diagnostics& diagnostics : mDiagnostics){
         if (diagnostics.minDurationMicros == UINT32_MAX){
             diagnostics.minDurationMicros = 0;
         }
@@ -53,7 +53,7 @@ TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
 
 }
 
-void TimeSlotScheduler::run() {
+void TimeSlotScheduler::run(){
 
     uint32_t currentTickTimeMicros = Time::GetMicros();
 
@@ -65,7 +65,7 @@ void TimeSlotScheduler::run() {
         mLastFrequencyTimeMicros = currentTickTimeMicros;
         mInitialRun = false;
     }
-    else if ((currentTickTimeMicros - mLastTickTimeMicros) < mLastSlotDurationMicros) {
+    else if ((currentTickTimeMicros - mLastTickTimeMicros) < mLastSlotDurationMicros){
         // wait until next slot is ready for execution
         return;
     }
@@ -76,7 +76,7 @@ void TimeSlotScheduler::run() {
 
     // execute slot
     const uint32_t slotStartTimeMicros = currentTickTimeMicros;
-    if (slot.handler) {
+    if (slot.handler){
         slot.handler();
     }
     diagnostics.frequencyCount++;
@@ -93,11 +93,11 @@ void TimeSlotScheduler::run() {
 
     // advance to next slot
     mNextSlotIndex++;
-    if (mNextSlotIndex >= mSlots.size()) {
+    if (mNextSlotIndex >= mSlots.size()){
         mNextSlotIndex = 0;
 
         // once per second snapshot and reset frequency counts
-        if ((currentTickTimeMicros - mLastFrequencyTimeMicros) >= 1'000'000) {
+        if ((currentTickTimeMicros - mLastFrequencyTimeMicros) >= 1'000'000){
             updateDiagnosticsFrequencies();
             mLastFrequencyTimeMicros = currentTickTimeMicros;
         }
@@ -109,7 +109,7 @@ void TimeSlotScheduler::run() {
 }
 
 void TimeSlotScheduler::updateDiagnosticsFrequencies(){
-    for (Diagnostics& diag : mDiagnostics) {
+    for (Diagnostics& diag : mDiagnostics){
         diag.frequencyHz = diag.frequencyCount;
         diag.frequencyCount = 0;
     }
@@ -123,8 +123,8 @@ size_t TimeSlotScheduler::getSlotCount() const {
     return mSlots.size();
 }
 
-void TimeSlotScheduler::clearMaxTimes() {
-    for (Diagnostics& diag : mDiagnostics) {
+void TimeSlotScheduler::clearMaxTimes(){
+    for (Diagnostics& diag : mDiagnostics){
         diag.maxTimeMicros = 0;
     }
 }

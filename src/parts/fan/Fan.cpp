@@ -107,7 +107,7 @@ void Fan::setStalledAlertCallback(StalledAlertCallback callback){
     mStalledAlertCallback = callback;
 }
 
-void Fan::setSpeed(float speed) {
+void Fan::setSpeed(float speed){
     if(!mInitialized){
         TriggerDebug("Fan", "not initialized");
         return;

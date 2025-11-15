@@ -12,7 +12,7 @@ Gpio::Gpio(int32_t pin):
     AssertExit((pin >= 0) && (pin < static_cast<int32_t>(gpio_num_t::GPIO_NUM_MAX)), "Gpio", "invalid pin number");
 }
 
-void Gpio::init(const Config& config, bool initialLevel) {
+void Gpio::init(const Config& config, bool initialLevel){
     AssertExit(!mInitialized, "Gpio", "already initialized");
     mLogicalLevel = initialLevel;
     mInitialized = true;
@@ -38,7 +38,7 @@ void Gpio::applyConfig(const Config& config){
     };
 
     // configure mode
-    switch (mConfig.mode) {
+    switch (mConfig.mode){
     case Mode::Disable:
         cfg.mode = GPIO_MODE_DISABLE;
         break;
@@ -117,12 +117,12 @@ Gpio::Config Gpio::getCurrentConfig() const {
     return mConfig;
 }
 
-void Gpio::toggle() {
+void Gpio::toggle(){
     if(!mInitialized){
         TriggerDebug("Gpio", "not initialized"); 
         return;
     }
-    switch (mConfig.mode) {
+    switch (mConfig.mode){
     case Mode::Output:
     case Mode::OutputOpenDrain:
         mLogicalLevel = !mLogicalLevel;
@@ -136,12 +136,12 @@ void Gpio::toggle() {
     }
 }
 
-void Gpio::writeLevel(bool logicalLevel) {
+void Gpio::writeLevel(bool logicalLevel){
     if(!mInitialized){
         TriggerDebug("Gpio", "not initialized"); 
         return;
     }
-    switch (mConfig.mode) {
+    switch (mConfig.mode){
     case Mode::Output:
     case Mode::OutputOpenDrain:
         if(mLogicalLevel == logicalLevel){
@@ -158,12 +158,12 @@ void Gpio::writeLevel(bool logicalLevel) {
     }
 }
 
-void Gpio::writeLevelRaw(bool rawLevel) {
+void Gpio::writeLevelRaw(bool rawLevel){
     if(!mInitialized){
         TriggerDebug("Gpio", "not initialized"); 
         return;
     }
-    switch (mConfig.mode) {
+    switch (mConfig.mode){
     case Mode::Output:
     case Mode::OutputOpenDrain: {
         bool logicalLevel = rawToLogical(rawLevel);
@@ -187,7 +187,7 @@ bool Gpio::readLevel() const {
         TriggerDebug("Gpio", "not initialized"); 
         return false;
     }
-    switch (mConfig.mode) {
+    switch (mConfig.mode){
     case Mode::Input:
         return rawToLogical(gpio_get_level(mPin));
     case Mode::Output:
@@ -204,7 +204,7 @@ bool Gpio::readLevelRaw() const {
         TriggerDebug("Gpio", "not initialized"); 
         return false;
     }
-    switch (mConfig.mode) {
+    switch (mConfig.mode){
     case Mode::Input:
         return gpio_get_level(mPin) != 0;
     case Mode::Output:

@@ -24,8 +24,6 @@ public:
     // Piezo Task
     static constexpr const char* PiezoPlayerTaskName = "PiezoPlayerTask";
     static constexpr uint32_t PiezoPlayerTaskFrequencyHz = 120;
-    static constexpr uint32_t PiezoPlayerTaskDurationMicros = 1'000'000 / PiezoPlayerTaskFrequencyHz;
-    static constexpr uint32_t PiezoPlayerTaskDurationMillis = 1'000 / PiezoPlayerTaskFrequencyHz;
     static constexpr uint32_t PiezoPlayerTaskPriority = 15;
     static constexpr uint32_t PiezoPlayerTaskStackSize = 1024*2;
     static constexpr uint32_t PiezoPlayerTaskCore = 1;
@@ -43,6 +41,12 @@ public:
     static constexpr uint32_t DisplayTaskStackSize = 1024*2;
     static constexpr uint32_t DisplayTaskCore = 1;
 
+    // SPI DMA Task
+    static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
+    static constexpr uint32_t SpiDmaTaskPriority = 10;
+    static constexpr uint32_t SpiDmaTaskStackSize = 2048;
+    static constexpr uint32_t SpiDmaTaskCore = 1;
+
     // Display
     static constexpr uint32_t DisplayWidth = 320;
     static constexpr uint32_t DisplayHeight = 240;
@@ -51,14 +55,11 @@ public:
     static constexpr uint32_t DisplayBytesPerFrame = DisplayWidth * DisplayHeight * DisplayBytesPerPixel;
     static constexpr uint32_t DisplayBytesPerFlush = DisplayBytesPerFrame / DisplayPartialFactor;
 
-    // SPI DMA 
-    static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
-    static constexpr uint32_t SpiDmaTaskPriority = 10;
-    static constexpr uint32_t SpiDmaTaskStackSize = 2048;
-    static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
+    // SPI DMA
     // Max SPI DMA size is limited to 32KB on ESP32-S3
     // Dividing by 8 allows sets to buffer to ~19KB
     static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayBytesPerFlush;
+    static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
 
 };
 

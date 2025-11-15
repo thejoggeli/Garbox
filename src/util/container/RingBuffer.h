@@ -8,11 +8,11 @@ template <typename T, std::size_t N>
 class RingBuffer {
 public:
 
-    RingBuffer() : mHead(0), mTail(0), mCount(0) {
+    RingBuffer() : mHead(0), mTail(0), mCount(0){
         // nothing to do
     }
 
-    bool push(const T& item) {
+    bool push(const T& item){
         if (isFull()){
             return false;
         }
@@ -22,7 +22,20 @@ public:
         return true;
     }
 
-    bool pop(T& item) {
+    // advance counter and return pointer to slot data
+    // the data must then be filled by the user
+    // allows pushing data without copying
+    T* pushPtr(){
+        if (isFull()){
+            return nullptr;
+        }
+        T* slot = &mBuffer[mHead];
+        advance(mHead);
+        ++mCount;
+        return slot;
+    }
+
+    bool pop(T& item){
         if (isEmpty()){
             return false;
         }
@@ -32,7 +45,7 @@ public:
         return true;
     }
 
-    T* popPtr() {
+    T* popPtr(){
         if (isEmpty()){
             return nullptr;
         }
@@ -50,7 +63,7 @@ public:
         return true;
     }
 
-    T* peekPtr() {
+    T* peekPtr(){
         if (isEmpty()){
             return nullptr;
         }
@@ -78,7 +91,7 @@ public:
         return N - mCount;
     }
 
-    void clear() {
+    void clear(){
         mHead = 0;
         mTail = 0;
         mCount = 0;
@@ -86,7 +99,7 @@ public:
 
 private:
 
-    void advance(std::size_t& index) {
+    void advance(std::size_t& index){
         if (++index == N){
             index = 0;
         }

@@ -30,11 +30,11 @@ void ExponentialFilter::setThreshold(float threshold){
     mThreshold = threshold;
 }
 
-float ExponentialFilter::getAlpha() const{
+float ExponentialFilter::getAlpha() const {
     return mAlpha;
 }
 
-float ExponentialFilter::getThreshold() const{
+float ExponentialFilter::getThreshold() const {
     return mThreshold;
 }
 

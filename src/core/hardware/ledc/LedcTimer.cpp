@@ -12,7 +12,7 @@ LedcTimer::LedcTimer() :
     // nothing to do
 }
 
-bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits) {
+bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits){
 
     // check if setup
     if(mInitialized){
@@ -70,23 +70,23 @@ bool LedcTimer::setFrequency(uint32_t frequencyHz) const {
     return true;
 }
 
-LedcTimer::Id LedcTimer::getId() const{
+LedcTimer::Id LedcTimer::getId() const {
     return mId;
 }
 
-ledc_mode_t LedcTimer::getMode() const{
+ledc_mode_t LedcTimer::getMode() const {
     return mMode;
 }
 
-ledc_timer_t LedcTimer::getIndex() const{
+ledc_timer_t LedcTimer::getIndex() const {
     return mIndex;
 }
 
-uint8_t LedcTimer::getResolutionBits() const{
+uint8_t LedcTimer::getResolutionBits() const {
     return mResolutionBits;
 }
 
-uint32_t LedcTimer::getMaxDuty() const{
+uint32_t LedcTimer::getMaxDuty() const {
     return mMaxDuty;
 }
 

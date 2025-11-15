@@ -13,7 +13,7 @@ FrequencySensor::FrequencySensor(Gpio& gpio, Timer& timer):
     // nothing to do
 }
 
-void FrequencySensor::init(Config const& config) {
+void FrequencySensor::init(Config const& config){
 
     AssertExit(!mInitialized, "FrequencySensor", "already initialized");
     
@@ -60,7 +60,7 @@ void FrequencySensor::init(Config const& config) {
     mInitialized = true;
 }
 
-void IRAM_ATTR FrequencySensor::isrHandler(void* arg) {
+void IRAM_ATTR FrequencySensor::isrHandler(void* arg){
     FrequencySensor* self = static_cast<FrequencySensor*>(arg);
     uint64_t nowTicks64 = self->mTimer.getValueFromIsr();
     self->vLastEdgeTicks = self->vCurrentEdgeTicks;
@@ -115,7 +115,7 @@ void FrequencySensor::tick(){
     }
 }
 
-void FrequencySensor::setEnabled(bool enabled) {
+void FrequencySensor::setEnabled(bool enabled){
     if (!mInitialized){
         TriggerDebug("FrequencySensor", "not initialized");
         return;
@@ -126,7 +126,7 @@ void FrequencySensor::setEnabled(bool enabled) {
     }
 
     portENTER_CRITICAL(&mFrequencySensorMux);
-    if (enabled) {
+    if (enabled){
         mGpio.setInterruptEnabled(true);
         mState = State::Idle;
     } else {
@@ -145,7 +145,7 @@ bool FrequencySensor::isEnabled(){
     return true;
 }
 
-float FrequencySensor::getFrequencyHz() {
+float FrequencySensor::getFrequencyHz(){
     if(!mInitialized){
         TriggerDebug("FrequencySensor", "not initialized");
         return 0;

@@ -6,7 +6,7 @@
 
 namespace Garbox {
 
-HslColor::HslColor() : h(0.0f), s(0.0f), l(0.0f) {
+HslColor::HslColor() : h(0.0f), s(0.0f), l(0.0f){
     // constructor body
 }
 
@@ -26,19 +26,19 @@ RgbFloat HslColor::toLinearRgb() const {
     return ColorConverter::ToLinearRgb(*this);
 }
 
-HslColor HslColor::From(const RgbFloat& rgb) {
+HslColor HslColor::From(const RgbFloat& rgb){
     return ColorConverter::ToHsl(rgb);
 }
 
-HslColor HslColor::From(const Rgb888& rgb) {
+HslColor HslColor::From(const Rgb888& rgb){
     return ColorConverter::ToHsl(rgb);
 }
 
-HslColor HslColor::From(const Rgb565& rgb) {
+HslColor HslColor::From(const Rgb565& rgb){
     return ColorConverter::ToHsl(rgb);
 }
 
-HslColor HslColor::From(const LabColor& lab) {
+HslColor HslColor::From(const LabColor& lab){
     return ColorConverter::ToHsl(lab);
 }
 

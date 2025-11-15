@@ -21,7 +21,7 @@ void AssertHandler::SetExitHandler(Handler handler){
     sExitHandler = handler;
 }
 
-void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg) {
+void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg){
     if(sExitTriggered){
         return;
     }
@@ -41,7 +41,7 @@ void AssertHandler::InvokeDebug(const char* context, const char* message, int32_
     }
 }
 
-void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg) {
+void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg){
     if(sExitTriggered){
         return;
     }
@@ -53,7 +53,7 @@ void AssertHandler::InvokeExit(const char* context, const char* message, int32_t
     }
 
     // default exit handler
-    while (true) {
+    while (true){
         LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 ")", context, message, arg);
         Time::DelayMillis(1000);
     }

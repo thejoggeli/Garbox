@@ -90,7 +90,7 @@ bool Adc::isCalibrated() const {
     return mCalibrated;
 }
 
-float Adc::convertRawToVoltage(uint16_t raw) const{
+float Adc::convertRawToVoltage(uint16_t raw) const {
     if(mCalibrated){
         uint32_t millivolts = esp_adc_cal_raw_to_voltage(raw, &mAdcChars);
         return static_cast<float>(millivolts) / 1000.0f;

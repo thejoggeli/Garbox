@@ -11,7 +11,7 @@ bool Profiler::sInitialized = false;
 uint32_t Profiler::sLastUpdateTime = 0;
 SemaphoreHandle_t Profiler::sMutex = nullptr;
 
-bool Profiler::Setup(uint8_t num) {
+bool Profiler::Setup(uint8_t num){
     if (sInitialized) return true;
     if (num == 0) return false;
 
@@ -19,14 +19,14 @@ bool Profiler::Setup(uint8_t num) {
     if (!sRecords) return false;
 
     sMutex = xSemaphoreCreateMutex();
-    if (!sMutex) {
+    if (!sMutex){
         free(sRecords);
         sRecords = nullptr;
         return false;
     }
 
     sNumRecords = num;
-    for (uint8_t i = 0; i < num; ++i) {
+    for (uint8_t i = 0; i < num; ++i){
         sRecords[i] = {
             0, 0, 0, 0,
             0xFFFFFFFF, 0,
@@ -43,14 +43,14 @@ bool Profiler::Setup(uint8_t num) {
     return true;
 }
 
-void Profiler::Start() {
+void Profiler::Start(){
     if (!sInitialized) return;
     LockGuard lock(sMutex);
     sLastUpdateTime = Time::GetMicros();
     sEnabled = true;
 
     // Optionally reset per-frame counters so first tick is clean
-    for (uint8_t i = 0; i < sNumRecords; ++i) {
+    for (uint8_t i = 0; i < sNumRecords; ++i){
         sRecords[i].countCurrent = 0;
         sRecords[i].totalTime = 0;
         sRecords[i].minDurationCurrent = 0xFFFFFFFF;
@@ -58,17 +58,17 @@ void Profiler::Start() {
     }
 }
 
-void Profiler::SetEnabled(bool on) {
+void Profiler::SetEnabled(bool on){
     LockGuard lock(sMutex);
     sEnabled = on;
 }
 
-bool Profiler::IsEnabled() {
+bool Profiler::IsEnabled(){
     LockGuard lock(sMutex);
     return sEnabled;
 }
 
-void Profiler::Begin(uint8_t id) {
+void Profiler::Begin(uint8_t id){
     if (!sInitialized || !sEnabled || id >= sNumRecords) return;
     LockGuard lock(sMutex);
     Record& r = sRecords[id];
@@ -76,7 +76,7 @@ void Profiler::Begin(uint8_t id) {
     r.active = true;
 }
 
-void Profiler::End(uint8_t id) {
+void Profiler::End(uint8_t id){
     if (!sInitialized || !sEnabled || id >= sNumRecords) return;
     LockGuard lock(sMutex);
     Record& r = sRecords[id];
@@ -96,8 +96,8 @@ void Profiler::End(uint8_t id) {
     r.countTotal++;
 }
 
-void Profiler::ProcessRecord(Record& r, uint32_t elapsed) {
-    if (r.countCurrent > 0) {
+void Profiler::ProcessRecord(Record& r, uint32_t elapsed){
+    if (r.countCurrent > 0){
         r.avgDuration = static_cast<float>(r.totalTime) / r.countCurrent;
         r.frequency   = (r.countCurrent * 1e6f) / elapsed;
 
@@ -118,7 +118,7 @@ void Profiler::ProcessRecord(Record& r, uint32_t elapsed) {
     r.totalTime          = 0;
 }
 
-void Profiler::Update(uint8_t id) {
+void Profiler::Update(uint8_t id){
     if (!sInitialized || !sEnabled || id >= sNumRecords) return;
     LockGuard lock(sMutex);
     const uint32_t now = Time::GetMicros();
@@ -131,7 +131,7 @@ void Profiler::Update(uint8_t id) {
         sLastUpdateTime = now;
 }
 
-void Profiler::UpdateAll() {
+void Profiler::UpdateAll(){
     if (!sInitialized || !sEnabled) return;
     LockGuard lock(sMutex);
     const uint32_t now = Time::GetMicros();
@@ -144,14 +144,14 @@ void Profiler::UpdateAll() {
     sLastUpdateTime = now;
 }
 
-const Profiler::Record& Profiler::GetRecord(uint8_t id) {
+const Profiler::Record& Profiler::GetRecord(uint8_t id){
     static Record dummy = {};
     if (!sInitialized || id >= sNumRecords) return dummy;
     LockGuard lock(sMutex);
     return sRecords[id];
 }
 
-const Profiler::Record* Profiler::GetNextRecord() {
+const Profiler::Record* Profiler::GetNextRecord(){
     if (!sInitialized || sNumRecords == 0) return nullptr;
     LockGuard lock(sMutex);
     const Record* r = &sRecords[sNextIndex];
@@ -160,12 +160,12 @@ const Profiler::Record* Profiler::GetNextRecord() {
     return r;
 }
 
-void Profiler::ResetIteration() {
+void Profiler::ResetIteration(){
     LockGuard lock(sMutex);
     sNextIndex = 0;
 }
 
-void Profiler::ResetTotals(uint8_t id) {
+void Profiler::ResetTotals(uint8_t id){
     if (!sInitialized || id >= sNumRecords) return;
     LockGuard lock(sMutex);
     Record& r = sRecords[id];
@@ -173,10 +173,10 @@ void Profiler::ResetTotals(uint8_t id) {
     r.maxDurationTotal = 0;
 }
 
-void Profiler::ResetAllTotals() {
+void Profiler::ResetAllTotals(){
     if (!sInitialized) return;
     LockGuard lock(sMutex);
-    for (uint8_t i = 0; i < sNumRecords; ++i) {
+    for (uint8_t i = 0; i < sNumRecords; ++i){
         sRecords[i].minDurationTotal = 0xFFFFFFFF;
         sRecords[i].maxDurationTotal = 0;
     }

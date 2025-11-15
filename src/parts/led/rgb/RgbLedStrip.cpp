@@ -103,19 +103,19 @@ void RgbLedStrip::setBrightnessFloat(float brightness){
     mNeedsUpdate = true;
 }
 
-uint16_t RgbLedStrip::getCount() const{
+uint16_t RgbLedStrip::getCount() const {
     return mCount;
 }
 
-uint8_t RgbLedStrip::getBrightness() const{
+uint8_t RgbLedStrip::getBrightness() const {
     return mRgbLeds->getBrightness();
 }
 
-float RgbLedStrip::getBrightnessFloat() const{
+float RgbLedStrip::getBrightnessFloat() const {
     return static_cast<float>(mRgbLeds->getBrightness()) / 255.0f;
 }
 
-bool RgbLedStrip::isInitialized() const{
+bool RgbLedStrip::isInitialized() const {
     return mInitialized;
 }
 

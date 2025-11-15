@@ -19,7 +19,7 @@ void DeadbandFilter::setThreshold(float threshold){
     mThreshold = std::max(threshold, 0.0f);
 }
 
-float DeadbandFilter::getThreshold() const{
+float DeadbandFilter::getThreshold() const {
     return mThreshold;
 }
 

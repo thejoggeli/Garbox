@@ -5,7 +5,7 @@
 namespace Garbox {
 
 template<typename StateType, StateType NumStates>
-FiniteStateMachine<StateType, NumStates>::FiniteStateMachine() {
+FiniteStateMachine<StateType, NumStates>::FiniteStateMachine(){
     AssertExit(static_cast<size_t>(NumStates) > 0, "FiniteStateMachine", "invalid number of states");
 }
 

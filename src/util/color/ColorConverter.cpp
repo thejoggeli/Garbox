@@ -154,7 +154,7 @@ static inline float hueToRgb(float p, float q, float t){
     }
 }
 
-static inline RgbFloat hslToRgb(const HslColor& hsl) {
+static inline RgbFloat hslToRgb(const HslColor& hsl){
     float c = (1.0f - fabsf(2.0f * hsl.l - 1.0f)) * hsl.s;
     float hp = hsl.h * 6.0f;
     float x = c * (1.0f - fabsf(fmodf(hp, 2.0f) - 1.0f));
@@ -164,19 +164,19 @@ static inline RgbFloat hslToRgb(const HslColor& hsl) {
     float g1 = 0.0f;
     float b1 = 0.0f;
 
-    if (hp < 1.0f) {
+    if (hp < 1.0f){
         r1 = c; g1 = x; b1 = 0.0f;
     }
-    else if (hp < 2.0f) {
+    else if (hp < 2.0f){
         r1 = x; g1 = c; b1 = 0.0f;
     }
-    else if (hp < 3.0f) {
+    else if (hp < 3.0f){
         r1 = 0.0f; g1 = c; b1 = x;
     }
-    else if (hp < 4.0f) {
+    else if (hp < 4.0f){
         r1 = 0.0f; g1 = x; b1 = c;
     }
-    else if (hp < 5.0f) {
+    else if (hp < 5.0f){
         r1 = x; g1 = 0.0f; b1 = c;
     }
     else {
@@ -186,18 +186,18 @@ static inline RgbFloat hslToRgb(const HslColor& hsl) {
     return RgbFloat(r1 + m, g1 + m, b1 + m);
 }
 
-static inline HslColor rgbToHsl(const RgbFloat& rgb) {
+static inline HslColor rgbToHsl(const RgbFloat& rgb){
     float maxVal = std::max({rgb.r, rgb.g, rgb.b});
     float minVal = std::min({rgb.r, rgb.g, rgb.b});
     float delta = maxVal - minVal;
 
     float h = 0.0f;
 
-    if (delta != 0.0f) {
-        if (maxVal == rgb.r) {
+    if (delta != 0.0f){
+        if (maxVal == rgb.r){
             h = fmodf(((rgb.g - rgb.b) / delta), 6.0f);
         }
-        else if (maxVal == rgb.g) {
+        else if (maxVal == rgb.g){
             h = ((rgb.b - rgb.r) / delta) + 2.0f;
         }
         else {
@@ -206,7 +206,7 @@ static inline HslColor rgbToHsl(const RgbFloat& rgb) {
 
         h /= 6.0f;
 
-        if (h < 0.0f) {
+        if (h < 0.0f){
             h += 1.0f;
         }
     }

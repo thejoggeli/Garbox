@@ -76,7 +76,7 @@ void CompositeFilter::setInputThreshold(float threshold){
     mInputThreshold = std::max(0.0f, threshold);
 }
 
-float CompositeFilter::getInputThreshold() const{
+float CompositeFilter::getInputThreshold() const {
     return mInputThreshold;
 }
 

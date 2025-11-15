@@ -126,7 +126,7 @@ static void test_non_uniform_rbr(){
     }
 }
 
-static void test_clamping_out_of_range() {
+static void test_clamping_out_of_range(){
 
     static const ColorMap::Entry entries[] = {
         ColorMap::Entry(0.0f, RgbFloat(1,0,0)),
@@ -148,7 +148,7 @@ static void test_clamping_out_of_range() {
     }
 }
 
-static void test_uniform_explicit_equal_spacing() {
+static void test_uniform_explicit_equal_spacing(){
 
     static const ColorMap::Entry entries[] = {
         ColorMap::Entry(0.0f, RgbFloat(1,0,0)),
@@ -166,7 +166,7 @@ static void test_uniform_explicit_equal_spacing() {
     assertRgbNear(map.interpolateStandardRgb(0.75f), 0.0f,0.5f,0.5f, eps);
 }
 
-static void test_hsl_interpolation() {
+static void test_hsl_interpolation(){
 
     static const ColorMap::Entry entries[] = {
         {0.0f, RgbFloat(1,0,0)},
@@ -188,7 +188,7 @@ static void test_hsl_interpolation() {
     TEST_ASSERT_FLOAT_WITHIN(eps, 120.0f/360.0f, h1.h);
 }
 
-static void test_lab_interpolation_monotonic_L() {
+static void test_lab_interpolation_monotonic_L(){
 
     static const ColorMap::Entry entries[] = {
         {0.0f, RgbFloat(1,0,0)},

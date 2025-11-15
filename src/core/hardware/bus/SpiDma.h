@@ -16,7 +16,7 @@ namespace Garbox {
 class SpiDma {
 public:
 
-    using TxCallback = void (*)(void* user, bool success);
+    using CompleteCallback = void (*)(void* user, bool success);
 
     struct Config {
         spi_host_device_t hostDevice;
@@ -28,19 +28,21 @@ public:
         int32_t frequencyHz = 40'000'000;
         int32_t maxTransferSizeBytes = 1024;
         int32_t queueSize = 3;
-        const char* txCompleteTaskName;
-        UBaseType_t txCompleteTaskPriority = 5;
-        uint32_t txCompleteTaskStackSize = 1024;
     };
 
     explicit SpiDma();
     ~SpiDma();
     
-    void setup(const Config& config);
-    void setTxCallback(TxCallback callback);
+    void init(const Config& config);
+
+    void startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
+    void stopTask();
+    TaskHandle_t getTaskHandle();
+
+    void setCompleteCallback(CompleteCallback callback);
 
     bool transferSync(const uint8_t* data, size_t lenBits, void* user = nullptr);
-    bool transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, TxCallback callback = nullptr);
+    bool transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, CompleteCallback callback = nullptr);
 
     // Disallow copy and move 
     SpiDma(const SpiDma&) = delete;
@@ -51,19 +53,19 @@ public:
 private:
     struct TxSlot {
         spi_transaction_t trans;
-        TxCallback callback = nullptr;
+        CompleteCallback callback = nullptr;
         bool inUse = false;
     };
 
     spi_host_device_t mHost;
     spi_device_handle_t mDevice = nullptr;
-    TxCallback mTxCallback = nullptr;
+    CompleteCallback mTxCallback = nullptr;
     bool mInitialized = false;
 
     TxSlot* mTxSlots = nullptr;
     int mNumSlots = 0;
 
-    TaskHandle_t mCompletionTask = nullptr;
+    TaskHandle_t mTaskHandle = nullptr;
 
     portMUX_TYPE mSlotLock = portMUX_INITIALIZER_UNLOCKED;
     size_t mMaxTransferSizeBits = 0;
@@ -73,8 +75,8 @@ private:
     TxSlot* allocFreeSlot();
     void freeSlot(TxSlot* slot);
 
-    static void completionTaskTrampoline(void* arg);
-    void completionTask();
+    static void taskTrampoline(void* arg);
+    void handleTask();
     void handleCompletedTransaction(spi_transaction_t* transaction, bool success);
     void invokeCallback(TxSlot* slot, void* user, bool success);
 };

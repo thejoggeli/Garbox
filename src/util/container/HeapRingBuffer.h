@@ -17,11 +17,11 @@ public:
         // nothing to do
     }
 
-    ~HeapRingBuffer() {
+    ~HeapRingBuffer(){
         delete[] mBuffer;
     }
 
-    bool push(const T& item) {
+    bool push(const T& item){
         if (isFull())
             return false;
         mBuffer[mHead] = item;
@@ -30,7 +30,7 @@ public:
         return true;
     }
 
-    bool pop(T& item) {
+    bool pop(T& item){
         if (isEmpty())
             return false;
         item = mBuffer[mTail];
@@ -39,7 +39,7 @@ public:
         return true;
     }
 
-    T* popPtr() {
+    T* popPtr(){
         if (isEmpty())
             return nullptr;
         T* item = &mBuffer[mTail];
@@ -71,14 +71,14 @@ public:
         return mCapacity; 
     }
 
-    void clear() {
+    void clear(){
         mHead = 0;
         mTail = 0;
         mCount = 0;
     }
 
 private:
-    void advance(std::size_t& index) {
+    void advance(std::size_t& index){
         if (++index == mCapacity)
             index = 0;
     }

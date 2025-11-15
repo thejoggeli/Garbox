@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-char* StringUtils::FormatDurationDHMS(uint32_t totalSeconds, char* out, size_t outSize) {
+char* StringUtils::FormatDurationDHMS(uint32_t totalSeconds, char* out, size_t outSize){
     uint32_t days = totalSeconds / 86400U;
     totalSeconds %= 86400U;
     uint32_t hours = totalSeconds / 3600U;

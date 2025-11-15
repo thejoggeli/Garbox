@@ -33,8 +33,8 @@ public:
 
     // Scoped RAII profiler section
     struct Scoped {
-        explicit Scoped(uint8_t id) : mId(id) { Profiler::Begin(mId); }
-        ~Scoped() { Profiler::End(mId); }
+        explicit Scoped(uint8_t id) : mId(id){ Profiler::Begin(mId); }
+        ~Scoped(){ Profiler::End(mId); }
 
         Scoped(const Scoped&) = delete;
         Scoped& operator=(const Scoped&) = delete;

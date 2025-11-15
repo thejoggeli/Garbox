@@ -6,8 +6,8 @@ namespace Garbox {
 
 static bool mInitialized = false;
 
-void Log::Init() {
-    if (mInitialized) {
+void Log::Init(){
+    if (mInitialized){
         TriggerExit("Log", "already initialized");
         return;
     }
@@ -35,7 +35,7 @@ void Log::Init() {
     mInitialized = true;
 }
 
-void Log::SetLevel(Level level, const char* tag) {
+void Log::SetLevel(Level level, const char* tag){
     esp_log_level_set(tag, static_cast<esp_log_level_t>(level));
 }
 

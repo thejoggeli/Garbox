@@ -71,7 +71,7 @@ public:
         RGB666 = 0x66  // 18-bit color (6 bits per channel)
     };
 
-    static constexpr uint8_t makeCololorModeValue(ColorMode mode) {
+    static constexpr uint8_t makeCololorModeValue(ColorMode mode){
         return static_cast<uint8_t>(mode);
     }
 
@@ -92,19 +92,19 @@ public:
     // Depending on panel wiring, flipX/flipY may need to be swapped
     // if the image flips in the wrong direction.
 
-    static constexpr uint8_t makePortraitRGB(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makePortraitRGB(bool flipX = false, bool flipY = false){
         return (flipY ? MY : 0) | (flipX ? MX : 0);
     }
 
-    static constexpr uint8_t makePortraitBGR(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makePortraitBGR(bool flipX = false, bool flipY = false){
         return (flipY ? MY : 0) | (flipX ? MX : 0) | BGR;
     }
 
-    static constexpr uint8_t makeLandscapeRGB(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makeLandscapeRGB(bool flipX = false, bool flipY = false){
         return MV | (flipY ? MX : 0) | (flipX ? MY : 0);
     }
 
-    static constexpr uint8_t makeLandscapeBGR(bool flipX = false, bool flipY = false) {
+    static constexpr uint8_t makeLandscapeBGR(bool flipX = false, bool flipY = false){
         return MV | (flipY ? MX : 0) | (flipX ? MY : 0) | BGR;
     }
 };

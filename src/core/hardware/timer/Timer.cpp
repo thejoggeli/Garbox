@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-Timer::Timer() {
+Timer::Timer(){
     // nothing to do
 }
 

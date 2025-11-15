@@ -6,7 +6,7 @@
 
 namespace Garbox {
 
-StaticLed::StaticLed(Gpio& gpio) : mGpio(gpio) {
+StaticLed::StaticLed(Gpio& gpio) : mGpio(gpio){
     mMutex = xSemaphoreCreateRecursiveMutex();
     AssertExit(mMutex != nullptr, "StaticLed", "mutex creation failed");
 }

@@ -18,11 +18,11 @@ float FilterFunctionAbs::process(float value){
     return mLastFiltered;
 }
 
-float FilterFunctionAbs::getFilteredValue() const{
+float FilterFunctionAbs::getFilteredValue() const {
     return mLastFiltered;
 }
 
-float FilterFunctionAbs::getRawValue() const{
+float FilterFunctionAbs::getRawValue() const {
     return mLastRaw;
 }
 

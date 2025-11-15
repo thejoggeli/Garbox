@@ -56,11 +56,11 @@ void PeriodicTask::stop(){
     }
 }
 
-bool PeriodicTask::isRunning() const{
+bool PeriodicTask::isRunning() const {
     return (mTaskHandle != nullptr);
 }
 
-bool PeriodicTask::isConfigured() const{
+bool PeriodicTask::isConfigured() const {
     return mConfigured;
 }
 
@@ -76,7 +76,7 @@ void PeriodicTask::taskLoop(void* arg){
     }
 }
 
-TaskHandle_t& PeriodicTask::getHandle(){
+TaskHandle_t PeriodicTask::getHandle(){
     return mTaskHandle;
 }
 

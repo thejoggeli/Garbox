@@ -235,11 +235,6 @@ void MainControl::tick(){
     HslColor hslColor = colorMap.interpolateHsl(tColorMap);
     hslColor.l = brightness;
     mRgbLed.setColor(hslColor.toLinearRgb());
-
-    // display tick
-    Profiler::Begin(ProfilerConfig::DisplayTick);
-    mDisplay.tick();
-    Profiler::End(ProfilerConfig::DisplayTick);
 }
 
 void MainControl::onAssertDebug(const char* context, const char* message){

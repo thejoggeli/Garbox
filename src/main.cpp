@@ -3,6 +3,7 @@
 #include "app/StatusLeds.h"
 #include "assert/AssertHandler.h"
 #include "core/diagnostics/Profiler.h"
+#include "core/hardware/bus/SpiDma.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "global/config/AppConfig.h"
@@ -13,6 +14,7 @@
 #include "global/hardware/spi/SpiInstances.h"
 #include "global/hardware/timer/TimerInstances.h"
 #include "global/providers/PartsProvider.h"
+#include "parts/display/Display.h"
 #include "parts/piezo/PiezoPlayer.h"
 #include "util/StringUtils.h"
 #include "util/threading/LockGuard.h"
@@ -27,7 +29,7 @@ static TaskHandle_t gMainTaskHandle = nullptr;
 void mainTask(void* parameter);
 void logProfiler();
 
-void setup() {
+void setup(){
 
     Log::Init();
     Log::SetLevel(Log::Level::Verbose);
@@ -75,6 +77,18 @@ void setup() {
         PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
         if(currentTask != piezoPlayer.getTaskHandle()){
             piezoPlayer.stopTask();
+        }
+
+        // stop display task
+        Display& display = PartsProvider::GetDisplay();
+        if(currentTask != display.getTaskHandle()){
+            display.stopTask();
+        }
+
+        // stop spi dma task
+        SpiDma& spiDma = SpiInstances::GetSpiDma();
+        if(currentTask != spiDma.getTaskHandle()){
+            spiDma.stopTask();
         }
         
         // turn off all status leds
@@ -144,6 +158,24 @@ void setup() {
         AppConfig::PiezoPlayerTaskCore
     );
 
+    // start spi dma task
+    SpiDma& spiDma = SpiInstances::GetSpiDma();
+    spiDma.startTask(
+        AppConfig::SpiDmaTaskName,
+        AppConfig::SpiDmaTaskStackSize,
+        AppConfig::SpiDmaTaskPriority,
+        AppConfig::SpiDmaTaskCore
+    );
+
+    // start render task (won't do anything until render trigger notify)
+    Display& display = PartsProvider::GetDisplay();
+    display.startTask(
+        AppConfig::DisplayTaskName,
+        AppConfig::DisplayTaskStackSize,
+        AppConfig::DisplayTaskPriority,
+        AppConfig::DisplayTaskCore
+    );
+
     // init main app
     gMainControl.init();
 
@@ -203,7 +235,7 @@ void mainTask(void* parameter){
 void logProfiler(){
     static uint32_t lastPrint = 0;
     uint32_t now = Time::GetMicros();
-    if (now - lastPrint > 30'000'000) {
+    if (now - lastPrint > 30'000'000){
         Profiler::UpdateAll();
         lastPrint = now;
         
@@ -212,7 +244,7 @@ void logProfiler(){
         StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
         LogInfo("Main", "======================== Diagnostics %s =======================", timeStringBuffer);
         LogInfo("Main", " | ProfilerId         | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
-        for (uint8_t i = 0; i < ProfilerConfig::Count; ++i) {
+        for (uint8_t i = 0; i < ProfilerConfig::Count; ++i){
             const Profiler::Record& r = Profiler::GetRecord(i);
             const char* idStr = ProfilerConfig::IdToString(i);
             LogInfo("Main", " | %-18s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);

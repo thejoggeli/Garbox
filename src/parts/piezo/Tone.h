@@ -49,7 +49,7 @@ public:
         return t;
     }
 
-    constexpr Tone& duration(uint16_t durationMicros) {
+    constexpr Tone& duration(uint16_t durationMicros){
         mDurationMicros = durationMicros;
         return *this;
     }
@@ -62,7 +62,7 @@ public:
         return t;
     }
 
-    constexpr Tone& frequency(uint16_t frequencyStart) {
+    constexpr Tone& frequency(uint16_t frequencyStart){
         mFrequencyStart = frequencyStart;
         mFrequencyEnd   = frequencyStart;
         return *this;
@@ -76,7 +76,7 @@ public:
         return t;
     }
 
-    constexpr Tone& sweep(uint16_t frequencyStart, uint16_t frequencyEnd) {
+    constexpr Tone& sweep(uint16_t frequencyStart, uint16_t frequencyEnd){
         mFrequencyStart = frequencyStart;
         mFrequencyEnd = frequencyEnd;
         return *this;
@@ -89,7 +89,7 @@ public:
         return t;
     }
 
-    constexpr Tone& duty(float duty) {
+    constexpr Tone& duty(float duty){
         mDuty = duty;
         return *this;
     }
@@ -102,7 +102,7 @@ public:
         return t;
     }
 
-    constexpr Tone& silent() {
+    constexpr Tone& silent(){
         mFrequencyStart = 0;
         mFrequencyEnd   = 0;
         return *this;

@@ -35,19 +35,19 @@ void QuadraticFunction::setPoints(float x1, float y1, float x2, float y2, float 
     m_c = (x2*x3 * (x2 - x3) * y1 + x3*x1 * (x3 - x1) * y2 + x1*x2 * (x1 - x2) * y3) / denom;
 }
 
-float QuadraticFunction::evaluate(float x) const{
+float QuadraticFunction::evaluate(float x) const {
     return (m_a * x * x) + (m_b * x) + m_c;
 }
 
-float QuadraticFunction::getA() const{
+float QuadraticFunction::getA() const {
     return m_a;
 }
 
-float QuadraticFunction::getB() const{
+float QuadraticFunction::getB() const {
     return m_b;
 }
 
-float QuadraticFunction::getC() const{
+float QuadraticFunction::getC() const {
     return m_c;
 }
 

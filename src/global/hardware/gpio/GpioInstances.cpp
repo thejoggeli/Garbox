@@ -18,7 +18,7 @@ using Pull = Gpio::Pull;
 using Interrupt = Gpio::Interrupt;
 
 template<int32_t Pin>
-Gpio& GetGpioInstance() {
+Gpio& GetGpioInstance(){
     static Gpio instance(Pin);
     return instance;
 }
@@ -68,11 +68,11 @@ Gpio& GpioInstances::GetDebugGpio1(){ return GetGpioInstance<PinConfig::DebugGpi
 
 // fan
 Gpio& GpioInstances::GetFanEnable(){ return GetGpioInstance<PinConfig::FanEnable>(); }
-Gpio& GpioInstances::GetFanTacho() { return GetGpioInstance<PinConfig::FanTacho>(); }
+Gpio& GpioInstances::GetFanTacho(){ return GetGpioInstance<PinConfig::FanTacho>(); }
 
 // display
-Gpio& GpioInstances::GetDisplayDc() { return GetGpioInstance<PinConfig::DisplayDc>(); }
-Gpio& GpioInstances::GetDisplayCs() { return GetGpioInstance<PinConfig::DisplayCs>(); }
+Gpio& GpioInstances::GetDisplayDc(){ return GetGpioInstance<PinConfig::DisplayDc>(); }
+Gpio& GpioInstances::GetDisplayCs(){ return GetGpioInstance<PinConfig::DisplayCs>(); }
 Gpio& GpioInstances::GetDisplayRst(){ return GetGpioInstance<PinConfig::DisplayRst>(); }
 
 // heatpad

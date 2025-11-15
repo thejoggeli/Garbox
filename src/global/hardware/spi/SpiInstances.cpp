@@ -12,7 +12,7 @@ void SpiInstances::Init(){
     
     AssertExit(!gInitialized, "SpiInstances", "already initialized");
 
-    GetSpiDma().setup({
+    GetSpiDma().init({
         .hostDevice = SPI2_HOST,
         .pinMosi = PinConfig::DisplaySda,
         .pinMiso = -1,
@@ -22,9 +22,6 @@ void SpiInstances::Init(){
         .frequencyHz = AppConfig::SpiDmaFrequencyHz,
         .maxTransferSizeBytes = static_cast<int32_t>(AppConfig::SpiDmaMaxTransferSizeBytes),
         .queueSize = 5,
-        .txCompleteTaskName = AppConfig::SpiDmaTaskName,
-        .txCompleteTaskPriority = AppConfig::SpiDmaTaskPriority,
-        .txCompleteTaskStackSize = AppConfig::SpiDmaTaskStackSize,
     });
 
     gInitialized = true;

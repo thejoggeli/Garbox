@@ -14,11 +14,11 @@ void ScaleFunction::setScale(float scale){
     mScale = scale;
 }
 
-float ScaleFunction::getScale() const{
+float ScaleFunction::getScale() const {
     return mScale;
 }
 
-float ScaleFunction::evaluate(float x) const{
+float ScaleFunction::evaluate(float x) const {
     return x * mScale;
 }
 

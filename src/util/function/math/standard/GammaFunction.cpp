@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-GammaFunction::GammaFunction(float gamma) : mGamma(gamma) {
+GammaFunction::GammaFunction(float gamma) : mGamma(gamma){
     // nothing to do
 }
 
@@ -16,14 +16,14 @@ void GammaFunction::setGamma(float gamma){
     mGamma = gamma;
 }
 
-float GammaFunction::evaluate(float x) const{
+float GammaFunction::evaluate(float x) const {
     if(x <= 0.0f){
         return 0.0f;
     }
     return powf(x, mGamma);
 }
 
-float GammaFunction::getGamma() const{
+float GammaFunction::getGamma() const {
     return mGamma;
 }
 

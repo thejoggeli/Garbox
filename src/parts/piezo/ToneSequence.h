@@ -16,7 +16,7 @@ public:
 
     // construct from fixed-size array (factory-style)
     template <size_t N>
-    static constexpr ToneSequence from(const Tone (&tones)[N]) {
+    static constexpr ToneSequence from(const Tone (&tones)[N]){
         return ToneSequence(tones, N);
     }
 

@@ -6,7 +6,7 @@
 
 namespace Garbox {
 
-LabColor::LabColor() : L(100.0f), a(0.0f), b(0.0f) {
+LabColor::LabColor() : L(100.0f), a(0.0f), b(0.0f){
     // constructor body
 }
 
@@ -26,11 +26,11 @@ RgbFloat LabColor::toLinearRgb() const {
     return ColorConverter::ToLinearRgb(*this);
 }
 
-LabColor LabColor::From(const HslColor& hsl) {
+LabColor LabColor::From(const HslColor& hsl){
     return ColorConverter::ToLab(hsl);
 }
 
-LabColor LabColor::From(const RgbFloat& linearRgb) {
+LabColor LabColor::From(const RgbFloat& linearRgb){
     return ColorConverter::ToLab(linearRgb);
 }
 

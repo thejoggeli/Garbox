@@ -42,7 +42,7 @@ void SoftwareTimer::restart(uint32_t newDurationMicros){
 
 void SoftwareTimer::restartInner(){
     // reset start time only
-    if (mDurationMicros == 0) {
+    if (mDurationMicros == 0){
         mStartTimeMicros = Time::GetMicros();
         return;
     }
@@ -52,7 +52,7 @@ void SoftwareTimer::restartInner(){
 
     // keep adding full periods until next target is in the future
     // works correctly with uint32_t wrap-around
-    while ((uint32_t)(currentTimeMicros - mStartTimeMicros) >= mDurationMicros) {
+    while ((uint32_t)(currentTimeMicros - mStartTimeMicros) >= mDurationMicros){
         mStartTimeMicros += mDurationMicros;
     }
 }

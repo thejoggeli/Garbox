@@ -31,7 +31,7 @@ public:
     void sendInit();
 
     void sendFillColor(uint16_t color);
-    void sendFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
+    void sendFillRectSync(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
     void sendDrawBufferXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t* buffer, size_t sizeBytes, bool async = false);
     void sendDrawBufferXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, uint8_t* buffer, size_t sizeBytes, bool async = false);
 
@@ -42,6 +42,8 @@ public:
     St7789v& operator=(St7789v&&) = delete;
 
 private:
+
+    static constexpr uint8_t BytesPerPixel = 2;
 
     Gpio& mGpioRst;
     Gpio& mGpioDc;
@@ -66,7 +68,7 @@ private:
 
     void sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async);
 
-    void invokeHandler(const uint8_t* buffer, size_t sizeBytes, bool async);
+    void sendData(const uint8_t* buffer, size_t sizeBytes, bool async);
 };
 
 } // namespace

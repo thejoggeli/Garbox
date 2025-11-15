@@ -9,6 +9,7 @@
 #include "global/providers/ColorMaps.h"
 #include "util/ByteUtils.h"
 #include "util/color/types/Rgb565.h"
+#include "core/diagnostics/Profiler.h"
 
 namespace Garbox {
 
@@ -65,8 +66,8 @@ void Display::init(){
     mDrawBufferData2 = allocDrawBufferData(mBufferSize);
     mDrawBufferData3 = allocDrawBufferData(mBufferSize);
     initDrawBuffer(mDrawBuffer1, mDrawBufferData1, mBufferSize, mBufferWidth, mBufferHeight);
-    initDrawBuffer(mDrawBuffer2, mDrawBufferData1, mBufferSize, mBufferWidth, mBufferHeight);
-    initDrawBuffer(mDrawBuffer3, mDrawBufferData1, mBufferSize, mBufferWidth, mBufferHeight);
+    initDrawBuffer(mDrawBuffer2, mDrawBufferData2, mBufferSize, mBufferWidth, mBufferHeight);
+    initDrawBuffer(mDrawBuffer3, mDrawBufferData3, mBufferSize, mBufferWidth, mBufferHeight);
 
     // init display
     mLvDisplay = lv_display_create(mSt7789v.getWidth(), mSt7789v.getHeight());
@@ -79,7 +80,7 @@ void Display::init(){
 
     // flush callbacks
     lv_display_set_flush_cb(mLvDisplay, flushTrampoline);
-    // lv_display_set_flush_wait_cb(mLvDisplay, flushWaitTrampoline);
+    lv_display_set_flush_wait_cb(mLvDisplay, flushWaitTrampoline);
 
     // create label
     mLabel = lv_label_create(lv_screen_active());
@@ -91,58 +92,74 @@ void Display::init(){
     const Rgb565 clearColor = Rgb565::FromRgbFloat(0, 0, 0);
     mSt7789v.sendFillColor(clearColor.value);
 
+    // create semaphores
+    mBufferSem = xSemaphoreCreateCounting(3, 3); // 3 free buffers at startup
+    mRenderSem = xSemaphoreCreateBinary();
+    mDisplaySem = xSemaphoreCreateRecursiveMutex();
+
+    AssertExit(mBufferSem != nullptr, "Display", "failed to create buffer sem");
+    AssertExit(mRenderSem != nullptr, "Display", "failed to create render sem");
+    AssertExit(mDisplaySem != nullptr, "Display", "failed to create display mutex");
+
+    // initially free
+    xSemaphoreGive(mRenderSem);
+
     // initialization complete
     mSt7789v.setBrightness(0.75f);
     mTestTimer.start(2000_ms);
     mInitialized = true;
 }
 
-void Display::tick(){
+void Display::startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
+    AssertExit(mInitialized, "Display", "not initialized");
+    AssertExit(mTaskHandle == nullptr, "Display", "task already running");
+    BaseType_t result = xTaskCreatePinnedToCore(
+        taskTrampoline,
+        name, 
+        stackSize,
+        this,
+        priority,
+        &mTaskHandle,
+        core
+    );
+    AssertExit(result == pdPASS, "Display", "task creation failed");
+}
 
-    // advance x
-    static int x = 0;
-    x = (x + 1) % 320;
-    
-    // advance t
-    static float t = 0.0f;
-    t = std::fmod(t + 0.004f, 1.0f);
-
-    lv_label_set_text_fmt(mLabel, "0.%03u", static_cast<uint32_t>(t*1000.0f));
-
-    lv_timer_handler(); 
-
-    // get a colormap for interpolation
-    static const ColorMap& colorMap1 = ColorMaps::GetTestRBR_Uniform();
-    static const ColorMap& colorMap2 = ColorMaps::GetTestRBR_NonUniform();
-
-    // draw rectangle with hsl rainbow
-    Rgb565 rgb1 = Rgb565::FromHsl(t, 1.0f, 0.5f);
-    mSt7789v.sendFillRect(x, 40, 1, 30, rgb1.value);
-
-    // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb2 = Rgb565::From(colorMap1.interpolateLinearRgb(t).toStandardRgb());
-    mSt7789v.sendFillRect(x, 80, 1, 30, rgb2.value);
-
-    // draw rectangle with colormap (rgb interpolation)
-    Rgb565 rgb3 = Rgb565::From(colorMap1.interpolateHsl(t));
-    mSt7789v.sendFillRect(x, 120, 1, 30, rgb3.value);
-
-    // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb4 = Rgb565::From(colorMap2.interpolateLinearRgb(t).toStandardRgb());
-    mSt7789v.sendFillRect(x, 160, 1, 30, rgb4.value);
-
-    // draw rectangle with colormap (hsl interpolation)
-    Rgb565 rgb5 = Rgb565::From(colorMap2.interpolateHsl(t));
-    mSt7789v.sendFillRect(x, 200, 1, 30, rgb5.value);
-
-    // test timer
-    if (mTestTimer.isExpired()){
-        mTestTimer.restart();
+void Display::stopTask(){
+    if(mTaskHandle != nullptr){
+        vTaskDelete(mTaskHandle);
+        mTaskHandle = nullptr;
+        // TODO stop all spi activity
     }
+}
+
+TaskHandle_t Display::getTaskHandle(){
+    return mTaskHandle;
+}
+
+void Display::handleTask(){
+    // wait for render trigger
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY); 
+
+    // execute display task
+    Profiler::Begin(ProfilerConfig::DisplayTick);
+    xSemaphoreTake(mRenderSem, portMAX_DELAY);
+    lv_timer_handler();
+    xSemaphoreGive(mRenderSem); // at this point, at least one buffer is free again (guaranteed by flush_wait_cb)
+    Profiler::End(ProfilerConfig::DisplayTick);
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 
+    // first ensure buffer availability
+    xSemaphoreTake(mBufferSem, portMAX_DELAY);
+
+    // now access display state
+    // this method is called from DisplayTask
+    // state is modified through mFlushQueue
+    LockGuard lock(mDisplaySem); // prevent concurrent access to display
+
+    // debug logging
 #if GarboxDebugDisplay
     if(pixelMap == mDrawBufferData1){
         LogDebug("Display", "buffer-1");
@@ -159,33 +176,84 @@ void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 #endif
     
     // send buffer to st7789v
-    const uint32_t width = area->x2 - area->x1 + 1;
-    const uint32_t height = area->y2 - area->y1 + 1;
-    const uint32_t sizeBytes = width * height * 2;
-    const bool async = false;
+    const int32_t width = area->x2 - area->x1 + 1;
+    const int32_t height = area->y2 - area->y1 + 1;
+    const size_t sizeBytes = static_cast<size_t>(width * height * 2);
 
-    mSt7789v.sendDrawBufferXXYY(area->x1, area->x2, area->y1, area->y2, pixelMap, sizeBytes, async);
-    
-    // notify lvgl that transfer is complete
-    lv_display_flush_ready(mLvDisplay);
+    // add to queue
+    FlushQueueEntry* entry = mFlushQueue.pushPtr();
+    if(entry == nullptr){
+        TriggerExit("Display", "flush queue is full");
+        return;
+    }
+    entry->data = pixelMap;
+    entry->sizeBytes = sizeBytes;
+    entry->x1 = area->x1;
+    entry->x2 = area->x2;
+    entry->y1 = area->y1;
+    entry->y2 = area->y2;
+
+    // send if nothing is being send currently
+    sendNextInQueue();
 }
 
 void Display::handleFlushWait(){
-    // TODO
+    xSemaphoreTake(mBufferSem, portMAX_DELAY); // block until at least one DMA finishes (token returned)
+    // now we are sure that at least one buffer is free to be used by LVGL
+    xSemaphoreGive(mBufferSem); // give token back immediately so next flush_cb can proceed
+}
+
+void Display::handleDmaComplete(bool success){
+
+    // this method is called from SpiDmaCompleteTask
+    // state is modified through lv_display_flush_ready()
+    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
+
+    // notify lvgl there is a free buffer
+    lv_display_flush_ready(mLvDisplay); // tell LVGL the buffer is free again
+
+    // return one free-buffer token
+    xSemaphoreGive(mBufferSem); 
+
+    // send next
+    mSendInProgress = false;
+    sendNextInQueue();
+}
+
+void Display::sendNextInQueue(){
+
+    // this method can be called from:
+    // - DisplayTask through lv_timer_handler() => handleFlush()
+    // - SpiDmaTask  through handleDmaComplete()
+    // state is modified through 
+    // - mFlushQueue 
+    // - mSendInProgress
+    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
+
+    // check if something is already being sent
+    if(mSendInProgress){
+        return;
+    }
+
+    // get next entry in flush queue
+    FlushQueueEntry* entry = mFlushQueue.popPtr();
+
+    // send next entry
+    if(entry != nullptr){
+        const bool async = true;
+        mSendInProgress = true;
+        mSt7789v.sendDrawBufferXXYY(entry->x1, entry->x2, entry->y1, entry->y2, entry->data, entry->sizeBytes, async);
+    }
 }
 
 void Display::handleSt7789vSendSync(const uint8_t* data, size_t numBytes){
+    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
     mSpi.transferSync(data, numBytes*8);
-    // LogDebug("Display", "sending %u bytes (sync)", numBytes);
 }
 
 void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
-    mSpi.transferSync(data, numBytes*8);
-    // LogDebug("Display", "sending %u bytes (async)", numBytes);
-}
-
-void Display::handleTxComplete(bool success){
-    // nothing to do
+    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
+    mSpi.transferAsync(data, numBytes*8, this, dmaCompleteTrampoline);
 }
 
 void Display::handleLog(lv_log_level_t level, const char* str){
@@ -211,6 +279,12 @@ void Display::handleLog(lv_log_level_t level, const char* str){
     }
 }
 
+void Display::taskTrampoline(void* user){
+    while(true){
+        static_cast<Display*>(user)->handleTask();   
+    }
+}
+
 void Display::flushTrampoline(lv_display_t* disp, const lv_area_t* area, uint8_t* pixelMap){
     Display* self = static_cast<Display*>(lv_display_get_user_data(disp));
     if (self){
@@ -225,8 +299,8 @@ void Display::flushWaitTrampoline(lv_display_t* disp){
     }
 }
 
-void Display::txCompleteTrampoline(void* user, bool success){
-    static_cast<Display*>(user)->handleTxComplete(success);
+void Display::dmaCompleteTrampoline(void* user, bool success){
+    static_cast<Display*>(user)->handleDmaComplete(success);
 }
 
 uint32_t Display::lvglTickProvider(){
@@ -234,7 +308,6 @@ uint32_t Display::lvglTickProvider(){
 }
 
 uint8_t* Display::allocDrawBufferData(uint32_t size){
-
     // alloc memory
     uint8_t* buffer = (uint8_t*) heap_caps_malloc(size, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     

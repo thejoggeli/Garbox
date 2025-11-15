@@ -17,14 +17,14 @@ void AssertHandler::SetExitHandler(Handler handler){
     sExitHandler = handler;
 }
 
-void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg) {
+void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg){
     printf("[ASSERT-DEBUG] %s: %s (arg=%u)\n", context, message, arg);
     if(sDebugHandler){
         sDebugHandler(context, message, arg);
     }
 }
 
-void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg) {
+void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg){
     printf("[ASSERT-EXIT] %s: %s (arg=%u)\n", context, message, arg);
     if(sExitHandler){
         sExitHandler(context, message, arg);

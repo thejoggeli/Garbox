@@ -49,7 +49,7 @@ void RgbLed::setColor(uint8_t r, uint8_t g, uint8_t b){
     mRgbLed->show();
 }
 
-bool RgbLed::isInitialized() const{
+bool RgbLed::isInitialized() const {
     return mInitialized;
 }
 

@@ -88,15 +88,15 @@ void SoftwarePwm::updateState(){
     State newState = mState;
 
     // timer not running
-    if (mTimer.isReset()) {
+    if (mTimer.isReset()){
         newState = State::Reset;
     }
     // 100% duty => always high
-    else if (mCurrentDutyCycle == 1.0f) {
+    else if (mCurrentDutyCycle == 1.0f){
         newState = State::High;
     }
     // 0% duty => always low
-    else if (mCurrentDutyCycle == 0.0f) {
+    else if (mCurrentDutyCycle == 0.0f){
         newState = State::Low;
     }
     else {
@@ -104,7 +104,7 @@ void SoftwarePwm::updateState(){
         bool inFirstPhase = (mTimer.getElapsedMicros() < mThresholdMicros);
 
         // start with high phase
-        if (mMode == Mode::StartHigh) {
+        if (mMode == Mode::StartHigh){
             newState = inFirstPhase ? State::High : State::Low;
         }
         // start with low phase

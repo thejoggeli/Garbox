@@ -9,7 +9,7 @@ Piezo::Piezo(LedcTimer& pwmTimer, LedcChannel& pwmChannel) :
     // init members
     mPwmTimer(pwmTimer),
     mPwmChannel(pwmChannel),
-    mTestTimer() {
+    mTestTimer(){
     // constructor body
 }
 

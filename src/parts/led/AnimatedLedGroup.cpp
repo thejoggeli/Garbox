@@ -6,7 +6,7 @@
 
 namespace Garbox {
 
-AnimatedLedGroup::AnimatedLedGroup(Span<AnimatedLed> leds) : mLeds(leds) {
+AnimatedLedGroup::AnimatedLedGroup(Span<AnimatedLed> leds) : mLeds(leds){
     mMutex = xSemaphoreCreateMutex();
     AssertExit((mMutex != nullptr), "AnimatedLedGroup", "mutex create failed");
 }
@@ -79,7 +79,7 @@ AnimatedLed& AnimatedLedGroup::getLed(uint8_t index){
     return mLeds[index];
 }
 
-Span<AnimatedLed>& AnimatedLedGroup::getAllLeds() {
+Span<AnimatedLed>& AnimatedLedGroup::getAllLeds(){
     return mLeds;
 }
 

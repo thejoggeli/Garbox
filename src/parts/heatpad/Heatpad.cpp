@@ -52,7 +52,7 @@ void Heatpad::init(){
     mCurrentSenseConditioner.setCalibrationPoints({0.0f, 0.0f}, {1.0f, CurrentAtOneAdcVolt});
     
     // software pwm attach state changed handler
-    mPwm.setStateChangedHandler([this](SoftwarePwm::State state) {
+    mPwm.setStateChangedHandler([this](SoftwarePwm::State state){
         handlePwmStateChanged(state);
     });
 
@@ -127,7 +127,7 @@ void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
 }
 
 void Heatpad::setHeatEnabled(bool enabled){
-    if (mHeatEnabled != enabled) {
+    if (mHeatEnabled != enabled){
         mGpioHeatpadEnable.writeLevel(enabled);
         mHeatEnabled = enabled;
     }

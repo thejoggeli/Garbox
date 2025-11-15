@@ -7,11 +7,11 @@
 
 namespace Garbox {
 
-RgbFloat::RgbFloat() : r(0.0f), g(0.0f), b(0.0f) {
+RgbFloat::RgbFloat() : r(0.0f), g(0.0f), b(0.0f){
     // constructor body
 }
 
-RgbFloat::RgbFloat(float rVal, float gVal, float bVal) : r(rVal), g(gVal), b(bVal) {
+RgbFloat::RgbFloat(float rVal, float gVal, float bVal) : r(rVal), g(gVal), b(bVal){
     // constructor body
 }
 
@@ -64,14 +64,14 @@ RgbFloat RgbFloat::operator/(float scalar) const {
     return RgbFloat(r / scalar, g / scalar, b / scalar);
 }
 
-RgbFloat& RgbFloat::operator*=(float scalar) {
+RgbFloat& RgbFloat::operator*=(float scalar){
     r *= scalar;
     g *= scalar;
     b *= scalar;
     return *this;
 }
 
-RgbFloat& RgbFloat::operator/=(float scalar) {
+RgbFloat& RgbFloat::operator/=(float scalar){
     r /= scalar;
     g /= scalar;
     b /= scalar;

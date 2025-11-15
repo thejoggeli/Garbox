@@ -28,11 +28,11 @@ void SnapFilter::setStickiness(float stickiness){
     updateStickRange();
 }
 
-float SnapFilter::getResolution() const{
+float SnapFilter::getResolution() const {
     return mResolution;
 }
 
-float SnapFilter::getStickiness() const{
+float SnapFilter::getStickiness() const {
     return mStickiness;
 }
 

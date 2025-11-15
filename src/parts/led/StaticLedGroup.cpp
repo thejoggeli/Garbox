@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-StaticLedGroup::StaticLedGroup(Span<StaticLed> leds) : mLeds(leds) {
+StaticLedGroup::StaticLedGroup(Span<StaticLed> leds) : mLeds(leds){
     // nothing to do
 }
 

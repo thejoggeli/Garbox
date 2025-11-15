@@ -16,25 +16,25 @@ public:
         // nothing to do
     }
 
-    ~HeapStack() {
+    ~HeapStack(){
         delete[] mBuffer;
     }
 
-    bool push(const T& item) {
+    bool push(const T& item){
         if (isFull())
             return false;
         mBuffer[mCount++] = item;
         return true;
     }
 
-    bool pop(T& item) {
+    bool pop(T& item){
         if (isEmpty())
             return false;
         item = mBuffer[--mCount];
         return true;
     }
 
-    T* popPtr() {
+    T* popPtr(){
         if (isEmpty())
             return nullptr;
         return &mBuffer[--mCount];
@@ -69,7 +69,7 @@ public:
         return mCapacity; 
     }
 
-    void clear() { mCount = 0; }
+    void clear(){ mCount = 0; }
 
 private:
     T* mBuffer;
