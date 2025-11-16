@@ -3,7 +3,7 @@
 #include "app/parts/StatusLeds.h"
 
 #include "assert/Assert.h"
-#include "assert/AssertHandler.h"
+#include "assert/AssertHandling.h"
 
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"

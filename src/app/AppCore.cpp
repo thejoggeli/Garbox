@@ -28,7 +28,7 @@ void AppCore::start(){
     mFanController.start();
 }
 
-void AppCore::tick(){
+void AppCore::mainTick(){
 
     // tick parts
     PartsProvider::Tick();
@@ -38,6 +38,11 @@ void AppCore::tick(){
     mGarboxController.tick();
     mFanController.tick();
     
+}
+
+void AppCore::displayTick(){
+    // TODO
+    // trigger UI update + notify display
 }
 
 } // namespace

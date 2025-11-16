@@ -2,7 +2,7 @@
 #include "app/AppCore.h"
 #include "app/parts/StatusLeds.h"
 #include "app/SystemTasks.h"
-#include "assert/AssertHandler.h"
+#include "assert/AssertHandling.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
@@ -28,7 +28,7 @@ void logProfiler();
 void handleAssertDebug(const char* context, const char* message, int32_t arg){
 
     // print error to log
-    LogError("AssertHandler", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
+    LogError("AssertHandling", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
 
     // turn on error led
     StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
@@ -41,7 +41,7 @@ void handleAssertDebug(const char* context, const char* message, int32_t arg){
 void handleAssertExit(const char* context, const char* message, int32_t arg){
     
     // print error to log
-    LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
+    LogError("AssertHandling", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
 
     // stop main task if this was called from another task
     TaskHandle_t currentTask = xTaskGetCurrentTaskHandle();
@@ -77,7 +77,7 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
 
     // enter endless loop and periodically print error to log
     while(true){
-        LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
+        LogError("AssertHandling", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
         Time::DelayMillis(1000);
     }
 }
@@ -88,8 +88,8 @@ void setup(){
     Log::SetLevel(Log::Level::Verbose);
     
     // assert handlers
-    AssertHandler::SetDebugHandler(handleAssertDebug);
-    AssertHandler::SetExitHandler(handleAssertExit);
+    AssertHandling::SetDebugHandler(handleAssertDebug);
+    AssertHandling::SetExitHandler(handleAssertExit);
 
     // install ISR service once globally (safe to call multiple times)
     if (gpio_install_isr_service(0) != ESP_OK){
@@ -139,8 +139,8 @@ void loop(){
 }
 
 void mainTask(void* parameter){
-    const TickType_t cycleDuration = pdMS_TO_TICKS(AppConfig::MainTaskDurationMillis);
-    const TickType_t updateDisplayDuration = pdMS_TO_TICKS(AppConfig::MainTaskUpdateDisplayDurationMillis);
+    const TickType_t mainTickMillis = pdMS_TO_TICKS(AppConfig::MainTickDurationMillis);
+    const TickType_t displayTickMillis = pdMS_TO_TICKS(AppConfig::DisplayTickDurationMillis);
     TickType_t lastWakeTime = xTaskGetTickCount();
     while(true){
         // begin main task
@@ -149,7 +149,7 @@ void mainTask(void* parameter){
         // main tick
         Profiler::Begin(ProfilerConfig::MainTick);
         Time::Tick();
-        gAppCore.tick();
+        gAppCore.mainTick();
         Profiler::End(ProfilerConfig::MainTick);
 
         // logging
@@ -160,11 +160,12 @@ void mainTask(void* parameter){
         // wait until updateDisplayDuration millis are remaining before current cycle is finished
         // this is done to ensure that the display is always updated at a fixed interval and to 
         // give it enough time to transfer the previous ui state via SPI
-        vTaskDelayUntil(&lastWakeTime, cycleDuration - updateDisplayDuration);
+        vTaskDelayUntil(&lastWakeTime, mainTickMillis);
+        gAppCore.displayTick();
         
         // end main task
         // sleep until next tick
-        vTaskDelayUntil(&lastWakeTime, updateDisplayDuration);
+        vTaskDelayUntil(&lastWakeTime, displayTickMillis);
         Profiler::End(ProfilerConfig::MainTask);
     }
 }

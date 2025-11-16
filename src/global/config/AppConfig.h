@@ -10,14 +10,11 @@ public:
     // Global
     static constexpr uint32_t NumCpuCores = 2;
     static constexpr uint32_t HeartbeatIntervalMicros = 2'000'000;
+    static constexpr uint32_t MainTickDurationMillis = 20;
+    static constexpr uint32_t DisplayTickDurationMillis = 13;
 
     // Main Task
     static constexpr const char* MainTaskName = "MainTask";
-    static constexpr uint32_t MainTaskFrequencyHz = 30;
-    static constexpr uint32_t MainTaskDurationMicros = 1'000'000 / MainTaskFrequencyHz; // 33'333 us
-    static constexpr uint32_t MainTaskDurationMillis = 1'000 / MainTaskFrequencyHz; // 33 ms
-    // ui and display update is triggered this many seconds before each main cycle tick finishes 
-    static constexpr uint32_t MainTaskUpdateDisplayDurationMillis = 13;
     static constexpr uint32_t MainTaskPriority = 5;
     static constexpr uint32_t MainTaskStackSize = 1024*8;
     static constexpr uint32_t MainTaskCore = 1;

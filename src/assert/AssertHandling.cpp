@@ -1,4 +1,4 @@
-#include "AssertHandler.h"
+#include "AssertHandling.h"
 
 #include "assert/Assert.h"
 #include "core/log/Log.h"
@@ -14,24 +14,24 @@ static constexpr bool DebugTriggersExit = true;
 static bool gExitTriggered = false;
 
 // custom handlers
-static AssertHandler::Handler gDebugHandler = nullptr;
-static AssertHandler::Handler gExitHandler = nullptr;
+static AssertHandling::Handler gDebugHandler = nullptr;
+static AssertHandling::Handler gExitHandler = nullptr;
 
 // handler mutex
 static SemaphoreHandle_t gAssertDebugHandlerMutex = nullptr;
 static SemaphoreHandle_t gAssertExitHandlerMutex = nullptr;
 
 // set debug handler
-void AssertHandler::SetDebugHandler(Handler handler){
+void AssertHandling::SetDebugHandler(Handler handler){
     gDebugHandler = handler;
 }
 
 // set exit handler
-void AssertHandler::SetExitHandler(Handler handler){
+void AssertHandling::SetExitHandler(Handler handler){
     gExitHandler = handler;
 }
 
-void AssertHandler::InvokeDebug(const char* context, const char* message, int32_t arg){
+void AssertHandling::InvokeDebug(const char* context, const char* message, int32_t arg){
 
     // abort if exit already triggerd to prevent infinite recursive calls
     if(gExitTriggered){
@@ -50,11 +50,11 @@ void AssertHandler::InvokeDebug(const char* context, const char* message, int32_
         gDebugHandler(context, message, arg);
     }
     else {
-        LogError("AssertHandler", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
+        LogError("AssertHandling", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
     }
 }
 
-void AssertHandler::InvokeExit(const char* context, const char* message, int32_t arg){
+void AssertHandling::InvokeExit(const char* context, const char* message, int32_t arg){
 
     // abort if exit already triggerd to prevent infinite recursive calls
     if(gExitTriggered){
@@ -70,7 +70,7 @@ void AssertHandler::InvokeExit(const char* context, const char* message, int32_t
 
     // default exit handler
     while (true){
-        LogError("AssertHandler", "AssertExit! %s %s (arg=%" PRIi32 ")", context, message, arg);
+        LogError("AssertHandling", "AssertExit! %s %s (arg=%" PRIi32 ")", context, message, arg);
         Time::DelayMillis(1000);
     }
 }

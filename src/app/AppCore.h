@@ -13,7 +13,8 @@ public:
 
     void init();
     void start();
-    void tick();
+    void mainTick();
+    void displayTick();
 
 private:
 
