@@ -104,7 +104,7 @@ void PiezoPlayer::handleTask(){
         }
 
         // Update ongoing playback
-        tick();
+        playbackTick();
 
         // Periodic timing while playing
         vTaskDelayUntil(&lastWake, periodMillis);
@@ -117,7 +117,7 @@ void PiezoPlayer::taskTrampoline(void* player){
     static_cast<PiezoPlayer*>(player)->handleTask();
 }
 
-void PiezoPlayer::tick(){
+void PiezoPlayer::playbackTick(){
     Garbox::LockGuard lock(mMutex);
 
     Profiler::Scoped(ProfilerConfig::PiezoPlayerTick);

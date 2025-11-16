@@ -1,12 +1,14 @@
 #pragma once
 
 #include <cstdint>
+#include "core/event/Event.h"
 
 namespace Garbox {
 
+template<typename EventType>
 struct EventWrapper {
-    uint16_t type;
-    void* dataPtr;
+    Event* header;
+    EventType* data;
 };
 
 } // namespace

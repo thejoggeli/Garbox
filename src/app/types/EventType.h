@@ -5,7 +5,8 @@
 namespace Garbox {
 
 enum class EventType : uint16_t {
-    Fan = 0,
+    Null = 0,
+    Fan,
     Button,
 };
 

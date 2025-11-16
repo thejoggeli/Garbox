@@ -1,6 +1,6 @@
 #include "SystemTasks.h"
 
-#include "app/StatusLeds.h"
+#include "app/parts/StatusLeds.h"
 #include "global/config/AppConfig.h"
 #include "global/hardware/spi/SpiInstances.h"
 #include "global/providers/PartsProvider.h"

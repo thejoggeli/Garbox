@@ -1,4 +1,4 @@
-#include "MainControl.h"
+#include "GarboxController.h"
 
 #include "app/parts/StatusLeds.h"
 
@@ -23,16 +23,12 @@
 #include "util/function/default/EasingFunctions.h"
 #include "util/math/MathUtils.h"
 
-
 namespace Garbox {
 
-static constexpr uint32_t HeartbeatInterval = 2000_ms;
-
-MainControl::MainControl() : 
-    // init memebers
+GarboxController::GarboxController():
+    // initialize members
     mRgbLed(PartsProvider::GetRgbLed()),
     mStatusLeds(PartsProvider::GetStatusLeds()),
-    mHeartbeatLed(mStatusLeds.getLed(StatusLedId::Heartbeat)),
     mFanStatusLed(mStatusLeds.getLed(StatusLedId::Custom1)),
     mButtonStatusLed(mStatusLeds.getLed(StatusLedId::Custom2)),
     mFan(PartsProvider::GetFan()),
@@ -43,34 +39,17 @@ MainControl::MainControl() :
     // nothing to do
 }
 
-void MainControl::init(){
-    AssertExit(!mInitialized, "MainControl", "already initialized");
+void GarboxController::onInit(){
 
-    // init piezo player and play sweep in
-    mPiezoPlayer.playTone(Tone(250_ms).sweep(300, 1000).duty(0.25f));
-
-    // fade debug leds in
-    for(AnimatedLed& led : mStatusLeds.getAllLeds()){
-        led.setBrightness(0);
-        led.setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 0.0f, 1.0f);
-    }
-
-    // init fan
+    // fan state changed
     mFan.setStateChangedCallback([this](Fan::State oldState, Fan::State newState){
         handleFanStateChanged(oldState, newState);
     });
+
+    // fan stalled alert
     mFan.setStalledAlertCallback([this](uint32_t counter){
         handleFanStalledAlert(counter);
     });
-
-    // button debouncing
-    mButton.setPressedToReleasedDelayMicros(1_ms);
-    mButton.setReleasedToPressedDelayMicros(1_ms);
-    mButton.setPressedHoldTimeMicros(10_ms);
-    mButton.setReleasedHoldTimeMicros(40_ms);
-
-    // button long press
-    mButton.setLongPressMicros(600_ms),
 
     // button state changed
     mButton.setStateChangedCallback([this](ButtonState oldState, ButtonState newState, void* userData){
@@ -78,78 +57,23 @@ void MainControl::init(){
     });
 
     // button holding
-    mButton.setInitialHoldDelayMicros(1200_ms);
-    mButton.setRepeatHoldDelayMicros(300_ms);
     mButton.setHoldCallback([this](uint32_t counter, uint32_t holdTimeMicros, void* userData){
         handleButtonHold(counter, holdTimeMicros);
     });
 
-    // init headpad
-    mHeatpad.setDutyCycle(0.5f);
-    mHeatpad.setPeriodDurationMicros(5000_ms);
-
-    // wait until led animation complete (fade in animation might still be ongoing)
-    while(mHeartbeatLed.isAnimationPlaying()){
-        Time::DelayMillis(1);
-    }
-
-    // wait until piezo player complete (sweep in might still be playing)
-    while(mPiezoPlayer.isPlaying()){
-        Time::DelayMillis(1);
-    }
-
-    // piezo play sweep out
-    mPiezoPlayer.playTone(Tone(250_ms).sweep(1000, 300).duty(0.25f));
-
-    // fade debug leds out
-    for(AnimatedLed& led : mStatusLeds.getAllLeds()){
-        led.setAnimation(EasingFunctions::GetInOutSine(), 1, 250_ms, 1.0f, 0.0f);
-    }
-
-    // wait until led fade out complete
-    while(mHeartbeatLed.isAnimationPlaying()){
-        Time::DelayMillis(1);
-    }
-
-    // wait until piezo play sweep out complete
-    while(mPiezoPlayer.isPlaying()){
-        Time::DelayMillis(1);
-    }
-
-    // setup heartbeat led animation
-    mHeartbeatLed.animationClear();
-    mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 0.0f,  1.0f);
-    mHeartbeatLed.animationAddDelay(200_ms);
-    mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 1.0f,  0.0f);
-
-    // init complete
-    mInitialized = true;
 }
 
-void MainControl::start(){
-
+void GarboxController::onStart(){
     // start fan start time
     mFanStateTimer.start(0);
 
     // start parts
     mFan.start();
     mHeatpad.start();
-
-    // start heartbeat led animation
-    mHeartbeatLed.animationStart();
-    
-    // start heartbeat timer
-    mHeartbeatTimer.start(HeartbeatInterval);
-
 }
 
-void MainControl::tick(){
-
-    if(mHeartbeatTimer.isExpired()){
-        mHeartbeatLed.animationStart();
-        mHeartbeatTimer.restart();
-    }
-    
+void GarboxController::onTick(){
+        
     // button tick
     mButton.tick();
 
@@ -228,24 +152,11 @@ void MainControl::tick(){
     HslColor hslColor = colorMap.interpolateHsl(tColorMap);
     hslColor.l = brightness;
     mRgbLed.setColor(hslColor.toLinearRgb());
+
 }
 
-void MainControl::onAssertDebug(const char* context, const char* message){
-    if(!mInitialized){
-        return;
-    }
-}
-
-void MainControl::onAssertExit(const char* context, const char* message){
-    if(!mInitialized){
-        return;
-    }
-    // TODO disable heatpad
-    // TODO disable fan
-}
-
-void MainControl::handleButtonStateChanged(ButtonState oldState, ButtonState newState){
-    LogDebug("MainControl", "button state changed: %s => %s", ButtonStateToString(oldState), ButtonStateToString(newState));
+void GarboxController::handleButtonStateChanged(ButtonState oldState, ButtonState newState){
+    LogDebug("GarboxController", "button state changed: %s => %s", ButtonStateToString(oldState), ButtonStateToString(newState));
     const uint32_t deadTime = 0;
     static uint32_t periodMicros = 5000_ms;
     static float duty = 0.5f;
@@ -260,7 +171,7 @@ void MainControl::handleButtonStateChanged(ButtonState oldState, ButtonState new
             // update heatpad duty on long press
             duty = MathUtils::Wrap(duty + 0.25f, 0.25f, 1.0f);
             mHeatpad.setDutyCycle(duty);
-            LogDebug("MainControl", "Heatpad set to: pwm=%2.0f%%, period=%u" PRIu32 "ms", 
+            LogDebug("GarboxController", "Heatpad set to: pwm=%2.0f%%, period=%u" PRIu32 "ms", 
                 mHeatpad.getNextDutyCycle()*100.0f, 
                 mHeatpad.getNextPeriodDurationMicros()/1000
             );
@@ -272,7 +183,7 @@ void MainControl::handleButtonStateChanged(ButtonState oldState, ButtonState new
             if(oldState == ButtonState::Pressed){
                 periodMicros = MathUtils::Wrap(periodMicros + 1000_ms, 1000_ms, 8000_ms);
                 mHeatpad.setPeriodDurationMicros(periodMicros);
-                LogDebug("MainControl", "Heatpad set to: pwm=%2.0f%%, period=%" PRIu32 "ms", 
+                LogDebug("GarboxController", "Heatpad set to: pwm=%2.0f%%, period=%" PRIu32 "ms", 
                     mHeatpad.getNextDutyCycle()*100.0f, 
                     mHeatpad.getNextPeriodDurationMicros()/1000
                 );
@@ -285,25 +196,25 @@ void MainControl::handleButtonStateChanged(ButtonState oldState, ButtonState new
     }
 }
 
-void MainControl::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
+void GarboxController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
     const uint32_t frequency = 300 + counter * 100;
     const uint32_t deadTime = 0;
     if(frequency > 3000){
-        TriggerExit("MainControl", "Testing");
+        TriggerExit("GarboxController", "Testing");
     }
     else if(!mPiezoPlayer.isPlaying()){
         mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
     }
 }
 
-void MainControl::handleFanStateChanged(Fan::State oldState, Fan::State newState){
-    LogDebug("MainControl", "fan state changed: %s => %s", 
+void GarboxController::handleFanStateChanged(Fan::State oldState, Fan::State newState){
+    LogDebug("GarboxController", "fan state changed: %s => %s", 
         Fan::StateToString(oldState), 
         Fan::StateToString(newState)
     );
 }
 
-void MainControl::handleFanStalledAlert(uint32_t counter){
+void GarboxController::handleFanStalledAlert(uint32_t counter){
     mPiezoPlayer.playSequence(PiezoSequences::GetFanStalled());
 }
 

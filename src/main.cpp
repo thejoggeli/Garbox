@@ -1,6 +1,6 @@
 
 #include "app/MainControl.h"
-#include "app/StatusLeds.h"
+#include "app/parts/StatusLeds.h"
 #include "app/SystemTasks.h"
 #include "assert/AssertHandler.h"
 #include "core/diagnostics/Profiler.h"

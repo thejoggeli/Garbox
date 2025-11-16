@@ -87,7 +87,7 @@ private:
     uint32_t mTaskFrequencyHz = 0;
 
     // playback
-    void tick();
+    void playbackTick();
     void playNextInQueue();
     static uint16_t interpolateFrequency(Tone const& tone, uint32_t elapsedMicros);
 

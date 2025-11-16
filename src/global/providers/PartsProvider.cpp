@@ -1,6 +1,6 @@
 #include "PartsProvider.h"
 
-#include "app/StatusLeds.h"
+#include "app/parts/StatusLeds.h"
 #include "assert/Assert.h"
 #include "global/hardware/adc/AdcInstances.h"
 #include "global/hardware/gpio/GpioInstances.h"
@@ -21,25 +21,54 @@ namespace Garbox {
 void PartsProvider::Init(){
 
     // init fan
-    GetFan().init();
+    Fan& fan = GetFan();
+    fan.init();
 
     // init headpad
-    GetHeatpad().init();
+    Heatpad& heatpad = GetHeatpad();
+    heatpad.init();
+    heatpad.setDutyCycle(0.5f);
+    heatpad.setPeriodDurationMicros(5000_ms);
 
     // init display
-    GetDisplay().init();
+    Display& display = GetDisplay();
+    display.init();
 
     // init piezo player
-    GetPiezoPlayer().init();
+    PiezoPlayer& piezoPlayer = GetPiezoPlayer();
+    piezoPlayer.init();
 
     // init encoder button
-    GetEncoderButton().init();
+    ButtonIfc& button = GetEncoderButton();
+    button.init();
+    button.setPressedToReleasedDelayMicros(1_ms);
+    button.setReleasedToPressedDelayMicros(1_ms);
+    button.setPressedHoldTimeMicros(10_ms);
+    button.setReleasedHoldTimeMicros(40_ms);
+    button.setLongPressMicros(600_ms),
+    button.setInitialHoldDelayMicros(1200_ms);
+    button.setRepeatHoldDelayMicros(300_ms);
 
     // init status leds
-    GetStatusLeds().init();
+    StatusLeds& statusLeds = GetStatusLeds();
+    statusLeds.init();
 
     // init rgb led
-    GetRgbLed().init();
+    RgbLed& rgbLed = GetRgbLed();
+    rgbLed.init();
+}
+
+void PartsProvider::Tick(){
+
+    // tick fan
+    GetFan().tick();
+
+    // tick headpad
+    GetHeatpad().tick();
+
+    // tick encoder button
+    GetEncoderButton().tick();
+    
 }
 
 Fan& PartsProvider::GetFan(){
@@ -84,6 +113,10 @@ ButtonIfc& PartsProvider::GetEncoderButton(){
         GpioInstances::GetEncoderButton()
     );
     return instance;
+}
+
+AnimatedLed& PartsProvider::GetStatusLed(StatusLedId id){
+    return GetStatusLeds().getLed(id);
 }
 
 StatusLeds& PartsProvider::GetStatusLeds(){
