@@ -62,7 +62,8 @@
         "condition_variable": "cpp",
         "list": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "iostream": "cpp"
     },
     "idf.pythonInstallPath": "/usr/bin/python3"
 }
