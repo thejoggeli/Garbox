@@ -9,7 +9,6 @@ namespace Garbox {
 struct Event {
     EventType type = EventType::Null;
     ControllerId sender = ControllerId::Null;
-    uint8_t meta = 0;
     void* data = nullptr;
 };
 

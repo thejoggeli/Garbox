@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Garbox {
 
 enum class StatusLedId : uint8_t {

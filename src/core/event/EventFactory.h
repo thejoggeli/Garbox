@@ -22,12 +22,11 @@ public:
     }
 
     template<typename EventData>
-    EventWrapper<EventData> make(uint8_t sender = 0, uint8_t meta = 0){
+    EventWrapper<EventData> make(){
         // allocate the event header
         Event* header = mPool.allocate<Event>();
         header->type = EventData::Type;
-        header->sender = sender;
-        header->meta = meta;
+        header->sender = ControllerId::Null;
 
         // allocate data only if EventData is non-empty
         EventData* data = nullptr;

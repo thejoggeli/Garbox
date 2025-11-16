@@ -1,5 +1,5 @@
 
-#include "app/MainControl.h"
+#include "app/AppCore.h"
 #include "app/parts/StatusLeds.h"
 #include "app/SystemTasks.h"
 #include "assert/AssertHandler.h"
@@ -19,7 +19,7 @@
 
 using namespace Garbox;
 
-static MainControl gMainControl;
+static AppCore gAppCore;
 static TaskHandle_t gMainTaskHandle = nullptr;
 
 void mainTask(void* parameter);
@@ -36,9 +36,6 @@ void handleAssertDebug(const char* context, const char* message, int32_t arg){
         AnimatedLed& errorLed = statusLeds.getLed(StatusLedId::Error);
         errorLed.setBrightness(1.0f);
     }
-
-    // trigger main controll assert debug handler
-    gMainControl.onAssertDebug(context, message);
 }
 
 void handleAssertExit(const char* context, const char* message, int32_t arg){
@@ -77,9 +74,6 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
 
     // turn leds on again
     statusLeds.setAllLeds(1.0f);
-
-    // trigger main control assert exit handler
-    gMainControl.onAssertExit(context, message);
 
     // enter endless loop and periodically print error to log
     while(true){
@@ -120,10 +114,10 @@ void setup(){
     SystemTasks::StartAll();
 
     // init main app
-    gMainControl.init();
+    gAppCore.init();
 
     // start main app
-    gMainControl.start();
+    gAppCore.start();
 
     // start profiler
     Profiler::Start();
@@ -155,7 +149,7 @@ void mainTask(void* parameter){
         // main tick
         Profiler::Begin(ProfilerConfig::MainTick);
         Time::Tick();
-        gMainControl.tick();
+        gAppCore.tick();
         Profiler::End(ProfilerConfig::MainTick);
 
         // logging

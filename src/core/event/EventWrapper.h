@@ -9,6 +9,11 @@ template<typename EventType>
 struct EventWrapper {
     Event* header;
     EventType* data;
+
+    EventWrapper(Event* headerPtr, EventType* dataPtr){
+        header = headerPtr;
+        data = dataPtr;
+    }
 };
 
 } // namespace

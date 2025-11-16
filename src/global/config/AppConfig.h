@@ -9,7 +9,7 @@ public:
 
     // Global
     static constexpr uint32_t NumCpuCores = 2;
-    static constexpr uint32_t HeartbeatInterval = 2000_ms;
+    static constexpr uint32_t HeartbeatIntervalMicros = 2'000'000;
 
     // Main Task
     static constexpr const char* MainTaskName = "MainTask";
