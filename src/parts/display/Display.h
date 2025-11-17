@@ -4,11 +4,10 @@
 #include <freertos/semphr.h>
 #include <lvgl.h>
 
+#include "core/hardware/bus/SpiDmaChunkSender.h"
 #include "core/rtos/Task.h"
 #include "core/time/SoftwareTimer.h"
 #include "parts/display/St7789v.h"
-#include "util/container/RingBuffer.h"
-#include "util/threading/LockGuard.h"
 
 namespace Garbox {
 
@@ -23,6 +22,7 @@ public:
         SpiDma& spi;
         Gpio& gpioRst;
         Gpio& gpioDc;
+        Gpio& gpioCs;
         LedcChannel& pwmBlk;
         uint32_t width;
         uint32_t height;
@@ -31,21 +31,19 @@ public:
         uint32_t bufferSizeBytes;
         uint32_t bufferWidth;
         uint32_t bufferHeight;
+        uint32_t chunkSizeBytes = 1024*4;
     };
 
     Display(const Config& config);
 
     void init();
 
-    void startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
-    void stopTask();
-    void notifyTask();
-    TaskHandle_t getTaskHandle() const;
+    void startRenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
+    void startSenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
+    void stopTasks();
 
-    void takeLock();
-    void giveLock();
-
-    bool isReady() const;
+    bool tryTakeRenderReady();
+    void giveRenderTrigger();
 
     // Disallow copy and move 
     Display(const Display&) = delete;
@@ -55,7 +53,7 @@ public:
 
 private:
 
-    struct FlushQueueEntry {
+    struct SendQueueEntry {
         uint8_t* data = nullptr;
         size_t sizeBytes = 0;  
         uint16_t x1 = 0;
@@ -66,13 +64,14 @@ private:
 
     SpiDma& mSpi;
     St7789v mSt7789v;    
+    SpiDmaChunkSender mChunkSender;
+
     SoftwareTimer mTestTimer;
-    RingBuffer<FlushQueueEntry, 3> mFlushQueue;
+    QueueHandle_t mSendQueue;
 
     // state
     bool mInitialized = false;
     bool mSendInProgress = false;
-    bool mReady = false;
     uint32_t mRenderSkipCount = 0;
 
     // lvgl display configuration
@@ -95,33 +94,41 @@ private:
     // lvgl objects
     lv_display_t* mLvDisplay = nullptr;
     lv_obj_t* mLabel;
+    lv_obj_t* mBackground;
+    lv_obj_t* mBox1;
+    lv_obj_t* mBox2;
+    lv_obj_t* mBox3;
+    lv_obj_t* mBox4;
 
     // task
-    Task mTask;
+    Task mRenderTask;
+    Task mSenderTask;
 
     // semaphore counts how many draw buffers are free (3 for triple buffering)
-    SemaphoreHandle_t mBufferSem;
+    SemaphoreHandle_t mBufferCounter;
     
-    // binary semaphore (mutex-style) to serialize lv_timer_handler() calls
-    SemaphoreHandle_t mRenderSem;
+    // display render barrier
+    SemaphoreHandle_t mRenderTrigger;
     
-    // dislay state access
-    SemaphoreHandle_t mDisplaySem;
+    // display render barrier
+    SemaphoreHandle_t mRenderReady;
+    
+    // dma semaphore
+    SemaphoreHandle_t mDmaBarrier;
 
     // callback handlers
-    void handleTask();
+    void handleRenderTask();
+    void handleSenderTask();
     void handleFlush(const lv_area_t* area, uint8_t* px_map);
     void handleFlushWait();
-    void handleDmaComplete(bool success);
-
-    // flush queue
-    void sendNextInQueue();
+    void handleChunkComplete(bool success);
 
     // callback trampolines
-    static void taskTrampoline(void* user);
+    static void renderTaskTrampoline(void* user);
+    static void senderTaskTrampoline(void* user);
     static void flushTrampoline(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map);
     static void flushWaitTrampoline(lv_display_t* disp);
-    static void dmaCompleteTrampoline(void* user, bool success);
+    static void chunkCompleteTrampoline(void* user, bool success);
 
     // st7789v handlers
     void handleSt7789vSendSync(const uint8_t* data, size_t numBytes);

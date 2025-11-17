@@ -155,15 +155,8 @@ void GarboxController::onTick(){
 
 void GarboxController::onDisplayTick(){
     // check if display is ready to render the next frame
-    if(mDisplay.isReady()){
-
-        // lock display state
-        mDisplay.takeLock();
-        // TODO update widgets here
-        mDisplay.giveLock();
-
-        // notify display to start rendering the next frame
-        mDisplay.notifyTask();
+    if(mDisplay.tryTakeRenderReady()){
+        mDisplay.giveRenderTrigger();
     }
 }
 

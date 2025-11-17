@@ -19,7 +19,7 @@ public:
 
     // Main Task
     static constexpr const char* MainTaskName = "MainTask";
-    static constexpr uint32_t MainTaskPriority = 5;
+    static constexpr uint32_t MainTaskPriority = 3;
     static constexpr uint32_t MainTaskStackSize = 1024*8;
     static constexpr uint32_t MainTaskCore = 1;
 
@@ -37,25 +37,32 @@ public:
     static constexpr uint32_t StatusLedsTaskStackSize = 1024*4;
     static constexpr uint32_t StatusLedsTaskCore = 1;
 
-    // Display Task
-    static constexpr const char* DisplayTaskName = "DisplayTask";
-    static constexpr uint32_t DisplayTaskPriority = 10;
-    static constexpr uint32_t DisplayTaskStackSize = 1024*4;
-    static constexpr uint32_t DisplayTaskCore = 1;
+    // Display Render Task
+    static constexpr const char* DisplayRenderTaskName = "DisplayRenderTask";
+    static constexpr uint32_t DisplayRenderTaskPriority = 10;
+    static constexpr uint32_t DisplayRenderTaskStackSize = 1024*4;
+    static constexpr uint32_t DisplayRenderTaskCore = 1;
+
+    // Display Sender Task
+    static constexpr const char* DisplaySenderTaskName = "DisplaySenderTask";
+    static constexpr uint32_t DisplaySenderTaskPriority = 12;
+    static constexpr uint32_t DisplaySenderTaskStackSize = 1024*4;
+    static constexpr uint32_t DisplaySenderTaskCore = 1;
 
     // SPI DMA Task
     static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
-    static constexpr uint32_t SpiDmaTaskPriority = 10;
+    static constexpr uint32_t SpiDmaTaskPriority = 11;
     static constexpr uint32_t SpiDmaTaskStackSize = 1024*4;
     static constexpr uint32_t SpiDmaTaskCore = 1;
 
     // Display
     static constexpr uint32_t DisplayWidth = 320;
     static constexpr uint32_t DisplayHeight = 240;
-    static constexpr uint32_t DisplayPartialFactor = 8;
+    static constexpr uint32_t DisplayPartialFactor = 4;
     static constexpr uint32_t DisplayBytesPerPixel = 2;
     static constexpr uint32_t DisplayBytesPerFrame = DisplayWidth * DisplayHeight * DisplayBytesPerPixel;
     static constexpr uint32_t DisplayBytesPerFlush = DisplayBytesPerFrame / DisplayPartialFactor;
+    static constexpr uint32_t DisplayChunkSizeBytes = 1024*2;
 
     // SPI DMA
     // Max SPI DMA size is limited to 32KB on ESP32-S3

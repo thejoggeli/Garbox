@@ -12,10 +12,11 @@ namespace Garbox {
 using Command = St7789vHelper::Command;
 using ColorMode = St7789vHelper::ColorMode;
 
-St7789v::St7789v(Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk):
+St7789v::St7789v(Gpio& gpioRst, Gpio& gpioDc, Gpio& gpioCs, LedcChannel& pwmBlk):
     // init members
     mGpioRst(gpioRst),
     mGpioDc(gpioDc),
+    mGpioCs(gpioCs),
     mPwmBlk(pwmBlk){
     // constructor body
 }
@@ -63,25 +64,35 @@ void St7789v::sendInit(){
 
     // sleep out
     cmd = Command::SLPOUT;
+    mGpioCs.writeLevel(false);
     sendCommand(cmd);
+    mGpioCs.writeLevel(true);
 
     // color mode: 16-bit
     cmd = Command::COLMOD;
     data = St7789vHelper::makeCololorModeValue(ColorMode::RGB565);
+    mGpioCs.writeLevel(false);
     sendCommand(cmd, data);
+    mGpioCs.writeLevel(true);
 
     // memory access control (rotation, RGB order)
     cmd = Command::MADCTL; 
     data = St7789vHelper::makeLandscapeRGB(false, true);
+    mGpioCs.writeLevel(false);
     sendCommand(cmd, data);
+    mGpioCs.writeLevel(true);
 
     // inversion on
     cmd = Command::INVON;
+    mGpioCs.writeLevel(false);
     sendCommand(cmd);
+    mGpioCs.writeLevel(true);
 
     // display on
     cmd = Command::DISPON;
+    mGpioCs.writeLevel(false);
     sendCommand(cmd);
+    mGpioCs.writeLevel(true);
 }
 
 void St7789v::sendFillColor(uint16_t color){
@@ -89,13 +100,21 @@ void St7789v::sendFillColor(uint16_t color){
 }
 
 void St7789v::sendDrawBufferXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, uint8_t* buffer, size_t sizeBytes, bool async){
+    mGpioCs.writeLevel(false);
     sendXXYY(x1, x2, y1, y2);
     sendDrawBufferInner(buffer, sizeBytes, async);
+    if(!async){
+        mGpioCs.writeLevel(true);
+    }
 }
 
 void St7789v::sendDrawBufferXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t* buffer, size_t sizeBytes, bool async){
+    mGpioCs.writeLevel(false);
     sendXYWH(x, y, w, h);
     sendDrawBufferInner(buffer, sizeBytes, async);
+    if(!async){
+        mGpioCs.writeLevel(true);
+    }
 }
 
 void St7789v::sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async){
@@ -104,6 +123,7 @@ void St7789v::sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async)
 }
 
 void St7789v::sendFillRectSync(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
+    mGpioCs.writeLevel(false);
     sendXYWH(x, y, w, h);
     sendCommand(Command::RAMWR); // sync
 
@@ -122,6 +142,7 @@ void St7789v::sendFillRectSync(uint16_t x, uint16_t y, uint16_t w, uint16_t h, u
         sendData((uint8_t*)block, currentBytes, false); // sync
         remainingPixels -= currentPixels;
     }
+    mGpioCs.writeLevel(true);
 }
 
 void St7789v::sendXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h){
@@ -197,6 +218,10 @@ void St7789v::sendData(const uint8_t* buffer, size_t sizeBytes, bool async){
     else {
         mSendSyncHandler(buffer, sizeBytes);
     }
+}
+
+void St7789v::onSendAsyncComplete(){
+    mGpioCs.writeLevel(true);
 }
 
 uint16_t St7789v::getWidth() const {

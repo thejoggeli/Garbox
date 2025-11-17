@@ -102,6 +102,7 @@ Display& PartsProvider::GetDisplay(){
         .spi = SpiInstances::GetSpiDma(),
         .gpioRst = GpioInstances::GetDisplayRst(),
         .gpioDc = GpioInstances::GetDisplayDc(),
+        .gpioCs = GpioInstances::GetDisplayCs(),
         .pwmBlk = LedcInstances::GetDisplayBacklightChannel(),
         .width = AppConfig::DisplayWidth,
         .height = AppConfig::DisplayHeight,
@@ -110,6 +111,7 @@ Display& PartsProvider::GetDisplay(){
         .bufferSizeBytes = AppConfig::DisplayBytesPerFlush,
         .bufferWidth = AppConfig::DisplayWidth,
         .bufferHeight = AppConfig::DisplayHeight / AppConfig::DisplayPartialFactor,
+        .chunkSizeBytes = AppConfig::DisplayChunkSizeBytes,
     });
     return instance;
 }

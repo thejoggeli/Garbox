@@ -31,13 +31,21 @@ void SystemTasks::StartAll(){
         AppConfig::PiezoPlayerTaskCore
     );
 
-    // start render task (won't do anything until render trigger notify)
+    // start display render task (won't do anything until render trigger notify)
     Display& display = PartsProvider::GetDisplay();
-    display.startTask(
-        AppConfig::DisplayTaskName,
-        AppConfig::DisplayTaskStackSize,
-        AppConfig::DisplayTaskPriority,
-        AppConfig::DisplayTaskCore
+    display.startRenderTask(
+        AppConfig::DisplayRenderTaskName,
+        AppConfig::DisplayRenderTaskStackSize,
+        AppConfig::DisplayRenderTaskPriority,
+        AppConfig::DisplayRenderTaskCore
+    );
+
+    // start display sender task
+    display.startSenderTask(
+        AppConfig::DisplaySenderTaskName,
+        AppConfig::DisplaySenderTaskStackSize,
+        AppConfig::DisplaySenderTaskPriority,
+        AppConfig::DisplaySenderTaskCore
     );
 
     // start spi dma task
@@ -60,9 +68,9 @@ void SystemTasks::StopAll(){
     PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
     piezoPlayer.stopTask();
 
-    // stop display task
+    // stop display tasks
     Display& display = PartsProvider::GetDisplay();
-    display.stopTask();
+    display.stopTasks();
 
     // stop spi dma task
     SpiDma& spiDma = SpiInstances::GetSpiDma();

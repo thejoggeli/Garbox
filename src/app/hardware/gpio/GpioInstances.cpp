@@ -46,7 +46,7 @@ void GpioInstances::Init(){
 
     // display
     InitGpio(GetDisplayDc(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
-    InitGpio(GetDisplayCs(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    InitGpio(GetDisplayCs(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialHigh);
     InitGpio(GetDisplayRst(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
 
     // heatpad

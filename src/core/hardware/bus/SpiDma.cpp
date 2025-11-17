@@ -182,7 +182,7 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, Comp
 
     esp_err_t res = spi_device_queue_trans(mDevice, &transaction, portMAX_DELAY);
     if (res != ESP_OK){
-        TriggerDebug("SpiDma", "failed to queue transaction", static_cast<int32_t>(res) );
+        TriggerDebug("SpiDma", "failed to queue transaction", static_cast<int32_t>(res));
         freeSlot(slot);
         return false;
     }

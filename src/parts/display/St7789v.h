@@ -14,7 +14,7 @@ public:
     using SendSyncHandler = std::function<void(const uint8_t* data, size_t numBytes)>;
     using SendAsyncHandler = std::function<void(const uint8_t* data, size_t numBytes)>;
 
-    St7789v(Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk);
+    St7789v(Gpio& gpioRst, Gpio& gpioDc, Gpio& gpioCs, LedcChannel& pwmBlk);
     ~St7789v();
 
     void init(uint16_t width, uint16_t height);
@@ -35,6 +35,8 @@ public:
     void sendDrawBufferXYWH(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t* buffer, size_t sizeBytes, bool async = false);
     void sendDrawBufferXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, uint8_t* buffer, size_t sizeBytes, bool async = false);
 
+    void onSendAsyncComplete();
+
     // Disallow copy and move 
     St7789v(const St7789v&) = delete;
     St7789v& operator=(const St7789v&) = delete;
@@ -47,6 +49,7 @@ private:
 
     Gpio& mGpioRst;
     Gpio& mGpioDc;
+    Gpio& mGpioCs;
     LedcChannel& mPwmBlk;
 
     uint16_t mWidth = 0;
@@ -67,7 +70,6 @@ private:
     void sendXXYY(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2);
 
     void sendDrawBufferInner(uint8_t* buffer, size_t sizeBytes, bool async);
-
     void sendData(const uint8_t* buffer, size_t sizeBytes, bool async);
 };
 

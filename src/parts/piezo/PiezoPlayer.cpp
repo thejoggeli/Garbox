@@ -88,10 +88,6 @@ void PiezoPlayer::handleTask(){
         // Update ongoing playback
         playbackTick();
 
-        if(Time::GetMicros() > 10'000'000){
-            TriggerExit("Fail", "Fail");
-        }
-
         // Periodic timing while playing
         vTaskDelayUntil(&lastWake, periodTicks);
     }

@@ -10,15 +10,18 @@
 #include "core/time/Time.h"
 #include "util/ByteUtils.h"
 #include "util/color/types/Rgb565.h"
+#include "util/color/types/Rgb888.h"
+#include "util/color/types/HslColor.h"
 
 namespace Garbox {
 
-#define GarboxDebugDisplay 1
+#define GarboxDebugDisplay 0
 
 Display::Display(const Config& config): 
     // init members 
     mSpi(config.spi),
-    mSt7789v(config.gpioRst, config.gpioDc, config.pwmBlk),
+    mSt7789v(config.gpioRst, config.gpioDc, config.gpioCs, config.pwmBlk),
+    mChunkSender(mSpi, config.chunkSizeBytes),
     mWidth(config.width),
     mHeight(config.height),
     mBytesPerPixel(config.bytesPerPixel),
@@ -82,114 +85,167 @@ void Display::init(){
     lv_display_set_flush_cb(mLvDisplay, flushTrampoline);
     lv_display_set_flush_wait_cb(mLvDisplay, flushWaitTrampoline);
 
+    // create background
+    mBackground = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBackground, mWidth, mHeight);
+    lv_obj_set_style_bg_color(mBackground, lv_color_hex(0x0), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBackground, LV_OPA_COVER, LV_PART_MAIN);
+
+    // create background
+    mBox1 = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBox1, 48, 48);
+    lv_obj_set_style_bg_color(mBox1, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBox1, LV_OPA_COVER, LV_PART_MAIN);
+
+    // create background
+    mBox2 = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBox2, 48, 48);
+    lv_obj_set_style_bg_color(mBox2, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBox2, LV_OPA_COVER, LV_PART_MAIN);
+
+    // create background
+    mBox3 = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBox3, 48, 48);
+    lv_obj_set_style_bg_color(mBox3, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBox3, LV_OPA_COVER, LV_PART_MAIN);
+
+    // create background
+    mBox4 = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBox4, 48, 48);
+    lv_obj_set_style_bg_color(mBox4, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBox4, LV_OPA_COVER, LV_PART_MAIN);
+
     // create label
     mLabel = lv_label_create(lv_screen_active());
     lv_label_set_text(mLabel, "Garbox Display");
+    lv_obj_set_style_text_color(mLabel, lv_color_hex(0xFF7F00), LV_PART_MAIN);
     lv_obj_set_style_text_font(mLabel, &lv_font_unscii_16, LV_PART_MAIN);
-    lv_obj_set_align(mLabel, lv_align_t::LV_ALIGN_TOP_MID);
-
-    // send initial commands to display
-    const Rgb565 clearColor = Rgb565::FromRgbFloat(0, 0, 0);
-    mSt7789v.sendFillColor(clearColor.value);
+    lv_obj_set_align(mLabel, lv_align_t::LV_ALIGN_CENTER);
 
     // create semaphores
-    mBufferSem = xSemaphoreCreateCounting(3, 3); // 3 free buffers at startup
-    mRenderSem = xSemaphoreCreateBinary();
-    mDisplaySem = xSemaphoreCreateRecursiveMutex();
+    mBufferCounter = xSemaphoreCreateCounting(3, 3); // 3 free buffers at startup
+    mRenderTrigger = xSemaphoreCreateBinary();
+    mRenderReady = xSemaphoreCreateBinary();
+    mDmaBarrier = xSemaphoreCreateBinary();
+    xSemaphoreGive(mRenderReady);
 
-    AssertExit(mBufferSem != nullptr, "Display", "failed to create buffer sem");
-    AssertExit(mRenderSem != nullptr, "Display", "failed to create render sem");
-    AssertExit(mDisplaySem != nullptr, "Display", "failed to create display mutex");
+    AssertExit(mBufferCounter != nullptr, "Display", "failed to create buffer sem");
+    AssertExit(mRenderTrigger != nullptr, "Display", "failed to create display mutex");
+    AssertExit(mDmaBarrier != nullptr, "Display", "failed to create dma sem");
 
-    // initially free
-    xSemaphoreGive(mRenderSem);
+    // create queue
+    mSendQueue = xQueueCreate(3, sizeof(SendQueueEntry));
+    AssertDebug(mSendQueue != nullptr, "Display", "create queue failed");
 
     // initialization complete
     mSt7789v.setBrightness(0.75f);
     mTestTimer.start(2000_ms);
-    mReady = true;
     mInitialized = true;
 }
 
-void Display::startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
-    LockGuard lock(mDisplaySem);
-    
+void Display::startRenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){   
     // check state
     AssertExit(mInitialized, "Display", "not initialized");
 
     // start task
-    mTask.configure(name, stackSize, priority, core);
-    mTask.start(taskTrampoline, this);
+    mRenderTask.configure(name, stackSize, priority, core);
+    mRenderTask.start(renderTaskTrampoline, this);
 }
 
-void Display::stopTask(){
-    LockGuard lock(mDisplaySem);
-    mTask.stop();
+void Display::startSenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
+    // check state
+    AssertExit(mInitialized, "Display", "not initialized");
+
+    // start task
+    mSenderTask.configure(name, stackSize, priority, core);
+    mSenderTask.start(senderTaskTrampoline, this);
+}
+
+void Display::stopTasks(){
+    mRenderTask.stop();
+    mSenderTask.stop();
     // TODO stop all spi activity
     // TODO leave display in a defined state after stopping
 }
 
-bool Display::isReady() const {
-    return mReady;
+bool Display::tryTakeRenderReady(){
+    if(xSemaphoreTake(mRenderReady, 0) == pdTRUE){
+        return true;
+    }
+    return false;
 }
 
-void Display::takeLock(){
-    xSemaphoreTake(mDisplaySem, portMAX_DELAY);
+void Display::giveRenderTrigger(){
+    xSemaphoreGive(mRenderTrigger);
 }
 
-void Display::giveLock(){
-    xSemaphoreGive(mDisplaySem);
-}
-
-void Display::notifyTask(){
-    xTaskNotifyGive(mTask.getHandle());
-}
-
-void Display::handleTask(){
+void Display::handleRenderTask(){
     while(true){
         // wait for render trigger
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); 
-        mReady = false;
+        xSemaphoreTake(mRenderTrigger, portMAX_DELAY);
+
+        // advance t
+        static float t = 0.0f;
+        t = std::fmod(t + 0.001f, 1.0f);
+        lv_label_set_text_fmt(mLabel, "0.%03u", static_cast<uint32_t>(t*1000.0f));
+
+        static float x = 320.0f/2 + 48.0f/2;
+        static float y = 240.0f/2 + 48.0f/2;
+        static float xdir = 0.8f;
+        static float ydir = 0.8f;
+        x += xdir;
+        y += ydir;
+        static float maxx = 320.0f-48.0f;
+        static float maxy = 240.0f-48.0f;
+        if(x > maxx){
+            xdir = -xdir;
+            x = maxx;
+        }
+        else if (x < 0.0f){
+            xdir = -xdir;
+            x = 0.0f;
+        }
+        if(y > maxy){
+            ydir = -ydir;
+            y = maxy;
+        }
+        else if(y < 0.0f){
+            ydir = -ydir;
+            y = 0.0f;
+        }
+        
+        lv_obj_set_pos(mBox1, x, y);
+        lv_obj_set_pos(mBox2, maxx-x, y);
+        lv_obj_set_pos(mBox3, x, maxy-y);
+        lv_obj_set_pos(mBox4, maxx-x, maxy-y);
 
         // render frame
         Profiler::Begin(ProfilerId::DisplayTick);
-        xSemaphoreTake(mRenderSem, portMAX_DELAY);
         lv_timer_handler();
-        xSemaphoreGive(mRenderSem); // at this point, at least one buffer is free again (guaranteed by flush_wait_cb)
         Profiler::End(ProfilerId::DisplayTick);
 
-        // ready to render the next frame
-        mReady = true;
+        xSemaphoreGive(mRenderReady);
     }
-}
-
-TaskHandle_t Display::getTaskHandle() const {
-    return mTask.getHandle();
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
 
     // first ensure buffer availability
-    xSemaphoreTake(mBufferSem, portMAX_DELAY);
-
-    // now access display state
-    // this method is called from DisplayTask
-    // state is modified through mFlushQueue
-    LockGuard lock(mDisplaySem); // prevent concurrent access to display
+    xSemaphoreTake(mBufferCounter, portMAX_DELAY);
 
     // debug logging
 #if GarboxDebugDisplay
     if(pixelMap == mDrawBufferData1){
-        LogDebug("Display", "buffer-1");
+        LogDebug("Display", "handle flush buffer-1");
     }
     else if(pixelMap == mDrawBufferData2){
-        LogDebug("Display", "buffer-2");
+        LogDebug("Display", "handle flush buffer-2");
     }
     else if(pixelMap == mDrawBufferData3){
-        LogDebug("Display", "buffer-3");
+        LogDebug("Display", "handle flush buffer-3");
     }
     else {
-        LogDebug("Display", "buffer-invalid");
+        LogDebug("Display", "handle flush buffer-invalid");
     }
 #endif
     
@@ -199,79 +255,57 @@ void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
     const size_t sizeBytes = static_cast<size_t>(width * height * 2);
 
     // add to queue
-    FlushQueueEntry* entry = mFlushQueue.pushPtr();
-    if(entry == nullptr){
+    SendQueueEntry entry;
+    entry.data = pixelMap;
+    entry.sizeBytes = sizeBytes;
+    entry.x1 = area->x1;
+    entry.x2 = area->x2;
+    entry.y1 = area->y1;
+    entry.y2 = area->y2;
+
+    if(xQueueSend(mSendQueue, &entry, 0) != pdTRUE){
         TriggerExit("Display", "flush queue is full");
         return;
     }
-    entry->data = pixelMap;
-    entry->sizeBytes = sizeBytes;
-    entry->x1 = area->x1;
-    entry->x2 = area->x2;
-    entry->y1 = area->y1;
-    entry->y2 = area->y2;
-
-    // send if nothing is being send currently
-    sendNextInQueue();
 }
 
 void Display::handleFlushWait(){
-    xSemaphoreTake(mBufferSem, portMAX_DELAY); // block until at least one DMA finishes (token returned)
+    xSemaphoreTake(mBufferCounter, portMAX_DELAY); // block until at least one DMA finishes (token returned)
     // now we are sure that at least one buffer is free to be used by LVGL
-    xSemaphoreGive(mBufferSem); // give token back immediately so next flush_cb can proceed
+    xSemaphoreGive(mBufferCounter); // give token back immediately so next flush_cb can proceed
 }
 
-void Display::handleDmaComplete(bool success){
+void Display::handleSenderTask(){
+    SendQueueEntry entry;
+    while(true){
+        if(xQueueReceive(mSendQueue, &entry, portMAX_DELAY) == pdTRUE) {
+            // send data to display via spi
+            // the send command sends 3 spi sync commands, followed by 1 spi async (dma) command
+            // the ST7789 requires this, which is why we can't directly queue DMA commands and
+            // have to ping-pong between sending a flush buffer and dma completion
+            const bool async = true;
+            mSt7789v.sendDrawBufferXXYY(entry.x1, entry.x2, entry.y1, entry.y2, entry.data, entry.sizeBytes, async);
+            
+            // wait until spi dma transfer is complete (ping)
+            xSemaphoreTake(mDmaBarrier, portMAX_DELAY); 
+        }
+    }
+}
 
-    // this method is called from SpiDmaCompleteTask
-    // state is modified through lv_display_flush_ready()
-    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
-
-    // notify lvgl there is a free buffer
-    lv_display_flush_ready(mLvDisplay); // tell LVGL the buffer is free again
-
+void Display::handleChunkComplete(bool success){
+    mSt7789v.onSendAsyncComplete();
     // return one free-buffer token
-    xSemaphoreGive(mBufferSem); 
-
-    // send next
-    mSendInProgress = false;
-    sendNextInQueue();
-}
-
-void Display::sendNextInQueue(){
-
-    // this method can be called from:
-    // - DisplayTask through lv_timer_handler() => handleFlush()
-    // - SpiDmaTask  through handleDmaComplete()
-    // state is modified through 
-    // - mFlushQueue 
-    // - mSendInProgress
-    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
-
-    // check if something is already being sent
-    if(mSendInProgress){
-        return;
-    }
-
-    // get next entry in flush queue
-    FlushQueueEntry* entry = mFlushQueue.popPtr();
-
-    // send next entry
-    if(entry != nullptr){
-        const bool async = true;
-        mSendInProgress = true;
-        mSt7789v.sendDrawBufferXXYY(entry->x1, entry->x2, entry->y1, entry->y2, entry->data, entry->sizeBytes, async);
-    }
+    xSemaphoreGive(mBufferCounter);
+    // notify sender task that dma is complete and safe to start another spi call (pong)
+    xSemaphoreGive(mDmaBarrier);
 }
 
 void Display::handleSt7789vSendSync(const uint8_t* data, size_t numBytes){
-    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
     mSpi.transferSync(data, numBytes*8);
 }
 
 void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
-    LockGuard lock(mDisplaySem); // prevent concurrent access to display state
-    mSpi.transferAsync(data, numBytes*8, this, dmaCompleteTrampoline);
+    mChunkSender.start(data, numBytes, this, chunkCompleteTrampoline);
 }
 
 void Display::handleLog(lv_log_level_t level, const char* str){
@@ -297,9 +331,14 @@ void Display::handleLog(lv_log_level_t level, const char* str){
     }
 }
 
-void Display::taskTrampoline(void* user){
+void Display::renderTaskTrampoline(void* user){
     AssertExit(user != nullptr, "Display", "user is nullptr");
-    static_cast<Display*>(user)->handleTask();   
+    static_cast<Display*>(user)->handleRenderTask();   
+}
+
+void Display::senderTaskTrampoline(void* user){
+    AssertExit(user != nullptr, "Display", "user is nullptr");
+    static_cast<Display*>(user)->handleSenderTask();   
 }
 
 void Display::flushTrampoline(lv_display_t* disp, const lv_area_t* area, uint8_t* pixelMap){
@@ -318,9 +357,9 @@ void Display::flushWaitTrampoline(lv_display_t* disp){
     }
 }
 
-void Display::dmaCompleteTrampoline(void* user, bool success){
+void Display::chunkCompleteTrampoline(void* user, bool success){
     AssertExit(user != nullptr, "Display", "user is nullptr");
-    static_cast<Display*>(user)->handleDmaComplete(success);
+    static_cast<Display*>(user)->handleChunkComplete(success);
 }
 
 uint32_t Display::lvglTickProvider(){
