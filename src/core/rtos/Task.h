@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -9,9 +10,10 @@ namespace Garbox {
 class Task {
 public:
 
-    using TaskHandler = void(*)(void*);
+    using TaskHandler = std::function<void()>;
 
     Task();
+    ~Task();
 
     void configure(
         const char* name,
@@ -20,8 +22,11 @@ public:
         BaseType_t coreId
     );
 
-    void start(TaskHandler handler, void* context);
+
+    void start();
     void stop();
+
+    void setHandler(TaskHandler handler);
 
     bool isRunning() const;
     bool isConfigured() const;

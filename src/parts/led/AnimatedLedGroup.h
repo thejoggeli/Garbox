@@ -52,7 +52,6 @@ private:
     uint32_t mTaskFrequencyHz = 0;
 
     void handleTask();
-    static void taskTrampoline(void* arg);
 
 };
 

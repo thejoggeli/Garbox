@@ -27,7 +27,15 @@ SpiDmaChunkSender::SpiDmaChunkSender(SpiDma& spi, size_t maxChunkBytes):
     AssertExit(mMaxChunkBytes > 0, "SpiDmaChunkSender", "maxChunkBytes must be > 0");
 }
 
-void SpiDmaChunkSender::start(const uint8_t* data, size_t totalBytes, void* user, CompleteHandler handler){
+SpiDmaChunkSender::~SpiDmaChunkSender(){
+    TriggerExit("SpiDmaChunkSender", "std::function can use heap");
+}
+
+void SpiDmaChunkSender::setCompleteHandler(CompleteHandler handler){
+    mHandler = handler;
+}
+
+void SpiDmaChunkSender::start(const uint8_t* data, size_t totalBytes){
 
     AssertExit(!mBusy, "SpiDmaChunkSender", "start() called while busy");
     AssertExit(data != nullptr, "SpiDmaChunkSender", "data is nullptr");
@@ -36,8 +44,6 @@ void SpiDmaChunkSender::start(const uint8_t* data, size_t totalBytes, void* user
     mData       = data;
     mTotalBytes = totalBytes;
     mSentBytes  = 0;
-    mUser       = user;
-    mHandler    = handler;
     mBusy       = true;
 
     // kick off first chunk
@@ -55,7 +61,7 @@ void SpiDmaChunkSender::handleDmaComplete(bool success){
         // abort sequence and notify user
         mBusy = false;
         if(mHandler){
-            mHandler(mUser, false);
+            mHandler(false);
         }
         return;
     }
@@ -65,7 +71,7 @@ void SpiDmaChunkSender::handleDmaComplete(bool success){
         // all bytes sent
         mBusy = false;
         if(mHandler){
-            mHandler(mUser, true);
+            mHandler(true);
         }
         return;
     }
@@ -98,7 +104,7 @@ void SpiDmaChunkSender::sendNext(){
         TriggerDebug("SpiDmaChunkSender", "transferAsync() failed");
         mBusy = false;
         if(mHandler){
-            mHandler(mUser, false);
+            mHandler(false);
         }
         return;
     }

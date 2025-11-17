@@ -107,10 +107,7 @@ Display& PartsProvider::GetDisplay(){
         .width = AppConfig::DisplayWidth,
         .height = AppConfig::DisplayHeight,
         .bytesPerPixel = AppConfig::DisplayBytesPerPixel,
-        .bufferPartialFactor = AppConfig::DisplayPartialFactor,
-        .bufferSizeBytes = AppConfig::DisplayBytesPerFlush,
-        .bufferWidth = AppConfig::DisplayWidth,
-        .bufferHeight = AppConfig::DisplayHeight / AppConfig::DisplayPartialFactor,
+        .partialFactor = AppConfig::DisplayPartialFactor,
         .chunkSizeBytes = AppConfig::DisplayChunkSizeBytes,
     });
     return instance;

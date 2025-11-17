@@ -32,6 +32,11 @@ void PiezoPlayer::init(uint32_t defaultSilentTimeMicros){
     mMutex = xSemaphoreCreateRecursiveMutex();
     AssertExit(mMutex != nullptr, "PiezoPlayer", "mutex creation failed");  
 
+    // task handler
+    mTask.setHandler([this](){
+        this->handleTask();
+    });
+
     // initialization complete
     mInitialized = true;
 }
@@ -56,7 +61,7 @@ void PiezoPlayer::startTask(const char* name, uint32_t frequencyHz, uint32_t sta
     
     // start task
     mTask.configure(name, stackSize, priority, core);
-    mTask.start(taskTrampoline, this);
+    mTask.start();
 }
 
 void PiezoPlayer::stopTask(){
@@ -91,11 +96,6 @@ void PiezoPlayer::handleTask(){
         // Periodic timing while playing
         vTaskDelayUntil(&lastWake, periodTicks);
     }
-}
-
-void PiezoPlayer::taskTrampoline(void* self){
-    AssertExit(self != nullptr, "PiezoPlayer", "self is nullptr");
-    static_cast<PiezoPlayer*>(self)->handleTask();
 }
 
 TaskHandle_t PiezoPlayer::getTaskHandle() const {

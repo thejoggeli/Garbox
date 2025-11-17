@@ -92,7 +92,6 @@ private:
 
     // playback task
     void handleTask();
-    static void taskTrampoline(void* self);
 };
 
 } // namespace Garbox

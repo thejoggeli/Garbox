@@ -1,17 +1,22 @@
 #pragma once
+
 #include <cstdint>
 #include <cstddef>
+#include <functional>
 #include "core/hardware/bus/SpiDma.h"
 
 namespace Garbox {
 
 class SpiDmaChunkSender {
 public:
-    using CompleteHandler = void(*)(void* user, bool success);
+    using CompleteHandler = std::function<void(bool success)>;
 
     SpiDmaChunkSender(SpiDma& spi, size_t maxChunkBytes);
+    ~SpiDmaChunkSender();
 
-    void start(const uint8_t* data, size_t totalBytes, void* user, CompleteHandler handler);
+    void setCompleteHandler(CompleteHandler handler);
+
+    void start(const uint8_t* data, size_t totalBytes);
     void handleDmaComplete(bool success);
     bool isBusy() const;
 

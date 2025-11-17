@@ -70,6 +70,8 @@ public:
     static constexpr uint32_t SpiDmaMaxTransferSizeBytes = DisplayBytesPerFlush;
     static constexpr uint32_t SpiDmaFrequencyHz = 62'500'000;
 
+    static_assert(SpiDmaMaxTransferSizeBytes >= DisplayChunkSizeBytes, "spi dma buffer size must be >= display chunk size");
+
 };
 
 } // namespace

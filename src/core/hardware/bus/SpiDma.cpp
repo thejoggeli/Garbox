@@ -65,6 +65,11 @@ void SpiDma::init(const Config& config){
         TriggerExit("SpiDma", "spi_bus_add_device failed");
     }
 
+    // task handler
+    mTask.setHandler([this](){
+        this->handleTask();
+    });
+
     // create mutex
     mMutex = xSemaphoreCreateRecursiveMutex();
     AssertExit(mMutex != nullptr, "PiezoPlayer", "mutex creation failed");  
@@ -203,7 +208,7 @@ void SpiDma::startTask(const char* name, uint32_t stackSize, UBaseType_t priorit
 
     // start task
     mTask.configure(name, stackSize, priority, core);
-    mTask.start(taskTrampoline, this);
+    mTask.start();
 }
 
 void SpiDma::stopTask(){
@@ -236,11 +241,6 @@ void SpiDma::handleTask(){
             vTaskDelay(pdMS_TO_TICKS(100));
         }
     }
-}
-
-void SpiDma::taskTrampoline(void* arg){
-    AssertExit(arg != nullptr, "SpiDma", "arg is nullptr");
-    static_cast<SpiDma*>(arg)->handleTask();
 }
 
 TaskHandle_t SpiDma::getTaskHandle() const {

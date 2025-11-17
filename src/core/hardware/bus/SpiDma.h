@@ -78,7 +78,6 @@ private:
     TxSlot* allocFreeSlot();
     void freeSlot(TxSlot* slot);
 
-    static void taskTrampoline(void* arg);
     void handleTask();
     void handleCompletedTransaction(spi_transaction_t* transaction, bool success);
     void invokeCallback(TxSlot* slot, void* user, bool success);

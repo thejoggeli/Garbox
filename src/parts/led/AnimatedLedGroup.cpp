@@ -25,6 +25,11 @@ void AnimatedLedGroup::init(){
         led.init();
     }
 
+    // task handler
+    mTask.setHandler([this](){
+        this->handleTask();
+    });
+
     mInitialized = true;
 }
 
@@ -40,7 +45,7 @@ void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uin
 
     // start task
     mTask.configure(taskName, stackSize, priority, coreId);
-    mTask.start(taskTrampoline, this);
+    mTask.start();
 }
 
 void AnimatedLedGroup::stopTask(){
@@ -64,11 +69,6 @@ void AnimatedLedGroup::handleTask(){
         tick();
         vTaskDelayUntil(&lastWake, periodTicks);
     }
-}
-
-void AnimatedLedGroup::taskTrampoline(void* self){
-    AssertExit(self != nullptr, "AnimatedLedGroup", "self is nullptr");
-    static_cast<AnimatedLedGroup*>(self)->handleTask();
 }
 
 void AnimatedLedGroup::tick(){

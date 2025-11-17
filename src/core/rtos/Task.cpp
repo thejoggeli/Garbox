@@ -9,6 +9,10 @@ Task::Task(){
     // nothing to do
 }
 
+Task::~Task(){
+    TriggerExit("Task", "std::function can use heap");
+}
+
 void Task::configure(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId){
     AssertExit(name != nullptr, "Task", "null name");
     mName = name;
@@ -18,14 +22,9 @@ void Task::configure(const char* name, uint32_t stackSize, UBaseType_t priority,
     mConfigured = true;
 }
 
-void Task::start(TaskHandler handler, void* context){
+void Task::start(){
     AssertExit(mConfigured, "Task", "not configured");
-    AssertExit(handler != nullptr, "Task", "null handler");
     AssertExit(mTaskHandle == nullptr, "Task", "task already running");
-
-    mTaskHandler = handler;
-    mContext = context;
-
     BaseType_t result = xTaskCreatePinnedToCore(
         handleTask,
         mName,
@@ -55,6 +54,10 @@ void Task::stop(){
     LogDebug("Task", "%s stopped", mName);
 }
 
+void Task::setHandler(TaskHandler handler){
+    mTaskHandler = handler;
+}
+
 bool Task::isRunning() const {
     return (mTaskHandle != nullptr);
 }
@@ -70,7 +73,7 @@ bool Task::isCurrentTask() const {
 void Task::handleTask(void* arg){
     Task* self = static_cast<Task*>(arg);
     LogDebug("Task", "%s started", self->mName);
-    self->mTaskHandler(self->mContext);
+    self->mTaskHandler();
     TriggerExit("Task", "reach end of handler");
 }
 

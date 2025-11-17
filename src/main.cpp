@@ -23,7 +23,7 @@ using namespace Garbox;
 static AppCore gAppCore;
 static Task gMainTask;
 
-void handleMainTask(void* parameter);
+void handleMainTask();
 void logProfiler();
 
 void handleAssertDebug(const char* context, const char* message, int32_t arg){
@@ -128,7 +128,8 @@ void setup(){
         AppConfig::MainTaskPriority,
         AppConfig::MainTaskCore
     );
-    gMainTask.start(handleMainTask, nullptr);
+    gMainTask.setHandler(handleMainTask);
+    gMainTask.start();
 
     // setup complete
     LogDebug("Main", "setup complete");
@@ -138,7 +139,7 @@ void loop(){
     Time::DelayMillis(1000);
 }
 
-void handleMainTask(void* parameter){
+void handleMainTask(){
     const TickType_t mainTickMillis = pdMS_TO_TICKS(AppConfig::MainTickDurationMillis);
     const TickType_t displayTickMillis = pdMS_TO_TICKS(AppConfig::DisplayTickDurationMillis);
     TickType_t lastWakeTime = xTaskGetTickCount();
