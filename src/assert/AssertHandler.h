@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-class AssertHandling final {
+class AssertHandler final {
 
 public:
 

@@ -8,8 +8,11 @@ namespace Garbox {
 class SystemTasks {
 public:
 
+    // starts all system tasks
     static void StartAll();
-    static void StopAll(TaskHandle_t exclude);
+
+    // stops all system tasks, excluding the task that is calling this function
+    static void StopAll();
 
 };
 

@@ -1,8 +1,10 @@
 #include "SpiDma.h"
 
 #include <cstring>
+#include <esp_heap_caps.h>
 #include "assert/Assert.h"
-#include "esp_heap_caps.h"
+#include "core/log/Log.h"
+#include "util/threading/LockGuard.h"
 
 namespace Garbox {
 
@@ -63,34 +65,11 @@ void SpiDma::init(const Config& config){
         TriggerExit("SpiDma", "spi_bus_add_device failed");
     }
 
+    // create mutex
+    mMutex = xSemaphoreCreateRecursiveMutex();
+    AssertExit(mMutex != nullptr, "PiezoPlayer", "mutex creation failed");  
+
     mInitialized = true;
-}
-
-void SpiDma::startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
-    AssertExit(mInitialized, "SpiDma", "not initialized");
-    AssertExit(mTaskHandle == nullptr, "SpiDma", "task already running");
-    BaseType_t result = xTaskCreatePinnedToCore(
-        taskTrampoline,
-        name, 
-        stackSize,
-        this,
-        priority,
-        &mTaskHandle,
-        core
-    );
-    AssertExit(result == pdPASS, "SpiDma", "task creation failed");
-}
-
-void SpiDma::stopTask(){
-    if(mTaskHandle != nullptr){
-        vTaskDelete(mTaskHandle);
-        mTaskHandle = nullptr;
-        // TODO stop all spi activity
-    }
-}
-
-TaskHandle_t SpiDma::getTaskHandle(){
-    return mTaskHandle;
 }
 
 bool SpiDma::validateTransferArgs(const uint8_t* data, size_t lenBits){
@@ -122,39 +101,38 @@ bool SpiDma::validateTransferArgs(const uint8_t* data, size_t lenBits){
 }
 
 SpiDma::TxSlot* SpiDma::allocFreeSlot(){
+    LockGuard lock(mMutex);
     // find next free tx slot
-    portENTER_CRITICAL(&mSlotLock);
     for (int i = 0; i < mNumSlots; ++i){
         if (!mTxSlots[i].inUse){
             mTxSlots[i].inUse = true;
-            portEXIT_CRITICAL(&mSlotLock);
             return &mTxSlots[i];
         }
     }
-    portEXIT_CRITICAL(&mSlotLock);
     // no free tx slot was found
     TriggerDebug("SpiDma::allocFreeSlot()", "no free tx slot found");
     return nullptr;
 }
 
 void SpiDma::freeSlot(TxSlot* slot){
+    LockGuard lock(mMutex);
     if (slot == nullptr){
         TriggerDebug("SpiDma", "invalid slot ptr");
         return;
     }
     // mark slot as free
-    portENTER_CRITICAL(&mSlotLock);
     slot->inUse = false;
     slot->callback = nullptr;
-    portEXIT_CRITICAL(&mSlotLock);
 }
 
 bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user){
+    LockGuard lock(mMutex);
+
     if (!validateTransferArgs(data, lenBits)){
         return false;
     }
 
-    if (xTaskGetCurrentTaskHandle() == mTaskHandle){
+    if (xTaskGetCurrentTaskHandle() == mTask.getHandle()){
         TriggerDebug("SpiDma", "transferSync() not supported from completion callback");
         return false;
     }
@@ -183,6 +161,8 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user){
 }
 
 bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, CompleteCallback callback){
+    LockGuard lock(mMutex);
+
     if (!validateTransferArgs(data, lenBits)){
         return false;
     }
@@ -211,18 +191,31 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, Comp
 }
 
 void SpiDma::setCompleteCallback(CompleteCallback callback){
-    portENTER_CRITICAL(&mSlotLock);
+    LockGuard lock(mMutex);
     mTxCallback = callback;
-    portEXIT_CRITICAL(&mSlotLock);
 }
 
-void SpiDma::taskTrampoline(void* arg){
-    static_cast<SpiDma*>(arg)->handleTask();
+void SpiDma::startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
+    LockGuard lock(mMutex);
+    
+    // check state
+    AssertExit(mInitialized, "SpiDma", "not initialized");
+
+    // start task
+    mTask.configure(name, stackSize, priority, core);
+    mTask.start(taskTrampoline, this);
+}
+
+void SpiDma::stopTask(){
+    LockGuard lock(mMutex);
+    mTask.stop();
+    // TODO stop all spi activity
 }
 
 void SpiDma::handleTask(){
+
     spi_transaction_t* transaction = nullptr;
-    constexpr TickType_t waitTicks = pdMS_TO_TICKS(1000); // 1s timeout
+    constexpr TickType_t waitTicks = pdMS_TO_TICKS(1000); // 1000ms timeout
 
     while (true){
         esp_err_t ret = spi_device_get_trans_result(mDevice, &transaction, waitTicks);
@@ -236,7 +229,6 @@ void SpiDma::handleTask(){
             }
         }
         else if (ret == ESP_ERR_TIMEOUT){
-            // No completed transactions within 1s, normal if idle
             continue;
         }
         else {
@@ -246,24 +238,30 @@ void SpiDma::handleTask(){
     }
 }
 
+void SpiDma::taskTrampoline(void* arg){
+    AssertExit(arg != nullptr, "SpiDma", "arg is nullptr");
+    static_cast<SpiDma*>(arg)->handleTask();
+}
+
+TaskHandle_t SpiDma::getTaskHandle(){
+    return mTask.getHandle();
+}
+
 void SpiDma::handleCompletedTransaction(spi_transaction_t* transaction, bool success){
+    LockGuard lock(mMutex);
     // invoke callback and free transaction slot
-    portENTER_CRITICAL(&mSlotLock);
     for (int i = 0; i < mNumSlots; ++i){
         if (&mTxSlots[i].trans == transaction){
-            portEXIT_CRITICAL(&mSlotLock);
             invokeCallback(&mTxSlots[i], transaction->user, success);
             freeSlot(&mTxSlots[i]);
             return;
         }
     }
-    portEXIT_CRITICAL(&mSlotLock);
 }
 
 void SpiDma::invokeCallback(TxSlot* slot, void* user, bool success){
-    portENTER_CRITICAL(&mSlotLock);
+    LockGuard lock(mMutex);
     CompleteCallback globalCb = mTxCallback;
-    portEXIT_CRITICAL(&mSlotLock);
 
     if (slot->callback != nullptr){
         slot->callback(user, success);

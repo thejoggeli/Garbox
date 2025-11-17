@@ -20,12 +20,21 @@ public:
         Count
     };
 
+    struct Config {
+        Gpio& enableGpio; 
+        LedcChannel& speedPwm; 
+        Gpio& tachoGpio;
+        Timer& tachoTimer;
+        uint32_t tachoPulsesPerRev = 1;
+        uint32_t tachoFilterTicks = 10;
+    };
+
     static const char* StateToString(State state);
 
     using StateChangedCallback = std::function<void(State oldState, State newState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
-    Fan(Gpio& enableGpio, LedcChannel& speedPwm, Gpio& tachoGpio, Timer& tachoTimer);
+    Fan(const Config& config);
 
     void init();
     void start();
@@ -78,6 +87,8 @@ private:
 
     // filter for measured RPM value
     TachoConditioner mTachoConditioner;
+    const uint32_t mTachoPulsesPerRev;
+    const float mHzToRpmFactor;
 
     // fan state monitor
     FanMonitor mMonitor;

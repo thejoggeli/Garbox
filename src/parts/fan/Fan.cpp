@@ -5,23 +5,18 @@
 #include "core/hardware/ledc/LedcChannel.h"
 #include "core/hardware/timer/Timer.h"
 #include "core/time/Time.h"
-#include "global/config/AppConfig.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {
 
-// RPM measure config 
-static constexpr uint32_t PulsesPerRevolution = 2;
-
-// RPM filter config
-static constexpr size_t TachoConditionerWindowSize = std::max(1u, AppConfig::MainTaskFrequencyHz/3);
-
-Fan::Fan(Gpio& gpioEnable, LedcChannel& speedPwm, Gpio& gpioTacho, Timer& timerTacho): 
+Fan::Fan(const Config& config):
     // init members
-    mGpioFanEnable(gpioEnable),
-    mSpeedPwm(speedPwm),
-    mFrequencySensor(gpioTacho, timerTacho),
-    mTachoConditioner(TachoConditionerWindowSize),
+    mGpioFanEnable(config.enableGpio),
+    mSpeedPwm(config.speedPwm),
+    mFrequencySensor(config.tachoGpio, config.tachoTimer),
+    mTachoConditioner(config.tachoFilterTicks),
+    mTachoPulsesPerRev(config.tachoPulsesPerRev),
+    mHzToRpmFactor(60.0f / static_cast<float>(config.tachoPulsesPerRev)),
     mMonitor(){
     // nothing to do
 }
@@ -34,9 +29,8 @@ void Fan::init(){
     config.stopTimeoutMicros = 1000_ms;
 
     // init rpm conditioner
-    constexpr float HzToRpmFactor = 60.0f / static_cast<float>(PulsesPerRevolution);
     mTachoConditioner.setFixedPointScaling(1000.0f); // gives theoretical 0.001 RPM resolution
-    mTachoConditioner.setInputScaling(HzToRpmFactor);
+    mTachoConditioner.setInputScaling(mHzToRpmFactor);
     mTachoConditioner.setOutputSnapping(10.0f, 0.5f); // snap to 10 RPM
 
     // init frequency sensor

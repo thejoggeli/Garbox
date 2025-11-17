@@ -1,32 +1,33 @@
 #include "Profiler.h"
-#include <stdlib.h>
+
+#include "assert/Assert.h"
 
 namespace Garbox {
 
-Profiler::Record* Profiler::sRecords = nullptr;
-uint8_t Profiler::sNumRecords = 0;
-uint8_t Profiler::sNextIndex = 0;
-bool Profiler::sEnabled = false;
-bool Profiler::sInitialized = false;
-uint32_t Profiler::sLastUpdateTime = 0;
-SemaphoreHandle_t Profiler::sMutex = nullptr;
+static constexpr size_t RecordsCount = static_cast<size_t>(ProfilerId::Count);
+static std::array<Profiler::Record, RecordsCount> sRecords = {};
+static uint8_t sNextIndex = 0;
+static bool sEnabled = false;
+static bool sInitialized = false;
+static uint32_t sLastUpdateTime = 0;
+static SemaphoreHandle_t sMutex = nullptr;
 
-bool Profiler::Setup(uint8_t num){
-    if (sInitialized) return true;
-    if (num == 0) return false;
+Profiler::Scoped::Scoped(ProfilerId id) : mId(id){ 
+    Profiler::Begin(mId); 
+}
 
-    sRecords = static_cast<Record*>(malloc(sizeof(Record) * num));
-    if (!sRecords) return false;
+Profiler::Scoped::~Scoped(){ 
+    Profiler::End(mId); 
+}
+
+bool Profiler::Setup(){
+    AssertExit(!sInitialized, "Profiler", "already initialized");
+    AssertExit(RecordsCount != 0, "Profiler", "no records"); 
 
     sMutex = xSemaphoreCreateMutex();
-    if (!sMutex){
-        free(sRecords);
-        sRecords = nullptr;
-        return false;
-    }
+    AssertExit(sMutex != nullptr, "Profiler", "failed to create mutex");
 
-    sNumRecords = num;
-    for (uint8_t i = 0; i < num; ++i){
+    for (uint8_t i = 0; i < RecordsCount; ++i){
         sRecords[i] = {
             0, 0, 0, 0,
             0xFFFFFFFF, 0,
@@ -44,13 +45,13 @@ bool Profiler::Setup(uint8_t num){
 }
 
 void Profiler::Start(){
-    if (!sInitialized) return;
+    AssertExit(sInitialized, "Profiler", "not initialized");
     LockGuard lock(sMutex);
     sLastUpdateTime = Time::GetMicros();
     sEnabled = true;
 
     // Optionally reset per-frame counters so first tick is clean
-    for (uint8_t i = 0; i < sNumRecords; ++i){
+    for (uint8_t i = 0; i < RecordsCount; ++i){
         sRecords[i].countCurrent = 0;
         sRecords[i].totalTime = 0;
         sRecords[i].minDurationCurrent = 0xFFFFFFFF;
@@ -68,18 +69,22 @@ bool Profiler::IsEnabled(){
     return sEnabled;
 }
 
-void Profiler::Begin(uint8_t id){
-    if (!sInitialized || !sEnabled || id >= sNumRecords) return;
+void Profiler::Begin(ProfilerId id){
+    if (!sEnabled) return;
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
     LockGuard lock(sMutex);
-    Record& r = sRecords[id];
+    Record& r = sRecords[static_cast<uint8_t>(id)];
     r.lastBegin = Time::GetMicros();
     r.active = true;
 }
 
-void Profiler::End(uint8_t id){
-    if (!sInitialized || !sEnabled || id >= sNumRecords) return;
+void Profiler::End(ProfilerId id){
+    if (!sEnabled) return;
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
     LockGuard lock(sMutex);
-    Record& r = sRecords[id];
+    Record& r = sRecords[static_cast<uint8_t>(id)];
     if (!r.active) return;
     r.active = false;
 
@@ -118,45 +123,48 @@ void Profiler::ProcessRecord(Record& r, uint32_t elapsed){
     r.totalTime          = 0;
 }
 
-void Profiler::Update(uint8_t id){
-    if (!sInitialized || !sEnabled || id >= sNumRecords) return;
+void Profiler::Update(ProfilerId id){
+    if (!sEnabled) return;
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
     LockGuard lock(sMutex);
     const uint32_t now = Time::GetMicros();
     const uint32_t elapsed = now - sLastUpdateTime;
     if (elapsed == 0) return;
 
-    ProcessRecord(sRecords[id], elapsed);
+    ProcessRecord(sRecords[static_cast<uint8_t>(id)], elapsed);
 
-    if (id == sNumRecords - 1)
+    if (static_cast<uint8_t>(id) == RecordsCount - 1)
         sLastUpdateTime = now;
 }
 
 void Profiler::UpdateAll(){
-    if (!sInitialized || !sEnabled) return;
+    if (!sEnabled) return;
+    AssertExit(sInitialized, "Profiler", "not initialized");
     LockGuard lock(sMutex);
     const uint32_t now = Time::GetMicros();
     const uint32_t elapsed = now - sLastUpdateTime;
     if (elapsed == 0) return;
 
-    for (uint8_t i = 0; i < sNumRecords; ++i)
+    for (uint8_t i = 0; i < RecordsCount; ++i)
         ProcessRecord(sRecords[i], elapsed);
 
     sLastUpdateTime = now;
 }
 
-const Profiler::Record& Profiler::GetRecord(uint8_t id){
-    static Record dummy = {};
-    if (!sInitialized || id >= sNumRecords) return dummy;
+const Profiler::Record& Profiler::GetRecord(ProfilerId id){
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
     LockGuard lock(sMutex);
-    return sRecords[id];
+    return sRecords[static_cast<uint8_t>(id)];
 }
 
 const Profiler::Record* Profiler::GetNextRecord(){
-    if (!sInitialized || sNumRecords == 0) return nullptr;
+    AssertExit(sInitialized, "Profiler", "not initialized");
     LockGuard lock(sMutex);
     const Record* r = &sRecords[sNextIndex];
     sNextIndex++;
-    if (sNextIndex >= sNumRecords) sNextIndex = 0;
+    if (sNextIndex >= RecordsCount) sNextIndex = 0;
     return r;
 }
 
@@ -165,18 +173,19 @@ void Profiler::ResetIteration(){
     sNextIndex = 0;
 }
 
-void Profiler::ResetTotals(uint8_t id){
-    if (!sInitialized || id >= sNumRecords) return;
+void Profiler::ResetTotals(ProfilerId id){
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
     LockGuard lock(sMutex);
-    Record& r = sRecords[id];
+    Record& r = sRecords[static_cast<uint8_t>(id)];
     r.minDurationTotal = 0xFFFFFFFF;
     r.maxDurationTotal = 0;
 }
 
 void Profiler::ResetAllTotals(){
-    if (!sInitialized) return;
+    AssertExit(sInitialized, "Profiler", "not initialized");
     LockGuard lock(sMutex);
-    for (uint8_t i = 0; i < sNumRecords; ++i){
+    for (uint8_t i = 0; i < RecordsCount; ++i){
         sRecords[i].minDurationTotal = 0xFFFFFFFF;
         sRecords[i].maxDurationTotal = 0;
     }

@@ -14,7 +14,16 @@ class Gpio;
 class Heatpad {
 public:
 
-    Heatpad(Gpio& enableGpio, Adc& voltageSenseAdc, Adc& currentSenseAdc);
+    struct Config {
+        Gpio& enableGpio;
+        Adc& voltageSenseAdc; 
+        Adc& currentSenseAdc;
+        uint32_t adcFilterTicks = 10;
+        float initialPwmDuty = 0.5f;
+        uint32_t initialPwmPeriodMicros = 5'000'000;
+    };
+
+    Heatpad(const Config& config);
 
     void init();
     void start();

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include "core/rtos/PeriodicTask.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include "core/rtos/Task.h"
 #include "parts/led/single/AnimatedLed.h"
 #include "util/container/Span.h"
 
@@ -44,11 +44,16 @@ public:
 
 private:
 
-    static void handleAnimationTask(void* arg);
     bool mInitialized = false;
     Span<AnimatedLed> mLeds;
     SemaphoreHandle_t mMutex = nullptr;
-    PeriodicTask mAnimationTask;
+
+    Task mTask;
+    uint32_t mTaskFrequencyHz = 0;
+
+    void handleTask();
+    static void taskTrampoline(void* arg);
+
 };
 
 } // namespace Garbox

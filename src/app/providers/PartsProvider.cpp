@@ -1,12 +1,14 @@
 #include "PartsProvider.h"
 
+#include <algorithm>
+#include "app/config/AppConfig.h"
+#include "app/hardware/adc/AdcInstances.h"
+#include "app/hardware/gpio/GpioInstances.h"
+#include "app/hardware/ledc/LedcInstances.h"
+#include "app/hardware/spi/SpiInstances.h"
+#include "app/hardware/timer/TimerInstances.h"
 #include "app/parts/StatusLeds.h"
 #include "assert/Assert.h"
-#include "global/hardware/adc/AdcInstances.h"
-#include "global/hardware/gpio/GpioInstances.h"
-#include "global/hardware/ledc/LedcInstances.h"
-#include "global/hardware/spi/SpiInstances.h"
-#include "global/hardware/timer/TimerInstances.h"
 #include "parts/button/InterruptButton.h"
 #include "parts/display/Display.h"
 #include "parts/fan/Fan.h"
@@ -72,31 +74,43 @@ void PartsProvider::Tick(){
 }
 
 Fan& PartsProvider::GetFan(){
-    static Fan instance(
-        GpioInstances::GetFanEnable(),
-        LedcInstances::GetFanSpeedChannel(),
-        GpioInstances::GetFanTacho(),
-        TimerInstances::GetFanTacho()
-    );
+    static constexpr uint32_t tachoFilterTicks = AppConfig::TickFrequencyHz * 0.3f;
+    static Fan instance(Fan::Config{
+        .enableGpio = GpioInstances::GetFanEnable(),
+        .speedPwm = LedcInstances::GetFanSpeedChannel(),
+        .tachoGpio = GpioInstances::GetFanTacho(),
+        .tachoTimer = TimerInstances::GetFanTacho(),
+        .tachoPulsesPerRev = 2,
+        .tachoFilterTicks = std::max(tachoFilterTicks, 1u)
+    });
     return instance;
 }
 
 Heatpad& PartsProvider::GetHeatpad(){
-    static Heatpad instance(
-        GpioInstances::GetHeatEnable(),
-        AdcInstances::GetHeatpadVoltage(),
-        AdcInstances::GetHeatpadCurrent()
-    );
+    static constexpr uint32_t adcFilterTicks = AppConfig::TickFrequencyHz;
+    static Heatpad instance(Heatpad::Config{
+        .enableGpio = GpioInstances::GetHeatEnable(),
+        .voltageSenseAdc = AdcInstances::GetHeatpadVoltage(),
+        .currentSenseAdc = AdcInstances::GetHeatpadCurrent(),
+        .adcFilterTicks = adcFilterTicks,
+    });
     return instance;
 }
 
 Display& PartsProvider::GetDisplay(){
-    static Display instance(
-        SpiInstances::GetSpiDma(),
-        GpioInstances::GetDisplayRst(),
-        GpioInstances::GetDisplayDc(),
-        LedcInstances::GetDisplayBacklightChannel()
-    );
+    static Display instance(Display::Config{
+        .spi = SpiInstances::GetSpiDma(),
+        .gpioRst = GpioInstances::GetDisplayRst(),
+        .gpioDc = GpioInstances::GetDisplayDc(),
+        .pwmBlk = LedcInstances::GetDisplayBacklightChannel(),
+        .width = AppConfig::DisplayWidth,
+        .height = AppConfig::DisplayHeight,
+        .bytesPerPixel = AppConfig::DisplayBytesPerPixel,
+        .bufferPartialFactor = AppConfig::DisplayPartialFactor,
+        .bufferSizeBytes = AppConfig::DisplayBytesPerFlush,
+        .bufferWidth = AppConfig::DisplayWidth,
+        .bufferHeight = AppConfig::DisplayHeight / AppConfig::DisplayPartialFactor,
+    });
     return instance;
 }
 

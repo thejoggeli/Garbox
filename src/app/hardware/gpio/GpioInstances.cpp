@@ -1,8 +1,8 @@
 #include "GpioInstances.h"
 
+#include "app/config/PinConfig.h"
 #include "assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"
-#include "global/config/PinConfig.h"
 
 namespace Garbox {
 

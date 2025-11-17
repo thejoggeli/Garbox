@@ -2,6 +2,7 @@
 
 #include "assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
+#include "core/log/Log.h"
 #include "util/threading/LockGuard.h"
 
 namespace Garbox {
@@ -30,35 +31,49 @@ void AnimatedLedGroup::init(){
 void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId){
     LockGuard lock(mMutex);
 
+    // check state
     AssertExit(mInitialized, "AnimatedLedGroup", "not initialized");
-    AssertExit(frequencyHz > 0, "AnimatedLedGroup", "frequency must be > 0");
-    AssertExit(!mAnimationTask.isRunning(), "AnimatedLedGroup", "task already running");
+    AssertExit(frequencyHz > 0, "AnimatedLedGroup", "task frequency must be > 0");
+    
+    // set before task starts!
+    mTaskFrequencyHz = frequencyHz;
 
-    // configure and start task
-    mAnimationTask.configure(taskName, frequencyHz, stackSize, priority, coreId);
-    mAnimationTask.start(handleAnimationTask, this);
+    // start task
+    mTask.configure(taskName, stackSize, priority, coreId);
+    mTask.start(taskTrampoline, this);
 }
-
 
 void AnimatedLedGroup::stopTask(){
     LockGuard lock(mMutex);
-    if(!mAnimationTask.isRunning()){
-        return;
-    }
-    mAnimationTask.stop();
+    mTask.stop();
 }
 
 TaskHandle_t AnimatedLedGroup::getTaskHandle(){
-    return mAnimationTask.getHandle();
+    return mTask.getHandle();
 }
 
-void AnimatedLedGroup::handleAnimationTask(void* self){
-    static_cast<AnimatedLedGroup*>(self)->tick();
+void AnimatedLedGroup::handleTask(){
+    
+    // task timing
+    const uint32_t periodMillis = 1000.0f / mTaskFrequencyHz;
+    const TickType_t periodTicks = pdMS_TO_TICKS(periodMillis);
+    TickType_t lastWake = xTaskGetTickCount();
+
+    // loop task forever
+    while(true){
+        tick();
+        vTaskDelayUntil(&lastWake, periodTicks);
+    }
+}
+
+void AnimatedLedGroup::taskTrampoline(void* self){
+    AssertExit(self != nullptr, "AnimatedLedGroup", "self is nullptr");
+    static_cast<AnimatedLedGroup*>(self)->handleTask();
 }
 
 void AnimatedLedGroup::tick(){
     LockGuard lock(mMutex);
-    Profiler::Scoped(ProfilerConfig::LedAnimationTick);
+    Profiler::Scoped(ProfilerId::LedAnimationTick);
 
     // must be initialized
     if(!mInitialized){

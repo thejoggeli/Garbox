@@ -1,7 +1,7 @@
 #include "AppCore.h"
 
+#include "app/providers/PartsProvider.h"
 #include "app/StartupSequence.h"
-#include "global/providers/PartsProvider.h"
 
 namespace Garbox {
 

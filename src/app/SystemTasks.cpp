@@ -1,9 +1,9 @@
 #include "SystemTasks.h"
 
+#include "app/config/AppConfig.h"
+#include "app/hardware/spi/SpiInstances.h"
 #include "app/parts/StatusLeds.h"
-#include "global/config/AppConfig.h"
-#include "global/hardware/spi/SpiInstances.h"
-#include "global/providers/PartsProvider.h"
+#include "app/providers/PartsProvider.h"
 #include "parts/display/Display.h"
 #include "parts/piezo/PiezoPlayer.h"
 
@@ -50,30 +50,23 @@ void SystemTasks::StartAll(){
     );
 }
 
-void SystemTasks::StopAll(TaskHandle_t exclude){
-
+void SystemTasks::StopAll(){
+    
     // stop status leds task
     StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
-    if(exclude != statusLeds.getTaskHandle()){
-        statusLeds.stopTask();
-    }
+    statusLeds.stopTask();
 
     // stop piezo task
     PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
-    if(exclude != piezoPlayer.getTaskHandle()){
-        piezoPlayer.stopTask();
-    }
+    piezoPlayer.stopTask();
 
     // stop display task
     Display& display = PartsProvider::GetDisplay();
-    if(exclude != display.getTaskHandle()){
-        display.stopTask();
-    }
+    display.stopTask();
 
     // stop spi dma task
     SpiDma& spiDma = SpiInstances::GetSpiDma();
-    if(exclude != spiDma.getTaskHandle()){
-        spiDma.stopTask();    }
+    spiDma.stopTask();    
 
 }
 

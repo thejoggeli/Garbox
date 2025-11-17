@@ -1,17 +1,16 @@
 #include "MainControl.h"
 
 #include "app/parts/StatusLeds.h"
+#include "app/providers/ColorMaps.h"
+#include "app/providers/PartsProvider.h"
+#include "app/providers/PiezoSequences.h"
 
 #include "assert/Assert.h"
-#include "assert/AssertHandling.h"
+#include "assert/AssertHandler.h"
 
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-
-#include "global/providers/ColorMaps.h"
-#include "global/providers/PartsProvider.h"
-#include "global/providers/PiezoSequences.h"
 
 #include "parts/display/Display.h"
 #include "parts/heatpad/Heatpad.h"

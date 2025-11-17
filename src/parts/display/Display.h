@@ -4,8 +4,8 @@
 #include <freertos/semphr.h>
 #include <lvgl.h>
 
+#include "core/rtos/Task.h"
 #include "core/time/SoftwareTimer.h"
-#include "global/config/AppConfig.h"
 #include "parts/display/St7789v.h"
 #include "util/container/RingBuffer.h"
 #include "util/threading/LockGuard.h"
@@ -19,7 +19,21 @@ class SpiDma;
 class Display {
 public:
 
-    Display(SpiDma& spi, Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk);
+    struct Config {
+        SpiDma& spi;
+        Gpio& gpioRst;
+        Gpio& gpioDc;
+        LedcChannel& pwmBlk;
+        uint32_t width;
+        uint32_t height;
+        uint32_t bytesPerPixel;
+        uint32_t bufferPartialFactor;
+        uint32_t bufferSizeBytes;
+        uint32_t bufferWidth;
+        uint32_t bufferHeight;
+    };
+
+    Display(const Config& config);
 
     void init();
 
@@ -57,8 +71,8 @@ private:
     // lvgl display configuration
     const uint32_t mWidth;
     const uint32_t mHeight;
-    const uint32_t mPartialFactor;
     const uint32_t mBytesPerPixel;
+    const uint32_t mBufferPartialFactor;
     const uint32_t mBufferSize;
     const uint32_t mBufferWidth;
     const uint32_t mBufferHeight;
@@ -76,7 +90,7 @@ private:
     lv_obj_t* mLabel;
 
     // task
-    TaskHandle_t mTaskHandle = nullptr;
+    Task mTask;
 
     // semaphore counts how many draw buffers are free (3 for triple buffering)
     SemaphoreHandle_t mBufferSem;

@@ -1,7 +1,9 @@
 #pragma once
 
-#include "driver/spi_master.h"
-#include "freertos/task.h"
+#include <driver/spi_master.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include "core/rtos/Task.h"
 
 namespace Garbox {
 
@@ -65,9 +67,10 @@ private:
     TxSlot* mTxSlots = nullptr;
     int mNumSlots = 0;
 
-    TaskHandle_t mTaskHandle = nullptr;
+    SemaphoreHandle_t mMutex = nullptr;
+    
+    Task mTask;
 
-    portMUX_TYPE mSlotLock = portMUX_INITIALIZER_UNLOCKED;
     size_t mMaxTransferSizeBits = 0;
 
     bool validateTransferArgs(const uint8_t* data, size_t lenBits);

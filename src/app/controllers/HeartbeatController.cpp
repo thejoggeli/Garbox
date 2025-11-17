@@ -1,8 +1,8 @@
 #include "HeartbeatController.h"
 
+#include "app/config/AppConfig.h"
 #include "app/parts/StatusLeds.h"
-#include "global/config/AppConfig.h"
-#include "global/providers/PartsProvider.h"
+#include "app/providers/PartsProvider.h"
 #include "util/function/default/EasingFunctions.h"
 
 namespace Garbox {

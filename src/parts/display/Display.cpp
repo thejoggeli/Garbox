@@ -1,38 +1,38 @@
 #include "Display.h"
 
 #include <cmath>
+#include <esp_heap_caps.h>
+
 #include "assert/Assert.h"
+#include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/hardware/bus/SpiDma.h"
 #include "core/time/Time.h"
-#include "esp_heap_caps.h"
-#include "global/providers/ColorMaps.h"
 #include "util/ByteUtils.h"
 #include "util/color/types/Rgb565.h"
-#include "core/diagnostics/Profiler.h"
 
 namespace Garbox {
 
 #define GarboxDebugDisplay 1
 
-Display::Display(SpiDma& spi, Gpio& gpioRst, Gpio& gpioDc, LedcChannel& pwmBlk): 
+Display::Display(const Config& config): 
     // init members 
-    mSpi(spi),
-    mSt7789v(gpioRst, gpioDc, pwmBlk),
-    mWidth(AppConfig::DisplayWidth),
-    mHeight(AppConfig::DisplayHeight),
-    mPartialFactor(AppConfig::DisplayPartialFactor),
-    mBytesPerPixel(AppConfig::DisplayBytesPerPixel),
-    mBufferSize(AppConfig::DisplayBytesPerFlush),
-    mBufferWidth(AppConfig::DisplayWidth),
-    mBufferHeight(AppConfig::DisplayHeight / AppConfig::DisplayPartialFactor){
+    mSpi(config.spi),
+    mSt7789v(config.gpioRst, config.gpioDc, config.pwmBlk),
+    mWidth(config.width),
+    mHeight(config.height),
+    mBytesPerPixel(config.bytesPerPixel),
+    mBufferPartialFactor(config.bufferPartialFactor),
+    mBufferSize(config.bufferSizeBytes),
+    mBufferWidth(config.bufferWidth),
+    mBufferHeight(config.bufferHeight){
 
     // constructor body
     AssertExit(mWidth == mBufferWidth, "Display", "display and buffer width must be equal");
-    AssertExit((mBufferHeight * mPartialFactor) == mHeight, "Display", "inconsistent buffer and display height");
-    AssertExit((mWidth / mPartialFactor) > 0, "Display", "partial buffer height cannot be zero");
+    AssertExit((mBufferHeight * mBufferPartialFactor) == mHeight, "Display", "inconsistent buffer and display height");
+    AssertExit((mWidth / mBufferPartialFactor) > 0, "Display", "partial buffer height cannot be zero");
     AssertExit(mBytesPerPixel == 2, "Display", "RGB565 requires exactly 2 bytes per pixel");
-    AssertExit(mBufferSize == (mWidth * mHeight * mBytesPerPixel / mPartialFactor), "Display", "frame size inconsistent with constants");
+    AssertExit(mBufferSize == (mWidth * mHeight * mBytesPerPixel / mBufferPartialFactor), "Display", "frame size inconsistent with constants");
 }
 
 void Display::init(){
@@ -111,43 +111,39 @@ void Display::init(){
 }
 
 void Display::startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
+    LockGuard lock(mDisplaySem);
+    
+    // check state
     AssertExit(mInitialized, "Display", "not initialized");
-    AssertExit(mTaskHandle == nullptr, "Display", "task already running");
-    BaseType_t result = xTaskCreatePinnedToCore(
-        taskTrampoline,
-        name, 
-        stackSize,
-        this,
-        priority,
-        &mTaskHandle,
-        core
-    );
-    AssertExit(result == pdPASS, "Display", "task creation failed");
+
+    // start task
+    mTask.configure(name, stackSize, priority, core);
+    mTask.start(taskTrampoline, this);
 }
 
 void Display::stopTask(){
-    if(mTaskHandle != nullptr){
-        vTaskDelete(mTaskHandle);
-        mTaskHandle = nullptr;
-        // TODO stop all spi activity
-        // TODO leave display in a defined state after stopping
-    }
+    LockGuard lock(mDisplaySem);
+    mTask.stop();
+    // TODO stop all spi activity
+    // TODO leave display in a defined state after stopping
 }
 
 TaskHandle_t Display::getTaskHandle(){
-    return mTaskHandle;
+    return mTask.getHandle();
 }
 
 void Display::handleTask(){
-    // wait for render trigger
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY); 
+    while(true){
+        // wait for render trigger
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); 
 
-    // execute display task
-    Profiler::Begin(ProfilerConfig::DisplayTick);
-    xSemaphoreTake(mRenderSem, portMAX_DELAY);
-    lv_timer_handler();
-    xSemaphoreGive(mRenderSem); // at this point, at least one buffer is free again (guaranteed by flush_wait_cb)
-    Profiler::End(ProfilerConfig::DisplayTick);
+        // execute display task
+        Profiler::Begin(ProfilerId::DisplayTick);
+        xSemaphoreTake(mRenderSem, portMAX_DELAY);
+        lv_timer_handler();
+        xSemaphoreGive(mRenderSem); // at this point, at least one buffer is free again (guaranteed by flush_wait_cb)
+        Profiler::End(ProfilerId::DisplayTick);
+    }
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){
@@ -260,17 +256,17 @@ void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
 void Display::handleLog(lv_log_level_t level, const char* str){
     switch(level){
     case LV_LOG_LEVEL_TRACE:
-        LogDebug("LVGL/Trace", "%s", str);
+        LogDebug0("LVGL/Trace", "%s", str);
         break;
     case LV_LOG_LEVEL_INFO:
-        LogInfo("LVGL/Info", "%s", str);
+        LogInfo0("LVGL/Info", "%s", str);
         break;
     case LV_LOG_LEVEL_WARN:
-        LogWarning("LVGL/Warn", "%s", str);
+        LogWarning0("LVGL/Warn", "%s", str);
         TriggerDebug("Display", "LVGL Warning");
         break;
     case LV_LOG_LEVEL_ERROR:
-        LogError("LVGL/Error", "%s", str);
+        LogError0("LVGL/Error", "%s", str);
         TriggerExit("Display", "LVGL Error");
         break;
     case LV_LOG_LEVEL_USER:        
@@ -281,12 +277,12 @@ void Display::handleLog(lv_log_level_t level, const char* str){
 }
 
 void Display::taskTrampoline(void* user){
-    while(true){
-        static_cast<Display*>(user)->handleTask();   
-    }
+    AssertExit(user != nullptr, "Display", "user is nullptr");
+    static_cast<Display*>(user)->handleTask();   
 }
 
 void Display::flushTrampoline(lv_display_t* disp, const lv_area_t* area, uint8_t* pixelMap){
+    AssertExit(disp != nullptr, "Display", "disp is nullptr");
     Display* self = static_cast<Display*>(lv_display_get_user_data(disp));
     if (self){
         self->handleFlush(area, pixelMap);
@@ -294,6 +290,7 @@ void Display::flushTrampoline(lv_display_t* disp, const lv_area_t* area, uint8_t
 }
 
 void Display::flushWaitTrampoline(lv_display_t* disp){
+    AssertExit(disp != nullptr, "Display", "disp is nullptr");
     Display* self = static_cast<Display*>(lv_display_get_user_data(disp));
     if (self){
         self->handleFlushWait();
@@ -301,6 +298,7 @@ void Display::flushWaitTrampoline(lv_display_t* disp){
 }
 
 void Display::dmaCompleteTrampoline(void* user, bool success){
+    AssertExit(user != nullptr, "Display", "user is nullptr");
     static_cast<Display*>(user)->handleDmaComplete(success);
 }
 

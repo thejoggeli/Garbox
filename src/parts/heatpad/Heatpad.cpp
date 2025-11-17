@@ -6,24 +6,18 @@
 #include "core/hardware/gpio/Gpio.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "global/config/AppConfig.h"
 #include "util/math/MathUtils.h"
 
 namespace Garbox {
 
-static constexpr uint32_t AdcConditionerWindowSize = static_cast<uint32_t>(AppConfig::MainTaskFrequencyHz * 1.0f);
-
-static constexpr uint32_t InitialPwmDuty = 0.5f;
-static constexpr uint32_t InitialPwmPeriodMicros = 5'000'000; // 5 seconds
-
-Heatpad::Heatpad(Gpio& enableGpio, Adc& voltageSenseAdc, Adc& currentSenseAdc): 
+Heatpad::Heatpad(const Config& config): 
     // init members
-    mGpioHeatpadEnable(enableGpio),
-    mVoltageSenseAdc(voltageSenseAdc),
-    mCurrentSenseAdc(currentSenseAdc),
-    mVoltageSenseConditioner(AdcConditionerWindowSize),
-    mCurrentSenseConditioner(AdcConditionerWindowSize),
-    mPwm(InitialPwmDuty, InitialPwmPeriodMicros){
+    mGpioHeatpadEnable(config.enableGpio),
+    mVoltageSenseAdc(config.voltageSenseAdc),
+    mCurrentSenseAdc(config.currentSenseAdc),
+    mVoltageSenseConditioner(config.adcFilterTicks),
+    mCurrentSenseConditioner(config.adcFilterTicks),
+    mPwm(config.initialPwmDuty, config.initialPwmPeriodMicros){
     // nothing to do
 }
 

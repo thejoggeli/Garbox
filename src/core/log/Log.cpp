@@ -27,7 +27,7 @@ void Log::Init(){
     uart_param_config(UART_NUM_0, &uart_config);
 
     // Install the driver with larger TX buffer (e.g. 2 KB)
-    uart_driver_install(UART_NUM_0, 1024*2, 0, 0, NULL, 0);
+    uart_driver_install(UART_NUM_0, 1024, 0, 0, NULL, 0);
 
     // Set default log level
     esp_log_level_set("*", ESP_LOG_VERBOSE);

@@ -1,8 +1,8 @@
 #include "StartupSequence.h"
 
 #include "app/parts/StatusLeds.h"
+#include "app/providers/PartsProvider.h"
 #include "core/time/Time.h"
-#include "global/providers/PartsProvider.h"
 #include "parts/button/InterruptButton.h"
 #include "parts/piezo/PiezoPlayer.h"
 #include "util/function/default/EasingFunctions.h"

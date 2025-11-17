@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Piezo.h"
-#include "ToneSequence.h"
 
 #include <cstddef>
 #include <cstdint>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
-#include <freertos/task.h>
+#include "core/rtos/Task.h"
+#include "parts/piezo/Piezo.h"
+#include "parts/piezo/ToneSequence.h"
 #include "util/container/RingBuffer.h"
 
 namespace Garbox {
@@ -28,7 +28,6 @@ public:
     void startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void stopTask();
     TaskHandle_t getTaskHandle();
-    bool isTaskRunning();
 
     // directly piezo control, bypassing the player logic. should only be used when the task is not running 
     void setPiezoEnabled(bool enabled);
@@ -83,7 +82,7 @@ private:
     SemaphoreHandle_t mMutex = nullptr;
 
     // playback task
-    TaskHandle_t mTaskHandle = nullptr;
+    Task mTask;
     uint32_t mTaskFrequencyHz = 0;
 
     // playback

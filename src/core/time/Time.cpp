@@ -51,11 +51,21 @@ uint32_t Time::CpuCyclesToMicros(uint32_t cycles){
     return static_cast<uint32_t>(cycles / CpuFreqMhz);
 }
 
-uint32_t Time::GetTickMicros()  { return gTickMicros; }
-uint32_t Time::GetTickMillis()  { return gTickMillis; }
-uint32_t Time::GetTickSeconds(){ return gTickSeconds; }
+uint32_t Time::GetTickMicros()  { 
+    return gTickMicros; 
+}
 
-void Time::DelayMillis(uint32_t millis){ delay(millis); }
+uint32_t Time::GetTickMillis(){ 
+    return gTickMillis; 
+}
+
+uint32_t Time::GetTickSeconds(){ 
+    return gTickSeconds; 
+}
+
+void Time::DelayMillis(uint32_t millis){ 
+    delay(millis); 
+}
 
 void Time::BlockMillis(uint32_t millis){
     const uint32_t startMicros = GetMicros();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unity.h>
-#include "assert/AssertHandling.h"
+#include "assert/AssertHandler.h"
 
 namespace GarboxTest {
 
@@ -15,17 +15,17 @@ inline void ResetAssertCounters(){
 
 inline void InstallAssertHandlers(){
     ResetAssertCounters();
-    Garbox::AssertHandling::SetDebugHandler([](const char*, const char*, int32_t){
+    Garbox::AssertHandler::SetDebugHandler([](const char*, const char*, int32_t){
         AssertDebugCount++;
     });
-    Garbox::AssertHandling::SetExitHandler([](const char*, const char*, int32_t){
+    Garbox::AssertHandler::SetExitHandler([](const char*, const char*, int32_t){
         AssertExitCount++;
     });
 }
 
 inline void ClearAssertHandlers(){
-    Garbox::AssertHandling::SetDebugHandler(nullptr);
-    Garbox::AssertHandling::SetExitHandler(nullptr);
+    Garbox::AssertHandler::SetDebugHandler(nullptr);
+    Garbox::AssertHandler::SetExitHandler(nullptr);
 }
 
 } // namespace GarboxTest

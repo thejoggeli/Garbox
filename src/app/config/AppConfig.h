@@ -12,6 +12,10 @@ public:
     static constexpr uint32_t HeartbeatIntervalMicros = 2'000'000;
     static constexpr uint32_t MainTickDurationMillis = 20;
     static constexpr uint32_t DisplayTickDurationMillis = 13;
+    static constexpr uint32_t TickFrequencyHz = 1000.0f / (MainTickDurationMillis + DisplayTickDurationMillis);
+
+    // Profiler
+    static constexpr bool EnableProfiler = false;
 
     // Main Task
     static constexpr const char* MainTaskName = "MainTask";
@@ -23,26 +27,26 @@ public:
     static constexpr const char* PiezoPlayerTaskName = "PiezoPlayerTask";
     static constexpr uint32_t PiezoPlayerTaskFrequencyHz = 120;
     static constexpr uint32_t PiezoPlayerTaskPriority = 15;
-    static constexpr uint32_t PiezoPlayerTaskStackSize = 1024*2;
+    static constexpr uint32_t PiezoPlayerTaskStackSize = 1024*4;
     static constexpr uint32_t PiezoPlayerTaskCore = 1;
 
     // Led Task
     static constexpr const char* StatusLedsTaskName = "LedAnimationTask";
     static constexpr uint32_t StatusLedsTaskFrequencyHz = 60;
     static constexpr uint32_t StatusLedsTaskPriority = 14;
-    static constexpr uint32_t StatusLedsTaskStackSize = 1024*2;
+    static constexpr uint32_t StatusLedsTaskStackSize = 1024*4;
     static constexpr uint32_t StatusLedsTaskCore = 1;
 
     // Display Task
     static constexpr const char* DisplayTaskName = "DisplayTask";
     static constexpr uint32_t DisplayTaskPriority = 10;
-    static constexpr uint32_t DisplayTaskStackSize = 1024*2;
+    static constexpr uint32_t DisplayTaskStackSize = 1024*4;
     static constexpr uint32_t DisplayTaskCore = 1;
 
     // SPI DMA Task
     static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
     static constexpr uint32_t SpiDmaTaskPriority = 10;
-    static constexpr uint32_t SpiDmaTaskStackSize = 2048;
+    static constexpr uint32_t SpiDmaTaskStackSize = 1024*4;
     static constexpr uint32_t SpiDmaTaskCore = 1;
 
     // Display

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "app/config/PinConfig.h" 
 #include "core/hardware/ledc/LedcTimer.h"
 #include "core/hardware/ledc/LedcChannel.h"
-#include "global/config/PinConfig.h" 
 
 namespace Garbox {
 
