@@ -243,7 +243,7 @@ void SpiDma::taskTrampoline(void* arg){
     static_cast<SpiDma*>(arg)->handleTask();
 }
 
-TaskHandle_t SpiDma::getTaskHandle(){
+TaskHandle_t SpiDma::getTaskHandle() const {
     return mTask.getHandle();
 }
 

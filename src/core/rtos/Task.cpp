@@ -74,7 +74,7 @@ void Task::handleTask(void* arg){
     TriggerExit("Task", "reach end of handler");
 }
 
-TaskHandle_t Task::getHandle(){
+TaskHandle_t Task::getHandle() const {
     return mTaskHandle;
 }
 

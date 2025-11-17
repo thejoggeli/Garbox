@@ -107,6 +107,7 @@ void Display::init(){
     // initialization complete
     mSt7789v.setBrightness(0.75f);
     mTestTimer.start(2000_ms);
+    mReady = true;
     mInitialized = true;
 }
 
@@ -128,22 +129,42 @@ void Display::stopTask(){
     // TODO leave display in a defined state after stopping
 }
 
-TaskHandle_t Display::getTaskHandle(){
-    return mTask.getHandle();
+bool Display::isReady() const {
+    return mReady;
+}
+
+void Display::takeLock(){
+    xSemaphoreTake(mDisplaySem, portMAX_DELAY);
+}
+
+void Display::giveLock(){
+    xSemaphoreGive(mDisplaySem);
+}
+
+void Display::notifyTask(){
+    xTaskNotifyGive(mTask.getHandle());
 }
 
 void Display::handleTask(){
     while(true){
         // wait for render trigger
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); 
+        mReady = false;
 
-        // execute display task
+        // render frame
         Profiler::Begin(ProfilerId::DisplayTick);
         xSemaphoreTake(mRenderSem, portMAX_DELAY);
         lv_timer_handler();
         xSemaphoreGive(mRenderSem); // at this point, at least one buffer is free again (guaranteed by flush_wait_cb)
         Profiler::End(ProfilerId::DisplayTick);
+
+        // ready to render the next frame
+        mReady = true;
     }
+}
+
+TaskHandle_t Display::getTaskHandle() const {
+    return mTask.getHandle();
 }
 
 void Display::handleFlush(const lv_area_t* area, uint8_t* pixelMap){

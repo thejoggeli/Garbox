@@ -6,7 +6,9 @@ namespace Garbox {
 
 enum class ControllerId : uint8_t {
     Null = 0,
-    Fan
+    Fan,
+    Heartbeat,
+    Garbox
 };
 
 } // namespace

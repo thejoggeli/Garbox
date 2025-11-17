@@ -11,14 +11,18 @@ namespace Garbox {
 class EventFactory {
 public:
 
-    EventFactory(size_t poolSizeBytes): 
-        // init members
-        mPool(poolSizeBytes){
+    EventFactory(){ 
         // nothing to do
     }
 
-    void init(){
-        mPool.init();
+    ~EventFactory(){ 
+        AssertExit(!mInitialized, "EventFactory", "heap deconstructor");
+    }
+
+    void init(size_t poolSizeBytes){
+        AssertExit(!mInitialized, "EventFactory", "already initialized");
+        mPool.init(poolSizeBytes);
+        mInitialized = true;
     }
 
     template<typename EventData>
@@ -42,6 +46,7 @@ public:
 
 private:
 
+    bool mInitialized = false;
     DataPoolHeap mPool;
 
 };

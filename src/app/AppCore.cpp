@@ -15,6 +15,15 @@ void AppCore::init(){
     StartupSequence startup;
     startup.run();
 
+    // init event factory
+    const size_t eventFactorySize = 1024;
+    mEventFactory.init(eventFactorySize);
+
+    // setup controllers
+    mHeartbeatController.setup(ControllerId::Heartbeat, mEventFactory);
+    mGarboxController.setup(ControllerId::Garbox, mEventFactory);
+    mFanController.setup(ControllerId::Fan, mEventFactory);
+
     // init controllers
     mHeartbeatController.init();
     mGarboxController.init();
@@ -43,6 +52,7 @@ void AppCore::mainTick(){
 void AppCore::displayTick(){
     // TODO
     // trigger UI update + notify display
+    mGarboxController.onDisplayTick();
 }
 
 } // namespace

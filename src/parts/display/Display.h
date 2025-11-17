@@ -39,7 +39,13 @@ public:
 
     void startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void stopTask();
-    TaskHandle_t getTaskHandle();
+    void notifyTask();
+    TaskHandle_t getTaskHandle() const;
+
+    void takeLock();
+    void giveLock();
+
+    bool isReady() const;
 
     // Disallow copy and move 
     Display(const Display&) = delete;
@@ -66,6 +72,7 @@ private:
     // state
     bool mInitialized = false;
     bool mSendInProgress = false;
+    bool mReady = false;
     uint32_t mRenderSkipCount = 0;
 
     // lvgl display configuration

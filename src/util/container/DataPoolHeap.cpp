@@ -2,19 +2,18 @@
 
 namespace Garbox {
 
-DataPoolHeap::DataPoolHeap(size_t capacityBytes):
-    // initialize members
-    mCapacityBytes(capacityBytes) {
+DataPoolHeap::DataPoolHeap(){
     // nothing to do
 }
 
 DataPoolHeap::~DataPoolHeap() {
-    TriggerExit("DataPoolHeap", "heap using classes must not be deconstructed");
+    AssertExit(mCapacityBytes == 0, "DataPoolHeap", "heap using classes must not be deconstructed");
 }
 
-void DataPoolHeap::init() {
+void DataPoolHeap::init(size_t capacityBytes) {
     AssertExit(!mInitialized, "DataPoolHeap", "already initialized");
 
+    mCapacityBytes = capacityBytes;
     mBuffer = new uint8_t[mCapacityBytes];
     AssertExit(mBuffer != nullptr, "DataPoolHeap", "heap allocation failed");
 

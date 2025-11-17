@@ -11,19 +11,18 @@ template<typename T>
 class RingBufferHeap {
 public:
 
-    RingBufferHeap(size_t capacity):
-        // initialize members
-        mCapacity(capacity) {
+    RingBufferHeap(){
         // nothing to do
     }
 
-    ~RingBufferHeap() {
-        TriggerExit("RingBufferHeap", "heap using classes must not be deconstructed");
+    ~RingBufferHeap(){
+        AssertExit(mCapacity == 0, "RingBufferHeap", "heap using classes must not be deconstructed");
     }
 
-    void init() {
+    void init(size_t capacity) {
         AssertExit(!mInitialized, "RingBufferHeap", "already initialized");
 
+        mCapacity = capacity;
         mBuffer = new T[mCapacity];
         AssertExit(mBuffer != nullptr, "RingBufferHeap", "heap allocation failed");
 
@@ -137,7 +136,7 @@ private:
         }
     }
 
-    size_t mCapacity;
+    size_t mCapacity = 0;
     T* mBuffer = nullptr;
     size_t mHead = 0;
     size_t mTail = 0;

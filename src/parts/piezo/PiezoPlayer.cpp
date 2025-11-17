@@ -102,7 +102,7 @@ void PiezoPlayer::taskTrampoline(void* self){
     static_cast<PiezoPlayer*>(self)->handleTask();
 }
 
-TaskHandle_t PiezoPlayer::getTaskHandle(){
+TaskHandle_t PiezoPlayer::getTaskHandle() const {
     return mTask.getHandle();
 }
 

@@ -151,7 +151,20 @@ void GarboxController::onTick(){
     HslColor hslColor = colorMap.interpolateHsl(tColorMap);
     hslColor.l = brightness;
     mRgbLed.setColor(hslColor.toLinearRgb());
+}
 
+void GarboxController::onDisplayTick(){
+    // check if display is ready to render the next frame
+    if(mDisplay.isReady()){
+
+        // lock display state
+        mDisplay.takeLock();
+        // TODO update widgets here
+        mDisplay.giveLock();
+
+        // notify display to start rendering the next frame
+        mDisplay.notifyTask();
+    }
 }
 
 void GarboxController::handleButtonStateChanged(ButtonState oldState, ButtonState newState){

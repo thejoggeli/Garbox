@@ -26,7 +26,7 @@ public:
     bool isRunning() const;
     bool isConfigured() const;
     bool isCurrentTask() const;
-    TaskHandle_t getHandle();
+    TaskHandle_t getHandle() const;
 
 private:
     const char* mName = nullptr;

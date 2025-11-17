@@ -3,6 +3,7 @@
 #include "app/controllers/FanController.h"
 #include "app/controllers/GarboxController.h"
 #include "app/controllers/HeartbeatController.h"
+#include "core/event/EventFactory.h"
 
 namespace Garbox {
 
@@ -18,6 +19,9 @@ public:
 
 private:
 
+    EventFactory mEventFactory;
+
+    // controllers
     GarboxController mGarboxController;
     HeartbeatController mHeartbeatController;
     FanController mFanController;

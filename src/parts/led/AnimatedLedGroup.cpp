@@ -48,7 +48,7 @@ void AnimatedLedGroup::stopTask(){
     mTask.stop();
 }
 
-TaskHandle_t AnimatedLedGroup::getTaskHandle(){
+TaskHandle_t AnimatedLedGroup::getTaskHandle() const {
     return mTask.getHandle();
 }
 

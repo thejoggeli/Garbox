@@ -21,6 +21,7 @@ class GarboxController : public ControllerAbs {
 public:
 
     GarboxController();
+    void onDisplayTick();
 
 private:
 
