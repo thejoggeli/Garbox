@@ -29,6 +29,7 @@ void PartsProvider::Init(){
     // init headpad
     Heatpad& heatpad = GetHeatpad();
     heatpad.init();
+    heatpad.setEnabled(false);
     heatpad.setDutyCycle(0.0f);
     heatpad.setPeriodDurationMicros(1000_ms);
 

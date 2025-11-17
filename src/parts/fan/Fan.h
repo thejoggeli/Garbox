@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "FanMonitor.h"
+#include "parts/fan/FanState.h"
+#include "parts/fan/FanMonitor.h"
 #include "core/sensor/FrequencySensor.h"
 #include "util/conditioner/TachoConditioner.h"
 
@@ -13,13 +14,6 @@ class LedcChannel;
 class Fan {
 public:
 
-    enum class State : uint8_t {
-        Disabled = 0,
-        Enabled,
-        Stalled,
-        Count
-    };
-
     struct Config {
         Gpio& enableGpio; 
         LedcChannel& speedPwm; 
@@ -29,9 +23,7 @@ public:
         uint32_t tachoFilterTicks = 10;
     };
 
-    static const char* StateToString(State state);
-
-    using StateChangedCallback = std::function<void(State oldState, State newState)>;
+    using StateChangedCallback = std::function<void(FanState oldState, FanState newState)>;
     using StalledAlertCallback = std::function<void(uint32_t counter)>;
 
     Fan(const Config& config);
@@ -43,13 +35,13 @@ public:
     void setStateChangedCallback(StateChangedCallback callback);
     void setStalledAlertCallback(StalledAlertCallback callback);
 
-    void setSpeed(float speed); // range [0.0, 1.0]
+    void setTargetSpeed(float speed); // range [0.0, 1.0]
     void setEnabled(bool enabled);
 
     bool isEnabled() const;
     bool isStalled() const;
-    State getState() const;
-    float getSpeed() const;
+    FanState getState() const;
+    float getTargetSpeed() const;
     float getMeasuredRpm(bool filtered = true) const;
 
     // Disallow copy and move 
@@ -69,12 +61,12 @@ private:
 
     bool mInitialized = false;
 
-    State mState = State::Disabled;
+    FanState mState = FanState::Disabled;
     bool mEnabled = false;
     bool mStalled = false;
     StateChangedCallback mStateChangedCallback = nullptr;
     StalledAlertCallback mStalledAlertCallback = nullptr;
-    float mSpeed = 0.0f;
+    float mTargetSpeed = 0.0f;
 
     // sets voltage on FanEnable pin
     Gpio& mGpioFanEnable;

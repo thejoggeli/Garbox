@@ -9,6 +9,7 @@
 namespace Garbox {
 
 LvglHandler::LvglHandler(const Config& config):
+    mObjects(),
     mWidth(config.width),
     mHeight(config.height),
     mBytesPerPixel(config.bytesPerPixel),
@@ -26,6 +27,10 @@ LvglHandler::LvglHandler(const Config& config):
 
 LvglHandler::~LvglHandler(){
     TriggerExit("LvglHandler", "std::function can use heap");
+}
+
+LvglObjects& LvglHandler::getObjects(){
+    return mObjects;
 }
 
 void LvglHandler::init(){
@@ -64,43 +69,35 @@ void LvglHandler::init(){
     lv_obj_set_style_bg_color(mBackground, lv_color_hex(0x0), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(mBackground, LV_OPA_COVER, LV_PART_MAIN);
 
-    // create background
+    // create box1
     mBox1 = lv_obj_create(lv_scr_act());
     lv_obj_set_size(mBox1, 48, 48);
     lv_obj_set_style_bg_color(mBox1, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(mBox1, LV_OPA_COVER, LV_PART_MAIN);
 
-    // create background
+    // create box2
     mBox2 = lv_obj_create(lv_scr_act());
     lv_obj_set_size(mBox2, 48, 48);
     lv_obj_set_style_bg_color(mBox2, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(mBox2, LV_OPA_COVER, LV_PART_MAIN);
 
-    // create background
+    // create box3
     mBox3 = lv_obj_create(lv_scr_act());
     lv_obj_set_size(mBox3, 48, 48);
     lv_obj_set_style_bg_color(mBox3, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(mBox3, LV_OPA_COVER, LV_PART_MAIN);
 
-    // create background
+    // create box4
     mBox4 = lv_obj_create(lv_scr_act());
     lv_obj_set_size(mBox4, 48, 48);
     lv_obj_set_style_bg_color(mBox4, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(mBox4, LV_OPA_COVER, LV_PART_MAIN);
 
-    // create label
-    mLabel = lv_label_create(lv_screen_active());
-    lv_label_set_text(mLabel, "LvglHandler");
-    lv_obj_set_style_text_color(mLabel, lv_color_hex(0xFF7F00), LV_PART_MAIN);
-    lv_obj_set_style_text_font(mLabel, &lv_font_unscii_16, LV_PART_MAIN);
-    lv_obj_set_align(mLabel, lv_align_t::LV_ALIGN_CENTER);
+    // init objects
+    mObjects.init(lv_scr_act());
 }
 
 void LvglHandler::startRender(){
-    // advance t
-    static float t = 0.0f;
-    t = std::fmod(t + 0.001f, 1.0f);
-    lv_label_set_text_fmt(mLabel, "0.%03u", static_cast<uint32_t>(t*1000.0f));
 
     static float x = 320.0f/2 + 48.0f/2;
     static float y = 240.0f/2 + 48.0f/2;

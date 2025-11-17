@@ -31,6 +31,10 @@ Display::Display(const Config& config):
     // constructor body
 }
 
+LvglHandler& Display::getLvglHandler(){
+    return mLvglHandler;
+}
+
 void Display::init(){
 
     AssertExit(!mInitialized, "Display", "already initialized");

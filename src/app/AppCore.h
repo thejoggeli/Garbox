@@ -33,6 +33,14 @@ private:
     HeartbeatController mHeartbeatController;
     HeatpadController mHeatpadController;
 
+    std::array<ControllerIfc*, 5> mControllers = {
+        &mDisplayController,
+        &mFanController,
+        &mGarboxController,
+        &mHeartbeatController,
+        &mHeatpadController,
+    };
+
     void handleForwardedEvent(const Event* event);
     void routeEvent(const Event* event);
 

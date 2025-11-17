@@ -4,6 +4,7 @@
 
 #include "core/time/SoftwarePwm.h"
 #include "core/time/SoftwareTimer.h"
+#include "parts/heatpad/HeatpadState.h"
 #include "util/conditioner/AdcConditioner.h"
 
 namespace Garbox {
@@ -13,6 +14,8 @@ class Gpio;
 
 class Heatpad {
 public:
+
+    using StateChangedHandler = std::function<void(HeatpadState oldstate, HeatpadState newState)>;
 
     struct Config {
         Gpio& enableGpio;
@@ -26,13 +29,16 @@ public:
     Heatpad(const Config& config);
 
     void init();
-    void start();
     void tick();
-    void reset();
 
+    void setEnabled(bool enabled);
     void setDutyCycle(float duty);
     void setPeriodDurationMicros(float durationMicros);
 
+    void setStateChangedHandler(StateChangedHandler handler);
+
+    bool isEnabled() const;
+    HeatpadState getState() const;
     float getCurrentDutyCycle() const;
     float getNextDutyCycle() const;
     uint32_t getCurrentPeriodDurationMicros() const;
@@ -48,10 +54,14 @@ public:
 
 private:
 
+    void updateState();
     void handlePwmStateChanged(SoftwarePwm::State state);
-
     void setHeatEnabled(bool enabled);
-    bool isHeatEnabled();
+    bool isHeating();
+
+    bool mEnabled = false;
+    HeatpadState mState = HeatpadState::Disabled;
+    StateChangedHandler mStateChangedHandler = nullptr;
     
     Gpio& mGpioHeatpadEnable;
 
@@ -64,7 +74,6 @@ private:
     AdcConditioner mCurrentSenseConditioner;
 
     SoftwarePwm mPwm;
-    SoftwareTimer mLogTimer;
 
     bool mHeatEnabled = false;
 

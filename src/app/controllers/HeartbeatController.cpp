@@ -32,8 +32,8 @@ void HeartbeatController::onTick(){
         mHeartbeatLed.animationStart();
         mHeartbeatTimer.restart();
 
-        // send heartbeat emit
-        EventWrapper wrapper = getEventFactory().make<HeartbeatEventData>();
+        // send heartbeat event
+        EventWrapper wrapper = getEventFactory().make<EventData::Heartbeat>();
         sendEvent(wrapper.event);
     }
 }

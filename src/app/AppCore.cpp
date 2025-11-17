@@ -28,21 +28,21 @@ void AppCore::init(){
     mEventFactory.init(eventFactorySize);
 
     // setup controllers
-    mHeartbeatController.setup(mEventFactory, mEventForwarder);
-    mGarboxController.setup(mEventFactory, mEventForwarder);
-    mFanController.setup(mEventFactory, mEventForwarder);
+    for(ControllerIfc* controller : mControllers){
+        controller->setup(mEventFactory, mEventForwarder);
+    }
 
     // init controllers
-    mHeartbeatController.init();
-    mGarboxController.init();
-    mFanController.init();
+    for(ControllerIfc* controller : mControllers){
+        controller->init();
+    }
 }
 
 void AppCore::start(){
     // start controllers
-    mHeartbeatController.start();
-    mGarboxController.start();
-    mFanController.start();
+    for(ControllerIfc* controller : mControllers){
+        controller->start();
+    }
 }
 
 void AppCore::mainTick(){
@@ -57,7 +57,6 @@ void AppCore::mainTick(){
 }
 
 void AppCore::displayTick(){
-    // TODO trigger UI update
     mDisplayController.tick();
 }
 
@@ -68,11 +67,18 @@ void AppCore::handleForwardedEvent(const Event* event){
 
 void AppCore::routeEvent(const Event* event){
     switch(event->type){
-    case EventType::Fan:
-    case EventType::Button:
-        break;
     case EventType::Heartbeat:
-        mFanController.onHeartbeatEvent(EventView<HeartbeatEventData>(event));
+        mFanController.onHeartbeat(EventView<EventData::Heartbeat>(event));
+        break;
+    case EventType::FanCommand:
+        mFanController.onFanCommand(EventView<EventData::FanCommand>(event));
+        break;
+    case EventType::FanStatus:
+        break;
+    case EventType::HeatpadCommand:
+        mHeatpadController.onHeatpadCommand(EventView<EventData::HeatpadCommand>(event));
+        break;
+    case EventType::HeatpadStatus:
         break;
     case EventType::Null:
     case EventType::Count:

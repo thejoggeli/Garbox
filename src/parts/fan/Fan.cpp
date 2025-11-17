@@ -101,13 +101,13 @@ void Fan::setStalledAlertCallback(StalledAlertCallback callback){
     mStalledAlertCallback = callback;
 }
 
-void Fan::setSpeed(float speed){
+void Fan::setTargetSpeed(float speed){
     if(!mInitialized){
         TriggerDebug("Fan", "not initialized");
         return;
     }
-    mSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
-    mSpeedPwm.setDutyRelative(mSpeed);
+    mTargetSpeed = MathUtils::Clamp<float>(speed, 0.0f, 1.0f);
+    mSpeedPwm.setDutyRelative(mTargetSpeed);
 }
 
 void Fan::setEnabled(bool enabled){
@@ -131,17 +131,17 @@ void Fan::setEnabled(bool enabled){
 }
 
 void Fan::updateState(){
-    const State oldState = mState;
+    const FanState oldState = mState;
     if(mEnabled){
         if(mMonitor.getState() == MonitorState::Stalled){
-            mState = State::Stalled;
+            mState = FanState::Stalled;
         }
         else {
-            mState = State::Enabled;
+            mState = FanState::Enabled;
         }
     }
     else {
-        mState = State::Disabled;
+        mState = FanState::Disabled;
     }
     if((mState != oldState) && mStateChangedCallback){
         mStateChangedCallback(oldState, mState);
@@ -163,15 +163,15 @@ bool Fan::isEnabled() const {
 }
 
 bool Fan::isStalled() const {
-    return (mState == State::Stalled); 
+    return (mState == FanState::Stalled); 
 }
 
-Fan::State Fan::getState() const {
+FanState Fan::getState() const {
     return mState;
 }
 
-float Fan::getSpeed() const {
-    return mSpeed;
+float Fan::getTargetSpeed() const {
+    return mTargetSpeed;
 }
 
 float Fan::getMeasuredRpm(bool filtered) const {
@@ -179,16 +179,6 @@ float Fan::getMeasuredRpm(bool filtered) const {
         return mTachoConditioner.getFilteredValue();
     }
     return mTachoConditioner.getUnfilteredValue();
-}
-
-const char* Fan::StateToString(State state){
-    switch(state){
-    case State::Disabled: return "Disabled";
-    case State::Enabled:  return "Enabled";
-    case State::Stalled:  return "Stalled";
-    case State::Count:  return "Count";
-    }
-    return "Unknown";
 }
 
 } // namespace

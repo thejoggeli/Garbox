@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <lvgl.h>
+#include "parts/display/LvglObjects.h"
 #include "util/math/RectXXYY.h"
 
 namespace Garbox {
@@ -23,6 +24,8 @@ public:
     LvglHandler(const Config& config);
     ~LvglHandler();
 
+    LvglObjects& getObjects();
+
     void init();
     void startRender();
 
@@ -34,6 +37,17 @@ private:
     FlushHandler mFlushHandler = nullptr;
     FlushWaitHandler mFlushWaitHandler = nullptr;
 
+    // lvgl
+    lv_display_t* mLvDisplay = nullptr;
+    LvglObjects mObjects;
+
+    // lvgl objects
+    lv_obj_t* mBackground;
+    lv_obj_t* mBox1;
+    lv_obj_t* mBox2;
+    lv_obj_t* mBox3;
+    lv_obj_t* mBox4;
+
     // drawing buffer
     lv_draw_buf_t mDrawBuffer1;
     lv_draw_buf_t mDrawBuffer2;
@@ -41,15 +55,6 @@ private:
     uint8_t* mDrawBufferData1 = nullptr;
     uint8_t* mDrawBufferData2 = nullptr;
     uint8_t* mDrawBufferData3 = nullptr;
-
-    // lvgl objects
-    lv_display_t* mLvDisplay = nullptr;
-    lv_obj_t* mLabel;
-    lv_obj_t* mBackground;
-    lv_obj_t* mBox1;
-    lv_obj_t* mBox2;
-    lv_obj_t* mBox3;
-    lv_obj_t* mBox4;
  
     const uint32_t mWidth;
     const uint32_t mHeight;

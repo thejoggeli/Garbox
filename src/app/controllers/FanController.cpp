@@ -22,7 +22,7 @@ FanController::FanController():
 void FanController::onInit(){
     // fan already initialized in parts provider
     // fan state changed
-    mFan.setStateChangedCallback([this](Fan::State oldState, Fan::State newState){
+    mFan.setStateChangedCallback([this](FanState oldState, FanState newState){
         handleFanStateChanged(oldState, newState);
     });
     // fan stalled alert
@@ -39,28 +39,29 @@ void FanController::onStart(){
 void FanController::onTick(){
     // fan tick
     mFan.tick();
+}
 
-    // print fan rpm
-    if(mRpmTimer.isExpired() || mRpmTimer.isReset()){
-        static float lastRpmValue = 0;
-        float const rpmValue = mFan.getMeasuredRpm();
-        float const rpmDiff = std::fabs(rpmValue - lastRpmValue);
-        if(rpmDiff > 0.0f){ 
-            LogDebug("FanController", "Measured RPM: %.0f", rpmValue);
-            lastRpmValue = rpmValue;
-        }
-        mRpmTimer.start(200_ms);
+void FanController::onFanCommand(const EventView<EventData::FanCommand> event){
+    mApplyingCommand = true;
+    bool changed = false;
+    // apply enabled
+    if(mFan.isEnabled() != event.data->enabled){
+        mFan.setEnabled(event.data->enabled);
+        changed = true;
+    }
+    // apply speed
+    if(mFan.getTargetSpeed() != event.data->targetSpeed){
+        mFan.setTargetSpeed(event.data->targetSpeed);
+        changed = true;
+    }
+    mApplyingCommand = false;
+    // send status 
+    if(changed){
+        sendStatusEvent();
     }
 }
 
-void FanController::onFanEvent(const EventView<FanEventData>& event){
-    EventWrapper wrapper = getEventFactory().make<FanEventData>();
-    wrapper.data->measuredRpm = 1234.5f;
-    wrapper.data->targetSpeed = 50.0f;
-    sendEvent(wrapper.event);
-}
-
-void FanController::onHeartbeatEvent(const EventView<HeartbeatEventData>& event){
+void FanController::onHeartbeat(const EventView<EventData::Heartbeat>& event){
     if(++mSwitchState >= SwitchStatesCount){
         mSwitchState = 0;
     }
@@ -72,58 +73,79 @@ void FanController::applySwitchState(){
     case 0:
         mFan.setEnabled(false);
         mStatusLed.setBrightnessSmooth(0.0f, 600_ms);
+        sendStatusEvent();
         break;
     case 1: 
         // stay
         break;
     case 2:
         mFan.setEnabled(true);
-        mFan.setSpeed(0.4f);
+        mFan.setTargetSpeed(0.4f);
         mStatusLed.setBrightnessSmooth(0.25f, 1000_ms);
+        sendStatusEvent();
         break;
     case 3:
-        mFan.setSpeed(0.6f);
+        mFan.setTargetSpeed(0.6f);
         mStatusLed.setBrightnessSmooth(0.5f, 1000_ms);
+        sendStatusEvent();
         break;
     case 4:
-        mFan.setSpeed(0.8f);
+        mFan.setTargetSpeed(0.8f);
         mStatusLed.setBrightnessSmooth(0.75f, 1000_ms);
+        sendStatusEvent();
         break;
     case 5:
-        mFan.setSpeed(1.0f);
+        mFan.setTargetSpeed(1.0f);
         mStatusLed.setBrightnessSmooth(1.0f, 1000_ms);
+        sendStatusEvent();
         break;
     case 6:
     case 7:
         // stay
         break;
     case 8:
-        mFan.setSpeed(0.8f);
+        mFan.setTargetSpeed(0.8f);
         mStatusLed.setBrightnessSmooth(0.75f, 1000_ms);
+        sendStatusEvent();
         break;
     case 9: 
-        mFan.setSpeed(0.6f);
+        mFan.setTargetSpeed(0.6f);
         mStatusLed.setBrightnessSmooth(0.5f, 1000_ms);
+        sendStatusEvent();
         break;
     case 10:
-        mFan.setSpeed(0.4f);
+        mFan.setTargetSpeed(0.4f);
         mStatusLed.setBrightnessSmooth(0.25f, 1000_ms);
+        sendStatusEvent();
         break;
     default:
         TriggerDebug("FanController", "unhandled fan state", mSwitchState);
     }
 }
 
-void FanController::handleFanStateChanged(Fan::State oldState, Fan::State newState){
+void FanController::handleFanStateChanged(FanState oldState, FanState newState){
     LogDebug("GarboxController", "fan state changed: %s => %s", 
-        Fan::StateToString(oldState), 
-        Fan::StateToString(newState)
+        FanStateToString(oldState), 
+        FanStateToString(newState)
     );
+    // send fan status event
+    sendStatusEvent();
 }
 
 void FanController::handleFanStalledAlert(uint32_t counter){
     PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
     piezoPlayer.playSequence(PiezoSequences::GetFanStalled());
+}
+
+void FanController::sendStatusEvent(){
+    if(mApplyingCommand){
+        return;
+    }
+    EventWrapper wrapper = getEventFactory().make<EventData::FanStatus>();
+    wrapper.data->state = mFan.getState();
+    wrapper.data->targetSpeed = mFan.getTargetSpeed();
+    wrapper.data->measuredRpm = mFan.getMeasuredRpm();
+    sendEvent(wrapper.event);
 }
 
 } // namespace

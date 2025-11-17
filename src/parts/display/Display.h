@@ -34,6 +34,8 @@ public:
 
     Display(const Config& config);
 
+    LvglHandler& getLvglHandler();
+
     void init();
 
     void startRenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);

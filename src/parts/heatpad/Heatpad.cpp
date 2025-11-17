@@ -54,14 +54,6 @@ void Heatpad::init(){
     mPwm.setMode(SoftwarePwm::Mode::StartHigh);
 }
 
-void Heatpad::start(){
-    // start software pwm
-    mPwm.start();
-
-    // start log timer
-    mLogTimer.start(250_ms);
-}
-
 void Heatpad::tick(){
     mPwm.tick();
 
@@ -72,38 +64,30 @@ void Heatpad::tick(){
     // condition adc voltages (filter + transform to actual units)
     mVoltageSenseConditioner.process(mVoltageSenseAdc.getVolts());
     mCurrentSenseConditioner.process(mCurrentSenseAdc.getVolts());
-
-    // log adc voltages
-    if(mLogTimer.isExpired()){
-        
-        // get most recent adc voltages
-        const float voltage = mVoltageSenseConditioner.getFilteredValue();
-        const float current = mCurrentSenseConditioner.getFilteredValue();
-
-        static float oldVoltage = 0.0f;
-        static float oldCurrent = 0.0f;
-
-        // print usense and isense values if changed
-        if((oldVoltage != voltage) || (oldCurrent != current)){
-            const float power = std::round(voltage * current / 0.1f) * 0.1f;
-            oldVoltage = voltage;
-            oldCurrent = current;
-            LogDebug("Heatpad", "usense=%4.1f V, isense=%3.1f A, psense=%4.1f W", voltage, current, power);
-        }
-
-        // restart timer
-        mLogTimer.restart();
-    }
 }
 
-void Heatpad::reset(){
-    mPwm.stop();
-    setHeatEnabled(false);
+void Heatpad::setEnabled(bool enabled){
+    if(enabled == mEnabled){
+        return;
+    }
+    mEnabled = enabled;
+    if(enabled){
+        mPwm.start();
+    }
+    else {
+        mPwm.stop();
+        setHeatEnabled(false);
+    }
+    updateState();
 }
 
 void Heatpad::setDutyCycle(float duty){
     bool const finishCurrent = true;
     mPwm.setDutyCycle(duty, finishCurrent);
+}
+
+void Heatpad::setStateChangedHandler(StateChangedHandler handler){
+    mStateChangedHandler = handler;
 }
 
 void Heatpad::setPeriodDurationMicros(float durationMicros){
@@ -118,6 +102,27 @@ void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
     else {
         setHeatEnabled(false);
     }
+    updateState();
+}
+
+void Heatpad::updateState(){
+    HeatpadState oldState = mState;
+    HeatpadState newState;
+    if(!mEnabled){
+        newState = HeatpadState::Disabled;
+    }
+    else if(isHeating()){
+        newState = HeatpadState::Heating;
+    }
+    else {
+        newState = HeatpadState::Idle;
+    }
+    if(oldState != newState){
+        mState = newState;
+        if(mStateChangedHandler){
+            mStateChangedHandler(oldState, newState);
+        }
+    }
 }
 
 void Heatpad::setHeatEnabled(bool enabled){
@@ -127,8 +132,16 @@ void Heatpad::setHeatEnabled(bool enabled){
     }
 }
 
-bool Heatpad::isHeatEnabled(){
+bool Heatpad::isHeating(){
     return mHeatEnabled;
+}
+
+bool Heatpad::isEnabled() const {
+    return mPwm.isRunning();
+}
+
+HeatpadState Heatpad::getState() const {
+    return mState;
 }
 
 float Heatpad::getCurrentDutyCycle() const {
