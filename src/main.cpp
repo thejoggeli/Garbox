@@ -80,8 +80,6 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
 
 void setup(){
 
-    Time::BlockMillis(5000);
-
     Log::Init();
     Log::SetLevel(Log::Level::Verbose);
     LogDebug("Main", "log setup complete");

@@ -11,19 +11,11 @@ namespace Garbox {
 class EventFactory {
 public:
 
-    EventFactory(){ 
-        // nothing to do
-    }
+    EventFactory();
+    ~EventFactory();
 
-    ~EventFactory(){ 
-        AssertExit(!mInitialized, "EventFactory", "heap deconstructor");
-    }
-
-    void init(size_t poolSizeBytes){
-        AssertExit(!mInitialized, "EventFactory", "already initialized");
-        mPool.init(poolSizeBytes);
-        mInitialized = true;
-    }
+    void init(size_t poolSizeBytes);
+    void clearDataPool();
 
     template<typename EventData>
     EventWrapper<EventData> make(){
@@ -40,8 +32,7 @@ public:
         }
 
         header->data = data;
-
-        return EventWrapper<EventData>(header, data);
+        return EventWrapper<EventData>(header);
     }
 
 private:

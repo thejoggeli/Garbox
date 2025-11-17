@@ -9,6 +9,7 @@ namespace Garbox {
 
 HeartbeatController::HeartbeatController(): 
     // initialize members
+    ControllerAbs(ControllerId::Heartbeat), 
     mIntervalMicros(AppConfig::HeartbeatIntervalMicros),
     mHeartbeatLed(PartsProvider::GetStatusLed(StatusLedId::Heartbeat)){
     // nothing to do
@@ -30,6 +31,10 @@ void HeartbeatController::onTick(){
     if(mHeartbeatTimer.isExpired()){
         mHeartbeatLed.animationStart();
         mHeartbeatTimer.restart();
+
+        // send heartbeat emit
+        EventWrapper wrapper = getEventFactory().make<HeartbeatEventData>();
+        sendEvent(wrapper.event);
     }
 }
 

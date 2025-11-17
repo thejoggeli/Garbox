@@ -17,4 +17,8 @@ struct ButtonEventData {
     bool pressed;
 };
 
+struct HeartbeatEventData {
+    static constexpr EventType Type = EventType::Heartbeat;
+};
+
 } // namespace

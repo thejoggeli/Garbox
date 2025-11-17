@@ -8,6 +8,10 @@ enum class EventType : uint16_t {
     Null = 0,
     Fan,
     Button,
+    Heartbeat,
+    Count,
 };
+
+const char* EventTypeToString(EventType type);
 
 } // namespace

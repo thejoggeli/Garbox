@@ -13,11 +13,11 @@ namespace Garbox {
 class ControllerAbs : public ControllerIfc {
 public:
 
-    ControllerAbs();
+    ControllerAbs(ControllerId controllerId);
     ~ControllerAbs();
 
     // interface implementations
-    void setup(ControllerId controllerId, EventFactory& eventSystem) final;
+    void setup(EventFactory& factory, EventForwarder& forwarder) final;
     void init() final;
     void start() final;
     void tick() final;
@@ -33,7 +33,7 @@ public:
 protected:
 
     // interface implementations
-    virtual void sendEvent(Event* header) final;
+    virtual void sendEvent(Event* event) final;
 
     // abstract methods for user of class
     virtual void onInit() = 0;
@@ -44,6 +44,7 @@ private:
 
     ControllerId mControllerId = ControllerId::Null;
     EventFactory* mEventFactory = nullptr;
+    EventForwarder* mEventForwarder = nullptr;
 
 };
 

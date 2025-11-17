@@ -18,7 +18,6 @@ class PartsProvider {
 public:
 
     static void Init();
-    static void Tick();
 
     static Fan& GetFan(); 
     static Heatpad& GetHeatpad(); 

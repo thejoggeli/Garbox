@@ -5,6 +5,7 @@
 namespace Garbox {
 
 class EventFactory;
+class EventForwarder;
 class Event;
 
 class ControllerIfc {
@@ -12,7 +13,7 @@ public:
 
     using EventHandler = std::function<void(const Event& event)>;
 
-    virtual void setup(ControllerId controllerId, EventFactory& eventFactory) = 0;
+    virtual void setup(EventFactory& factory, EventForwarder& forwarder) = 0;
     virtual void init() = 0;
     virtual void start() = 0;
     virtual void tick() = 0;

@@ -29,8 +29,8 @@ void PartsProvider::Init(){
     // init headpad
     Heatpad& heatpad = GetHeatpad();
     heatpad.init();
-    heatpad.setDutyCycle(0.5f);
-    heatpad.setPeriodDurationMicros(5000_ms);
+    heatpad.setDutyCycle(0.0f);
+    heatpad.setPeriodDurationMicros(1000_ms);
 
     // init display
     Display& display = GetDisplay();
@@ -58,19 +58,6 @@ void PartsProvider::Init(){
     // init rgb led
     RgbLed& rgbLed = GetRgbLed();
     rgbLed.init();
-}
-
-void PartsProvider::Tick(){
-
-    // tick fan
-    GetFan().tick();
-
-    // tick headpad
-    GetHeatpad().tick();
-
-    // tick encoder button
-    GetEncoderButton().tick();
-    
 }
 
 Fan& PartsProvider::GetFan(){

@@ -8,7 +8,9 @@ enum class ControllerId : uint8_t {
     Null = 0,
     Fan,
     Heartbeat,
-    Garbox
+    Garbox,
+    Heatpad,
+    Display,
 };
 
 } // namespace

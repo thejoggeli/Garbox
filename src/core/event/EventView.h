@@ -6,11 +6,11 @@
 namespace Garbox {
 
 template<typename EventType>
-struct EventWrapper {
-    Event* event;
-    EventType* data;
+struct EventView {
+    const Event* event;
+    const EventType* data;
 
-    EventWrapper(Event* eventPtr):
+    EventView(const Event* eventPtr):
         event(eventPtr),
         data(static_cast<EventType*>(eventPtr->data)){
         // constructor body

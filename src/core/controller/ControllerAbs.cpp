@@ -1,10 +1,11 @@
 #include "ControllerAbs.h"
 
 #include "assert/Assert.h"
+#include "core/event/EventForwarder.h"
 
 namespace Garbox {
 
-ControllerAbs::ControllerAbs(){
+ControllerAbs::ControllerAbs(ControllerId controllerId) : mControllerId(controllerId) {
     // constructor body
 }
 
@@ -12,9 +13,9 @@ ControllerAbs::~ControllerAbs(){
     TriggerExit("ControllerAbs", "controllers must not be destroyed");
 }
 
-void ControllerAbs::setup(ControllerId controllerId, EventFactory& eventFactory){
-    mControllerId = controllerId;
-    mEventFactory = &eventFactory;
+void ControllerAbs::setup(EventFactory& factory, EventForwarder& forwarder){;
+    mEventFactory = &factory;
+    mEventForwarder = &forwarder;
 }
 
 void ControllerAbs::init(){
@@ -37,13 +38,9 @@ EventFactory& ControllerAbs::getEventFactory(){
     return *mEventFactory;
 }
 
-void ControllerAbs::sendEvent(Event* header){
-    if(header == nullptr){
-        TriggerDebug("ControllerAbs", "event header is nullptr", static_cast<uint32_t>(mControllerId));
-        return;
-    }
-    header->sender = mControllerId;
-    // TODO do something with header
+void ControllerAbs::sendEvent(Event* event){
+    event->sender = mControllerId;
+    mEventForwarder->forward(event);
 }
 
 } // namespace
