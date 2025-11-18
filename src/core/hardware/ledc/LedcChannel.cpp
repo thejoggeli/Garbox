@@ -1,6 +1,6 @@
 #include "LedcChannel.h"
 
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "LedcTimer.h"
 
 namespace Garbox {
@@ -15,7 +15,7 @@ LedcChannel::LedcChannel() :
     // nothing to do
 }
 
-bool LedcChannel::setup(Id id, LedcTimer* timer, int32_t gpio, bool invert){
+bool LedcChannel::init(Id id, LedcTimer* timer, int32_t gpio, bool invert){
 
     // check if setup
     if(mInitialized){

@@ -1,6 +1,6 @@
 #include "PulseCounter.h"
 
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_private/esp_clk.h"

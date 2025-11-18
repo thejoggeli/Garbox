@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/types/StatusLedId.h"
-#include "parts/led/AnimatedLedGroup.h"
+#include "modules/parts/led/AnimatedLedGroup.h"
 
 namespace Garbox {
 

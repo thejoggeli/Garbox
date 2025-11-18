@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unity.h>
-#include "assert/AssertHandler.h"
+#include "core/assert/AssertHandler.h"
 
 namespace GarboxTest {
 

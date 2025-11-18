@@ -2,9 +2,9 @@
 
 #include <cstring>
 #include <esp_heap_caps.h>
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "core/log/Log.h"
-#include "util/threading/LockGuard.h"
+#include "core/util/threading/LockGuard.h"
 
 namespace Garbox {
 

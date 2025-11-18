@@ -3,9 +3,9 @@
 #include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
 #include "core/time/Time.h"
-#include "parts/button/InterruptButton.h"
-#include "parts/piezo/PiezoPlayer.h"
-#include "util/function/default/EasingFunctions.h"
+#include "modules/parts/button/InterruptButton.h"
+#include "modules/parts/piezo/PiezoPlayer.h"
+#include "core/util/function/default/EasingFunctions.h"
 
 namespace Garbox {
 

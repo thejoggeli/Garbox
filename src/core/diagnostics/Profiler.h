@@ -6,9 +6,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "app/types/ProfilerId.h"
+#include "shared/types/ProfilerId.h"
 #include "core/time/Time.h"
-#include "util/threading/LockGuard.h"
+#include "core/util/threading/LockGuard.h"
 
 namespace Garbox {
 
@@ -22,7 +22,7 @@ public:
     private:
         ProfilerId mId;
     }; 
-    
+
     struct Record {
         uint32_t countCurrent;
         uint32_t countLast;

@@ -3,26 +3,27 @@
 #include "app/config/AppConfig.h"
 #include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
-#include "util/function/default/EasingFunctions.h"
+#include "core/util/function/default/EasingFunctions.h"
 
 namespace Garbox {
 
-HeartbeatController::HeartbeatController(): 
+HeartbeatController::HeartbeatController(ControllerId id): 
     // initialize members
-    ControllerAbs(ControllerId::Heartbeat), 
+    ControllerAbs(id),
     mIntervalMicros(AppConfig::HeartbeatIntervalMicros),
     mHeartbeatLed(PartsProvider::GetStatusLed(StatusLedId::Heartbeat)){
     // nothing to do
 }
 
 void HeartbeatController::onInit(){
+    // nothing to do
+}
+
+void HeartbeatController::onStart(){
     mHeartbeatLed.animationClear();
     mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 0.0f,  1.0f);
     mHeartbeatLed.animationAddDelay(200_ms);
     mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 1.0f,  0.0f);
-}
-
-void HeartbeatController::onStart(){
     mHeartbeatLed.animationStart();
     mHeartbeatTimer.start(mIntervalMicros);
 }

@@ -2,14 +2,14 @@
 
 #include "app/providers/ColorMaps.h"
 #include "app/providers/PartsProvider.h"
-#include "parts/heatpad/Heatpad.h"
-#include "parts/led/rgb/RgbLed.h"
+#include "modules/parts/heatpad/Heatpad.h"
+#include "modules/parts/led/rgb/RgbLed.h"
 
 namespace Garbox {
 
-HeatpadController::HeatpadController(): 
+HeatpadController::HeatpadController(ControllerId id): 
     // init members
-    ControllerAbs(ControllerId::Heatpad),
+    ControllerAbs(id),
     mHeatpad(PartsProvider::GetHeatpad()),
     mLed(PartsProvider::GetRgbLed()){
     // nothing to do
@@ -28,40 +28,50 @@ void HeatpadController::onStart(){
     mHeatpad.setEnabled(true);
 }
 
-void HeatpadController::onTick(){
+void HeatpadController::onInputTick(){
     mHeatpad.tick();
 
-    // rgb led tick
+    // send changed event
+    if(mStateChanged){
+        sendStatusEvent();
+        mStateChanged = false;
+    }
+}
+
+void HeatpadController::onOutputTick(){
+
+    // get measured voltage
+    const float measuredVoltageNorm = mHeatpad.getMeasuredVoltage() / 17.0f;
+
+    // get interpolated color
     static const ColorMap& colorMap = ColorMaps::GetRedBlue();
-    constexpr float brightness = 0.14f;
-    float const tColorMap = mHeatpad.getMeasuredVoltage() / 17.0f;
-    HslColor hslColor = colorMap.interpolateHsl(tColorMap);
-    hslColor.l = brightness;
+    HslColor hslColor = colorMap.interpolateHsl(measuredVoltageNorm);
+    hslColor.l = 0.14f;
+
+    // update rgb led 
     mLed.setColor(hslColor.toLinearRgb());
 }
 
 void HeatpadController::onHeatpadCommand(const EventView<EventData::HeatpadCommand> event){
-    mApplyingCommand = true;
-    bool changed = false;
     // apply enabled 
     if(mHeatpad.isEnabled() != event.data->enabled){
         mHeatpad.setEnabled(event.data->enabled);
-        changed = true;
+        mStateChanged = true;
     }
     // apply duty cycle
     if(mHeatpad.getNextDutyCycle() != event.data->dutyCycle){
         mHeatpad.setDutyCycle(event.data->dutyCycle);
-        changed = true;
+        mStateChanged = true;
     }
     // apply period
     if(mHeatpad.getNextPeriodDurationMicros() != event.data->periodMicros){
         mHeatpad.setPeriodDurationMicros(event.data->periodMicros);
-        changed = true;
+        mStateChanged = true;
     }
-    mApplyingCommand = false;
-    // send status event
-    if(changed){
+    // send changed event
+    if(mStateChanged){
         sendStatusEvent();
+        mStateChanged = false;
     }
 }
 
@@ -70,9 +80,6 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 }
 
 void HeatpadController::sendStatusEvent(){
-    if(mApplyingCommand){
-        return;
-    }
     EventWrapper wrapper = getEventFactory().make<EventData::HeatpadStatus>();
     wrapper.data->state = mHeatpad.getState();
     sendEvent(wrapper.event);

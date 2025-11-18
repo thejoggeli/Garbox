@@ -1,6 +1,6 @@
 #pragma once
 
-#include "parts/piezo/ToneSequence.h"
+#include "modules/parts/piezo/ToneSequence.h"
 
 namespace Garbox {
 

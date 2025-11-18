@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "app/types/ControllerId.h"
-#include "app/types/EventType.h"
+#include "shared/types/ControllerId.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 

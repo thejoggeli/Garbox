@@ -10,13 +10,14 @@ class AnimatedLed;
 class HeartbeatController : public ControllerAbs {
 public:
 
-    HeartbeatController();
+    HeartbeatController(ControllerId id);
+
+    void onTick();
 
 private: 
 
     void onInit();
     void onStart();
-    void onTick();
 
     uint32_t mIntervalMicros;
     AnimatedLed& mHeartbeatLed;

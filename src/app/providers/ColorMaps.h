@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/color/ColorMap.h"
+#include "core/util/color/ColorMap.h"
 
 namespace Garbox {
 

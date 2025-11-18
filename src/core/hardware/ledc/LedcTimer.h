@@ -19,7 +19,7 @@ public:
 
     explicit LedcTimer();
 
-    bool setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits);
+    bool init(Id id, uint32_t frequencyHz, uint8_t resolutionBits);
     bool setFrequency(uint32_t frequencyHz) const;
 
     Id getId() const;

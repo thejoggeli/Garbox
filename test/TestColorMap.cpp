@@ -2,9 +2,9 @@
 #include <iostream>
 
 #include "helpers/AssertHelper.h"
-#include "util/color/ColorMap.h"
-#include "util/color/types/RgbFloat.h"
-#include "util/container/Span.h"
+#include "core/util/color/ColorMap.h"
+#include "core/util/color/types/RgbFloat.h"
+#include "core/util/container/Span.h"
 
 using namespace Garbox;
 using namespace GarboxTest;

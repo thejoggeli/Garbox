@@ -1,6 +1,6 @@
 #include "ControllerAbs.h"
 
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "core/event/EventForwarder.h"
 
 namespace Garbox {
@@ -13,21 +13,14 @@ ControllerAbs::~ControllerAbs(){
     TriggerExit("ControllerAbs", "controllers must not be destroyed");
 }
 
-void ControllerAbs::setup(EventFactory& factory, EventForwarder& forwarder){;
+void ControllerAbs::init(EventFactory& factory, EventForwarder& forwarder){
     mEventFactory = &factory;
     mEventForwarder = &forwarder;
-}
-
-void ControllerAbs::init(){
     onInit();
 }
 
 void ControllerAbs::start(){
     onStart();
-}
-
-void ControllerAbs::tick(){
-    onTick();
 }
 
 ControllerId ControllerAbs::getControllerId(){

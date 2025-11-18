@@ -3,17 +3,17 @@
 #include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
 #include "app/providers/PiezoSequences.h"
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "core/log/Log.h"
-#include "parts/piezo/PiezoPlayer.h"
+#include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 
 constexpr static uint32_t SwitchStatesCount = 11;
 
-FanController::FanController(): 
+FanController::FanController(ControllerId id): 
     // init members
-    ControllerAbs(ControllerId::Fan),
+    ControllerAbs(id),
     mFan(PartsProvider::GetFan()),
     mStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom1)){
     // nothing to do
@@ -36,13 +36,25 @@ void FanController::onStart(){
     applySwitchState();
 }
 
-void FanController::onTick(){
-    // fan tick
+void FanController::onInputTick(){
+    // updates MeasuredRpm + FanState
+    // may trigger handleFanStateChanged()
     mFan.tick();
+    if(mFanStateChanged){
+        sendStatusEvent();
+        mFanStateChanged = false;
+    }
+}
+
+void FanController::onOutputTick(){
+    if(mSwitchStateChanged){
+        applySwitchState();
+        sendStatusEvent();
+        mSwitchStateChanged = false;
+    }
 }
 
 void FanController::onFanCommand(const EventView<EventData::FanCommand> event){
-    mApplyingCommand = true;
     bool changed = false;
     // apply enabled
     if(mFan.isEnabled() != event.data->enabled){
@@ -54,7 +66,6 @@ void FanController::onFanCommand(const EventView<EventData::FanCommand> event){
         mFan.setTargetSpeed(event.data->targetSpeed);
         changed = true;
     }
-    mApplyingCommand = false;
     // send status 
     if(changed){
         sendStatusEvent();
@@ -62,10 +73,11 @@ void FanController::onFanCommand(const EventView<EventData::FanCommand> event){
 }
 
 void FanController::onHeartbeat(const EventView<EventData::Heartbeat>& event){
-    if(++mSwitchState >= SwitchStatesCount){
+    mSwitchState++;
+    if(mSwitchState >= SwitchStatesCount){
         mSwitchState = 0;
     }
-    applySwitchState();
+    mSwitchStateChanged = true;
 }
 
 void FanController::applySwitchState(){
@@ -73,7 +85,6 @@ void FanController::applySwitchState(){
     case 0:
         mFan.setEnabled(false);
         mStatusLed.setBrightnessSmooth(0.0f, 600_ms);
-        sendStatusEvent();
         break;
     case 1: 
         // stay
@@ -82,22 +93,18 @@ void FanController::applySwitchState(){
         mFan.setEnabled(true);
         mFan.setTargetSpeed(0.4f);
         mStatusLed.setBrightnessSmooth(0.25f, 1000_ms);
-        sendStatusEvent();
         break;
     case 3:
         mFan.setTargetSpeed(0.6f);
         mStatusLed.setBrightnessSmooth(0.5f, 1000_ms);
-        sendStatusEvent();
         break;
     case 4:
         mFan.setTargetSpeed(0.8f);
         mStatusLed.setBrightnessSmooth(0.75f, 1000_ms);
-        sendStatusEvent();
         break;
     case 5:
         mFan.setTargetSpeed(1.0f);
         mStatusLed.setBrightnessSmooth(1.0f, 1000_ms);
-        sendStatusEvent();
         break;
     case 6:
     case 7:
@@ -106,17 +113,14 @@ void FanController::applySwitchState(){
     case 8:
         mFan.setTargetSpeed(0.8f);
         mStatusLed.setBrightnessSmooth(0.75f, 1000_ms);
-        sendStatusEvent();
         break;
     case 9: 
         mFan.setTargetSpeed(0.6f);
         mStatusLed.setBrightnessSmooth(0.5f, 1000_ms);
-        sendStatusEvent();
         break;
     case 10:
         mFan.setTargetSpeed(0.4f);
         mStatusLed.setBrightnessSmooth(0.25f, 1000_ms);
-        sendStatusEvent();
         break;
     default:
         TriggerDebug("FanController", "unhandled fan state", mSwitchState);
@@ -128,8 +132,7 @@ void FanController::handleFanStateChanged(FanState oldState, FanState newState){
         FanStateToString(oldState), 
         FanStateToString(newState)
     );
-    // send fan status event
-    sendStatusEvent();
+    mFanStateChanged = true;
 }
 
 void FanController::handleFanStalledAlert(uint32_t counter){
@@ -138,9 +141,6 @@ void FanController::handleFanStalledAlert(uint32_t counter){
 }
 
 void FanController::sendStatusEvent(){
-    if(mApplyingCommand){
-        return;
-    }
     EventWrapper wrapper = getEventFactory().make<EventData::FanStatus>();
     wrapper.data->state = mFan.getState();
     wrapper.data->targetSpeed = mFan.getTargetSpeed();

@@ -4,8 +4,8 @@
 #include "app/hardware/spi/SpiInstances.h"
 #include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
-#include "parts/display/Display.h"
-#include "parts/piezo/PiezoPlayer.h"
+#include "modules/parts/display/Display.h"
+#include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 

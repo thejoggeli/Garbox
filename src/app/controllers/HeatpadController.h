@@ -2,7 +2,7 @@
 
 #include "core/controller/ControllerAbs.h"
 #include "core/event/EventView.h"
-#include "parts/heatpad/HeatpadState.h"
+#include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox {
 
@@ -12,19 +12,21 @@ class RgbLed;
 class HeatpadController : public ControllerAbs {
 public:
     
-    HeatpadController();
+    HeatpadController(ControllerId id);
+
+    void onInputTick();
+    void onOutputTick();
 
     void onHeatpadCommand(const EventView<EventData::HeatpadCommand> event);
 
 private:
 
-    bool mApplyingCommand = false;
+    bool mStateChanged = false;
     Heatpad& mHeatpad;
     RgbLed& mLed;
 
     void onInit() final;
     void onStart() final;
-    void onTick() final;
 
     void handleHeatpadStateChanged(HeatpadState oldState, HeatpadState newState);
     void sendStatusEvent();

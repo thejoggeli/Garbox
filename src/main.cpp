@@ -1,5 +1,7 @@
 
-#include "app/AppCore.h"
+#include "app/StartupSequence.h"
+#include "app/SystemRuntime.h"
+#include "app/SystemTasks.h"
 #include "app/config/AppConfig.h"
 #include "app/hardware/adc/AdcInstances.h"
 #include "app/hardware/ledc/LedcInstances.h"
@@ -8,19 +10,18 @@
 #include "app/hardware/timer/TimerInstances.h"
 #include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
-#include "app/SystemTasks.h"
-#include "assert/AssertHandler.h"
+#include "core/assert/AssertHandler.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
-#include "parts/piezo/PiezoPlayer.h"
-#include "util/StringUtils.h"
-#include "util/threading/LockGuard.h"
+#include "core/util/StringUtils.h"
+#include "core/util/threading/LockGuard.h"
+#include "modules/parts/piezo/PiezoPlayer.h"
 
 using namespace Garbox;
 
-static AppCore gAppCore;
+static SystemRuntime gAppCore;
 static Task gMainTask;
 
 void handleMainTask();
@@ -110,16 +111,17 @@ void setup(){
     // start system tasks
     SystemTasks::StartAll();
 
+    // run startup sequence
+    StartupSequence startup;
+    startup.run();
+
     // init main app
-    gAppCore.init();
+    gAppCore.init({
+        .eventPoolSizeBytes = 1024,
+        .eventQueueLength = 128,
+    });
 
-    // start main app
-    gAppCore.start();
-
-    // start profiler
-    Profiler::Start();
-
-    // start main task
+    // init main task
     gMainTask.configure(
         AppConfig::MainTaskName,
         AppConfig::MainTaskStackSize,
@@ -127,6 +129,14 @@ void setup(){
         AppConfig::MainTaskCore
     );
     gMainTask.setHandler(handleMainTask);
+
+    // start profiler
+    Profiler::Start();
+
+    // start main app
+    gAppCore.start();
+
+    // start main task
     gMainTask.start();
 
     // setup complete
@@ -148,7 +158,7 @@ void handleMainTask(){
         // main tick
         Profiler::Begin(ProfilerId::MainTick);
         Time::Tick();
-        gAppCore.mainTick();
+        gAppCore.onMainTick();
         Profiler::End(ProfilerId::MainTick);
 
         // logging
@@ -160,7 +170,7 @@ void handleMainTask(){
         // this is done to ensure that the display is always updated at a fixed interval and to 
         // give it enough time to transfer the previous ui state via SPI
         vTaskDelayUntil(&lastWakeTime, mainTickMillis);
-        gAppCore.displayTick();
+        gAppCore.onDisplayTick();
         
         // end main task
         // sleep until next tick

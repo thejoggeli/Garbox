@@ -1,7 +1,7 @@
 #include "LedcInstances.h"
 
 #include "app/config/PinConfig.h"
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "LedcConfig.h"
 
 namespace Garbox {
@@ -19,12 +19,12 @@ static LedcTimer* resolveTimer(LedcTimer::Id id){
     }
 }
 
-static void setupTimer(LedcTimer& timer, LedcConfig::TimerConfig const& config){
-    timer.setup(config.id, config.frequencyHz, config.resolutionBits);
+static void initTimer(LedcTimer& timer, LedcConfig::TimerConfig const& config){
+    timer.init(config.id, config.frequencyHz, config.resolutionBits);
 }
 
-static void setupChannel(LedcChannel& channel, LedcConfig::ChannelConfig const& config){
-    channel.setup(config.channelId, resolveTimer(config.timerId), config.pin, config.invert);
+static void initChannel(LedcChannel& channel, LedcConfig::ChannelConfig const& config){
+    channel.init(config.channelId, resolveTimer(config.timerId), config.pin, config.invert);
 }
 
 void LedcInstances::Init(){
@@ -32,18 +32,18 @@ void LedcInstances::Init(){
     AssertExit(!gInitialized, "LedInstances", "already initialized");
 
     // setup timers
-    setupTimer(GetDimmingTimer(), LedcConfig::DimmingTimer);
-    setupTimer(GetFanTimer(),     LedcConfig::FanTimer);
-    setupTimer(GetPiezoTimer(),   LedcConfig::PiezoTimer);
+    initTimer(GetDimmingTimer(), LedcConfig::DimmingTimer);
+    initTimer(GetFanTimer(),     LedcConfig::FanTimer);
+    initTimer(GetPiezoTimer(),   LedcConfig::PiezoTimer);
 
     // setup channels
-    setupChannel(GetDebugLed0Channel(),  LedcConfig::DebugLed0Channel);
-    setupChannel(GetDebugLed1Channel(),  LedcConfig::DebugLed1Channel);
-    setupChannel(GetDebugLed2Channel(),  LedcConfig::DebugLed2Channel);
-    setupChannel(GetDebugLed3Channel(),  LedcConfig::DebugLed3Channel);
-    setupChannel(GetDisplayBacklightChannel(),  LedcConfig::BacklightChannel);
-    setupChannel(GetFanSpeedChannel(), LedcConfig::FanControlChannel);
-    setupChannel(GetPiezoChannel(),      LedcConfig::PiezoChannel);
+    initChannel(GetDebugLed0Channel(),  LedcConfig::DebugLed0Channel);
+    initChannel(GetDebugLed1Channel(),  LedcConfig::DebugLed1Channel);
+    initChannel(GetDebugLed2Channel(),  LedcConfig::DebugLed2Channel);
+    initChannel(GetDebugLed3Channel(),  LedcConfig::DebugLed3Channel);
+    initChannel(GetDisplayBacklightChannel(),  LedcConfig::BacklightChannel);
+    initChannel(GetFanSpeedChannel(), LedcConfig::FanControlChannel);
+    initChannel(GetPiezoChannel(),      LedcConfig::PiezoChannel);
 
     gInitialized = true;
 }

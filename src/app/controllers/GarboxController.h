@@ -2,7 +2,7 @@
 
 #include "core/controller/ControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
-#include "parts/button/ButtonIfc.h"
+#include "modules/parts/button/ButtonIfc.h"
 
 namespace Garbox {
 
@@ -13,13 +13,14 @@ class AnimatedLed;
 class GarboxController : public ControllerAbs {
 public:
 
-    GarboxController();
+    GarboxController(ControllerId id);
+
+    void onTick();
 
 private:
 
     void onInit() final;
     void onStart() final;
-    void onTick() final;
 
     void handleButtonStateChanged(ButtonState oldState, ButtonState newState);
     void handleButtonHold(uint32_t counter, uint32_t holdTimeMicros);

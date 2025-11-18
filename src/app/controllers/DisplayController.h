@@ -9,18 +9,32 @@ class Display;
 
 class DisplayController : public ControllerAbs {
 public:
-    
-    DisplayController();
 
-    void onDisplayTick();
+    struct State {
+        FanState fanState;
+        float fanTargetSpeed;
+        float fanMeasuredRpm;
+        HeatpadState heatpadState;
+        float heatpadDuty;
+        float heatpadVoltage;
+        float heatpadCurrent;
+        uint32_t renderSkippedCount;
+    };
+    
+    DisplayController(ControllerId id);
+
+    void onRenderTick();
 
 private:
 
     Display& mDisplay;
+    State mState {};
+
+    uint32_t mRenderSkippedCount = 0;
 
     void onInit() final;
     void onStart() final;
-    void onTick() final;
+
 
 };
 

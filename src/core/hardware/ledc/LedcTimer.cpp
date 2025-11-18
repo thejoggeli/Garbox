@@ -1,6 +1,6 @@
 #include "LedcTimer.h"
 
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 
 namespace Garbox {
 
@@ -12,7 +12,7 @@ LedcTimer::LedcTimer() :
     // nothing to do
 }
 
-bool LedcTimer::setup(Id id, uint32_t frequencyHz, uint8_t resolutionBits){
+bool LedcTimer::init(Id id, uint32_t frequencyHz, uint8_t resolutionBits){
 
     // check if setup
     if(mInitialized){

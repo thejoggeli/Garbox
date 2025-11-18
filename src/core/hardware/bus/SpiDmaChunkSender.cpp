@@ -1,6 +1,6 @@
 #include "SpiDmaChunkSender.h"
 
-#include "assert/Assert.h"
+#include "core/assert/Assert.h"
 #include "core/log/Log.h"
 
 namespace Garbox {
