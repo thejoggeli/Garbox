@@ -1,7 +1,8 @@
 #pragma once
 
 #include "core/controller/ControllerAbs.h"
-#include "core/event/EventView.h"
+#include "modules/parts/fan/FanState.h"
+#include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox {
 
@@ -18,10 +19,10 @@ public:
         float heatpadDuty;
         float heatpadVoltage;
         float heatpadCurrent;
-        uint32_t renderSkippedCount;
+        uint32_t renderSkippedCount = 0xFFFFFFFF;
     };
     
-    DisplayController(ControllerId id);
+    DisplayController(ComponentId id);
 
     void onRenderTick();
 

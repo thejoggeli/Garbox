@@ -24,7 +24,7 @@ public:
     bool isInitialized() const;
     uint16_t getCount() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     StaticLedGroup(const StaticLedGroup&) = delete;
     StaticLedGroup& operator=(const StaticLedGroup&) = delete;
     StaticLedGroup(StaticLedGroup&&) = delete;

@@ -51,7 +51,7 @@ public:
     // handle a missed pulse (e.g. button was pressed and released between two ticks, detected by interrupt)
     void handleMissedPulse(uint32_t pulseDuration);
 
-    // Disallow copy and move 
+    // disallow copy and move 
     FsmButton(const FsmButton&) = delete;
     FsmButton& operator=(const FsmButton&) = delete;
     FsmButton(FsmButton&&) = delete;

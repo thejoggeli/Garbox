@@ -36,7 +36,7 @@ public:
     uint32_t getFrequencyHz();
     uint64_t getMaxValue();
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Timer(const Timer&) = delete;
     Timer& operator=(const Timer&) = delete;
     Timer(Timer&&) = delete;

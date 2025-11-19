@@ -11,7 +11,7 @@
 
 namespace Garbox {
 
-GarboxController::GarboxController(ControllerId id):
+GarboxController::GarboxController(ComponentId id):
     // initialize members
     ControllerAbs(id),
     mButtonStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom2)),

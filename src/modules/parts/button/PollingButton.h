@@ -37,7 +37,7 @@ public:
     void setInitialHoldDelayMicros(uint32_t delayMicros) final;
     void setRepeatHoldDelayMicros(uint32_t delayMicros) final;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     PollingButton(const PollingButton&) = delete;
     PollingButton& operator=(const PollingButton&) = delete;
     PollingButton(PollingButton&&) = delete;

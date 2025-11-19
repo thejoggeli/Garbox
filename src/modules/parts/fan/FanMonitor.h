@@ -34,7 +34,7 @@ public:
 
     State getState() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     FanMonitor(const FanMonitor&) = delete;
     FanMonitor& operator=(const FanMonitor&) = delete;
     FanMonitor(FanMonitor&&) = delete;

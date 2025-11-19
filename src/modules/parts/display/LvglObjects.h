@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 
 struct _lv_obj_t;
 typedef struct _lv_obj_t lv_obj_t;

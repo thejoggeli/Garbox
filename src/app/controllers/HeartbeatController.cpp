@@ -7,7 +7,7 @@
 
 namespace Garbox {
 
-HeartbeatController::HeartbeatController(ControllerId id): 
+HeartbeatController::HeartbeatController(ComponentId id): 
     // initialize members
     ControllerAbs(id),
     mIntervalMicros(AppConfig::HeartbeatIntervalMicros),
@@ -34,7 +34,7 @@ void HeartbeatController::onTick(){
         mHeartbeatTimer.restart();
 
         // send heartbeat event
-        EventWrapper wrapper = getEventFactory().make<EventData::Heartbeat>();
+        EventWrapper wrapper = makeEvent<EventData::Heartbeat>();
         sendEvent(wrapper.event);
     }
 }

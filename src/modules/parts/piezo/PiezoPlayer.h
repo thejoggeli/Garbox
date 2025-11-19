@@ -41,7 +41,7 @@ public:
     void playTone(const Tone& tone, uint32_t SilentTime);
     bool isPlaying() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     PiezoPlayer(const PiezoPlayer&) = delete;
     PiezoPlayer& operator=(const PiezoPlayer&) = delete;
     PiezoPlayer(PiezoPlayer&&) = delete;

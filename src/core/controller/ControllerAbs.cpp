@@ -1,11 +1,14 @@
 #include "ControllerAbs.h"
 
 #include "core/assert/Assert.h"
+#include "core/event/EventFactory.h"
 #include "core/event/EventForwarder.h"
 
 namespace Garbox {
 
-ControllerAbs::ControllerAbs(ControllerId controllerId) : mControllerId(controllerId) {
+ControllerAbs::ControllerAbs(ComponentId id): 
+    // init members    
+    mComponentDescriptor{ComponentType::Controller, id} {
     // constructor body
 }
 
@@ -14,26 +17,33 @@ ControllerAbs::~ControllerAbs(){
 }
 
 void ControllerAbs::init(EventFactory& factory, EventForwarder& forwarder){
+    AssertExit(!mInitialized, "ControllerAbs", "already initialized");
     mEventFactory = &factory;
     mEventForwarder = &forwarder;
     onInit();
+    mInitialized = true;
 }
 
 void ControllerAbs::start(){
+    if(!mInitialized){
+        TriggerExit("ControllerAbs", "not initialized");
+    }
     onStart();
 }
 
-ControllerId ControllerAbs::getControllerId(){
-    return mControllerId;
-}
-
-EventFactory& ControllerAbs::getEventFactory(){
-    return *mEventFactory;
-}
-
 void ControllerAbs::sendEvent(Event* event){
-    event->sender = mControllerId;
+    if(!mInitialized){
+        TriggerExit("ControllerAbs", "not initialized");
+    }
     mEventForwarder->forward(event);
+}
+
+bool ControllerAbs::isInitialized() const {
+    return mInitialized;
+}
+
+ComponentId ControllerAbs::getComponentId() const {
+    return mComponentDescriptor.id;
 }
 
 } // namespace

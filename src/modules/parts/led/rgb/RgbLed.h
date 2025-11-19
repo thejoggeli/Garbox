@@ -25,7 +25,7 @@ public:
 
     bool isInitialized() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     RgbLed(const RgbLed&) = delete;
     RgbLed& operator=(const RgbLed&) = delete;
     RgbLed(RgbLed&&) = delete;

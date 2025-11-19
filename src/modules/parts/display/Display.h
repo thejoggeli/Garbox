@@ -45,7 +45,7 @@ public:
     bool tryTakeRenderReady();
     void giveRenderTrigger();
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Display(const Display&) = delete;
     Display& operator=(const Display&) = delete;
     Display(Display&&) = delete;

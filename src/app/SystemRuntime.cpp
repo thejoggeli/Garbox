@@ -8,13 +8,19 @@
 namespace Garbox {
 
 SystemRuntime::SystemRuntime():
-    // init members
-    mDisplayController(ControllerId::Display),
-    mFanController(ControllerId::Fan),
-    mGarboxController(ControllerId::Garbox),
-    mHeatpadController(ControllerId::Heatpad),
-    mHeartbeatController(ControllerId::Heartbeat){
+    // init behaviours
+    mFermentationBehaviour(ComponentId::FermentationBehaviour),
+    // init controllers
+    mDisplayController(ComponentId::DisplayController),
+    mFanController(ComponentId::FanController),
+    mGarboxController(ComponentId::GarboxController),
+    mHeatpadController(ComponentId::HeatpadController),
+    mHeartbeatController(ComponentId::HeartbeatController){
     // nothing to do
+}
+
+void SystemRuntime::onRegisterBehaviours(){
+    registerBehaviour(&mFermentationBehaviour);
 }
 
 void SystemRuntime::onRegisterControllers(){
@@ -26,15 +32,19 @@ void SystemRuntime::onRegisterControllers(){
 }
 
 void SystemRuntime::onInit(){
-    // controllers are already initialized when this function is called
+    // behaviours and controllers are already initialized when this function is called
+    setQueuedBehaviour(&mFermentationBehaviour);
 }
 
 void SystemRuntime::onStart(){
-    // controllers are already started when this function is called
+    // behaviours and controllers are already started when this function is called
     // nothing to do
 }
 
 void SystemRuntime::onMainTick(){
+
+    // apply next behaviour
+    applyQueuedBehaviour();
 
     // input tick
     mFanController.onInputTick();
@@ -46,8 +56,10 @@ void SystemRuntime::onMainTick(){
     mGarboxController.onTick();
     dispatchEvents();
 
-    // behaviour tick
-    // mActiveBehaviour.tick();
+    // behaviour logic tick
+    AppBehaviourAbs* behaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "SystemRuntime", "no behaviour set");
+    behaviour->onLogicTick();
 
     // output tick
     mFanController.onOutputTick();
@@ -61,10 +73,14 @@ void SystemRuntime::onDisplayTick(){
 }
 
 void SystemRuntime::onRouteEvent(const Event* event){
-    LogDebug("SystemRuntime", "Event: %s", EventTypeToString(event->type));
+    LogDebug("SystemRuntime", "[Event] %s (id=%" PRIi32 ") from %s", 
+        EventTypeToString(event->type),
+        event->id,
+        ComponentIdToString(event->sender.id)
+    );
     switch(event->type){
     case EventType::Heartbeat:
-        mFanController.onHeartbeat(EventView<EventData::Heartbeat>(event));
+        mFermentationBehaviour.onHeartbeat(EventView<EventData::Heartbeat>(event));
         break;
     case EventType::FanCommand:
         mFanController.onFanCommand(EventView<EventData::FanCommand>(event));

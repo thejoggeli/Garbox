@@ -20,7 +20,7 @@ public:
     float getBrightness() const;
     float getBrightnessCorrected() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     DimmingLed(const DimmingLed&) = delete;
     DimmingLed& operator=(const DimmingLed&) = delete;
     DimmingLed(DimmingLed&&) = delete;

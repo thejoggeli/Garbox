@@ -8,7 +8,7 @@
 
 namespace Garbox {
 
-DisplayController::DisplayController(ControllerId id): 
+DisplayController::DisplayController(ComponentId id): 
     // init members
     ControllerAbs(id),
     mDisplay(PartsProvider::GetDisplay()){
@@ -49,7 +49,7 @@ void DisplayController::onRenderTick(){
         if(state.heatpadDuty != mState.heatpadDuty) lv.setHeatpadDuty(state.heatpadDuty);
         if(state.heatpadVoltage != mState.heatpadVoltage) lv.setHeatpadVoltage(state.heatpadVoltage);
         if(state.heatpadCurrent != mState.heatpadCurrent) lv.setHeatpadCurrent(state.heatpadCurrent);
-        if(state.renderSkippedCount != mState.renderSkippedCount) lv.setHeatpadCurrent(state.heatpadCurrent);
+        if(state.renderSkippedCount != mState.renderSkippedCount) lv.setRenderSkippedCount(state.renderSkippedCount);
 
         mState = state;
 

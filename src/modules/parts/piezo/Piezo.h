@@ -23,7 +23,7 @@ public:
     bool isEnabled();
     float getDuty();
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Piezo(const Piezo&) = delete;
     Piezo& operator=(const Piezo&) = delete;
     Piezo(Piezo&&) = delete;

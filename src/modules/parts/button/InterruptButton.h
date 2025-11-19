@@ -39,7 +39,7 @@ public:
     void setInitialHoldDelayMicros(uint32_t delayMicros) final;
     void setRepeatHoldDelayMicros(uint32_t delayMicros) final;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     InterruptButton(const InterruptButton&) = delete;
     InterruptButton& operator=(const InterruptButton&) = delete;
     InterruptButton(InterruptButton&&) = delete;

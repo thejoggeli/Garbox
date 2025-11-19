@@ -7,7 +7,7 @@
 
 namespace Garbox {
 
-HeatpadController::HeatpadController(ControllerId id): 
+HeatpadController::HeatpadController(ComponentId id): 
     // init members
     ControllerAbs(id),
     mHeatpad(PartsProvider::GetHeatpad()),
@@ -70,17 +70,16 @@ void HeatpadController::onHeatpadCommand(const EventView<EventData::HeatpadComma
     }
     // send changed event
     if(mStateChanged){
-        sendStatusEvent();
         mStateChanged = false;
     }
 }
 
 void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, HeatpadState newState){
-    sendStatusEvent();
+    mStateChanged = true;
 }
 
 void HeatpadController::sendStatusEvent(){
-    EventWrapper wrapper = getEventFactory().make<EventData::HeatpadStatus>();
+    EventWrapper wrapper = makeEvent<EventData::HeatpadStatus>();
     wrapper.data->state = mHeatpad.getState();
     sendEvent(wrapper.event);
 }

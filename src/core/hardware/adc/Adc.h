@@ -40,7 +40,7 @@ public:
     float getVolts() const;
     bool isCalibrated() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Adc(const Adc&) = delete;
     Adc& operator=(const Adc&) = delete;
     Adc(Adc&&) = delete;

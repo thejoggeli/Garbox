@@ -37,7 +37,7 @@ public:
     float getBrightnessFloat() const;
     bool isInitialized() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     RgbLedStrip(const RgbLedStrip&) = delete;
     RgbLedStrip& operator=(const RgbLedStrip&) = delete;
     RgbLedStrip(RgbLedStrip&&) = delete;

@@ -13,7 +13,7 @@ class Fan;
 class FanController : public ControllerAbs {
 public:
     
-    FanController(ControllerId id);
+    FanController(ComponentId id);
 
     void onInputTick();
     void onOutputTick();
@@ -26,10 +26,7 @@ private:
     Fan& mFan;
     AnimatedLed& mStatusLed;
 
-    bool mFanStateChanged = false;
-
-    bool mSwitchStateChanged = false;
-    uint32_t mSwitchState = 0;
+    bool mStateChanged = false;
     
     void onInit() final;
     void onStart() final;
@@ -37,7 +34,6 @@ private:
     void handleFanStateChanged(FanState oldState, FanState newState);
     void handleFanStalledAlert(uint32_t counter);
 
-    void applySwitchState();
     void sendStatusEvent();
 
 };

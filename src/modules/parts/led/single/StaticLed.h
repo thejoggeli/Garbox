@@ -18,7 +18,7 @@ public:
 
     bool isEnabled() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     StaticLed(const StaticLed&) = delete;
     StaticLed& operator=(const StaticLed&) = delete;
     StaticLed(StaticLed&&) = delete;

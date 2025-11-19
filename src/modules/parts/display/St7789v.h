@@ -37,7 +37,7 @@ public:
 
     void onSendAsyncComplete();
 
-    // Disallow copy and move 
+    // disallow copy and move 
     St7789v(const St7789v&) = delete;
     St7789v& operator=(const St7789v&) = delete;
     St7789v(St7789v&&) = delete;

@@ -46,7 +46,7 @@ public:
     float getMeasuredVoltage() const;
     float getMeasuredCurrent() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Heatpad(const Heatpad&) = delete;
     Heatpad& operator=(const Heatpad&) = delete;
     Heatpad(Heatpad&&) = delete;

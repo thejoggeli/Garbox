@@ -36,7 +36,7 @@ public:
     bool isInitialized() const;
     uint16_t getCount() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     AnimatedLedGroup(const AnimatedLedGroup&) = delete;
     AnimatedLedGroup& operator=(const AnimatedLedGroup&) = delete;
     AnimatedLedGroup(AnimatedLedGroup&&) = delete;

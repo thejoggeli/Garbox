@@ -25,7 +25,7 @@ public:
 
     float getFrequencyHz();
 
-    // Disallow copy and move 
+    // disallow copy and move 
     FrequencySensor(const FrequencySensor&) = delete;
     FrequencySensor& operator=(const FrequencySensor&) = delete;
     FrequencySensor(FrequencySensor&&) = delete;

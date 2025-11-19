@@ -1,7 +1,6 @@
 #pragma once
 
-#include <functional>
-#include "shared/types/ControllerId.h"
+#include "core/types/ComponentDescriptor.h"
 
 namespace Garbox {
 
@@ -12,12 +11,11 @@ class Event;
 class ControllerIfc {
 public:
 
-    using EventHandler = std::function<void(const Event& event)>;
-
     virtual void init(EventFactory& factory, EventForwarder& forwarder) = 0;
     virtual void start() = 0;
-    virtual ControllerId getControllerId() = 0;
-    virtual EventFactory& getEventFactory() = 0;
+
+    virtual bool isInitialized() const = 0;
+    virtual ComponentId getComponentId() const = 0;
 
 protected:
 

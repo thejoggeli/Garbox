@@ -10,7 +10,7 @@ class AnimatedLed;
 class HeartbeatController : public ControllerAbs {
 public:
 
-    HeartbeatController(ControllerId id);
+    HeartbeatController(ComponentId id);
 
     void onTick();
 

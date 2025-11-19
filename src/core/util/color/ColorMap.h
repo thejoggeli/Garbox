@@ -45,7 +45,7 @@ public:
     HslColor interpolateHsl(float t) const;
     LabColor interpolateLab(float t) const; 
 
-    // Disallow copy and move 
+    // disallow copy and move 
     ColorMap(const ColorMap&) = delete;
     ColorMap& operator=(const ColorMap&) = delete;
     ColorMap(ColorMap&&) = delete;

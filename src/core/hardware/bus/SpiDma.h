@@ -46,7 +46,7 @@ public:
     bool transferSync(const uint8_t* data, size_t lenBits, void* user = nullptr);
     bool transferAsync(const uint8_t* data, size_t lenBits, void* user = nullptr, CompleteCallback callback = nullptr);
 
-    // Disallow copy and move 
+    // disallow copy and move 
     SpiDma(const SpiDma&) = delete;
     SpiDma& operator=(const SpiDma&) = delete;
     SpiDma(SpiDma&&) = delete;

@@ -81,7 +81,7 @@ public:
     bool hasPulldown() const;
     bool isInitialized() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Gpio(const Gpio&) = delete;
     Gpio& operator=(const Gpio&) = delete;
     Gpio(Gpio&&) = delete;

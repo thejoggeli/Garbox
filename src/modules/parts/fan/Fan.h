@@ -44,7 +44,7 @@ public:
     float getTargetSpeed() const;
     float getMeasuredRpm(bool filtered = true) const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     Fan(const Fan&) = delete;
     Fan& operator=(const Fan&) = delete;
     Fan(Fan&&) = delete;

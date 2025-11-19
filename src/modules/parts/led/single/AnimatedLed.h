@@ -41,7 +41,7 @@ public:
     bool isInitialized() const;
     bool isAnimationPlaying() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     AnimatedLed(const AnimatedLed&) = delete;
     AnimatedLed& operator=(const AnimatedLed&) = delete;
     AnimatedLed(AnimatedLed&&) = delete;

@@ -13,7 +13,7 @@ class AnimatedLed;
 class GarboxController : public ControllerAbs {
 public:
 
-    GarboxController(ControllerId id);
+    GarboxController(ComponentId id);
 
     void onTick();
 

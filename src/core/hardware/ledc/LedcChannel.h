@@ -29,7 +29,7 @@ public:
 
     uint32_t getDuty() const;
 
-    // Disallow copy and move 
+    // disallow copy and move 
     LedcChannel(const LedcChannel&) = delete;
     LedcChannel& operator=(const LedcChannel&) = delete;
     LedcChannel(LedcChannel&&) = delete;

@@ -30,7 +30,7 @@ public:
     int32_t getAndClearCount();
     void clearCount();
 
-    // Disallow copy and move 
+    // disallow copy and move 
     PulseCounter(const PulseCounter&) = delete;
     PulseCounter& operator=(const PulseCounter&) = delete;
     PulseCounter(PulseCounter&&) = delete;
