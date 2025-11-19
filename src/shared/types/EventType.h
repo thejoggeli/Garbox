@@ -5,12 +5,20 @@
 namespace Garbox {
 
 enum class EventType : uint16_t {
+    
+    // null event
     Null = 0,
+
+    // status events
     Heartbeat,
     FanStatus,
-    FanCommand,
     HeatpadStatus,
+
+    // command events
+    FanCommand,
     HeatpadCommand,
+
+    // enum size 
     Count,
 };
 

@@ -37,13 +37,13 @@ void LedcInstances::Init(){
     initTimer(GetPiezoTimer(),   LedcConfig::PiezoTimer);
 
     // setup channels
-    initChannel(GetDebugLed0Channel(),  LedcConfig::DebugLed0Channel);
-    initChannel(GetDebugLed1Channel(),  LedcConfig::DebugLed1Channel);
-    initChannel(GetDebugLed2Channel(),  LedcConfig::DebugLed2Channel);
-    initChannel(GetDebugLed3Channel(),  LedcConfig::DebugLed3Channel);
-    initChannel(GetDisplayBacklightChannel(),  LedcConfig::BacklightChannel);
-    initChannel(GetFanSpeedChannel(), LedcConfig::FanControlChannel);
-    initChannel(GetPiezoChannel(),      LedcConfig::PiezoChannel);
+    initChannel(GetDebugLed0Channel(),        LedcConfig::DebugLed0Channel);
+    initChannel(GetDebugLed1Channel(),        LedcConfig::DebugLed1Channel);
+    initChannel(GetDebugLed2Channel(),        LedcConfig::DebugLed2Channel);
+    initChannel(GetDebugLed3Channel(),        LedcConfig::DebugLed3Channel);
+    initChannel(GetDisplayBacklightChannel(), LedcConfig::BacklightChannel);
+    initChannel(GetFanSpeedChannel(),         LedcConfig::FanControlChannel);
+    initChannel(GetPiezoChannel(),            LedcConfig::PiezoChannel);
 
     gInitialized = true;
 }

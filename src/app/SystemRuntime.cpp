@@ -65,7 +65,6 @@ void SystemRuntime::onMainTick(){
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
     dispatchEvents();
-
 }
 
 void SystemRuntime::onDisplayTick(){
@@ -73,25 +72,30 @@ void SystemRuntime::onDisplayTick(){
 }
 
 void SystemRuntime::onRouteEvent(const Event* event){
+    
+    // log event
     LogDebug("SystemRuntime", "[Event] %s [id=%" PRIi32 "] %s", 
         EventTypeToString(event->type),
         event->id,
         ComponentIdToString(event->sender.id)
     );
+
+    // get active behaviour
+    AppBehaviourAbs* activeBehaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
+
+    // route the event
     switch(event->type){
-    case EventType::Heartbeat:
-        mFermentationBehaviour.onHeartbeat(EventView<EventData::Heartbeat>(event));
-        break;
-    case EventType::FanCommand:
-        mFanController.onFanCommand(EventView<EventData::FanCommand>(event));
-        break;
-    case EventType::FanStatus:
-        break;
-    case EventType::HeatpadCommand:
-        mHeatpadController.onHeatpadCommand(EventView<EventData::HeatpadCommand>(event));
-        break;
-    case EventType::HeatpadStatus:
-        break;
+
+    // route status updates to behaviour
+    case EventType::Heartbeat:          activeBehaviour->onHeartbeat(EventView<EventData::Heartbeat>(event)); break;
+    case EventType::FanStatus:          activeBehaviour->onFanStatus(EventView<EventData::FanStatus>(event)); break;
+    case EventType::HeatpadStatus:      activeBehaviour->onHeatpadStatus(EventView<EventData::HeatpadStatus>(event)); break;
+
+    // route commands to controllers
+    case EventType::FanCommand:         mFanController.onFanCommand(EventView<EventData::FanCommand>(event)); break;
+    case EventType::HeatpadCommand:     mHeatpadController.onHeatpadCommand(EventView<EventData::HeatpadCommand>(event)); break;
+    
+    // special event types
     case EventType::Null:
     case EventType::Count:
         TriggerDebug("SystemRuntime", "invalid event type");
