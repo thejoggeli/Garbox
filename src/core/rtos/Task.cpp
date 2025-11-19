@@ -41,12 +41,10 @@ void Task::start(){
 void Task::stop(){
     if(mTaskHandle == nullptr){
         TriggerDebug("Task", "stop failed, task is not running");
-        LogWarning("Task", "%s is not running", mName);
         return;
     }
     if(xTaskGetCurrentTaskHandle() == mTaskHandle){
         TriggerDebug("Task", "task not allowed to stop itself");
-        LogWarning("Task", "%s tried to stop itself", mName);
         return;
     }
     vTaskDelete(mTaskHandle);

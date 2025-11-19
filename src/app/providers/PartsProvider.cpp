@@ -4,6 +4,7 @@
 #include "app/config/AppConfig.h"
 #include "app/hardware/adc/AdcInstances.h"
 #include "app/hardware/gpio/GpioInstances.h"
+#include "app/hardware/i2c/I2cInstances.h"
 #include "app/hardware/ledc/LedcInstances.h"
 #include "app/hardware/spi/SpiInstances.h"
 #include "app/hardware/timer/TimerInstances.h"
@@ -16,6 +17,7 @@
 #include "modules/parts/led/rgb/RgbLed.h"
 #include "modules/parts/led/single/AnimatedLed.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
+#include "modules/parts/temperature/Sht31.h"
 #include "core/util/container/Span.h"
 
 namespace Garbox {
@@ -51,6 +53,13 @@ void PartsProvider::Init(){
     button.setLongPressMicros(600_ms),
     button.setInitialHoldDelayMicros(1200_ms);
     button.setRepeatHoldDelayMicros(300_ms);
+
+    // init sht31
+    Sht31& sht31 = GetTemperatureSensor();
+    sht31.init({
+        .address = 0x44,
+        .mode = Sht31::PeriodicMode::Hz1,
+    });
 
     // init status leds
     StatusLeds& statusLeds = GetStatusLeds();
@@ -114,6 +123,14 @@ ButtonIfc& PartsProvider::GetEncoderButton(){
         GpioInstances::GetEncoderButton()
     );
     return instance;
+}
+
+Sht31& PartsProvider::GetTemperatureSensor(){
+    static Sht31 instance(
+        I2cInstances::GetI2c()
+    );
+    return instance;
+
 }
 
 AnimatedLed& PartsProvider::GetStatusLed(StatusLedId id){

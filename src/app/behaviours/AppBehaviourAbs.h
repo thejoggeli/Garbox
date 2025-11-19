@@ -14,6 +14,7 @@ public:
     virtual void onHeartbeat(const EventView<EventData::Heartbeat>& event) {};
     virtual void onFanStatus(const EventView<EventData::FanStatus>& event) {};
     virtual void onHeatpadStatus(const EventView<EventData::HeatpadStatus>& event) {};
+    virtual void onTemperatureStatus(const EventView<EventData::TemperatureStatus>& event) {};
 
 };
 

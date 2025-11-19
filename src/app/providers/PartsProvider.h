@@ -9,6 +9,7 @@ class Display;
 class Fan;
 class Heatpad;
 class PiezoPlayer;
+class Sht31;
 
 class AnimatedLed;
 class StatusLeds;
@@ -24,6 +25,7 @@ public:
     static Display& GetDisplay(); 
     static PiezoPlayer& GetPiezoPlayer(); 
     static ButtonIfc& GetEncoderButton(); 
+    static Sht31& GetTemperatureSensor();
 
     static AnimatedLed& GetStatusLed(StatusLedId id);
     static StatusLeds& GetStatusLeds();

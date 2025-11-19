@@ -10,10 +10,10 @@ class ButtonIfc;
 class PiezoPlayer;
 class AnimatedLed;
 
-class GarboxController : public ControllerAbs {
+class InputController : public ControllerAbs {
 public:
 
-    GarboxController(ComponentId id);
+    InputController(ComponentId id);
 
     void onTick();
 

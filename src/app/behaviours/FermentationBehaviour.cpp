@@ -1,5 +1,6 @@
 #include "FermentationBehaviour.h"
 
+#include "core/log/Log.h"
 #include "core/time/TimeLiterals.h"
 
 namespace Garbox {
@@ -26,10 +27,6 @@ void FermentationBehaviour::onBecomeInactive(){
 
 void FermentationBehaviour::onLogicTick(){
 
-    // set control engine inputs
-    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    // TODO
-
     // perform control engine step
     mControlEngine.step();
 
@@ -50,6 +47,45 @@ void FermentationBehaviour::onLogicTick(){
 
 void FermentationBehaviour::onHeartbeat(const EventView<EventData::Heartbeat>& event){
     mHeartbeatReceived = true;
+}
+
+void FermentationBehaviour::onFanStatus(const EventView<EventData::FanStatus>& event){
+    LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%, rpm=%" PRIi32,
+        FanStateToString(event.data->state),
+        event.data->targetSpeed * 100.0f,
+        static_cast<uint32_t>(event.data->measuredRpm + 0.5f)
+    );
+    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    inputs.fanEnabled = (event.data->state != FanState::Disabled);
+    inputs.fanStalled = (event.data->state == FanState::Stalled);
+    inputs.fanTargetSpeed = event.data->targetSpeed;
+    inputs.fanMeasuredRpm = event.data->measuredRpm;
+}
+
+void FermentationBehaviour::onHeatpadStatus(const EventView<EventData::HeatpadStatus>& event){
+    LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
+        HeatpadStateToString(event.data->state),
+        event.data->duty,
+        event.data->periodMicros / 1000
+    );
+    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    inputs.heatpadEnabled = (event.data->state != HeatpadState::Disabled);
+    inputs.heatpadPwmDuty = event.data->duty;
+    inputs.heatpadPwmPeriodMicros = event.data->periodMicros; 
+}
+
+void FermentationBehaviour::onTemperatureStatus(const EventView<EventData::TemperatureStatus>& event){
+    LogDebug("FermentationBehaviour", "[TemperatureStatus] en=%u, err=%u, temp=%.2f°C, hum=%.2f%%",
+        event.data->sensorEnabled,
+        event.data->sensorError,
+        event.data->temperatureCelcius,
+        event.data->humidityRelative
+    );
+    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    inputs.temperatureEnabled = event.data->sensorEnabled;
+    inputs.temperatureError = event.data->sensorError;
+    inputs.temperatureCelcius = event.data->temperatureCelcius;
+    inputs.humidityRelative = event.data->humidityRelative;
 }
 
 void FermentationBehaviour::applySwitchState(){

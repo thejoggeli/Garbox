@@ -13,6 +13,7 @@ enum class EventType : uint16_t {
     Heartbeat,
     FanStatus,
     HeatpadStatus,
+    TemperatureStatus,
 
     // command events
     FanCommand,

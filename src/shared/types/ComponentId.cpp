@@ -12,9 +12,10 @@ const char* ComponentIdToString(ComponentId id){
         // controllers
         case ComponentId::FanController: return "FanController";
         case ComponentId::HeartbeatController: return "HeartbeatController";
-        case ComponentId::GarboxController: return "GarboxController";
+        case ComponentId::InputController: return "InputController";
         case ComponentId::HeatpadController: return "HeatpadController";
         case ComponentId::DisplayController: return "DisplayController";
+        case ComponentId::I2cPartsController: return "I2cPartsController";
 
         // special types
         case ComponentId::Null: return "Null";

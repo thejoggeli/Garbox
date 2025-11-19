@@ -15,9 +15,10 @@ enum class ComponentId : uint8_t {
     // controller ids
     FanController,
     HeartbeatController,
-    GarboxController,
+    InputController,
     HeatpadController,
     DisplayController,
+    I2cPartsController,
 
     // special count type
     Count

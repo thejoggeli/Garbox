@@ -11,6 +11,9 @@ public:
     
     void onLogicTick() final;
     void onHeartbeat(const EventView<EventData::Heartbeat>& event) final;
+    void onFanStatus(const EventView<EventData::FanStatus>& event) final;
+    void onHeatpadStatus(const EventView<EventData::HeatpadStatus>& event) final;
+    void onTemperatureStatus(const EventView<EventData::TemperatureStatus>& event) final;
 
 private:
 

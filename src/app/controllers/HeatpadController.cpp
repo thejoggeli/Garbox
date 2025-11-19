@@ -68,10 +68,6 @@ void HeatpadController::onHeatpadCommand(const EventView<EventData::HeatpadComma
         mHeatpad.setPeriodDurationMicros(event.data->periodMicros);
         mStateChanged = true;
     }
-    // send changed event
-    if(mStateChanged){
-        mStateChanged = false;
-    }
 }
 
 void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, HeatpadState newState){
@@ -81,6 +77,8 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 void HeatpadController::sendStatusEvent(){
     EventWrapper wrapper = makeEvent<EventData::HeatpadStatus>();
     wrapper.data->state = mHeatpad.getState();
+    wrapper.data->duty = mHeatpad.getCurrentDutyCycle();
+    wrapper.data->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
     sendEvent(wrapper.event);
 }
 

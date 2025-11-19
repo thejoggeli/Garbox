@@ -37,12 +37,14 @@ void GpioInstances::Init(){
     AssertExit(!gInitialized, "GpioInstances", "already initialized");
 
     // debug gpios
-    InitGpio(GetDebugGpio0(), { Mode::Disable, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
-    InitGpio(GetDebugGpio1(), { Mode::Disable, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
+    InitGpio(GetDebugGpio(), { Mode::Disable, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
 
     // fan
     InitGpio(GetFanEnable(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
     InitGpio(GetFanTacho(),  { Mode::Input,  Pull::Disable, Interrupt::Disable, NonInverted });
+
+    // i2c sensor
+    InitGpio(GetI2cEnablePower(), { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialHigh);
 
     // display
     InitGpio(GetDisplayDc(),  { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }, InitialLow);
@@ -63,12 +65,14 @@ void GpioInstances::Init(){
 }
 
 // debug gpios
-Gpio& GpioInstances::GetDebugGpio0(){ return GetGpioInstance<PinConfig::DebugGpio0>(); }
-Gpio& GpioInstances::GetDebugGpio1(){ return GetGpioInstance<PinConfig::DebugGpio1>(); }
+Gpio& GpioInstances::GetDebugGpio(){ return GetGpioInstance<PinConfig::DebugGpio>(); }
 
 // fan
 Gpio& GpioInstances::GetFanEnable(){ return GetGpioInstance<PinConfig::FanEnable>(); }
 Gpio& GpioInstances::GetFanTacho(){ return GetGpioInstance<PinConfig::FanTacho>(); }
+
+// temperature sensor
+Gpio& GpioInstances::GetI2cEnablePower(){ return GetGpioInstance<PinConfig::I2cEnable>(); }
 
 // display
 Gpio& GpioInstances::GetDisplayDc(){ return GetGpioInstance<PinConfig::DisplayDc>(); }

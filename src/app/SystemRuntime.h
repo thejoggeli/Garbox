@@ -3,9 +3,10 @@
 #include "app/behaviours/FermentationBehaviour.h"
 #include "app/controllers/DisplayController.h"
 #include "app/controllers/FanController.h"
-#include "app/controllers/GarboxController.h"
 #include "app/controllers/HeartbeatController.h"
 #include "app/controllers/HeatpadController.h"
+#include "app/controllers/InputController.h"
+#include "app/controllers/I2cPartsController.h"
 #include "core/application/system/SystemRuntimeAbs.h"
 
 namespace Garbox {
@@ -26,9 +27,10 @@ private:
     // controllers
     DisplayController mDisplayController;
     FanController mFanController;
-    GarboxController mGarboxController;
+    InputController mInputController;
     HeatpadController mHeatpadController;
     HeartbeatController mHeartbeatController;
+    I2cPartsController mI2cPartsController;
 
     void onInit() final;
     void onStart() final;

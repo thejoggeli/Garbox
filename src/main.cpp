@@ -6,6 +6,7 @@
 #include "app/hardware/adc/AdcInstances.h"
 #include "app/hardware/ledc/LedcInstances.h"
 #include "app/hardware/gpio/GpioInstances.h"
+#include "app/hardware/i2c/I2cInstances.h"
 #include "app/hardware/spi/SpiInstances.h"
 #include "app/hardware/timer/TimerInstances.h"
 #include "app/parts/StatusLeds.h"
@@ -99,11 +100,12 @@ void setup(){
     Profiler::SetEnabled(AppConfig::EnableProfiler);
 
     // init hardware instances
-    GpioInstances::Init();
-    LedcInstances::Init();
-    TimerInstances::Init();
-    SpiInstances::Init();
     AdcInstances::Init();
+    GpioInstances::Init();
+    I2cInstances::Init();
+    LedcInstances::Init();
+    SpiInstances::Init();
+    TimerInstances::Init();
 
     // init all parts
     PartsProvider::Init();

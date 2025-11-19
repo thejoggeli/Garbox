@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/hardware/bus/SpiDma.h"
+#include "core/hardware/spi/SpiDma.h"
 
 namespace Garbox {
 

@@ -5,15 +5,15 @@
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
-#include "core/hardware/bus/SpiDma.h"
+#include "core/hardware/spi/SpiDma.h"
 #include "core/util/ByteUtils.h"
 #include "core/util/color/types/Rgb565.h"
 #include "core/util/color/types/Rgb888.h"
 #include "core/util/color/types/HslColor.h"
 
-namespace Garbox {
-
 #define GarboxDebugDisplay 0
+
+namespace Garbox {
 
 Display::Display(const Config& config): 
     // init members 

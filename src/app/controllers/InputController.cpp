@@ -1,4 +1,4 @@
-#include "GarboxController.h"
+#include "InputController.h"
 
 #include "app/providers/PartsProvider.h"
 #include "app/providers/PiezoSequences.h"
@@ -11,7 +11,7 @@
 
 namespace Garbox {
 
-GarboxController::GarboxController(ComponentId id):
+InputController::InputController(ComponentId id):
     // initialize members
     ControllerAbs(id),
     mButtonStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom2)),
@@ -20,7 +20,7 @@ GarboxController::GarboxController(ComponentId id):
     // nothing to do
 }
 
-void GarboxController::onInit(){
+void InputController::onInit(){
 
     // button state changed
     mButton.setStateChangedCallback([this](ButtonState oldState, ButtonState newState, void* userData){
@@ -34,17 +34,17 @@ void GarboxController::onInit(){
 
 }
 
-void GarboxController::onStart(){
+void InputController::onStart(){
     // nothing to do
 }
 
-void GarboxController::onTick(){
+void InputController::onTick(){
     // button tick
     mButton.tick();
 }
 
-void GarboxController::handleButtonStateChanged(ButtonState oldState, ButtonState newState){
-    LogDebug("GarboxController", "button state changed: %s => %s", ButtonStateToString(oldState), ButtonStateToString(newState));
+void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState newState){
+    LogDebug("InputController", "button state changed: %s => %s", ButtonStateToString(oldState), ButtonStateToString(newState));
     const uint32_t deadTime = 0;
     switch(newState){
     case ButtonState::Pressed: {
@@ -66,11 +66,11 @@ void GarboxController::handleButtonStateChanged(ButtonState oldState, ButtonStat
     }
 }
 
-void GarboxController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
+void InputController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
     const uint32_t frequency = 300 + counter * 100;
     const uint32_t deadTime = 0;
     if(frequency > 3000){
-        TriggerExit("GarboxController", "Testing");
+        TriggerExit("InputController", "Testing");
     }
     else if(!mPiezoPlayer.isPlaying()){
         mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);

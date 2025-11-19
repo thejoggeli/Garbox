@@ -4,7 +4,7 @@
 #include <freertos/semphr.h>
 #include <lvgl.h>
 
-#include "core/hardware/bus/SpiDmaChunkSender.h"
+#include "core/hardware/spi/SpiDmaChunkSender.h"
 #include "core/rtos/Task.h"
 #include "modules/parts/display/LvglHandler.h"
 #include "modules/parts/display/St7789v.h"

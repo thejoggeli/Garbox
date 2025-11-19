@@ -17,8 +17,7 @@ public:
     static constexpr int32_t DebugLed3 = 39;           // DEBUG_LED_3
 
     // Debug GPIO
-    static constexpr int32_t DebugGpio0 = 41;         // DEBUG_GPIO
-    static constexpr int32_t DebugGpio1 = 15;         // PIEZO_B
+    static constexpr int32_t DebugGpio = 41;           // DEBUG_GPIO
 
     // Fan
     static constexpr int32_t FanEnable = 4;            // FAN_ENABLE
@@ -34,8 +33,9 @@ public:
     static constexpr int32_t DisplayBlk = 16;          // DISP_BLK
 
     // Sensors (Temperature, Humidity, Brightness)
-    static constexpr int32_t SensorSda = 6;            // SENS_SDA
-    static constexpr int32_t SensorScl = 7;            // SENS_SCL
+    static constexpr int32_t I2cSda = 7;               // TEMPSENS_SDA
+    static constexpr int32_t I2cScl = 6;               // TEMPSENS_SCL
+    static constexpr int32_t I2cEnable = 15;           // TEMPSENS_ENABLE
 
     // Piezo
     static constexpr int32_t Piezo = 38;               // PIEZO

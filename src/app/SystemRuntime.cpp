@@ -5,6 +5,8 @@
 #include "core/log/Log.h"
 #include "modules/parts/heatpad/Heatpad.h"
 
+#define GarboxDebugSystemRuntime 0
+
 namespace Garbox {
 
 SystemRuntime::SystemRuntime():
@@ -13,9 +15,10 @@ SystemRuntime::SystemRuntime():
     // init controllers
     mDisplayController(ComponentId::DisplayController),
     mFanController(ComponentId::FanController),
-    mGarboxController(ComponentId::GarboxController),
+    mInputController(ComponentId::InputController),
     mHeatpadController(ComponentId::HeatpadController),
-    mHeartbeatController(ComponentId::HeartbeatController){
+    mHeartbeatController(ComponentId::HeartbeatController),
+    mI2cPartsController(ComponentId::I2cPartsController){
     // nothing to do
 }
 
@@ -26,9 +29,10 @@ void SystemRuntime::onRegisterBehaviours(){
 void SystemRuntime::onRegisterControllers(){
     registerController(&mDisplayController);
     registerController(&mFanController);
-    registerController(&mGarboxController);
+    registerController(&mInputController);
     registerController(&mHeatpadController);
     registerController(&mHeartbeatController);
+    registerController(&mI2cPartsController);
 }
 
 void SystemRuntime::onInit(){
@@ -49,11 +53,12 @@ void SystemRuntime::onMainTick(){
     // input tick
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
+    mI2cPartsController.onInputTick();
     dispatchEvents();
 
     // regular tick tick
     mHeartbeatController.onTick();
-    mGarboxController.onTick();
+    mInputController.onTick();
     dispatchEvents();
 
     // behaviour logic tick
@@ -64,6 +69,7 @@ void SystemRuntime::onMainTick(){
     // output tick
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
+    mI2cPartsController.onOutputTick();
     dispatchEvents();
 }
 
@@ -73,12 +79,14 @@ void SystemRuntime::onDisplayTick(){
 
 void SystemRuntime::onRouteEvent(const Event* event){
     
-    // log event
+#if GarboxDebugSystemRuntime
+    // log event meta data
     LogDebug("SystemRuntime", "[Event] %s [id=%" PRIi32 "] %s", 
         EventTypeToString(event->type),
         event->id,
         ComponentIdToString(event->sender.id)
     );
+#endif
 
     // get active behaviour
     AppBehaviourAbs* activeBehaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
@@ -90,6 +98,7 @@ void SystemRuntime::onRouteEvent(const Event* event){
     case EventType::Heartbeat:          activeBehaviour->onHeartbeat(EventView<EventData::Heartbeat>(event)); break;
     case EventType::FanStatus:          activeBehaviour->onFanStatus(EventView<EventData::FanStatus>(event)); break;
     case EventType::HeatpadStatus:      activeBehaviour->onHeatpadStatus(EventView<EventData::HeatpadStatus>(event)); break;
+    case EventType::TemperatureStatus:  activeBehaviour->onTemperatureStatus(EventView<EventData::TemperatureStatus>(event)); break;
 
     // route commands to controllers
     case EventType::FanCommand:         mFanController.onFanCommand(EventView<EventData::FanCommand>(event)); break;

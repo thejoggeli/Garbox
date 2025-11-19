@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Garbox {
 
 class FermentationControlEngine {
@@ -12,13 +14,20 @@ public:
 
         // fan input
         bool fanEnabled;
+        bool fanStalled;
         float fanTargetSpeed;
         float fanMeasuredRpm;
 
         // heatpad
         bool heatpadEnabled;
         float heatpadPwmDuty;
-        float heatpadPwmPeriodSeconds;
+        uint32_t heatpadPwmPeriodMicros;
+
+        // temperature and humidity
+        bool temperatureEnabled;
+        bool temperatureError;
+        float temperatureCelcius;
+        float humidityRelative;
     };
 
     struct Outputs {

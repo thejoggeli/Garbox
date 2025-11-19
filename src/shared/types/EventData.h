@@ -19,15 +19,25 @@ struct FanStatus {
     float measuredRpm = 0.0f;
 };
 
+struct HeatpadStatus {
+    static constexpr EventType Type = EventType::HeatpadStatus;
+    HeatpadState state = HeatpadState::Disabled;
+    float duty = 0.0f;
+    uint32_t periodMicros = 0;
+};
+
+struct TemperatureStatus {
+    static constexpr EventType Type = EventType::TemperatureStatus;
+    bool sensorEnabled = false;
+    bool sensorError = false;
+    float temperatureCelcius = 0.0f;
+    float humidityRelative = 0.0f;
+};
+
 struct FanCommand {
     static constexpr EventType Type = EventType::FanCommand;
     bool enabled = false;
     float targetSpeed = 0.0f;
-};
-
-struct HeatpadStatus {
-    static constexpr EventType Type = EventType::HeatpadStatus;
-    HeatpadState state = HeatpadState::Disabled;
 };
 
 struct HeatpadCommand {

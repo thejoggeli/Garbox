@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/fan/FanMonitor.h"
-#include "modules/sensors/FrequencySensor.h"
+#include "modules/sensors/frequency/FrequencySensor.h"
 #include "core/util/conditioner/TachoConditioner.h"
 
 namespace Garbox {

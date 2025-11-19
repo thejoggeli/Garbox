@@ -72,10 +72,6 @@ void FanController::onFanCommand(const EventView<EventData::FanCommand> event){
 }
 
 void FanController::handleFanStateChanged(FanState oldState, FanState newState){
-    LogDebug("GarboxController", "fan state changed: %s => %s", 
-        FanStateToString(oldState), 
-        FanStateToString(newState)
-    );
     mStateChanged = true;
 }
 
