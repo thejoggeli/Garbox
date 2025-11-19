@@ -68,7 +68,7 @@ void LvglObjects::init(lv_obj_t *parentObject){
     // create heatpad voltage label
     mRenderSkippedCountLabel = lv_label_create(parentObject);
     lv_obj_set_pos(mRenderSkippedCountLabel, startXPx, currentYPx);
-    lv_label_set_text(mRenderSkippedCountLabel, "Render skipped count: ");
+    lv_label_set_text(mRenderSkippedCountLabel, "Render skipped count: 0");
 }
 
 void LvglObjects::setFanState(const char *stateText){
@@ -144,7 +144,7 @@ void LvglObjects::setHeatpadVoltage(float voltageVolts){
 void LvglObjects::setRenderSkippedCount(uint32_t count){
     // update heatpad voltage
     char buffer[64];
-    std::snprintf(buffer, sizeof(buffer), "Render skipped count: %u V", count);
+    std::snprintf(buffer, sizeof(buffer), "Render skipped count: %u", count);
     lv_label_set_text(mRenderSkippedCountLabel, buffer);
 }
 

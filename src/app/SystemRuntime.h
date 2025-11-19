@@ -1,11 +1,11 @@
 #pragma once
 
+#include "app/behaviours/FermentationBehaviour.h"
 #include "app/controllers/DisplayController.h"
 #include "app/controllers/FanController.h"
 #include "app/controllers/GarboxController.h"
 #include "app/controllers/HeartbeatController.h"
 #include "app/controllers/HeatpadController.h"
-
 #include "core/application/system/SystemRuntimeAbs.h"
 
 namespace Garbox {
@@ -20,6 +20,9 @@ public:
 
 private:
 
+    // behaviours
+    FermentationBehaviour mFermentationBehaviour;
+
     // controllers
     DisplayController mDisplayController;
     FanController mFanController;
@@ -30,6 +33,7 @@ private:
     void onInit() final;
     void onStart() final;
     void onRouteEvent(const Event* event) final;
+    void onRegisterBehaviours() final;
     void onRegisterControllers() final;
 };
 

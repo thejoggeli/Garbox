@@ -10,9 +10,15 @@ struct EventWrapper {
     Event* event;
     EventType* data;
 
+    EventWrapper():
+        event(nullptr),
+        data(nullptr){
+        // constructor body
+    }
+
     EventWrapper(Event* eventPtr):
         event(eventPtr),
-        data(static_cast<EventType*>(eventPtr->data)){
+        data(eventPtr ? static_cast<EventType*>(eventPtr->data) : nullptr){
         // constructor body
     }
 
