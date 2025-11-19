@@ -3,7 +3,7 @@
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
-#include "core/util/threading/LockGuard.h"
+#include "core/rtos/LockGuard.h"
 
 namespace Garbox {
 
@@ -53,8 +53,8 @@ void AnimatedLedGroup::stopTask(){
     mTask.stop();
 }
 
-TaskHandle_t AnimatedLedGroup::getTaskHandle() const {
-    return mTask.getHandle();
+const Task& AnimatedLedGroup::getTask() const {
+    return mTask;
 }
 
 void AnimatedLedGroup::handleTask(){

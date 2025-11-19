@@ -16,7 +16,7 @@
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
 #include "core/util/StringUtils.h"
-#include "core/util/threading/LockGuard.h"
+#include "core/rtos/LockGuard.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 using namespace Garbox;
@@ -47,7 +47,6 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
     LogError("Main", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
 
     // stop all tasks (automatically excludes the current task running this handler)
-    gMainTask.stop();
     SystemTasks::StopAll();
 
     // get status leds and piezo
@@ -111,6 +110,9 @@ void setup(){
 
     // start system tasks
     SystemTasks::StartAll();
+    SystemTasks::RegisterStopHandler([](){
+        gMainTask.stop();
+    });
 
     // run startup sequence
     StartupSequence startup;

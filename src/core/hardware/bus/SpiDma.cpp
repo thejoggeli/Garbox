@@ -4,7 +4,7 @@
 #include <esp_heap_caps.h>
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
-#include "core/util/threading/LockGuard.h"
+#include "core/rtos/LockGuard.h"
 
 namespace Garbox {
 
@@ -239,8 +239,8 @@ void SpiDma::handleTask(){
     }
 }
 
-TaskHandle_t SpiDma::getTaskHandle() const {
-    return mTask.getHandle();
+const Task& SpiDma::getTask() const {
+    return mTask;
 }
 
 void SpiDma::handleCompletedTransaction(spi_transaction_t* transaction, bool success){

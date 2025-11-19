@@ -2,7 +2,7 @@
 
 #include "core/assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"
-#include "core/util/threading/LockGuard.h"
+#include "core/rtos/LockGuard.h"
 
 namespace Garbox {
 

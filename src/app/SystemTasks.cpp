@@ -4,10 +4,20 @@
 #include "app/hardware/spi/SpiInstances.h"
 #include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
+#include "core/assert/Assert.h"
 #include "modules/parts/display/Display.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
+
+static constexpr size_t MaxStopHandlersCount = 16; 
+static std::array<SystemTasks::StopHandler, MaxStopHandlersCount> sStopHandlers;
+static uint32_t sStopHandlersCount = 0;
+
+void SystemTasks::RegisterStopHandler(StopHandler handler){
+    AssertExit(sStopHandlersCount < MaxStopHandlersCount, "SystemTasks", "max tasks count exceeded");
+    sStopHandlers[sStopHandlersCount++] = handler;
+}
 
 void SystemTasks::StartAll(){
 
@@ -56,26 +66,34 @@ void SystemTasks::StartAll(){
         AppConfig::SpiDmaTaskPriority,
         AppConfig::SpiDmaTaskCore
     );
+
+    // register status leds stop handler
+    RegisterStopHandler([](){
+        PartsProvider::GetStatusLeds().stopTask();
+    });
+
+    // register piezo player stop handler
+    RegisterStopHandler([](){
+        PartsProvider::GetPiezoPlayer().stopTask();
+    });
+
+    // register display stop handler
+    RegisterStopHandler([](){
+        PartsProvider::GetDisplay().stopTasks();
+    });
+
+    // register spi dma stop handler
+    RegisterStopHandler([](){
+        SpiInstances().GetSpiDma().stopTask();
+    });
+
 }
 
 void SystemTasks::StopAll(){
-    
-    // stop status leds task
-    StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
-    statusLeds.stopTask();
-
-    // stop piezo task
-    PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
-    piezoPlayer.stopTask();
-
-    // stop display tasks
-    Display& display = PartsProvider::GetDisplay();
-    display.stopTasks();
-
-    // stop spi dma task
-    SpiDma& spiDma = SpiInstances::GetSpiDma();
-    spiDma.stopTask();    
-
+    for(size_t i = 0; i < sStopHandlersCount; i++){
+        StopHandler& handler = sStopHandlers[i];
+        handler();
+    }
 }
 
 } // namespace

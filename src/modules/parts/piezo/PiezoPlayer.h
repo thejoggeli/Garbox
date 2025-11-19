@@ -27,7 +27,7 @@ public:
     // periodc task
     void startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void stopTask();
-    TaskHandle_t getTaskHandle() const;
+    const Task& getTask() const;
 
     // directly piezo control, bypassing the player logic. should only be used when the task is not running 
     void setPiezoEnabled(bool enabled);

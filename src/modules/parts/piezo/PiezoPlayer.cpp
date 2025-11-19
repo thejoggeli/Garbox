@@ -7,7 +7,7 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "core/util/threading/LockGuard.h"
+#include "core/rtos/LockGuard.h"
 
 namespace Garbox {
 
@@ -98,8 +98,8 @@ void PiezoPlayer::handleTask(){
     }
 }
 
-TaskHandle_t PiezoPlayer::getTaskHandle() const {
-    return mTask.getHandle();
+const Task& PiezoPlayer::getTask() const {
+    return mTask;
 }
 
 void PiezoPlayer::playbackTick(){

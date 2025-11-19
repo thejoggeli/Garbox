@@ -41,6 +41,8 @@ public:
     void startRenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void startSenderTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void stopTasks();
+    const Task& getRenderTask() const;
+    const Task& getSenderTask() const;
 
     bool tryTakeRenderReady();
     void giveRenderTrigger();

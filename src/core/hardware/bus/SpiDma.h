@@ -39,7 +39,7 @@ public:
 
     void startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId);
     void stopTask();
-    TaskHandle_t getTaskHandle() const;
+    const Task& getTask() const;
 
     void setCompleteCallback(CompleteCallback callback);
 

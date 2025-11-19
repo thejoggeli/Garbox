@@ -117,6 +117,14 @@ void Display::stopTasks(){
     // TODO leave display in a defined state after stopping
 }
 
+const Task& Display::getRenderTask() const {
+    return mRenderTask;
+}
+
+const Task& Display::getSenderTask() const {
+    return mSenderTask;
+}
+
 bool Display::tryTakeRenderReady(){
     if(xSemaphoreTake(mRenderReady, 0) == pdTRUE){
         return true;

@@ -8,7 +8,7 @@
 
 #include "shared/types/ProfilerId.h"
 #include "core/time/Time.h"
-#include "core/util/threading/LockGuard.h"
+#include "core/rtos/LockGuard.h"
 
 namespace Garbox {
 
