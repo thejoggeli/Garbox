@@ -69,11 +69,11 @@ void SystemRuntime::onMainTick(){
 }
 
 void SystemRuntime::onDisplayTick(){
-    mDisplayController.onRenderTick();
+    mDisplayController.onTick();
 }
 
 void SystemRuntime::onRouteEvent(const Event* event){
-    LogDebug("SystemRuntime", "[Event] %s (id=%" PRIi32 ") from %s", 
+    LogDebug("SystemRuntime", "[Event] %s [id=%" PRIi32 "] %s", 
         EventTypeToString(event->type),
         event->id,
         ComponentIdToString(event->sender.id)

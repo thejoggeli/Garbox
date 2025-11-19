@@ -28,23 +28,19 @@ namespace Garbox {
     #define LogVerbose(tag, fmt, ...) esp_log_write(ESP_LOG_VERBOSE, tag, fmt "\n", ##__VA_ARGS__)
 #endif
 
+enum class LogLevel : uint8_t {
+    None    = ESP_LOG_NONE,
+    Error   = ESP_LOG_ERROR,
+    Warning = ESP_LOG_WARN,
+    Info    = ESP_LOG_INFO,
+    Debug   = ESP_LOG_DEBUG,
+    Verbose = ESP_LOG_VERBOSE
+};
+
 class Log {
-
 public:
-
-    enum class Level : uint8_t {
-        None    = ESP_LOG_NONE,
-        Error   = ESP_LOG_ERROR,
-        Warning = ESP_LOG_WARN,
-        Info    = ESP_LOG_INFO,
-        Debug   = ESP_LOG_DEBUG,
-        Verbose = ESP_LOG_VERBOSE
-    };
-
     static void Init();
-
-    static void SetLevel(Level level, const char* tag = "*");
-
+    static void SetLevel(LogLevel level, const char* tag = "*");
 };
 
 }

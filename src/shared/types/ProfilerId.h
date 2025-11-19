@@ -9,8 +9,9 @@ enum struct ProfilerId : uint8_t {
     MainTick,
     LogTick,
     DisplayTick,
-    PiezoPlayerTick,
-    LedAnimationTick,
+    RenderTick,
+    PiezoPlayer,
+    LedAnimation,
     Count
 };
 
@@ -20,8 +21,9 @@ static constexpr const char* ProfilerIdToString(ProfilerId id){
         case ProfilerId::MainTick: return "MainTick";
         case ProfilerId::LogTick: return "LogTick";
         case ProfilerId::DisplayTick: return "DisplayTick";
-        case ProfilerId::PiezoPlayerTick: return "PiezoPlayerTick";
-        case ProfilerId::LedAnimationTick: return "LedAnimationTick";
+        case ProfilerId::RenderTick: return "RenderTick";
+        case ProfilerId::PiezoPlayer: return "PiezoPlayer";
+        case ProfilerId::LedAnimation: return "LedAnimation";
         case ProfilerId::Count: return "Count";
     }
     static_assert("unhandled profiler config id");

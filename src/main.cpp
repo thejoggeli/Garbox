@@ -23,6 +23,7 @@ using namespace Garbox;
 
 static SystemRuntime gAppCore;
 static Task gMainTask;
+static bool gResetProfiler = false;
 
 void handleMainTask();
 void logProfiler();
@@ -82,7 +83,7 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
 void setup(){
 
     Log::Init();
-    Log::SetLevel(Log::Level::Verbose);
+    Log::SetLevel(LogLevel::Verbose);
     LogDebug("Main", "log setup complete");
     
     // assert handlers
@@ -132,6 +133,7 @@ void setup(){
 
     // start profiler
     Profiler::Start();
+    gResetProfiler = true;
 
     // start main app
     gAppCore.start();
@@ -152,30 +154,41 @@ void handleMainTask(){
     const TickType_t displayTickMillis = pdMS_TO_TICKS(AppConfig::DisplayTickDurationMillis);
     TickType_t lastWakeTime = xTaskGetTickCount();
     while(true){
+
+        // reset profiler
+        if(gResetProfiler){
+            Profiler::Start();
+            gResetProfiler = false;
+        }
+
         // begin main task
-        Profiler::Begin(ProfilerId::MainTask);
+        ProfilerScoped mainTaskProfilerScoped = ProfilerScoped(ProfilerId::MainTask);
 
         // main tick
-        Profiler::Begin(ProfilerId::MainTick);
-        Time::Tick();
-        gAppCore.onMainTick();
-        Profiler::End(ProfilerId::MainTick);
+        {
+            ProfilerScoped mainTickProfilerScoped = ProfilerScoped(ProfilerId::MainTick);
+            Time::Tick();
+            gAppCore.onMainTick();
+        }
 
         // logging
-        Profiler::Begin(ProfilerId::LogTick);
-        logProfiler();
-        Profiler::End(ProfilerId::LogTick);
+        {
+            ProfilerScoped logTickProfilerScoped = ProfilerScoped(ProfilerId::LogTick);
+            logProfiler();
+        }
 
         // wait until updateDisplayDuration millis are remaining before current cycle is finished
         // this is done to ensure that the display is always updated at a fixed interval and to 
         // give it enough time to transfer the previous ui state via SPI
-        vTaskDelayUntil(&lastWakeTime, mainTickMillis);
-        gAppCore.onDisplayTick();
+        {
+            vTaskDelayUntil(&lastWakeTime, mainTickMillis);
+            ProfilerScoped displayTickProfilerScoped = ProfilerScoped(ProfilerId::DisplayTick);
+            gAppCore.onDisplayTick();
+        }
         
         // end main task
         // sleep until next tick
         vTaskDelayUntil(&lastWakeTime, displayTickMillis);
-        Profiler::End(ProfilerId::MainTask);
     }
 }
 
@@ -189,15 +202,16 @@ void logProfiler(){
         uint32_t seconds = Time::GetSeconds();
         static char timeStringBuffer[20];
         StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
-        LogInfo("Main", "======================== Diagnostics %s =======================", timeStringBuffer);
-        LogInfo("Main", " | ProfilerId         | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
+        LogInfo("Main", "===================== Diagnostics %s =====================", timeStringBuffer);
+        LogInfo("Main", " | ProfilerId    | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
         for (uint32_t i = 0; i < static_cast<uint32_t>(ProfilerId::Count); ++i){
             const ProfilerId id = static_cast<ProfilerId>(i);
             const Profiler::Record& r = Profiler::GetRecord(id);
             const char* idStr = ProfilerIdToString(id);
-            LogInfo("Main", " | %-18s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
+            LogInfo("Main", " | %-13s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
         }
-        LogInfo("Main", "=========================================================================");
+        LogInfo("Main", "====================================================================");
+        gResetProfiler = true;
     }
 }
 

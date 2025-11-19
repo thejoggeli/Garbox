@@ -12,11 +12,11 @@ static bool sInitialized = false;
 static uint32_t sLastUpdateTime = 0;
 static SemaphoreHandle_t sMutex = nullptr;
 
-Profiler::Scoped::Scoped(ProfilerId id) : mId(id){ 
+ProfilerScoped::ProfilerScoped(ProfilerId id) : mId(id){ 
     Profiler::Begin(mId); 
 }
 
-Profiler::Scoped::~Scoped(){ 
+ProfilerScoped::~ProfilerScoped(){ 
     Profiler::End(mId); 
 }
 

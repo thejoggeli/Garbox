@@ -12,16 +12,16 @@
 
 namespace Garbox {
 
+// Scoped RAII profiler
+struct ProfilerScoped {
+    ProfilerScoped(ProfilerId id);
+    ~ProfilerScoped();
+private:
+    ProfilerId mId;
+}; 
+
 class Profiler {
 public:
-
-    // Scoped RAII profiler
-    struct Scoped {
-        Scoped(ProfilerId id);
-        ~Scoped();
-    private:
-        ProfilerId mId;
-    }; 
 
     struct Record {
         uint32_t countCurrent;

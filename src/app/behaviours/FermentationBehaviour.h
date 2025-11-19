@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/behaviours/AppBehaviourAbs.h"
+#include "app/engine/FermentationControlEngine.h"
 
 namespace Garbox {
 
@@ -16,6 +17,8 @@ private:
     bool mHeartbeatReceived = false;
     bool mSwitchStateChanged = false;
     uint32_t mSwitchState = 0;
+
+    FermentationControlEngine mControlEngine;
 
     void applySwitchState();
     void sendFanCommand(bool enabled, float speed);

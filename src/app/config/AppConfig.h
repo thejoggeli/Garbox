@@ -19,7 +19,7 @@ public:
 
     // Main Task
     static constexpr const char* MainTaskName = "MainTask";
-    static constexpr uint32_t MainTaskPriority = 3;
+    static constexpr uint32_t MainTaskPriority = 5;
     static constexpr uint32_t MainTaskStackSize = 1024*8;
     static constexpr uint32_t MainTaskCore = 1;
 
@@ -39,7 +39,7 @@ public:
 
     // Display Render Task
     static constexpr const char* DisplayRenderTaskName = "DisplayRenderTask";
-    static constexpr uint32_t DisplayRenderTaskPriority = 10;
+    static constexpr uint32_t DisplayRenderTaskPriority = 1; // rendering is low priority
     static constexpr uint32_t DisplayRenderTaskStackSize = 1024*4;
     static constexpr uint32_t DisplayRenderTaskCore = 1;
 
@@ -58,11 +58,11 @@ public:
     // Display
     static constexpr uint32_t DisplayWidth = 320;
     static constexpr uint32_t DisplayHeight = 240;
-    static constexpr uint32_t DisplayPartialFactor = 24;
+    static constexpr uint32_t DisplayPartialFactor = 4;
     static constexpr uint32_t DisplayBytesPerPixel = 2;
     static constexpr uint32_t DisplayBytesPerFrame = DisplayWidth * DisplayHeight * DisplayBytesPerPixel;
     static constexpr uint32_t DisplayBytesPerFlush = DisplayBytesPerFrame / DisplayPartialFactor;
-    static constexpr uint32_t DisplayChunkSizeBytes = 1024*2;
+    static constexpr uint32_t DisplayChunkSizeBytes = 1024*4;
 
     // SPI DMA
     // Max SPI DMA size is limited to 32KB on ESP32-S3

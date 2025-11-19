@@ -23,7 +23,7 @@ void DisplayController::onStart(){
     // nothing to do
 }
 
-void DisplayController::onRenderTick(){
+void DisplayController::onTick(){
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
 

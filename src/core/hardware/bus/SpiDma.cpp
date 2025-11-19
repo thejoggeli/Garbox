@@ -233,12 +233,8 @@ void SpiDma::handleTask(){
                 TriggerDebug("SpiDma", "got ESP_OK but nullptr transaction");
             }
         }
-        else if (ret == ESP_ERR_TIMEOUT){
-            continue;
-        }
-        else {
+        else if (ret != ESP_ERR_TIMEOUT){
             TriggerDebug("SpiDma", "spi_device_get_trans_result error");
-            vTaskDelay(pdMS_TO_TICKS(100));
         }
     }
 }

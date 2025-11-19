@@ -9,15 +9,15 @@ FermentationBehaviour::FermentationBehaviour(ComponentId id) : AppBehaviourAbs(i
 }
 
 void FermentationBehaviour::onInit(){
-    // nothing to do
+    mControlEngine.init();
 }
 
 void FermentationBehaviour::onStart(){
-    // nothing to do
+    mControlEngine.reset();
 }
 
 void FermentationBehaviour::onBecomeActive(){
-    // nothing to do
+    mControlEngine.reset();
 }
 
 void FermentationBehaviour::onBecomeInactive(){
@@ -25,6 +25,18 @@ void FermentationBehaviour::onBecomeInactive(){
 }
 
 void FermentationBehaviour::onLogicTick(){
+
+    // set control engine inputs
+    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    // TODO
+
+    // perform control engine step
+    mControlEngine.step();
+
+    // get control engine outputs
+    const FermentationControlEngine::Outputs& outputs = mControlEngine.getOutputs();
+    // TODO
+
     if(mHeartbeatReceived){
         constexpr static uint32_t SwitchStatesCount = 11;
         mSwitchState++;

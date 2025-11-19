@@ -24,7 +24,7 @@ public:
     
     DisplayController(ComponentId id);
 
-    void onRenderTick();
+    void onTick();
 
 private:
 

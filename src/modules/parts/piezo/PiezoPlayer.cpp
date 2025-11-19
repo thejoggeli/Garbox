@@ -105,7 +105,7 @@ TaskHandle_t PiezoPlayer::getTaskHandle() const {
 void PiezoPlayer::playbackTick(){
     Garbox::LockGuard lock(mMutex);
 
-    Profiler::Scoped(ProfilerId::PiezoPlayerTick);
+    ProfilerScoped profilerScoped = ProfilerScoped(ProfilerId::PiezoPlayer);
 
     if (!mPlaying || !mCurrentSequence){
         return;
