@@ -1,8 +1,8 @@
 #include "BehaviourAbs.h"
 
 #include "core/assert/Assert.h"
-#include "core/event/EventFactory.h"
-#include "core/event/EventForwarder.h"
+#include "core/application/event/EventFactory.h"
+#include "core/application/event/EventForwarder.h"
 
 namespace Garbox {
 

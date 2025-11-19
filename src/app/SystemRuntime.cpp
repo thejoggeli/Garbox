@@ -1,7 +1,7 @@
 #include "SystemRuntime.h"
 
 #include "app/providers/PartsProvider.h"
-#include "core/event/EventView.h"
+#include "core/application/event/EventView.h"
 #include "core/log/Log.h"
 #include "modules/parts/heatpad/Heatpad.h"
 

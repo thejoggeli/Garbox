@@ -1,8 +1,8 @@
 #pragma once
 
 #include "shared/types/EventData.h"
-#include "core/controller/ControllerAbs.h"
-#include "core/event/EventView.h"
+#include "core/application/controller/ControllerAbs.h"
+#include "core/application/event/EventView.h"
 #include "modules/parts/fan/Fan.h"
 
 namespace Garbox {

@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "core/event/EventFactory.h"
-#include "core/event/EventForwarder.h"
+#include "core/application/event/EventFactory.h"
+#include "core/application/event/EventForwarder.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/RingBufferHeap.h"
 

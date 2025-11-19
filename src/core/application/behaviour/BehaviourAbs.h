@@ -1,9 +1,9 @@
 #pragma once 
 
 #include "core/application/behaviour/BehaviourIfc.h"
-#include "core/event/EventFactory.h"
-#include "core/event/EventView.h"
-#include "core/event/EventWrapper.h"
+#include "core/application/event/EventFactory.h"
+#include "core/application/event/EventView.h"
+#include "core/application/event/EventWrapper.h"
 #include "shared/types/EventData.h"
 
 namespace Garbox {

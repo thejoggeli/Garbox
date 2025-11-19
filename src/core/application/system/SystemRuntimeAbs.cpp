@@ -2,7 +2,7 @@
 
 #include "core/application/behaviour/BehaviourIfc.h"
 #include "core/assert/Assert.h"
-#include "core/controller/ControllerIfc.h"
+#include "core/application/controller/ControllerIfc.h"
 
 namespace Garbox {
 
