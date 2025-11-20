@@ -34,7 +34,6 @@ public:
     void start();
 
     void incrementTickCount();
-    void updateNowTime();
     const RuntimeContext& getContext() const;
 
 protected:
@@ -63,8 +62,11 @@ protected:
 
 private:
 
-    // context for controllers and behaviours to use
-    // RuntimeAbs never modifies this by itself, must be done by user
+    // Context for controllers and behaviours to use.
+    // RuntimeAbs only modifies this in init() and start().
+    // For all other updates, the user must call e.g.
+    // - incrementTickCount()
+    // at the appropriate time
     RuntimeContext mContext;
 
     // members for events

@@ -26,14 +26,16 @@ void RuntimeAbs::init(const Config& config){
         handleForwardedEvent(header);
     });
 
+    // derived class must register controllers and behaviours
+    onRegisterControllers();
+    onRegisterBehaviours();
+
     // init all controllers
-    onRegisterControllers(); // derived class must register controllers
     for(ControllerIfc* controller : mControllersSpan){
         controller->init(mEventFactory, mEventForwarder);
     }
 
     // init all behaviours
-    onRegisterBehaviours(); // derived class must register behaviours
     for(BehaviourIfc* behaviour : mBehavioursSpan){
         behaviour->init(mEventFactory, mEventForwarder);
     }
@@ -133,10 +135,6 @@ void RuntimeAbs::handleForwardedEvent(const EventHeader* header){
 
 void RuntimeAbs::incrementTickCount(){
     mContext.tickCount++;
-}
-
-void RuntimeAbs::updateNowTime(){
-    mContext.nowMicros = Time::GetMicros();
 }
 
 const RuntimeContext& RuntimeAbs::getContext() const {

@@ -169,10 +169,12 @@ void handleMainTask(){
         // begin main task
         ProfilerScoped mainTaskProfilerScoped = ProfilerScoped(ProfilerId::MainTask);
 
+        // advance time
+        Time::Tick();
+
         // main tick
         {
             ProfilerScoped mainTickProfilerScoped = ProfilerScoped(ProfilerId::MainTick);
-            Time::Tick();
             gRuntime.onMainTick();
         }
 

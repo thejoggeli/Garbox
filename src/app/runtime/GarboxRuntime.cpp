@@ -54,25 +54,21 @@ void GarboxRuntime::onMainTick(){
     AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
 
     // input tick
-    updateNowTime();
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mI2cPartsController.onInputTick();
     dispatchEvents();
 
     // regular tick tick
-    updateNowTime();
     mHeartbeatController.onTick();
     mInputController.onTick();
     dispatchEvents();
 
     // behaviour logic tick
-    updateNowTime();
     behaviour->onLogicTick();
     dispatchEvents();
 
     // output tick
-    updateNowTime();
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
     mI2cPartsController.onOutputTick();
