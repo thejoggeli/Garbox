@@ -52,20 +52,20 @@ void HeatpadController::onOutputTick(){
     mLed.setColor(hslColor.toLinearRgb());
 }
 
-void HeatpadController::onHeatpadCommand(const EventView<EventData::HeatpadCommand> event){
+void HeatpadController::onHeatpadCommand(const EventRead<EventData::HeatpadCommand> event){
     // apply enabled 
-    if(mHeatpad.isEnabled() != event.data->enabled){
-        mHeatpad.setEnabled(event.data->enabled);
+    if(mHeatpad.isEnabled() != event.payload->enabled){
+        mHeatpad.setEnabled(event.payload->enabled);
         mStateChanged = true;
     }
     // apply duty cycle
-    if(mHeatpad.getNextDutyCycle() != event.data->dutyCycle){
-        mHeatpad.setDutyCycle(event.data->dutyCycle);
+    if(mHeatpad.getNextDutyCycle() != event.payload->dutyCycle){
+        mHeatpad.setDutyCycle(event.payload->dutyCycle);
         mStateChanged = true;
     }
     // apply period
-    if(mHeatpad.getNextPeriodDurationMicros() != event.data->periodMicros){
-        mHeatpad.setPeriodDurationMicros(event.data->periodMicros);
+    if(mHeatpad.getNextPeriodDurationMicros() != event.payload->periodMicros){
+        mHeatpad.setPeriodDurationMicros(event.payload->periodMicros);
         mStateChanged = true;
     }
 }
@@ -75,11 +75,11 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 }
 
 void HeatpadController::sendStatusEvent(){
-    EventWrapper wrapper = makeEvent<EventData::HeatpadStatus>();
-    wrapper.data->state = mHeatpad.getState();
-    wrapper.data->duty = mHeatpad.getCurrentDutyCycle();
-    wrapper.data->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
-    sendEvent(wrapper.event);
+    EventWrite event = makeEvent<EventData::HeatpadStatus>();
+    event.payload->state = mHeatpad.getState();
+    event.payload->duty = mHeatpad.getCurrentDutyCycle();
+    event.payload->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
+    sendEvent(event.header);
 }
 
 } // namespace

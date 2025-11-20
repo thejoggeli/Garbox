@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-class SystemTasks {
+class TaskManager {
 public:
 
     using StopHandler = std::function<void()>;

@@ -31,11 +31,11 @@ void BehaviourAbs::start(){
     onStart();
 }
 
-void BehaviourAbs::sendEvent(Event* event){
+void BehaviourAbs::sendEvent(EventHeader* header){
     if(!mInitialized){
         TriggerExit("BehaviourAbs", "not initialized");
     }
-    mEventForwarder->forward(event);
+    mEventForwarder->forward(header);
 }
 
 void BehaviourAbs::setActive(bool active){

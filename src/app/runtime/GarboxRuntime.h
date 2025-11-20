@@ -7,14 +7,14 @@
 #include "app/controllers/HeatpadController.h"
 #include "app/controllers/InputController.h"
 #include "app/controllers/I2cPartsController.h"
-#include "core/application/system/SystemRuntimeAbs.h"
+#include "core/application/runtime/RuntimeAbs.h"
 
 namespace Garbox {
 
-class SystemRuntime : public SystemRuntimeAbs {
+class GarboxRuntime : public RuntimeAbs {
 public:
 
-    SystemRuntime();
+    GarboxRuntime();
 
     void onMainTick();
     void onDisplayTick();
@@ -34,7 +34,7 @@ private:
 
     void onInit() final;
     void onStart() final;
-    void onRouteEvent(const Event* event) final;
+    void onRouteEvent(const EventHeader* header) final;
     void onRegisterBehaviours() final;
     void onRegisterControllers() final;
 };

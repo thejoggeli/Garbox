@@ -2,9 +2,9 @@
 
 namespace Garbox {
 
-class PiezoPlayer;
-class StatusLeds;
+class AnimatedLedGroup;
 class AnimatedLed;
+class PiezoPlayer;
 
 class StartupSequence {
 public:
@@ -15,7 +15,7 @@ public:
 private: 
 
     PiezoPlayer& mPiezoPlayer;
-    StatusLeds& mStatusLeds;
+    AnimatedLedGroup& mStatusLeds;
     AnimatedLed& mHeartbeatLed;
 
     void playSweepIn();

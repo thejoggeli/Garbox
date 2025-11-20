@@ -6,7 +6,7 @@ namespace Garbox {
 
 class EventFactory;
 class EventForwarder;
-class Event;
+class EventHeader;
 
 class BehaviourIfc {
 public:
@@ -21,7 +21,7 @@ public:
 
 protected:
 
-    virtual void sendEvent(Event* event) = 0;
+    virtual void sendEvent(EventHeader* event) = 0;
 
 };
 

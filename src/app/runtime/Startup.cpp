@@ -1,7 +1,6 @@
 
-#include "app/StartupSequence.h"
-#include "app/SystemRuntime.h"
-#include "app/SystemTasks.h"
+#include "app/runtime/StartupSequence.h"
+#include "app/runtime/TaskManager.h"
 #include "app/config/AppConfig.h"
 #include "app/hardware/adc/AdcInstances.h"
 #include "app/hardware/ledc/LedcInstances.h"
@@ -9,8 +8,8 @@
 #include "app/hardware/i2c/I2cInstances.h"
 #include "app/hardware/spi/SpiInstances.h"
 #include "app/hardware/timer/TimerInstances.h"
-#include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
+#include "app/runtime/GarboxRuntime.h"
 #include "core/assert/AssertHandler.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
@@ -18,11 +17,12 @@
 #include "core/time/Time.h"
 #include "core/util/StringUtils.h"
 #include "core/rtos/LockGuard.h"
+#include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 using namespace Garbox;
 
-static SystemRuntime gAppCore;
+static GarboxRuntime gRuntime;
 static Task gMainTask;
 static bool gResetProfiler = false;
 
@@ -35,9 +35,9 @@ void handleAssertDebug(const char* context, const char* message, int32_t arg){
     LogError("Main", "AssertDebug! %s %s (arg=%" PRIi32 ")", context, message, arg);
 
     // turn on error led
-    StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+    AnimatedLedGroup& statusLeds = PartsProvider::GetStatusLeds();
     if(statusLeds.isInitialized()){
-        AnimatedLed& errorLed = statusLeds.getLed(StatusLedId::Error);
+        AnimatedLed& errorLed = statusLeds.getLed(static_cast<uint8_t>(StatusLedId::Error));
         errorLed.setBrightness(1.0f);
     }
 }
@@ -48,10 +48,10 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
     LogError("Main", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
 
     // stop all tasks (automatically excludes the current task running this handler)
-    SystemTasks::StopAll();
+    TaskManager::StopAll();
 
     // get status leds and piezo
-    StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+    AnimatedLedGroup& statusLeds = PartsProvider::GetStatusLeds();
     PiezoPlayer& piezoPlayer = PartsProvider::GetPiezoPlayer();
         
     // turn off all status leds
@@ -111,8 +111,8 @@ void setup(){
     PartsProvider::Init();
 
     // start system tasks
-    SystemTasks::StartAll();
-    SystemTasks::RegisterStopHandler([](){
+    TaskManager::StartAll();
+    TaskManager::RegisterStopHandler([](){
         gMainTask.stop();
     });
 
@@ -121,7 +121,7 @@ void setup(){
     startup.run();
 
     // init main app
-    gAppCore.init({
+    gRuntime.init({
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
     });
@@ -140,7 +140,7 @@ void setup(){
     gResetProfiler = true;
 
     // start main app
-    gAppCore.start();
+    gRuntime.start();
 
     // start main task
     gMainTask.start();
@@ -172,7 +172,7 @@ void handleMainTask(){
         {
             ProfilerScoped mainTickProfilerScoped = ProfilerScoped(ProfilerId::MainTick);
             Time::Tick();
-            gAppCore.onMainTick();
+            gRuntime.onMainTick();
         }
 
         // logging
@@ -187,7 +187,7 @@ void handleMainTask(){
         {
             vTaskDelayUntil(&lastWakeTime, mainTickMillis);
             ProfilerScoped displayTickProfilerScoped = ProfilerScoped(ProfilerId::DisplayTick);
-            gAppCore.onDisplayTick();
+            gRuntime.onDisplayTick();
         }
         
         // end main task

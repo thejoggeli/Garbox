@@ -1,9 +1,9 @@
 #include "HeartbeatController.h"
 
 #include "app/config/AppConfig.h"
-#include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
 #include "core/util/function/default/EasingFunctions.h"
+#include "modules/parts/led/single/AnimatedLed.h"
 
 namespace Garbox {
 
@@ -34,8 +34,8 @@ void HeartbeatController::onTick(){
         mHeartbeatTimer.restart();
 
         // send heartbeat event
-        EventWrapper wrapper = makeEvent<EventData::Heartbeat>();
-        sendEvent(wrapper.event);
+        EventWrite event = makeEvent<EventData::Heartbeat>();
+        sendEvent(event.header);
     }
 }
 

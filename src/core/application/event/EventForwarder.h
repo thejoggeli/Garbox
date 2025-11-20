@@ -3,19 +3,20 @@
 #include <functional>
 
 #include "core/assert/Assert.h"
-#include "core/application/event/Event.h"
 
 namespace Garbox {
+
+class EventHeader;
 
 class EventForwarder {
 public:
 
-    using Handler = std::function<void(const Event* event)>;
+    using Handler = std::function<void(const EventHeader* event)>;
 
     EventForwarder();
 
-    void setHandler(const Handler& handler);
-    void forward(const Event* event);
+    void setHandler(Handler handler);
+    void forward(const EventHeader* event);
 
 private:
     Handler mHandler = nullptr;

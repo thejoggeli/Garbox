@@ -6,11 +6,17 @@
 
 namespace Garbox {
 
-struct Event {
-    uint32_t id = 0; // zero is reserved for "invalid event id"
+struct EventHeader {
+
+    // the id of the event. zero is reserved for "invalid event id"
+    uint32_t id = 0;
+
+    // event type from user-defined enum
     EventType type = EventType::Null;
+
+    // component type + id of event sender
     ComponentDescriptor sender = {ComponentType::Null, ComponentId::Null};
-    void* data = nullptr;
+
 };
 
 } // namespace

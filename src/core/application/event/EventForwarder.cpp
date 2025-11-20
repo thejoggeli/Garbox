@@ -6,16 +6,16 @@ EventForwarder::EventForwarder(){
     // nothing to do
 }
 
-void EventForwarder::setHandler(const Handler& handler){
+void EventForwarder::setHandler(Handler handler){
     mHandler = handler;
 }
 
-void EventForwarder::forward(const Event* event){
+void EventForwarder::forward(const EventHeader* header){
     if(!mHandler){
         TriggerDebug("EventForwarder", "no handler set");
         return;
     }
-    mHandler(event);
+    mHandler(header);
 }
 
 } // namespace Garbox

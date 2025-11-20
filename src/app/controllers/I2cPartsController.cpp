@@ -95,12 +95,12 @@ void I2cPartsController::enterFsmState(FsmState state){
 }
 
 void I2cPartsController::sendTemperatureStatusEvent(){
-    EventWrapper wrapper = makeEvent<EventData::TemperatureStatus>();
-    wrapper.data->sensorEnabled = mTemperatureSensor.isStarted();
-    wrapper.data->sensorError = false;
-    wrapper.data->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
-    wrapper.data->humidityRelative = mTemperatureSensor.getHumidityRelative();
-    sendEvent(wrapper.event);
+    EventWrite event = makeEvent<EventData::TemperatureStatus>();
+    event.payload->sensorEnabled = mTemperatureSensor.isStarted();
+    event.payload->sensorError = false;
+    event.payload->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
+    event.payload->humidityRelative = mTemperatureSensor.getHumidityRelative();
+    sendEvent(event.header);
 }
 
 } // namespace

@@ -1,11 +1,11 @@
 #include "FanController.h"
 
-#include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
 #include "app/providers/PiezoSequences.h"
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/util/math/MathUtils.h"
+#include "modules/parts/led/single/AnimatedLed.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
@@ -48,15 +48,15 @@ void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const EventView<EventData::FanCommand> event){
+void FanController::onFanCommand(const EventRead<EventData::FanCommand> event){
     // apply enabled
-    if(mFan.isEnabled() != event.data->enabled){
-        mFan.setEnabled(event.data->enabled);
+    if(mFan.isEnabled() != event.payload->enabled){
+        mFan.setEnabled(event.payload->enabled);
         mStateChanged = true;
     }
     // apply speed
-    if(mFan.getTargetSpeed() != event.data->targetSpeed){
-        mFan.setTargetSpeed(event.data->targetSpeed);
+    if(mFan.getTargetSpeed() != event.payload->targetSpeed){
+        mFan.setTargetSpeed(event.payload->targetSpeed);
         mStateChanged = true;
     }
     // send status 
@@ -81,11 +81,11 @@ void FanController::handleFanStalledAlert(uint32_t counter){
 }
 
 void FanController::sendStatusEvent(){
-    EventWrapper wrapper = makeEvent<EventData::FanStatus>();
-    wrapper.data->state = mFan.getState();
-    wrapper.data->targetSpeed = mFan.getTargetSpeed();
-    wrapper.data->measuredRpm = mFan.getMeasuredRpm();
-    sendEvent(wrapper.event);
+    EventWrite event = makeEvent<EventData::FanStatus>();
+    event.payload->state = mFan.getState();
+    event.payload->targetSpeed = mFan.getTargetSpeed();
+    event.payload->measuredRpm = mFan.getMeasuredRpm();
+    sendEvent(event.header);
 }
 
 } // namespace

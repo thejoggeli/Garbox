@@ -1,28 +1,28 @@
-#include "SystemTasks.h"
+#include "TaskManager.h"
 
 #include "app/config/AppConfig.h"
 #include "app/hardware/spi/SpiInstances.h"
-#include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
 #include "core/assert/Assert.h"
 #include "modules/parts/display/Display.h"
+#include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 
 static constexpr size_t MaxStopHandlersCount = 16; 
-static std::array<SystemTasks::StopHandler, MaxStopHandlersCount> sStopHandlers;
+static std::array<TaskManager::StopHandler, MaxStopHandlersCount> sStopHandlers;
 static uint32_t sStopHandlersCount = 0;
 
-void SystemTasks::RegisterStopHandler(StopHandler handler){
-    AssertExit(sStopHandlersCount < MaxStopHandlersCount, "SystemTasks", "max tasks count exceeded");
+void TaskManager::RegisterStopHandler(StopHandler handler){
+    AssertExit(sStopHandlersCount < MaxStopHandlersCount, "TaskManager", "max tasks count exceeded");
     sStopHandlers[sStopHandlersCount++] = handler;
 }
 
-void SystemTasks::StartAll(){
+void TaskManager::StartAll(){
 
     // start status leds task
-    StatusLeds& statusLeds = PartsProvider::GetStatusLeds();
+    AnimatedLedGroup& statusLeds = PartsProvider::GetStatusLeds();
     statusLeds.startTask(
         AppConfig::StatusLedsTaskName,
         AppConfig::StatusLedsTaskFrequencyHz,
@@ -86,10 +86,9 @@ void SystemTasks::StartAll(){
     RegisterStopHandler([](){
         SpiInstances().GetSpiDma().stopTask();
     });
-
 }
 
-void SystemTasks::StopAll(){
+void TaskManager::StopAll(){
     for(size_t i = 0; i < sStopHandlersCount; i++){
         StopHandler& handler = sStopHandlers[i];
         handler();

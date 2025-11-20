@@ -1,4 +1,4 @@
-#include "SystemRuntimeAbs.h"
+#include "RuntimeAbs.h"
 
 #include "core/application/behaviour/BehaviourIfc.h"
 #include "core/assert/Assert.h"
@@ -6,13 +6,13 @@
 
 namespace Garbox {
 
-SystemRuntimeAbs::SystemRuntimeAbs():
+RuntimeAbs::RuntimeAbs():
     // init members
     mControllersSpan(nullptr, 0){
     // constructor body
 }
 
-void SystemRuntimeAbs::init(const Config& config){
+void RuntimeAbs::init(const Config& config){
 
     // init event factory
     mEventFactory.init(config.eventPoolSizeBytes);
@@ -21,8 +21,8 @@ void SystemRuntimeAbs::init(const Config& config){
     mEventQueue.init(config.eventQueueLength);
 
     // setup event forwarder
-    mEventForwarder.setHandler([this](const Event* event){
-        handleForwardedEvent(event);
+    mEventForwarder.setHandler([this](const EventHeader* header){
+        handleForwardedEvent(header);
     });
 
     // init all controllers
@@ -41,10 +41,10 @@ void SystemRuntimeAbs::init(const Config& config){
     onInit();
 }
 
-void SystemRuntimeAbs::start(){
+void RuntimeAbs::start(){
 
-    AssertExit(mBehavioursSpan.size() > 0, "SystemRuntimeAbs", "no behaviours registered");
-    AssertExit(mControllersSpan.size() > 0, "SystemRuntimeAbs", "no controllers registered");
+    AssertExit(mBehavioursSpan.size() > 0, "RuntimeAbs", "no behaviours registered");
+    AssertExit(mControllersSpan.size() > 0, "RuntimeAbs", "no controllers registered");
 
     // start all controllers
     for(ControllerIfc* controller : mControllersSpan){
@@ -60,73 +60,73 @@ void SystemRuntimeAbs::start(){
     onStart();
 }
 
-void SystemRuntimeAbs::setQueuedBehaviour(BehaviourIfc* behaviour){
+void RuntimeAbs::setQueuedBehaviour(BehaviourIfc* behaviour){
     mQueuedBehaviour = behaviour;
 }
 
-void SystemRuntimeAbs::applyQueuedBehaviour() {
+void RuntimeAbs::applyQueuedBehaviour() {
     if(mQueuedBehaviour){
         mActiveBehaviour = mQueuedBehaviour;
         mQueuedBehaviour = nullptr;
     }
 }
 
-bool SystemRuntimeAbs::hasQueuedBehaviour() const {
+bool RuntimeAbs::hasQueuedBehaviour() const {
     return mQueuedBehaviour != nullptr;
 }
 
-BehaviourIfc* SystemRuntimeAbs::getActiveBehaviour() const {
+BehaviourIfc* RuntimeAbs::getActiveBehaviour() const {
     return mActiveBehaviour;
 }
 
-BehaviourIfc* SystemRuntimeAbs::getQueuedBehaviour() const {
+BehaviourIfc* RuntimeAbs::getQueuedBehaviour() const {
     return mQueuedBehaviour;
 }
 
-void SystemRuntimeAbs::registerController(ControllerIfc* controller){
+void RuntimeAbs::registerController(ControllerIfc* controller){
     const size_t maxIndex = MaxControllersCount - 1;
     const size_t nextIndex = mControllersSpan.size();
-    AssertExit(nextIndex <= maxIndex, "SystemRuntimeAbs", "max controllers count exceeded");
+    AssertExit(nextIndex <= maxIndex, "RuntimeAbs", "max controllers count exceeded");
     mControllersRawArray[nextIndex] = controller;
     mControllersSpan = Span<ControllerIfc*>(mControllersRawArray, mControllersSpan.size()+1);
 }
 
-Span<ControllerIfc*> SystemRuntimeAbs::getControllers(){
+Span<ControllerIfc*> RuntimeAbs::getControllers(){
     return mControllersSpan;
 }
 
-void SystemRuntimeAbs::registerBehaviour(BehaviourIfc* behaviour){
+void RuntimeAbs::registerBehaviour(BehaviourIfc* behaviour){
     const size_t maxIndex = MaxBehavioursCount - 1;
     const size_t nextIndex = mBehavioursSpan.size();
-    AssertExit(nextIndex <= maxIndex, "SystemRuntimeAbs", "max behaviours count exceeded");
+    AssertExit(nextIndex <= maxIndex, "RuntimeAbs", "max behaviours count exceeded");
     mBehavioursRawArray[nextIndex] = behaviour;
     mBehavioursSpan = Span<BehaviourIfc*>(mBehavioursRawArray, mBehavioursSpan.size()+1);
 }
 
-Span<BehaviourIfc*> SystemRuntimeAbs::getBehaviours(){
+Span<BehaviourIfc*> RuntimeAbs::getBehaviours(){
     return mBehavioursSpan;
 }
 
-void SystemRuntimeAbs::dispatchEvents(){
-    const Event* event;
-    while(mEventQueue.pop(event)){
-        if(event == nullptr){
-            TriggerDebug("SystemRuntimeAbs", "event is nullptr");
+void RuntimeAbs::dispatchEvents(){
+    const EventHeader* header;
+    while(mEventQueue.pop(header)){
+        if(header == nullptr){
+            TriggerDebug("RuntimeAbs", "event header is nullptr");
             continue;
         }
-        onRouteEvent(event);
+        onRouteEvent(header);
     }
     mEventFactory.clearDataPool();
 }
 
-void SystemRuntimeAbs::clearEventQueue(){
+void RuntimeAbs::clearEventQueue(){
     mEventQueue.clear();
     mEventFactory.clearDataPool();
 }
 
-void SystemRuntimeAbs::handleForwardedEvent(const Event* event){
-    if(!mEventQueue.push(event)){
-        TriggerExit("SystemRuntimeAbs", "event queue is full");
+void RuntimeAbs::handleForwardedEvent(const EventHeader* header){
+    if(!mEventQueue.push(header)){
+        TriggerExit("RuntimeAbs", "event queue is full");
     }
 }
 

@@ -2,8 +2,8 @@
 
 #include "core/application/behaviour/BehaviourIfc.h"
 #include "core/application/event/EventFactory.h"
-#include "core/application/event/EventView.h"
-#include "core/application/event/EventWrapper.h"
+#include "core/application/event/types/EventWrite.h"
+#include "core/application/event/types/EventRead.h"
 #include "shared/types/EventData.h"
 
 namespace Garbox {
@@ -31,19 +31,19 @@ public:
 protected:
 
     // interface implementations
-    void sendEvent(Event* event) final;
+    void sendEvent(EventHeader* header) final;
 
     // make event
-    template<typename EventDataType>
-    EventWrapper<EventDataType> makeEvent(){
+    template<typename EventPayload>
+    EventWrite<EventPayload> makeEvent(){
         if(!mInitialized){
             TriggerExit("BehaviourAbs", "not initialized");
         }
-        EventWrapper wrapper = mEventFactory->make<EventDataType>(mComponentDescriptor);
-        if(!wrapper.event){
+        EventWrite<EventPayload> event = mEventFactory->make<EventPayload>(mComponentDescriptor);
+        if(!event.header){
             TriggerExit("BehaviourAbs", "could not allocate event");
         }
-        return wrapper;
+        return event;
     }
 
     // abstract methods for user of class

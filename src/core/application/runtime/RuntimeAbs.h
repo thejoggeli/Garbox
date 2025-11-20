@@ -13,7 +13,7 @@ class ControllerIfc;
 /**
  * Extend this class in the application
  */
-class SystemRuntimeAbs {
+class RuntimeAbs {
 public:
 
     struct Config {
@@ -21,13 +21,13 @@ public:
         size_t eventQueueLength = 64;
     };
 
-    SystemRuntimeAbs();
+    RuntimeAbs();
 
     // disallow copy and move 
-    SystemRuntimeAbs(const SystemRuntimeAbs&) = delete;
-    SystemRuntimeAbs& operator=(const SystemRuntimeAbs&) = delete;
-    SystemRuntimeAbs(SystemRuntimeAbs&&) = delete;
-    SystemRuntimeAbs& operator=(SystemRuntimeAbs&&) = delete;
+    RuntimeAbs(const RuntimeAbs&) = delete;
+    RuntimeAbs& operator=(const RuntimeAbs&) = delete;
+    RuntimeAbs(RuntimeAbs&&) = delete;
+    RuntimeAbs& operator=(RuntimeAbs&&) = delete;
 
     void init(const Config& config);
     void start();
@@ -53,14 +53,14 @@ protected:
     virtual void onStart() = 0;
     virtual void onRegisterControllers() = 0;
     virtual void onRegisterBehaviours() = 0;
-    virtual void onRouteEvent(const Event* event) = 0;
+    virtual void onRouteEvent(const EventHeader* event) = 0;
 
 private:
 
     // members for events
     EventFactory mEventFactory;
     EventForwarder mEventForwarder;
-    RingBufferHeap<const Event*> mEventQueue; // store only pointer, events are owned by event factory
+    RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
     // controllers array
     static constexpr size_t MaxControllersCount = 16;
@@ -76,7 +76,7 @@ private:
     BehaviourIfc* mActiveBehaviour = nullptr;
     BehaviourIfc* mQueuedBehaviour = nullptr;
 
-    void handleForwardedEvent(const Event* event);
+    void handleForwardedEvent(const EventHeader* event);
 
 };
 

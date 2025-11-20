@@ -1,6 +1,7 @@
 #include "PartsProvider.h"
 
 #include <algorithm>
+
 #include "app/config/AppConfig.h"
 #include "app/hardware/adc/AdcInstances.h"
 #include "app/hardware/gpio/GpioInstances.h"
@@ -8,17 +9,20 @@
 #include "app/hardware/ledc/LedcInstances.h"
 #include "app/hardware/spi/SpiInstances.h"
 #include "app/hardware/timer/TimerInstances.h"
-#include "app/parts/StatusLeds.h"
+
 #include "core/assert/Assert.h"
+#include "core/util/container/Span.h"
+
 #include "modules/parts/button/InterruptButton.h"
 #include "modules/parts/display/Display.h"
 #include "modules/parts/fan/Fan.h"
 #include "modules/parts/heatpad/Heatpad.h"
 #include "modules/parts/led/rgb/RgbLed.h"
 #include "modules/parts/led/single/AnimatedLed.h"
+#include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 #include "modules/parts/temperature/Sht31.h"
-#include "core/util/container/Span.h"
+
 
 namespace Garbox {
 
@@ -62,7 +66,7 @@ void PartsProvider::Init(){
     });
 
     // init status leds
-    StatusLeds& statusLeds = GetStatusLeds();
+    AnimatedLedGroup& statusLeds = GetStatusLeds();
     statusLeds.init();
 
     // init rgb led
@@ -134,10 +138,10 @@ Sht31& PartsProvider::GetTemperatureSensor(){
 }
 
 AnimatedLed& PartsProvider::GetStatusLed(StatusLedId id){
-    return GetStatusLeds().getLed(id);
+    return GetStatusLeds().getLed(static_cast<uint8_t>(id));
 }
 
-StatusLeds& PartsProvider::GetStatusLeds(){
+AnimatedLedGroup& PartsProvider::GetStatusLeds(){
 
     // animated leds
     static AnimatedLed leds[] = {
@@ -149,7 +153,7 @@ StatusLeds& PartsProvider::GetStatusLeds(){
     static Span span(leds);
 
     // status leds instance
-    static StatusLeds instance(span);
+    static AnimatedLedGroup instance(span);
     return instance;
 }
 

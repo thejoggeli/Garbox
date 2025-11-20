@@ -12,7 +12,7 @@ class PiezoPlayer;
 class Sht31;
 
 class AnimatedLed;
-class StatusLeds;
+class AnimatedLedGroup;
 class RgbLed;
 
 class PartsProvider {
@@ -28,7 +28,7 @@ public:
     static Sht31& GetTemperatureSensor();
 
     static AnimatedLed& GetStatusLed(StatusLedId id);
-    static StatusLeds& GetStatusLeds();
+    static AnimatedLedGroup& GetStatusLeds();
     static RgbLed& GetRgbLed();
 
 };

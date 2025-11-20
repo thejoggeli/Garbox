@@ -2,8 +2,10 @@
 
 #include <cstdint>
 #include <functional>
-#include "core/application/event/Event.h"
-#include "core/application/event/EventWrapper.h"
+#include "core/application/event/types/EventBlock.h"
+#include "core/application/event/types/EventWrite.h"
+#include "core/application/event/types/EventHeader.h"
+#include "core/assert/Assert.h"
 #include "core/util/container/DataPoolHeap.h"
 
 namespace Garbox {
@@ -17,32 +19,28 @@ public:
     void init(size_t poolSizeBytes);
     void clearDataPool();
 
-    template<typename EventDataType>
-    EventWrapper<EventDataType> make(ComponentDescriptor componentDescriptor){
-        // allocate the event header
-        Event* event = mPool.allocate<Event>();
-        if(!event){
-            TriggerDebug("EventWrapper", "failed to allocate event");
-            return EventWrapper<EventDataType>{nullptr};
+    template<typename EventPayload>
+    EventWrite<EventPayload> make(ComponentDescriptor componentDescriptor){
+
+        // shorthand for events with given payload type
+        using EventBlockType = EventBlock<EventPayload>;
+        using EventWriteType = EventWrite<EventPayload>;
+        
+        // allocate memory for the event block
+        EventBlockType* block = mPool.allocate<EventBlockType>();
+        if(!block){
+            TriggerDebug("EventFactory", "failed to allocate event");
+            return EventWriteType(nullptr);
         }
 
-        event->id = getNextEventId();
-        event->type = EventDataType::Type;
-        event->sender = componentDescriptor;
+        // fill header data
+        EventHeader* header = &block->header;
+        header->id = getNextEventId();
+        header->type = EventPayload::Type;
+        header->sender = componentDescriptor;
 
-        // allocate data only if EventData is non-empty
-        EventDataType* data = nullptr;
-
-        if constexpr(sizeof(EventDataType) > 0){
-            data = mPool.allocate<EventDataType>();
-            if(!data){
-                TriggerDebug("EventWrapper", "failed to allocate event data");
-                return EventWrapper<EventDataType>{nullptr};
-            }
-        }
-
-        event->data = data;
-        return EventWrapper<EventDataType>(event);
+        // the caller gets only a non-owning view with pointers to event header and payload 
+        return EventWriteType(header);
     }
 
 private:

@@ -31,11 +31,11 @@ void ControllerAbs::start(){
     onStart();
 }
 
-void ControllerAbs::sendEvent(Event* event){
+void ControllerAbs::sendEvent(EventHeader* header){
     if(!mInitialized){
         TriggerExit("ControllerAbs", "not initialized");
     }
-    mEventForwarder->forward(event);
+    mEventForwarder->forward(header);
 }
 
 bool ControllerAbs::isInitialized() const {

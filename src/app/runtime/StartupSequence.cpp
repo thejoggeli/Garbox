@@ -1,11 +1,11 @@
 #include "StartupSequence.h"
 
-#include "app/parts/StatusLeds.h"
 #include "app/providers/PartsProvider.h"
 #include "core/time/Time.h"
-#include "modules/parts/button/InterruptButton.h"
-#include "modules/parts/piezo/PiezoPlayer.h"
 #include "core/util/function/default/EasingFunctions.h"
+#include "modules/parts/button/InterruptButton.h"
+#include "modules/parts/led/AnimatedLedGroup.h"
+#include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 
@@ -13,7 +13,7 @@ StartupSequence::StartupSequence():
     // initialize members
     mPiezoPlayer(PartsProvider::GetPiezoPlayer()),
     mStatusLeds(PartsProvider::GetStatusLeds()),
-    mHeartbeatLed(mStatusLeds.getLed(StatusLedId::Heartbeat)){
+    mHeartbeatLed(mStatusLeds.getLed(static_cast<uint8_t>(StatusLedId::Heartbeat))){
     // nothing to do
 }
 

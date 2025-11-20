@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/application/controller/ControllerAbs.h"
-#include "core/application/event/EventView.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox {
@@ -17,7 +16,7 @@ public:
     void onInputTick();
     void onOutputTick();
 
-    void onHeatpadCommand(const EventView<EventData::HeatpadCommand> event);
+    void onHeatpadCommand(const EventRead<EventData::HeatpadCommand> event);
 
 private:
 

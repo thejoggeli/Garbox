@@ -45,47 +45,47 @@ void FermentationBehaviour::onLogicTick(){
     }
 }
 
-void FermentationBehaviour::onHeartbeat(const EventView<EventData::Heartbeat>& event){
+void FermentationBehaviour::onHeartbeat(const EventRead<EventData::Heartbeat>& event){
     mHeartbeatReceived = true;
 }
 
-void FermentationBehaviour::onFanStatus(const EventView<EventData::FanStatus>& event){
+void FermentationBehaviour::onFanStatus(const EventRead<EventData::FanStatus>& event){
     LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%, rpm=%" PRIi32,
-        FanStateToString(event.data->state),
-        event.data->targetSpeed * 100.0f,
-        static_cast<uint32_t>(event.data->measuredRpm + 0.5f)
+        FanStateToString(event.payload->state),
+        event.payload->targetSpeed * 100.0f,
+        static_cast<uint32_t>(event.payload->measuredRpm + 0.5f)
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.fanEnabled = (event.data->state != FanState::Disabled);
-    inputs.fanStalled = (event.data->state == FanState::Stalled);
-    inputs.fanTargetSpeed = event.data->targetSpeed;
-    inputs.fanMeasuredRpm = event.data->measuredRpm;
+    inputs.fanEnabled = (event.payload->state != FanState::Disabled);
+    inputs.fanStalled = (event.payload->state == FanState::Stalled);
+    inputs.fanTargetSpeed = event.payload->targetSpeed;
+    inputs.fanMeasuredRpm = event.payload->measuredRpm;
 }
 
-void FermentationBehaviour::onHeatpadStatus(const EventView<EventData::HeatpadStatus>& event){
+void FermentationBehaviour::onHeatpadStatus(const EventRead<EventData::HeatpadStatus>& event){
     LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
-        HeatpadStateToString(event.data->state),
-        event.data->duty,
-        event.data->periodMicros / 1000
+        HeatpadStateToString(event.payload->state),
+        event.payload->duty,
+        event.payload->periodMicros / 1000
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.heatpadEnabled = (event.data->state != HeatpadState::Disabled);
-    inputs.heatpadPwmDuty = event.data->duty;
-    inputs.heatpadPwmPeriodMicros = event.data->periodMicros; 
+    inputs.heatpadEnabled = (event.payload->state != HeatpadState::Disabled);
+    inputs.heatpadPwmDuty = event.payload->duty;
+    inputs.heatpadPwmPeriodMicros = event.payload->periodMicros; 
 }
 
-void FermentationBehaviour::onTemperatureStatus(const EventView<EventData::TemperatureStatus>& event){
+void FermentationBehaviour::onTemperatureStatus(const EventRead<EventData::TemperatureStatus>& event){
     LogDebug("FermentationBehaviour", "[TemperatureStatus] en=%u, err=%u, temp=%.2f°C, hum=%.2f%%",
-        event.data->sensorEnabled,
-        event.data->sensorError,
-        event.data->temperatureCelcius,
-        event.data->humidityRelative
+        event.payload->sensorEnabled,
+        event.payload->sensorError,
+        event.payload->temperatureCelcius,
+        event.payload->humidityRelative
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.temperatureEnabled = event.data->sensorEnabled;
-    inputs.temperatureError = event.data->sensorError;
-    inputs.temperatureCelcius = event.data->temperatureCelcius;
-    inputs.humidityRelative = event.data->humidityRelative;
+    inputs.temperatureEnabled = event.payload->sensorEnabled;
+    inputs.temperatureError = event.payload->sensorError;
+    inputs.temperatureCelcius = event.payload->temperatureCelcius;
+    inputs.humidityRelative = event.payload->humidityRelative;
 }
 
 void FermentationBehaviour::applySwitchState(){
@@ -107,10 +107,10 @@ void FermentationBehaviour::applySwitchState(){
 }
 
 void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
-    EventWrapper wrapper = makeEvent<EventData::FanCommand>();
-    wrapper.data->enabled = enabled;
-    wrapper.data->targetSpeed = speed;
-    sendEvent(wrapper.event);
+    EventWrite event = makeEvent<EventData::FanCommand>();
+    event.payload->enabled = enabled;
+    event.payload->targetSpeed = speed;
+    sendEvent(event.header);
 }
 
 } // namespace
