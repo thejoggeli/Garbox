@@ -13,7 +13,7 @@ class AnimatedLed;
 class InputController : public ControllerAbs {
 public:
 
-    InputController(ComponentId id);
+    InputController(ComponentId id, const RuntimeContext& context);
 
     void onTick();
 

@@ -11,7 +11,7 @@ class RgbLed;
 class HeatpadController : public ControllerAbs {
 public:
     
-    HeatpadController(ComponentId id);
+    HeatpadController(ComponentId id, const RuntimeContext& context);
 
     void onInputTick();
     void onOutputTick();

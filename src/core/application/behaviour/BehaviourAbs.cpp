@@ -6,9 +6,10 @@
 
 namespace Garbox {
 
-BehaviourAbs::BehaviourAbs(ComponentId id):
+BehaviourAbs::BehaviourAbs(ComponentId id, const RuntimeContext& context):
     // init members
-    mComponentDescriptor{ComponentType::Behaviour, id} {
+    mComponentDescriptor{ComponentType::Behaviour, id},
+    mContext(context){
     // nothing to do
 }
 
@@ -65,6 +66,10 @@ bool BehaviourAbs::isInitialized() const {
 
 ComponentId BehaviourAbs::getComponentId() const {
     return mComponentDescriptor.id;
+}
+
+const RuntimeContext& BehaviourAbs::getContext() const {
+    return mContext;
 }
 
 } // namespace

@@ -11,7 +11,7 @@ class Sht31;
 class I2cPartsController : public ControllerAbs {
 public:
     
-    I2cPartsController(ComponentId id);
+    I2cPartsController(ComponentId id, const RuntimeContext& context);
 
     void onInputTick();
     void onOutputTick();

@@ -7,9 +7,9 @@
 
 namespace Garbox {
 
-HeatpadController::HeatpadController(ComponentId id): 
+HeatpadController::HeatpadController(ComponentId id, const RuntimeContext& context): 
     // init members
-    ControllerAbs(id),
+    ControllerAbs(id, context),
     mHeatpad(PartsProvider::GetHeatpad()),
     mLed(PartsProvider::GetRgbLed()){
     // nothing to do

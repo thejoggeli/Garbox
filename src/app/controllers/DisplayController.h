@@ -22,7 +22,7 @@ public:
         uint32_t renderSkippedCount = 0xFFFFFFFF;
     };
     
-    DisplayController(ComponentId id);
+    DisplayController(ComponentId id, const RuntimeContext& context);
 
     void onTick();
 

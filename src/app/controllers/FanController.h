@@ -11,7 +11,7 @@ class Fan;
 class FanController : public ControllerAbs {
 public:
     
-    FanController(ComponentId id);
+    FanController(ComponentId id, const RuntimeContext& context);
 
     void onInputTick();
     void onOutputTick();

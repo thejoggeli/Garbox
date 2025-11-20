@@ -1,8 +1,9 @@
 #include "RuntimeAbs.h"
 
 #include "core/application/behaviour/BehaviourIfc.h"
-#include "core/assert/Assert.h"
 #include "core/application/controller/ControllerIfc.h"
+#include "core/assert/Assert.h"
+#include "core/time/Time.h"
 
 namespace Garbox {
 
@@ -128,6 +129,18 @@ void RuntimeAbs::handleForwardedEvent(const EventHeader* header){
     if(!mEventQueue.push(header)){
         TriggerExit("RuntimeAbs", "event queue is full");
     }
+}
+
+void RuntimeAbs::incrementTickCount(){
+    mContext.tickCount++;
+}
+
+void RuntimeAbs::updateNowTime(){
+    mContext.nowMicros = Time::GetMicros();
+}
+
+const RuntimeContext& RuntimeAbs::getContext() const {
+    return mContext;
 }
 
 } // namespace

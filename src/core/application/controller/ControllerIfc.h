@@ -7,6 +7,7 @@ namespace Garbox {
 class EventFactory;
 class EventForwarder;
 class EventHeader;
+class RuntimeContext;
 
 class ControllerIfc {
 public:
@@ -16,6 +17,7 @@ public:
 
     virtual bool isInitialized() const = 0;
     virtual ComponentId getComponentId() const = 0;
+    virtual const RuntimeContext& getContext() const = 0;
 
 protected:
 

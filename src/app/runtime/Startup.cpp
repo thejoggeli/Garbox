@@ -157,6 +157,7 @@ void handleMainTask(){
     const TickType_t mainTickMillis = pdMS_TO_TICKS(AppConfig::MainTickDurationMillis);
     const TickType_t displayTickMillis = pdMS_TO_TICKS(AppConfig::DisplayTickDurationMillis);
     TickType_t lastWakeTime = xTaskGetTickCount();
+
     while(true){
 
         // reset profiler
@@ -189,6 +190,9 @@ void handleMainTask(){
             ProfilerScoped displayTickProfilerScoped = ProfilerScoped(ProfilerId::DisplayTick);
             gRuntime.onDisplayTick();
         }
+
+        // increment runtime context tick count
+        gRuntime.incrementTickCount();
         
         // end main task
         // sleep until next tick

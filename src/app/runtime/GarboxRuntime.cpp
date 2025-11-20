@@ -10,14 +10,14 @@ namespace Garbox {
 
 GarboxRuntime::GarboxRuntime():
     // init behaviours
-    mFermentationBehaviour(ComponentId::FermentationBehaviour),
+    mFermentationBehaviour(ComponentId::FermentationBehaviour, getContext()),
     // init controllers
-    mDisplayController(ComponentId::DisplayController),
-    mFanController(ComponentId::FanController),
-    mInputController(ComponentId::InputController),
-    mHeatpadController(ComponentId::HeatpadController),
-    mHeartbeatController(ComponentId::HeartbeatController),
-    mI2cPartsController(ComponentId::I2cPartsController){
+    mDisplayController(ComponentId::DisplayController, getContext()),
+    mFanController(ComponentId::FanController, getContext()),
+    mInputController(ComponentId::InputController, getContext()),
+    mHeatpadController(ComponentId::HeatpadController, getContext()),
+    mHeartbeatController(ComponentId::HeartbeatController, getContext()),
+    mI2cPartsController(ComponentId::I2cPartsController, getContext()){
     // nothing to do
 }
 
@@ -46,26 +46,33 @@ void GarboxRuntime::onStart(){
 
 void GarboxRuntime::onMainTick(){
 
-    // apply next behaviour
+    // apply queued behaviour
     applyQueuedBehaviour();
 
+    // get active behaviour 
+    AppBehaviourAbs* behaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+
     // input tick
+    updateNowTime();
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mI2cPartsController.onInputTick();
     dispatchEvents();
 
     // regular tick tick
+    updateNowTime();
     mHeartbeatController.onTick();
     mInputController.onTick();
     dispatchEvents();
 
     // behaviour logic tick
-    AppBehaviourAbs* behaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    updateNowTime();
     behaviour->onLogicTick();
+    dispatchEvents();
 
     // output tick
+    updateNowTime();
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
     mI2cPartsController.onOutputTick();

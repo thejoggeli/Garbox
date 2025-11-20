@@ -7,9 +7,9 @@
 
 namespace Garbox {
 
-HeartbeatController::HeartbeatController(ComponentId id): 
+HeartbeatController::HeartbeatController(ComponentId id, const RuntimeContext& context): 
     // initialize members
-    ControllerAbs(id),
+    ControllerAbs(id, context),
     mIntervalMicros(AppConfig::HeartbeatIntervalMicros),
     mHeartbeatLed(PartsProvider::GetStatusLed(StatusLedId::Heartbeat)){
     // nothing to do

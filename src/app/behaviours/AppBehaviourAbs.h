@@ -7,7 +7,7 @@ namespace Garbox {
 class AppBehaviourAbs : public BehaviourAbs {
 public:
 
-    AppBehaviourAbs(ComponentId id);
+    AppBehaviourAbs(ComponentId id, const RuntimeContext& context);
 
     virtual void onLogicTick(){};
 

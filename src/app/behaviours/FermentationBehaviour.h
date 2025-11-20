@@ -7,7 +7,7 @@ namespace Garbox {
 
 class FermentationBehaviour : public AppBehaviourAbs {
 public:
-    explicit FermentationBehaviour(ComponentId id = ComponentId::FermentationBehaviour);
+    explicit FermentationBehaviour(ComponentId id, const RuntimeContext& context);
     
     void onLogicTick() final;
     void onHeartbeat(const EventRead<EventData::Heartbeat>& event) final;

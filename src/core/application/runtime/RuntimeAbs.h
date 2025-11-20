@@ -2,6 +2,7 @@
 
 #include "core/application/event/EventFactory.h"
 #include "core/application/event/EventForwarder.h"
+#include "core/application/runtime/RuntimeContext.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/RingBufferHeap.h"
 
@@ -32,6 +33,10 @@ public:
     void init(const Config& config);
     void start();
 
+    void incrementTickCount();
+    void updateNowTime();
+    const RuntimeContext& getContext() const;
+
 protected:
 
     void registerController(ControllerIfc* controller);
@@ -49,6 +54,7 @@ protected:
     void dispatchEvents();
     void clearEventQueue();
 
+    // to be implemented by user
     virtual void onInit() = 0;
     virtual void onStart() = 0;
     virtual void onRegisterControllers() = 0;
@@ -56,6 +62,10 @@ protected:
     virtual void onRouteEvent(const EventHeader* event) = 0;
 
 private:
+
+    // context for controllers and behaviours to use
+    // RuntimeAbs never modifies this by itself, must be done by user
+    RuntimeContext mContext;
 
     // members for events
     EventFactory mEventFactory;

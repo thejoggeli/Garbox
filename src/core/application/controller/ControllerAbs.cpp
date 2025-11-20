@@ -6,9 +6,10 @@
 
 namespace Garbox {
 
-ControllerAbs::ControllerAbs(ComponentId id): 
+ControllerAbs::ControllerAbs(ComponentId id, const RuntimeContext& context): 
     // init members    
-    mComponentDescriptor{ComponentType::Controller, id} {
+    mComponentDescriptor{ComponentType::Controller, id},
+    mContext(context){
     // constructor body
 }
 
@@ -44,6 +45,10 @@ bool ControllerAbs::isInitialized() const {
 
 ComponentId ControllerAbs::getComponentId() const {
     return mComponentDescriptor.id;
+}
+
+const RuntimeContext& ControllerAbs::getContext() const {
+    return mContext;
 }
 
 } // namespace

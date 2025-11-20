@@ -4,6 +4,7 @@
 #include "core/application/event/EventFactory.h"
 #include "core/application/event/types/EventWrite.h"
 #include "core/application/event/types/EventRead.h"
+#include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/EventData.h"
 
 namespace Garbox {
@@ -11,7 +12,7 @@ namespace Garbox {
 class BehaviourAbs : public BehaviourIfc {
 public:
 
-    BehaviourAbs(ComponentId id);
+    BehaviourAbs(ComponentId id, const RuntimeContext& context);
     ~BehaviourAbs();
 
     // interface implementations
@@ -21,6 +22,7 @@ public:
     bool isActive() const final;
     bool isInitialized() const final;
     ComponentId getComponentId() const final;
+    const RuntimeContext& getContext() const final;
 
     // disallow copy and move 
     BehaviourAbs(const BehaviourAbs&) = delete;
@@ -54,11 +56,13 @@ protected:
 
 private:
 
-    bool mInitialized = false;
     ComponentDescriptor mComponentDescriptor;
+    const RuntimeContext& mContext;
+
     EventFactory* mEventFactory = nullptr;
     EventForwarder* mEventForwarder = nullptr;
 
+    bool mInitialized = false;
     bool mActive = false;
 
 };
