@@ -1,29 +1,32 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #pragma once
 
 #include <cstdint>
 
+
+
 namespace Garbox {
 
-enum class ComponentId : uint8_t {
-    // special zero type
+enum class ComponentId : uint16_t {
+
+    // null event
     Null = 0,
 
-    // behaviour ids
-    CalibrationBehaviour,
+    DisplayController,
+    FanController,
+    HeatpadController,
+    HeartbeatController,
+    I2cPartsController,
+    InputController,
     FermentationBehaviour,
 
-    // controller ids
-    FanController,
-    HeartbeatController,
-    InputController,
-    HeatpadController,
-    DisplayController,
-    I2cPartsController,
-
-    // special count type
-    Count
+    // enum size marker
+    Count,
 };
 
 const char* ComponentIdToString(ComponentId id);
 
-} // namespace
+} // namespace Garbox

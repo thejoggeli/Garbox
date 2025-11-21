@@ -42,8 +42,6 @@ void {{ name }}Runtime::onStart(){
 {# ---- GENERATE TICKS ---- #}
 {% for tick in ticks %}
 void {{ name }}Runtime::on{{ tick }}(){
-
-    // controller ticks
     {# Call tick on controllers supporting this tick #}
     {% for ctrl_key, ctrl in controllers.items() %}
         {% if tick in ctrl['ticks'] %}
@@ -52,19 +50,14 @@ void {{ name }}Runtime::on{{ tick }}(){
     {% endfor %}
     {# Call tick on active behaviour (if it supports this tick) #}
     {% if tick in behaviour_ticks %}
-
-    // behaviour tick
     BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
     AssertExit(behaviour != nullptr, "{{ name }}Runtime", "no behaviour set");
     behaviour->on{{ tick }}();
     {% endif %}
-
-    // dispatch events at the end of tick
     dispatchEvents();
 }
+
 {% endfor %}
-
-
 void {{ name }}Runtime::onRouteEvent(const EventHeader* header){
     switch(header->type){
     {# ---- Route events ---- #}

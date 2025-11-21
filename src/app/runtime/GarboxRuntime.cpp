@@ -1,23 +1,22 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #include "GarboxRuntime.h"
-
-#include "app/providers/PartsProvider.h"
+#include "core/assert/Assert.h"
 #include "core/log/Log.h"
-#include "modules/parts/heatpad/Heatpad.h"
-
-#define GarboxDebugRuntime 0
 
 namespace Garbox {
 
 GarboxRuntime::GarboxRuntime():
-    // init behaviours
     mFermentationBehaviour(getContext()),
-    // init controllers
     mDisplayController(getContext()),
     mFanController(getContext()),
-    mInputController(getContext()),
-    mHeatpadController(getContext()),
     mHeartbeatController(getContext()),
-    mI2cPartsController(getContext()){
+    mHeatpadController(getContext()),
+    mInputController(getContext()),
+    mI2cPartsController(getContext())
+{
     // nothing to do
 }
 
@@ -28,88 +27,109 @@ void GarboxRuntime::onRegisterBehaviours(){
 void GarboxRuntime::onRegisterControllers(){
     registerController(&mDisplayController);
     registerController(&mFanController);
-    registerController(&mInputController);
-    registerController(&mHeatpadController);
     registerController(&mHeartbeatController);
+    registerController(&mHeatpadController);
+    registerController(&mInputController);
     registerController(&mI2cPartsController);
 }
 
 void GarboxRuntime::onInit(){
-    // behaviours and controllers are already initialized when this function is called
+    // behaviours and controllers are already initialized
     setQueuedBehaviour(&mFermentationBehaviour);
 }
 
 void GarboxRuntime::onStart(){
-    // behaviours and controllers are already started when this function is called
-    // nothing to do
+    // behaviours and controllers are already started
 }
 
-void GarboxRuntime::onMainTick(){
-
-    // apply queued behaviour
-    applyQueuedBehaviour();
-
-    // get active behaviour 
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-
-    // heartbeat tick
-    mHeartbeatController.onHeartbeatTick();
+void GarboxRuntime::onRenderTick(){
+    mDisplayController.onRenderTick();
     dispatchEvents();
+}
 
-    // input tick
-    mInputController.onInputTick();
+void GarboxRuntime::onInputTick(){
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
+    mInputController.onInputTick();
     mI2cPartsController.onInputTick();
     dispatchEvents();
+}
 
-    // behaviour logic tick
-    behaviour->onLogicTick();
-    dispatchEvents();
-
-    // output tick
+void GarboxRuntime::onOutputTick(){
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
     dispatchEvents();
 }
 
-void GarboxRuntime::onDisplayTick(){
-    // render tick
-    mDisplayController.onRenderTick();
+void GarboxRuntime::onLogicTick(){
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    behaviour->onLogicTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onHeartbeatTick(){
+    mHeartbeatController.onHeartbeatTick();
     dispatchEvents();
 }
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
-    
-#if GarboxDebugRuntime
-    // log event meta data
-    LogDebug("GarboxRuntime", "[Event] %s [id=%" PRIi32 "] %s", 
-        EventTypeToString(header->type),
-        header->id,
-        ComponentIdToString(header->sender.id)
-    );
-#endif
-
-    // get active behaviour
-    BaseBehaviourAbs* activeBehaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-
-    // route the event
     switch(header->type){
-
-    // route status updates to behaviour
-    case EventType::Heartbeat:          activeBehaviour->onHeartbeat(EventRead<EventPayload::Heartbeat>(header)); break;
-    case EventType::FanStatus:          activeBehaviour->onFanStatus(EventRead<EventPayload::FanStatus>(header)); break;
-    case EventType::FanSample:          activeBehaviour->onFanSample(EventRead<EventPayload::FanSample>(header)); break;
-    case EventType::HeatpadStatus:      activeBehaviour->onHeatpadStatus(EventRead<EventPayload::HeatpadStatus>(header)); break;
-    case EventType::TemperatureStatus:  activeBehaviour->onTemperatureStatus(EventRead<EventPayload::TemperatureStatus>(header)); break;
-    case EventType::TemperatureSample:  activeBehaviour->onTemperatureSample(EventRead<EventPayload::TemperatureSample>(header)); break;
-
-    // route commands to controllers
-    case EventType::FanCommand:         mFanController.onFanCommand(EventRead<EventPayload::FanCommand>(header)); break;
-    case EventType::HeatpadCommand:     mHeatpadController.onHeatpadCommand(EventRead<EventPayload::HeatpadCommand>(header)); break;
-    
-    // special event types
+    case EventType::Heartbeat: {
+        const EventRead<EventPayload::Heartbeat> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onHeartbeat(event);
+        break;
+    }
+    case EventType::FanStatus: {
+        const EventRead<EventPayload::FanStatus> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onFanStatus(event);
+        break;
+    }
+    case EventType::FanSample: {
+        const EventRead<EventPayload::FanSample> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onFanSample(event);
+        break;
+    }
+    case EventType::FanCommand: {
+        const EventRead<EventPayload::FanCommand> event(header);
+        mFanController.onFanCommand(event);
+        break;
+    }
+    case EventType::HeatpadStatus: {
+        const EventRead<EventPayload::HeatpadStatus> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onHeatpadStatus(event);
+        break;
+    }
+    case EventType::HeatpadCommand: {
+        const EventRead<EventPayload::HeatpadCommand> event(header);
+        mHeatpadController.onHeatpadCommand(event);
+        break;
+    }
+    case EventType::TemperatureStatus: {
+        const EventRead<EventPayload::TemperatureStatus> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureStatus(event);
+        break;
+    }
+    case EventType::TemperatureSample: {
+        const EventRead<EventPayload::TemperatureSample> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureSample(event);
+        break;
+    }
+    case EventType::Button: {
+        const EventRead<EventPayload::Button> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onButton(event);
+        break;
+    }
+    case EventType::ButtonRepeat: {
+        const EventRead<EventPayload::ButtonRepeat> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onButtonRepeat(event);
+        break;
+    }
+    case EventType::EncoderStep: {
+        const EventRead<EventPayload::EncoderStep> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onEncoderStep(event);
+        break;
+    }
     case EventType::Null:
     case EventType::Count:
         TriggerDebug("GarboxRuntime", "invalid event type");
@@ -117,4 +137,4 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
 }
 
-} // namespace
+} // namespace Garbox

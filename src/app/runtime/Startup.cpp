@@ -167,7 +167,10 @@ void handleMainTask(){
         // main tick
         {
             ProfilerScoped mainTickProfilerScoped = ProfilerScoped(ProfilerId::MainTick);
-            gRuntime.onMainTick();
+            gRuntime.onHeartbeatTick();
+            gRuntime.onInputTick();
+            gRuntime.onLogicTick();
+            gRuntime.onOutputTick();
         }
 
         // logging
@@ -182,7 +185,7 @@ void handleMainTask(){
         {
             vTaskDelayUntil(&lastWakeTime, mainTickMillis);
             ProfilerScoped displayTickProfilerScoped = ProfilerScoped(ProfilerId::DisplayTick);
-            gRuntime.onDisplayTick();
+            gRuntime.onRenderTick();
         }
         
         // end main task

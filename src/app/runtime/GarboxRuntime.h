@@ -1,13 +1,19 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #pragma once
 
+#include "core/application/runtime/RuntimeAbs.h"
+
 #include "app/behaviours/FermentationBehaviour.h"
+
 #include "app/controllers/DisplayController.h"
 #include "app/controllers/FanController.h"
 #include "app/controllers/HeartbeatController.h"
 #include "app/controllers/HeatpadController.h"
 #include "app/controllers/InputController.h"
 #include "app/controllers/I2cPartsController.h"
-#include "core/application/runtime/RuntimeAbs.h"
 
 namespace Garbox {
 
@@ -16,20 +22,21 @@ public:
 
     GarboxRuntime();
 
-    void onMainTick();
-    void onDisplayTick();
+    void onRenderTick();
+    void onInputTick();
+    void onOutputTick();
+    void onLogicTick();
+    void onHeartbeatTick();
 
 private:
 
-    // behaviours
     FermentationBehaviour mFermentationBehaviour;
 
-    // controllers
     DisplayController mDisplayController;
     FanController mFanController;
-    InputController mInputController;
-    HeatpadController mHeatpadController;
     HeartbeatController mHeartbeatController;
+    HeatpadController mHeatpadController;
+    InputController mInputController;
     I2cPartsController mI2cPartsController;
 
     void onInit() final;
@@ -39,4 +46,4 @@ private:
     void onRegisterControllers() final;
 };
 
-}
+} // namespace Garbox

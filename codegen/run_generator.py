@@ -324,7 +324,7 @@ def generate_behaviours(yaml_config):
     generate_items(stubs, base_path=script_dir)
 
 
-def generate_runtime(yaml_config):
+def generate_runtime(yaml_config, events_config):
 
     behaviours = yaml_config["behaviours"]
     controllers = yaml_config["controllers"]
@@ -343,13 +343,14 @@ def generate_runtime(yaml_config):
         ticks.update(item_dict["ticks"])
         controller_ticks.update(item_dict["ticks"])
 
+    for event_key in events_config["type"].keys():
+        event_routes[event_key] = {"controllers": set(), "behaviours": set()}
+
     # controller event routes
     for ctrl_key, ctrl_dict in controllers.items():
         if(ctrl_dict["receives"] is None or len(ctrl_dict["receives"]) == 0):
             continue
         for event in ctrl_dict["receives"]:
-            if(event not in event_routes):
-                event_routes[event] = {"controllers": set(), "behaviours": set()}
             event_routes[event]["controllers"].add(ctrl_key)
         
     # behaviour event routes
@@ -357,8 +358,6 @@ def generate_runtime(yaml_config):
         if(behaviour_dict["receives"] is None or len(behaviour_dict["receives"]) == 0):
             continue
         for event in behaviour_dict["receives"]:
-            if(event not in event_routes):
-                event_routes[event] = {"controllers": set(), "behaviours": set()}
             event_routes[event]["behaviours"].add(behaviour_key)
 
     for route in event_routes.values():
@@ -366,7 +365,7 @@ def generate_runtime(yaml_config):
         route["behaviours"] = list(route["behaviours"])
 
     name =  yaml_config["name"]
-    out_path = f"app/runtime/test/{name}Runtime"
+    out_path = f"app/runtime/{name}Runtime"
     template_path = f"application/Runtime"
     runtime_dict = {
         "name": name,
@@ -378,23 +377,41 @@ def generate_runtime(yaml_config):
         "controller_ticks": list(controller_ticks),
         "event_routes": event_routes,
     }
-    print_json(runtime_dict)
     items = []
     items.append(Item(runtime_dict, list(runtime_dict.keys()), f"{out_path}.h", f"{template_path}.h.j2"))
     items.append(Item(runtime_dict, list(runtime_dict.keys()), f"{out_path}.cpp", f"{template_path}.cpp.j2"))
     generate_items(items)
 
+
+def generate_components(yaml_config):
+    all_names = set()
+    all_names.update(yaml_config["controllers"])
+    all_names.update(yaml_config["behaviours"])
+
+    out_path = f"shared/types/ComponentId"
+    template_path = f"application/ComponentId"
+    comp_dict = {
+        "names": list(all_names)
+    }
+    items = []
+    items.append(Item(comp_dict, list(comp_dict.keys()), f"{out_path}.h", f"{template_path}.h.j2"))
+    items.append(Item(comp_dict, list(comp_dict.keys()), f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+    generate_items(items)
+
+
 def generate_application():
     yaml_path = script_dir.joinpath("config/application.yaml")
     yaml_config = load_yaml(yaml_path)
+    events_path = script_dir.joinpath("config/events.yaml")
+    events_config = load_yaml(events_path)
     ensure_suffix(yaml_config, "behaviours", "Behaviour")
     ensure_value_suffix(yaml_config, "behaviours", "ticks", "Tick")
     ensure_suffix(yaml_config, "controllers", "Controller")
     ensure_value_suffix(yaml_config, "controllers", "ticks", "Tick")
     generate_controllers(yaml_config)
     generate_behaviours(yaml_config)
-    generate_runtime(yaml_config)
-    
+    generate_runtime(yaml_config, events_config)
+    generate_components(yaml_config)
 
 def main():
     generate_hardware()
