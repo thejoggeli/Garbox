@@ -48,7 +48,7 @@ void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const EventRead<EventData::FanCommand> event){
+void FanController::onFanCommand(const EventRead<EventPayload::FanCommand> event){
     // apply enabled
     if(mFan.isEnabled() != event.payload->enabled){
         mFan.setEnabled(event.payload->enabled);
@@ -81,7 +81,7 @@ void FanController::handleFanStalledAlert(uint32_t counter){
 }
 
 void FanController::sendStatusEvent(){
-    EventWrite event = makeEvent<EventData::FanStatus>();
+    EventWrite event = makeEvent<EventPayload::FanStatus>();
     event.payload->state = mFan.getState();
     event.payload->targetSpeed = mFan.getTargetSpeed();
     event.payload->measuredRpm = mFan.getMeasuredRpm();

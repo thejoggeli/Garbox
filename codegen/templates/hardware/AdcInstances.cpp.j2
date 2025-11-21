@@ -1,0 +1,53 @@
+#include "AdcInstances.h"
+
+#include "core/assert/Assert.h"
+{% from "common/includes.j2" import emit_includes %}
+{{ emit_includes(include) }}
+
+namespace Garbox {
+
+template<int32_t GpioNum>
+static constexpr adc1_channel_t GpioToAdc1Channel(){
+    switch(GpioNum){
+    case 1:  return ADC1_CHANNEL_0;
+    case 2:  return ADC1_CHANNEL_1;
+    case 3:  return ADC1_CHANNEL_2;
+    case 4:  return ADC1_CHANNEL_3;
+    case 5:  return ADC1_CHANNEL_4;
+    case 6:  return ADC1_CHANNEL_5;
+    case 7:  return ADC1_CHANNEL_6;
+    case 8:  return ADC1_CHANNEL_7;
+    case 9:  return ADC1_CHANNEL_8;
+    case 10: return ADC1_CHANNEL_9;
+    }
+    static_assert((GpioNum >= 1) && (GpioNum <= 10), "Invalid GPIO number for ADC1 channel on ESP32-S3");
+}
+
+static bool sInitialized = false;
+
+void AdcInstances::Init(){
+    
+    AssertExit(!sInitialized, "AdcInstances", "already initialized");
+
+{% for name, entry in adc.items() %}
+    Get{{ name }}().init(Adc::Config {
+        .pin = Pin{{ name }},
+        .channel = GpioToAdc1Channel<{{ entry.pin }}>(),
+        .attenuation = ADC_ATTEN_DB_{{ entry.attenuation }},
+        .bitWidth = ADC_WIDTH_BIT_{{ entry.bitWidth }},
+        .enableCalibration = {{ "true" if entry.calibration else "false" }},
+    });
+    
+{% endfor %}
+
+    sInitialized = true;
+}
+
+{% for name, entry in adc.items() %}
+Adc& AdcInstances::Get{{ name }}(){
+    static Adc instance;
+    return instance;
+}
+{% endfor %}
+
+} // namespace

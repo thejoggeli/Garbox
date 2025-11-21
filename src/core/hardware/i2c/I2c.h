@@ -20,10 +20,10 @@ public:
 
     struct Config {
         Port port = Port::Num0;
-        int32_t sdaPin = -1;
-        int32_t sclPin = -1;
-        Pull sdaPull = Pull::Disable;
-        Pull sclPull = Pull::Disable;
+        int32_t pinSda = -1;
+        int32_t pinScl = -1;
+        Pull pullSda = Pull::Disable;
+        Pull pullScl = Pull::Disable;
         uint32_t frequencyHz = 100000;
     };
 
@@ -63,8 +63,8 @@ public:
 
 private:
     bool mInitialized = false;
-    int32_t mSdaPin = -1;
-    int32_t mSclPin = -1;
+    int32_t mPinSda = -1;
+    int32_t mPinScl = -1;
     uint32_t mFrequencyHz = 100000;
     i2c_port_t mPort = I2C_NUM_0;
     uint32_t mTimeoutMillis = 10; // default timeout

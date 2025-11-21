@@ -2,6 +2,7 @@
 
 #include "core/hardware/timer/Timer.h"
 
+
 namespace Garbox {
 
 class TimerInstances {
@@ -13,4 +14,4 @@ public:
 
 };
 
-} // namespace Garbox
+} // namespace

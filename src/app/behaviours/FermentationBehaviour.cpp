@@ -47,11 +47,11 @@ void FermentationBehaviour::onLogicTick(){
     }
 }
 
-void FermentationBehaviour::onHeartbeat(const EventRead<EventData::Heartbeat>& event){
+void FermentationBehaviour::onHeartbeat(const EventRead<EventPayload::Heartbeat>& event){
     mHeartbeatReceived = true;
 }
 
-void FermentationBehaviour::onFanStatus(const EventRead<EventData::FanStatus>& event){
+void FermentationBehaviour::onFanStatus(const EventRead<EventPayload::FanStatus>& event){
     LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%, rpm=%" PRIi32,
         FanStateToString(event.payload->state),
         event.payload->targetSpeed * 100.0f,
@@ -64,7 +64,7 @@ void FermentationBehaviour::onFanStatus(const EventRead<EventData::FanStatus>& e
     inputs.fanMeasuredRpm = event.payload->measuredRpm;
 }
 
-void FermentationBehaviour::onHeatpadStatus(const EventRead<EventData::HeatpadStatus>& event){
+void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event){
     LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
         HeatpadStateToString(event.payload->state),
         event.payload->duty,
@@ -76,7 +76,7 @@ void FermentationBehaviour::onHeatpadStatus(const EventRead<EventData::HeatpadSt
     inputs.heatpadPwmPeriodMicros = event.payload->periodMicros; 
 }
 
-void FermentationBehaviour::onTemperatureStatus(const EventRead<EventData::TemperatureStatus>& event){
+void FermentationBehaviour::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
     LogDebug("FermentationBehaviour", "[TemperatureStatus] en=%u, err=%u, temp=%.2f°C, hum=%.2f%%",
         event.payload->sensorEnabled,
         event.payload->sensorError,
@@ -109,7 +109,7 @@ void FermentationBehaviour::applySwitchState(){
 }
 
 void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
-    EventWrite event = makeEvent<EventData::FanCommand>();
+    EventWrite event = makeEvent<EventPayload::FanCommand>();
     event.payload->enabled = enabled;
     event.payload->targetSpeed = speed;
     sendEvent(event.header);

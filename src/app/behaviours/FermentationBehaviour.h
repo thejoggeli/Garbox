@@ -10,10 +10,10 @@ public:
     explicit FermentationBehaviour(ComponentId id, const RuntimeContext& context);
     
     void onLogicTick() final;
-    void onHeartbeat(const EventRead<EventData::Heartbeat>& event) final;
-    void onFanStatus(const EventRead<EventData::FanStatus>& event) final;
-    void onHeatpadStatus(const EventRead<EventData::HeatpadStatus>& event) final;
-    void onTemperatureStatus(const EventRead<EventData::TemperatureStatus>& event) final;
+    void onHeartbeat(const EventRead<EventPayload::Heartbeat>& event) final;
+    void onFanStatus(const EventRead<EventPayload::FanStatus>& event) final;
+    void onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event) final;
+    void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) final;
 
 private:
 

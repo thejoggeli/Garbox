@@ -48,12 +48,12 @@ public:
         bool invert = false; // if enabled: (logical_level) = !(physical_level)
     };
 
-    Gpio(int32_t pin);
+    Gpio();
 
     // Configure the GPIO pin with a specific mode, inversion option, and initial output level (logical) 
     // The initial logical level can be set with initialLevel. 
     // It is written to (or read from) the pin upon initialization.
-    void init(const Config& config, bool initialLevel = false);
+    void init(int32_t pin, bool initialLevel, const Config& config);
 
     // configuration
     void applyConfig(const Config& config);
@@ -89,7 +89,7 @@ public:
 
 private:
 
-    const gpio_num_t mPin = gpio_num_t::GPIO_NUM_NC;
+    gpio_num_t mPin = gpio_num_t::GPIO_NUM_NC;
     bool mLogicalLevel = false; // current (logical) pin level 
 
     Config mConfig;

@@ -1,7 +1,7 @@
 #include "TaskManager.h"
 
 #include "app/config/AppConfig.h"
-#include "app/hardware/spi/SpiInstances.h"
+#include "app/hardware/SpiInstances.h"
 #include "app/providers/PartsProvider.h"
 #include "core/assert/Assert.h"
 #include "modules/parts/display/Display.h"

@@ -1,0 +1,40 @@
+#include "GpioInstances.h"
+
+#include "core/assert/Assert.h"
+{% from "common/includes.j2" import emit_includes %}
+{{ emit_includes(include) }}
+
+namespace Garbox {
+
+constexpr bool InitialLow = false;
+constexpr bool InitialHigh = true;
+
+constexpr bool NonInverted = false;
+constexpr bool Inverted = true;
+
+using Config = Gpio::Config;
+using Mode = Gpio::Mode;
+using Pull = Gpio::Pull;
+using Interrupt = Gpio::Interrupt;
+
+static bool sInitialized = false;
+
+void GpioInstances::Init(){
+    AssertExit(!sInitialized, "GpioInstances", "already initialized");
+
+{% for name, entry in gpio.items() %}
+    Get{{ name }}().init(
+        Pin{{ name }}, {{ "InitialHigh" if entry.level else "InitialLow" }},
+        { Mode::{{ entry.mode }}, Pull::{{ entry.pull }}, Interrupt::Disable, {{ "Inverted" if entry.invert else "NonInverted" }} }
+    );
+
+{% endfor %}
+
+    sInitialized = true;
+}
+
+{% for name, entry in gpio.items() %}
+Gpio& GpioInstances::Get{{ name }}(){ static Gpio instance; return instance; }
+{% endfor %}
+
+} // namespace

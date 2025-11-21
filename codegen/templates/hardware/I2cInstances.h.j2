@@ -1,0 +1,25 @@
+#pragma once
+
+#include "core/hardware/i2c/I2c.h"
+{% from "common/includes.j2" import emit_includes %}
+{{ emit_includes(include) }}
+
+namespace Garbox {
+
+struct I2cInstances {
+public:
+
+{% for name, entry in i2c.items() %}
+    static constexpr int32_t PinSda{{ name }} = {{ entry.pinSda }}; 
+    static constexpr int32_t PinScl{{ name }} = {{ entry.pinScl }}; 
+{% endfor %}
+
+    static void Init();
+
+{% for name, entry in i2c.items() %}
+    static I2c& Get{{ name }}();
+{% endfor %}
+
+};
+
+} // namespace

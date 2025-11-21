@@ -97,14 +97,14 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
 
     // route status updates to behaviour
-    case EventType::Heartbeat:          activeBehaviour->onHeartbeat(EventRead<EventData::Heartbeat>(header)); break;
-    case EventType::FanStatus:          activeBehaviour->onFanStatus(EventRead<EventData::FanStatus>(header)); break;
-    case EventType::HeatpadStatus:      activeBehaviour->onHeatpadStatus(EventRead<EventData::HeatpadStatus>(header)); break;
-    case EventType::TemperatureStatus:  activeBehaviour->onTemperatureStatus(EventRead<EventData::TemperatureStatus>(header)); break;
+    case EventType::Heartbeat:          activeBehaviour->onHeartbeat(EventRead<EventPayload::Heartbeat>(header)); break;
+    case EventType::FanStatus:          activeBehaviour->onFanStatus(EventRead<EventPayload::FanStatus>(header)); break;
+    case EventType::HeatpadStatus:      activeBehaviour->onHeatpadStatus(EventRead<EventPayload::HeatpadStatus>(header)); break;
+    case EventType::TemperatureStatus:  activeBehaviour->onTemperatureStatus(EventRead<EventPayload::TemperatureStatus>(header)); break;
 
     // route commands to controllers
-    case EventType::FanCommand:         mFanController.onFanCommand(EventRead<EventData::FanCommand>(header)); break;
-    case EventType::HeatpadCommand:     mHeatpadController.onHeatpadCommand(EventRead<EventData::HeatpadCommand>(header)); break;
+    case EventType::FanCommand:         mFanController.onFanCommand(EventRead<EventPayload::FanCommand>(header)); break;
+    case EventType::HeatpadCommand:     mHeatpadController.onHeatpadCommand(EventRead<EventPayload::HeatpadCommand>(header)); break;
     
     // special event types
     case EventType::Null:

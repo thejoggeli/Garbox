@@ -1,7 +1,7 @@
 #include "AdcInstances.h"
 
-#include "app/config/PinConfig.h"
 #include "core/assert/Assert.h"
+
 
 namespace Garbox {
 
@@ -22,39 +22,39 @@ static constexpr adc1_channel_t GpioToAdc1Channel(){
     static_assert((GpioNum >= 1) && (GpioNum <= 10), "Invalid GPIO number for ADC1 channel on ESP32-S3");
 }
 
-static bool gInitialized = false;
+static bool sInitialized = false;
 
 void AdcInstances::Init(){
     
-    AssertExit(!gInitialized, "SpiInstances", "already initialized");
+    AssertExit(!sInitialized, "AdcInstances", "already initialized");
 
     GetHeatpadVoltage().init(Adc::Config {
-        .pin = PinConfig::HeatpadVoltageSense,
-        .channel = GpioToAdc1Channel<PinConfig::HeatpadVoltageSense>(), 
+        .pin = PinHeatpadVoltage,
+        .channel = GpioToAdc1Channel<8>(),
         .attenuation = ADC_ATTEN_DB_6,
         .bitWidth = ADC_WIDTH_BIT_12,
         .enableCalibration = true,
     });
-
+    
     GetHeatpadCurrent().init(Adc::Config {
-        .pin = PinConfig::HeatpadCurrentSense,
-        .channel = GpioToAdc1Channel<PinConfig::HeatpadCurrentSense>(),
+        .pin = PinHeatpadCurrent,
+        .channel = GpioToAdc1Channel<9>(),
         .attenuation = ADC_ATTEN_DB_12,
         .bitWidth = ADC_WIDTH_BIT_12,
         .enableCalibration = true,
     });
+    
 
-    gInitialized = true;
+    sInitialized = true;
 }
 
 Adc& AdcInstances::GetHeatpadVoltage(){
     static Adc instance;
     return instance;
 }
-
 Adc& AdcInstances::GetHeatpadCurrent(){
     static Adc instance;
     return instance;
 }
 
-} // namespace Garbox
+} // namespace

@@ -1,0 +1,42 @@
+#include "TimerInstances.h"
+
+#include "core/assert/Assert.h"
+{% from "common/includes.j2" import emit_includes %}
+{{ emit_includes(include) }}
+
+namespace Garbox {
+    
+static bool sInitialized = false;
+
+void TimerInstances::Init(){
+    AssertExit(!sInitialized, "TimerInstances", "already initialized");
+
+{% for name, t in timer.items() %}
+    Get{{ name }}().init({
+        .group = TIMER_GROUP_{{ t.group }},
+        .index = TIMER_{{ t.index }},
+        .frequencyHz = {{ t.frequencyHz }},
+        .maxValue = {{ t.maxValue }},
+        .config = {
+            .alarm_en = {{ t.alarm_en }},
+            .counter_en = {{ t.counter_en }},
+            .intr_type = {{ t.intr_type }},
+            .counter_dir = {{ t.counter_dir }},
+            .auto_reload = {{ t.auto_reload }},
+            .divider = {{ t.divider }}, // computed from frequencyHz in Timer::init() 
+            .clk_src = {{ t.clk_src }}
+        },
+    });
+{% endfor %}
+    
+    sInitialized = true;
+}
+
+{% for name, t in timer.items() %}
+Timer& TimerInstances::Get{{ name }}(){
+    static Timer instance;
+    return instance;
+}
+{% endfor %}
+
+} // namespace

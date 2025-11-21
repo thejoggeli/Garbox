@@ -1,0 +1,20 @@
+#include "EventType.h"
+
+namespace Garbox {
+
+const char* EventTypeToString(EventType type){
+    switch(type){
+
+        case EventType::Null: return "Null";
+
+{% for name, fields in events.types.items() %}
+        case EventType::{{ name }}: return "{{ name }}";
+{% endfor %}
+
+        case EventType::Count: return "Count";
+    }
+
+    return "Invalid";
+}
+
+} // namespace Garbox

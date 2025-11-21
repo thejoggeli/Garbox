@@ -5,7 +5,7 @@
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
-namespace Garbox::EventData {
+namespace Garbox::EventPayload {
 
 struct Heartbeat {
     static constexpr EventType Type = EventType::Heartbeat;

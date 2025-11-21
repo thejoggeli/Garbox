@@ -1,6 +1,6 @@
 #include "I2cPartsController.h"
 
-#include "app/hardware/gpio/GpioInstances.h"
+#include "app/hardware/GpioInstances.h"
 #include "app/providers/PartsProvider.h"
 #include "core/assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"
@@ -13,7 +13,7 @@ namespace Garbox {
 I2cPartsController::I2cPartsController(ComponentId id, const RuntimeContext& context): 
     // init members
     ControllerAbs(id, context),
-    mEnablePowerGpio(GpioInstances::GetI2cEnablePower()),
+    mEnablePowerGpio(GpioInstances::GetI2cEnable()),
     mTemperatureSensor(PartsProvider::GetTemperatureSensor()){
     // nothing to do
 }
@@ -95,7 +95,7 @@ void I2cPartsController::enterFsmState(FsmState state){
 }
 
 void I2cPartsController::sendTemperatureStatusEvent(){
-    EventWrite event = makeEvent<EventData::TemperatureStatus>();
+    EventWrite event = makeEvent<EventPayload::TemperatureStatus>();
     event.payload->sensorEnabled = mTemperatureSensor.isStarted();
     event.payload->sensorError = false;
     event.payload->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();

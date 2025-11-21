@@ -16,7 +16,7 @@ public:
     void onInputTick();
     void onOutputTick();
 
-    void onFanCommand(const EventRead<EventData::FanCommand> event);
+    void onFanCommand(const EventRead<EventPayload::FanCommand> event);
 
 private:
 

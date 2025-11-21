@@ -52,7 +52,7 @@ void HeatpadController::onOutputTick(){
     mLed.setColor(hslColor.toLinearRgb());
 }
 
-void HeatpadController::onHeatpadCommand(const EventRead<EventData::HeatpadCommand> event){
+void HeatpadController::onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand> event){
     // apply enabled 
     if(mHeatpad.isEnabled() != event.payload->enabled){
         mHeatpad.setEnabled(event.payload->enabled);
@@ -75,7 +75,7 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 }
 
 void HeatpadController::sendStatusEvent(){
-    EventWrite event = makeEvent<EventData::HeatpadStatus>();
+    EventWrite event = makeEvent<EventPayload::HeatpadStatus>();
     event.payload->state = mHeatpad.getState();
     event.payload->duty = mHeatpad.getCurrentDutyCycle();
     event.payload->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();

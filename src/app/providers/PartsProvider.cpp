@@ -3,12 +3,12 @@
 #include <algorithm>
 
 #include "app/config/AppConfig.h"
-#include "app/hardware/adc/AdcInstances.h"
-#include "app/hardware/gpio/GpioInstances.h"
-#include "app/hardware/i2c/I2cInstances.h"
-#include "app/hardware/ledc/LedcInstances.h"
-#include "app/hardware/spi/SpiInstances.h"
-#include "app/hardware/timer/TimerInstances.h"
+#include "app/hardware/AdcInstances.h"
+#include "app/hardware/GpioInstances.h"
+#include "app/hardware/I2cInstances.h"
+#include "app/hardware/LedcInstances.h"
+#include "app/hardware/SpiInstances.h"
+#include "app/hardware/TimerInstances.h"
 
 #include "core/assert/Assert.h"
 #include "core/util/container/Span.h"
@@ -90,7 +90,7 @@ Fan& PartsProvider::GetFan(){
 Heatpad& PartsProvider::GetHeatpad(){
     static constexpr uint32_t adcFilterTicks = AppConfig::TickFrequencyHz;
     static Heatpad instance(Heatpad::Config{
-        .enableGpio = GpioInstances::GetHeatEnable(),
+        .enableGpio = GpioInstances::GetHeatpadEnable(),
         .voltageSenseAdc = AdcInstances::GetHeatpadVoltage(),
         .currentSenseAdc = AdcInstances::GetHeatpadCurrent(),
         .adcFilterTicks = adcFilterTicks,
@@ -104,7 +104,7 @@ Display& PartsProvider::GetDisplay(){
         .gpioRst = GpioInstances::GetDisplayRst(),
         .gpioDc = GpioInstances::GetDisplayDc(),
         .gpioCs = GpioInstances::GetDisplayCs(),
-        .pwmBlk = LedcInstances::GetDisplayBacklightChannel(),
+        .pwmBlk = LedcInstances::GetBacklightChannel(),
         .width = AppConfig::DisplayWidth,
         .height = AppConfig::DisplayHeight,
         .bytesPerPixel = AppConfig::DisplayBytesPerPixel,
@@ -145,10 +145,10 @@ AnimatedLedGroup& PartsProvider::GetStatusLeds(){
 
     // animated leds
     static AnimatedLed leds[] = {
-        LedcInstances::GetDebugLed0Channel(),
-        LedcInstances::GetDebugLed1Channel(),
-        LedcInstances::GetDebugLed2Channel(),
-        LedcInstances::GetDebugLed3Channel(),
+        LedcInstances::GetStatusLed0Channel(),
+        LedcInstances::GetStatusLed1Channel(),
+        LedcInstances::GetStatusLed2Channel(),
+        LedcInstances::GetStatusLed3Channel(),
     };
     static Span span(leds);
 

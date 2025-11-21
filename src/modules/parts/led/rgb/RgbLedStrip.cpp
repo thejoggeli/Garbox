@@ -13,10 +13,7 @@ RgbLedStrip::RgbLedStrip(Gpio& gpio, uint16_t count):
     // initialize members
     mGpio(gpio),
     mCount(count){
-
     // constructor body
-    mRgbLeds = new Adafruit_NeoPixel(mCount, mGpio.getPinNumber(), NEO_GRB + NEO_KHZ800);
-    AssertExit(mRgbLeds != nullptr, "RgbLedStrip", "allocation failed");
 }
 
 RgbLedStrip::~RgbLedStrip(){
@@ -25,6 +22,8 @@ RgbLedStrip::~RgbLedStrip(){
 
 void RgbLedStrip::init(){
     AssertExit(!mInitialized, "RgbLedStrip", "already initialized");
+    mRgbLeds = new Adafruit_NeoPixel(mCount, mGpio.getPinNumber(), NEO_GRB + NEO_KHZ800);
+    AssertExit(mRgbLeds != nullptr, "RgbLedStrip", "allocation failed");
     mRgbLeds->begin();
     mRgbLeds->show();
     mInitialized = true;

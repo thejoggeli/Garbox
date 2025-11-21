@@ -14,10 +14,7 @@ namespace Garbox {
 RgbLed::RgbLed(Gpio& gpio):
     // initialize members
     mGpio(gpio){
-
     // constructor body
-    mRgbLed = new Adafruit_NeoPixel(1, mGpio.getPinNumber(), NEO_GRB + NEO_KHZ800);
-    AssertExit(mRgbLed != nullptr, "RgbLed", "allocation failed");
 }
 
 RgbLed::~RgbLed(){
@@ -26,6 +23,8 @@ RgbLed::~RgbLed(){
 
 void RgbLed::init(){
     AssertExit(!mInitialized, "RgbLed", "already initialized");
+    mRgbLed = new Adafruit_NeoPixel(1, mGpio.getPinNumber(), NEO_GRB + NEO_KHZ800);
+    AssertExit(mRgbLed != nullptr, "RgbLed", "allocation failed");
     mRgbLed->begin();
     mRgbLed->show();
     mInitialized = true;

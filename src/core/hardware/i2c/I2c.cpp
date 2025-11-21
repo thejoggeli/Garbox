@@ -15,20 +15,20 @@ void I2c::setTimeoutMillis(uint32_t timeoutMillis){
 
 void I2c::init(const Config& config){
     AssertExit(!mInitialized, "I2c", "already initialized");
-    AssertExit((config.sdaPin >= 0), "I2c", "invalid sda pin");
-    AssertExit((config.sclPin >= 0), "I2c", "invalid scl pin");
+    AssertExit((config.pinSda >= 0), "I2c", "invalid sda pin");
+    AssertExit((config.pinScl >= 0), "I2c", "invalid scl pin");
 
-    mSdaPin = config.sdaPin;
-    mSclPin = config.sclPin;
+    mPinSda = config.pinSda;
+    mPinScl = config.pinScl;
     mFrequencyHz = config.frequencyHz;
     mPort = (config.port == Port::Num0) ? I2C_NUM_0 : I2C_NUM_1;
 
     i2c_config_t i2cConfig = {};
     i2cConfig.mode = I2C_MODE_MASTER;
-    i2cConfig.sda_io_num = mSdaPin;
-    i2cConfig.scl_io_num = mSclPin;
-    i2cConfig.sda_pullup_en = (config.sdaPull == Pull::Up) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
-    i2cConfig.scl_pullup_en = (config.sclPull == Pull::Up) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
+    i2cConfig.sda_io_num = mPinSda;
+    i2cConfig.scl_io_num = mPinScl;
+    i2cConfig.sda_pullup_en = (config.pullSda == Pull::Up) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
+    i2cConfig.scl_pullup_en = (config.pullScl == Pull::Up) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
     i2cConfig.master.clk_speed = mFrequencyHz;
 
     if(i2c_param_config(mPort, &i2cConfig) != ESP_OK){

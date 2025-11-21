@@ -2,10 +2,14 @@
 
 #include "core/hardware/adc/Adc.h"
 
+
 namespace Garbox {
 
 class AdcInstances {
 public:
+
+    static constexpr int32_t PinHeatpadVoltage = 8; 
+    static constexpr int32_t PinHeatpadCurrent = 9; 
 
     static void Init();
 
@@ -20,4 +24,4 @@ private:
     AdcInstances& operator=(const AdcInstances&) = delete;
 };
 
-} // namespace Garbox
+} // namespace

@@ -16,7 +16,7 @@ public:
     void onInputTick();
     void onOutputTick();
 
-    void onHeatpadCommand(const EventRead<EventData::HeatpadCommand> event);
+    void onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand> event);
 
 private:
 

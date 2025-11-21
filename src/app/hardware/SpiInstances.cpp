@@ -1,30 +1,29 @@
 #include "SpiInstances.h"
 
-#include "app/config/AppConfig.h"
-#include "app/config/PinConfig.h"
 #include "core/assert/Assert.h"
+#include "app/config/AppConfig.h"
 
 namespace Garbox {
 
-static bool gInitialized = false;
+static bool sInitialized = false;
 
 void SpiInstances::Init(){
     
-    AssertExit(!gInitialized, "SpiInstances", "already initialized");
+    AssertExit(!sInitialized, "SpiInstances", "already initialized");
 
     GetSpiDma().init({
         .hostDevice = SPI2_HOST,
-        .pinMosi = PinConfig::DisplaySda,
-        .pinMiso = -1,
-        .pinClk = PinConfig::DisplayScl,
-        .pinCs = -1,
+        .pinMosi = PinMosiSpiDma,
+        .pinMiso = PinMisoSpiDma,
+        .pinClk = PinClkSpiDma,
+        .pinCs = PinCsSpiDma,
         .mode = 3,
         .frequencyHz = AppConfig::SpiDmaFrequencyHz,
         .maxTransferSizeBytes = static_cast<int32_t>(AppConfig::SpiDmaMaxTransferSizeBytes),
         .queueSize = 5,
     });
 
-    gInitialized = true;
+    sInitialized = true;
 }
 
 SpiDma& SpiInstances::GetSpiDma(){

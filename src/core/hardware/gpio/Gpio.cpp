@@ -5,15 +5,14 @@
 
 namespace Garbox {
 
-Gpio::Gpio(int32_t pin):
-    // init members
-    mPin(static_cast<gpio_num_t>(pin)){
+Gpio::Gpio(){
     // constructor body
-    AssertExit((pin >= 0) && (pin < static_cast<int32_t>(gpio_num_t::GPIO_NUM_MAX)), "Gpio", "invalid pin number");
 }
 
-void Gpio::init(const Config& config, bool initialLevel){
+void Gpio::init(int32_t pin, bool initialLevel, const Config& config){
     AssertExit(!mInitialized, "Gpio", "already initialized");
+    AssertExit((pin >= 0) && (pin < static_cast<int32_t>(gpio_num_t::GPIO_NUM_MAX)), "Gpio", "invalid pin number");
+    mPin = static_cast<gpio_num_t>(pin);
     mLogicalLevel = initialLevel;
     mInitialized = true;
     applyConfig(config);

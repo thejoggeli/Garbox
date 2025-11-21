@@ -1,0 +1,24 @@
+#pragma once
+
+#include <cstdint>
+{% from "common/includes.j2" import emit_includes -%}
+{{ emit_includes(events.includes) }}
+
+namespace Garbox {
+
+enum class EventType : uint16_t {
+
+    // null event
+    Null = 0,
+
+{% for name, fields in events.types.items() %}
+    {{ name }},
+{% endfor %}
+
+    // enum size marker
+    Count,
+};
+
+const char* EventTypeToString(EventType type);
+
+} // namespace Garbox
