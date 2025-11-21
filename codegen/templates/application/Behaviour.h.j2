@@ -1,22 +1,22 @@
 #pragma once
 
-#include "app/controllers/generated/{{ name }}Abs.h"
+#include "app/behaviours/generated/BaseBehaviourAbs.h"
 
 namespace Garbox {
 
-class {{ name }} : public {{ name }}Abs {
+class {{ name }} : public BaseBehaviourAbs {
 public:
 
     {{ name }}(const RuntimeContext& context);
-    {% if controller.ticks %}
+    {% if behaviour.ticks %}
 
-        {% for tick in controller.ticks %}
+        {% for tick in behaviour.ticks %}
     void on{{ tick }}() final;
         {% endfor %}
     {% endif %}
-    {% if controller.receives %}
+    {% if behaviour.receives %}
 
-        {% for ev in controller.receives %}
+        {% for ev in behaviour.receives %}
     void on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event) final;
         {% endfor %}
     {% endif %}
@@ -25,6 +25,8 @@ private:
 
     void onInit() final;
     void onStart() final;
+    void onBecomeActive() final;
+    void onBecomeInactive() final;
 
 };
 

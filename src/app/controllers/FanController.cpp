@@ -10,9 +10,9 @@
 
 namespace Garbox {
 
-FanController::FanController(ComponentId id, const RuntimeContext& context): 
+FanController::FanController(const RuntimeContext& context): 
     // init members
-    FanControllerAbs(id, context),
+    FanControllerAbs(context),
     mFan(PartsProvider::GetFan()),
     mStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom1)){
     // nothing to do

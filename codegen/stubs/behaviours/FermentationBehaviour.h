@@ -1,15 +1,14 @@
 #pragma once
 
 #include "app/behaviours/generated/BaseBehaviourAbs.h"
-#include "app/engine/FermentationControlEngine.h"
 
 namespace Garbox {
 
 class FermentationBehaviour : public BaseBehaviourAbs {
 public:
-    
+
     FermentationBehaviour(const RuntimeContext& context);
-    
+
     void onLogicTick() final;
 
     void onHeartbeat(const EventRead<EventPayload::Heartbeat>& event) final;
@@ -24,15 +23,6 @@ public:
 
 private:
 
-    bool mHeartbeatReceived = false;
-    bool mSwitchStateChanged = false;
-    uint32_t mSwitchState = 0;
-
-    FermentationControlEngine mControlEngine;
-
-    void applySwitchState();
-    void sendFanCommand(bool enabled, float speed);
-    
     void onInit() final;
     void onStart() final;
     void onBecomeActive() final;
@@ -40,4 +30,4 @@ private:
 
 };
 
-} // namespace
+} // namespace Garbox

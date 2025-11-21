@@ -7,7 +7,6 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 script_dir = Path(__file__).parent
 template_dir = script_dir.joinpath("templates")
 src_dir = script_dir.joinpath("../src").resolve()
-# src_dir = script_dir.joinpath("test").resolve()
 
 # create Jinja environment
 jinja_env = Environment(
@@ -144,14 +143,14 @@ def render_template(jinja_env, template_name: str, output_path: Path, **context)
     print(f"Generated {output_path}")
 
 
-def generate_items(items : list[Item]):
+def generate_items(items : list[Item], base_path=src_dir):
 
     # generate the source code for all passed items
     for item in items:
 
         # generate full output and template path
         yaml_config = item.yaml_config
-        out_path = src_dir.joinpath(item.out_path).resolve()
+        out_path = base_path.joinpath(item.out_path).resolve()
         template_path = item.template_path
 
         # get current item config from yaml
@@ -247,6 +246,7 @@ def generate_controllers(yaml_config):
     # list of items to be generated
     controllers = yaml_config["controllers"]
     items = []
+    stubs = []
     for controller_key, controller_dict in controllers.items():
         out_path = f"app/controllers/generated/{controller_key}Abs"
         template_path = "application/ControllerAbs"
@@ -256,15 +256,68 @@ def generate_controllers(yaml_config):
         }
         controller_dict["name"] = controller_key
         items.append(Item(item_dict, ["controller", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
+        items.append(Item(item_dict, ["controller", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+
+        out_path = f"stubs/controllers/{controller_key}"
+        template_path = "application/Controller"
+        stubs.append(Item(item_dict, ["controller", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
+        stubs.append(Item(item_dict, ["controller", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
     # generate all hardware h/cpp files
     generate_items(items)
+    generate_items(stubs, base_path=script_dir)
+
+
+def generate_behaviours(yaml_config):
+
+    ensure_suffix(yaml_config, "behaviours", "Behaviour")
+    ensure_value_suffix(yaml_config, "behaviours", "ticks", "Tick")
+
+    # list of items to be generated
+    controllers = yaml_config["behaviours"]
+    items = []
+    stubs = []
+    all_ticks = set()
+    all_sends = set()
+    all_receives = set()
+    for behaviour_key, behaviour_dict in controllers.items():
+        all_ticks.update(behaviour_dict["ticks"])
+        all_sends.update(behaviour_dict["sends"])
+        all_receives.update(behaviour_dict["receives"])
+        item_dict = {
+            "name": behaviour_key,
+            "behaviour": behaviour_dict
+        }
+        behaviour_dict["name"] = behaviour_key
+        out_path = f"stubs/behaviours/{behaviour_key}"
+        template_path = "application/Behaviour"
+        stubs.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
+        stubs.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+
+    # BaseBehaviourAbs
+    out_path = f"app/behaviours/generated/BaseBehaviourAbs"
+    template_path = "application/BehaviourAbs"
+    app_dict = {
+        "name": "BaseBehaviour",
+        "behaviour": {
+            "ticks": all_ticks,
+            "sends": all_sends,
+            "receives": all_receives
+        }
+    }
+    items.append(Item(app_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
+    items.append(Item(app_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+
+    # generate all hardware h/cpp files
+    generate_items(items)
+    generate_items(stubs, base_path=script_dir)
 
 
 def generate_application():
     yaml_path = script_dir.joinpath("config/application.yaml")
     yaml_config = load_yaml(yaml_path)
     generate_controllers(yaml_config)
+    generate_behaviours(yaml_config)
     
 
 def main():

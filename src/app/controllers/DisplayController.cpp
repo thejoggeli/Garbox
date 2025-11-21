@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-DisplayController::DisplayController(ComponentId id, const RuntimeContext& context): 
+DisplayController::DisplayController(const RuntimeContext& context): 
     // init members
-    DisplayControllerAbs(id, context),
+    DisplayControllerAbs(context),
     mDisplay(PartsProvider::GetDisplay()){
     // nothing to do
 }

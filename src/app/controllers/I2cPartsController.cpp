@@ -10,9 +10,9 @@
 
 namespace Garbox {
 
-I2cPartsController::I2cPartsController(ComponentId id, const RuntimeContext& context): 
+I2cPartsController::I2cPartsController(const RuntimeContext& context): 
     // init members
-    I2cPartsControllerAbs(id, context),
+    I2cPartsControllerAbs(context),
     mEnablePowerGpio(GpioInstances::GetI2cEnable()),
     mTemperatureSensor(PartsProvider::GetTemperatureSensor()){
     // nothing to do

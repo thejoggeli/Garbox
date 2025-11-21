@@ -1,11 +1,13 @@
 #include "{{ name }}Abs.h"
 
+#include "shared/types/ComponentId.h"
+
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs(ComponentId id, const RuntimeContext& context) : ControllerAbs(id, context){
+{{ name }}Abs::{{ name }}Abs(const RuntimeContext& context): 
+    // init members
+    ControllerAbs(ComponentId::{{ name }}, context){
     // nothing to do
 }
 
-    {% endfor %}
-{% endif %}
 } // namespace Garbox

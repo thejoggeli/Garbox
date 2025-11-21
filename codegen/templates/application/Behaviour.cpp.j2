@@ -2,7 +2,9 @@
 
 namespace Garbox {
 
-{{ name }}::{{ name }}(const RuntimeContext& context): {{ name }}Abs(context){
+{{ name }}::{{ name }}(const RuntimeContext& context):
+    // init members
+    BaseBehaviourAbs(ComponentId::{{ name }}, context){
     // nothing to do
 }
 
@@ -14,16 +16,24 @@ void {{ name }}::onStart(){
     // nothing to do
 }
 
-{% if controller.ticks %}
-    {% for tick in controller.ticks %}
+void {{ name }}::onBecomeActive(){
+    // nothing to do
+}
+
+void {{ name }}::onBecomeInactive(){
+    // nothing to do
+}
+{% if behaviour.ticks %}
+    {% for tick in behaviour.ticks %}
+
 void {{ name }}::on{{ tick }}(){
     // nothing to do
 }
     {% endfor %}
 {% endif %}
+{% if behaviour.receives %}
+    {% for ev in behaviour.receives %}
 
-{% if controller.receives %}
-    {% for ev in controller.receives %}
 void {{ name }}::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
     // nothing to do
 }

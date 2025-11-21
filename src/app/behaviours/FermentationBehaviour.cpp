@@ -5,9 +5,9 @@
 
 namespace Garbox {
 
-FermentationBehaviour::FermentationBehaviour(ComponentId id, const RuntimeContext& context): 
+FermentationBehaviour::FermentationBehaviour(const RuntimeContext& context): 
     // init members
-    AppBehaviourAbs(id, context){
+    BaseBehaviourAbs(ComponentId::FermentationBehaviour, context){
     // nothing to do
 }
 
@@ -96,6 +96,18 @@ void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::Te
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
     inputs.temperatureCelcius = event.payload->temperatureCelcius;
     inputs.humidityRelative = event.payload->humidityRelative;
+}
+
+void FermentationBehaviour::onButton(const EventRead<EventPayload::Button>& event){
+    // nothing to do
+}
+    
+void FermentationBehaviour::onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event){
+    // nothing to do
+}
+    
+void FermentationBehaviour::onEncoderStep(const EventRead<EventPayload::EncoderStep>& event){
+    // nothing to do
 }
 
 void FermentationBehaviour::applySwitchState(){

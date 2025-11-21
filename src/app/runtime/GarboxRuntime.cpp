@@ -10,14 +10,14 @@ namespace Garbox {
 
 GarboxRuntime::GarboxRuntime():
     // init behaviours
-    mFermentationBehaviour(ComponentId::FermentationBehaviour, getContext()),
+    mFermentationBehaviour(getContext()),
     // init controllers
-    mDisplayController(ComponentId::DisplayController, getContext()),
-    mFanController(ComponentId::FanController, getContext()),
-    mInputController(ComponentId::InputController, getContext()),
-    mHeatpadController(ComponentId::HeatpadController, getContext()),
-    mHeartbeatController(ComponentId::HeartbeatController, getContext()),
-    mI2cPartsController(ComponentId::I2cPartsController, getContext()){
+    mDisplayController(getContext()),
+    mFanController(getContext()),
+    mInputController(getContext()),
+    mHeatpadController(getContext()),
+    mHeartbeatController(getContext()),
+    mI2cPartsController(getContext()){
     // nothing to do
 }
 
@@ -50,7 +50,7 @@ void GarboxRuntime::onMainTick(){
     applyQueuedBehaviour();
 
     // get active behaviour 
-    AppBehaviourAbs* behaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
     AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
 
     // heartbeat tick
@@ -92,7 +92,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
 #endif
 
     // get active behaviour
-    AppBehaviourAbs* activeBehaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
+    BaseBehaviourAbs* activeBehaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
 
     // route the event
     switch(header->type){

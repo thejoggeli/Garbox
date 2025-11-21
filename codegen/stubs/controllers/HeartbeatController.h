@@ -1,11 +1,8 @@
 #pragma once
 
 #include "app/controllers/generated/HeartbeatControllerAbs.h"
-#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
-
-class AnimatedLed;
 
 class HeartbeatController : public HeartbeatControllerAbs {
 public:
@@ -14,15 +11,11 @@ public:
 
     void onHeartbeatTick() final;
 
-private: 
+private:
 
-    void onInit();
-    void onStart();
-
-    uint32_t mIntervalMicros;
-    AnimatedLed& mHeartbeatLed;
-    SoftwareTimer mHeartbeatTimer;
+    void onInit() final;
+    void onStart() final;
 
 };
 
-} // namespace
+} // namespace Garbox

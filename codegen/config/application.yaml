@@ -44,13 +44,8 @@ controllers:
     receives: null
 
 behaviours:
-
-  CalibrationBehaviour:
-    ticks: [Logic]
-    sends: [FanCommand]
-    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, Button, ButtonRepeat, EncoderStep, TemperatureStatus, TemperatureSample]
     
   FermentationBehaviour:
     ticks: [Logic]
     sends: [FanCommand, HeatpadCommand]
-    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, Button, ButtonRepeat, EncoderStep, TemperatureStatus, TemperatureSample]
+    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, Button, ButtonRepeat, EncoderStep]

@@ -11,9 +11,9 @@
 
 namespace Garbox {
 
-InputController::InputController(ComponentId id, const RuntimeContext& context):
+InputController::InputController(const RuntimeContext& context):
     // initialize members
-    InputControllerAbs(id, context),
+    InputControllerAbs(context),
     mButtonStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom2)),
     mPiezoPlayer(PartsProvider::GetPiezoPlayer()),
     mButton(PartsProvider::GetEncoderButton()){

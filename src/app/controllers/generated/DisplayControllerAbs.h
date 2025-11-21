@@ -9,7 +9,7 @@ class DisplayControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    DisplayControllerAbs(ComponentId id, const RuntimeContext& context) : ControllerAbs(id, context) {}
+    DisplayControllerAbs(const RuntimeContext& context);
 
     // tick handlers
     virtual void onRenderTick() = 0;

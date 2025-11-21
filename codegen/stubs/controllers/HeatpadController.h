@@ -1,16 +1,12 @@
 #pragma once
 
 #include "app/controllers/generated/HeatpadControllerAbs.h"
-#include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox {
 
-class Heatpad;
-class RgbLed;
-
 class HeatpadController : public HeatpadControllerAbs {
 public:
-    
+
     HeatpadController(const RuntimeContext& context);
 
     void onInputTick() final;
@@ -20,16 +16,9 @@ public:
 
 private:
 
-    bool mStateChanged = false;
-    Heatpad& mHeatpad;
-    RgbLed& mLed;
-
     void onInit() final;
     void onStart() final;
 
-    void handleHeatpadStateChanged(HeatpadState oldState, HeatpadState newState);
-    void sendStatusEvent();
-
 };
 
-} // namespace
+} // namespace Garbox
