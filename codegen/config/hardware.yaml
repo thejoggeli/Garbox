@@ -8,7 +8,7 @@ gpio:
   FanTacho:       {pin: 5,  mode: Input,   pull: Disable, level: 0, invert: false}
   I2cEnable:      {pin: 15, mode: Output,  pull: Disable, level: 1, invert: false}
   DisplayDc:      {pin: 18, mode: Output,  pull: Disable, level: 0, invert: false}
-  DisplayCs:      {pin: 17, mode: Output,  pull: Disable, level: 1, invert: false}
+  DisplayCs:      {pin: 17, mode: Output,  pull: Disable, level: 0, invert: false}
   DisplayRst:     {pin: 10, mode: Output,  pull: Disable, level: 0, invert: false}
   HeatpadEnable:  {pin: 14, mode: Output,  pull: Disable, level: 0, invert: false}
   EncoderButton:  {pin: 1,  mode: Input,   pull: Disable, level: 0, invert: true}

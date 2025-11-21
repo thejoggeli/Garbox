@@ -4,7 +4,6 @@
 #include "app/providers/PartsProvider.h"
 #include "core/assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"
-#include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "modules/parts/temperature/Sht31.h"
 
@@ -60,7 +59,6 @@ void I2cPartsController::onInputTick(){
 
     // set new sample
     if(mNewSample){
-        LogDebug("I2cPartsController", "new sample!");
         sendTemperatureSampleEvent();
         mNewSample = false;
     }

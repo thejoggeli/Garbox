@@ -1,5 +1,6 @@
 #include "DisplayController.h"
 
+#include <esp_heap_caps.h>
 #include "app/providers/PartsProvider.h"
 #include "core/log/Log.h"
 #include "modules/parts/display/Display.h"
@@ -20,10 +21,16 @@ void DisplayController::onInit(){
 }
 
 void DisplayController::onStart(){
-    // nothing to do
+    mHeapTimer.start(1000_ms);
 }
 
 void DisplayController::onRenderTick(){
+
+    if(mHeapTimer.isExpired()){
+        mNewState.heapSpace = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+        mHeapTimer.restart();
+    }
+
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
 
@@ -31,27 +38,40 @@ void DisplayController::onRenderTick(){
         const Fan& fan = PartsProvider::GetFan();
         const Heatpad& heatpad = PartsProvider::GetHeatpad();
 
-        State state;
+        mNewState.fanState = fan.getState();
+        mNewState.fanTargetSpeed = fan.getTargetSpeed();
+        mNewState.fanMeasuredRpm = fan.getMeasuredRpm();
+        mNewState.heatpadState = heatpad.getState();
+        mNewState.heatpadDuty = heatpad.getCurrentDutyCycle();
+        mNewState.heatpadVoltage = heatpad.getMeasuredVoltage();
+        mNewState.heatpadCurrent = heatpad.getMeasuredCurrent();
+        mNewState.renderSkippedCount = mRenderSkippedCount;
 
-        state.fanState = fan.getState();
-        state.fanTargetSpeed = fan.getTargetSpeed();
-        state.fanMeasuredRpm = fan.getMeasuredRpm();
-        state.heatpadState = heatpad.getState();
-        state.heatpadDuty = heatpad.getCurrentDutyCycle();
-        state.heatpadVoltage = heatpad.getMeasuredVoltage();
-        state.heatpadCurrent = heatpad.getMeasuredCurrent();
-        state.renderSkippedCount = mRenderSkippedCount;
+        if(mNewState.fanState != mOldState.fanState || mNewState.fanTargetSpeed != mOldState.fanTargetSpeed) 
+            lv.setFanState(FanStateToString(mNewState.fanState), mNewState.fanTargetSpeed);
+        if(mNewState.fanMeasuredRpm != mOldState.fanMeasuredRpm) 
+            lv.setFanMeasuredRpm(mNewState.fanMeasuredRpm);
+        if(mNewState.heatpadState != mOldState.heatpadState) 
+            lv.setHeatpadState(HeatpadStateToString(mNewState.heatpadState));
+        if(mNewState.heatpadDuty != mOldState.heatpadDuty) 
+            lv.setHeatpadDuty(mNewState.heatpadDuty);
+        if(mNewState.heatpadVoltage != mOldState.heatpadVoltage || mNewState.heatpadCurrent != mOldState.heatpadCurrent) 
+            lv.setHeatpadSense(mNewState.heatpadVoltage, mNewState.heatpadCurrent);
+        if(mNewState.renderSkippedCount != mOldState.renderSkippedCount) 
+            lv.setRenderSkippedCount(mNewState.renderSkippedCount);
+        if(mDirty.shtState){
+            lv.setTemperatureState(mNewState.shtPower, mNewState.shtDriver, mNewState.shtReset);
+            mDirty.shtState = false;
+        }
+        if(mDirty.shtSample){
+            lv.setTemperatureSample(mNewState.shtTemp, mNewState.shtHum);
+            mDirty.shtSample = false;
+        }
+        if(mNewState.heapSpace != mOldState.heapSpace){
+            lv.setHeapSpace(mNewState.heapSpace);
+        }
 
-        if(state.fanState != mState.fanState) lv.setFanState(FanStateToString(state.fanState));
-        if(state.fanTargetSpeed != mState.fanTargetSpeed) lv.setFanTargetSpeed(state.fanTargetSpeed);
-        if(state.fanMeasuredRpm != mState.fanMeasuredRpm) lv.setFanMeasuredRpm(state.fanMeasuredRpm);
-        if(state.heatpadState != mState.heatpadState) lv.setHeatpadState(HeatpadStateToString(state.heatpadState));
-        if(state.heatpadDuty != mState.heatpadDuty) lv.setHeatpadDuty(state.heatpadDuty);
-        if(state.heatpadVoltage != mState.heatpadVoltage) lv.setHeatpadVoltage(state.heatpadVoltage);
-        if(state.heatpadCurrent != mState.heatpadCurrent) lv.setHeatpadCurrent(state.heatpadCurrent);
-        if(state.renderSkippedCount != mState.renderSkippedCount) lv.setRenderSkippedCount(state.renderSkippedCount);
-
-        mState = state;
+        mOldState = mNewState;
 
         mDisplay.giveRenderTrigger();
     }
@@ -59,6 +79,19 @@ void DisplayController::onRenderTick(){
         mRenderSkippedCount++;
         LogDebug("DisplayController", "render skipped! total skip count = %" PRIi32, mRenderSkippedCount);
     }
+}
+
+void DisplayController::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
+    mNewState.shtDriver = event.payload->driverEnabled;
+    mNewState.shtPower = event.payload->powerEnabled;
+    mNewState.shtReset = event.payload->resetting;
+    mDirty.shtState = true;
+}
+
+void DisplayController::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
+    mNewState.shtTemp = event.payload->temperatureCelcius;
+    mNewState.shtHum = event.payload->humidityRelative;
+    mDirty.shtSample = true;
 }
 
 } // namespace

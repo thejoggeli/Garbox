@@ -45,7 +45,7 @@ void GpioInstances::Init(){
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
     GetDisplayCs().init(
-        PinDisplayCs, InitialHigh,
+        PinDisplayCs, InitialLow,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
     GetDisplayRst().init(

@@ -21,5 +21,11 @@ void DisplayController::onRenderTick(){
     // nothing to do
 }
 
+void DisplayController::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
+    // nothing to do
+}
+void DisplayController::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
+    // nothing to do
+}
 
 } // namespace Garbox

@@ -18,6 +18,10 @@ public:
     // tick handlers
     virtual void onRenderTick() = 0;
 
+    // receive event handlers
+    virtual void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) = 0;
+    virtual void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) = 0;
+
 };
 
 } // namespace Garbox

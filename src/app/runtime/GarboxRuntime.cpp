@@ -47,6 +47,13 @@ void GarboxRuntime::onHeartbeatTick(){
     dispatchEvents();
 }
 
+void GarboxRuntime::onLogicTick(){
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    behaviour->onLogicTick();
+    dispatchEvents();
+}
+
 void GarboxRuntime::onRenderTick(){
     mDisplayController.onRenderTick();
     dispatchEvents();
@@ -63,13 +70,6 @@ void GarboxRuntime::onInputTick(){
 void GarboxRuntime::onOutputTick(){
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onLogicTick(){
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-    behaviour->onLogicTick();
     dispatchEvents();
 }
 
@@ -108,11 +108,13 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::TemperatureStatus: {
         const EventRead<EventPayload::TemperatureStatus> event(header);
         static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureStatus(event);
+        mDisplayController.onTemperatureStatus(event);
         break;
     }
     case EventType::TemperatureSample: {
         const EventRead<EventPayload::TemperatureSample> event(header);
         static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureSample(event);
+        mDisplayController.onTemperatureSample(event);
         break;
     }
     case EventType::ButtonStateChanged: {

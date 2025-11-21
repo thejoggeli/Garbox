@@ -5,7 +5,7 @@ controllers:
 
   DisplayController:
     ticks: [Render]
-    receives: null
+    receives: [TemperatureStatus, TemperatureSample]
     sends: null
 
   FanController:

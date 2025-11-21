@@ -14,6 +14,9 @@ public:
 
     void onRenderTick() final;
 
+    void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) final;
+    void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) final;
+
 private:
 
     void onInit() final;

@@ -33,7 +33,7 @@ void FermentationBehaviour::onLogicTick(){
     mControlEngine.step();
 
     // get control engine outputs
-    const FermentationControlEngine::Outputs& outputs = mControlEngine.getOutputs();
+    [[maybe_unused]] const FermentationControlEngine::Outputs& outputs = mControlEngine.getOutputs();
     // TODO
 
     if(mHeartbeatReceived){

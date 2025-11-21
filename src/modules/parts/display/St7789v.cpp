@@ -32,6 +32,7 @@ void St7789v::init(uint16_t width, uint16_t height){
     mWidth = width;
     mHeight = height;
     mPwmBlk.setDutyRaw(0);
+    mGpioCs.writeLevel(false);
     mBrightness = 0.0f;
     mInitialized = true;
 }
