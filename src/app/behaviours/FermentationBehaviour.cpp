@@ -17,7 +17,9 @@ void FermentationBehaviour::onInit(){
 }
 
 void FermentationBehaviour::onStart(){
-    mControlEngine.reset();
+    EventWrite cmd = makeBacklightCommandEvent();
+    cmd.payload->brightness = 0.5f;
+    sendEvent(cmd);
 }
 
 void FermentationBehaviour::onBecomeActive(){
