@@ -20,7 +20,7 @@ public:
     void onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event) final;
     void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) final;
     void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) final;
-    void onButton(const EventRead<EventPayload::Button>& event) final;
+    void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) final;
     void onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event) final;
     void onEncoderStep(const EventRead<EventPayload::EncoderStep>& event) final;
 

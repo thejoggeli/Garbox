@@ -55,7 +55,7 @@ void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::Te
     // nothing to do
 }
 
-void FermentationBehaviour::onButton(const EventRead<EventPayload::Button>& event){
+void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
     // nothing to do
 }
 

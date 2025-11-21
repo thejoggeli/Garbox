@@ -69,15 +69,15 @@ void FiniteStateMachine<StateType, NumStates>::setStateChangedCallback(StateChan
 }
 
 template<typename StateType, StateType NumStates>
-void FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
+bool FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
     if(!mInitialized){
         TriggerDebug("FiniteStateMachine", "not initialized");
-        return;
+        return false;
     }
 
     // abort if new state equals current state or is already pending
     if((newState == mCurrentState) || (newState == mPendingState)){
-        return;
+        return false;
     }
 
     // transition logic
@@ -93,6 +93,7 @@ void FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
         else {
             // hold timer not active => immediate transition
             applyTransition(newState);
+            return true;
         }
     }
     else {
@@ -100,7 +101,7 @@ void FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
         mPendingState = newState;
         mTransitionTimer.start(delayMicros);
     }
-
+    return false;
 }
 
 template<typename StateType, StateType NumStates>
@@ -136,6 +137,9 @@ void FiniteStateMachine<StateType, NumStates>::applyTransition(StateType newStat
     // call state changed callback
     if(mStateChangedCallback){
         mStateChangedCallback(oldState, newState);
+    }
+    else {
+        TriggerDebug("FinitStateMachine", "no state chnaged handler");
     }
 }
 

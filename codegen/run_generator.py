@@ -400,10 +400,23 @@ def generate_components(yaml_config):
 
 
 def generate_application():
+
     yaml_path = script_dir.joinpath("config/application.yaml")
     yaml_config = load_yaml(yaml_path)
+
     events_path = script_dir.joinpath("config/events.yaml")
     events_config = load_yaml(events_path)
+
+    for dict_item in yaml_config["behaviours"].values():
+        dict_item["ticks"] = ensure_list(dict_item["ticks"])
+        dict_item["sends"] = ensure_list(dict_item["sends"])
+        dict_item["receives"] = ensure_list(dict_item["receives"])
+
+    for dict_item in yaml_config["controllers"].values():
+        dict_item["ticks"] = ensure_list(dict_item["ticks"])
+        dict_item["sends"] = ensure_list(dict_item["sends"])
+        dict_item["receives"] = ensure_list(dict_item["receives"])
+
     ensure_suffix(yaml_config, "behaviours", "Behaviour")
     ensure_value_suffix(yaml_config, "behaviours", "ticks", "Tick")
     ensure_suffix(yaml_config, "controllers", "Controller")

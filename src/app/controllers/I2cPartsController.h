@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/controllers/generated/I2cPartsControllerAbs.h"
-#include "core/time/SoftwareTimer.h"
+#include "core/util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
 
@@ -14,6 +14,7 @@ public:
     I2cPartsController(const RuntimeContext& context);
 
     void onInputTick() final;
+    void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) final;
 
 private:
 
@@ -21,23 +22,27 @@ private:
         ResetPowerOffPhase = 0,
         ResetPowerOnPhase,
         Running,
+        Count
     };
+
+    static constexpr uint32_t ResetPowerOffPhaseDurationMicros = 100_ms;
+    static constexpr uint32_t ResetPowerOnPhaseDurationMicros = 1000_ms;
+    static constexpr uint32_t MaxFetchDurationBeforeRestartMicros = 5000_ms;
+    FiniteStateMachine<FsmState, FsmState::Count> mFsm;
 
     Gpio& mEnablePowerGpio;
     Sht31& mTemperatureSensor;
 
-    FsmState mFsmState = FsmState::ResetPowerOffPhase;
-
-    bool mChanged = true;
-
-    static constexpr uint32_t ResetPowerOffPhaseDurationMicros = 100;
-    static constexpr uint32_t ResetPowerOnPhaseDurationMicros = 1000;
-    SoftwareTimer mResetTimer;
+    bool mNewSample = false;
+    bool mStateChanged = true;
+    bool mResetting = false;
     
     void onInit() final;
     void onStart() final;
 
-    void enterFsmState(FsmState state);
+    void handleRunningState();
+    void handleStateChanged(FsmState oldState, FsmState newState);
+
     void sendTemperatureStatusEvent();
     void sendTemperatureSampleEvent();
 

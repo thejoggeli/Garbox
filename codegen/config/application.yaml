@@ -5,37 +5,37 @@ controllers:
 
   DisplayController:
     ticks: [Render]
-    sends: null
     receives: null
+    sends: null
 
   FanController:
     ticks: [Input, Output]
-    sends: [FanStatus, FanSample]
     receives: [FanCommand]
+    sends: null
 
   HeartbeatController:
     ticks: [Heartbeat]
-    sends: [Heartbeat]
     receives: null
+    sends: null
 
   HeatpadController:
     ticks: [Input, Output]
-    sends: [HeatpadStatus]
     receives: [HeatpadCommand]
+    sends: null
 
   InputController:
     ticks: [Input]
-    sends: [Button, ButtonRepeat, EncoderStep]
     receives: null
+    sends: null
 
   I2cPartsController:
     ticks: [Input]
-    sends: [TemperatureStatus, TemperatureSample]
-    receives: null
+    receives: [ButtonStateChanged]
+    sends: null
 
 initial_behaviour: FermentationBehaviour
 behaviours:
   FermentationBehaviour:
     ticks: [Logic]
-    sends: [FanCommand, HeatpadCommand]
-    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, Button, ButtonRepeat, EncoderStep, ]
+    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]
+    sends: null

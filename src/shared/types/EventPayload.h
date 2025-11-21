@@ -52,8 +52,9 @@ struct HeatpadCommand {
 
 struct TemperatureStatus {
     static constexpr EventType Type = EventType::TemperatureStatus;
-    bool enabled;          
-    bool error;          
+    bool driverEnabled;          
+    bool powerEnabled;          
+    bool resetting;          
 };
 
 struct TemperatureSample {
@@ -62,9 +63,10 @@ struct TemperatureSample {
     float humidityRelative;          
 };
 
-struct Button {
-    static constexpr EventType Type = EventType::Button;
-    ButtonState state;          
+struct ButtonStateChanged {
+    static constexpr EventType Type = EventType::ButtonStateChanged;
+    ButtonState oldState;          
+    ButtonState newState;          
 };
 
 struct ButtonRepeat {

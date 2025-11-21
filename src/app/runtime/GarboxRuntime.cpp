@@ -42,6 +42,11 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
+void GarboxRuntime::onHeartbeatTick(){
+    mHeartbeatController.onHeartbeatTick();
+    dispatchEvents();
+}
+
 void GarboxRuntime::onRenderTick(){
     mDisplayController.onRenderTick();
     dispatchEvents();
@@ -65,11 +70,6 @@ void GarboxRuntime::onLogicTick(){
     BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
     AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
     behaviour->onLogicTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onHeartbeatTick(){
-    mHeartbeatController.onHeartbeatTick();
     dispatchEvents();
 }
 
@@ -115,9 +115,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureSample(event);
         break;
     }
-    case EventType::Button: {
-        const EventRead<EventPayload::Button> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onButton(event);
+    case EventType::ButtonStateChanged: {
+        const EventRead<EventPayload::ButtonStateChanged> event(header);
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onButtonStateChanged(event);
+        mI2cPartsController.onButtonStateChanged(event);
         break;
     }
     case EventType::ButtonRepeat: {

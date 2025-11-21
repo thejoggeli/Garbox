@@ -8,9 +8,6 @@ payload:
 
 type:
 
-  include_h: []
-  include_cpp: []
-
   # Heartbeat
   Heartbeat: null
 
@@ -35,16 +32,18 @@ type:
     periodMicros: uint32_t
   
   # Temperature
-  TemperatureStatus:  
-    enabled: bool
-    error: bool
+  TemperatureStatus:
+    driverEnabled: bool  
+    powerEnabled: bool
+    resetting: bool
   TemperatureSample:  
     temperatureCelcius: float
     humidityRelative: float
   
   # Encoder
-  Button:  
-    state: ButtonState
+  ButtonStateChanged:  
+    oldState: ButtonState 
+    newState: ButtonState
   ButtonRepeat:  
     count: uint32_t
   EncoderStep:  

@@ -21,5 +21,8 @@ void I2cPartsController::onInputTick(){
     // nothing to do
 }
 
+void I2cPartsController::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
+    // nothing to do
+}
 
 } // namespace Garbox

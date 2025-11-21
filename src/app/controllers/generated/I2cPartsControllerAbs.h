@@ -18,6 +18,9 @@ public:
     // tick handlers
     virtual void onInputTick() = 0;
 
+    // receive event handlers
+    virtual void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) = 0;
+
 };
 
 } // namespace Garbox

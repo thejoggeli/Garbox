@@ -19,8 +19,8 @@ public:
     virtual void onLogicTick() = 0;
 
     // receive event handlers
-    virtual void onButton(const EventRead<EventPayload::Button>& event) = 0;
     virtual void onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event) = 0;
+    virtual void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) = 0;
     virtual void onEncoderStep(const EventRead<EventPayload::EncoderStep>& event) = 0;
     virtual void onFanSample(const EventRead<EventPayload::FanSample>& event) = 0;
     virtual void onFanStatus(const EventRead<EventPayload::FanStatus>& event) = 0;

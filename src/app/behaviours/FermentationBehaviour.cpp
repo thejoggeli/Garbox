@@ -80,12 +80,12 @@ void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::Heatpa
 }
 
 void FermentationBehaviour::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
-    LogDebug("FermentationBehaviour", "[TemperatureStatus] en=%u, err=%u",
-        event.payload->enabled, event.payload->error
-    );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.temperatureEnabled = event.payload->enabled;
-    inputs.temperatureError = event.payload->error;
+    inputs.temperatureEnabled = event.payload->powerEnabled && event.payload->driverEnabled;
+    inputs.temperatureError = !inputs.temperatureEnabled && !event.payload->resetting; 
+    LogDebug("FermentationBehaviour", "[TemperatureStatus] power=%u, driver=%u, reset=%u, error=%u",
+        event.payload->powerEnabled, event.payload->driverEnabled, event.payload->resetting, inputs.temperatureError
+    );
 }
 
 void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
@@ -98,7 +98,7 @@ void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::Te
     inputs.humidityRelative = event.payload->humidityRelative;
 }
 
-void FermentationBehaviour::onButton(const EventRead<EventPayload::Button>& event){
+void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
     // nothing to do
 }
     

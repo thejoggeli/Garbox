@@ -23,7 +23,7 @@ enum class EventType : uint16_t {
     HeatpadCommand,
     TemperatureStatus,
     TemperatureSample,
-    Button,
+    ButtonStateChanged,
     ButtonRepeat,
     EncoderStep,
 

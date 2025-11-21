@@ -36,7 +36,7 @@ public:
     void setStateChangedCallback(StateChangedCallback callback);
 
     // schedules a delayed transition, respecting TransitionDelay and StateHoldTime
-    void transition(StateType newState);
+    bool transition(StateType newState);
 
     // immediate transition, ignoring hold/delay constraints
     void forceTransition(StateType newState);
