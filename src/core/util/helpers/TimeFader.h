@@ -6,11 +6,11 @@ namespace Garbox {
 
 class MathFunctionIfc;
 
-class SmoothTransition {
+class TimeFader {
 public:
 
-    SmoothTransition();
-    SmoothTransition(const MathFunctionIfc& function);
+    TimeFader();
+    TimeFader(const MathFunctionIfc& function);
 
     void start(float targetValue, uint32_t durationMicros);
     void start(float startValue, float targetValue, uint32_t durationMicros);

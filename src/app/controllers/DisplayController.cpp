@@ -19,7 +19,7 @@ DisplayController::DisplayController(const RuntimeContext& context):
 }
 
 void DisplayController::onInit(){
-    mBacklightTransition.setEasingFunction(EasingFunctions::GetOutSine());
+    mBacklightFader.setEasingFunction(EasingFunctions::GetOutSine());
 }
 
 void DisplayController::onStart(){
@@ -29,8 +29,8 @@ void DisplayController::onStart(){
 
 void DisplayController::onRenderTick(){
 
-    if(mBacklightTransition.isActive()){
-        float brightness = mBacklightTransition.updateValue();
+    if(mBacklightFader.isActive()){
+        float brightness = mBacklightFader.updateValue();
         mDisplay.setBrightness(brightness);
     }
 
@@ -115,7 +115,7 @@ void DisplayController::onBacklightCommand(const EventRead<EventPayload::Backlig
 
 void DisplayController::setBrightnessSmooth(float targetBrightness, uint32_t durationMicros){
     const float startBrightness = mDisplay.getBrightness();
-    mBacklightTransition.start(startBrightness, targetBrightness, durationMicros);
+    mBacklightFader.start(startBrightness, targetBrightness, durationMicros);
 }
 
 } // namespace

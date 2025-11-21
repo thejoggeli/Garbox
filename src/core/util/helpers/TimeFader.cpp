@@ -1,4 +1,4 @@
-#include "SmoothTransition.h"
+#include "TimeFader.h"
 
 #include "core/assert/Assert.h"
 #include "core/time/Time.h"
@@ -9,21 +9,21 @@ namespace Garbox {
 
 
 
-SmoothTransition::SmoothTransition(): 
+TimeFader::TimeFader(): 
     mEasingFunction(&EasingFunctions::GetOutSine()) {}
 
-SmoothTransition::SmoothTransition(const MathFunctionIfc& easingFunction):
+TimeFader::TimeFader(const MathFunctionIfc& easingFunction):
     mEasingFunction(&easingFunction) {}
 
-void SmoothTransition::setEasingFunction(const MathFunctionIfc& fn){
+void TimeFader::setEasingFunction(const MathFunctionIfc& fn){
     mEasingFunction = &fn;
 }
 
-void SmoothTransition::setClampEnabled(bool enabled){
+void TimeFader::setClampEnabled(bool enabled){
     mClampEnabled = enabled;
 }
 
-void SmoothTransition::start(float targetValue, uint32_t durationMicros){
+void TimeFader::start(float targetValue, uint32_t durationMicros){
     mStartValue = mCurrentValue;
     mTargetValue = targetValue;
     mDurationMicros = durationMicros;
@@ -32,7 +32,7 @@ void SmoothTransition::start(float targetValue, uint32_t durationMicros){
     mFinished = false;
 }
 
-void SmoothTransition::start(float startValue, float targetValue, uint32_t durationMicros){
+void TimeFader::start(float startValue, float targetValue, uint32_t durationMicros){
     mStartValue = startValue;
     mTargetValue = targetValue;
     mDurationMicros = durationMicros;
@@ -41,7 +41,7 @@ void SmoothTransition::start(float startValue, float targetValue, uint32_t durat
     mFinished = false;
 }
 
-float SmoothTransition::updateValue(){
+float TimeFader::updateValue(){
     if(!mActive){
         return mCurrentValue;
     }
@@ -61,25 +61,30 @@ float SmoothTransition::updateValue(){
 
     const float mappedValue = MathUtils::Map(eased, 0.0f, 1.0f, mStartValue, mTargetValue);
     if(mClampEnabled){
-        mCurrentValue = MathUtils::Clamp(mappedValue, mStartValue, mTargetValue);
+        if(mStartValue < mTargetValue){
+            mCurrentValue = MathUtils::Clamp(mappedValue, mStartValue, mTargetValue);
+        }
+        else {
+            mCurrentValue = MathUtils::Clamp(mappedValue, mTargetValue, mStartValue);
+        }
     }
 
     return mCurrentValue;
 }
 
-bool SmoothTransition::isActive() const{
+bool TimeFader::isActive() const{
     return mActive;
 }
 
-bool SmoothTransition::isFinished() const{
+bool TimeFader::isFinished() const{
     return mFinished;
 }
 
-float SmoothTransition::getCurrentValue() const{
+float TimeFader::getCurrentValue() const{
     return mCurrentValue;
 }
 
-float SmoothTransition::getTargetValue() const{
+float TimeFader::getTargetValue() const{
     return mTargetValue;
 }
 

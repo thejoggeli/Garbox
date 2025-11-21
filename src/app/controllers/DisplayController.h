@@ -2,7 +2,7 @@
 
 #include "app/controllers/generated/DisplayControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
-#include "core/util/transition/SmoothTransition.h"
+#include "core/util/helpers/TimeFader.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
@@ -47,7 +47,7 @@ private:
 
     Display& mDisplay;
     SoftwareTimer mHeapTimer;
-    SmoothTransition mBacklightTransition;
+    TimeFader mBacklightFader;
 
     Dirty mDirty;
     State mOldState {};
