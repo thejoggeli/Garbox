@@ -9,7 +9,7 @@ namespace Garbox {
 
 HeatpadController::HeatpadController(ComponentId id, const RuntimeContext& context): 
     // init members
-    ControllerAbs(id, context),
+    HeatpadControllerAbs(id, context),
     mHeatpad(PartsProvider::GetHeatpad()),
     mLed(PartsProvider::GetRgbLed()){
     // nothing to do
@@ -52,7 +52,7 @@ void HeatpadController::onOutputTick(){
     mLed.setColor(hslColor.toLinearRgb());
 }
 
-void HeatpadController::onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand> event){
+void HeatpadController::onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand>& event){
     // apply enabled 
     if(mHeatpad.isEnabled() != event.payload->enabled){
         mHeatpad.setEnabled(event.payload->enabled);

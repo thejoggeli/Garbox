@@ -53,15 +53,15 @@ void GarboxRuntime::onMainTick(){
     AppBehaviourAbs* behaviour = static_cast<AppBehaviourAbs*>(getActiveBehaviour());
     AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
 
+    // heartbeat tick
+    mHeartbeatController.onHeartbeatTick();
+    dispatchEvents();
+
     // input tick
+    mInputController.onInputTick();
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mI2cPartsController.onInputTick();
-    dispatchEvents();
-
-    // regular tick tick
-    mHeartbeatController.onTick();
-    mInputController.onTick();
     dispatchEvents();
 
     // behaviour logic tick
@@ -71,12 +71,13 @@ void GarboxRuntime::onMainTick(){
     // output tick
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
-    mI2cPartsController.onOutputTick();
     dispatchEvents();
 }
 
 void GarboxRuntime::onDisplayTick(){
-    mDisplayController.onTick();
+    // render tick
+    mDisplayController.onRenderTick();
+    dispatchEvents();
 }
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){

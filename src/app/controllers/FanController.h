@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/application/controller/ControllerAbs.h"
+#include "app/controllers/generated/FanControllerAbs.h"
 #include "modules/parts/fan/Fan.h"
 
 namespace Garbox {
@@ -8,15 +8,15 @@ namespace Garbox {
 class AnimatedLed;
 class Fan;
 
-class FanController : public ControllerAbs {
+class FanController : public FanControllerAbs {
 public:
     
     FanController(ComponentId id, const RuntimeContext& context);
 
-    void onInputTick();
-    void onOutputTick();
+    void onInputTick() final;
+    void onOutputTick() final;
 
-    void onFanCommand(const EventRead<EventPayload::FanCommand> event);
+    void onFanCommand(const EventRead<EventPayload::FanCommand>& event) final;
 
 private:
 

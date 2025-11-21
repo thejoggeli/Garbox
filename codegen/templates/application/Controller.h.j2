@@ -1,0 +1,31 @@
+#pragma once
+
+#include "app/controllers/generated/{{ name }}Abs.h"
+
+namespace Garbox {
+
+class {{ name }} : public {{ name }}Abs {
+public:
+
+    {{ name }}(ComponentId id, const RuntimeContext& context);
+    {% if controller.ticks %}
+
+        {% for tick in controller.ticks %}
+    void on{{ tick }}Tick() final;
+        {% endfor %}
+    {% endif %}
+    {% if controller.receives %}
+
+        {% for ev in controller.receives %}
+    void on{{ ev }}(const EventRead<{{ ev }}>& event) final;
+        {% endfor %}
+    {% endif %}
+
+private:
+
+    void onInit() final;
+    void onStart() final;
+
+};
+
+} // namespace Garbox

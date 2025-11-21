@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/application/controller/ControllerAbs.h"
+#include "app/controllers/generated/DisplayControllerAbs.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
@@ -8,7 +8,7 @@ namespace Garbox {
 
 class Display;
 
-class DisplayController : public ControllerAbs {
+class DisplayController : public DisplayControllerAbs {
 public:
 
     struct State {
@@ -24,7 +24,7 @@ public:
     
     DisplayController(ComponentId id, const RuntimeContext& context);
 
-    void onTick();
+    void onRenderTick() final;
 
 private:
 
@@ -35,7 +35,6 @@ private:
 
     void onInit() final;
     void onStart() final;
-
 
 };
 

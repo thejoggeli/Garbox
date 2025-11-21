@@ -9,7 +9,7 @@ namespace Garbox {
 
 HeartbeatController::HeartbeatController(ComponentId id, const RuntimeContext& context): 
     // initialize members
-    ControllerAbs(id, context),
+    HeartbeatControllerAbs(id, context),
     mIntervalMicros(AppConfig::HeartbeatIntervalMicros),
     mHeartbeatLed(PartsProvider::GetStatusLed(StatusLedId::Heartbeat)){
     // nothing to do
@@ -28,7 +28,7 @@ void HeartbeatController::onStart(){
     mHeartbeatTimer.start(mIntervalMicros);
 }
 
-void HeartbeatController::onTick(){
+void HeartbeatController::onHeartbeatTick(){
     if(mHeartbeatTimer.isExpired()){
         mHeartbeatLed.animationStart();
         mHeartbeatTimer.restart();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/application/controller/ControllerAbs.h"
+#include "app/controllers/generated/I2cPartsControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
@@ -8,13 +8,12 @@ namespace Garbox {
 class Gpio;
 class Sht31;
 
-class I2cPartsController : public ControllerAbs {
+class I2cPartsController : public I2cPartsControllerAbs {
 public:
     
     I2cPartsController(ComponentId id, const RuntimeContext& context);
 
-    void onInputTick();
-    void onOutputTick();
+    void onInputTick() final;
 
 private:
 

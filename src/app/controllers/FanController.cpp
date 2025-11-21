@@ -12,7 +12,7 @@ namespace Garbox {
 
 FanController::FanController(ComponentId id, const RuntimeContext& context): 
     // init members
-    ControllerAbs(id, context),
+    FanControllerAbs(id, context),
     mFan(PartsProvider::GetFan()),
     mStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom1)){
     // nothing to do
@@ -53,7 +53,7 @@ void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const EventRead<EventPayload::FanCommand> event){
+void FanController::onFanCommand(const EventRead<EventPayload::FanCommand>& event){
     // apply enabled
     if(mFan.isEnabled() != event.payload->enabled){
         mFan.setEnabled(event.payload->enabled);

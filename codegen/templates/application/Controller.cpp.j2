@@ -1,0 +1,33 @@
+#include "{{ name }}.h"
+
+namespace Garbox {
+
+{{ name }}::{{ name }}(ComponentId id, const RuntimeContext& context) : {{ name }}Abs(id, context){
+    // nothing to do
+}
+
+void {{ name }}::onInit(){
+    // nothing to do
+}
+
+void {{ name }}::onStart(){
+    // TODO implement
+}
+
+{% if .ticks %}
+    {% for tick in .ticks %}
+void {{ name }}::on{{ tick }}Tick(){
+    // TODO implement
+}
+    {% endfor %}
+{% endif %}
+
+{% if .receives %}
+    {% for ev in .receives %}
+void {{ name }}::on{{ ev }}(const EventRead<{{ ev }}>& event){
+    // TODO implement
+}
+    {% endfor %}
+{% endif %}
+
+} // namespace Garbox

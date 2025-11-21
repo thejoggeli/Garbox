@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/application/controller/ControllerAbs.h"
+#include "app/controllers/generated/HeatpadControllerAbs.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox {
@@ -8,15 +8,15 @@ namespace Garbox {
 class Heatpad;
 class RgbLed;
 
-class HeatpadController : public ControllerAbs {
+class HeatpadController : public HeatpadControllerAbs {
 public:
     
     HeatpadController(ComponentId id, const RuntimeContext& context);
 
-    void onInputTick();
-    void onOutputTick();
+    void onInputTick() final;
+    void onOutputTick() final;
 
-    void onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand> event);
+    void onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand>& event) final;
 
 private:
 

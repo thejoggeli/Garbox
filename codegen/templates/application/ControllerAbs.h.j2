@@ -1,0 +1,34 @@
+#pragma once
+
+#include "core/application/controller/ControllerAbs.h"
+#include "shared/types/EventType.h"
+{%- from "_common/includes.j2" import emit_includes -%}
+{{- emit_includes(include) -}}
+
+namespace Garbox {
+
+class {{ name }}Abs : public ControllerAbs {
+public:
+    
+    // controller constructor
+    {{ name }}Abs(ComponentId id, const RuntimeContext& context) : ControllerAbs(id, context) {}
+    {# ---- Tick handlers ---- #}
+    {% if controller.ticks %}
+
+    // tick handlers
+        {% for tick in controller.ticks %}
+    virtual void on{{ tick }}() = 0;
+        {% endfor %}
+    {% endif %}
+    {# ---- Receive event typedefs + virtual handlers ---- #}
+    {% if controller.receives %}
+
+    // receive event handlers
+        {% for ev in controller.receives %}
+    virtual void on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event) = 0;
+        {% endfor %}
+    {% endif %}
+
+};
+
+} // namespace Garbox

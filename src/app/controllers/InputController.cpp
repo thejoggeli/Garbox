@@ -13,7 +13,7 @@ namespace Garbox {
 
 InputController::InputController(ComponentId id, const RuntimeContext& context):
     // initialize members
-    ControllerAbs(id, context),
+    InputControllerAbs(id, context),
     mButtonStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom2)),
     mPiezoPlayer(PartsProvider::GetPiezoPlayer()),
     mButton(PartsProvider::GetEncoderButton()){
@@ -38,7 +38,7 @@ void InputController::onStart(){
     // nothing to do
 }
 
-void InputController::onTick(){
+void InputController::onInputTick(){
     // button tick
     mButton.tick();
 }

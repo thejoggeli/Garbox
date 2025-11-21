@@ -1,0 +1,11 @@
+#include "{{ name }}Abs.h"
+
+namespace Garbox {
+
+{{ name }}Abs::{{ name }}Abs(ComponentId id, const RuntimeContext& context) : ControllerAbs(id, context){
+    // nothing to do
+}
+
+    {% endfor %}
+{% endif %}
+} // namespace Garbox

@@ -12,7 +12,7 @@ namespace Garbox {
 
 I2cPartsController::I2cPartsController(ComponentId id, const RuntimeContext& context): 
     // init members
-    ControllerAbs(id, context),
+    I2cPartsControllerAbs(id, context),
     mEnablePowerGpio(GpioInstances::GetI2cEnable()),
     mTemperatureSensor(PartsProvider::GetTemperatureSensor()){
     // nothing to do
@@ -59,10 +59,6 @@ void I2cPartsController::onInputTick(){
     if(fetched){
         sendTemperatureSampleEvent();
     }
-}
-
-void I2cPartsController::onOutputTick(){
-    // nothing to do
 }
 
 void I2cPartsController::enterFsmState(FsmState state){

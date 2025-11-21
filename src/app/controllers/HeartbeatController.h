@@ -1,18 +1,18 @@
 #pragma once
 
-#include "core/application/controller/ControllerAbs.h"
+#include "app/controllers/generated/HeartbeatControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
 class AnimatedLed;
 
-class HeartbeatController : public ControllerAbs {
+class HeartbeatController : public HeartbeatControllerAbs {
 public:
 
     HeartbeatController(ComponentId id, const RuntimeContext& context);
 
-    void onTick();
+    void onHeartbeatTick() final;
 
 private: 
 

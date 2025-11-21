@@ -10,7 +10,7 @@ namespace Garbox {
 
 DisplayController::DisplayController(ComponentId id, const RuntimeContext& context): 
     // init members
-    ControllerAbs(id, context),
+    DisplayControllerAbs(id, context),
     mDisplay(PartsProvider::GetDisplay()){
     // nothing to do
 }
@@ -23,7 +23,7 @@ void DisplayController::onStart(){
     // nothing to do
 }
 
-void DisplayController::onTick(){
+void DisplayController::onRenderTick(){
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
 

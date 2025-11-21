@@ -20,7 +20,7 @@ controllers:
 
   FanController:
     ticks: [Input, Output]
-    sends: [FanStatus, FanReading]
+    sends: [FanStatus, FanSample]
     receives: [FanCommand]
 
   HeartbeatController:
@@ -38,14 +38,19 @@ controllers:
     sends: [Button, ButtonRepeat, EncoderStep]
     receives: null
 
+  I2cPartsController:
+    ticks: [Input]
+    sends: [TemperatureStatus, TemperatureSample]
+    receives: null
+
 behaviours:
 
   CalibrationBehaviour:
     ticks: [Logic]
     sends: [FanCommand]
-    receives: [Heartbeat, FanStatus, FanReading, HeatpadStatus, Button, ButtonRepeat, EncoderStep]
+    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, Button, ButtonRepeat, EncoderStep, TemperatureStatus, TemperatureSample]
     
   FermentationBehaviour:
     ticks: [Logic]
     sends: [FanCommand, HeatpadCommand]
-    receives: [Heartbeat, FanStatus, FanReading, HeatpadStatus, Button, ButtonRepeat, EncoderStep]
+    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, Button, ButtonRepeat, EncoderStep, TemperatureStatus, TemperatureSample]

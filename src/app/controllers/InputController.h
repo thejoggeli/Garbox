@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/application/controller/ControllerAbs.h"
+#include "app/controllers/generated/InputControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
 #include "modules/parts/button/ButtonIfc.h"
 
@@ -10,12 +10,12 @@ class ButtonIfc;
 class PiezoPlayer;
 class AnimatedLed;
 
-class InputController : public ControllerAbs {
+class InputController : public InputControllerAbs {
 public:
 
     InputController(ComponentId id, const RuntimeContext& context);
 
-    void onTick();
+    void onInputTick() final;
 
 private:
 

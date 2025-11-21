@@ -88,10 +88,16 @@ def ensure_value_suffix(yaml_config: dict, parent: str, field: str, suffix: str)
             raise KeyError(
                 f"Entry '{key}' in '{parent}' does not contain required field '{field}'"
             )
-
-        val = str(entry[field])
-        if not val.endswith(suffix):
-            entry[field] = val + suffix
+        
+        if isinstance(entry[field], list):
+            for i, v in enumerate(entry[field]):
+                val = str(v)
+                if not val.endswith(suffix):
+                    entry[field][i] = val + suffix
+        else:
+            val = str(entry[field])
+            if not val.endswith(suffix):
+                entry[field] = val + suffix
 
     return yaml_config
 
@@ -163,7 +169,6 @@ def generate_items(items : list[Item]):
 
 def generate_hardware():
 
-    # generate all code files specific in config/hardware.yaml
     yaml_path = script_dir.joinpath("config/hardware.yaml")
     yaml_config = load_yaml(yaml_path)
 
@@ -210,7 +215,6 @@ def generate_hardware():
 
 def generate_events():
 
-    # generate all code files specific in config/hardware.yaml
     yaml_path = script_dir.joinpath("config/events.yaml")
     yaml_config = load_yaml(yaml_path)
 
@@ -234,9 +238,39 @@ def generate_events():
     # generate all hardware h/cpp files
     generate_items(items)
 
+
+def generate_controllers(yaml_config):
+
+    ensure_suffix(yaml_config, "controllers", "Controller")
+    ensure_value_suffix(yaml_config, "controllers", "ticks", "Tick")
+
+    # list of items to be generated
+    controllers = yaml_config["controllers"]
+    items = []
+    for controller_key, controller_dict in controllers.items():
+        out_path = f"app/controllers/generated/{controller_key}Abs"
+        template_path = "application/ControllerAbs"
+        item_dict = {
+            "name": controller_key,
+            "controller": controller_dict
+        }
+        controller_dict["name"] = controller_key
+        items.append(Item(item_dict, ["controller", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
+
+    # generate all hardware h/cpp files
+    generate_items(items)
+
+
+def generate_application():
+    yaml_path = script_dir.joinpath("config/application.yaml")
+    yaml_config = load_yaml(yaml_path)
+    generate_controllers(yaml_config)
+    
+
 def main():
     generate_hardware()
     generate_events()
+    generate_application()
 
 
 if __name__ == "__main__":
