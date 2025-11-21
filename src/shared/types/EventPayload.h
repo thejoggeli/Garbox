@@ -1,8 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
+
+// included from config
 #include "modules/parts/fan/FanState.h"
+#include "modules/parts/button/ButtonState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox::EventPayload {
@@ -13,37 +17,60 @@ struct Heartbeat {
 
 struct FanStatus {
     static constexpr EventType Type = EventType::FanStatus;
-    FanState state = FanState::Disabled;
-    float targetSpeed = 0.0f;
-    float measuredRpm = 0.0f;
+    FanState state;          
+    float targetSpeed;          
 };
 
-struct HeatpadStatus {
-    static constexpr EventType Type = EventType::HeatpadStatus;
-    HeatpadState state = HeatpadState::Disabled;
-    float duty = 0.0f;
-    uint32_t periodMicros = 0;
-};
-
-struct TemperatureStatus {
-    static constexpr EventType Type = EventType::TemperatureStatus;
-    bool sensorEnabled = false;
-    bool sensorError = false;
-    float temperatureCelcius = 0.0f;
-    float humidityRelative = 0.0f;
+struct FanSample {
+    static constexpr EventType Type = EventType::FanSample;
+    float measuredRpm;          
 };
 
 struct FanCommand {
     static constexpr EventType Type = EventType::FanCommand;
-    bool enabled = false;
-    float targetSpeed = 0.0f;
+    bool enabled;          
+    float targetSpeed;          
+};
+
+struct HeatpadStatus {
+    static constexpr EventType Type = EventType::HeatpadStatus;
+    HeatpadState state;          
+    float dutyCycle;          
+    uint32_t periodMicros;          
 };
 
 struct HeatpadCommand {
     static constexpr EventType Type = EventType::HeatpadCommand;
-    bool enabled = false;
-    float dutyCycle = 0.0f;
-    uint32_t periodMicros = 0;
+    bool enabled;          
+    float dutyCycle;          
+    uint32_t periodMicros;          
 };
 
-} // namespace
+struct TemperatureStatus {
+    static constexpr EventType Type = EventType::TemperatureStatus;
+    bool enabled;          
+    bool error;          
+};
+
+struct TemperatureSample {
+    static constexpr EventType Type = EventType::TemperatureSample;
+    float temperatureCelcius;          
+    float humidityRelative;          
+};
+
+struct Button {
+    static constexpr EventType Type = EventType::Button;
+    ButtonState state;          
+};
+
+struct ButtonRepeat {
+    static constexpr EventType Type = EventType::ButtonRepeat;
+    uint32_t count;          
+};
+
+struct EncoderStep {
+    static constexpr EventType Type = EventType::EncoderStep;
+    int32_t steps;          
+};
+
+} // namespace Garbox::EventPayload

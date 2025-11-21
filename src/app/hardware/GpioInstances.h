@@ -2,7 +2,6 @@
 
 #include "core/hardware/gpio/Gpio.h"
 
-
 namespace Garbox {
 
 struct GpioInstances {

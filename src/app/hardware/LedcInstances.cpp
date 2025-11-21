@@ -2,7 +2,6 @@
 
 #include "core/assert/Assert.h"
 
-
 namespace Garbox {
 
 using TimerId = LedcTimer::Id;

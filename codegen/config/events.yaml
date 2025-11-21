@@ -1,47 +1,52 @@
-events:
+payload:
 
-  includes:
-    - "modules/parts/button/ButtonState.h"
-    - "modules/parts/fan/FanState.h"
-    - "modules/parts/heatpad/HeatpadState.h"
-    
-  types:
+  include_h: [
+    "modules/parts/button/ButtonState.h",
+    "modules/parts/fan/FanState.h",
+    "modules/parts/heatpad/HeatpadState.h"
+  ]
 
-    # Heartbeat
-    Heartbeat: null
+type:
 
-    # Fan
-    FanStatus:  
-      state: FanState, 
-      targetSpeed: float
-    FanReading:  
-      measuredRpm: float
-    FanCommand:  
-      enabled: bool, 
-      targetSpeed: float
-    
-    # Heatpad
-    HeatpadStatus:  
-      state: HeatpadState, 
-      duty: float, 
-      periodMicros: uint32_t
-    HeatpadCommand:  
-      enabled: bool, 
-      duty: float, 
-      periodMicros: uint32_t
-    
-    # Temperature
-    TemperatureStatus:  
-      error: bool
-    TemperatureReading:  
-      temperatureCelcius: float, 
-      humidityRelative: float
-    
-    # Encoder
-    Button:  
-      state: ButtonState
-    ButtonRepeat:  
-      count: uint32_t
-    EncoderStep:  
-      steps: int32_t
-    
+  include_h: []
+  include_cpp: []
+
+  # Heartbeat
+  Heartbeat: null
+
+  # Fan
+  FanStatus:  
+    state: FanState
+    targetSpeed: float
+  FanSample:  
+    measuredRpm: float
+  FanCommand:  
+    enabled: bool
+    targetSpeed: float
+  
+  # Heatpad
+  HeatpadStatus:  
+    state: HeatpadState 
+    dutyCycle: float
+    periodMicros: uint32_t
+  HeatpadCommand:  
+    enabled: bool
+    dutyCycle: float
+    periodMicros: uint32_t
+  
+  # Temperature
+  TemperatureStatus:  
+    enabled: bool
+    error: bool
+  TemperatureSample:  
+    temperatureCelcius: float
+    humidityRelative: float
+  
+  # Encoder
+  Button:  
+    state: ButtonState
+  ButtonRepeat:  
+    count: uint32_t
+  EncoderStep:  
+    steps: int32_t
+  

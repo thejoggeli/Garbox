@@ -2,7 +2,6 @@
 
 #include "core/hardware/spi/SpiDma.h"
 
-
 namespace Garbox {
 
 struct SpiInstances {

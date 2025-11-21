@@ -30,6 +30,8 @@ void I2cPartsController::onStart(){
 
 void I2cPartsController::onInputTick(){
 
+    bool fetched = false;
+
     // handle current fsm state
     switch(mFsmState){
     case FsmState::ResetPowerOffPhase:
@@ -43,9 +45,7 @@ void I2cPartsController::onInputTick(){
         }
         break;
     case FsmState::Running:
-        if(mTemperatureSensor.tryFetch()){
-            mChanged = true;
-        }
+        fetched = mTemperatureSensor.tryFetch();
         break;
     default:
         TriggerDebug("I2cPartsController", "unhandled state");
@@ -55,6 +55,9 @@ void I2cPartsController::onInputTick(){
     if(mChanged){
         sendTemperatureStatusEvent();
         mChanged = false;
+    }
+    if(fetched){
+        sendTemperatureSampleEvent();
     }
 }
 
@@ -96,8 +99,13 @@ void I2cPartsController::enterFsmState(FsmState state){
 
 void I2cPartsController::sendTemperatureStatusEvent(){
     EventWrite event = makeEvent<EventPayload::TemperatureStatus>();
-    event.payload->sensorEnabled = mTemperatureSensor.isStarted();
-    event.payload->sensorError = false;
+    event.payload->enabled = mTemperatureSensor.isStarted();
+    event.payload->error = false;
+    sendEvent(event.header);
+}
+
+void I2cPartsController::sendTemperatureSampleEvent(){
+    EventWrite event = makeEvent<EventPayload::TemperatureSample>();
     event.payload->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
     event.payload->humidityRelative = mTemperatureSensor.getHumidityRelative();
     sendEvent(event.header);

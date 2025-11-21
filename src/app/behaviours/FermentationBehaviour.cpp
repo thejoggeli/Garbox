@@ -52,40 +52,48 @@ void FermentationBehaviour::onHeartbeat(const EventRead<EventPayload::Heartbeat>
 }
 
 void FermentationBehaviour::onFanStatus(const EventRead<EventPayload::FanStatus>& event){
-    LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%, rpm=%" PRIi32,
+    LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%",
         FanStateToString(event.payload->state),
-        event.payload->targetSpeed * 100.0f,
-        static_cast<uint32_t>(event.payload->measuredRpm + 0.5f)
+        event.payload->targetSpeed * 100.0f
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
     inputs.fanEnabled = (event.payload->state != FanState::Disabled);
     inputs.fanStalled = (event.payload->state == FanState::Stalled);
     inputs.fanTargetSpeed = event.payload->targetSpeed;
+}
+
+void FermentationBehaviour::onFanSample(const EventRead<EventPayload::FanSample>& event){
+    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
     inputs.fanMeasuredRpm = event.payload->measuredRpm;
 }
 
 void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event){
     LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
         HeatpadStateToString(event.payload->state),
-        event.payload->duty,
+        event.payload->dutyCycle,
         event.payload->periodMicros / 1000
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
     inputs.heatpadEnabled = (event.payload->state != HeatpadState::Disabled);
-    inputs.heatpadPwmDuty = event.payload->duty;
+    inputs.heatpadPwmDuty = event.payload->dutyCycle;
     inputs.heatpadPwmPeriodMicros = event.payload->periodMicros; 
 }
 
 void FermentationBehaviour::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
-    LogDebug("FermentationBehaviour", "[TemperatureStatus] en=%u, err=%u, temp=%.2f°C, hum=%.2f%%",
-        event.payload->sensorEnabled,
-        event.payload->sensorError,
+    LogDebug("FermentationBehaviour", "[TemperatureStatus] en=%u, err=%u",
+        event.payload->enabled, event.payload->error
+    );
+    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    inputs.temperatureEnabled = event.payload->enabled;
+    inputs.temperatureError = event.payload->error;
+}
+
+void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
+    LogDebug("FermentationBehaviour", "[TemperatureSample] temp=%.2f°C, hum=%.2f%%",
         event.payload->temperatureCelcius,
         event.payload->humidityRelative
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.temperatureEnabled = event.payload->sensorEnabled;
-    inputs.temperatureError = event.payload->sensorError;
     inputs.temperatureCelcius = event.payload->temperatureCelcius;
     inputs.humidityRelative = event.payload->humidityRelative;
 }

@@ -40,6 +40,7 @@ private:
 
     void enterFsmState(FsmState state);
     void sendTemperatureStatusEvent();
+    void sendTemperatureSampleEvent();
 
 };
 

@@ -1,5 +1,8 @@
 #include "EventType.h"
 
+{%- from "common/includes.j2" import emit_includes -%}
+{{ emit_includes(includes) }}
+
 namespace Garbox {
 
 const char* EventTypeToString(EventType type){
@@ -7,7 +10,7 @@ const char* EventTypeToString(EventType type){
 
         case EventType::Null: return "Null";
 
-{% for name, fields in events.types.items() %}
+{% for name, fields in type.items() %}
         case EventType::{{ name }}: return "{{ name }}";
 {% endfor %}
 

@@ -2,7 +2,6 @@
 
 #include "core/assert/Assert.h"
 
-
 namespace Garbox {
 
 constexpr bool InitialLow = false;
@@ -25,52 +24,42 @@ void GpioInstances::Init(){
         PinDebugGpio, InitialLow,
         { Mode::Disable, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetFanEnable().init(
         PinFanEnable, InitialLow,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetFanTacho().init(
         PinFanTacho, InitialLow,
         { Mode::Input, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetI2cEnable().init(
         PinI2cEnable, InitialHigh,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetDisplayDc().init(
         PinDisplayDc, InitialLow,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetDisplayCs().init(
         PinDisplayCs, InitialHigh,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetDisplayRst().init(
         PinDisplayRst, InitialLow,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetHeatpadEnable().init(
         PinHeatpadEnable, InitialLow,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
     GetEncoderButton().init(
         PinEncoderButton, InitialLow,
         { Mode::Input, Pull::Disable, Interrupt::Disable, Inverted }
     );
-
     GetRgbLed().init(
         PinRgbLed, InitialLow,
         { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
     );
-
 
     sInitialized = true;
 }

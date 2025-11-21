@@ -2,7 +2,6 @@
 
 #include "core/hardware/adc/Adc.h"
 
-
 namespace Garbox {
 
 class AdcInstances {

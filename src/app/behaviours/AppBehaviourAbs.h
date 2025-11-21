@@ -13,8 +13,10 @@ public:
 
     virtual void onHeartbeat(const EventRead<EventPayload::Heartbeat>& event) {};
     virtual void onFanStatus(const EventRead<EventPayload::FanStatus>& event) {};
+    virtual void onFanSample(const EventRead<EventPayload::FanSample>& event) {};
     virtual void onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event) {};
     virtual void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) {};
+    virtual void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) {};
 
 };
 

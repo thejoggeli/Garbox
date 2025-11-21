@@ -1,7 +1,14 @@
-{% macro emit_includes(include) -%}
-{%- if include is defined and include -%}
-{%- for path in include -%}
+{% macro emit_includes(include) %}
+{% if include is defined and include %}
+
+
+// included from config
+{% for path in include %}
 #include "{{ path }}"
-{%- endfor -%}
-{%- endif -%}
-{%- endmacro %}
+{% endfor %}
+
+{% else %}
+
+
+{% endif %}
+{% endmacro %}

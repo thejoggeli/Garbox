@@ -99,8 +99,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     // route status updates to behaviour
     case EventType::Heartbeat:          activeBehaviour->onHeartbeat(EventRead<EventPayload::Heartbeat>(header)); break;
     case EventType::FanStatus:          activeBehaviour->onFanStatus(EventRead<EventPayload::FanStatus>(header)); break;
+    case EventType::FanSample:          activeBehaviour->onFanSample(EventRead<EventPayload::FanSample>(header)); break;
     case EventType::HeatpadStatus:      activeBehaviour->onHeatpadStatus(EventRead<EventPayload::HeatpadStatus>(header)); break;
     case EventType::TemperatureStatus:  activeBehaviour->onTemperatureStatus(EventRead<EventPayload::TemperatureStatus>(header)); break;
+    case EventType::TemperatureSample:  activeBehaviour->onTemperatureSample(EventRead<EventPayload::TemperatureSample>(header)); break;
 
     // route commands to controllers
     case EventType::FanCommand:         mFanController.onFanCommand(EventRead<EventPayload::FanCommand>(header)); break;

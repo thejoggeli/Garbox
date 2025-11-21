@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-{% from "common/includes.j2" import emit_includes -%}
-{{ emit_includes(events.includes) }}
+{%- from "common/includes.j2" import emit_includes -%}
+{{ emit_includes(includes) }}
 
 namespace Garbox {
 
@@ -11,7 +11,7 @@ enum class EventType : uint16_t {
     // null event
     Null = 0,
 
-{% for name, fields in events.types.items() %}
+{% for name, fields in type.items() %}
     {{ name }},
 {% endfor %}
 

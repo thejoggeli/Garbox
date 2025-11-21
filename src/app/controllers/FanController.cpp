@@ -35,12 +35,17 @@ void FanController::onStart(){
 }
 
 void FanController::onInputTick(){
-    // updates MeasuredRpm + FanState
-    // may trigger handleFanStateChanged()
+    // updates MeasuredRpm and FanState
     mFan.tick();
     if(mStateChanged){
         sendStatusEvent();
         mStateChanged = false;
+    }
+    // send rpm sample if changed
+    float measuredRpm = mFan.getMeasuredRpm();
+    if(measuredRpm != mLastMeasuredRpm){
+        sendSampleEvent(measuredRpm);
+        mLastMeasuredRpm = measuredRpm;
     }
 }
 
@@ -84,7 +89,12 @@ void FanController::sendStatusEvent(){
     EventWrite event = makeEvent<EventPayload::FanStatus>();
     event.payload->state = mFan.getState();
     event.payload->targetSpeed = mFan.getTargetSpeed();
-    event.payload->measuredRpm = mFan.getMeasuredRpm();
+    sendEvent(event.header);
+}
+
+void FanController::sendSampleEvent(float measuredRpm){
+    EventWrite event = makeEvent<EventPayload::FanSample>();
+    event.payload->measuredRpm = measuredRpm;
     sendEvent(event.header);
 }
 

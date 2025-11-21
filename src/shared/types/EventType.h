@@ -2,27 +2,31 @@
 
 #include <cstdint>
 
+
+
 namespace Garbox {
 
 enum class EventType : uint16_t {
-    
+
     // null event
     Null = 0,
 
-    // status events
     Heartbeat,
     FanStatus,
-    HeatpadStatus,
-    TemperatureStatus,
-
-    // command events
+    FanSample,
     FanCommand,
+    HeatpadStatus,
     HeatpadCommand,
+    TemperatureStatus,
+    TemperatureSample,
+    Button,
+    ButtonRepeat,
+    EncoderStep,
 
-    // enum size 
+    // enum size marker
     Count,
 };
 
 const char* EventTypeToString(EventType type);
 
-} // namespace
+} // namespace Garbox

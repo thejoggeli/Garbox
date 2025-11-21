@@ -1,6 +1,8 @@
 #include "SpiInstances.h"
 
 #include "core/assert/Assert.h"
+
+// included from config
 #include "app/config/AppConfig.h"
 
 namespace Garbox {

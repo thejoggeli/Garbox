@@ -18,7 +18,8 @@ jinja_env = Environment(
 )
 
 class Item:
-    def __init__(self, yaml_keys, out_path, template_path):
+    def __init__(self, yaml_config, yaml_keys, out_path, template_path):
+        self.yaml_config = yaml_config
         self.yaml_keys = ensure_list(yaml_keys)
         self.out_path = out_path
         self.template_path = template_path
@@ -137,26 +138,27 @@ def render_template(jinja_env, template_name: str, output_path: Path, **context)
     print(f"Generated {output_path}")
 
 
-def generate_items(yaml_config, items : list[Item]):
+def generate_items(items : list[Item]):
 
     # generate the source code for all passed items
     for item in items:
 
         # generate full output and template path
+        yaml_config = item.yaml_config
         out_path = src_dir.joinpath(item.out_path).resolve()
         template_path = item.template_path
 
         # get current item config from yaml
         # ['a', 'b'] => {'a': yaml_config['a'], 'b': yaml_config['b']}
-        config = copy.deepcopy({ key: yaml_config[key] for key in item.yaml_keys })
+        config_copy = copy.deepcopy({ key: yaml_config[key] for key in item.yaml_keys })
         
         # create include list
-        includes = extract_includes(config, out_path.suffix)
+        includes = extract_includes(config_copy, out_path.suffix)
         if(includes is not None and len(includes) > 0):
-            config["include"] = includes
+            config_copy["include"] = includes
 
         # generate the code file using jinja
-        render_template(jinja_env, template_path, out_path, **config)
+        render_template(jinja_env, template_path, out_path, **config_copy)
 
 
 def generate_hardware():
@@ -172,18 +174,18 @@ def generate_hardware():
 
     # list of items to be generated
     items = [
-        Item(yaml_keys="adc",   out_path="app/hardware/AdcInstances.h",     template_path="hardware/AdcInstances.h.j2"),
-        Item(yaml_keys="adc",   out_path="app/hardware/AdcInstances.cpp",   template_path="hardware/AdcInstances.cpp.j2"),
-        Item(yaml_keys="gpio",  out_path="app/hardware/GpioInstances.h",    template_path="hardware/GpioInstances.h.j2"),
-        Item(yaml_keys="gpio",  out_path="app/hardware/GpioInstances.cpp",  template_path="hardware/GpioInstances.cpp.j2"),
-        Item(yaml_keys="i2c",   out_path="app/hardware/I2cInstances.h",     template_path="hardware/I2cInstances.h.j2"),
-        Item(yaml_keys="i2c",   out_path="app/hardware/I2cInstances.cpp",   template_path="hardware/I2cInstances.cpp.j2"),
-        Item(yaml_keys="spi",   out_path="app/hardware/SpiInstances.h",     template_path="hardware/SpiInstances.h.j2"),
-        Item(yaml_keys="spi",   out_path="app/hardware/SpiInstances.cpp",   template_path="hardware/SpiInstances.cpp.j2"),
-        Item(yaml_keys="timer", out_path="app/hardware/TimerInstances.h",   template_path="hardware/TimerInstances.h.j2"),
-        Item(yaml_keys="timer", out_path="app/hardware/TimerInstances.cpp", template_path="hardware/TimerInstances.cpp.j2"),
-        Item(yaml_keys=["ledcTimer", "ledcChannel"], out_path="app/hardware/LedcInstances.h",   template_path="hardware/LedcInstances.h.j2"),
-        Item(yaml_keys=["ledcTimer", "ledcChannel"], out_path="app/hardware/LedcInstances.cpp", template_path="hardware/LedcInstances.cpp.j2"),
+        Item(yaml_config, "adc",   out_path="app/hardware/AdcInstances.h",     template_path="hardware/AdcInstances.h.j2"),
+        Item(yaml_config, "adc",   out_path="app/hardware/AdcInstances.cpp",   template_path="hardware/AdcInstances.cpp.j2"),
+        Item(yaml_config, "gpio",  out_path="app/hardware/GpioInstances.h",    template_path="hardware/GpioInstances.h.j2"),
+        Item(yaml_config, "gpio",  out_path="app/hardware/GpioInstances.cpp",  template_path="hardware/GpioInstances.cpp.j2"),
+        Item(yaml_config, "i2c",   out_path="app/hardware/I2cInstances.h",     template_path="hardware/I2cInstances.h.j2"),
+        Item(yaml_config, "i2c",   out_path="app/hardware/I2cInstances.cpp",   template_path="hardware/I2cInstances.cpp.j2"),
+        Item(yaml_config, "spi",   out_path="app/hardware/SpiInstances.h",     template_path="hardware/SpiInstances.h.j2"),
+        Item(yaml_config, "spi",   out_path="app/hardware/SpiInstances.cpp",   template_path="hardware/SpiInstances.cpp.j2"),
+        Item(yaml_config, "timer", out_path="app/hardware/TimerInstances.h",   template_path="hardware/TimerInstances.h.j2"),
+        Item(yaml_config, "timer", out_path="app/hardware/TimerInstances.cpp", template_path="hardware/TimerInstances.cpp.j2"),
+        Item(yaml_config, ["ledcTimer", "ledcChannel"], out_path="app/hardware/LedcInstances.h",   template_path="hardware/LedcInstances.h.j2"),
+        Item(yaml_config, ["ledcTimer", "ledcChannel"], out_path="app/hardware/LedcInstances.cpp", template_path="hardware/LedcInstances.cpp.j2"),
     ]
 
     # HardwareInit
@@ -199,11 +201,11 @@ def generate_hardware():
     for key in init_mapping:
         if key in yaml_config and len(yaml_config[key].keys()) > 0:
             yaml_config["init"][key] = init_mapping[key]
-    items.append(Item(yaml_keys="init", out_path="app/hardware/HardwareInit.h",   template_path="hardware/HardwareInit.h.j2"))
-    items.append(Item(yaml_keys="init", out_path="app/hardware/HardwareInit.cpp", template_path="hardware/HardwareInit.cpp.j2"))
+    items.append(Item(yaml_config, "init", out_path="app/hardware/HardwareInit.h",   template_path="hardware/HardwareInit.h.j2"))
+    items.append(Item(yaml_config, "init", out_path="app/hardware/HardwareInit.cpp", template_path="hardware/HardwareInit.cpp.j2"))
 
     # generate all hardware h/cpp files
-    generate_items(yaml_config, items)
+    generate_items(items)
 
 
 def generate_events():
@@ -212,17 +214,29 @@ def generate_events():
     yaml_path = script_dir.joinpath("config/events.yaml")
     yaml_config = load_yaml(yaml_path)
 
+    types_copy = copy.deepcopy(yaml_config["type"])
+    if "include_h" in types_copy:
+        del types_copy["include_h"]
+    if "include_cpp" in types_copy:
+        del types_copy["include_cpp"]
+    if("payload" not in yaml_config):
+        yaml_config["payload"] = types_copy
+    else:
+        yaml_config["payload"].update(types_copy)
+
     # list of items to be generated
     items = [
-        Item(yaml_keys="events", out_path="shared/types/EventType.h",   template_path="events/EventType.h.j2"),
-        Item(yaml_keys="events", out_path="shared/types/EventType.cpp", template_path="events/EventType.cpp.j2"),
+        Item(yaml_config, "type", out_path="shared/types/EventType.h",       template_path="events/EventType.h.j2"),
+        Item(yaml_config, "type", out_path="shared/types/EventType.cpp",     template_path="events/EventType.cpp.j2"),
+        Item(yaml_config, "payload", out_path="shared/types/EventPayload.h", template_path="events/EventPayload.h.j2"),
     ]
 
     # generate all hardware h/cpp files
-    generate_items(yaml_config, items)
+    generate_items(items)
 
 def main():
     generate_hardware()
+    generate_events()
 
 
 if __name__ == "__main__":

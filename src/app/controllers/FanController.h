@@ -23,6 +23,7 @@ private:
     Fan& mFan;
     AnimatedLed& mStatusLed;
 
+    float mLastMeasuredRpm = 0.0f;
     bool mStateChanged = false;
     
     void onInit() final;
@@ -32,6 +33,7 @@ private:
     void handleFanStalledAlert(uint32_t counter);
 
     void sendStatusEvent();
+    void sendSampleEvent(float measuredRpm);
 
 };
 

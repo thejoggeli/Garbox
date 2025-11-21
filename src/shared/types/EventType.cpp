@@ -1,25 +1,30 @@
 #include "EventType.h"
 
+
+
 namespace Garbox {
 
 const char* EventTypeToString(EventType type){
     switch(type){
+
         case EventType::Null: return "Null";
 
-        // status events
         case EventType::Heartbeat: return "Heartbeat";
         case EventType::FanStatus: return "FanStatus";
-        case EventType::HeatpadStatus: return "HeatpadStatus";
-        case EventType::TemperatureStatus: return "TemperatureStatus";
-
-        // command events
+        case EventType::FanSample: return "FanSample";
         case EventType::FanCommand: return "FanCommand";
+        case EventType::HeatpadStatus: return "HeatpadStatus";
         case EventType::HeatpadCommand: return "HeatpadCommand";
+        case EventType::TemperatureStatus: return "TemperatureStatus";
+        case EventType::TemperatureSample: return "TemperatureSample";
+        case EventType::Button: return "Button";
+        case EventType::ButtonRepeat: return "ButtonRepeat";
+        case EventType::EncoderStep: return "EncoderStep";
 
-        // special type
         case EventType::Count: return "Count";
     }
+
     return "Invalid";
 }
 
-} // namespace
+} // namespace Garbox

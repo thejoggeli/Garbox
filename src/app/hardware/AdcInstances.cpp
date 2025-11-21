@@ -2,7 +2,6 @@
 
 #include "core/assert/Assert.h"
 
-
 namespace Garbox {
 
 template<int32_t GpioNum>

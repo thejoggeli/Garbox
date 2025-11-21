@@ -2,7 +2,6 @@
 
 #include "core/hardware/i2c/I2c.h"
 
-
 namespace Garbox {
 
 struct I2cInstances {
