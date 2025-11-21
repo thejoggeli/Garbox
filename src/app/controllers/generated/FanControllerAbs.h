@@ -19,18 +19,25 @@ public:
     virtual void onInputTick() = 0;
     virtual void onOutputTick() = 0;
 
+    // shorthand types for read events 
+    using FanCommand = EventRead<EventPayload::FanCommand>;
+
     // receive event handlers
-    virtual void onFanCommand(const EventRead<EventPayload::FanCommand>& event) = 0;
+    virtual void onFanCommand(const FanCommand& event) = 0;
 
 protected:
 
+    // shorthand types for write events 
+    using FanStatusWrite = EventWrite<EventPayload::FanStatus>;
+    using FanSampleWrite = EventWrite<EventPayload::FanSample>;
+
     // make typed events
-    EventWrite<EventPayload::FanStatus> makeFanStatusEvent();
-    EventWrite<EventPayload::FanSample> makeFanSampleEvent();
+    FanStatusWrite makeFanStatusEvent();
+    FanSampleWrite makeFanSampleEvent();
 
     // send typed events
-    void sendEvent(const EventWrite<EventPayload::FanStatus>& event);
-    void sendEvent(const EventWrite<EventPayload::FanSample>& event);
+    void sendEvent(const FanStatusWrite& event);
+    void sendEvent(const FanSampleWrite& event);
 
 private:
 

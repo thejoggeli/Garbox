@@ -14,27 +14,27 @@ InputControllerAbs::InputControllerAbs(const RuntimeContext& context):
     // nothing to do
 }
 
-EventWrite<EventPayload::ButtonStateChanged> InputControllerAbs::makeButtonStateChangedEvent(){
+InputControllerAbs::ButtonStateChangedWrite InputControllerAbs::makeButtonStateChangedEvent(){
     return makeEvent<EventPayload::ButtonStateChanged>();
 }
 
-EventWrite<EventPayload::ButtonRepeat> InputControllerAbs::makeButtonRepeatEvent(){
+InputControllerAbs::ButtonRepeatWrite InputControllerAbs::makeButtonRepeatEvent(){
     return makeEvent<EventPayload::ButtonRepeat>();
 }
 
-EventWrite<EventPayload::EncoderStep> InputControllerAbs::makeEncoderStepEvent(){
+InputControllerAbs::EncoderStepWrite InputControllerAbs::makeEncoderStepEvent(){
     return makeEvent<EventPayload::EncoderStep>();
 }
 
-void InputControllerAbs::sendEvent(const EventWrite<EventPayload::ButtonStateChanged>& event){
+void InputControllerAbs::sendEvent(const ButtonStateChangedWrite& event){
     sendEvent(event.header);
 }
 
-void InputControllerAbs::sendEvent(const EventWrite<EventPayload::ButtonRepeat>& event){
+void InputControllerAbs::sendEvent(const ButtonRepeatWrite& event){
     sendEvent(event.header);
 }
 
-void InputControllerAbs::sendEvent(const EventWrite<EventPayload::EncoderStep>& event){
+void InputControllerAbs::sendEvent(const EncoderStepWrite& event){
     sendEvent(event.header);
 }
 

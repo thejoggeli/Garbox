@@ -14,19 +14,19 @@ FanControllerAbs::FanControllerAbs(const RuntimeContext& context):
     // nothing to do
 }
 
-EventWrite<EventPayload::FanStatus> FanControllerAbs::makeFanStatusEvent(){
+FanControllerAbs::FanStatusWrite FanControllerAbs::makeFanStatusEvent(){
     return makeEvent<EventPayload::FanStatus>();
 }
 
-EventWrite<EventPayload::FanSample> FanControllerAbs::makeFanSampleEvent(){
+FanControllerAbs::FanSampleWrite FanControllerAbs::makeFanSampleEvent(){
     return makeEvent<EventPayload::FanSample>();
 }
 
-void FanControllerAbs::sendEvent(const EventWrite<EventPayload::FanStatus>& event){
+void FanControllerAbs::sendEvent(const FanStatusWrite& event){
     sendEvent(event.header);
 }
 
-void FanControllerAbs::sendEvent(const EventWrite<EventPayload::FanSample>& event){
+void FanControllerAbs::sendEvent(const FanSampleWrite& event){
     sendEvent(event.header);
 }
 

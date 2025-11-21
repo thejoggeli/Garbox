@@ -20,11 +20,12 @@ void HeatpadController::onStart(){
 void HeatpadController::onInputTick(){
     // nothing to do
 }
+
 void HeatpadController::onOutputTick(){
     // nothing to do
 }
 
-void HeatpadController::onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand>& event){
+void HeatpadController::onHeatpadCommand(const HeatpadCommand& event){
     // nothing to do
 }
 

@@ -21,7 +21,7 @@ void I2cPartsController::onInputTick(){
     // nothing to do
 }
 
-void I2cPartsController::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
+void I2cPartsController::onButtonStateChanged(const ButtonStateChanged& event){
     // nothing to do
 }
 

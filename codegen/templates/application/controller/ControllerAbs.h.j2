@@ -15,33 +15,43 @@ public:
     // controller constructor
     {{ name }}Abs(const RuntimeContext& context);
     {# ---- Tick handlers ---- #}
-    {% if controller.ticks %}
+{% if controller.ticks %}
 
     // tick handlers
-        {% for tick in controller.ticks %}
+{% for tick in controller.ticks %}
     virtual void on{{ tick }}() = 0;
-        {% endfor %}
-    {% endif %}
-    {# ---- Receive event typedefs + virtual handlers ---- #}
-    {% if controller.receives %}
+{% endfor %}
+{% endif %}
+{# ---- Receive event typedefs + virtual handlers ---- #}
+{% if controller.receives %}
+
+    // shorthand types for read events 
+{% for ev in controller.receives %}
+    using {{ ev }} = EventRead<EventPayload::{{ ev }}>;
+{% endfor %}
 
     // receive event handlers
-        {% for ev in controller.receives %}
-    virtual void on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event) = 0;
-        {% endfor %}
-    {% endif %}
+{% for ev in controller.receives %}
+    virtual void on{{ ev }}(const {{ ev }}& event) = 0;
+{% endfor %}
+{% endif %}
 
 protected:
 {% if controller.sends %}
 
+    // shorthand types for write events 
+{% for ev in controller.sends %}
+    using {{ ev }}Write = EventWrite<EventPayload::{{ ev }}>;
+{% endfor %}
+
     // make typed events
 {% for ev in controller.sends %}
-    EventWrite<EventPayload::{{ ev }}> make{{ ev }}Event();
+    {{ ev }}Write make{{ ev }}Event();
 {% endfor %}
 
     // send typed events
 {% for ev in controller.sends %}
-    void sendEvent(const EventWrite<EventPayload::{{ ev }}>& event);
+    void sendEvent(const {{ ev }}Write& event);
 {% endfor %}
 {% endif %}
 

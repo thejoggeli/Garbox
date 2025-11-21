@@ -12,27 +12,27 @@ FermentationBehaviourAbs::FermentationBehaviourAbs(const RuntimeContext& context
     // nothing to do
 }
 
-EventWrite<EventPayload::FanCommand> FermentationBehaviourAbs::makeFanCommandEvent(){
+FermentationBehaviourAbs::FanCommandWrite FermentationBehaviourAbs::makeFanCommandEvent(){
     return makeEvent<EventPayload::FanCommand>();
 }
 
-EventWrite<EventPayload::BacklightCommand> FermentationBehaviourAbs::makeBacklightCommandEvent(){
+FermentationBehaviourAbs::BacklightCommandWrite FermentationBehaviourAbs::makeBacklightCommandEvent(){
     return makeEvent<EventPayload::BacklightCommand>();
 }
 
-EventWrite<EventPayload::HeatpadCommand> FermentationBehaviourAbs::makeHeatpadCommandEvent(){
+FermentationBehaviourAbs::HeatpadCommandWrite FermentationBehaviourAbs::makeHeatpadCommandEvent(){
     return makeEvent<EventPayload::HeatpadCommand>();
 }
 
-void FermentationBehaviourAbs::sendEvent(const EventWrite<EventPayload::FanCommand>& event){
+void FermentationBehaviourAbs::sendEvent(const FanCommandWrite& event){
     sendEvent(event.header);
 }
 
-void FermentationBehaviourAbs::sendEvent(const EventWrite<EventPayload::BacklightCommand>& event){
+void FermentationBehaviourAbs::sendEvent(const BacklightCommandWrite& event){
     sendEvent(event.header);
 }
 
-void FermentationBehaviourAbs::sendEvent(const EventWrite<EventPayload::HeatpadCommand>& event){
+void FermentationBehaviourAbs::sendEvent(const HeatpadCommandWrite& event){
     sendEvent(event.header);
 }
 

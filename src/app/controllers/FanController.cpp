@@ -53,7 +53,7 @@ void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const EventRead<EventPayload::FanCommand>& event){
+void FanController::onFanCommand(const FanCommand& event){
     // apply enabled
     if(mFan.isEnabled() != event.payload->enabled){
         mFan.setEnabled(event.payload->enabled);

@@ -14,7 +14,7 @@ public:
     I2cPartsController(const RuntimeContext& context);
 
     void onInputTick() final;
-    void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) final;
+    void onButtonStateChanged(const ButtonStateChanged& event) final;
 
 private:
 

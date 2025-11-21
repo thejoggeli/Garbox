@@ -26,20 +26,20 @@ void {{ name }}::onBecomeInactive(){
     // nothing to do
 }
 {% if behaviour.ticks %}
-    {% for tick in behaviour.ticks %}
+{% for tick in behaviour.ticks %}
 
 void {{ name }}::on{{ tick }}(){
     // nothing to do
 }
-    {% endfor %}
+{% endfor %}
 {% endif %}
 {% if behaviour.receives %}
-    {% for ev in behaviour.receives %}
+{% for ev in behaviour.receives %}
 
-void {{ name }}::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
+void {{ name }}::on{{ ev }}(const {{ ev }}& event){
     // nothing to do
 }
-    {% endfor %}
+{% endfor %}
 {% endif %}
 
 } // namespace Garbox

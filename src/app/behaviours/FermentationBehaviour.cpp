@@ -48,11 +48,11 @@ void FermentationBehaviour::onLogicTick(){
     }
 }
 
-void FermentationBehaviour::onHeartbeat(const EventRead<EventPayload::Heartbeat>& event){
+void FermentationBehaviour::onHeartbeat(const Heartbeat& event){
     mHeartbeatReceived = true;
 }
 
-void FermentationBehaviour::onFanStatus(const EventRead<EventPayload::FanStatus>& event){
+void FermentationBehaviour::onFanStatus(const FanStatus& event){
     LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%",
         FanStateToString(event.payload->state),
         event.payload->targetSpeed * 100.0f
@@ -63,12 +63,12 @@ void FermentationBehaviour::onFanStatus(const EventRead<EventPayload::FanStatus>
     inputs.fanTargetSpeed = event.payload->targetSpeed;
 }
 
-void FermentationBehaviour::onFanSample(const EventRead<EventPayload::FanSample>& event){
+void FermentationBehaviour::onFanSample(const FanSample& event){
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
     inputs.fanMeasuredRpm = event.payload->measuredRpm;
 }
 
-void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event){
+void FermentationBehaviour::onHeatpadStatus(const HeatpadStatus& event){
     LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
         HeatpadStateToString(event.payload->state),
         event.payload->dutyCycle * 100.0f,
@@ -80,7 +80,7 @@ void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::Heatpa
     inputs.heatpadPwmPeriodMicros = event.payload->periodMicros; 
 }
 
-void FermentationBehaviour::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
+void FermentationBehaviour::onTemperatureStatus(const TemperatureStatus& event){
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
     inputs.temperatureEnabled = event.payload->powerEnabled && event.payload->driverEnabled;
     inputs.temperatureError = !inputs.temperatureEnabled && !event.payload->resetting; 
@@ -89,7 +89,7 @@ void FermentationBehaviour::onTemperatureStatus(const EventRead<EventPayload::Te
     );
 }
 
-void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
+void FermentationBehaviour::onTemperatureSample(const TemperatureSample& event){
     LogDebug("FermentationBehaviour", "[TemperatureSample] temp=%.2f°C, hum=%.2f%%",
         event.payload->temperatureCelcius,
         event.payload->humidityRelative
@@ -99,7 +99,7 @@ void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::Te
     inputs.humidityRelative = event.payload->humidityRelative;
 }
 
-void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
+void FermentationBehaviour::onButtonStateChanged(const ButtonStateChanged& event){
     if(event.payload->newState == ButtonState::Released){
         static uint32_t b = 4;
         b = MathUtils::Wrap(b+1, 5u);
@@ -109,11 +109,11 @@ void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::B
     }
 }
     
-void FermentationBehaviour::onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event){
+void FermentationBehaviour::onButtonRepeat(const ButtonRepeat& event){
     // nothing to do
 }
     
-void FermentationBehaviour::onEncoderStep(const EventRead<EventPayload::EncoderStep>& event){
+void FermentationBehaviour::onEncoderStep(const EncoderStep& event){
     // nothing to do
 }
 

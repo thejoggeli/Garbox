@@ -21,5 +21,4 @@ void HeartbeatController::onHeartbeatTick(){
     // nothing to do
 }
 
-
 } // namespace Garbox

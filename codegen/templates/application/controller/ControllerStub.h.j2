@@ -19,7 +19,7 @@ public:
     {% if controller.receives %}
 
         {% for ev in controller.receives %}
-    void on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event) final;
+    void on{{ ev }}(const {{ ev }}& event) final;
         {% endfor %}
     {% endif %}
 

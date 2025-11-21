@@ -6,6 +6,7 @@
 
 #include "core/application/runtime/RuntimeAbs.h"
 
+#include "app/behaviours/CalibrationBehaviour.h"
 #include "app/behaviours/FermentationBehaviour.h"
 
 #include "app/controllers/DisplayController.h"
@@ -23,13 +24,14 @@ public:
     GarboxRuntime();
 
     void onRenderTick();
+    void onHeartbeatTick();
+    void onInputTick();
     void onOutputTick();
     void onLogicTick();
-    void onInputTick();
-    void onHeartbeatTick();
 
 private:
 
+    CalibrationBehaviour mCalibrationBehaviour;
     FermentationBehaviour mFermentationBehaviour;
 
     DisplayController mDisplayController;

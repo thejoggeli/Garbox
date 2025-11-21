@@ -20,15 +20,20 @@ public:
 
 protected:
 
+    // shorthand types for write events 
+    using ButtonStateChangedWrite = EventWrite<EventPayload::ButtonStateChanged>;
+    using ButtonRepeatWrite = EventWrite<EventPayload::ButtonRepeat>;
+    using EncoderStepWrite = EventWrite<EventPayload::EncoderStep>;
+
     // make typed events
-    EventWrite<EventPayload::ButtonStateChanged> makeButtonStateChangedEvent();
-    EventWrite<EventPayload::ButtonRepeat> makeButtonRepeatEvent();
-    EventWrite<EventPayload::EncoderStep> makeEncoderStepEvent();
+    ButtonStateChangedWrite makeButtonStateChangedEvent();
+    ButtonRepeatWrite makeButtonRepeatEvent();
+    EncoderStepWrite makeEncoderStepEvent();
 
     // send typed events
-    void sendEvent(const EventWrite<EventPayload::ButtonStateChanged>& event);
-    void sendEvent(const EventWrite<EventPayload::ButtonRepeat>& event);
-    void sendEvent(const EventWrite<EventPayload::EncoderStep>& event);
+    void sendEvent(const ButtonStateChangedWrite& event);
+    void sendEvent(const ButtonRepeatWrite& event);
+    void sendEvent(const EncoderStepWrite& event);
 
 private:
 

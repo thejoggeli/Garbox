@@ -19,16 +19,22 @@ public:
     virtual void onInputTick() = 0;
     virtual void onOutputTick() = 0;
 
+    // shorthand types for read events 
+    using HeatpadCommand = EventRead<EventPayload::HeatpadCommand>;
+
     // receive event handlers
-    virtual void onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand>& event) = 0;
+    virtual void onHeatpadCommand(const HeatpadCommand& event) = 0;
 
 protected:
 
+    // shorthand types for write events 
+    using HeatpadStatusWrite = EventWrite<EventPayload::HeatpadStatus>;
+
     // make typed events
-    EventWrite<EventPayload::HeatpadStatus> makeHeatpadStatusEvent();
+    HeatpadStatusWrite makeHeatpadStatusEvent();
 
     // send typed events
-    void sendEvent(const EventWrite<EventPayload::HeatpadStatus>& event);
+    void sendEvent(const HeatpadStatusWrite& event);
 
 private:
 

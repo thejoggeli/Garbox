@@ -20,7 +20,7 @@ void {{ name }}Abs::on{{ tick }}(){
 {% if behaviour.receives_null %}
     {% for ev in behaviour.receives_null %}
 
-void {{ name }}Abs::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
+void {{ name }}Abs::on{{ ev }}(const {{ ev }}& event){
     // no-op. add event handler to behaviour in yaml to enable 
 }
     {% endfor %}
@@ -28,13 +28,13 @@ void {{ name }}Abs::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
 {% if behaviour.sends %}
 {% for ev in behaviour.sends %}
 
-EventWrite<EventPayload::{{ ev }}> {{ name }}Abs::make{{ ev }}Event(){
+{{ name }}Abs::{{ ev }}Write {{ name }}Abs::make{{ ev }}Event(){
     return makeEvent<EventPayload::{{ ev }}>();
 }
 {% endfor %}
 {% for ev in behaviour.sends %}
 
-void {{ name }}Abs::sendEvent(const EventWrite<EventPayload::{{ ev }}>& event){
+void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
     sendEvent(event.header);
 }
 {% endfor %}

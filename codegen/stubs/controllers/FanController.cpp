@@ -20,11 +20,12 @@ void FanController::onStart(){
 void FanController::onInputTick(){
     // nothing to do
 }
+
 void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const EventRead<EventPayload::FanCommand>& event){
+void FanController::onFanCommand(const FanCommand& event){
     // nothing to do
 }
 

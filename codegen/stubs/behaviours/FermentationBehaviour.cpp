@@ -31,39 +31,39 @@ void FermentationBehaviour::onLogicTick(){
     // nothing to do
 }
 
-void FermentationBehaviour::onHeartbeat(const EventRead<EventPayload::Heartbeat>& event){
+void FermentationBehaviour::onHeartbeat(const Heartbeat& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onFanStatus(const EventRead<EventPayload::FanStatus>& event){
+void FermentationBehaviour::onFanStatus(const FanStatus& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onFanSample(const EventRead<EventPayload::FanSample>& event){
+void FermentationBehaviour::onFanSample(const FanSample& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event){
+void FermentationBehaviour::onHeatpadStatus(const HeatpadStatus& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
+void FermentationBehaviour::onTemperatureStatus(const TemperatureStatus& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
+void FermentationBehaviour::onTemperatureSample(const TemperatureSample& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
+void FermentationBehaviour::onButtonStateChanged(const ButtonStateChanged& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event){
+void FermentationBehaviour::onButtonRepeat(const ButtonRepeat& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onEncoderStep(const EventRead<EventPayload::EncoderStep>& event){
+void FermentationBehaviour::onEncoderStep(const EncoderStep& event){
     // nothing to do
 }
 

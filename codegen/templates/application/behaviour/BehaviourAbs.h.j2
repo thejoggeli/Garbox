@@ -10,30 +10,23 @@ class {{ name }}Abs : public BaseBehaviourAbs {
 public:
 
     {{ name }}Abs(const RuntimeContext& context);
-    {% if behaviour.ticks_null %}
-
-        {% for tick in behaviour.ticks_null %}
-    void on{{ tick }}() final;
-        {% endfor %}
-    {% endif %}
-    {% if behaviour.receives_null %}
-
-        {% for ev in behaviour.receives_null %}
-    void on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event) final;
-        {% endfor %}
-    {% endif %}
 
 protected:
 {% if behaviour.sends %}
 
+    // shorthand types for write events 
+{% for ev in behaviour.sends %}
+    using {{ ev }}Write = EventWrite<EventPayload::{{ ev }}>;
+{% endfor %}
+
     // make typed events
 {% for ev in behaviour.sends %}
-    EventWrite<EventPayload::{{ ev }}> make{{ ev }}Event();
+    {{ ev }}Write make{{ ev }}Event();
 {% endfor %}
 
     // send typed events
 {% for ev in behaviour.sends %}
-    void sendEvent(const EventWrite<EventPayload::{{ ev }}>& event);
+    void sendEvent(const {{ ev }}Write& event);
 {% endfor %}
 {% endif %}
 
@@ -42,6 +35,25 @@ private:
     // hide event methods
     using BehaviourAbs::makeEvent;
     using BehaviourAbs::sendEvent;
+{% if behaviour.ticks_null %}
+
+    // hide unused ticks
+{% for tick in behaviour.ticks_null %}
+    void on{{ tick }}() final;
+{% endfor %}
+{% endif %}
+{% if behaviour.receives_null %}
+
+    // hide unused shorthand types 
+{% for ev in behaviour.receives %}
+    using BaseBehaviourAbs::{{ ev }};
+{% endfor %}
+
+    // hide unsued event handlers
+{% for ev in behaviour.receives_null %}
+    void on{{ ev }}(const {{ ev }}& event) final;
+{% endfor %}
+{% endif %}
 
 };
 

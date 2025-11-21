@@ -23,13 +23,18 @@ public:
         {% endfor %}
     {% endif %}
     {# ---- Receive event typedefs + virtual handlers ---- #}
-    {% if behaviour.receives %}
+{% if behaviour.receives %}
+
+    // shorthand types for read events 
+{% for ev in behaviour.receives %}
+    using {{ ev }} = EventRead<EventPayload::{{ ev }}>;
+{% endfor %}
 
     // receive event handlers
-        {% for ev in behaviour.receives %}
-    virtual void on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event) = 0;
-        {% endfor %}
-    {% endif %}
+{% for ev in behaviour.receives %}
+    virtual void on{{ ev }}(const {{ ev }}& event) = 0;
+{% endfor %}
+{% endif %}
 
 };
 

@@ -9,6 +9,7 @@
 namespace Garbox {
 
 GarboxRuntime::GarboxRuntime():
+    mCalibrationBehaviour(getContext()),
     mFermentationBehaviour(getContext()),
     mDisplayController(getContext()),
     mFanController(getContext()),
@@ -21,6 +22,7 @@ GarboxRuntime::GarboxRuntime():
 }
 
 void GarboxRuntime::onRegisterBehaviours(){
+    registerBehaviour(&mCalibrationBehaviour);
     registerBehaviour(&mFermentationBehaviour);
 }
 
@@ -47,16 +49,8 @@ void GarboxRuntime::onRenderTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onOutputTick(){
-    mFanController.onOutputTick();
-    mHeatpadController.onOutputTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onLogicTick(){
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-    behaviour->onLogicTick();
+void GarboxRuntime::onHeartbeatTick(){
+    mHeartbeatController.onHeartbeatTick();
     dispatchEvents();
 }
 
@@ -68,8 +62,16 @@ void GarboxRuntime::onInputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onHeartbeatTick(){
-    mHeartbeatController.onHeartbeatTick();
+void GarboxRuntime::onOutputTick(){
+    mFanController.onOutputTick();
+    mHeatpadController.onOutputTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onLogicTick(){
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    behaviour->onLogicTick();
     dispatchEvents();
 }
 

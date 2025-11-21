@@ -14,11 +14,11 @@ HeartbeatControllerAbs::HeartbeatControllerAbs(const RuntimeContext& context):
     // nothing to do
 }
 
-EventWrite<EventPayload::Heartbeat> HeartbeatControllerAbs::makeHeartbeatEvent(){
+HeartbeatControllerAbs::HeartbeatWrite HeartbeatControllerAbs::makeHeartbeatEvent(){
     return makeEvent<EventPayload::Heartbeat>();
 }
 
-void HeartbeatControllerAbs::sendEvent(const EventWrite<EventPayload::Heartbeat>& event){
+void HeartbeatControllerAbs::sendEvent(const HeartbeatWrite& event){
     sendEvent(event.header);
 }
 

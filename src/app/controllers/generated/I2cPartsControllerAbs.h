@@ -18,18 +18,25 @@ public:
     // tick handlers
     virtual void onInputTick() = 0;
 
+    // shorthand types for read events 
+    using ButtonStateChanged = EventRead<EventPayload::ButtonStateChanged>;
+
     // receive event handlers
-    virtual void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) = 0;
+    virtual void onButtonStateChanged(const ButtonStateChanged& event) = 0;
 
 protected:
 
+    // shorthand types for write events 
+    using TemperatureStatusWrite = EventWrite<EventPayload::TemperatureStatus>;
+    using TemperatureSampleWrite = EventWrite<EventPayload::TemperatureSample>;
+
     // make typed events
-    EventWrite<EventPayload::TemperatureStatus> makeTemperatureStatusEvent();
-    EventWrite<EventPayload::TemperatureSample> makeTemperatureSampleEvent();
+    TemperatureStatusWrite makeTemperatureStatusEvent();
+    TemperatureSampleWrite makeTemperatureSampleEvent();
 
     // send typed events
-    void sendEvent(const EventWrite<EventPayload::TemperatureStatus>& event);
-    void sendEvent(const EventWrite<EventPayload::TemperatureSample>& event);
+    void sendEvent(const TemperatureStatusWrite& event);
+    void sendEvent(const TemperatureSampleWrite& event);
 
 private:
 

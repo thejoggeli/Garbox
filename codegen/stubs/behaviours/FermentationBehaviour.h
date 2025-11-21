@@ -14,15 +14,15 @@ public:
 
     void onLogicTick() final;
 
-    void onHeartbeat(const EventRead<EventPayload::Heartbeat>& event) final;
-    void onFanStatus(const EventRead<EventPayload::FanStatus>& event) final;
-    void onFanSample(const EventRead<EventPayload::FanSample>& event) final;
-    void onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event) final;
-    void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) final;
-    void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) final;
-    void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) final;
-    void onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event) final;
-    void onEncoderStep(const EventRead<EventPayload::EncoderStep>& event) final;
+    void onHeartbeat(const Heartbeat& event) final;
+    void onFanStatus(const FanStatus& event) final;
+    void onFanSample(const FanSample& event) final;
+    void onHeatpadStatus(const HeatpadStatus& event) final;
+    void onTemperatureStatus(const TemperatureStatus& event) final;
+    void onTemperatureSample(const TemperatureSample& event) final;
+    void onButtonStateChanged(const ButtonStateChanged& event) final;
+    void onButtonRepeat(const ButtonRepeat& event) final;
+    void onEncoderStep(const EncoderStep& event) final;
 
 private:
 

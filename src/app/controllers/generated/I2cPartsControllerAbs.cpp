@@ -14,19 +14,19 @@ I2cPartsControllerAbs::I2cPartsControllerAbs(const RuntimeContext& context):
     // nothing to do
 }
 
-EventWrite<EventPayload::TemperatureStatus> I2cPartsControllerAbs::makeTemperatureStatusEvent(){
+I2cPartsControllerAbs::TemperatureStatusWrite I2cPartsControllerAbs::makeTemperatureStatusEvent(){
     return makeEvent<EventPayload::TemperatureStatus>();
 }
 
-EventWrite<EventPayload::TemperatureSample> I2cPartsControllerAbs::makeTemperatureSampleEvent(){
+I2cPartsControllerAbs::TemperatureSampleWrite I2cPartsControllerAbs::makeTemperatureSampleEvent(){
     return makeEvent<EventPayload::TemperatureSample>();
 }
 
-void I2cPartsControllerAbs::sendEvent(const EventWrite<EventPayload::TemperatureStatus>& event){
+void I2cPartsControllerAbs::sendEvent(const TemperatureStatusWrite& event){
     sendEvent(event.header);
 }
 
-void I2cPartsControllerAbs::sendEvent(const EventWrite<EventPayload::TemperatureSample>& event){
+void I2cPartsControllerAbs::sendEvent(const TemperatureSampleWrite& event){
     sendEvent(event.header);
 }
 

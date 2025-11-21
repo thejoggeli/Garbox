@@ -21,5 +21,4 @@ void InputController::onInputTick(){
     // nothing to do
 }
 
-
 } // namespace Garbox

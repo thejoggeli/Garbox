@@ -15,21 +15,21 @@ void {{ name }}::onInit(){
 void {{ name }}::onStart(){
     // nothing to do
 }
-
 {% if controller.ticks %}
-    {% for tick in controller.ticks %}
+{% for tick in controller.ticks %}
+
 void {{ name }}::on{{ tick }}(){
     // nothing to do
 }
-    {% endfor %}
+{% endfor %}
 {% endif %}
-
 {% if controller.receives %}
-    {% for ev in controller.receives %}
-void {{ name }}::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
+{% for ev in controller.receives %}
+
+void {{ name }}::on{{ ev }}(const {{ ev }}& event){
     // nothing to do
 }
-    {% endfor %}
+{% endfor %}
 {% endif %}
 
 } // namespace Garbox

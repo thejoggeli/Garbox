@@ -15,15 +15,20 @@ public:
 
 protected:
 
+    // shorthand types for write events 
+    using FanCommandWrite = EventWrite<EventPayload::FanCommand>;
+    using BacklightCommandWrite = EventWrite<EventPayload::BacklightCommand>;
+    using HeatpadCommandWrite = EventWrite<EventPayload::HeatpadCommand>;
+
     // make typed events
-    EventWrite<EventPayload::FanCommand> makeFanCommandEvent();
-    EventWrite<EventPayload::BacklightCommand> makeBacklightCommandEvent();
-    EventWrite<EventPayload::HeatpadCommand> makeHeatpadCommandEvent();
+    FanCommandWrite makeFanCommandEvent();
+    BacklightCommandWrite makeBacklightCommandEvent();
+    HeatpadCommandWrite makeHeatpadCommandEvent();
 
     // send typed events
-    void sendEvent(const EventWrite<EventPayload::FanCommand>& event);
-    void sendEvent(const EventWrite<EventPayload::BacklightCommand>& event);
-    void sendEvent(const EventWrite<EventPayload::HeatpadCommand>& event);
+    void sendEvent(const FanCommandWrite& event);
+    void sendEvent(const BacklightCommandWrite& event);
+    void sendEvent(const HeatpadCommandWrite& event);
 
 private:
 

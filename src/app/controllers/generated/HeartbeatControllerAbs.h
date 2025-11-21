@@ -20,11 +20,14 @@ public:
 
 protected:
 
+    // shorthand types for write events 
+    using HeartbeatWrite = EventWrite<EventPayload::Heartbeat>;
+
     // make typed events
-    EventWrite<EventPayload::Heartbeat> makeHeartbeatEvent();
+    HeartbeatWrite makeHeartbeatEvent();
 
     // send typed events
-    void sendEvent(const EventWrite<EventPayload::Heartbeat>& event);
+    void sendEvent(const HeartbeatWrite& event);
 
 private:
 

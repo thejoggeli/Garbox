@@ -14,11 +14,11 @@ HeatpadControllerAbs::HeatpadControllerAbs(const RuntimeContext& context):
     // nothing to do
 }
 
-EventWrite<EventPayload::HeatpadStatus> HeatpadControllerAbs::makeHeatpadStatusEvent(){
+HeatpadControllerAbs::HeatpadStatusWrite HeatpadControllerAbs::makeHeatpadStatusEvent(){
     return makeEvent<EventPayload::HeatpadStatus>();
 }
 
-void HeatpadControllerAbs::sendEvent(const EventWrite<EventPayload::HeatpadStatus>& event){
+void HeatpadControllerAbs::sendEvent(const HeatpadStatusWrite& event){
     sendEvent(event.header);
 }
 

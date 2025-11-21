@@ -14,7 +14,7 @@ public:
 
     void onInputTick() final;
 
-    void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) final;
+    void onButtonStateChanged(const ButtonStateChanged& event) final;
 
 private:
 

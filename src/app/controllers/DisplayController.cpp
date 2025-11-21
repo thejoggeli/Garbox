@@ -96,20 +96,20 @@ void DisplayController::onRenderTick(){
     }
 }
 
-void DisplayController::onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event){
+void DisplayController::onTemperatureStatus(const TemperatureStatus& event){
     mNewState.shtDriver = event.payload->driverEnabled;
     mNewState.shtPower = event.payload->powerEnabled;
     mNewState.shtReset = event.payload->resetting;
     mDirty.shtState = true;
 }
 
-void DisplayController::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
+void DisplayController::onTemperatureSample(const TemperatureSample& event){
     mNewState.shtTemp = event.payload->temperatureCelcius;
     mNewState.shtHum = event.payload->humidityRelative;
     mDirty.shtSample = true;
 }
 
-void DisplayController::onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event){
+void DisplayController::onBacklightCommand(const BacklightCommand& event){
     setBrightnessSmooth(event.payload->brightness, 1000_ms);
 };
 

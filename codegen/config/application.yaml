@@ -35,6 +35,10 @@ controllers:
 
 initial_behaviour: FermentationBehaviour
 behaviours:
+  CalibrationBehaviour:
+    ticks: [Logic]
+    receives: [Heartbeat, FanStatus, FanSample]
+    sends: [FanCommand]
   FermentationBehaviour:
     ticks: [Logic]
     receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]
