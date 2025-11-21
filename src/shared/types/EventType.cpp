@@ -14,6 +14,7 @@ const char* EventTypeToString(EventType type){
         case EventType::Null: return "Null";
 
         case EventType::Heartbeat: return "Heartbeat";
+        case EventType::BacklightCommand: return "BacklightCommand";
         case EventType::FanStatus: return "FanStatus";
         case EventType::FanSample: return "FanSample";
         case EventType::FanCommand: return "FanCommand";

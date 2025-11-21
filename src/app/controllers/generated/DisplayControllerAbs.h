@@ -21,6 +21,7 @@ public:
     // receive event handlers
     virtual void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) = 0;
     virtual void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) = 0;
+    virtual void onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event) = 0;
 
 };
 

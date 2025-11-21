@@ -6,7 +6,7 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/hardware/spi/SpiDma.h"
-#include "core/util/ByteUtils.h"
+#include "core/util/helpers/ByteUtils.h"
 #include "core/util/color/types/Rgb565.h"
 #include "core/util/color/types/Rgb888.h"
 #include "core/util/color/types/HslColor.h"
@@ -51,7 +51,6 @@ void Display::init(){
     // send st7789v display init sequence
     mSt7789v.sendReset();
     mSt7789v.sendInit();
-    mSt7789v.setBrightness(0.75f);
 
     // init lvgl handler
     mLvglHandler.init();
@@ -227,6 +226,14 @@ void Display::handleSt7789vSendSync(const uint8_t* data, size_t numBytes){
 
 void Display::handleSt7789vSendAsync(const uint8_t* data, size_t numBytes){
     mChunkSender.start(data, numBytes);
+}
+
+void Display::setBrightness(float brightness) {
+    mSt7789v.setBrightness(brightness);
+}
+
+float Display::getBrightness() const {
+    return mSt7789v.getBrightness();
 }
 
 }  // namespace Garbox

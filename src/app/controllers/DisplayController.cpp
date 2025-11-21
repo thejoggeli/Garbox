@@ -3,6 +3,8 @@
 #include <esp_heap_caps.h>
 #include "app/providers/PartsProvider.h"
 #include "core/log/Log.h"
+#include "core/util/function/default/EasingFunctions.h"
+#include "core/util/math/MathUtils.h"
 #include "modules/parts/display/Display.h"
 #include "modules/parts/fan/Fan.h"
 #include "modules/parts/heatpad/Heatpad.h"
@@ -17,14 +19,20 @@ DisplayController::DisplayController(const RuntimeContext& context):
 }
 
 void DisplayController::onInit(){
-    // display already initialized in parts provider
+    mBacklightTransition.setEasingFunction(EasingFunctions::GetOutSine());
 }
 
 void DisplayController::onStart(){
     mHeapTimer.start(1000_ms);
+    setBrightnessSmooth(0.65f, 1500_ms);
 }
 
 void DisplayController::onRenderTick(){
+
+    if(mBacklightTransition.isActive()){
+        float brightness = mBacklightTransition.updateValue();
+        mDisplay.setBrightness(brightness);
+    }
 
     if(mHeapTimer.isExpired()){
         mNewState.heapSpace = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
@@ -46,19 +54,26 @@ void DisplayController::onRenderTick(){
         mNewState.heatpadVoltage = heatpad.getMeasuredVoltage();
         mNewState.heatpadCurrent = heatpad.getMeasuredCurrent();
         mNewState.renderSkippedCount = mRenderSkippedCount;
+        mNewState.brightness = mDisplay.getBrightness();
 
-        if(mNewState.fanState != mOldState.fanState || mNewState.fanTargetSpeed != mOldState.fanTargetSpeed) 
+        if(mNewState.fanState != mOldState.fanState || mNewState.fanTargetSpeed != mOldState.fanTargetSpeed){
             lv.setFanState(FanStateToString(mNewState.fanState), mNewState.fanTargetSpeed);
-        if(mNewState.fanMeasuredRpm != mOldState.fanMeasuredRpm) 
+        }
+        if(mNewState.fanMeasuredRpm != mOldState.fanMeasuredRpm){
             lv.setFanMeasuredRpm(mNewState.fanMeasuredRpm);
-        if(mNewState.heatpadState != mOldState.heatpadState) 
+        }
+        if(mNewState.heatpadState != mOldState.heatpadState){
             lv.setHeatpadState(HeatpadStateToString(mNewState.heatpadState));
-        if(mNewState.heatpadDuty != mOldState.heatpadDuty) 
+        }
+        if(mNewState.heatpadDuty != mOldState.heatpadDuty){ 
             lv.setHeatpadDuty(mNewState.heatpadDuty);
-        if(mNewState.heatpadVoltage != mOldState.heatpadVoltage || mNewState.heatpadCurrent != mOldState.heatpadCurrent) 
+        }
+        if(mNewState.heatpadVoltage != mOldState.heatpadVoltage || mNewState.heatpadCurrent != mOldState.heatpadCurrent){
             lv.setHeatpadSense(mNewState.heatpadVoltage, mNewState.heatpadCurrent);
-        if(mNewState.renderSkippedCount != mOldState.renderSkippedCount) 
-            lv.setRenderSkippedCount(mNewState.renderSkippedCount);
+        }
+        if(mNewState.renderSkippedCount != mOldState.renderSkippedCount || mNewState.brightness != mOldState.brightness){
+            lv.setDisplayState(mNewState.brightness, mNewState.renderSkippedCount);
+        } 
         if(mDirty.shtState){
             lv.setTemperatureState(mNewState.shtPower, mNewState.shtDriver, mNewState.shtReset);
             mDirty.shtState = false;
@@ -92,6 +107,15 @@ void DisplayController::onTemperatureSample(const EventRead<EventPayload::Temper
     mNewState.shtTemp = event.payload->temperatureCelcius;
     mNewState.shtHum = event.payload->humidityRelative;
     mDirty.shtSample = true;
+}
+
+void DisplayController::onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event){
+    setBrightnessSmooth(event.payload->brightness, 1000_ms);
+};
+
+void DisplayController::setBrightnessSmooth(float targetBrightness, uint32_t durationMicros){
+    const float startBrightness = mDisplay.getBrightness();
+    mBacklightTransition.start(startBrightness, targetBrightness, durationMicros);
 }
 
 } // namespace

@@ -43,20 +43,17 @@ void LvglObjects::init(lv_obj_t *parentObject){
     mHeatpadStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad state: "); currentYPx += deltaYPx;
     mHeatpadDutyLabel        = createLabel(parentObject, startXPx, currentYPx, "Heatpad duty:  "); currentYPx += deltaYPx;
     mHeatpadSenseLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad sense: ");currentYPx += deltaYPx;
-    mRenderSkippedCountLabel = createLabel(parentObject, startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
+    mDisplayStateLabel = createLabel(parentObject, startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
     mTemperatureStateLabel   = createLabel(parentObject, startXPx, currentYPx, "Sht31 state: "); currentYPx += deltaYPx;
     mTemperatureSampleLabel  = createLabel(parentObject, startXPx, currentYPx, "Sht31 sample:"); currentYPx += deltaYPx;
     mHeapSpaceLabel          = createLabel(parentObject, startXPx, currentYPx, "Heap space:"); currentYPx += deltaYPx;
 }
 
 void LvglObjects::setFanState(const char *stateText, float targetSpeed){
-    setFormatted(mFanStateLabel, "Fan state: state=%s, speed=%.1f", stateText, targetSpeed);
+    setFormatted(mFanStateLabel, "Fan state: state=%s, speed=%.1f%%", stateText, targetSpeed*100.0f);
 }
 
 void LvglObjects::setFanMeasuredRpm(float rpmValue){
-    if(rpmValue < 0.0f) rpmValue = 0.0f;
-    else if(rpmValue > 5000.0f) rpmValue = 5000.0f;
-
     setFormatted(mFanMeasuredRpmLabel, "Fan measured rpm: %.0f", rpmValue);
 }
 
@@ -64,19 +61,16 @@ void LvglObjects::setHeatpadState(const char *stateText){
     setFormatted(mHeatpadStateLabel, "Heatpad state: %s", stateText);
 }
 
-void LvglObjects::setHeatpadDuty(float duty01){
-    if(duty01 < 0.0f) duty01 = 0.0f;
-    else if(duty01 > 1.0f) duty01 = 1.0f;
-
-    setFormatted(mHeatpadDutyLabel, "Heatpad duty:  %.2f", duty01);
+void LvglObjects::setHeatpadDuty(float duty){
+    setFormatted(mHeatpadDutyLabel, "Heatpad duty:  %.1f%%", duty*100.0f);
 }
 
 void LvglObjects::setHeatpadSense(float voltageVolts, float currentAmps){
     setFormatted(mHeatpadSenseLabel, "Heatpad sense: %4.1fV, %3.1fA", voltageVolts, currentAmps);
 }
 
-void LvglObjects::setRenderSkippedCount(uint32_t count){
-    setFormatted(mRenderSkippedCountLabel, "Render skipped count: %u", count);
+void LvglObjects::setDisplayState(float brightness, uint32_t skipped){
+    setFormatted(mDisplayStateLabel, "Display: b=%.1f%%, skip=%u", brightness*100.0f, skipped);
 }
 
 void LvglObjects::setTemperatureState(bool power, bool driver, bool reset){
@@ -84,11 +78,11 @@ void LvglObjects::setTemperatureState(bool power, bool driver, bool reset){
 }
 
 void LvglObjects::setTemperatureSample(float t, float h){
-    setFormatted(mTemperatureSampleLabel, "Sht31 sample: t=%.2f°C, h=%.2f%%", t, h);
+    setFormatted(mTemperatureSampleLabel, "Sht31 sample: t=%.2f°C, rh=%.2f%%", t, h);
 }
 
 void LvglObjects::setHeapSpace(uint32_t space){
-    setFormatted(mHeapSpaceLabel, "Heap space: %u bytes", space);
+    setFormatted(mHeapSpaceLabel, "Heap space: %u.%03u kB", space/1000, space%1000);
 }
 
 } // namespace Garbox

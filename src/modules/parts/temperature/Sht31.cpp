@@ -4,7 +4,7 @@
 #include "core/hardware/i2c/I2c.h"
 #include "core/time/Time.h"
 #include "core/util/math/Crc.h"
-#include "core/util/ByteUtils.h"
+#include "core/util/helpers/ByteUtils.h"
 
 namespace Garbox {
 

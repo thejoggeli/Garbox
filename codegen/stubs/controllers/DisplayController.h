@@ -16,6 +16,7 @@ public:
 
     void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) final;
     void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) final;
+    void onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event) final;
 
 private:
 

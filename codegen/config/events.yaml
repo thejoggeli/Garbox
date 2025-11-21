@@ -11,6 +11,10 @@ type:
   # Heartbeat
   Heartbeat: null
 
+  # Display
+  BacklightCommand:
+    brightness: float
+
   # Fan
   FanStatus:  
     state: FanState

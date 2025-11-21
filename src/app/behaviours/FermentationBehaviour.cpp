@@ -2,6 +2,7 @@
 
 #include "core/log/Log.h"
 #include "core/time/TimeLiterals.h"
+#include "core/util/math/MathUtils.h"
 
 namespace Garbox {
 
@@ -70,7 +71,7 @@ void FermentationBehaviour::onFanSample(const EventRead<EventPayload::FanSample>
 void FermentationBehaviour::onHeatpadStatus(const EventRead<EventPayload::HeatpadStatus>& event){
     LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
         HeatpadStateToString(event.payload->state),
-        event.payload->dutyCycle,
+        event.payload->dutyCycle * 100.0f,
         event.payload->periodMicros / 1000
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
@@ -99,7 +100,13 @@ void FermentationBehaviour::onTemperatureSample(const EventRead<EventPayload::Te
 }
 
 void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event){
-    // nothing to do
+    if(event.payload->newState == ButtonState::Released){
+        static uint32_t b = 4;
+        b = MathUtils::Wrap(b+1, 5u);
+        EventWrite cmd = makeEvent<EventPayload::BacklightCommand>();
+        cmd.payload->brightness = b/4.0f;
+        sendEvent(cmd.header);
+    }
 }
     
 void FermentationBehaviour::onButtonRepeat(const EventRead<EventPayload::ButtonRepeat>& event){

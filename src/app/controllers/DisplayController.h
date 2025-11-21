@@ -2,6 +2,7 @@
 
 #include "app/controllers/generated/DisplayControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
+#include "core/util/transition/SmoothTransition.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
@@ -26,6 +27,7 @@ public:
         float shtTemp;
         float shtHum;
         uint32_t renderSkippedCount = 0xFFFFFFFF;
+        float brightness;
         uint32_t heapSpace = 0;
     };
 
@@ -39,11 +41,13 @@ public:
     void onRenderTick() final;
     void onTemperatureStatus(const EventRead<EventPayload::TemperatureStatus>& event) final;
     void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) final;
+    void onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event) final;
 
 private:
 
     Display& mDisplay;
     SoftwareTimer mHeapTimer;
+    SmoothTransition mBacklightTransition;
 
     Dirty mDirty;
     State mOldState {};
@@ -53,6 +57,8 @@ private:
 
     void onInit() final;
     void onStart() final;
+
+    void setBrightnessSmooth(float brightness, uint32_t durationMicros);
 
 };
 

@@ -42,8 +42,19 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
+void GarboxRuntime::onRenderTick(){
+    mDisplayController.onRenderTick();
+    dispatchEvents();
+}
+
 void GarboxRuntime::onHeartbeatTick(){
     mHeartbeatController.onHeartbeatTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onOutputTick(){
+    mFanController.onOutputTick();
+    mHeatpadController.onOutputTick();
     dispatchEvents();
 }
 
@@ -51,11 +62,6 @@ void GarboxRuntime::onLogicTick(){
     BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
     AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
     behaviour->onLogicTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onRenderTick(){
-    mDisplayController.onRenderTick();
     dispatchEvents();
 }
 
@@ -67,17 +73,16 @@ void GarboxRuntime::onInputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onOutputTick(){
-    mFanController.onOutputTick();
-    mHeatpadController.onOutputTick();
-    dispatchEvents();
-}
-
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
     case EventType::Heartbeat: {
         const EventRead<EventPayload::Heartbeat> event(header);
         static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onHeartbeat(event);
+        break;
+    }
+    case EventType::BacklightCommand: {
+        const EventRead<EventPayload::BacklightCommand> event(header);
+        mDisplayController.onBacklightCommand(event);
         break;
     }
     case EventType::FanStatus: {

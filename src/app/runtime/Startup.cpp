@@ -10,7 +10,7 @@
 #include "core/log/Log.h"
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
-#include "core/util/StringUtils.h"
+#include "core/util/helpers/StringUtils.h"
 #include "core/rtos/LockGuard.h"
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"

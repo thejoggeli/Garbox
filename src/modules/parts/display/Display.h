@@ -47,6 +47,9 @@ public:
     bool tryTakeRenderReady();
     void giveRenderTrigger();
 
+    void setBrightness(float brightness);
+    float getBrightness() const;
+
     // disallow copy and move 
     Display(const Display&) = delete;
     Display& operator=(const Display&) = delete;

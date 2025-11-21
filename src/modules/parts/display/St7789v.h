@@ -23,6 +23,7 @@ public:
     void setSendAsyncHandler(SendAsyncHandler handler);
 
     void setBrightness(float brightness);
+    float getBrightness() const;
 
     uint16_t getWidth() const;
     uint16_t getHeight() const;
@@ -54,7 +55,7 @@ private:
 
     uint16_t mWidth = 0;
     uint16_t mHeight = 0;
-    bool mBrightness = 0.0f;
+    float mBrightness = 0.0f;
 
     SendSyncHandler mSendSyncHandler = nullptr;
     SendAsyncHandler mSendAsyncHandler = nullptr;

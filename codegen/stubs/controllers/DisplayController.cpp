@@ -27,5 +27,8 @@ void DisplayController::onTemperatureStatus(const EventRead<EventPayload::Temper
 void DisplayController::onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event){
     // nothing to do
 }
+void DisplayController::onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event){
+    // nothing to do
+}
 
 } // namespace Garbox

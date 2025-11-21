@@ -21,7 +21,7 @@ public:
     void setHeatpadDuty(float duty01);
     void setHeatpadSense(float voltageVolts, float currentAmps);
 
-    void setRenderSkippedCount(uint32_t count);
+    void setDisplayState(float brightness, uint32_t skipped);
 
     void setTemperatureState(bool power, bool driver, bool reset);
     void setTemperatureSample(float t, float h);
@@ -34,7 +34,7 @@ private:
     lv_obj_t* mHeatpadStateLabel = nullptr;
     lv_obj_t* mHeatpadDutyLabel = nullptr;
     lv_obj_t* mHeatpadSenseLabel = nullptr;
-    lv_obj_t* mRenderSkippedCountLabel = nullptr;
+    lv_obj_t* mDisplayStateLabel = nullptr;
     lv_obj_t* mTemperatureStateLabel = nullptr;
     lv_obj_t* mTemperatureSampleLabel = nullptr;
     lv_obj_t* mHeapSpaceLabel = nullptr;

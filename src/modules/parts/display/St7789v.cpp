@@ -1,11 +1,17 @@
 #include "St7789v.h"
 
+#define GarboxDebugStv7789 1
+
 #include "core/assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"
 #include "core/hardware/ledc/LedcChannel.h"
 #include "core/time/Time.h"
-#include "core/util/ByteUtils.h"
+#include "core/util/helpers/ByteUtils.h"
 #include "core/util/function/default/GammaFunctions.h"
+
+#if GarboxDebugStv7789
+#include "core/log/Log.h"
+#endif
 
 namespace Garbox {
 
@@ -46,9 +52,14 @@ void St7789v::setSendAsyncHandler(SendAsyncHandler handler){
 }
 
 void St7789v::setBrightness(float brightness){
+    mBrightness = std::clamp(brightness, 0.0f, 1.0f);
     const MathFunctionIfc& correctionFunction = GammaFunctions::GetGamma22();
     float brightnessCorrected = correctionFunction.evaluate(brightness);
     mPwmBlk.setDutyRelative(brightnessCorrected);
+}
+
+float St7789v::getBrightness() const {
+    return mBrightness;
 }
 
 void St7789v::sendReset(){

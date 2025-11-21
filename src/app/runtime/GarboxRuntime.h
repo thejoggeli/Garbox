@@ -22,11 +22,11 @@ public:
 
     GarboxRuntime();
 
-    void onHeartbeatTick();
-    void onLogicTick();
     void onRenderTick();
-    void onInputTick();
+    void onHeartbeatTick();
     void onOutputTick();
+    void onLogicTick();
+    void onInputTick();
 
 private:
 
