@@ -44,6 +44,13 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
+void GarboxRuntime::onLogicTick(){
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    behaviour->onLogicTick();
+    dispatchEvents();
+}
+
 void GarboxRuntime::onRenderTick(){
     mDisplayController.onRenderTick();
     dispatchEvents();
@@ -54,24 +61,17 @@ void GarboxRuntime::onHeartbeatTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onInputTick(){
-    mFanController.onInputTick();
-    mHeatpadController.onInputTick();
-    mInputController.onInputTick();
-    mI2cPartsController.onInputTick();
-    dispatchEvents();
-}
-
 void GarboxRuntime::onOutputTick(){
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
     dispatchEvents();
 }
 
-void GarboxRuntime::onLogicTick(){
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-    behaviour->onLogicTick();
+void GarboxRuntime::onInputTick(){
+    mFanController.onInputTick();
+    mHeatpadController.onInputTick();
+    mInputController.onInputTick();
+    mI2cPartsController.onInputTick();
     dispatchEvents();
 }
 

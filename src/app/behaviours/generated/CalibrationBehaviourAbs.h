@@ -31,9 +31,12 @@ private:
     using BehaviourAbs::sendEvent;
 
     // hide unused shorthand types 
-    using BaseBehaviourAbs::Heartbeat;
-    using BaseBehaviourAbs::FanStatus;
-    using BaseBehaviourAbs::FanSample;
+    using BaseBehaviourAbs::ButtonRepeat;
+    using BaseBehaviourAbs::ButtonStateChanged;
+    using BaseBehaviourAbs::EncoderStep;
+    using BaseBehaviourAbs::HeatpadStatus;
+    using BaseBehaviourAbs::TemperatureSample;
+    using BaseBehaviourAbs::TemperatureStatus;
 
     // hide unsued event handlers
     void onButtonRepeat(const ButtonRepeat& event) final;

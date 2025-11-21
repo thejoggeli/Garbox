@@ -45,7 +45,7 @@ private:
 {% if behaviour.receives_null %}
 
     // hide unused shorthand types 
-{% for ev in behaviour.receives %}
+{% for ev in behaviour.receives_null %}
     using BaseBehaviourAbs::{{ ev }};
 {% endfor %}
 
