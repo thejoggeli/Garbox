@@ -1,3 +1,7 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #pragma once
 
 #include "core/hardware/spi/SpiDma.h"

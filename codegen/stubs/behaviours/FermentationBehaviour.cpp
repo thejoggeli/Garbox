@@ -1,10 +1,13 @@
+// This stub always gets generated along, together with the remaining
+// code. It can be used as a starting or reference point. 
+
 #include "FermentationBehaviour.h"
 
 namespace Garbox {
 
 FermentationBehaviour::FermentationBehaviour(const RuntimeContext& context):
     // init members
-    BaseBehaviourAbs(ComponentId::FermentationBehaviour, context){
+    FermentationBehaviourAbs(context){
     // nothing to do
 }
 

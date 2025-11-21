@@ -2,15 +2,13 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
-#include "DisplayControllerAbs.h"
-
-#include "shared/types/ComponentId.h"
+#include "FermentationBehaviourAbs.h"
 
 namespace Garbox {
 
-DisplayControllerAbs::DisplayControllerAbs(const RuntimeContext& context): 
+FermentationBehaviourAbs::FermentationBehaviourAbs(const RuntimeContext& context):
     // init members
-    ControllerAbs(ComponentId::DisplayController, context){
+    BaseBehaviourAbs(ComponentId::FermentationBehaviour, context){
     // nothing to do
 }
 

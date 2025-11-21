@@ -1,3 +1,7 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #pragma once
 
 #include <cstdint>
@@ -5,9 +9,9 @@
 #include "shared/types/EventType.h"
 
 // included from config
+#include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 #include "modules/parts/button/ButtonState.h"
-#include "modules/parts/fan/FanState.h"
 
 namespace Garbox::EventPayload {
 

@@ -1,10 +1,12 @@
+{% include "_common/header_stub.j2" %}
+
 #pragma once
 
-#include "app/behaviours/generated/BaseBehaviourAbs.h"
+#include "app/behaviours/generated/{{ name }}Abs.h"
 
 namespace Garbox {
 
-class {{ name }} : public BaseBehaviourAbs {
+class {{ name }} : public {{ name }}Abs {
 public:
 
     {{ name }}(const RuntimeContext& context);

@@ -48,4 +48,4 @@ behaviours:
   FermentationBehaviour:
     ticks: [Logic]
     sends: [FanCommand, HeatpadCommand]
-    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, Button, ButtonRepeat, EncoderStep]
+    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, Button, ButtonRepeat, EncoderStep, ]

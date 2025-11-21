@@ -249,7 +249,7 @@ def generate_controllers(yaml_config):
     stubs = []
     for controller_key, controller_dict in controllers.items():
         out_path = f"app/controllers/generated/{controller_key}Abs"
-        template_path = "application/ControllerAbs"
+        template_path = "application/controller/ControllerAbs"
         item_dict = {
             "name": controller_key,
             "controller": controller_dict
@@ -259,7 +259,7 @@ def generate_controllers(yaml_config):
         items.append(Item(item_dict, ["controller", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
         out_path = f"stubs/controllers/{controller_key}"
-        template_path = "application/Controller"
+        template_path = "application/controller/ControllerStub"
         stubs.append(Item(item_dict, ["controller", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
         stubs.append(Item(item_dict, ["controller", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
@@ -275,8 +275,6 @@ def generate_behaviours(yaml_config):
 
     # list of items to be generated
     controllers = yaml_config["behaviours"]
-    items = []
-    stubs = []
     all_ticks = set()
     all_sends = set()
     all_receives = set()
@@ -284,29 +282,43 @@ def generate_behaviours(yaml_config):
         all_ticks.update(behaviour_dict["ticks"])
         all_sends.update(behaviour_dict["sends"])
         all_receives.update(behaviour_dict["receives"])
+
+    items = []
+    stubs = []
+    for behaviour_key, behaviour_dict in controllers.items():
         item_dict = {
             "name": behaviour_key,
             "behaviour": behaviour_dict
         }
+        behaviour_dict["ticks_null"] = sorted(all_ticks.difference(set(behaviour_dict["ticks"])))
+        behaviour_dict["sends_null"] = sorted(all_sends.difference(set(behaviour_dict["sends"])))
+        behaviour_dict["receives_null"] = sorted(all_receives.difference(set(behaviour_dict["receives"])))
         behaviour_dict["name"] = behaviour_key
+
+        # behaviour stubs
         out_path = f"stubs/behaviours/{behaviour_key}"
-        template_path = "application/Behaviour"
+        template_path = "application/behaviour/BehaviourStub"
         stubs.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
         stubs.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
+        # behaviours abs
+        out_path = f"app/behaviours/generated/{behaviour_key}Abs"
+        template_path = "application/behaviour/BehaviourAbs"
+        items.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
+        items.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+
     # BaseBehaviourAbs
     out_path = f"app/behaviours/generated/BaseBehaviourAbs"
-    template_path = "application/BehaviourAbs"
+    template_path = "application/behaviour/BaseBehaviourAbs"
     app_dict = {
-        "name": "BaseBehaviour",
         "behaviour": {
-            "ticks": all_ticks,
-            "sends": all_sends,
-            "receives": all_receives
+            "ticks": sorted(all_ticks),
+            "sends": sorted(all_sends),
+            "receives": sorted(all_receives)
         }
     }
-    items.append(Item(app_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
-    items.append(Item(app_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+    items.append(Item(app_dict, "behaviour", f"{out_path}.h", f"{template_path}.h.j2"))
+    items.append(Item(app_dict, "behaviour", f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
     # generate all hardware h/cpp files
     generate_items(items)

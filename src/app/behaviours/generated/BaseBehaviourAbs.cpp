@@ -1,3 +1,7 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #include "BaseBehaviourAbs.h"
 
 #include "shared/types/ComponentId.h"

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "app/behaviours/generated/BaseBehaviourAbs.h"
+#include "app/behaviours/generated/FermentationBehaviourAbs.h"
 #include "app/engine/FermentationControlEngine.h"
 
 namespace Garbox {
 
-class FermentationBehaviour : public BaseBehaviourAbs {
+class FermentationBehaviour : public FermentationBehaviourAbs {
 public:
     
     FermentationBehaviour(const RuntimeContext& context);

@@ -1,10 +1,13 @@
+// This stub always gets generated along, together with the remaining
+// code. It can be used as a starting or reference point. 
+
 #pragma once
 
-#include "app/behaviours/generated/BaseBehaviourAbs.h"
+#include "app/behaviours/generated/FermentationBehaviourAbs.h"
 
 namespace Garbox {
 
-class FermentationBehaviour : public BaseBehaviourAbs {
+class FermentationBehaviour : public FermentationBehaviourAbs {
 public:
 
     FermentationBehaviour(const RuntimeContext& context);

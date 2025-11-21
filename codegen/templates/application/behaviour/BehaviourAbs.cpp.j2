@@ -1,0 +1,29 @@
+{% include "_common/header.j2" %}
+
+#include "{{ name }}Abs.h"
+
+namespace Garbox {
+
+{{ name }}Abs::{{ name }}Abs(const RuntimeContext& context):
+    // init members
+    BaseBehaviourAbs(ComponentId::{{ name }}, context){
+    // nothing to do
+}
+{% if behaviour.ticks_null %}
+    {% for tick in behaviour.ticks_null %}
+    
+void {{ name }}Abs::on{{ tick }}(){
+    // no-op. add tick handler to behaviour in yaml to enable 
+}
+    {% endfor %}
+{% endif %}
+{% if behaviour.receives_null %}
+    {% for ev in behaviour.receives_null %}
+
+void {{ name }}Abs::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
+    // no-op. add event handler to behaviour in yaml to enable 
+}
+    {% endfor %}
+{% endif %}
+
+} // namespace Garbox

@@ -1,3 +1,7 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #include "SpiInstances.h"
 
 #include "core/assert/Assert.h"

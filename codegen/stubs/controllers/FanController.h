@@ -1,3 +1,6 @@
+// This stub always gets generated along, together with the remaining
+// code. It can be used as a starting or reference point. 
+
 #pragma once
 
 #include "app/controllers/generated/FanControllerAbs.h"

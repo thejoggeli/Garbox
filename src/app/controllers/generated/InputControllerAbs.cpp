@@ -1,3 +1,7 @@
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
+
 #include "InputControllerAbs.h"
 
 #include "shared/types/ComponentId.h"
