@@ -70,28 +70,10 @@ void LvglHandler::init(){
     lv_obj_set_style_bg_opa(mBackground, LV_OPA_COVER, LV_PART_MAIN);
 
     // create box1
-    mBox1 = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(mBox1, 48, 48);
-    lv_obj_set_style_bg_color(mBox1, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(mBox1, LV_OPA_COVER, LV_PART_MAIN);
-
-    // create box2
-    mBox2 = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(mBox2, 48, 48);
-    lv_obj_set_style_bg_color(mBox2, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(mBox2, LV_OPA_COVER, LV_PART_MAIN);
-
-    // create box3
-    mBox3 = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(mBox3, 48, 48);
-    lv_obj_set_style_bg_color(mBox3, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(mBox3, LV_OPA_COVER, LV_PART_MAIN);
-
-    // create box4
-    mBox4 = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(mBox4, 48, 48);
-    lv_obj_set_style_bg_color(mBox4, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(mBox4, LV_OPA_COVER, LV_PART_MAIN);
+    mBox = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBox, 48, 8);
+    lv_obj_set_style_bg_color(mBox, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBox, LV_OPA_COVER, LV_PART_MAIN);
 
     // init objects
     mObjects.init(lv_scr_act());
@@ -100,34 +82,21 @@ void LvglHandler::init(){
 void LvglHandler::startRender(){
 
     static float x = 320.0f/2 + 48.0f/2;
-    static float y = 240.0f/2 + 48.0f/2;
-    static float xdir = 0.8f;
-    static float ydir = 0.8f;
-    x += xdir;
-    y += ydir;
-    static float maxx = 320.0f-48.0f;
-    static float maxy = 240.0f-48.0f;
-    if(x > maxx){
-        xdir = -xdir;
-        x = maxx;
+    static uint32_t y = 240-8;
+    static float xSpeed = 1.6f;
+    static float xDir = 1.0f;
+    static float xMax = 320.0f-48.0f;
+    x += xDir * xSpeed;
+    if(x > xMax){
+        xDir = std::round(-xDir);
+        x = xMax;
     }
     else if (x < 0.0f){
-        xdir = -xdir;
+        xDir = std::round(-xDir);
         x = 0.0f;
     }
-    if(y > maxy){
-        ydir = -ydir;
-        y = maxy;
-    }
-    else if(y < 0.0f){
-        ydir = -ydir;
-        y = 0.0f;
-    }
     
-    lv_obj_set_pos(mBox1, x, y);
-    lv_obj_set_pos(mBox2, maxx-x, y);
-    lv_obj_set_pos(mBox3, x, maxy-y);
-    lv_obj_set_pos(mBox4, maxx-x, maxy-y);
+    lv_obj_set_pos(mBox, x, y);
     
     lv_timer_handler();
 }

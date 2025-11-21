@@ -14,7 +14,7 @@ lv_obj_t* LvglObjects::createLabel(lv_obj_t* parent, int16_t x, int16_t y, const
     lv_obj_t* lbl = lv_label_create(parent);
     lv_obj_set_pos(lbl, x, y);
     lv_label_set_text(lbl, text);
-    lv_obj_set_style_text_color(lbl, lv_color_hex(0xFFFF00), LV_PART_MAIN);
+    lv_obj_set_style_text_color(lbl, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     return lbl;
 }
 
@@ -84,7 +84,7 @@ void LvglObjects::setTemperatureState(bool power, bool driver, bool reset){
 }
 
 void LvglObjects::setTemperatureSample(float t, float h){
-    setFormatted(mTemperatureSampleLabel, "Sht31 sample: temp=%.2f°C, hum=%.2f%%", t, h);
+    setFormatted(mTemperatureSampleLabel, "Sht31 sample: t=%.2f°C, h=%.2f%%", t, h);
 }
 
 void LvglObjects::setHeapSpace(uint32_t space){

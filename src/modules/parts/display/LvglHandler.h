@@ -43,10 +43,7 @@ private:
 
     // lvgl objects
     lv_obj_t* mBackground;
-    lv_obj_t* mBox1;
-    lv_obj_t* mBox2;
-    lv_obj_t* mBox3;
-    lv_obj_t* mBox4;
+    lv_obj_t* mBox;
 
     // drawing buffer
     lv_draw_buf_t mDrawBuffer1;
