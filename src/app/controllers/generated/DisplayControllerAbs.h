@@ -23,6 +23,14 @@ public:
     virtual void onTemperatureSample(const EventRead<EventPayload::TemperatureSample>& event) = 0;
     virtual void onBacklightCommand(const EventRead<EventPayload::BacklightCommand>& event) = 0;
 
+protected:
+
+private:
+
+    // hide event methods
+    using ControllerAbs::makeEvent;
+    using ControllerAbs::sendEvent;
+
 };
 
 } // namespace Garbox

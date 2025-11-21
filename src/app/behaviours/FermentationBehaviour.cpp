@@ -103,9 +103,9 @@ void FermentationBehaviour::onButtonStateChanged(const EventRead<EventPayload::B
     if(event.payload->newState == ButtonState::Released){
         static uint32_t b = 4;
         b = MathUtils::Wrap(b+1, 5u);
-        EventWrite cmd = makeEvent<EventPayload::BacklightCommand>();
+        EventWrite cmd = makeBacklightCommandEvent();
         cmd.payload->brightness = b/4.0f;
-        sendEvent(cmd.header);
+        sendEvent(cmd);
     }
 }
     
@@ -136,10 +136,10 @@ void FermentationBehaviour::applySwitchState(){
 }
 
 void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
-    EventWrite event = makeEvent<EventPayload::FanCommand>();
+    EventWrite event = makeFanCommandEvent();
     event.payload->enabled = enabled;
     event.payload->targetSpeed = speed;
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 } // namespace

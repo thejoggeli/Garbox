@@ -22,6 +22,22 @@ public:
     // receive event handlers
     virtual void onFanCommand(const EventRead<EventPayload::FanCommand>& event) = 0;
 
+protected:
+
+    // make typed events
+    EventWrite<EventPayload::FanStatus> makeFanStatusEvent();
+    EventWrite<EventPayload::FanSample> makeFanSampleEvent();
+
+    // send typed events
+    void sendEvent(const EventWrite<EventPayload::FanStatus>& event);
+    void sendEvent(const EventWrite<EventPayload::FanSample>& event);
+
+private:
+
+    // hide event methods
+    using ControllerAbs::makeEvent;
+    using ControllerAbs::sendEvent;
+
 };
 
 } // namespace Garbox

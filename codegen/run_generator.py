@@ -297,14 +297,14 @@ def generate_behaviours(yaml_config):
         # behaviour stubs
         out_path = f"stubs/behaviours/{behaviour_key}"
         template_path = "application/behaviour/BehaviourStub"
-        stubs.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
-        stubs.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+        stubs.append(Item(item_dict, list(item_dict.keys()), f"{out_path}.h", f"{template_path}.h.j2"))
+        stubs.append(Item(item_dict, list(item_dict.keys()), f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
         # behaviours abs
         out_path = f"app/behaviours/generated/{behaviour_key}Abs"
         template_path = "application/behaviour/BehaviourAbs"
-        items.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.h", f"{template_path}.h.j2"))
-        items.append(Item(item_dict, ["behaviour", "name"], f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+        items.append(Item(item_dict, list(item_dict.keys()), f"{out_path}.h", f"{template_path}.h.j2"))
+        items.append(Item(item_dict, list(item_dict.keys()), f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
     # BaseBehaviourAbs
     out_path = f"app/behaviours/generated/BaseBehaviourAbs"

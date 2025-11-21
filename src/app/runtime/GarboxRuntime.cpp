@@ -47,11 +47,6 @@ void GarboxRuntime::onRenderTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onHeartbeatTick(){
-    mHeartbeatController.onHeartbeatTick();
-    dispatchEvents();
-}
-
 void GarboxRuntime::onOutputTick(){
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
@@ -70,6 +65,11 @@ void GarboxRuntime::onInputTick(){
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
     mI2cPartsController.onInputTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onHeartbeatTick(){
+    mHeartbeatController.onHeartbeatTick();
     dispatchEvents();
 }
 

@@ -11,5 +11,19 @@ namespace Garbox {
     ControllerAbs(ComponentId::{{ name }}, context){
     // nothing to do
 }
+{% if controller.sends %}
+{% for ev in controller.sends %}
+
+EventWrite<EventPayload::{{ ev }}> {{ name }}Abs::make{{ ev }}Event(){
+    return makeEvent<EventPayload::{{ ev }}>();
+}
+{% endfor %}
+{% for ev in controller.sends %}
+
+void {{ name }}Abs::sendEvent(const EventWrite<EventPayload::{{ ev }}>& event){
+    sendEvent(event.header);
+}
+{% endfor %}
+{% endif %}
 
 } // namespace Garbox

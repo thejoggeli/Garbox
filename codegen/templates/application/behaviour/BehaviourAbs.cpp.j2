@@ -25,5 +25,19 @@ void {{ name }}Abs::on{{ ev }}(const EventRead<EventPayload::{{ ev }}>& event){
 }
     {% endfor %}
 {% endif %}
+{% if behaviour.sends %}
+{% for ev in behaviour.sends %}
+
+EventWrite<EventPayload::{{ ev }}> {{ name }}Abs::make{{ ev }}Event(){
+    return makeEvent<EventPayload::{{ ev }}>();
+}
+{% endfor %}
+{% for ev in behaviour.sends %}
+
+void {{ name }}Abs::sendEvent(const EventWrite<EventPayload::{{ ev }}>& event){
+    sendEvent(event.header);
+}
+{% endfor %}
+{% endif %}
 
 } // namespace Garbox

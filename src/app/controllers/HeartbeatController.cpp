@@ -34,8 +34,8 @@ void HeartbeatController::onHeartbeatTick(){
         mHeartbeatTimer.restart();
 
         // send heartbeat event
-        EventWrite event = makeEvent<EventPayload::Heartbeat>();
-        sendEvent(event.header);
+        EventWrite event = makeHeartbeatEvent();
+        sendEvent(event);
     }
 }
 

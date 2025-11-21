@@ -86,16 +86,16 @@ void FanController::handleFanStalledAlert(uint32_t counter){
 }
 
 void FanController::sendStatusEvent(){
-    EventWrite event = makeEvent<EventPayload::FanStatus>();
+    EventWrite event = makeFanStatusEvent();
     event.payload->state = mFan.getState();
     event.payload->targetSpeed = mFan.getTargetSpeed();
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 void FanController::sendSampleEvent(float measuredRpm){
-    EventWrite event = makeEvent<EventPayload::FanSample>();
+    EventWrite event = makeFanSampleEvent();
     event.payload->measuredRpm = measuredRpm;
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 } // namespace

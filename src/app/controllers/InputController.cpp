@@ -65,10 +65,10 @@ void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState
         break;
     }
     // send event
-    EventWrite event = makeEvent<EventPayload::ButtonStateChanged>();
+    EventWrite event = makeButtonStateChangedEvent();
     event.payload->oldState = oldState;
     event.payload->newState = newState;
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 void InputController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){

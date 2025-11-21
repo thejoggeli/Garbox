@@ -75,11 +75,11 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 }
 
 void HeatpadController::sendStatusEvent(){
-    EventWrite event = makeEvent<EventPayload::HeatpadStatus>();
+    EventWrite event = makeHeatpadStatusEvent();
     event.payload->state = mHeatpad.getState();
     event.payload->dutyCycle = mHeatpad.getCurrentDutyCycle();
     event.payload->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 } // namespace

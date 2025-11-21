@@ -22,6 +22,20 @@ public:
     // receive event handlers
     virtual void onHeatpadCommand(const EventRead<EventPayload::HeatpadCommand>& event) = 0;
 
+protected:
+
+    // make typed events
+    EventWrite<EventPayload::HeatpadStatus> makeHeatpadStatusEvent();
+
+    // send typed events
+    void sendEvent(const EventWrite<EventPayload::HeatpadStatus>& event);
+
+private:
+
+    // hide event methods
+    using ControllerAbs::makeEvent;
+    using ControllerAbs::sendEvent;
+
 };
 
 } // namespace Garbox

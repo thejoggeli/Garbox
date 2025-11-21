@@ -9,8 +9,8 @@
 #include "shared/types/EventType.h"
 
 // included from config
-#include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
+#include "modules/parts/fan/FanState.h"
 #include "modules/parts/button/ButtonState.h"
 
 namespace Garbox::EventPayload {

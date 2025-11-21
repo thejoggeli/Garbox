@@ -18,6 +18,20 @@ public:
     // tick handlers
     virtual void onHeartbeatTick() = 0;
 
+protected:
+
+    // make typed events
+    EventWrite<EventPayload::Heartbeat> makeHeartbeatEvent();
+
+    // send typed events
+    void sendEvent(const EventWrite<EventPayload::Heartbeat>& event);
+
+private:
+
+    // hide event methods
+    using ControllerAbs::makeEvent;
+    using ControllerAbs::sendEvent;
+
 };
 
 } // namespace Garbox

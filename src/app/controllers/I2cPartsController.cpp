@@ -107,18 +107,18 @@ void I2cPartsController::handleStateChanged(FsmState oldState, FsmState newState
 }
 
 void I2cPartsController::sendTemperatureStatusEvent(){
-    EventWrite event = makeEvent<EventPayload::TemperatureStatus>();
+    EventWrite event = makeTemperatureStatusEvent();
     event.payload->powerEnabled = mEnablePowerGpio.readLevel();
     event.payload->driverEnabled = mTemperatureSensor.isStarted();
     event.payload->resetting = mResetting;
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 void I2cPartsController::sendTemperatureSampleEvent(){
-    EventWrite event = makeEvent<EventPayload::TemperatureSample>();
+    EventWrite event = makeTemperatureSampleEvent();
     event.payload->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
     event.payload->humidityRelative = mTemperatureSensor.getHumidityRelative();
-    sendEvent(event.header);
+    sendEvent(event);
 }
 
 } // namespace

@@ -31,6 +31,26 @@ public:
         {% endfor %}
     {% endif %}
 
+protected:
+{% if controller.sends %}
+
+    // make typed events
+{% for ev in controller.sends %}
+    EventWrite<EventPayload::{{ ev }}> make{{ ev }}Event();
+{% endfor %}
+
+    // send typed events
+{% for ev in controller.sends %}
+    void sendEvent(const EventWrite<EventPayload::{{ ev }}>& event);
+{% endfor %}
+{% endif %}
+
+private:
+
+    // hide event methods
+    using ControllerAbs::makeEvent;
+    using ControllerAbs::sendEvent;
+
 };
 
 } // namespace Garbox

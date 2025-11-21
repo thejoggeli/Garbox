@@ -14,4 +14,12 @@ HeartbeatControllerAbs::HeartbeatControllerAbs(const RuntimeContext& context):
     // nothing to do
 }
 
+EventWrite<EventPayload::Heartbeat> HeartbeatControllerAbs::makeHeartbeatEvent(){
+    return makeEvent<EventPayload::Heartbeat>();
+}
+
+void HeartbeatControllerAbs::sendEvent(const EventWrite<EventPayload::Heartbeat>& event){
+    sendEvent(event.header);
+}
+
 } // namespace Garbox

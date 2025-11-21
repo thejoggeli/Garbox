@@ -21,6 +21,22 @@ public:
     // receive event handlers
     virtual void onButtonStateChanged(const EventRead<EventPayload::ButtonStateChanged>& event) = 0;
 
+protected:
+
+    // make typed events
+    EventWrite<EventPayload::TemperatureStatus> makeTemperatureStatusEvent();
+    EventWrite<EventPayload::TemperatureSample> makeTemperatureSampleEvent();
+
+    // send typed events
+    void sendEvent(const EventWrite<EventPayload::TemperatureStatus>& event);
+    void sendEvent(const EventWrite<EventPayload::TemperatureSample>& event);
+
+private:
+
+    // hide event methods
+    using ControllerAbs::makeEvent;
+    using ControllerAbs::sendEvent;
+
 };
 
 } // namespace Garbox

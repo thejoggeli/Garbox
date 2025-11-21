@@ -1,4 +1,17 @@
 {
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "codegen/stubs": true,
+    },
     "files.associations": {
         "cstdint": "cpp",
         "functional": "cpp",
