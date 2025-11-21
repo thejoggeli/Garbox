@@ -186,6 +186,22 @@ def generate_hardware():
         Item(yaml_keys=["ledcTimer", "ledcChannel"], out_path="app/hardware/LedcInstances.cpp", template_path="hardware/LedcInstances.cpp.j2"),
     ]
 
+    # HardwareInit
+    init_mapping = {
+        "adc": "AdcInstances",
+        "gpio": "GpioInstances",
+        "i2c": "I2cInstances",
+        "spi": "SpiInstances",
+        "timer": "TimerInstances",
+        "ledcTimer": "LedcInstances",
+    }
+    yaml_config["init"] = {}
+    for key in init_mapping:
+        if key in yaml_config and len(yaml_config[key].keys()) > 0:
+            yaml_config["init"][key] = init_mapping[key]
+    items.append(Item(yaml_keys="init", out_path="app/hardware/HardwareInit.h",   template_path="hardware/HardwareInit.h.j2"))
+    items.append(Item(yaml_keys="init", out_path="app/hardware/HardwareInit.cpp", template_path="hardware/HardwareInit.cpp.j2"))
+
     # generate all hardware h/cpp files
     generate_items(yaml_config, items)
 

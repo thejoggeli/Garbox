@@ -1,0 +1,23 @@
+#include "HardwareInit.h"
+
+#include "core/assert/Assert.h"
+{% for name, item in init.items() %}
+#include "app/hardware/{{ item }}.h"
+{% endfor %}
+
+namespace Garbox {
+    
+static bool sInitialized = false;
+
+void HardwareInit::Init(){
+    AssertExit(!sInitialized, "HardwareInit", "already initialized");
+
+{% for name, item in init.items() %}
+    {{ item }}::Init();
+{% endfor %}
+    
+    sInitialized = true;
+}
+
+
+} // namespace

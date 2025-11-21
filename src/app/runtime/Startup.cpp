@@ -2,12 +2,7 @@
 #include "app/runtime/StartupSequence.h"
 #include "app/runtime/TaskManager.h"
 #include "app/config/AppConfig.h"
-#include "app/hardware/AdcInstances.h"
-#include "app/hardware/LedcInstances.h"
-#include "app/hardware/GpioInstances.h"
-#include "app/hardware/I2cInstances.h"
-#include "app/hardware/SpiInstances.h"
-#include "app/hardware/TimerInstances.h"
+#include "app/hardware/HardwareInit.h"
 #include "app/providers/PartsProvider.h"
 #include "app/runtime/GarboxRuntime.h"
 #include "core/assert/AssertHandler.h"
@@ -100,12 +95,7 @@ void setup(){
     Profiler::SetEnabled(AppConfig::EnableProfiler);
 
     // init hardware instances
-    AdcInstances::Init();
-    GpioInstances::Init();
-    I2cInstances::Init();
-    LedcInstances::Init();
-    SpiInstances::Init();
-    TimerInstances::Init();
+    HardwareInit::Init();
 
     // init all parts
     PartsProvider::Init();

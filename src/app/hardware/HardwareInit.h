@@ -1,0 +1,14 @@
+#pragma once
+
+#include "core/hardware/adc/Adc.h"
+
+namespace Garbox {
+
+class HardwareInit {
+public:
+
+    static void Init();
+
+};
+
+} // namespace
