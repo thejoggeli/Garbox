@@ -1,16 +1,6 @@
 # The generated runtime instance will be called NameRuntime
 name: Garbox
 
-# Generates onNameTick() methods in the generated Runtime class.
-# The methods must be called manually by the user in the correct order and with correct timing, e.g. in main() 
-ticks: [
-  Heartbeat, 
-  Input, 
-  Logic, 
-  Output, 
-  Render
-]
-
 controllers:
 
   DisplayController:
@@ -43,8 +33,8 @@ controllers:
     sends: [TemperatureStatus, TemperatureSample]
     receives: null
 
+initial_behaviour: FermentationBehaviour
 behaviours:
-    
   FermentationBehaviour:
     ticks: [Logic]
     sends: [FanCommand, HeatpadCommand]

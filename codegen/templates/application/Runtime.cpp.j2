@@ -1,1 +1,92 @@
 {% include "_common/header.j2" %}
+
+#include "{{ name }}Runtime.h"
+#include "core/assert/Assert.h"
+#include "core/log/Log.h"
+
+namespace {{ name }} {
+
+{{ name }}Runtime::{{ name }}Runtime():
+    {# init behaviours #}
+    {% for beh in behaviours %}
+    m{{ beh }}(getContext()){{ "," if not loop.last or controllers|length > 0 }}
+    {% endfor %}
+    {# init controllers #}
+    {% for ctrl in controllers %}
+    m{{ ctrl }}(getContext()){{ "," if not loop.last }}
+    {% endfor %}{
+    // nothing to do
+}
+
+void {{ name }}Runtime::onRegisterBehaviours(){
+    {% for beh in behaviours %}
+    registerBehaviour(&m{{ beh }});
+    {% endfor %}
+}
+
+void {{ name }}Runtime::onRegisterControllers(){
+    {% for ctrl in controllers %}
+    registerController(&m{{ ctrl }});
+    {% endfor %}
+}
+
+void {{ name }}Runtime::onInit(){
+    // behaviours and controllers are already initialized
+    setQueuedBehaviour(&m{{ initial_behaviour }});
+}
+
+void {{ name }}Runtime::onStart(){
+    // behaviours and controllers are already started
+}
+
+{# ---- GENERATE TICKS ---- #}
+{% for tick in ticks %}
+void {{ name }}Runtime::on{{ tick }}(){
+
+    // controller ticks
+    {# Call tick on controllers supporting this tick #}
+    {% for ctrl_key, ctrl in controllers.items() %}
+        {% if tick in ctrl['ticks'] %}
+    m{{ ctrl_key }}.on{{ tick }}();
+        {% endif %}
+    {% endfor %}
+    {# Call tick on active behaviour (if it supports this tick) #}
+    {% if tick in behaviour_ticks %}
+
+    // behaviour tick
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "{{ name }}Runtime", "no behaviour set");
+    behaviour->on{{ tick }}();
+    {% endif %}
+
+    // dispatch events at the end of tick
+    dispatchEvents();
+}
+{% endfor %}
+
+
+void {{ name }}Runtime::onRouteEvent(const EventHeader* header){
+    switch(header->type){
+    {# ---- Route events ---- #}
+    {% for event, routes in event_routes.items() %}
+    case EventType::{{ event }}: {
+        const EventRead<EventPayload::{{ event }}> event(header);
+        {# 1. send event to active behaviour (if it supports this event) #}
+        {% if routes["behaviours"][0] is defined > 0 %}
+        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->on{{ event }}(event);
+        {% endif %}
+        {# 2. send event to controllers supporting this event #}
+        {% for ctrl in routes["controllers"] %}
+        m{{ ctrl }}.on{{ event }}(event);
+        {% endfor %}
+        break;
+    }
+    {% endfor %}
+    case EventType::Null:
+    case EventType::Count:
+        TriggerDebug("{{ name }}Runtime", "invalid event type");
+        break;
+    }
+}
+
+} // namespace {{ name }}

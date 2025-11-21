@@ -33,6 +33,8 @@ public:
     void init(const Config& config);
     void start();
 
+    void beginTickSequence();
+
     void incrementTickCount();
     const RuntimeContext& getContext() const;
 

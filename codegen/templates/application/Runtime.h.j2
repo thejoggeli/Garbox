@@ -1,1 +1,48 @@
 {% include "_common/header.j2" %}
+
+#pragma once
+
+#include "core/application/runtime/RuntimeAbs.h"
+
+{# include all behaviour headers #}
+{% for beh in behaviours %}
+#include "app/behaviours/{{ beh }}.h"
+{% endfor %}
+
+{# include all controller headers #}
+{% for ctrl in controllers %}
+#include "app/controllers/{{ ctrl }}.h"
+{% endfor %}
+
+namespace {{ name }} {
+
+class {{ name }}Runtime : public RuntimeAbs {
+public:
+
+    {{ name }}Runtime();
+
+    {# Generate tick method declarations #}
+    {% for tick in ticks %}
+    void on{{ tick }}();
+    {% endfor %}
+
+private:
+
+    {# behaviour instances #}
+    {% for beh in behaviours %}
+    {{ beh }} m{{ beh }};
+    {% endfor %}
+
+    {# controller instances #}
+    {% for ctrl in controllers %}
+    {{ ctrl }} m{{ ctrl }};
+    {% endfor %}
+
+    void onInit() final;
+    void onStart() final;
+    void onRouteEvent(const EventHeader* header) final;
+    void onRegisterBehaviours() final;
+    void onRegisterControllers() final;
+};
+
+} // namespace {{ name }}

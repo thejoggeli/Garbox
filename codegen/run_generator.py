@@ -1,5 +1,6 @@
 import yaml
 import copy
+import json
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
@@ -22,6 +23,10 @@ class Item:
         self.yaml_keys = ensure_list(yaml_keys)
         self.out_path = out_path
         self.template_path = template_path
+
+
+def print_json(data):
+    print(json.dumps(data, indent=2))
 
         
 def ensure_list(x):
@@ -240,9 +245,6 @@ def generate_events():
 
 def generate_controllers(yaml_config):
 
-    ensure_suffix(yaml_config, "controllers", "Controller")
-    ensure_value_suffix(yaml_config, "controllers", "ticks", "Tick")
-
     # list of items to be generated
     controllers = yaml_config["controllers"]
     items = []
@@ -270,22 +272,19 @@ def generate_controllers(yaml_config):
 
 def generate_behaviours(yaml_config):
 
-    ensure_suffix(yaml_config, "behaviours", "Behaviour")
-    ensure_value_suffix(yaml_config, "behaviours", "ticks", "Tick")
-
     # list of items to be generated
-    controllers = yaml_config["behaviours"]
+    behaviours = yaml_config["behaviours"]
     all_ticks = set()
     all_sends = set()
     all_receives = set()
-    for behaviour_key, behaviour_dict in controllers.items():
+    for behaviour_key, behaviour_dict in behaviours.items():
         all_ticks.update(behaviour_dict["ticks"])
         all_sends.update(behaviour_dict["sends"])
         all_receives.update(behaviour_dict["receives"])
 
     items = []
     stubs = []
-    for behaviour_key, behaviour_dict in controllers.items():
+    for behaviour_key, behaviour_dict in behaviours.items():
         item_dict = {
             "name": behaviour_key,
             "behaviour": behaviour_dict
@@ -325,11 +324,76 @@ def generate_behaviours(yaml_config):
     generate_items(stubs, base_path=script_dir)
 
 
+def generate_runtime(yaml_config):
+
+    behaviours = yaml_config["behaviours"]
+    controllers = yaml_config["controllers"]
+    ticks = set()
+    behaviour_ticks = set()
+    controller_ticks = set()
+    event_routes = {}
+
+    # behaviour ticks
+    for item_dict in behaviours.values():
+        ticks.update(item_dict["ticks"])
+        behaviour_ticks.update(item_dict["ticks"])
+
+    # controller ticks
+    for item_dict in controllers.values():
+        ticks.update(item_dict["ticks"])
+        controller_ticks.update(item_dict["ticks"])
+
+    # controller event routes
+    for ctrl_key, ctrl_dict in controllers.items():
+        if(ctrl_dict["receives"] is None or len(ctrl_dict["receives"]) == 0):
+            continue
+        for event in ctrl_dict["receives"]:
+            if(event not in event_routes):
+                event_routes[event] = {"controllers": set(), "behaviours": set()}
+            event_routes[event]["controllers"].add(ctrl_key)
+        
+    # behaviour event routes
+    for behaviour_key, behaviour_dict in behaviours.items():
+        if(behaviour_dict["receives"] is None or len(behaviour_dict["receives"]) == 0):
+            continue
+        for event in behaviour_dict["receives"]:
+            if(event not in event_routes):
+                event_routes[event] = {"controllers": set(), "behaviours": set()}
+            event_routes[event]["behaviours"].add(behaviour_key)
+
+    for route in event_routes.values():
+        route["controllers"] = list(route["controllers"])
+        route["behaviours"] = list(route["behaviours"])
+
+    name =  yaml_config["name"]
+    out_path = f"app/runtime/test/{name}Runtime"
+    template_path = f"application/Runtime"
+    runtime_dict = {
+        "name": name,
+        "initial_behaviour": yaml_config["initial_behaviour"],
+        "behaviours": behaviours,
+        "controllers": controllers,
+        "ticks": list(ticks),
+        "behaviour_ticks": list(behaviour_ticks),
+        "controller_ticks": list(controller_ticks),
+        "event_routes": event_routes,
+    }
+    print_json(runtime_dict)
+    items = []
+    items.append(Item(runtime_dict, list(runtime_dict.keys()), f"{out_path}.h", f"{template_path}.h.j2"))
+    items.append(Item(runtime_dict, list(runtime_dict.keys()), f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+    generate_items(items)
+
 def generate_application():
     yaml_path = script_dir.joinpath("config/application.yaml")
     yaml_config = load_yaml(yaml_path)
+    ensure_suffix(yaml_config, "behaviours", "Behaviour")
+    ensure_value_suffix(yaml_config, "behaviours", "ticks", "Tick")
+    ensure_suffix(yaml_config, "controllers", "Controller")
+    ensure_value_suffix(yaml_config, "controllers", "ticks", "Tick")
     generate_controllers(yaml_config)
     generate_behaviours(yaml_config)
+    generate_runtime(yaml_config)
     
 
 def main():

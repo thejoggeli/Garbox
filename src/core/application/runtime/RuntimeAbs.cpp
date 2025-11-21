@@ -63,6 +63,11 @@ void RuntimeAbs::start(){
     onStart();
 }
 
+void RuntimeAbs::beginTickSequence(){
+    incrementTickCount();
+    applyQueuedBehaviour();
+}
+
 void RuntimeAbs::setQueuedBehaviour(BehaviourIfc* behaviour){
     mQueuedBehaviour = behaviour;
 }

@@ -162,6 +162,8 @@ void handleMainTask(){
         // advance time
         Time::Tick();
 
+        gRuntime.beginTickSequence();
+
         // main tick
         {
             ProfilerScoped mainTickProfilerScoped = ProfilerScoped(ProfilerId::MainTick);
@@ -182,9 +184,6 @@ void handleMainTask(){
             ProfilerScoped displayTickProfilerScoped = ProfilerScoped(ProfilerId::DisplayTick);
             gRuntime.onDisplayTick();
         }
-
-        // increment runtime context tick count
-        gRuntime.incrementTickCount();
         
         // end main task
         // sleep until next tick
