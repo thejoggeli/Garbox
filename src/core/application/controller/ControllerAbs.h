@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/application/component/ComponentAbs.h"
 #include "core/application/controller/ControllerIfc.h"
 #include "core/application/event/EventFactory.h"
 #include "core/application/event/types/EventWrite.h"
@@ -12,7 +13,7 @@ namespace Garbox {
 
 class EventFactory;
 
-class ControllerAbs : public ControllerIfc {
+class ControllerAbs : public ComponentAbs, public ControllerIfc {
 public:
 
     ControllerAbs(ComponentId componentId, ControllerId controllerId);

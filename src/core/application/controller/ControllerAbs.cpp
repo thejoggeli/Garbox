@@ -6,7 +6,7 @@ namespace Garbox {
 
 ControllerAbs::ControllerAbs(ComponentId componentId, ControllerId controllerId): 
     // init memberes
-    ControllerIfc(componentId),
+    ComponentAbs(ComponentType::Controller, componentId),
     mControllerId(controllerId){
     // nothing to do
 }

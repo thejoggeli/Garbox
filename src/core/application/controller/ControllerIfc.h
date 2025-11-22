@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/application/component/ComponentAbs.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/ControllerId.h"
 
@@ -8,10 +7,8 @@ namespace Garbox {
 
 class ControllerHostIfc;
 
-class ControllerIfc : public ComponentAbs {
+class ControllerIfc {
 public:
-
-    ControllerIfc(ComponentId id) : ComponentAbs(ComponentType::Controller, id) {}
 
     virtual void init(ControllerHostIfc& host) = 0;
     virtual void start() = 0;

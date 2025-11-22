@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "core/application/behaviour/BehaviourIfc.h"
+#include "core/application/component/ComponentAbs.h"
 #include "core/application/event/EventFactory.h"
 #include "core/application/event/types/EventWrite.h"
 #include "core/application/event/types/EventRead.h"
@@ -10,7 +11,7 @@
 
 namespace Garbox {
 
-class BehaviourAbs : public BehaviourIfc {
+class BehaviourAbs : public ComponentAbs, public BehaviourIfc {
 public:
 
     BehaviourAbs(ComponentId componentId, BehaviourId behaviourId);

@@ -1,6 +1,5 @@
 #pragma once 
 
-#include "core/application/component/ComponentAbs.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/BehaviourId.h"
 
@@ -10,10 +9,8 @@ class BehaviourHostIfc;
 class EventHeader;
 class RuntimeContext;
 
-class BehaviourIfc : public ComponentAbs {
+class BehaviourIfc {
 public:
-
-    BehaviourIfc(ComponentId id) : ComponentAbs(ComponentType::Behaviour, id) {}
 
     virtual void init(BehaviourHostIfc& host) = 0;
     virtual void start() = 0;
