@@ -36,7 +36,7 @@ void CalibrationBehaviour::onLogicTick(){
 void CalibrationBehaviour::onHeartbeat(const Heartbeat& event){
     static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
     if(getContext()->tickCount > 10*30){
-        getHost()->requestChangeBehaviour(BehaviourId::Fermentation);
+        getBehaviourHost()->requestChangeBehaviour(BehaviourId::Fermentation);
         piezo.playTone(Tone(400_ms).sweep(1000, 2500));
     }
     else {

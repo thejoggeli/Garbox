@@ -1,7 +1,7 @@
 #include "RuntimeAbs.h"
 
-#include "core/application/behaviour/BehaviourIfc.h"
-#include "core/application/controller/ControllerIfc.h"
+#include "core/application/behaviour/BehaviourAbs.h"
+#include "core/application/controller/ControllerAbs.h"
 #include "core/assert/Assert.h"
 #include "core/time/Time.h"
 
@@ -26,12 +26,12 @@ void RuntimeAbs::init(const Config& config){
     onRegisterBehaviours();
 
     // init all controllers
-    for(ControllerIfc* controller : mControllersSpan){
+    for(ControllerAbs* controller : mControllersSpan){
         controller->init(*this);
     }
 
     // init all behaviours
-    for(BehaviourIfc* behaviour : mBehavioursSpan){
+    for(BehaviourAbs* behaviour : mBehavioursSpan){
         behaviour->init(*this);
     }
 
@@ -45,12 +45,12 @@ void RuntimeAbs::start(){
     AssertExit(mControllersSpan.size() > 0, "RuntimeAbs", "no controllers registered");
 
     // start all controllers
-    for(ControllerIfc* controller : mControllersSpan){
+    for(ControllerAbs* controller : mControllersSpan){
         controller->start();
     }
 
     // start all behaviours
-    for(BehaviourIfc* behaviour : mBehavioursSpan){
+    for(BehaviourAbs* behaviour : mBehavioursSpan){
         behaviour->start();
     }
 
@@ -63,7 +63,7 @@ void RuntimeAbs::beginTickSequence(){
     applyQueuedBehaviour();
 }
 
-void RuntimeAbs::setQueuedBehaviour(BehaviourIfc* behaviour){
+void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
     mQueuedBehaviour = behaviour;
 }
 
@@ -75,36 +75,36 @@ void RuntimeAbs::applyQueuedBehaviour() {
 }
 
 void RuntimeAbs::requestChangeBehaviour(BehaviourId id){
-    BehaviourIfc* behaviour = resolveBehaviour(id);
+    BehaviourAbs* behaviour = resolveBehaviour(id);
     AssertExit(behaviour != nullptr, "RuntimeAbs", "failed to resolve behaviour", static_cast<uint32_t>(id));
     setQueuedBehaviour(behaviour);
 }
 
-BehaviourIfc* RuntimeAbs::getActiveBehaviour() const {
+BehaviourAbs* RuntimeAbs::getActiveBehaviour() const {
     return mActiveBehaviour;
 }
 
-void RuntimeAbs::registerController(ControllerIfc* controller){
+void RuntimeAbs::registerController(ControllerAbs* controller){
     const size_t maxIndex = MaxControllersCount - 1;
     const size_t nextIndex = mControllersSpan.size();
     AssertExit(nextIndex <= maxIndex, "RuntimeAbs", "max controllers count exceeded");
     mControllersRawArray[nextIndex] = controller;
-    mControllersSpan = Span<ControllerIfc*>(mControllersRawArray, mControllersSpan.size()+1);
+    mControllersSpan = Span<ControllerAbs*>(mControllersRawArray, mControllersSpan.size()+1);
 }
 
-Span<ControllerIfc*> RuntimeAbs::getControllers(){
+Span<ControllerAbs*> RuntimeAbs::getControllers(){
     return mControllersSpan;
 }
 
-void RuntimeAbs::registerBehaviour(BehaviourIfc* behaviour){
+void RuntimeAbs::registerBehaviour(BehaviourAbs* behaviour){
     const size_t maxIndex = MaxBehavioursCount - 1;
     const size_t nextIndex = mBehavioursSpan.size();
     AssertExit(nextIndex <= maxIndex, "RuntimeAbs", "max behaviours count exceeded");
     mBehavioursRawArray[nextIndex] = behaviour;
-    mBehavioursSpan = Span<BehaviourIfc*>(mBehavioursRawArray, mBehavioursSpan.size()+1);
+    mBehavioursSpan = Span<BehaviourAbs*>(mBehavioursRawArray, mBehavioursSpan.size()+1);
 }
 
-Span<BehaviourIfc*> RuntimeAbs::getBehaviours(){
+Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
     return mBehavioursSpan;
 }
 

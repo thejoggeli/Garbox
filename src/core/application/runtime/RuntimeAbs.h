@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "core/application/behaviour/BehaviourIfc.h"
-#include "core/application/controller/ControllerIfc.h"
+#include "core/application/behaviour/BehaviourAbs.h"
+#include "core/application/controller/ControllerAbs.h"
 #include "core/application/event/EventFactory.h"
 #include "core/application/host/BehaviourHostIfc.h"
 #include "core/application/host/ControllerHostIfc.h"
@@ -44,26 +44,26 @@ public:
 
     // BehaviourHostIfc
     void requestChangeBehaviour(BehaviourId id) final;
-    BehaviourIfc* getActiveBehaviour() const final;
+    BehaviourAbs* getActiveBehaviour() const final;
 
 protected:
 
     // controllers setup
-    void registerController(ControllerIfc* controller);
-    Span<ControllerIfc*> getControllers();
-    virtual ControllerIfc* resolveController(ControllerId id) = 0;
+    void registerController(ControllerAbs* controller);
+    Span<ControllerAbs*> getControllers();
+    virtual ControllerAbs* resolveController(ControllerId id) = 0;
 
     // behaviours setup
-    void registerBehaviour(BehaviourIfc* behaviour);
-    Span<BehaviourIfc*> getBehaviours();
-    virtual BehaviourIfc* resolveBehaviour(BehaviourId id) = 0;
+    void registerBehaviour(BehaviourAbs* behaviour);
+    Span<BehaviourAbs*> getBehaviours();
+    virtual BehaviourAbs* resolveBehaviour(BehaviourId id) = 0;
 
     // event handling internal methods
     void dispatchEvents();
     void clearEventQueue();
 
     // behaviours internal methods
-    void setQueuedBehaviour(BehaviourIfc* behaviour);
+    void setQueuedBehaviour(BehaviourAbs* behaviour);
     void applyQueuedBehaviour(); 
     bool hasQueuedBehaviour() const;
 
@@ -89,17 +89,17 @@ private:
 
     // controllers array
     static constexpr size_t MaxControllersCount = 16;
-    ControllerIfc* mControllersRawArray[MaxControllersCount];
-    Span<ControllerIfc*> mControllersSpan;
+    ControllerAbs* mControllersRawArray[MaxControllersCount];
+    Span<ControllerAbs*> mControllersSpan;
 
     // behaviours array
     static constexpr size_t MaxBehavioursCount = 16;
-    BehaviourIfc* mBehavioursRawArray[MaxBehavioursCount];
-    Span<BehaviourIfc*> mBehavioursSpan;
+    BehaviourAbs* mBehavioursRawArray[MaxBehavioursCount];
+    Span<BehaviourAbs*> mBehavioursSpan;
 
     // behaviour active and queued
-    BehaviourIfc* mActiveBehaviour = nullptr;
-    BehaviourIfc* mQueuedBehaviour = nullptr;
+    BehaviourAbs* mActiveBehaviour = nullptr;
+    BehaviourAbs* mQueuedBehaviour = nullptr;
 
 };
 

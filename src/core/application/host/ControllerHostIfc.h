@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/application/host/BaseHostIfc.h"
+#include "core/application/host/ComponentHostIfc.h"
 
 namespace Garbox {
 
-class ControllerHostIfc : public BaseHostIfc {
+class ControllerHostIfc : public ComponentHostIfc {
 public:
 
 };

@@ -7,7 +7,7 @@ namespace Garbox {
 class EventHeader;
 class EventFactory;
 
-class BaseHostIfc {
+class ComponentHostIfc {
 public:
 
     virtual void publishEvent(const EventHeader* header) = 0;

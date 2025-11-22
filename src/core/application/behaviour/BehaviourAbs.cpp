@@ -11,31 +11,8 @@ BehaviourAbs::BehaviourAbs(ComponentId componentId, BehaviourId behaviourId):
     // nothing to do
 }
 
-BehaviourAbs::~BehaviourAbs(){
-    TriggerExit("BehaviourAbs", "behaviours must not be destroyed");
-}
-
 void BehaviourAbs::init(BehaviourHostIfc& host){
-    AssertExit(!mInitialized, "BehaviourAbs", "already initialized");
-    mHost = &host;
-    mContext = &host.getContext();
-    mEventFactory = &host.getEventFactory();
-    onInit();
-    mInitialized = true;
-}
-
-void BehaviourAbs::start(){
-    if(!mInitialized){
-        TriggerExit("BehaviourAbs", "not initialized");
-    }
-    onStart();
-}
-
-void BehaviourAbs::sendEvent(EventHeader* header){
-    if(!mInitialized){
-        TriggerExit("BehaviourAbs", "not initialized");
-    }
-    mHost->publishEvent(header);
+    ComponentAbs::init(host);
 }
 
 void BehaviourAbs::setActive(bool active){

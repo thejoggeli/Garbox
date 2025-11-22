@@ -1,17 +1,17 @@
 #pragma once
 
-#include "core/application/host/BaseHostIfc.h"
+#include "core/application/host/ComponentHostIfc.h"
 #include "shared/types/BehaviourId.h"
-
+    
 namespace Garbox {
 
-class BehaviourIfc;
+class BehaviourAbs;
 
-class BehaviourHostIfc : public BaseHostIfc {
+class BehaviourHostIfc : public ComponentHostIfc {
 public:
 
     virtual void requestChangeBehaviour(BehaviourId id) = 0;
-    virtual BehaviourIfc* getActiveBehaviour() const = 0;
+    virtual BehaviourAbs* getActiveBehaviour() const = 0;
 
 };
 

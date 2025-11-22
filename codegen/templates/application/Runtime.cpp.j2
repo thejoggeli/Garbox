@@ -84,7 +84,7 @@ void {{ name }}Runtime::onRouteEvent(const EventHeader* header){
     }
 }
 
-ControllerIfc* {{ name }}Runtime::resolveController(ControllerId id){
+ControllerAbs* {{ name }}Runtime::resolveController(ControllerId id){
     switch(id){
 {% for key in controllers %}
     case ControllerId::{{ key.removesuffix("Controller") }}: return &m{{ key }};
@@ -95,7 +95,7 @@ ControllerIfc* {{ name }}Runtime::resolveController(ControllerId id){
     return nullptr;
 }
 
-BehaviourIfc* {{ name }}Runtime::resolveBehaviour(BehaviourId id){
+BehaviourAbs* {{ name }}Runtime::resolveBehaviour(BehaviourId id){
     switch(id){
 {% for key in behaviours %}
     case BehaviourId::{{ key.removesuffix("Behaviour") }}: return &m{{ key }};

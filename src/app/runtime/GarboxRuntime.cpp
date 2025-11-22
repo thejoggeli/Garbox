@@ -149,7 +149,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
 }
 
-ControllerIfc* GarboxRuntime::resolveController(ControllerId id){
+ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
     switch(id){
     case ControllerId::Display: return &mDisplayController;
     case ControllerId::Fan: return &mFanController;
@@ -163,7 +163,7 @@ ControllerIfc* GarboxRuntime::resolveController(ControllerId id){
     return nullptr;
 }
 
-BehaviourIfc* GarboxRuntime::resolveBehaviour(BehaviourId id){
+BehaviourAbs* GarboxRuntime::resolveBehaviour(BehaviourId id){
     switch(id){
     case BehaviourId::Calibration: return &mCalibrationBehaviour;
     case BehaviourId::Fermentation: return &mFermentationBehaviour;

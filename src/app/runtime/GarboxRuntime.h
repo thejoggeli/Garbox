@@ -31,8 +31,8 @@ public:
 
 private:
 
-    ControllerIfc* resolveController(ControllerId id) final;
-    BehaviourIfc* resolveBehaviour(BehaviourId id) final;
+    ControllerAbs* resolveController(ControllerId id) final;
+    BehaviourAbs* resolveBehaviour(BehaviourId id) final;
 
     CalibrationBehaviour mCalibrationBehaviour;
     FermentationBehaviour mFermentationBehaviour;
