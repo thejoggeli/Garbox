@@ -8,48 +8,55 @@ payload:
 
 type:
 
-  # Heartbeat
+  #### Heartbeat ####
   Heartbeat: null
 
-  # Display
+  #### Display ####
   BacklightCommand:
     brightness: float
 
-  # Fan
+  #### Fan ####
   FanStatus:  
     state: FanState
     targetSpeed: float
+
   FanSample:  
     measuredRpm: float
+
   FanCommand:  
     enabled: bool
     targetSpeed: float
-  
-  # Heatpad
+
+  #### Heatpad ####
   HeatpadStatus:  
     state: HeatpadState 
     dutyCycle: float
     periodMicros: uint32_t
+    
   HeatpadCommand:  
     enabled: bool
     dutyCycle: float
     periodMicros: uint32_t
   
-  # Temperature
+  #### Temperature ####
   TemperatureStatus:
     driverEnabled: bool  
     powerEnabled: bool
     resetting: bool
+
   TemperatureSample:  
     temperatureCelcius: float
     humidityRelative: float
   
-  # Encoder
+  #### Button ####
   ButtonStateChanged:  
     oldState: ButtonState 
     newState: ButtonState
+
   ButtonRepeat:  
     count: uint32_t
+
+  #### Encoder ####
   EncoderStep:  
     steps: int32_t
   

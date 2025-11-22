@@ -1,6 +1,6 @@
 #include "RuntimeAbs.h"
 
-#define GarboxDebugRuntimeAbs 1
+#define GarboxDebugRuntimeAbs 0
 
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "core/application/controller/ControllerAbs.h"
@@ -115,9 +115,6 @@ Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
-    if(header->type == EventType::Heartbeat){
-        LogDebug("RuntimeAbs", "bypassQueue: %u", header->bypassQueue);
-    }
     if(header->bypassQueue){
         onRouteEvent(header);
     }
