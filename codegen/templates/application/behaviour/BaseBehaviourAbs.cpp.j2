@@ -6,7 +6,9 @@
 
 namespace Garbox {
 
-BaseBehaviourAbs::BaseBehaviourAbs(ComponentId id): BehaviourAbs(id){
+BaseBehaviourAbs::BaseBehaviourAbs(ComponentId componentId, BehaviourId behaviourId): 
+    // init memberes
+    BehaviourAbs(componentId, behaviourId){
     // nothing to do
 }
 

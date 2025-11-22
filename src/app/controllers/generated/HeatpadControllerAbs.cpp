@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-HeatpadControllerAbs::HeatpadControllerAbs(): 
-    // init members
-    ControllerAbs(ComponentId::HeatpadController){
+HeatpadControllerAbs::HeatpadControllerAbs():
+    // init memberes
+    ControllerAbs(ComponentId::HeatpadController, ControllerId::Heatpad){
     // nothing to do
 }
 
@@ -20,10 +20,6 @@ HeatpadControllerAbs::HeatpadStatusWrite HeatpadControllerAbs::makeHeatpadStatus
 
 void HeatpadControllerAbs::sendEvent(const HeatpadStatusWrite& event){
     sendEvent(event.header);
-}
-
-ControllerId HeatpadControllerAbs::getControllerId() const {
-    return ControllerId::Heatpad;
 }
 
 } // namespace Garbox

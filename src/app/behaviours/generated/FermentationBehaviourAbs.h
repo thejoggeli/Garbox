@@ -12,8 +12,6 @@ class FermentationBehaviourAbs : public BaseBehaviourAbs {
 public:
 
     FermentationBehaviourAbs();
-    
-    BehaviourId getBehaviourId() const final;
 
 protected:
 

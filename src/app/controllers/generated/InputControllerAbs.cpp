@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-InputControllerAbs::InputControllerAbs(): 
-    // init members
-    ControllerAbs(ComponentId::InputController){
+InputControllerAbs::InputControllerAbs():
+    // init memberes
+    ControllerAbs(ComponentId::InputController, ControllerId::Input){
     // nothing to do
 }
 
@@ -36,10 +36,6 @@ void InputControllerAbs::sendEvent(const ButtonRepeatWrite& event){
 
 void InputControllerAbs::sendEvent(const EncoderStepWrite& event){
     sendEvent(event.header);
-}
-
-ControllerId InputControllerAbs::getControllerId() const {
-    return ControllerId::Input;
 }
 
 } // namespace Garbox

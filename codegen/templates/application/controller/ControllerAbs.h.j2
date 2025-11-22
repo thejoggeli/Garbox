@@ -13,8 +13,6 @@ class {{ name }}Abs : public ControllerAbs {
 public:
     
     {{ name }}Abs();
-    
-    ControllerId getControllerId() const final;
     {# ---- Tick handlers ---- #}
 {% if controller.ticks %}
 

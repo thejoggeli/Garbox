@@ -6,9 +6,9 @@
 
 namespace Garbox {
 
-FermentationBehaviourAbs::FermentationBehaviourAbs():
-    // init members
-    BaseBehaviourAbs(ComponentId::FermentationBehaviour){
+FermentationBehaviourAbs::FermentationBehaviourAbs(): 
+    // init memberes
+    BaseBehaviourAbs(ComponentId::FermentationBehaviour, BehaviourId::Fermentation){
     // nothing to do
 }
 
@@ -34,10 +34,6 @@ void FermentationBehaviourAbs::sendEvent(const BacklightCommandWrite& event){
 
 void FermentationBehaviourAbs::sendEvent(const HeatpadCommandWrite& event){
     sendEvent(event.header);
-}
-
-BehaviourId FermentationBehaviourAbs::getBehaviourId() const {
-    return BehaviourId::Fermentation;
 }
 
 } // namespace Garbox

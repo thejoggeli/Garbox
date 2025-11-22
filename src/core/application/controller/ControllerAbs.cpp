@@ -4,10 +4,11 @@
 
 namespace Garbox {
 
-ControllerAbs::ControllerAbs(ComponentId id): 
-    // init members    
-    mComponentDescriptor{ComponentType::Controller, id}{
-    // constructor body
+ControllerAbs::ControllerAbs(ComponentId componentId, ControllerId controllerId): 
+    // init memberes
+    ControllerIfc(componentId),
+    mControllerId(controllerId){
+    // nothing to do
 }
 
 ControllerAbs::~ControllerAbs(){
@@ -35,22 +36,6 @@ void ControllerAbs::sendEvent(EventHeader* header){
         TriggerExit("ControllerAbs", "not initialized");
     }
     mHost->publishEvent(header);
-}
-
-bool ControllerAbs::isInitialized() const {
-    return mInitialized;
-}
-
-ComponentId ControllerAbs::getComponentId() const {
-    return mComponentDescriptor.id;
-}
-
-const RuntimeContext* ControllerAbs::getContext() const {
-    return mContext;
-}
-
-ControllerHostIfc* ControllerAbs::getHost(){
-    return mHost;
 }
 
 } // namespace

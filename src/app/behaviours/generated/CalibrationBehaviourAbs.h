@@ -12,8 +12,6 @@ class CalibrationBehaviourAbs : public BaseBehaviourAbs {
 public:
 
     CalibrationBehaviourAbs();
-    
-    BehaviourId getBehaviourId() const final;
 
 protected:
 

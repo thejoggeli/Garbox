@@ -15,16 +15,18 @@ class EventFactory;
 class ControllerAbs : public ControllerIfc {
 public:
 
-    ControllerAbs(ComponentId id);
+    ControllerAbs(ComponentId componentId, ControllerId controllerId);
     ~ControllerAbs();
 
     // interface implementations
     void init(ControllerHostIfc& host) final;
     void start() final;
-    bool isInitialized() const final;
-    ComponentId getComponentId() const final;
-    const RuntimeContext* getContext() const final;
-    ControllerHostIfc* getHost() final;
+
+    // trivial getters
+    bool isInitialized() const { return mInitialized; }
+    const RuntimeContext* getContext() const { return mContext; }
+    ControllerHostIfc* getHost() final { return mHost; }
+    ControllerId getControllerId() const { return mControllerId; }
 
     // disallow copy and move 
     ControllerAbs(const ControllerAbs&) = delete;
@@ -34,8 +36,8 @@ public:
 
 protected:
 
-    // interface implementations
-    void sendEvent(EventHeader* header) final;
+    // send event
+    void sendEvent(EventHeader* header);
 
     // make event
     template<typename EventPayload>
@@ -56,7 +58,7 @@ protected:
 
 private:
 
-    ComponentDescriptor mComponentDescriptor;
+    ControllerId mControllerId;
     ControllerHostIfc* mHost = nullptr;
     const RuntimeContext* mContext = nullptr;
     EventFactory* mEventFactory = nullptr;

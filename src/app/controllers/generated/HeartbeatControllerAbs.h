@@ -13,8 +13,6 @@ class HeartbeatControllerAbs : public ControllerAbs {
 public:
     
     HeartbeatControllerAbs();
-    
-    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onHeartbeatTick() = 0;

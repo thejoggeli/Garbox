@@ -6,9 +6,9 @@
 
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs(): 
-    // init members
-    ControllerAbs(ComponentId::{{ name }}){
+{{ name }}Abs::{{ name }}Abs():
+    // init memberes
+    ControllerAbs(ComponentId::{{ name }}, ControllerId::{{ name.removesuffix("Controller") }}){
     // nothing to do
 }
 {% if controller.sends %}
@@ -25,9 +25,5 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
 }
 {% endfor %}
 {% endif %}
-
-ControllerId {{ name }}Abs::getControllerId() const {
-    return ControllerId::{{ name.removesuffix("Controller") }};
-}
 
 } // namespace Garbox

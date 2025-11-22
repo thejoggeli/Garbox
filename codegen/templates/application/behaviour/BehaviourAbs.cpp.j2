@@ -4,9 +4,9 @@
 
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs():
-    // init members
-    BaseBehaviourAbs(ComponentId::{{ name }}){
+{{ name }}Abs::{{ name }}Abs(): 
+    // init memberes
+    BaseBehaviourAbs(ComponentId::{{ name }}, BehaviourId::{{ name.removesuffix("Behaviour") }}){
     // nothing to do
 }
 {% if behaviour.ticks_null %}
@@ -39,9 +39,5 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
 }
 {% endfor %}
 {% endif %}
-
-BehaviourId {{ name }}Abs::getBehaviourId() const {
-    return BehaviourId::{{ name.removesuffix("Behaviour") }};
-}
 
 } // namespace Garbox

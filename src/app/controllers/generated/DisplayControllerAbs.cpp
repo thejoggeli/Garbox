@@ -8,14 +8,10 @@
 
 namespace Garbox {
 
-DisplayControllerAbs::DisplayControllerAbs(): 
-    // init members
-    ControllerAbs(ComponentId::DisplayController){
+DisplayControllerAbs::DisplayControllerAbs():
+    // init memberes
+    ControllerAbs(ComponentId::DisplayController, ControllerId::Display){
     // nothing to do
-}
-
-ControllerId DisplayControllerAbs::getControllerId() const {
-    return ControllerId::Display;
 }
 
 } // namespace Garbox

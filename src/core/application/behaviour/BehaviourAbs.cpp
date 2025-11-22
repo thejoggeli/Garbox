@@ -4,9 +4,10 @@
 
 namespace Garbox {
 
-BehaviourAbs::BehaviourAbs(ComponentId id):
-    // init members
-    mComponentDescriptor{ComponentType::Behaviour, id}{
+BehaviourAbs::BehaviourAbs(ComponentId componentId, BehaviourId behaviourId): 
+    // init memberes
+    BehaviourIfc(componentId),
+    mBehaviourId(behaviourId){
     // nothing to do
 }
 
@@ -52,26 +53,6 @@ void BehaviourAbs::setActive(bool active){
     else {
         onBecomeInactive();
     }
-}
-
-bool BehaviourAbs::isActive() const {
-    return mActive;
-}
-
-bool BehaviourAbs::isInitialized() const {
-    return mInitialized;
-}
-
-ComponentId BehaviourAbs::getComponentId() const {
-    return mComponentDescriptor.id;
-}
-
-const RuntimeContext* BehaviourAbs::getContext() const {
-    return mContext;
-}
-
-BehaviourHostIfc* BehaviourAbs::getHost(){
-    return mHost;
 }
 
 } // namespace

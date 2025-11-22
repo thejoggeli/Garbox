@@ -13,7 +13,7 @@ class BaseBehaviourAbs : public BehaviourAbs {
 public:
     
     // behaviour constructor
-    BaseBehaviourAbs(ComponentId id);
+    BaseBehaviourAbs(ComponentId componentId, BehaviourId behaviourId);
     {# ---- Tick handlers ---- #}
     {% if behaviour.ticks %}
 

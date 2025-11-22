@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "core/types/ComponentDescriptor.h"
+#include "core/application/component/ComponentDescriptor.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {

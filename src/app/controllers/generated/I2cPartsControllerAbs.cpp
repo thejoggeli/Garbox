@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-I2cPartsControllerAbs::I2cPartsControllerAbs(): 
-    // init members
-    ControllerAbs(ComponentId::I2cPartsController){
+I2cPartsControllerAbs::I2cPartsControllerAbs():
+    // init memberes
+    ControllerAbs(ComponentId::I2cPartsController, ControllerId::I2cParts){
     // nothing to do
 }
 
@@ -28,10 +28,6 @@ void I2cPartsControllerAbs::sendEvent(const TemperatureStatusWrite& event){
 
 void I2cPartsControllerAbs::sendEvent(const TemperatureSampleWrite& event){
     sendEvent(event.header);
-}
-
-ControllerId I2cPartsControllerAbs::getControllerId() const {
-    return ControllerId::I2cParts;
 }
 
 } // namespace Garbox

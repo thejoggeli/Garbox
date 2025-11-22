@@ -13,8 +13,6 @@ class HeatpadControllerAbs : public ControllerAbs {
 public:
     
     HeatpadControllerAbs();
-    
-    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

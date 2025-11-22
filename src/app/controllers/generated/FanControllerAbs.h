@@ -13,8 +13,6 @@ class FanControllerAbs : public ControllerAbs {
 public:
     
     FanControllerAbs();
-    
-    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

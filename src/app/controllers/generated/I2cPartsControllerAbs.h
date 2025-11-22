@@ -13,8 +13,6 @@ class I2cPartsControllerAbs : public ControllerAbs {
 public:
     
     I2cPartsControllerAbs();
-    
-    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

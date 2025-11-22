@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-FanControllerAbs::FanControllerAbs(): 
-    // init members
-    ControllerAbs(ComponentId::FanController){
+FanControllerAbs::FanControllerAbs():
+    // init memberes
+    ControllerAbs(ComponentId::FanController, ControllerId::Fan){
     // nothing to do
 }
 
@@ -28,10 +28,6 @@ void FanControllerAbs::sendEvent(const FanStatusWrite& event){
 
 void FanControllerAbs::sendEvent(const FanSampleWrite& event){
     sendEvent(event.header);
-}
-
-ControllerId FanControllerAbs::getControllerId() const {
-    return ControllerId::Fan;
 }
 
 } // namespace Garbox

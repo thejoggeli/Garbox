@@ -13,8 +13,6 @@ class InputControllerAbs : public ControllerAbs {
 public:
     
     InputControllerAbs();
-    
-    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

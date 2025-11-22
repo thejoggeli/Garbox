@@ -8,7 +8,8 @@
 
 namespace Garbox {
 
-BaseBehaviourAbs::BaseBehaviourAbs(ComponentId id): BehaviourAbs(id){
+BaseBehaviourAbs::BaseBehaviourAbs(ComponentId componentId, BehaviourId behaviourId): 
+    BehaviourAbs(componentId, behaviourId){
     // nothing to do
 }
 

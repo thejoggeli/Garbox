@@ -6,9 +6,9 @@
 
 namespace Garbox {
 
-CalibrationBehaviourAbs::CalibrationBehaviourAbs():
-    // init members
-    BaseBehaviourAbs(ComponentId::CalibrationBehaviour){
+CalibrationBehaviourAbs::CalibrationBehaviourAbs(): 
+    // init memberes
+    BaseBehaviourAbs(ComponentId::CalibrationBehaviour, BehaviourId::Calibration){
     // nothing to do
 }
 
@@ -42,10 +42,6 @@ CalibrationBehaviourAbs::FanCommandWrite CalibrationBehaviourAbs::makeFanCommand
 
 void CalibrationBehaviourAbs::sendEvent(const FanCommandWrite& event){
     sendEvent(event.header);
-}
-
-BehaviourId CalibrationBehaviourAbs::getBehaviourId() const {
-    return BehaviourId::Calibration;
 }
 
 } // namespace Garbox

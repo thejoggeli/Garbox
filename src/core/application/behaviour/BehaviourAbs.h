@@ -13,18 +13,20 @@ namespace Garbox {
 class BehaviourAbs : public BehaviourIfc {
 public:
 
-    BehaviourAbs(ComponentId id);
+    BehaviourAbs(ComponentId componentId, BehaviourId behaviourId);
     ~BehaviourAbs();
 
     // interface implementations
     void init(BehaviourHostIfc& host) final;
     void start() final;
     void setActive(bool active) final;
-    bool isActive() const final;
-    bool isInitialized() const final;
-    ComponentId getComponentId() const final;
-    const RuntimeContext* getContext() const final;
-    BehaviourHostIfc* getHost() final;
+
+    // trivial getters
+    bool isInitialized() const { return mInitialized; }
+    const RuntimeContext* getContext() const { return mContext; }
+    BehaviourHostIfc* getHost() final { return mHost; }
+    bool isActive() const { return mActive; }
+    BehaviourId getControllerId() const { return mBehaviourId; }
 
     // disallow copy and move 
     BehaviourAbs(const BehaviourAbs&) = delete;
@@ -34,8 +36,8 @@ public:
 
 protected:
 
-    // interface implementations
-    void sendEvent(EventHeader* header) final;
+    // send event
+    void sendEvent(EventHeader* header);
 
     // make event
     template<typename EventPayload>
@@ -58,7 +60,7 @@ protected:
 
 private:
 
-    ComponentDescriptor mComponentDescriptor;
+    BehaviourId mBehaviourId;
     BehaviourHostIfc* mHost = nullptr;
     const RuntimeContext* mContext = nullptr;
     EventFactory* mEventFactory = nullptr;

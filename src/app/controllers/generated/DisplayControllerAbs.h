@@ -13,8 +13,6 @@ class DisplayControllerAbs : public ControllerAbs {
 public:
     
     DisplayControllerAbs();
-    
-    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onRenderTick() = 0;

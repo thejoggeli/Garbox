@@ -52,8 +52,8 @@ void GarboxRuntime::onOutputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onHeartbeatTick(){
-    mHeartbeatController.onHeartbeatTick();
+void GarboxRuntime::onRenderTick(){
+    mDisplayController.onRenderTick();
     dispatchEvents();
 }
 
@@ -65,15 +65,15 @@ void GarboxRuntime::onInputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onRenderTick(){
-    mDisplayController.onRenderTick();
-    dispatchEvents();
-}
-
 void GarboxRuntime::onLogicTick(){
     BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
     AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
     behaviour->onLogicTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onHeartbeatTick(){
+    mHeartbeatController.onHeartbeatTick();
     dispatchEvents();
 }
 
