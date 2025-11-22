@@ -40,4 +40,8 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
 {% endfor %}
 {% endif %}
 
+BehaviourId {{ name }}Abs::getBehaviourId() const {
+    return BehaviourId::{{ name.removesuffix("Behaviour") }};
+}
+
 } // namespace Garbox

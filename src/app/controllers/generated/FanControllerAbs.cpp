@@ -30,4 +30,8 @@ void FanControllerAbs::sendEvent(const FanSampleWrite& event){
     sendEvent(event.header);
 }
 
+ControllerId FanControllerAbs::getControllerId() const {
+    return ControllerId::Fan;
+}
+
 } // namespace Garbox

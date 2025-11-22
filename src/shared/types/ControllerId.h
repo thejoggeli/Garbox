@@ -8,24 +8,22 @@
 
 namespace Garbox {
 
-enum class ComponentId : uint16_t {
+enum class ControllerId : uint16_t {
 
     // null event
     Null = 0,
 
-    CalibrationBehaviour,
-    HeartbeatController,
-    HeatpadController,
-    FanController,
-    InputController,
-    DisplayController,
-    FermentationBehaviour,
-    I2cPartsController,
+    Display,
+    Fan,
+    Heartbeat,
+    Heatpad,
+    Input,
+    I2cParts,
 
     // enum size marker
     Count,
 };
 
-const char* ComponentIdToString(ComponentId id);
+const char* ControllerIdToString(ControllerId id);
 
 } // namespace Garbox

@@ -14,4 +14,8 @@ DisplayControllerAbs::DisplayControllerAbs():
     // nothing to do
 }
 
+ControllerId DisplayControllerAbs::getControllerId() const {
+    return ControllerId::Display;
+}
+
 } // namespace Garbox

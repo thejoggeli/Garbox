@@ -12,8 +12,9 @@ namespace Garbox {
 class {{ name }}Abs : public ControllerAbs {
 public:
     
-    // controller constructor
     {{ name }}Abs();
+    
+    ControllerId getControllerId() const final;
     {# ---- Tick handlers ---- #}
 {% if controller.ticks %}
 

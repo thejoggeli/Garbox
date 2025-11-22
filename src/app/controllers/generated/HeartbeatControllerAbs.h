@@ -12,8 +12,9 @@ namespace Garbox {
 class HeartbeatControllerAbs : public ControllerAbs {
 public:
     
-    // controller constructor
     HeartbeatControllerAbs();
+    
+    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onHeartbeatTick() = 0;

@@ -74,7 +74,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
     }
 }
 
-void RuntimeAbs::requestChangeBehaviour(ComponentId id){
+void RuntimeAbs::requestChangeBehaviour(BehaviourId id){
     BehaviourIfc* behaviour = resolveBehaviour(id);
     AssertExit(behaviour != nullptr, "RuntimeAbs", "failed to resolve behaviour", static_cast<uint32_t>(id));
     setQueuedBehaviour(behaviour);

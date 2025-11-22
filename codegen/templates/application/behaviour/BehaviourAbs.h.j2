@@ -10,6 +10,8 @@ class {{ name }}Abs : public BaseBehaviourAbs {
 public:
 
     {{ name }}Abs();
+    
+    BehaviourId getBehaviourId() const final;
 
 protected:
 {% if behaviour.sends %}

@@ -12,8 +12,9 @@ namespace Garbox {
 class I2cPartsControllerAbs : public ControllerAbs {
 public:
     
-    // controller constructor
     I2cPartsControllerAbs();
+    
+    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

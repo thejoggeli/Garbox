@@ -12,8 +12,9 @@ namespace Garbox {
 class HeatpadControllerAbs : public ControllerAbs {
 public:
     
-    // controller constructor
     HeatpadControllerAbs();
+    
+    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

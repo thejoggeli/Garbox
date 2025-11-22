@@ -1,7 +1,9 @@
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-
 #include "CalibrationBehaviour.h"
+
+#include "app/providers/PartsProvider.h"
+#include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 
@@ -32,7 +34,15 @@ void CalibrationBehaviour::onLogicTick(){
 }
 
 void CalibrationBehaviour::onHeartbeat(const Heartbeat& event){
-    // nothing to do
+    static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
+    if(getContext()->tickCount > 10*30){
+        getHost()->requestChangeBehaviour(BehaviourId::Fermentation);
+        piezo.playTone(Tone(400_ms).sweep(1000, 2500));
+    }
+    else {
+        piezo.playTone(Tone(125_ms).sweep(1000, 1500), 125_ms);
+        piezo.playTone(Tone(125_ms).sweep(1250, 2000));
+    }
 }
 
 void CalibrationBehaviour::onFanStatus(const FanStatus& event){

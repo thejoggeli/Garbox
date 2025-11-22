@@ -22,4 +22,8 @@ void HeatpadControllerAbs::sendEvent(const HeatpadStatusWrite& event){
     sendEvent(event.header);
 }
 
+ControllerId HeatpadControllerAbs::getControllerId() const {
+    return ControllerId::Heatpad;
+}
+
 } // namespace Garbox

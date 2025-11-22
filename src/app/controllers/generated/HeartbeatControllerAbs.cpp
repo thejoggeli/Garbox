@@ -22,4 +22,8 @@ void HeartbeatControllerAbs::sendEvent(const HeartbeatWrite& event){
     sendEvent(event.header);
 }
 
+ControllerId HeartbeatControllerAbs::getControllerId() const {
+    return ControllerId::Heartbeat;
+}
+
 } // namespace Garbox

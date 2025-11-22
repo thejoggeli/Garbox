@@ -26,4 +26,8 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
 {% endfor %}
 {% endif %}
 
+ControllerId {{ name }}Abs::getControllerId() const {
+    return ControllerId::{{ name.removesuffix("Controller") }};
+}
+
 } // namespace Garbox

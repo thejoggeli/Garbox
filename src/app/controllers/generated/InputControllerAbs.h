@@ -12,8 +12,9 @@ namespace Garbox {
 class InputControllerAbs : public ControllerAbs {
 public:
     
-    // controller constructor
     InputControllerAbs();
+    
+    ControllerId getControllerId() const final;
 
     // tick handlers
     virtual void onInputTick() = 0;

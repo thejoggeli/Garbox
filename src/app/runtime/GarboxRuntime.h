@@ -23,16 +23,16 @@ public:
 
     GarboxRuntime();
 
-    void onRenderTick();
-    void onHeartbeatTick();
-    void onLogicTick();
     void onOutputTick();
+    void onHeartbeatTick();
     void onInputTick();
+    void onRenderTick();
+    void onLogicTick();
 
 private:
 
-    ControllerIfc* resolveController(ComponentId id) final;
-    BehaviourIfc* resolveBehaviour(ComponentId id) final;
+    ControllerIfc* resolveController(ControllerId id) final;
+    BehaviourIfc* resolveBehaviour(BehaviourId id) final;
 
     CalibrationBehaviour mCalibrationBehaviour;
     FermentationBehaviour mFermentationBehaviour;

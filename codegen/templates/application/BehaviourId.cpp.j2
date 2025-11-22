@@ -3,15 +3,15 @@
 #include "BehaviourId.h"
 
 {%- from "_common/includes.j2" import emit_includes -%}
-{{ emit_includes(includes) }}
+{{- emit_includes(includes) -}}
 
 namespace Garbox {
 
 const char* BehaviourIdToString(BehaviourId id){
     switch(id){
         case BehaviourId::Null: return "Null";
-{% for name in names %}
-        case BehaviourId::{{ name }}: return "{{ name }}";
+{% for name in behaviours %}
+        case BehaviourId::{{ name.removesuffix("Behaviour") }}: return "{{ name.removesuffix("Behaviour") }}";
 {% endfor %}
         case BehaviourId::Count: return "Count";
     }

@@ -38,4 +38,8 @@ void InputControllerAbs::sendEvent(const EncoderStepWrite& event){
     sendEvent(event.header);
 }
 
+ControllerId InputControllerAbs::getControllerId() const {
+    return ControllerId::Input;
+}
+
 } // namespace Garbox

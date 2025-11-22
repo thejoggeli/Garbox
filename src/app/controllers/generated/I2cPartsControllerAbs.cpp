@@ -30,4 +30,8 @@ void I2cPartsControllerAbs::sendEvent(const TemperatureSampleWrite& event){
     sendEvent(event.header);
 }
 
+ControllerId I2cPartsControllerAbs::getControllerId() const {
+    return ControllerId::I2cParts;
+}
+
 } // namespace Garbox

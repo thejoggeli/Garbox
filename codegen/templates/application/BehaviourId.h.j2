@@ -4,7 +4,7 @@
 
 #include <cstdint>
 {%- from "_common/includes.j2" import emit_includes -%}
-{{ emit_includes(includes) }}
+{{- emit_includes(includes) -}}
 
 namespace Garbox {
 
@@ -13,8 +13,8 @@ enum class BehaviourId : uint16_t {
     // null event
     Null = 0,
 
-{% for name in names %}
-    {{ name }},
+{% for name in behaviours %}
+    {{ name.removesuffix("Behaviour") }},
 {% endfor %}
 
     // enum size marker

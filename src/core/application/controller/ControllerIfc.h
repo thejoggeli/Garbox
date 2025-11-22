@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/types/ComponentDescriptor.h"
+#include "shared/types/ControllerId.h"
 
 namespace Garbox {
 
@@ -15,6 +16,7 @@ public:
     virtual void start() = 0;
 
     virtual bool isInitialized() const = 0;
+    virtual ControllerId getControllerId() const = 0;
     virtual ComponentId getComponentId() const = 0;
     virtual const RuntimeContext* getContext() const = 0;
     virtual ControllerHostIfc* getHost() = 0;

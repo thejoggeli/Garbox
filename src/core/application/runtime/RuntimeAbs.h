@@ -1,5 +1,7 @@
 #pragma once 
 
+#include "core/application/behaviour/BehaviourIfc.h"
+#include "core/application/controller/ControllerIfc.h"
 #include "core/application/event/EventFactory.h"
 #include "core/application/host/BehaviourHostIfc.h"
 #include "core/application/host/ControllerHostIfc.h"
@@ -8,9 +10,6 @@
 #include "core/util/container/RingBufferHeap.h"
 
 namespace Garbox {
-
-class BehaviourIfc;
-class ControllerIfc;
 
 /**
  * Extend this class in the application
@@ -44,7 +43,7 @@ public:
     virtual const RuntimeContext& getContext() const final;
 
     // BehaviourHostIfc
-    void requestChangeBehaviour(ComponentId id) final;
+    void requestChangeBehaviour(BehaviourId id) final;
     BehaviourIfc* getActiveBehaviour() const final;
 
 protected:
@@ -52,12 +51,12 @@ protected:
     // controllers setup
     void registerController(ControllerIfc* controller);
     Span<ControllerIfc*> getControllers();
-    virtual ControllerIfc* resolveController(ComponentId id) = 0;
+    virtual ControllerIfc* resolveController(ControllerId id) = 0;
 
     // behaviours setup
     void registerBehaviour(BehaviourIfc* behaviour);
     Span<BehaviourIfc*> getBehaviours();
-    virtual BehaviourIfc* resolveBehaviour(ComponentId id) = 0;
+    virtual BehaviourIfc* resolveBehaviour(BehaviourId id) = 0;
 
     // event handling internal methods
     void dispatchEvents();
@@ -95,7 +94,7 @@ private:
 
     // behaviours array
     static constexpr size_t MaxBehavioursCount = 16;
-    BehaviourIfc* mBehavioursRawArray[MaxControllersCount];
+    BehaviourIfc* mBehavioursRawArray[MaxBehavioursCount];
     Span<BehaviourIfc*> mBehavioursSpan;
 
     // behaviour active and queued

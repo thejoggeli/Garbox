@@ -46,8 +46,9 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
-void GarboxRuntime::onRenderTick(){
-    mDisplayController.onRenderTick();
+void GarboxRuntime::onOutputTick(){
+    mFanController.onOutputTick();
+    mHeatpadController.onOutputTick();
     dispatchEvents();
 }
 
@@ -56,24 +57,23 @@ void GarboxRuntime::onHeartbeatTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onLogicTick(){
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-    behaviour->onLogicTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onOutputTick(){
-    mFanController.onOutputTick();
-    mHeatpadController.onOutputTick();
-    dispatchEvents();
-}
-
 void GarboxRuntime::onInputTick(){
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
     mI2cPartsController.onInputTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onRenderTick(){
+    mDisplayController.onRenderTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onLogicTick(){
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    behaviour->onLogicTick();
     dispatchEvents();
 }
 
@@ -149,24 +149,24 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
 }
 
-ControllerIfc* GarboxRuntime::resolveController(ComponentId id){
+ControllerIfc* GarboxRuntime::resolveController(ControllerId id){
     switch(id){
-    case ComponentId::DisplayController: return &mDisplayController;
-    case ComponentId::FanController: return &mFanController;
-    case ComponentId::HeartbeatController: return &mHeartbeatController;
-    case ComponentId::HeatpadController: return &mHeatpadController;
-    case ComponentId::InputController: return &mInputController;
-    case ComponentId::I2cPartsController: return &mI2cPartsController;
+    case ControllerId::Display: return &mDisplayController;
+    case ControllerId::Fan: return &mFanController;
+    case ControllerId::Heartbeat: return &mHeartbeatController;
+    case ControllerId::Heatpad: return &mHeatpadController;
+    case ControllerId::Input: return &mInputController;
+    case ControllerId::I2cParts: return &mI2cPartsController;
     default:
         TriggerExit("GarboxRuntime", "controller with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }
 
-BehaviourIfc* GarboxRuntime::resolveBehaviour(ComponentId id){
+BehaviourIfc* GarboxRuntime::resolveBehaviour(BehaviourId id){
     switch(id){
-    case ComponentId::CalibrationBehaviour: return &mCalibrationBehaviour;
-    case ComponentId::FermentationBehaviour: return &mFermentationBehaviour;
+    case BehaviourId::Calibration: return &mCalibrationBehaviour;
+    case BehaviourId::Fermentation: return &mFermentationBehaviour;
     default:
         TriggerExit("GarboxRuntime", "behaviour with id not found", static_cast<uint32_t>(id));
     }

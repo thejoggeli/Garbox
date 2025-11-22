@@ -396,6 +396,14 @@ def generate_components(yaml_config):
     items = []
     items.append(Item(comp_dict, list(comp_dict.keys()), f"{out_path}.h", f"{template_path}.h.j2"))
     items.append(Item(comp_dict, list(comp_dict.keys()), f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+    out_path = f"shared/types/BehaviourId"
+    template_path = f"application/BehaviourId"
+    items.append(Item(yaml_config, "behaviours", f"{out_path}.h", f"{template_path}.h.j2"))
+    items.append(Item(yaml_config, "behaviours", f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+    out_path = f"shared/types/ControllerId"
+    template_path = f"application/ControllerId"
+    items.append(Item(yaml_config, "controllers", f"{out_path}.h", f"{template_path}.h.j2"))
+    items.append(Item(yaml_config, "controllers", f"{out_path}.cpp", f"{template_path}.cpp.j2"))
     generate_items(items)
 
 

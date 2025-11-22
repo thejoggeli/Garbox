@@ -36,4 +36,8 @@ void FermentationBehaviourAbs::sendEvent(const HeatpadCommandWrite& event){
     sendEvent(event.header);
 }
 
+BehaviourId FermentationBehaviourAbs::getBehaviourId() const {
+    return BehaviourId::Fermentation;
+}
+
 } // namespace Garbox

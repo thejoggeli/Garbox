@@ -44,4 +44,8 @@ void CalibrationBehaviourAbs::sendEvent(const FanCommandWrite& event){
     sendEvent(event.header);
 }
 
+BehaviourId CalibrationBehaviourAbs::getBehaviourId() const {
+    return BehaviourId::Calibration;
+}
+
 } // namespace Garbox

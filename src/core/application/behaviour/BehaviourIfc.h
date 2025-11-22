@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "core/types/ComponentDescriptor.h"
+#include "shared/types/BehaviourId.h"
 
 namespace Garbox {
 
@@ -17,6 +18,7 @@ public:
     virtual void setActive(bool active) = 0;
     virtual bool isActive() const = 0;
     virtual bool isInitialized() const = 0;
+    virtual BehaviourId getBehaviourId() const = 0;
     virtual ComponentId getComponentId() const = 0;
     virtual const RuntimeContext* getContext() const = 0;
     virtual BehaviourHostIfc* getHost() = 0;
