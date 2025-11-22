@@ -10,7 +10,7 @@ namespace Garbox {
 class CalibrationBehaviour : public CalibrationBehaviourAbs {
 public:
 
-    CalibrationBehaviour(const RuntimeContext& context);
+    CalibrationBehaviour();
 
     void onLogicTick() final;
 

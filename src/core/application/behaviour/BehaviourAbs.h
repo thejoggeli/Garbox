@@ -4,6 +4,7 @@
 #include "core/application/event/EventFactory.h"
 #include "core/application/event/types/EventWrite.h"
 #include "core/application/event/types/EventRead.h"
+#include "core/application/host/BehaviourHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/EventPayload.h"
 
@@ -12,17 +13,18 @@ namespace Garbox {
 class BehaviourAbs : public BehaviourIfc {
 public:
 
-    BehaviourAbs(ComponentId id, const RuntimeContext& context);
+    BehaviourAbs(ComponentId id);
     ~BehaviourAbs();
 
     // interface implementations
-    void init(EventFactory& factory, EventForwarder& forwarder) final;
+    void init(BehaviourHostIfc& host) final;
     void start() final;
     void setActive(bool active) final;
     bool isActive() const final;
     bool isInitialized() const final;
     ComponentId getComponentId() const final;
-    const RuntimeContext& getContext() const final;
+    const RuntimeContext* getContext() const final;
+    BehaviourHostIfc* getHost() final;
 
     // disallow copy and move 
     BehaviourAbs(const BehaviourAbs&) = delete;
@@ -57,10 +59,9 @@ protected:
 private:
 
     ComponentDescriptor mComponentDescriptor;
-    const RuntimeContext& mContext;
-
+    BehaviourHostIfc* mHost = nullptr;
+    const RuntimeContext* mContext = nullptr;
     EventFactory* mEventFactory = nullptr;
-    EventForwarder* mEventForwarder = nullptr;
 
     bool mInitialized = false;
     bool mActive = false;

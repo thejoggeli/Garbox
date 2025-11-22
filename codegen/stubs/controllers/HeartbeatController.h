@@ -10,7 +10,7 @@ namespace Garbox {
 class HeartbeatController : public HeartbeatControllerAbs {
 public:
 
-    HeartbeatController(const RuntimeContext& context);
+    HeartbeatController();
 
     void onHeartbeatTick() final;
 

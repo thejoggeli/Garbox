@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-InputControllerAbs::InputControllerAbs(const RuntimeContext& context): 
+InputControllerAbs::InputControllerAbs(): 
     // init members
-    ControllerAbs(ComponentId::InputController, context){
+    ControllerAbs(ComponentId::InputController){
     // nothing to do
 }
 

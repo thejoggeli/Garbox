@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-HeatpadController::HeatpadController(const RuntimeContext& context): HeatpadControllerAbs(context){
+HeatpadController::HeatpadController() : HeatpadControllerAbs(){
     // nothing to do
 }
 

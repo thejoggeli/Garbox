@@ -13,7 +13,7 @@ class HeartbeatControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    HeartbeatControllerAbs(const RuntimeContext& context);
+    HeartbeatControllerAbs();
 
     // tick handlers
     virtual void onHeartbeatTick() = 0;

@@ -10,7 +10,7 @@ namespace Garbox {
 class DisplayController : public DisplayControllerAbs {
 public:
 
-    DisplayController(const RuntimeContext& context);
+    DisplayController();
 
     void onRenderTick() final;
 

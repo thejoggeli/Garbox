@@ -13,7 +13,7 @@ class FanControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    FanControllerAbs(const RuntimeContext& context);
+    FanControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;

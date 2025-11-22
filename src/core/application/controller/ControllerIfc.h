@@ -4,20 +4,20 @@
 
 namespace Garbox {
 
-class EventFactory;
-class EventForwarder;
+class ControllerHostIfc;
 class EventHeader;
 class RuntimeContext;
 
 class ControllerIfc {
 public:
 
-    virtual void init(EventFactory& factory, EventForwarder& forwarder) = 0;
+    virtual void init(ControllerHostIfc& host) = 0;
     virtual void start() = 0;
 
     virtual bool isInitialized() const = 0;
     virtual ComponentId getComponentId() const = 0;
-    virtual const RuntimeContext& getContext() const = 0;
+    virtual const RuntimeContext* getContext() const = 0;
+    virtual ControllerHostIfc* getHost() = 0;
 
 protected:
 

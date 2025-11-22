@@ -8,7 +8,7 @@
 
 namespace Garbox {
 
-BaseBehaviourAbs::BaseBehaviourAbs(ComponentId id, const RuntimeContext& context): BehaviourAbs(id, context){
+BaseBehaviourAbs::BaseBehaviourAbs(ComponentId id): BehaviourAbs(id){
     // nothing to do
 }
 

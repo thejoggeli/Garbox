@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-DisplayController::DisplayController(const RuntimeContext& context): DisplayControllerAbs(context){
+DisplayController::DisplayController() : DisplayControllerAbs(){
     // nothing to do
 }
 

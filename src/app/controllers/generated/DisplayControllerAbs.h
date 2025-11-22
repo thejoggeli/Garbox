@@ -13,7 +13,7 @@ class DisplayControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    DisplayControllerAbs(const RuntimeContext& context);
+    DisplayControllerAbs();
 
     // tick handlers
     virtual void onRenderTick() = 0;

@@ -10,7 +10,7 @@ namespace Garbox {
 class I2cPartsController : public I2cPartsControllerAbs {
 public:
 
-    I2cPartsController(const RuntimeContext& context);
+    I2cPartsController();
 
     void onInputTick() final;
 

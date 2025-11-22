@@ -36,7 +36,7 @@ public:
         bool shtSample = true;
     };
     
-    DisplayController(const RuntimeContext& context);
+    DisplayController();
 
     void onRenderTick() final;
     void onTemperatureStatus(const TemperatureStatus& event) final;

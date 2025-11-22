@@ -11,7 +11,7 @@ class Fan;
 class FanController : public FanControllerAbs {
 public:
     
-    FanController(const RuntimeContext& context);
+    FanController();
 
     void onInputTick() final;
     void onOutputTick() final;

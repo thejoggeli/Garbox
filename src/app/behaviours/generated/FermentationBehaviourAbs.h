@@ -11,7 +11,7 @@ namespace Garbox {
 class FermentationBehaviourAbs : public BaseBehaviourAbs {
 public:
 
-    FermentationBehaviourAbs(const RuntimeContext& context);
+    FermentationBehaviourAbs();
 
 protected:
 

@@ -5,15 +5,15 @@
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
+#include "core/util/function/default/EasingFunctions.h"
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
-#include "core/util/function/default/EasingFunctions.h"
 
 namespace Garbox {
 
-InputController::InputController(const RuntimeContext& context):
+InputController::InputController():
     // initialize members
-    InputControllerAbs(context),
+    InputControllerAbs(),
     mButtonStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom2)),
     mPiezoPlayer(PartsProvider::GetPiezoPlayer()),
     mButton(PartsProvider::GetEncoderButton()){

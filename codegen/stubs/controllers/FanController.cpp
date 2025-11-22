@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-FanController::FanController(const RuntimeContext& context): FanControllerAbs(context){
+FanController::FanController() : FanControllerAbs(){
     // nothing to do
 }
 

@@ -1,15 +1,12 @@
 #include "ControllerAbs.h"
 
 #include "core/assert/Assert.h"
-#include "core/application/event/EventFactory.h"
-#include "core/application/event/EventForwarder.h"
 
 namespace Garbox {
 
-ControllerAbs::ControllerAbs(ComponentId id, const RuntimeContext& context): 
+ControllerAbs::ControllerAbs(ComponentId id): 
     // init members    
-    mComponentDescriptor{ComponentType::Controller, id},
-    mContext(context){
+    mComponentDescriptor{ComponentType::Controller, id}{
     // constructor body
 }
 
@@ -17,10 +14,11 @@ ControllerAbs::~ControllerAbs(){
     TriggerExit("ControllerAbs", "controllers must not be destroyed");
 }
 
-void ControllerAbs::init(EventFactory& factory, EventForwarder& forwarder){
+void ControllerAbs::init(ControllerHostIfc& host){
     AssertExit(!mInitialized, "ControllerAbs", "already initialized");
-    mEventFactory = &factory;
-    mEventForwarder = &forwarder;
+    mHost = &host;
+    mEventFactory = &mHost->getEventFactory();
+    mContext = &mHost->getContext();
     onInit();
     mInitialized = true;
 }
@@ -36,7 +34,7 @@ void ControllerAbs::sendEvent(EventHeader* header){
     if(!mInitialized){
         TriggerExit("ControllerAbs", "not initialized");
     }
-    mEventForwarder->forward(header);
+    mHost->publishEvent(header);
 }
 
 bool ControllerAbs::isInitialized() const {
@@ -47,8 +45,12 @@ ComponentId ControllerAbs::getComponentId() const {
     return mComponentDescriptor.id;
 }
 
-const RuntimeContext& ControllerAbs::getContext() const {
+const RuntimeContext* ControllerAbs::getContext() const {
     return mContext;
+}
+
+ControllerHostIfc* ControllerAbs::getHost(){
+    return mHost;
 }
 
 } // namespace

@@ -1,15 +1,12 @@
 #include "BehaviourAbs.h"
 
 #include "core/assert/Assert.h"
-#include "core/application/event/EventFactory.h"
-#include "core/application/event/EventForwarder.h"
 
 namespace Garbox {
 
-BehaviourAbs::BehaviourAbs(ComponentId id, const RuntimeContext& context):
+BehaviourAbs::BehaviourAbs(ComponentId id):
     // init members
-    mComponentDescriptor{ComponentType::Behaviour, id},
-    mContext(context){
+    mComponentDescriptor{ComponentType::Behaviour, id}{
     // nothing to do
 }
 
@@ -17,10 +14,11 @@ BehaviourAbs::~BehaviourAbs(){
     TriggerExit("BehaviourAbs", "behaviours must not be destroyed");
 }
 
-void BehaviourAbs::init(EventFactory& factory, EventForwarder& forwarder){
+void BehaviourAbs::init(BehaviourHostIfc& host){
     AssertExit(!mInitialized, "BehaviourAbs", "already initialized");
-    mEventFactory = &factory;
-    mEventForwarder = &forwarder;
+    mHost = &host;
+    mContext = &host.getContext();
+    mEventFactory = &host.getEventFactory();
     onInit();
     mInitialized = true;
 }
@@ -36,7 +34,7 @@ void BehaviourAbs::sendEvent(EventHeader* header){
     if(!mInitialized){
         TriggerExit("BehaviourAbs", "not initialized");
     }
-    mEventForwarder->forward(header);
+    mHost->publishEvent(header);
 }
 
 void BehaviourAbs::setActive(bool active){
@@ -68,8 +66,12 @@ ComponentId BehaviourAbs::getComponentId() const {
     return mComponentDescriptor.id;
 }
 
-const RuntimeContext& BehaviourAbs::getContext() const {
+const RuntimeContext* BehaviourAbs::getContext() const {
     return mContext;
+}
+
+BehaviourHostIfc* BehaviourAbs::getHost(){
+    return mHost;
 }
 
 } // namespace

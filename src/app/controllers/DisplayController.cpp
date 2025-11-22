@@ -11,9 +11,9 @@
 
 namespace Garbox {
 
-DisplayController::DisplayController(const RuntimeContext& context): 
+DisplayController::DisplayController(): 
     // init members
-    DisplayControllerAbs(context),
+    DisplayControllerAbs(),
     mDisplay(PartsProvider::GetDisplay()){
     // nothing to do
 }

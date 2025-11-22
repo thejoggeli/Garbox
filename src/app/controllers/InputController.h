@@ -13,7 +13,7 @@ class AnimatedLed;
 class InputController : public InputControllerAbs {
 public:
 
-    InputController(const RuntimeContext& context);
+    InputController();
 
     void onInputTick() final;
 

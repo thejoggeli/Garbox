@@ -13,7 +13,7 @@ class I2cPartsControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    I2cPartsControllerAbs(const RuntimeContext& context);
+    I2cPartsControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;

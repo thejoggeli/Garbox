@@ -4,9 +4,9 @@
 
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs(const RuntimeContext& context):
+{{ name }}Abs::{{ name }}Abs():
     // init members
-    BaseBehaviourAbs(ComponentId::{{ name }}, context){
+    BaseBehaviourAbs(ComponentId::{{ name }}){
     // nothing to do
 }
 {% if behaviour.ticks_null %}

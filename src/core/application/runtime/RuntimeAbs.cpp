@@ -21,23 +21,18 @@ void RuntimeAbs::init(const Config& config){
     // init event queue
     mEventQueue.init(config.eventQueueLength);
 
-    // setup event forwarder
-    mEventForwarder.setHandler([this](const EventHeader* header){
-        handleForwardedEvent(header);
-    });
-
     // derived class must register controllers and behaviours
     onRegisterControllers();
     onRegisterBehaviours();
 
     // init all controllers
     for(ControllerIfc* controller : mControllersSpan){
-        controller->init(mEventFactory, mEventForwarder);
+        controller->init(*this);
     }
 
     // init all behaviours
     for(BehaviourIfc* behaviour : mBehavioursSpan){
-        behaviour->init(mEventFactory, mEventForwarder);
+        behaviour->init(*this);
     }
 
     // init derived class
@@ -79,16 +74,13 @@ void RuntimeAbs::applyQueuedBehaviour() {
     }
 }
 
-bool RuntimeAbs::hasQueuedBehaviour() const {
-    return mQueuedBehaviour != nullptr;
+void RuntimeAbs::requestChangeBehaviour(ComponentId id){
+    // TODO implement
+    TriggerExit("RuntimeAbs", "requestChangeBehaviour not implemented");
 }
 
 BehaviourIfc* RuntimeAbs::getActiveBehaviour() const {
     return mActiveBehaviour;
-}
-
-BehaviourIfc* RuntimeAbs::getQueuedBehaviour() const {
-    return mQueuedBehaviour;
 }
 
 void RuntimeAbs::registerController(ControllerIfc* controller){
@@ -115,6 +107,21 @@ Span<BehaviourIfc*> RuntimeAbs::getBehaviours(){
     return mBehavioursSpan;
 }
 
+void RuntimeAbs::publishEvent(const EventHeader* header){
+    if(!mEventQueue.push(header)){
+        TriggerExit("RuntimeAbs", "event queue is full");
+    }
+}
+
+EventFactory& RuntimeAbs::getEventFactory(){
+    return mEventFactory;
+}
+
+void RuntimeAbs::clearEventQueue(){
+    mEventQueue.clear();
+    mEventFactory.clearDataPool();
+}
+
 void RuntimeAbs::dispatchEvents(){
     const EventHeader* header;
     while(mEventQueue.pop(header)){
@@ -125,17 +132,6 @@ void RuntimeAbs::dispatchEvents(){
         onRouteEvent(header);
     }
     mEventFactory.clearDataPool();
-}
-
-void RuntimeAbs::clearEventQueue(){
-    mEventQueue.clear();
-    mEventFactory.clearDataPool();
-}
-
-void RuntimeAbs::handleForwardedEvent(const EventHeader* header){
-    if(!mEventQueue.push(header)){
-        TriggerExit("RuntimeAbs", "event queue is full");
-    }
 }
 
 void RuntimeAbs::incrementTickCount(){

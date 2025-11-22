@@ -1,7 +1,8 @@
 #pragma once 
 
 #include "core/application/event/EventFactory.h"
-#include "core/application/event/EventForwarder.h"
+#include "core/application/host/BehaviourHostIfc.h"
+#include "core/application/host/ControllerHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/RingBufferHeap.h"
@@ -14,7 +15,7 @@ class ControllerIfc;
 /**
  * Extend this class in the application
  */
-class RuntimeAbs {
+class RuntimeAbs : public BehaviourHostIfc, public ControllerHostIfc {
 public:
 
     struct Config {
@@ -33,27 +34,37 @@ public:
     void init(const Config& config);
     void start();
 
+    // runtime context related methods
     void beginTickSequence();
-
     void incrementTickCount();
-    const RuntimeContext& getContext() const;
+
+    // BaseHostIfc
+    virtual void publishEvent(const EventHeader* header) final;
+    virtual EventFactory& getEventFactory() final;
+    virtual const RuntimeContext& getContext() const final;
+
+    // BehaviourHostIfc
+    void requestChangeBehaviour(ComponentId id) final;
+    BehaviourIfc* getActiveBehaviour() const final;
 
 protected:
 
+    // controllers setup
     void registerController(ControllerIfc* controller);
     Span<ControllerIfc*> getControllers();
 
+    // behaviours setup
     void registerBehaviour(BehaviourIfc* behaviour);
     Span<BehaviourIfc*> getBehaviours();
 
+    // event handling internal methods
+    void dispatchEvents();
+    void clearEventQueue();
+
+    // behaviours internal methods
     void setQueuedBehaviour(BehaviourIfc* behaviour);
     void applyQueuedBehaviour(); 
     bool hasQueuedBehaviour() const;
-    BehaviourIfc* getActiveBehaviour() const;
-    BehaviourIfc* getQueuedBehaviour() const;
-
-    void dispatchEvents();
-    void clearEventQueue();
 
     // to be implemented by user
     virtual void onInit() = 0;
@@ -73,7 +84,6 @@ private:
 
     // members for events
     EventFactory mEventFactory;
-    EventForwarder mEventForwarder;
     RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
     // controllers array
@@ -89,8 +99,6 @@ private:
     // behaviour active and queued
     BehaviourIfc* mActiveBehaviour = nullptr;
     BehaviourIfc* mQueuedBehaviour = nullptr;
-
-    void handleForwardedEvent(const EventHeader* event);
 
 };
 

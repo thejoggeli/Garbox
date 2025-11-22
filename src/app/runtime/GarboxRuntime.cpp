@@ -9,14 +9,16 @@
 namespace Garbox {
 
 GarboxRuntime::GarboxRuntime():
-    mCalibrationBehaviour(getContext()),
-    mFermentationBehaviour(getContext()),
-    mDisplayController(getContext()),
-    mFanController(getContext()),
-    mHeartbeatController(getContext()),
-    mHeatpadController(getContext()),
-    mInputController(getContext()),
-    mI2cPartsController(getContext())
+    // call behaviours constructors
+    mCalibrationBehaviour(),
+    mFermentationBehaviour(),
+    // call controllers constructors
+    mDisplayController(),
+    mFanController(),
+    mHeartbeatController(),
+    mHeatpadController(),
+    mInputController(),
+    mI2cPartsController()
 {
     // nothing to do
 }
@@ -44,20 +46,16 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
-void GarboxRuntime::onLogicTick(){
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-    behaviour->onLogicTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onRenderTick(){
-    mDisplayController.onRenderTick();
-    dispatchEvents();
-}
-
 void GarboxRuntime::onHeartbeatTick(){
     mHeartbeatController.onHeartbeatTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onInputTick(){
+    mFanController.onInputTick();
+    mHeatpadController.onInputTick();
+    mInputController.onInputTick();
+    mI2cPartsController.onInputTick();
     dispatchEvents();
 }
 
@@ -67,11 +65,15 @@ void GarboxRuntime::onOutputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onInputTick(){
-    mFanController.onInputTick();
-    mHeatpadController.onInputTick();
-    mInputController.onInputTick();
-    mI2cPartsController.onInputTick();
+void GarboxRuntime::onLogicTick(){
+    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
+    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
+    behaviour->onLogicTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onRenderTick(){
+    mDisplayController.onRenderTick();
     dispatchEvents();
 }
 

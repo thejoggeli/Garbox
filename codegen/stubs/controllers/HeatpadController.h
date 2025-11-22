@@ -10,7 +10,7 @@ namespace Garbox {
 class HeatpadController : public HeatpadControllerAbs {
 public:
 
-    HeatpadController(const RuntimeContext& context);
+    HeatpadController();
 
     void onInputTick() final;
     void onOutputTick() final;

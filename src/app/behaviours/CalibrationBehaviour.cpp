@@ -5,9 +5,9 @@
 
 namespace Garbox {
 
-CalibrationBehaviour::CalibrationBehaviour(const RuntimeContext& context):
+CalibrationBehaviour::CalibrationBehaviour():
     // init members
-    CalibrationBehaviourAbs(context){
+    CalibrationBehaviourAbs(){
     // nothing to do
 }
 

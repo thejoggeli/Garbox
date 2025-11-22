@@ -11,7 +11,7 @@ namespace Garbox {
 class CalibrationBehaviourAbs : public BaseBehaviourAbs {
 public:
 
-    CalibrationBehaviourAbs(const RuntimeContext& context);
+    CalibrationBehaviourAbs();
 
 protected:
 

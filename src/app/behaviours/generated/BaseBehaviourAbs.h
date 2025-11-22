@@ -13,7 +13,7 @@ class BaseBehaviourAbs : public BehaviourAbs {
 public:
     
     // behaviour constructor
-    BaseBehaviourAbs(ComponentId id, const RuntimeContext& context);
+    BaseBehaviourAbs(ComponentId id);
 
     // tick handlers
     virtual void onLogicTick() = 0;

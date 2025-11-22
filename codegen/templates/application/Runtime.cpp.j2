@@ -8,12 +8,14 @@ namespace {{ name }} {
 
 {{ name }}Runtime::{{ name }}Runtime():
     {# init behaviours #}
+    // call behaviours constructors
     {% for beh in behaviours %}
-    m{{ beh }}(getContext()){{ "," if not loop.last or controllers|length > 0 }}
+    m{{ beh }}(){{ "," if not loop.last or controllers|length > 0 }}
     {% endfor %}
     {# init controllers #}
+    // call controllers constructors
     {% for ctrl in controllers %}
-    m{{ ctrl }}(getContext()){{ "," if not loop.last }}
+    m{{ ctrl }}(){{ "," if not loop.last }}
     {% endfor %}{
     // nothing to do
 }

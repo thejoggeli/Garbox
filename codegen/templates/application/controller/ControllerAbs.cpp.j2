@@ -6,9 +6,9 @@
 
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs(const RuntimeContext& context): 
+{{ name }}Abs::{{ name }}Abs(): 
     // init members
-    ControllerAbs(ComponentId::{{ name }}, context){
+    ControllerAbs(ComponentId::{{ name }}){
     // nothing to do
 }
 {% if controller.sends %}

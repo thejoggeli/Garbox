@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-HeartbeatController::HeartbeatController(const RuntimeContext& context): HeartbeatControllerAbs(context){
+HeartbeatController::HeartbeatController() : HeartbeatControllerAbs(){
     // nothing to do
 }
 

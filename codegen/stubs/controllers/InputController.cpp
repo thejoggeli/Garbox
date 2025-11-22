@@ -5,7 +5,7 @@
 
 namespace Garbox {
 
-InputController::InputController(const RuntimeContext& context): InputControllerAbs(context){
+InputController::InputController() : InputControllerAbs(){
     // nothing to do
 }
 

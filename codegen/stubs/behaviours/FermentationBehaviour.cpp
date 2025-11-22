@@ -5,9 +5,7 @@
 
 namespace Garbox {
 
-FermentationBehaviour::FermentationBehaviour(const RuntimeContext& context):
-    // init members
-    FermentationBehaviourAbs(context){
+FermentationBehaviour::FermentationBehaviour() : FermentationBehaviourAbs(){
     // nothing to do
 }
 

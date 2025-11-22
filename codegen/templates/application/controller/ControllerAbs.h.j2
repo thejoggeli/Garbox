@@ -13,7 +13,7 @@ class {{ name }}Abs : public ControllerAbs {
 public:
     
     // controller constructor
-    {{ name }}Abs(const RuntimeContext& context);
+    {{ name }}Abs();
     {# ---- Tick handlers ---- #}
 {% if controller.ticks %}
 

@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-I2cPartsControllerAbs::I2cPartsControllerAbs(const RuntimeContext& context): 
+I2cPartsControllerAbs::I2cPartsControllerAbs(): 
     // init members
-    ControllerAbs(ComponentId::I2cPartsController, context){
+    ControllerAbs(ComponentId::I2cPartsController){
     // nothing to do
 }
 

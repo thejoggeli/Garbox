@@ -9,7 +9,7 @@ namespace Garbox {
 class {{ name }} : public {{ name }}Abs {
 public:
 
-    {{ name }}(const RuntimeContext& context);
+    {{ name }}();
     {% if controller.ticks %}
 
         {% for tick in controller.ticks %}

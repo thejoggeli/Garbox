@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-HeartbeatControllerAbs::HeartbeatControllerAbs(const RuntimeContext& context): 
+HeartbeatControllerAbs::HeartbeatControllerAbs(): 
     // init members
-    ControllerAbs(ComponentId::HeartbeatController, context){
+    ControllerAbs(ComponentId::HeartbeatController){
     // nothing to do
 }
 

@@ -8,9 +8,9 @@
 
 namespace Garbox {
 
-FanControllerAbs::FanControllerAbs(const RuntimeContext& context): 
+FanControllerAbs::FanControllerAbs(): 
     // init members
-    ControllerAbs(ComponentId::FanController, context){
+    ControllerAbs(ComponentId::FanController){
     // nothing to do
 }
 

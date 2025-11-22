@@ -13,7 +13,7 @@ class HeatpadControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    HeatpadControllerAbs(const RuntimeContext& context);
+    HeatpadControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;

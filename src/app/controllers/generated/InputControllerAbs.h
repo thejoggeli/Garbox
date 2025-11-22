@@ -13,7 +13,7 @@ class InputControllerAbs : public ControllerAbs {
 public:
     
     // controller constructor
-    InputControllerAbs(const RuntimeContext& context);
+    InputControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;
