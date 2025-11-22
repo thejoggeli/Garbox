@@ -1,6 +1,7 @@
 # The generated runtime instance will be called NameRuntime
 name: Garbox
 
+### Controllers ###
 controllers:
 
   DisplayController:
@@ -33,12 +34,17 @@ controllers:
     receives: [ButtonStateChanged]
     sends: [TemperatureStatus, TemperatureSample]
 
-initial_behaviour: FermentationBehaviour
+### General ###
+initial_behaviour: CalibrationBehaviour
+
+### Behaviours ###
 behaviours:
+
   CalibrationBehaviour:
     ticks: [Logic]
     receives: [Heartbeat, FanStatus, FanSample]
     sends: [FanCommand]
+
   FermentationBehaviour:
     ticks: [Logic]
     receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]

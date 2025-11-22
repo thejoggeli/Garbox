@@ -75,8 +75,12 @@ void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
 
 void RuntimeAbs::applyQueuedBehaviour() {
     if(mQueuedBehaviour){
+        if(mActiveBehaviour){
+            mActiveBehaviour->setActive(false);
+        }
         mActiveBehaviour = mQueuedBehaviour;
         mQueuedBehaviour = nullptr;
+        mActiveBehaviour->setActive(true);
     }
 }
 

@@ -39,17 +39,32 @@ void GarboxRuntime::onRegisterControllers(){
 
 void GarboxRuntime::onInit(){
     // behaviours and controllers are already initialized
-    setQueuedBehaviour(&mFermentationBehaviour);
+    setQueuedBehaviour(&mCalibrationBehaviour);
 }
 
 void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
-void GarboxRuntime::onRenderTick(){
+void GarboxRuntime::onInputTick(){
 
     // call controller ticks
-    mDisplayController.onRenderTick();
+    mFanController.onInputTick();
+    mHeatpadController.onInputTick();
+    mInputController.onInputTick();
+    mI2cPartsController.onInputTick();
+
+    // dispatch events
+    dispatchEvents();
+}
+void GarboxRuntime::onLogicTick(){
+
+    // call behaviour tick
+    switch(mActiveBehaviour->getBehaviourId()){
+        case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
+        case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
+        default: break; // active behaviour does not support tick type
+    }
 
     // dispatch events
     dispatchEvents();
@@ -71,25 +86,10 @@ void GarboxRuntime::onHeartbeatTick(){
     // dispatch events
     dispatchEvents();
 }
-void GarboxRuntime::onLogicTick(){
-
-    // call behaviour tick
-    switch(mActiveBehaviour->getBehaviourId()){
-        case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
-        case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
-        default: break; // active behaviour does not support tick type
-    }
-
-    // dispatch events
-    dispatchEvents();
-}
-void GarboxRuntime::onInputTick(){
+void GarboxRuntime::onRenderTick(){
 
     // call controller ticks
-    mFanController.onInputTick();
-    mHeatpadController.onInputTick();
-    mInputController.onInputTick();
-    mI2cPartsController.onInputTick();
+    mDisplayController.onRenderTick();
 
     // dispatch events
     dispatchEvents();

@@ -22,11 +22,15 @@ void CalibrationBehaviour::onStart(){
 }
 
 void CalibrationBehaviour::onBecomeActive(){
-    // nothing to do
+    static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
+    piezo.playTone(Tone(75_ms).sweep(1000, 1500), 50_ms); 
+    piezo.playTone(Tone(75_ms).sweep(1000, 2000), 50_ms); 
+    piezo.playTone(Tone(75_ms).sweep(1000, 3000), 50_ms);
 }
 
 void CalibrationBehaviour::onBecomeInactive(){
-    // nothing to do
+    static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
+    piezo.playTone(Tone(400_ms).sweep(1000, 2500));
 }
 
 void CalibrationBehaviour::onLogicTick(){
@@ -37,7 +41,6 @@ void CalibrationBehaviour::onHeartbeat(const Heartbeat& event){
     static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
     if(mContext->tickCount > 10*30){
         getBehaviourHost()->requestChangeBehaviour(BehaviourId::Fermentation);
-        piezo.playTone(Tone(400_ms).sweep(1000, 2500));
     }
     else {
         piezo.playTone(Tone(125_ms).sweep(1000, 1500), 125_ms);
