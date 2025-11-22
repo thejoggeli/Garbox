@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/application/controller/ControllerIfc.h"
 #include "core/application/host/BaseHostIfc.h"
 
 namespace Garbox {

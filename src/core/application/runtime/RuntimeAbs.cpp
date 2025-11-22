@@ -75,8 +75,9 @@ void RuntimeAbs::applyQueuedBehaviour() {
 }
 
 void RuntimeAbs::requestChangeBehaviour(ComponentId id){
-    // TODO implement
-    TriggerExit("RuntimeAbs", "requestChangeBehaviour not implemented");
+    BehaviourIfc* behaviour = resolveBehaviour(id);
+    AssertExit(behaviour != nullptr, "RuntimeAbs", "failed to resolve behaviour", static_cast<uint32_t>(id));
+    setQueuedBehaviour(behaviour);
 }
 
 BehaviourIfc* RuntimeAbs::getActiveBehaviour() const {

@@ -46,22 +46,13 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
+void GarboxRuntime::onRenderTick(){
+    mDisplayController.onRenderTick();
+    dispatchEvents();
+}
+
 void GarboxRuntime::onHeartbeatTick(){
     mHeartbeatController.onHeartbeatTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onInputTick(){
-    mFanController.onInputTick();
-    mHeatpadController.onInputTick();
-    mInputController.onInputTick();
-    mI2cPartsController.onInputTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onOutputTick(){
-    mFanController.onOutputTick();
-    mHeatpadController.onOutputTick();
     dispatchEvents();
 }
 
@@ -72,8 +63,17 @@ void GarboxRuntime::onLogicTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onRenderTick(){
-    mDisplayController.onRenderTick();
+void GarboxRuntime::onOutputTick(){
+    mFanController.onOutputTick();
+    mHeatpadController.onOutputTick();
+    dispatchEvents();
+}
+
+void GarboxRuntime::onInputTick(){
+    mFanController.onInputTick();
+    mHeatpadController.onInputTick();
+    mInputController.onInputTick();
+    mI2cPartsController.onInputTick();
     dispatchEvents();
 }
 
@@ -147,6 +147,30 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         TriggerDebug("GarboxRuntime", "invalid event type");
         break;
     }
+}
+
+ControllerIfc* GarboxRuntime::resolveController(ComponentId id){
+    switch(id){
+    case ComponentId::DisplayController: return &mDisplayController;
+    case ComponentId::FanController: return &mFanController;
+    case ComponentId::HeartbeatController: return &mHeartbeatController;
+    case ComponentId::HeatpadController: return &mHeatpadController;
+    case ComponentId::InputController: return &mInputController;
+    case ComponentId::I2cPartsController: return &mI2cPartsController;
+    default:
+        TriggerExit("GarboxRuntime", "controller with id not found", static_cast<uint32_t>(id));
+    }
+    return nullptr;
+}
+
+BehaviourIfc* GarboxRuntime::resolveBehaviour(ComponentId id){
+    switch(id){
+    case ComponentId::CalibrationBehaviour: return &mCalibrationBehaviour;
+    case ComponentId::FermentationBehaviour: return &mFermentationBehaviour;
+    default:
+        TriggerExit("GarboxRuntime", "behaviour with id not found", static_cast<uint32_t>(id));
+    }
+    return nullptr;
 }
 
 } // namespace Garbox

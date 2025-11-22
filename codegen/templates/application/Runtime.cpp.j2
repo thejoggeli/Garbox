@@ -84,4 +84,26 @@ void {{ name }}Runtime::onRouteEvent(const EventHeader* header){
     }
 }
 
+ControllerIfc* {{ name }}Runtime::resolveController(ComponentId id){
+    switch(id){
+{% for key in controllers %}
+    case ComponentId::{{ key }}: return &m{{key}};
+{% endfor %}
+    default:
+        TriggerExit("{{ name }}Runtime", "controller with id not found", static_cast<uint32_t>(id));
+    }
+    return nullptr;
+}
+
+BehaviourIfc* {{ name }}Runtime::resolveBehaviour(ComponentId id){
+    switch(id){
+{% for key in behaviours %}
+    case ComponentId::{{ key }}: return &m{{key}};
+{% endfor %}
+    default:
+        TriggerExit("{{ name }}Runtime", "behaviour with id not found", static_cast<uint32_t>(id));
+    }
+    return nullptr;
+}
+
 } // namespace {{ name }}

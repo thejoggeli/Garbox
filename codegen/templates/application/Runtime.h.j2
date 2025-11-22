@@ -28,6 +28,9 @@ public:
 
 private:
 
+    ControllerIfc* resolveController(ComponentId id) final;
+    BehaviourIfc* resolveBehaviour(ComponentId id) final;
+
     {# behaviour instances #}
     {% for beh in behaviours %}
     {{ beh }} m{{ beh }};

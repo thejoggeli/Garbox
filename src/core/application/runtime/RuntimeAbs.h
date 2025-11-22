@@ -52,10 +52,12 @@ protected:
     // controllers setup
     void registerController(ControllerIfc* controller);
     Span<ControllerIfc*> getControllers();
+    virtual ControllerIfc* resolveController(ComponentId id) = 0;
 
     // behaviours setup
     void registerBehaviour(BehaviourIfc* behaviour);
     Span<BehaviourIfc*> getBehaviours();
+    virtual BehaviourIfc* resolveBehaviour(ComponentId id) = 0;
 
     // event handling internal methods
     void dispatchEvents();
