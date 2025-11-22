@@ -1,0 +1,50 @@
+from common.item import Item
+from common.util import ensure_suffix, ensure_value_suffix
+from common.generate_items import generate_items
+from common.generator_paths import GeneratorPaths
+
+
+def generate_hardware(jinja_env, paths: GeneratorPaths, config):
+    """
+    Load hardware.yaml, normalize names, and generate all hardware-related
+    .h and .cpp files.
+    """
+
+    hw_dir = paths.app_dir / "hardware"
+
+    # list of Item objects to generate
+    items = [
+        Item(config, "adc",   hw_dir / "AdcInstances.h",     "hardware/AdcInstances.h.j2"),
+        Item(config, "adc",   hw_dir / "AdcInstances.cpp",   "hardware/AdcInstances.cpp.j2"),
+        Item(config, "gpio",  hw_dir / "GpioInstances.h",    "hardware/GpioInstances.h.j2"),
+        Item(config, "gpio",  hw_dir / "GpioInstances.cpp",  "hardware/GpioInstances.cpp.j2"),
+        Item(config, "i2c",   hw_dir / "I2cInstances.h",     "hardware/I2cInstances.h.j2"),
+        Item(config, "i2c",   hw_dir / "I2cInstances.cpp",   "hardware/I2cInstances.cpp.j2"),
+        Item(config, "spi",   hw_dir / "SpiInstances.h",     "hardware/SpiInstances.h.j2"),
+        Item(config, "spi",   hw_dir / "SpiInstances.cpp",   "hardware/SpiInstances.cpp.j2"),
+        Item(config, "timer", hw_dir / "TimerInstances.h",   "hardware/TimerInstances.h.j2"),
+        Item(config, "timer", hw_dir / "TimerInstances.cpp", "hardware/TimerInstances.cpp.j2"),
+        Item(config, ["ledcTimer", "ledcChannel"], hw_dir / "LedcInstances.h",   "hardware/LedcInstances.h.j2"),
+        Item(config, ["ledcTimer", "ledcChannel"], hw_dir / "LedcInstances.cpp", "hardware/LedcInstances.cpp.j2"),
+    ]
+
+    # HardwareInit files
+    init_mapping = {
+        "adc":        "AdcInstances",
+        "gpio":       "GpioInstances",
+        "i2c":        "I2cInstances",
+        "spi":        "SpiInstances",
+        "timer":      "TimerInstances",
+        "ledcTimer":  "LedcInstances",
+    }
+
+    config["init"] = {}
+    for key, name in init_mapping.items():
+        if key in config and len(config[key]) > 0:
+            config["init"][key] = name
+
+    items.append(Item(config, "init", hw_dir / "HardwareInit.h",   "hardware/HardwareInit.h.j2"))
+    items.append(Item(config, "init", hw_dir / "HardwareInit.cpp", "hardware/HardwareInit.cpp.j2"))
+
+    # generate to src_dir
+    generate_items(jinja_env, items)
