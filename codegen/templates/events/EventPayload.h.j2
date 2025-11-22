@@ -4,18 +4,20 @@
 
 #include <cstdint>
 #include <cstring>
+#include "shared/types/BehaviourId.h"
 #include "shared/types/EventType.h"
 {%- from "_common/includes.j2" import emit_includes -%}
 {{- emit_includes(include) -}}
 
 namespace Garbox::EventPayload {
 
+// generated payloads
 {% for name, fields in payload.items() %}
 struct {{ name }} {
     static constexpr EventType Type = EventType::{{ name }};
 {% if fields %}
 {% for name, type in fields.items() %}
-    {{ type }} {{ name }};          
+    {{ type }} {{ name }};
 {% endfor %}
 {% endif %}
 };

@@ -9,6 +9,7 @@ namespace Garbox {
 const char* ComponentIdToString(ComponentId id){
     switch(id){
         case ComponentId::Null: return "Null";
+        case ComponentId::Runtime: return "Runtime";
         case ComponentId::CalibrationBehaviour: return "CalibrationBehaviour";
         case ComponentId::DisplayController: return "DisplayController";
         case ComponentId::FanController: return "FanController";

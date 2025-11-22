@@ -80,6 +80,9 @@ protected:
 
 private:
 
+    // component descriptor
+    ComponentDescriptor mComponentDescriptor {ComponentType::Runtime, ComponentId::Runtime};
+
     // Context for controllers and behaviours to use.
     // RuntimeAbs only modifies this in init() and start().
     // For all other updates, the user must call e.g.

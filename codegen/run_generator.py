@@ -139,6 +139,46 @@ def load_yaml(path: Path):
         return yaml.safe_load(f)
 
 
+def load_yaml_multi(paths: list[Path]):
+    merged = {}
+    for path in paths:
+        with path.open("r") as f:
+            data = yaml.safe_load(f)
+        if data is None:
+            continue
+        merged = merge_yaml(merged, data)
+    return merged
+
+
+def load_events():
+    events_path = script_dir.joinpath("config/events.yaml")
+    system_events_path = script_dir.joinpath("config/core/system_events.yaml")
+    return load_yaml_multi([system_events_path, events_path])
+
+
+def merge_yaml(a, b):
+    """
+    Recursively merge b into a.
+    - dict + dict -> merged
+    - list + list -> concatenated
+    - everything else -> b overwrites a
+    """
+    if isinstance(a, dict) and isinstance(b, dict):
+        result = dict(a)
+        for key, b_val in b.items():
+            if key in result:
+                result[key] = merge_yaml(result[key], b_val)
+            else:
+                result[key] = b_val
+        return result
+
+    if isinstance(a, list) and isinstance(b, list):
+        return a + b  # deterministic, but you can dedupe if needed
+
+    # overwrite on type mismatch or scalar
+    return b    
+
+
 def render_template(jinja_env, template_name: str, output_path: Path, **context):
     template = jinja_env.get_template(template_name)
     result = template.render(**context)
@@ -220,8 +260,7 @@ def generate_hardware():
 
 def generate_events():
 
-    yaml_path = script_dir.joinpath("config/events.yaml")
-    yaml_config = load_yaml(yaml_path)
+    yaml_config = load_events()
 
     types_copy = copy.deepcopy(yaml_config["type"])
     if "include_h" in types_copy:
@@ -358,8 +397,7 @@ def generate_application():
     yaml_path = script_dir.joinpath("config/application.yaml")
     yaml_config = load_yaml(yaml_path)
 
-    events_path = script_dir.joinpath("config/events.yaml")
-    events_config = load_yaml(events_path)
+    events_config = load_events()
 
     for dict_item in yaml_config["behaviours"].values():
         dict_item["ticks"] = ensure_list(dict_item["ticks"])

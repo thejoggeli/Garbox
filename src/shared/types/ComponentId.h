@@ -13,6 +13,10 @@ enum class ComponentId : uint16_t {
     // null event
     Null = 0,
 
+    // default component ids
+    Runtime,
+
+    // user component ids
     CalibrationBehaviour,
     DisplayController,
     FanController,

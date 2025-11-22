@@ -17,6 +17,7 @@ public:
     void onTemperatureStatus(const TemperatureStatus& event) final;
     void onTemperatureSample(const TemperatureSample& event) final;
     void onBacklightCommand(const BacklightCommand& event) final;
+    void onActiveBehaviourChanged(const ActiveBehaviourChanged& event) final;
 
 private:
 

@@ -13,8 +13,8 @@ LvglObjects::LvglObjects() {}
 lv_obj_t* LvglObjects::createLabel(lv_obj_t* parent, int16_t x, int16_t y, const char* text) {
     lv_obj_t* lbl = lv_label_create(parent);
     lv_obj_set_pos(lbl, x, y);
-    lv_label_set_text(lbl, text);
     lv_obj_set_style_text_color(lbl, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    setFormatted(lbl, "%s -", text);
     return lbl;
 }
 
@@ -47,7 +47,7 @@ void LvglObjects::init(lv_obj_t *parentObject){
     mTemperatureStateLabel   = createLabel(parentObject, startXPx, currentYPx, "Sht31 state: "); currentYPx += deltaYPx;
     mTemperatureSampleLabel  = createLabel(parentObject, startXPx, currentYPx, "Sht31 sample:"); currentYPx += deltaYPx;
     mHeapSpaceLabel          = createLabel(parentObject, startXPx, currentYPx, "Heap space:"); currentYPx += deltaYPx;
-    mEventsLabel             = createLabel(parentObject, startXPx, currentYPx, "Events:"); currentYPx += deltaYPx;
+    mAppInfoLabel             = createLabel(parentObject, startXPx, currentYPx, "App:"); currentYPx += deltaYPx;
 }
 
 void LvglObjects::setFanState(const char *stateText, float targetSpeed){
@@ -86,8 +86,8 @@ void LvglObjects::setHeapSpace(uint32_t space){
     setFormatted(mHeapSpaceLabel, "Heap space: %u.%03u kB", space/1000, space%1000);
 }
 
-void LvglObjects::setEvents(uint32_t count){
-    setFormatted(mEventsLabel, "Events: count=%u", count);
+void LvglObjects::setAppInfo(const char* behaviour, uint32_t eventCount){
+    setFormatted(mAppInfoLabel, "App: %s, events=%u", behaviour, eventCount);
 }
 
 } // namespace Garbox

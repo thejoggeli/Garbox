@@ -86,8 +86,8 @@ void DisplayController::onRenderTick(){
         if(mNewState.heapSpace != mOldState.heapSpace){
             lv.setHeapSpace(mNewState.heapSpace);
         }
-        if(mNewState.eventCount != mOldState.eventCount){
-            lv.setEvents(mNewState.eventCount);
+        if(mNewState.behaviour != mOldState.behaviour || mNewState.eventCount != mOldState.eventCount){
+            lv.setAppInfo(BehaviourIdToString(mNewState.behaviour), mNewState.eventCount);
         }
 
         mOldState = mNewState;
@@ -116,6 +116,10 @@ void DisplayController::onTemperatureSample(const TemperatureSample& event){
 void DisplayController::onBacklightCommand(const BacklightCommand& event){
     setBrightnessSmooth(event.payload->brightness, 1000_ms);
 };
+
+void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChanged& event){
+    mNewState.behaviour = event.payload->newBehaviour;
+}
 
 void DisplayController::setBrightnessSmooth(float targetBrightness, uint32_t durationMicros){
     const float startBrightness = mDisplay.getBrightness();

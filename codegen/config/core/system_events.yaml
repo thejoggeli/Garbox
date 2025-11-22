@@ -1,0 +1,6 @@
+### System Events. DO NOT CHANGE THIS FILE ###
+
+type:
+  ActiveBehaviourChanged:
+    oldBehaviour: BehaviourId
+    newBehaviour: BehaviourId

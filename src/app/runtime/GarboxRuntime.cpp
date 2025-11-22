@@ -97,6 +97,11 @@ void GarboxRuntime::onRenderTick(){
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
+    case EventType::ActiveBehaviourChanged: {
+        const EventRead<EventPayload::ActiveBehaviourChanged> event(header);
+        mDisplayController.onActiveBehaviourChanged(event);
+        break;
+    }
     case EventType::Heartbeat: {
         const EventRead<EventPayload::Heartbeat> event(header);
  

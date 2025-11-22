@@ -15,6 +15,8 @@ enum class EventType : uint16_t {
     // null event
     Null = 0,
 
+    // generated events
+    ActiveBehaviourChanged,
     Heartbeat,
     BacklightCommand,
     FanStatus,

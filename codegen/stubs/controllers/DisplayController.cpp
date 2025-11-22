@@ -33,4 +33,8 @@ void DisplayController::onBacklightCommand(const BacklightCommand& event){
     // nothing to do
 }
 
+void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChanged& event){
+    // nothing to do
+}
+
 } // namespace Garbox

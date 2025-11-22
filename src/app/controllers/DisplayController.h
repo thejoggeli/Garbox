@@ -5,6 +5,7 @@
 #include "core/util/helpers/TimeFader.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
+#include "shared/types/BehaviourId.h"
 
 namespace Garbox {
 
@@ -29,6 +30,7 @@ public:
         uint32_t renderSkippedCount = 0xFFFFFFFF;
         float brightness;
         uint32_t heapSpace = 0;
+        BehaviourId behaviour;
         uint32_t eventCount = 0xFFFFFFFF;
     };
 
@@ -43,6 +45,7 @@ public:
     void onTemperatureStatus(const TemperatureStatus& event) final;
     void onTemperatureSample(const TemperatureSample& event) final;
     void onBacklightCommand(const BacklightCommand& event) final;
+    void onActiveBehaviourChanged(const ActiveBehaviourChanged& event) final;
 
 private:
 
