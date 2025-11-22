@@ -6,25 +6,10 @@ namespace Garbox {
 
 {{ name }}Abs::{{ name }}Abs(): 
     // init memberes
-    BaseBehaviourAbs(ComponentId::{{ name }}, BehaviourId::{{ name.removesuffix("Behaviour") }}){
+    BehaviourAbs(ComponentId::{{ name }}, BehaviourId::{{ name.removesuffix("Behaviour") }}){
     // nothing to do
 }
-{% if behaviour.ticks_null %}
-    {% for tick in behaviour.ticks_null %}
-    
-void {{ name }}Abs::on{{ tick }}(){
-    // no-op. add tick handler to behaviour in yaml to enable 
-}
-    {% endfor %}
-{% endif %}
-{% if behaviour.receives_null %}
-    {% for ev in behaviour.receives_null %}
-
-void {{ name }}Abs::on{{ ev }}(const {{ ev }}& event){
-    // no-op. add event handler to behaviour in yaml to enable 
-}
-    {% endfor %}
-{% endif %}
+{# makeEvent methods #}
 {% if behaviour.sends %}
 {% for ev in behaviour.sends %}
 
@@ -32,6 +17,7 @@ void {{ name }}Abs::on{{ ev }}(const {{ ev }}& event){
     return makeEvent<EventPayload::{{ ev }}>();
 }
 {% endfor %}
+{# sendEvent methods #}
 {% for ev in behaviour.sends %}
 
 void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){

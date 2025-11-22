@@ -46,34 +46,52 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
+void GarboxRuntime::onRenderTick(){
+
+    // call controller ticks
+    mDisplayController.onRenderTick();
+
+    // dispatch events
+    dispatchEvents();
+}
 void GarboxRuntime::onOutputTick(){
+
+    // call controller ticks
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
+
+    // dispatch events
     dispatchEvents();
 }
+void GarboxRuntime::onHeartbeatTick(){
 
-void GarboxRuntime::onRenderTick(){
-    mDisplayController.onRenderTick();
+    // call controller ticks
+    mHeartbeatController.onHeartbeatTick();
+
+    // dispatch events
     dispatchEvents();
 }
+void GarboxRuntime::onLogicTick(){
 
+    // call behaviour tick
+    switch(mActiveBehaviour->getBehaviourId()){
+        case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
+        case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
+        default: break; // active behaviour does not support tick type
+    }
+
+    // dispatch events
+    dispatchEvents();
+}
 void GarboxRuntime::onInputTick(){
+
+    // call controller ticks
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
     mI2cPartsController.onInputTick();
-    dispatchEvents();
-}
 
-void GarboxRuntime::onLogicTick(){
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "GarboxRuntime", "no behaviour set");
-    behaviour->onLogicTick();
-    dispatchEvents();
-}
-
-void GarboxRuntime::onHeartbeatTick(){
-    mHeartbeatController.onHeartbeatTick();
+    // dispatch events
     dispatchEvents();
 }
 
@@ -81,7 +99,13 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
     case EventType::Heartbeat: {
         const EventRead<EventPayload::Heartbeat> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onHeartbeat(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::BacklightCommand: {
@@ -91,12 +115,24 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FanStatus: {
         const EventRead<EventPayload::FanStatus> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onFanStatus(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::FanSample: {
         const EventRead<EventPayload::FanSample> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onFanSample(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::FanCommand: {
@@ -106,7 +142,12 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::HeatpadStatus: {
         const EventRead<EventPayload::HeatpadStatus> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onHeatpadStatus(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::HeatpadCommand: {
@@ -116,30 +157,55 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::TemperatureStatus: {
         const EventRead<EventPayload::TemperatureStatus> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureStatus(event);
         mDisplayController.onTemperatureStatus(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatus(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::TemperatureSample: {
         const EventRead<EventPayload::TemperatureSample> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onTemperatureSample(event);
         mDisplayController.onTemperatureSample(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSample(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::ButtonStateChanged: {
         const EventRead<EventPayload::ButtonStateChanged> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onButtonStateChanged(event);
         mI2cPartsController.onButtonStateChanged(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChanged(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::ButtonRepeat: {
         const EventRead<EventPayload::ButtonRepeat> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onButtonRepeat(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeat(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::EncoderStep: {
         const EventRead<EventPayload::EncoderStep> event(header);
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->onEncoderStep(event);
+ 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStep(event); break;
+            default: break; // active behaviour does not support event type
+        }
         break;
     }
     case EventType::Null:
@@ -151,24 +217,22 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
 
 ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
     switch(id){
-    case ControllerId::Display: return &mDisplayController;
-    case ControllerId::Fan: return &mFanController;
-    case ControllerId::Heartbeat: return &mHeartbeatController;
-    case ControllerId::Heatpad: return &mHeatpadController;
-    case ControllerId::Input: return &mInputController;
-    case ControllerId::I2cParts: return &mI2cPartsController;
-    default:
-        TriggerExit("GarboxRuntime", "controller with id not found", static_cast<uint32_t>(id));
+        case ControllerId::Display: return &mDisplayController;
+        case ControllerId::Fan: return &mFanController;
+        case ControllerId::Heartbeat: return &mHeartbeatController;
+        case ControllerId::Heatpad: return &mHeatpadController;
+        case ControllerId::Input: return &mInputController;
+        case ControllerId::I2cParts: return &mI2cPartsController;
+        default: TriggerExit("GarboxRuntime", "controller with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }
 
 BehaviourAbs* GarboxRuntime::resolveBehaviour(BehaviourId id){
     switch(id){
-    case BehaviourId::Calibration: return &mCalibrationBehaviour;
-    case BehaviourId::Fermentation: return &mFermentationBehaviour;
-    default:
-        TriggerExit("GarboxRuntime", "behaviour with id not found", static_cast<uint32_t>(id));
+        case BehaviourId::Calibration: return &mCalibrationBehaviour;
+        case BehaviourId::Fermentation: return &mFermentationBehaviour;
+        default: TriggerExit("GarboxRuntime", "behaviour with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }

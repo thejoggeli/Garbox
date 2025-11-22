@@ -1,12 +1,13 @@
 {% include "_common/header.j2" %}
+{% set RuntimeName = name ~ 'Runtime' %}
 
-#include "{{ name }}Runtime.h"
+#include "{{ RuntimeName }}.h"
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 
 namespace {{ name }} {
 
-{{ name }}Runtime::{{ name }}Runtime():
+{{ RuntimeName }}::{{ RuntimeName }}():
     {# init behaviours #}
     // call behaviours constructors
     {% for beh in behaviours %}
@@ -20,88 +21,131 @@ namespace {{ name }} {
     // nothing to do
 }
 
-void {{ name }}Runtime::onRegisterBehaviours(){
+void {{ RuntimeName }}::onRegisterBehaviours(){
     {% for beh in behaviours %}
     registerBehaviour(&m{{ beh }});
     {% endfor %}
 }
 
-void {{ name }}Runtime::onRegisterControllers(){
+void {{ RuntimeName }}::onRegisterControllers(){
     {% for ctrl in controllers %}
     registerController(&m{{ ctrl }});
     {% endfor %}
 }
 
-void {{ name }}Runtime::onInit(){
+void {{ RuntimeName }}::onInit(){
     // behaviours and controllers are already initialized
     setQueuedBehaviour(&m{{ initial_behaviour }});
 }
 
-void {{ name }}Runtime::onStart(){
+void {{ RuntimeName }}::onStart(){
     // behaviours and controllers are already started
 }
 
 {# ---- GENERATE TICKS ---- #}
 {% for tick in ticks %}
-void {{ name }}Runtime::on{{ tick }}(){
-    {# Call tick on controllers supporting this tick #}
+    {% set onTick = 'on' ~ tick %}
+void {{ RuntimeName }}::{{ onTick }}(){
+    {# get number of controllers with this tick #}
+    {% set ns = namespace(ctrl_count=0, beha_count=0) %}
     {% for ctrl_key, ctrl in controllers.items() %}
         {% if tick in ctrl['ticks'] %}
-    m{{ ctrl_key }}.on{{ tick }}();
+            {% set ns.ctrl_count = ns.ctrl_count + 1 %}
         {% endif %}
     {% endfor %}
-    {# Call tick on active behaviour (if it supports this tick) #}
-    {% if tick in behaviour_ticks %}
-    BaseBehaviourAbs* behaviour = static_cast<BaseBehaviourAbs*>(getActiveBehaviour());
-    AssertExit(behaviour != nullptr, "{{ name }}Runtime", "no behaviour set");
-    behaviour->on{{ tick }}();
-    {% endif %}
-    dispatchEvents();
-}
+    {# get number of behaviours with this tick #}
+    {% for beha_key, beha in behaviours.items() %}
+        {% if tick in beha['ticks'] %}
+            {% set ns.beha_count = ns.beha_count + 1 %}
+        {% endif %}
+    {% endfor %}
+    {% if ns.ctrl_count > 0 %}
 
+    // call controller ticks
+    {# Call tick on controllers supporting this tick #}
+        {% for ctrl_key, ctrl in controllers.items() %}
+            {% if tick in ctrl['ticks'] %}
+    m{{ ctrl_key }}.{{ onTick }}();
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {# Call tick on active behaviour #}
+    {% if ns.beha_count > 0 %}
+
+    // call behaviour tick
+    switch(mActiveBehaviour->getBehaviourId()){
+        {% for beha_key, beha in behaviours.items() %}
+            {% if tick in beha['ticks'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->{{ onTick }}(); break;
+            {% endif %}
+        {% endfor %}
+        default: break; // active behaviour does not support tick type
+    }
+    {% endif %}
+    {# Call dispatch events #}
+    {% if ns.ctrl_count > 0 or ns.beha_count > 0 %}
+
+    // dispatch events
+    dispatchEvents();
+    {% else %}
+        // no controller or behaviour with this tick
+    {% endif %}
+}
 {% endfor %}
-void {{ name }}Runtime::onRouteEvent(const EventHeader* header){
+
+void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     switch(header->type){
-    {# ---- Route events ---- #}
-    {% for event, routes in event_routes.items() %}
+{# ---- Route events ---- #}
+{% for event, routes in event_routes.items() %}
     case EventType::{{ event }}: {
         const EventRead<EventPayload::{{ event }}> event(header);
-        {# 1. send event to active behaviour (if it supports this event) #}
-        {% if routes["behaviours"][0] is defined > 0 %}
-        static_cast<BaseBehaviourAbs*>(getActiveBehaviour())->on{{ event }}(event);
-        {% endif %}
-        {# 2. send event to controllers supporting this event #}
-        {% for ctrl in routes["controllers"] %}
+    {# send event to controllers supporting this event #}
+    {% for ctrl in routes["controllers"] %}
         m{{ ctrl }}.on{{ event }}(event);
-        {% endfor %}
+    {% endfor %}
+    {% set ns = namespace(count=0) %}
+    {# get number of behaviours with this event #}
+    {% for beha_key, beha in behaviours.items() %}
+        {% if event in beha['receives'] %}
+            {% set ns.count = ns.count + 1 %}
+        {% endif %}
+    {% endfor %}
+    {# send event to active behaviour (if it supports this event) #}
+    {% if ns.count > 0 %} 
+        // send event to active behaviour (if supported)
+        switch(mActiveBehaviour->getBehaviourId()){
+            {% for beha_key, beha in behaviours.items() %}
+                {% if event in beha['receives'] %}            case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ event }}(event); break;
+                {% endif %}
+            {% endfor %}
+            default: break; // active behaviour does not support event type
+        }
+    {% endif %}
         break;
     }
     {% endfor %}
     case EventType::Null:
     case EventType::Count:
-        TriggerDebug("{{ name }}Runtime", "invalid event type");
+        TriggerDebug("{{ RuntimeName }}", "invalid event type");
         break;
     }
 }
 
-ControllerAbs* {{ name }}Runtime::resolveController(ControllerId id){
+ControllerAbs* {{ RuntimeName }}::resolveController(ControllerId id){
     switch(id){
 {% for key in controllers %}
-    case ControllerId::{{ key.removesuffix("Controller") }}: return &m{{ key }};
+        case ControllerId::{{ key.removesuffix("Controller") }}: return &m{{ key }};
 {% endfor %}
-    default:
-        TriggerExit("{{ name }}Runtime", "controller with id not found", static_cast<uint32_t>(id));
+        default: TriggerExit("{{ RuntimeName }}", "controller with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }
 
-BehaviourAbs* {{ name }}Runtime::resolveBehaviour(BehaviourId id){
+BehaviourAbs* {{ RuntimeName }}::resolveBehaviour(BehaviourId id){
     switch(id){
 {% for key in behaviours %}
-    case BehaviourId::{{ key.removesuffix("Behaviour") }}: return &m{{ key }};
+        case BehaviourId::{{ key.removesuffix("Behaviour") }}: return &m{{ key }};
 {% endfor %}
-    default:
-        TriggerExit("{{ name }}Runtime", "behaviour with id not found", static_cast<uint32_t>(id));
+        default: TriggerExit("{{ RuntimeName }}", "behaviour with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }

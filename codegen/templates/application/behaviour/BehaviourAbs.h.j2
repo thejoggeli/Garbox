@@ -1,33 +1,61 @@
 {% include "_common/header.j2" %}
+{% set BehaviourName = name ~ 'Abs' %}
 
 #pragma once
 
-#include "app/behaviours/generated/BaseBehaviourAbs.h"
+#include "core/application/behaviour/BehaviourAbs.h"
 
 namespace Garbox {
 
-class {{ name }}Abs : public BaseBehaviourAbs {
+class {{ BehaviourName }} : public BehaviourAbs {
 public:
 
-    {{ name }}Abs();
+    {{ BehaviourName }}();
+{# ---- Tick handlers ---- #}
+{% if behaviour.ticks %}
+
+    // tick handlers
+    {% for tick in behaviour.ticks %}
+    virtual void on{{ tick }}() = 0;
+    {% endfor %}
+{% endif %}
+{# ---- receives ---- #}
+{% if behaviour.receives %}
+
+    {# receive event shorthands #}
+    // shorthand types for read events 
+    {% for ev in behaviour.receives %}
+    using {{ ev }} = EventRead<EventPayload::{{ ev }}>;
+    {% endfor %}
+
+    {# onEvent methods #}
+    // receive event handlers
+    {% for ev in behaviour.receives %}
+    virtual void on{{ ev }}(const {{ ev }}& event) = 0;
+    {% endfor %}
+{% endif %}
 
 protected:
+{# send event methods #}
 {% if behaviour.sends %}
 
+    {# send event shorthands #}
     // shorthand types for write events 
-{% for ev in behaviour.sends %}
+    {% for ev in behaviour.sends %}
     using {{ ev }}Write = EventWrite<EventPayload::{{ ev }}>;
-{% endfor %}
+    {% endfor %}
 
+    {# makeEvent methods #}
     // make typed events
-{% for ev in behaviour.sends %}
+    {% for ev in behaviour.sends %}
     {{ ev }}Write make{{ ev }}Event();
-{% endfor %}
+    {% endfor %}
 
+    {# sendEvent methods #}
     // send typed events
-{% for ev in behaviour.sends %}
+    {% for ev in behaviour.sends %}
     void sendEvent(const {{ ev }}Write& event);
-{% endfor %}
+    {% endfor %}
 {% endif %}
 
 private:
@@ -35,25 +63,6 @@ private:
     // hide event methods
     using BehaviourAbs::makeEvent;
     using BehaviourAbs::sendEvent;
-{% if behaviour.ticks_null %}
-
-    // hide unused ticks
-{% for tick in behaviour.ticks_null %}
-    void on{{ tick }}() final;
-{% endfor %}
-{% endif %}
-{% if behaviour.receives_null %}
-
-    // hide unused shorthand types 
-{% for ev in behaviour.receives_null %}
-    using BaseBehaviourAbs::{{ ev }};
-{% endfor %}
-
-    // hide unsued event handlers
-{% for ev in behaviour.receives_null %}
-    void on{{ ev }}(const {{ ev }}& event) final;
-{% endfor %}
-{% endif %}
 
 };
 

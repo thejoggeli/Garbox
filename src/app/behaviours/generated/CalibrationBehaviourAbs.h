@@ -4,14 +4,27 @@
 
 #pragma once
 
-#include "app/behaviours/generated/BaseBehaviourAbs.h"
+#include "core/application/behaviour/BehaviourAbs.h"
 
 namespace Garbox {
 
-class CalibrationBehaviourAbs : public BaseBehaviourAbs {
+class CalibrationBehaviourAbs : public BehaviourAbs {
 public:
 
     CalibrationBehaviourAbs();
+
+    // tick handlers
+    virtual void onLogicTick() = 0;
+
+    // shorthand types for read events 
+    using Heartbeat = EventRead<EventPayload::Heartbeat>;
+    using FanStatus = EventRead<EventPayload::FanStatus>;
+    using FanSample = EventRead<EventPayload::FanSample>;
+
+    // receive event handlers
+    virtual void onHeartbeat(const Heartbeat& event) = 0;
+    virtual void onFanStatus(const FanStatus& event) = 0;
+    virtual void onFanSample(const FanSample& event) = 0;
 
 protected:
 
@@ -29,22 +42,6 @@ private:
     // hide event methods
     using BehaviourAbs::makeEvent;
     using BehaviourAbs::sendEvent;
-
-    // hide unused shorthand types 
-    using BaseBehaviourAbs::ButtonRepeat;
-    using BaseBehaviourAbs::ButtonStateChanged;
-    using BaseBehaviourAbs::EncoderStep;
-    using BaseBehaviourAbs::HeatpadStatus;
-    using BaseBehaviourAbs::TemperatureSample;
-    using BaseBehaviourAbs::TemperatureStatus;
-
-    // hide unsued event handlers
-    void onButtonRepeat(const ButtonRepeat& event) final;
-    void onButtonStateChanged(const ButtonStateChanged& event) final;
-    void onEncoderStep(const EncoderStep& event) final;
-    void onHeatpadStatus(const HeatpadStatus& event) final;
-    void onTemperatureSample(const TemperatureSample& event) final;
-    void onTemperatureStatus(const TemperatureStatus& event) final;
 
 };
 

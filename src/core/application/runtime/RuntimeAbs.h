@@ -48,6 +48,10 @@ public:
 
 protected:
 
+    // behaviour active and queued
+    BehaviourAbs* mActiveBehaviour = nullptr;
+    BehaviourAbs* mQueuedBehaviour = nullptr;
+
     // controllers setup
     void registerController(ControllerAbs* controller);
     Span<ControllerAbs*> getControllers();
@@ -96,10 +100,6 @@ private:
     static constexpr size_t MaxBehavioursCount = 16;
     BehaviourAbs* mBehavioursRawArray[MaxBehavioursCount];
     Span<BehaviourAbs*> mBehavioursSpan;
-
-    // behaviour active and queued
-    BehaviourAbs* mActiveBehaviour = nullptr;
-    BehaviourAbs* mQueuedBehaviour = nullptr;
 
 };
 

@@ -24,21 +24,22 @@ public:
     void setActive(bool active);
     bool isActive() const { return mActive; }
 
-    // get the host of this behaviour
-    BehaviourHostIfc* getBehaviourHost() { return static_cast<BehaviourHostIfc*>(mHost); }
-
     // get the behaviour id
     BehaviourId getBehaviourId() const { return mBehaviourId; }
 
 protected:
 
+    const BehaviourId mBehaviourId;
+
     // abstract methods for user of class
     virtual void onBecomeActive() = 0;
     virtual void onBecomeInactive() = 0;
 
+    // get the host of this behaviour
+    BehaviourHostIfc* getBehaviourHost() { return static_cast<BehaviourHostIfc*>(mHost); }
+
 private:
 
-    BehaviourId mBehaviourId;
     bool mActive = false;
 
 };

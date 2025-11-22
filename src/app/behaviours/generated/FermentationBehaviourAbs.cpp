@@ -8,7 +8,7 @@ namespace Garbox {
 
 FermentationBehaviourAbs::FermentationBehaviourAbs(): 
     // init memberes
-    BaseBehaviourAbs(ComponentId::FermentationBehaviour, BehaviourId::Fermentation){
+    BehaviourAbs(ComponentId::FermentationBehaviour, BehaviourId::Fermentation){
     // nothing to do
 }
 

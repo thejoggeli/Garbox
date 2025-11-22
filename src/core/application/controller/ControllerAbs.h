@@ -19,15 +19,17 @@ public:
     // setup method
     void init(ControllerHostIfc& host);
 
-    // get the host of this behaviour
-    ControllerHostIfc* getControllerHost() { return static_cast<ControllerHostIfc*>(mHost); }
-
     // get the behaviour id
     ControllerId getControllerId() const { return mControllerId; }
 
-private:
+protected:
 
-    ControllerId mControllerId;
+    const ControllerId mControllerId;
+
+    // get the host of this behaviour
+    ControllerHostIfc* getControllerHost() { return static_cast<ControllerHostIfc*>(mHost); }
+
+private:
 
 };
 
