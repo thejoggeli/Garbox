@@ -1,13 +1,8 @@
 #pragma once 
 
 #include "core/application/component/ComponentAbs.h"
-#include "core/application/event/EventFactory.h"
-#include "core/application/event/types/EventWrite.h"
-#include "core/application/event/types/EventRead.h"
 #include "core/application/host/ControllerHostIfc.h"
-#include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/ControllerId.h"
-#include "shared/types/EventPayload.h"
 
 namespace Garbox {
 

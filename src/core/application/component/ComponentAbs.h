@@ -5,6 +5,8 @@
 #include "core/application/event/types/EventWrite.h"
 #include "core/application/event/types/EventRead.h"
 #include "core/application/host/ComponentHostIfc.h"
+#include "core/application/runtime/RuntimeContext.h"
+#include "shared/types/EventPayload.h"
 
 namespace Garbox {
 

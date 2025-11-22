@@ -1,13 +1,8 @@
 #pragma once 
 
 #include "core/application/component/ComponentAbs.h"
-#include "core/application/event/EventFactory.h"
-#include "core/application/event/types/EventWrite.h"
-#include "core/application/event/types/EventRead.h"
 #include "core/application/host/BehaviourHostIfc.h"
-#include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/BehaviourId.h"
-#include "shared/types/EventPayload.h"
 
 namespace Garbox {
 
@@ -20,7 +15,6 @@ public:
     void init(BehaviourHostIfc& host);
 
     // unlike controllers, behaviours can be active or inactive
-    // the setActive must only be called by runtime
     void setActive(bool active);
     bool isActive() const { return mActive; }
 

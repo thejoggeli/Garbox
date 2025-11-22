@@ -27,11 +27,14 @@ public:
         using EventWriteType = EventWrite<EventPayload>;
         
         // allocate memory for the event block
-        EventBlockType* block = mPool.allocate<EventBlockType>();
-        if(!block){
+        void* memory = mPool.allocate<EventBlockType>();
+        if(!memory){
             TriggerDebug("EventFactory", "failed to allocate event");
             return EventWriteType(nullptr);
         }
+
+        // use placement new with value-initialize (fills memory with either zeros or default values) 
+        EventBlockType* block = new (memory) EventBlockType();
 
         // fill header data
         EventHeader* header = &block->header;

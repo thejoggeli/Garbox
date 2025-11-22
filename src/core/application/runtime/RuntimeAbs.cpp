@@ -1,9 +1,15 @@
 #include "RuntimeAbs.h"
 
+#define GarboxDebugRuntimeAbs 1
+
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "core/application/controller/ControllerAbs.h"
 #include "core/assert/Assert.h"
 #include "core/time/Time.h"
+
+#if GarboxDebugRuntimeAbs
+#include "core/log/Log.h"
+#endif
 
 namespace Garbox {
 
@@ -109,7 +115,13 @@ Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
-    if(!mEventQueue.push(header)){
+    if(header->type == EventType::Heartbeat){
+        LogDebug("RuntimeAbs", "bypassQueue: %u", header->bypassQueue);
+    }
+    if(header->bypassQueue){
+        onRouteEvent(header);
+    }
+    else if(!mEventQueue.push(header)){
         TriggerExit("RuntimeAbs", "event queue is full");
     }
 }
