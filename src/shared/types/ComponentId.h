@@ -13,14 +13,14 @@ enum class ComponentId : uint16_t {
     // null event
     Null = 0,
 
-    FanController,
-    InputController,
-    FermentationBehaviour,
-    HeatpadController,
     CalibrationBehaviour,
-    I2cPartsController,
-    HeartbeatController,
     DisplayController,
+    FanController,
+    FermentationBehaviour,
+    HeartbeatController,
+    HeatpadController,
+    I2cPartsController,
+    InputController,
 
     // enum size marker
     Count,

@@ -43,10 +43,11 @@ void LvglObjects::init(lv_obj_t *parentObject){
     mHeatpadStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad state: "); currentYPx += deltaYPx;
     mHeatpadDutyLabel        = createLabel(parentObject, startXPx, currentYPx, "Heatpad duty:  "); currentYPx += deltaYPx;
     mHeatpadSenseLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad sense: ");currentYPx += deltaYPx;
-    mDisplayStateLabel = createLabel(parentObject, startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
+    mDisplayStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
     mTemperatureStateLabel   = createLabel(parentObject, startXPx, currentYPx, "Sht31 state: "); currentYPx += deltaYPx;
     mTemperatureSampleLabel  = createLabel(parentObject, startXPx, currentYPx, "Sht31 sample:"); currentYPx += deltaYPx;
     mHeapSpaceLabel          = createLabel(parentObject, startXPx, currentYPx, "Heap space:"); currentYPx += deltaYPx;
+    mEventsLabel             = createLabel(parentObject, startXPx, currentYPx, "Events:"); currentYPx += deltaYPx;
 }
 
 void LvglObjects::setFanState(const char *stateText, float targetSpeed){
@@ -83,6 +84,10 @@ void LvglObjects::setTemperatureSample(float t, float h){
 
 void LvglObjects::setHeapSpace(uint32_t space){
     setFormatted(mHeapSpaceLabel, "Heap space: %u.%03u kB", space/1000, space%1000);
+}
+
+void LvglObjects::setEvents(uint32_t count){
+    setFormatted(mEventsLabel, "Events: count=%u", count);
 }
 
 } // namespace Garbox

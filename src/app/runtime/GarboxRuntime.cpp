@@ -46,6 +46,14 @@ void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
 }
 
+void GarboxRuntime::onHeartbeatTick(){
+
+    // call controller ticks
+    mHeartbeatController.onHeartbeatTick();
+
+    // dispatch events
+    dispatchEvents();
+}
 void GarboxRuntime::onInputTick(){
 
     // call controller ticks
@@ -74,14 +82,6 @@ void GarboxRuntime::onOutputTick(){
     // call controller ticks
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
-
-    // dispatch events
-    dispatchEvents();
-}
-void GarboxRuntime::onHeartbeatTick(){
-
-    // call controller ticks
-    mHeartbeatController.onHeartbeatTick();
 
     // dispatch events
     dispatchEvents();

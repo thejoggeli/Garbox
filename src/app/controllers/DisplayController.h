@@ -29,6 +29,7 @@ public:
         uint32_t renderSkippedCount = 0xFFFFFFFF;
         float brightness;
         uint32_t heapSpace = 0;
+        uint32_t eventCount = 0xFFFFFFFF;
     };
 
     struct Dirty {

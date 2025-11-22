@@ -28,6 +28,8 @@ public:
 
     void setHeapSpace(uint32_t free);
 
+    void setEvents(uint32_t count);
+
 private:
     lv_obj_t* mFanStateLabel = nullptr;
     lv_obj_t* mFanMeasuredRpmLabel = nullptr;
@@ -38,6 +40,7 @@ private:
     lv_obj_t* mTemperatureStateLabel = nullptr;
     lv_obj_t* mTemperatureSampleLabel = nullptr;
     lv_obj_t* mHeapSpaceLabel = nullptr;
+    lv_obj_t* mEventsLabel = nullptr;
 
     lv_obj_t* createLabel(lv_obj_t* parent, int16_t x, int16_t y, const char* text);
     void setFormatted(lv_obj_t* lbl, const char* fmt, ...);

@@ -119,6 +119,7 @@ Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
+    mContext.eventCount++;
     if(header->bypassQueue){
         onRouteEvent(header);
     }

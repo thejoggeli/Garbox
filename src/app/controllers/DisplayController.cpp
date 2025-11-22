@@ -55,6 +55,7 @@ void DisplayController::onRenderTick(){
         mNewState.heatpadCurrent = heatpad.getMeasuredCurrent();
         mNewState.renderSkippedCount = mRenderSkippedCount;
         mNewState.brightness = mDisplay.getBrightness();
+        mNewState.eventCount = mContext->eventCount;
 
         if(mNewState.fanState != mOldState.fanState || mNewState.fanTargetSpeed != mOldState.fanTargetSpeed){
             lv.setFanState(FanStateToString(mNewState.fanState), mNewState.fanTargetSpeed);
@@ -84,6 +85,9 @@ void DisplayController::onRenderTick(){
         }
         if(mNewState.heapSpace != mOldState.heapSpace){
             lv.setHeapSpace(mNewState.heapSpace);
+        }
+        if(mNewState.eventCount != mOldState.eventCount){
+            lv.setEvents(mNewState.eventCount);
         }
 
         mOldState = mNewState;

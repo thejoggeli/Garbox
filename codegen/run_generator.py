@@ -3,6 +3,7 @@ import copy
 import json
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
+from sortedcontainers import SortedSet
 
 # global paths
 script_dir = Path(__file__).parent
@@ -115,7 +116,7 @@ def extract_includes(config, extension, remove=True):
     
     includes_list = []
     if(include_key is not None):
-        includes_set = set()
+        includes_set = SortedSet()
         for config_entry in config.values():
             if include_key in config_entry:
                 for include in config_entry[include_key]:
@@ -273,9 +274,9 @@ def generate_runtime(yaml_config, events_config):
 
     behaviours = yaml_config["behaviours"]
     controllers = yaml_config["controllers"]
-    ticks = set()
-    behaviour_ticks = set()
-    controller_ticks = set()
+    ticks = SortedSet()
+    behaviour_ticks = SortedSet()
+    controller_ticks = SortedSet()
     event_routes = {}
 
     # behaviour ticks
@@ -289,7 +290,7 @@ def generate_runtime(yaml_config, events_config):
         controller_ticks.update(item_dict["ticks"])
 
     for event_key in events_config["type"].keys():
-        event_routes[event_key] = {"controllers": set(), "behaviours": set()}
+        event_routes[event_key] = {"controllers": SortedSet(), "behaviours": SortedSet()}
 
     # controller event routes
     for ctrl_key, ctrl_dict in controllers.items():
@@ -329,7 +330,7 @@ def generate_runtime(yaml_config, events_config):
 
 
 def generate_components_ids(yaml_config):
-    all_names = set()
+    all_names = SortedSet()
     all_names.update(yaml_config["controllers"])
     all_names.update(yaml_config["behaviours"])
 
