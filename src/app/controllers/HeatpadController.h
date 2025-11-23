@@ -32,6 +32,7 @@ private:
 
     void handleHeatpadStateChanged(HeatpadState oldState, HeatpadState newState);
     void sendStatusEvent();
+    void updateSensorValues();
 
 };
 

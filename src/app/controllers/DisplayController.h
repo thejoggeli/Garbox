@@ -28,11 +28,11 @@ public:
         bool shtReset;
         float shtTemp;
         float shtHum;
-        uint32_t renderSkippedCount = 0xFFFFFFFF;
+        uint32_t renderSkippedCount = 0;
         float brightness;
         uint32_t heapSpace = 0;
         BehaviourId behaviour;
-        uint32_t eventCount = 0xFFFFFFFF;
+        uint32_t eventCount = 0;
     };
 
     struct Dirty {

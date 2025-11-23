@@ -32,21 +32,7 @@ void HeatpadController::onInputTick(){
     mHeatpad.tick();
 
     // send sample if measured voltage or current changed
-    bool sendSample = false;
-    if(mHeatpad.getMeasuredVoltage() != mLastMeasuredVoltage){
-        mLastMeasuredVoltage = true;
-        sendSample = true;
-    }
-    if(mHeatpad.getMeasuredCurrent() != mLastMeasuredCurrent){
-        mLastMeasuredCurrent = true;
-        sendSample = true;
-    }
-    if(sendSample){
-        HeatpadSampleEvent event = makeHeatpadSampleEvent();
-        event->measuredVoltage = mLastMeasuredVoltage;
-        event->measuredCurrent = mLastMeasuredCurrent;
-        sendEvent(event);
-    }
+    updateSensorValues();
 
     // send changed event
     if(mStateChanged){
@@ -97,6 +83,26 @@ void HeatpadController::sendStatusEvent(){
     event->dutyCycle = mHeatpad.getCurrentDutyCycle();
     event->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
     sendEvent(event);
+}
+
+void HeatpadController::updateSensorValues(){
+    bool changed = false;
+    float voltage = mHeatpad.getMeasuredVoltage();
+    float current = mHeatpad.getMeasuredCurrent();
+    if(voltage != mLastMeasuredVoltage){
+        mLastMeasuredVoltage = voltage;
+        changed = true;
+    }
+    if(current != mLastMeasuredCurrent){
+        mLastMeasuredCurrent = current;
+        changed = true;
+    }
+    if(changed){
+        HeatpadSampleEvent event = makeHeatpadSampleEvent();
+        event->measuredVoltage = mLastMeasuredVoltage;
+        event->measuredCurrent = mLastMeasuredCurrent;
+        sendEvent(event);
+    }
 }
 
 } // namespace
