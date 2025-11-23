@@ -2,18 +2,12 @@
 
 namespace Garbox {
 
-EventFactory::EventFactory(){ 
-    AssertExit(!mInitialized, "EventFactory", "heap deconstructor");
+EventFactory::EventFactory(size_t poolSizeBytes) : mPool(poolSizeBytes) {
+    // nothing to do
 }
 
 EventFactory::~EventFactory(){ 
-    AssertExit(!mInitialized, "EventFactory", "heap deconstructor");
-}
-
-void EventFactory::init(size_t poolSizeBytes){
-    AssertExit(!mInitialized, "EventFactory", "already initialized");
-    mPool.init(poolSizeBytes);
-    mInitialized = true;
+    TriggerExit("EventFactory", "heap deconstructor");
 }
 
 void EventFactory::clearDataPool(){

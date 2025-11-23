@@ -7,7 +7,7 @@
 
 namespace Garbox {
 
-GarboxRuntime::GarboxRuntime(){
+GarboxRuntime::GarboxRuntime(const RuntimeAbs::Config& config) : RuntimeAbs(config) {
     // nothing to do
 }
 

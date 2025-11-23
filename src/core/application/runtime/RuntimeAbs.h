@@ -22,7 +22,7 @@ public:
         size_t eventQueueLength = 64;
     };
 
-    RuntimeAbs();
+    RuntimeAbs(const Config& config);
 
     // disallow copy and move 
     RuntimeAbs(const RuntimeAbs&) = delete;
@@ -30,7 +30,7 @@ public:
     RuntimeAbs(RuntimeAbs&&) = delete;
     RuntimeAbs& operator=(RuntimeAbs&&) = delete;
 
-    void init(const Config& config);
+    void init();
     void start();
 
     // runtime context related methods

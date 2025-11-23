@@ -15,10 +15,9 @@ namespace Garbox {
 class EventFactory {
 public:
 
-    EventFactory();
+    EventFactory(size_t poolSizeBytes);
     ~EventFactory();
 
-    void init(size_t poolSizeBytes);
     void clearDataPool();
 
     template<EventType E>
@@ -47,7 +46,6 @@ public:
 private:
 
     int32_t mCurrentEventId = 0;
-    bool mInitialized = false;
     DataPoolHeap mPool;
 
     int32_t getNextEventId(){

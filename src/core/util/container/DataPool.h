@@ -15,7 +15,6 @@ public:
     DataPool();
     ~DataPool();
 
-    void init();
     void clear();
 
     void* allocateRaw(size_t sizeBytes, size_t alignmentBytes);
@@ -43,7 +42,6 @@ public:
 private:
     std::array<uint8_t, CapacityBytes> mBuffer{};
     size_t mOffsetBytes = 0;
-    bool mInitialized = false;
 };
 
 } // namespace Garbox

@@ -12,12 +12,47 @@ namespace Garbox {
 DisplayController::DisplayController(): 
     // init members
     DisplayControllerAbs(),
-    mDisplay(PartsProvider::GetDisplay()){
+    mDisplay(PartsProvider::GetDisplay()),
+    mObjects(mDisplay.getLvglHandler().getObjects()){
     // nothing to do
 }
 
 void DisplayController::onInit(){
     mBacklightFader.setEasingFunction(EasingFunctions::GetOutSine());
+    registerHandlers();
+}
+
+void DisplayController::registerHandlers(){
+    mUpdateHandlers.emplace(mDirtyFlags.fanStatus, [this](){
+        mObjects.setFanState(FanStateToString(mShadowState.fanState), mShadowState.fanTargetSpeed);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.fanMeasuredRpm, [this](){
+        mObjects.setFanMeasuredRpm(mShadowState.fanMeasuredRpm);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.heatpadState, [this](){
+        mObjects.setHeatpadState(HeatpadStateToString(mShadowState.heatpadState));
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.heatpadDuty, [this](){
+        mObjects.setHeatpadDuty(mShadowState.heatpadDuty);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.heatpadSense, [this](){
+        mObjects.setHeatpadSense(mShadowState.heatpadVoltage, mShadowState.heatpadCurrent);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.displayState, [this](){
+        mObjects.setDisplayState(mShadowState.brightness, mShadowState.renderSkippedCount);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.shtState, [this](){
+        mObjects.setTemperatureState(mShadowState.shtPower, mShadowState.shtDriver, mShadowState.shtReset);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.shtSample, [this](){
+        mObjects.setTemperatureSample(mShadowState.shtTemp, mShadowState.shtHum);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.heapSpace, [this](){
+        mObjects.setHeapSpace(mShadowState.heapSpace);
+    });
+    mUpdateHandlers.emplace(mDirtyFlags.appState, [this](){
+        mObjects.setAppInfo(BehaviourIdToString(mShadowState.behaviour), mShadowState.eventCount);
+    });
 }
 
 void DisplayController::onStart(){
@@ -26,7 +61,7 @@ void DisplayController::onStart(){
 }
 
 void DisplayController::onRenderTick(){
-    
+
     // update display brightness
     if(mBacklightFader.isActive()){
         float brightness = mBacklightFader.updateValue();
@@ -54,49 +89,15 @@ void DisplayController::onRenderTick(){
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
 
-        LvglObjects& lv = mDisplay.getLvglHandler().getObjects();
-
-        if(mDirtyFlags.fanStatus){
-            lv.setFanState(FanStateToString(mShadowState.fanState), mShadowState.fanTargetSpeed);
-            mDirtyFlags.fanStatus = false;
-        }
-        if(mDirtyFlags.fanMeasuredRpm){
-            lv.setFanMeasuredRpm(mShadowState.fanMeasuredRpm);
-            mDirtyFlags.fanMeasuredRpm = false;
-        }
-        if(mDirtyFlags.heatpadState){
-            lv.setHeatpadState(HeatpadStateToString(mShadowState.heatpadState));
-            mDirtyFlags.heatpadState = false;
-        }
-        if(mDirtyFlags.heatpadDuty){ 
-            lv.setHeatpadDuty(mShadowState.heatpadDuty);
-            mDirtyFlags.heatpadDuty = false;
-        }
-        if(mDirtyFlags.heatpadSense){
-            lv.setHeatpadSense(mShadowState.heatpadVoltage, mShadowState.heatpadCurrent);
-            mDirtyFlags.heatpadSense = false;
-        }
-        if(mDirtyFlags.displayState){
-            lv.setDisplayState(mShadowState.brightness, mShadowState.renderSkippedCount);
-            mDirtyFlags.displayState = false;
-        } 
-        if(mDirtyFlags.shtState){
-            lv.setTemperatureState(mShadowState.shtPower, mShadowState.shtDriver, mShadowState.shtReset);
-            mDirtyFlags.shtState = false;
-        }
-        if(mDirtyFlags.shtSample){
-            lv.setTemperatureSample(mShadowState.shtTemp, mShadowState.shtHum);
-            mDirtyFlags.shtSample = false;
-        }
-        if(mDirtyFlags.heapSpace){
-            lv.setHeapSpace(mShadowState.heapSpace);
-            mDirtyFlags.heapSpace = false;
-        }
-        if(mDirtyFlags.appState){
-            lv.setAppInfo(BehaviourIdToString(mShadowState.behaviour), mShadowState.eventCount);
-            mDirtyFlags.appState = false;
+        // update all dirty handlers
+        for(UpdateHandler& handler : mUpdateHandlers){
+            if(handler.dirtyFlag){
+                handler.updateFn();
+                handler.dirtyFlag = false;
+            }
         }
 
+        // signal display to render frame
         mDisplay.giveRenderTrigger();
     }
     else {

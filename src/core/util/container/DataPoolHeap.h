@@ -10,10 +10,9 @@ namespace Garbox {
 class DataPoolHeap {
 public:
 
-    DataPoolHeap();
+    DataPoolHeap(size_t capacityBytes);
     ~DataPoolHeap();
 
-    void init(size_t capacityBytes);
     void clear();
 
     void* allocateRaw(size_t sizeBytes, size_t alignmentBytes);
@@ -42,7 +41,6 @@ private:
     size_t mCapacityBytes = 0;
     uint8_t* mBuffer = nullptr;
     size_t mOffsetBytes = 0;
-    bool mInitialized = false;
 };
 
 } // namespace Garbox

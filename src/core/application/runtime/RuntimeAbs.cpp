@@ -13,20 +13,16 @@
 
 namespace Garbox {
 
-RuntimeAbs::RuntimeAbs():
+RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
     mControllersSpan(nullptr, 0),
-    mBehavioursSpan(nullptr, 0){
+    mBehavioursSpan(nullptr, 0),
+    mEventFactory(config.eventPoolSizeBytes),
+    mEventQueue(config.eventQueueLength){
     // constructor body
 }
 
-void RuntimeAbs::init(const Config& config){
-
-    // init event factory
-    mEventFactory.init(config.eventPoolSizeBytes);
-
-    // init event queue
-    mEventQueue.init(config.eventQueueLength);
+void RuntimeAbs::init(){
 
     // derived class must register controllers and behaviours
     onRegisterControllers();

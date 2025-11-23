@@ -2,40 +2,20 @@
 
 namespace Garbox {
 
-DataPoolHeap::DataPoolHeap(){
-    // nothing to do
+DataPoolHeap::DataPoolHeap(size_t capacityBytes) : mCapacityBytes(capacityBytes) {
+    mBuffer = new uint8_t[mCapacityBytes];
+    AssertExit(mBuffer != nullptr, "DataPoolHeap", "heap allocation failed");
 }
 
 DataPoolHeap::~DataPoolHeap() {
     AssertExit(mCapacityBytes == 0, "DataPoolHeap", "heap using classes must not be deconstructed");
 }
 
-void DataPoolHeap::init(size_t capacityBytes) {
-    AssertExit(!mInitialized, "DataPoolHeap", "already initialized");
-
-    mCapacityBytes = capacityBytes;
-    mBuffer = new uint8_t[mCapacityBytes];
-    AssertExit(mBuffer != nullptr, "DataPoolHeap", "heap allocation failed");
-
-    mOffsetBytes = 0;
-    mInitialized = true;
-}
-
 void DataPoolHeap::clear() {
-    if(!mInitialized) {
-        TriggerDebug("DataPoolHeap", "not initialized");
-        return;
-    }
-
     mOffsetBytes = 0;
 }
 
 void* DataPoolHeap::allocateRaw(size_t sizeBytes, size_t alignmentBytes) {
-    if(!mInitialized) {
-        TriggerDebug("DataPoolHeap", "not initialized");
-        return nullptr;
-    }
-
     const size_t mask = alignmentBytes - 1;
     size_t alignedOffset = (mOffsetBytes + mask) & ~mask;
 

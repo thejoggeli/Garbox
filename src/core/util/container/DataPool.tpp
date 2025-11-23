@@ -13,30 +13,12 @@ DataPool<CapacityBytes>::~DataPool() {
 }
 
 template<size_t CapacityBytes>
-void DataPool<CapacityBytes>::init() {
-    AssertExit(!mInitialized, "DataPool", "already initialized");
-
-    mOffsetBytes = 0;
-    mInitialized = true;
-}
-
-template<size_t CapacityBytes>
 void DataPool<CapacityBytes>::clear() {
-    if(!mInitialized) {
-        TriggerDebug("DataPool", "not initialized");
-        return;
-    }
-
     mOffsetBytes = 0;
 }
 
 template<size_t CapacityBytes>
 void* DataPool<CapacityBytes>::allocateRaw(size_t sizeBytes, size_t alignmentBytes) {
-    if(!mInitialized) {
-        TriggerDebug("DataPool", "not initialized");
-        return nullptr;
-    }
-
     const size_t mask = alignmentBytes - 1;
     size_t alignedOffset = (mOffsetBytes + mask) & ~mask;
 

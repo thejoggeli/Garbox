@@ -17,7 +17,10 @@
 
 using namespace Garbox;
 
-static GarboxRuntime gRuntime;
+static GarboxRuntime gRuntime({
+    .eventPoolSizeBytes = AppConfig::RuntimeEventPoolSizeBytes,
+    .eventQueueLength = AppConfig::RuntimeEventQueueLength,    
+});
 static Task gMainTask;
 static bool gResetProfiler = false;
 
@@ -111,10 +114,7 @@ void setup(){
     startup.run();
 
     // init main app
-    gRuntime.init({
-        .eventPoolSizeBytes = AppConfig::RuntimeEventPoolSizeBytes,
-        .eventQueueLength = AppConfig::RuntimeEventQueueLength,
-    });
+    gRuntime.init();
 
     // init main task
     gMainTask.configure(

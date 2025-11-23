@@ -1,7 +1,9 @@
 #pragma once
 
+#include <functional>
 #include "app/controllers/generated/DisplayControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
+#include "core/util/container/StaticVector.h"
 #include "core/util/helpers/TimeFader.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
@@ -10,6 +12,7 @@
 namespace Garbox {
 
 class Display;
+class LvglObjects;
 
 class DisplayController : public DisplayControllerAbs {
 public:
@@ -63,7 +66,20 @@ public:
 
 private:
 
+    using UpdateFunction = std::function<void()>;
+
+    struct UpdateHandler {
+        bool& dirtyFlag;
+        UpdateFunction updateFn;
+
+        // constructor for emplace
+        UpdateHandler(bool& flag, UpdateFunction fn):
+            dirtyFlag(flag), updateFn(fn) {}
+    };
+
     Display& mDisplay;
+    LvglObjects& mObjects;
+
     SoftwareTimer mHeapTimer;
     TimeFader mBacklightFader;
 
@@ -72,9 +88,13 @@ private:
 
     uint32_t mRenderSkippedCount = 0;
 
+    static constexpr size_t MaxUpdateHandlers = 32;
+    StaticVector<UpdateHandler, MaxUpdateHandlers> mUpdateHandlers;
+
     void onInit() final;
     void onStart() final;
 
+    void registerHandlers();
     void setBrightnessSmooth(float brightness, uint32_t durationMicros);
 
 };

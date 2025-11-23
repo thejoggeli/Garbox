@@ -11,33 +11,17 @@ template<typename T>
 class RingBufferHeap {
 public:
 
-    RingBufferHeap(){
-        // nothing to do
+    RingBufferHeap(size_t capacity) : mCapacity(capacity) {
+        mCapacity = capacity;
+        mBuffer = new T[mCapacity];
+        AssertExit(mBuffer != nullptr, "RingBufferHeap", "heap allocation failed");
     }
 
     ~RingBufferHeap(){
         AssertExit(mCapacity == 0, "RingBufferHeap", "heap using classes must not be deconstructed");
     }
 
-    void init(size_t capacity) {
-        AssertExit(!mInitialized, "RingBufferHeap", "already initialized");
-
-        mCapacity = capacity;
-        mBuffer = new T[mCapacity];
-        AssertExit(mBuffer != nullptr, "RingBufferHeap", "heap allocation failed");
-
-        mHead = 0;
-        mTail = 0;
-        mCount = 0;
-        mInitialized = true;
-    }
-
     void clear() {
-        if(!mInitialized) {
-            TriggerDebug("RingBufferHeap", "not initialized");
-            return;
-        }
-
         mHead = 0;
         mTail = 0;
         mCount = 0;
@@ -141,7 +125,6 @@ private:
     size_t mHead = 0;
     size_t mTail = 0;
     size_t mCount = 0;
-    bool mInitialized = false;
 };
 
 } // namespace Garbox

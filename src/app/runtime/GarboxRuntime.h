@@ -23,7 +23,7 @@ namespace Garbox {
 class GarboxRuntime : public RuntimeAbs {
 public:
 
-    GarboxRuntime();
+    GarboxRuntime(const RuntimeAbs::Config& config);
 
     void onHeartbeatTick();
     void onInputTick();

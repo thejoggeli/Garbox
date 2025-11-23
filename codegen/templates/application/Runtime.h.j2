@@ -22,7 +22,7 @@ namespace Garbox {
 class {{ RuntimeName }} : public RuntimeAbs {
 public:
 
-    {{ RuntimeName }}();
+    {{ RuntimeName }}(const RuntimeAbs::Config& config);
 
     {# Generate tick method declarations #}
     {% for tick in all_ticks %}
