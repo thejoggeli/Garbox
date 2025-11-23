@@ -65,9 +65,9 @@ void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState
         break;
     }
     // send event
-    EventWrite event = makeButtonStateChangedEvent();
-    event.payload->oldState = oldState;
-    event.payload->newState = newState;
+    EventView event = makeButtonStateChangedEvent();
+    event->oldState = oldState;
+    event->newState = newState;
     sendEvent(event);
 }
 

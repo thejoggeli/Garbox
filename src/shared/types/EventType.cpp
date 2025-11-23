@@ -4,8 +4,6 @@
 
 #include "EventType.h"
 
-
-
 namespace Garbox {
 
 const char* EventTypeToString(EventType type){

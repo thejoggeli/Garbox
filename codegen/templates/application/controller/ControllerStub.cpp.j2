@@ -26,7 +26,7 @@ void {{ name }}::on{{ tick }}(){
 {% if controller.receives %}
 {% for ev in controller.receives %}
 
-void {{ name }}::on{{ ev }}(const {{ ev }}& event){
+void {{ name }}::on{{ ev }}(const {{ ev }}Event& event){
     // nothing to do
 }
 {% endfor %}

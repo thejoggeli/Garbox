@@ -2,11 +2,12 @@
 
 #include "core/application/component/ComponentDescriptor.h"
 #include "core/application/event/EventFactory.h"
-#include "core/application/event/types/EventWrite.h"
-#include "core/application/event/types/EventRead.h"
+#include "core/application/event/EventView.h"
 #include "core/application/host/ComponentHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
+#include "shared/types/EventAlias.h"
 #include "shared/types/EventPayload.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -59,13 +60,13 @@ protected:
     void sendEvent(EventHeader* header);
 
     // make event
-    template<typename EventPayload>
-    EventWrite<EventPayload> makeEvent(){
+    template<EventType E>
+    EventView<E> makeEvent(){
         if(!mInitialized){
             TriggerExit("BehaviourAbs", "not initialized");
         }
-        EventWrite<EventPayload> event = mEventFactory->make<EventPayload>(mComponentDescriptor);
-        if(!event.header){
+        EventView<E> event = mEventFactory->make<E>(mComponentDescriptor);
+        if(!event.header()){
             TriggerExit("BehaviourAbs", "could not allocate event");
         }
         return event;

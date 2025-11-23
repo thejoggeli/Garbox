@@ -2,11 +2,13 @@
 
 #include <cstdint>
 #include <functional>
-#include "core/application/event/types/EventBlock.h"
-#include "core/application/event/types/EventWrite.h"
-#include "core/application/event/types/EventHeader.h"
+#include "core/application/event/EventView.h"
+#include "core/application/event/EventBlock.h"
+#include "core/application/event/EventHeader.h"
 #include "core/assert/Assert.h"
 #include "core/util/container/DataPoolHeap.h"
+#include "shared/types/EventType.h"
+#include "shared/types/EventPayload.h"
 
 namespace Garbox {
 
@@ -19,31 +21,27 @@ public:
     void init(size_t poolSizeBytes);
     void clearDataPool();
 
-    template<typename EventPayload>
-    EventWrite<EventPayload> make(ComponentDescriptor componentDescriptor){
-
-        // shorthand for events with given payload type
-        using EventBlockType = EventBlock<EventPayload>;
-        using EventWriteType = EventWrite<EventPayload>;
+    template<EventType E>
+    EventView<E> make(ComponentDescriptor componentDescriptor){
         
         // allocate memory for the event block
-        void* memory = mPool.allocate<EventBlockType>();
+        void* memory = mPool.allocate<EventBlock<E>>();
         if(!memory){
             TriggerDebug("EventFactory", "failed to allocate event");
-            return EventWriteType(nullptr);
+            return EventView<E>((EventHeader*)nullptr);
         }
 
         // use placement new with value-initialize (fills memory with either zeros or default values) 
-        EventBlockType* block = new (memory) EventBlockType();
+        EventBlock<E>* block = new (memory) EventBlock<E>();
 
         // fill header data
         EventHeader* header = &block->header;
         header->id = getNextEventId();
-        header->type = EventPayload::Type;
+        header->type = E;
         header->sender = componentDescriptor;
 
         // the caller gets only a non-owning view with pointers to event header and payload 
-        return EventWriteType(header);
+        return EventView<E>(header);
     }
 
 private:

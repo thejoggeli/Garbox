@@ -14,10 +14,10 @@ public:
 
     void onRenderTick() final;
 
-    void onTemperatureStatus(const TemperatureStatus& event) final;
-    void onTemperatureSample(const TemperatureSample& event) final;
-    void onBacklightCommand(const BacklightCommand& event) final;
-    void onActiveBehaviourChanged(const ActiveBehaviourChanged& event) final;
+    void onTemperatureStatus(const TemperatureStatusEvent& event) final;
+    void onTemperatureSample(const TemperatureSampleEvent& event) final;
+    void onBacklightCommand(const BacklightCommandEvent& event) final;
+    void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
 
 private:
 

@@ -29,15 +29,15 @@ void CalibrationBehaviour::onLogicTick(){
     // nothing to do
 }
 
-void CalibrationBehaviour::onHeartbeat(const Heartbeat& event){
+void CalibrationBehaviour::onHeartbeat(const HeartbeatEvent& event){
     // nothing to do
 }
 
-void CalibrationBehaviour::onFanStatus(const FanStatus& event){
+void CalibrationBehaviour::onFanStatus(const FanStatusEvent& event){
     // nothing to do
 }
 
-void CalibrationBehaviour::onFanSample(const FanSample& event){
+void CalibrationBehaviour::onFanSample(const FanSampleEvent& event){
     // nothing to do
 }
 

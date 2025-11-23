@@ -1,8 +1,8 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
-#pragma once
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -19,20 +19,15 @@ public:
 
 protected:
 
-    // shorthand types for write events 
-    using ButtonStateChangedWrite = EventWrite<EventPayload::ButtonStateChanged>;
-    using ButtonRepeatWrite = EventWrite<EventPayload::ButtonRepeat>;
-    using EncoderStepWrite = EventWrite<EventPayload::EncoderStep>;
-
     // make typed events
-    ButtonStateChangedWrite makeButtonStateChangedEvent();
-    ButtonRepeatWrite makeButtonRepeatEvent();
-    EncoderStepWrite makeEncoderStepEvent();
+    ButtonStateChangedEvent makeButtonStateChangedEvent();
+    ButtonRepeatEvent makeButtonRepeatEvent();
+    EncoderStepEvent makeEncoderStepEvent();
 
     // send typed events
-    void sendEvent(const ButtonStateChangedWrite& event);
-    void sendEvent(const ButtonRepeatWrite& event);
-    void sendEvent(const EncoderStepWrite& event);
+    void sendEvent(const ButtonStateChangedEvent& event);
+    void sendEvent(const ButtonRepeatEvent& event);
+    void sendEvent(const EncoderStepEvent& event);
 
 private:
 

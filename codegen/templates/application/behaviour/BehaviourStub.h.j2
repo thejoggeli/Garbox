@@ -10,18 +10,18 @@ class {{ name }} : public {{ name }}Abs {
 public:
 
     {{ name }}();
-    {% if behaviour.ticks %}
+{% if behaviour.ticks %}
 
-        {% for tick in behaviour.ticks %}
+    {% for tick in behaviour.ticks %}
     void on{{ tick }}() final;
-        {% endfor %}
-    {% endif %}
-    {% if behaviour.receives %}
+    {% endfor %}
+{% endif %}
+{% if behaviour.receives %}
 
-        {% for ev in behaviour.receives %}
-    void on{{ ev }}(const {{ ev }}& event) final;
-        {% endfor %}
-    {% endif %}
+    {% for ev in behaviour.receives %}
+    void on{{ ev }}(const {{ ev }}Event& event) final;
+    {% endfor %}
+{% endif %}
 
 private:
 

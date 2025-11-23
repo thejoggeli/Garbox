@@ -19,7 +19,7 @@ public:
     {% if controller.receives %}
 
         {% for ev in controller.receives %}
-    void on{{ ev }}(const {{ ev }}& event) final;
+    void on{{ ev }}(const {{ ev }}Event& event) final;
         {% endfor %}
     {% endif %}
 

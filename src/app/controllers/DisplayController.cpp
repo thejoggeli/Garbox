@@ -100,25 +100,25 @@ void DisplayController::onRenderTick(){
     }
 }
 
-void DisplayController::onTemperatureStatus(const TemperatureStatus& event){
-    mNewState.shtDriver = event.payload->driverEnabled;
-    mNewState.shtPower = event.payload->powerEnabled;
-    mNewState.shtReset = event.payload->resetting;
+void DisplayController::onTemperatureStatus(const TemperatureStatusEvent& event){
+    mNewState.shtDriver = event->driverEnabled;
+    mNewState.shtPower = event->powerEnabled;
+    mNewState.shtReset = event->resetting;
     mDirty.shtState = true;
 }
 
-void DisplayController::onTemperatureSample(const TemperatureSample& event){
-    mNewState.shtTemp = event.payload->temperatureCelcius;
-    mNewState.shtHum = event.payload->humidityRelative;
+void DisplayController::onTemperatureSample(const TemperatureSampleEvent& event){
+    mNewState.shtTemp = event->temperatureCelcius;
+    mNewState.shtHum = event->humidityRelative;
     mDirty.shtSample = true;
 }
 
-void DisplayController::onBacklightCommand(const BacklightCommand& event){
-    setBrightnessSmooth(event.payload->brightness, 1000_ms);
+void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
+    setBrightnessSmooth(event->brightness, 1000_ms);
 };
 
-void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChanged& event){
-    mNewState.behaviour = event.payload->newBehaviour;
+void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
+    mNewState.behaviour = event->newBehaviour;
 }
 
 void DisplayController::setBrightnessSmooth(float targetBrightness, uint32_t durationMicros){

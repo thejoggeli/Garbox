@@ -53,15 +53,15 @@ void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const FanCommand& event){
+void FanController::onFanCommand(const FanCommandEvent& event){
     // apply enabled
-    if(mFan.isEnabled() != event.payload->enabled){
-        mFan.setEnabled(event.payload->enabled);
+    if(mFan.isEnabled() != event->enabled){
+        mFan.setEnabled(event->enabled);
         mStateChanged = true;
     }
     // apply speed
-    if(mFan.getTargetSpeed() != event.payload->targetSpeed){
-        mFan.setTargetSpeed(event.payload->targetSpeed);
+    if(mFan.getTargetSpeed() != event->targetSpeed){
+        mFan.setTargetSpeed(event->targetSpeed);
         mStateChanged = true;
     }
     // send status 
@@ -86,15 +86,15 @@ void FanController::handleFanStalledAlert(uint32_t counter){
 }
 
 void FanController::sendStatusEvent(){
-    EventWrite event = makeFanStatusEvent();
-    event.payload->state = mFan.getState();
-    event.payload->targetSpeed = mFan.getTargetSpeed();
+    EventView event = makeFanStatusEvent();
+    event->state = mFan.getState();
+    event->targetSpeed = mFan.getTargetSpeed();
     sendEvent(event);
 }
 
 void FanController::sendSampleEvent(float measuredRpm){
-    EventWrite event = makeFanSampleEvent();
-    event.payload->measuredRpm = measuredRpm;
+    EventView event = makeFanSampleEvent();
+    event->measuredRpm = measuredRpm;
     sendEvent(event);
 }
 

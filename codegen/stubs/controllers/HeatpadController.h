@@ -15,7 +15,7 @@ public:
     void onInputTick() final;
     void onOutputTick() final;
 
-    void onHeatpadCommand(const HeatpadCommand& event) final;
+    void onHeatpadCommand(const HeatpadCommandEvent& event) final;
 
 private:
 

@@ -1,26 +1,42 @@
-{% include "_common/header.j2" %}
-
 #pragma once
+
+{% include "_common/header.j2" %}
 
 #include <cstdint>
 #include <cstring>
-#include "shared/types/BehaviourId.h"
 #include "shared/types/EventType.h"
 {%- from "_common/includes.j2" import emit_includes -%}
 {{- emit_includes(include) -}}
 
-namespace Garbox::EventPayload {
+namespace Garbox {
 
 // generated payloads
 {% for name, fields in payloads.items() %}
-struct {{ name }} {
-    static constexpr EventType Type = EventType::{{ name }};
-{% if fields %}
-{% for name, type in fields.items() %}
+struct {{ name }}Payload {
+    {% if fields %}
+        {% for name, type in fields.items() %}
     {{ type }} {{ name }};
-{% endfor %}
-{% endif %}
+        {% endfor %}
+    {% else %}
+    // no fields
+    {% endif %}
 };
 
 {% endfor %}
-} // namespace Garbox::EventPayload
+
+// generated mappings
+template<EventType>
+struct ResolveEventPayload; // primary template (intentionally undefined)
+
+{% for name, fields in payloads.items() %}
+template<>
+struct ResolveEventPayload<EventType::{{ name }}> {
+    using type = {{ name }}Payload;
+};
+
+{% endfor %}
+// resolve EventType to EventPayload
+template<EventType E>
+using EventPayload = typename ResolveEventPayload<E>::type;
+
+} // namespace 

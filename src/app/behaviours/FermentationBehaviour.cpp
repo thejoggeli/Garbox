@@ -17,8 +17,8 @@ void FermentationBehaviour::onInit(){
 }
 
 void FermentationBehaviour::onStart(){
-    EventWrite cmd = makeBacklightCommandEvent();
-    cmd.payload->brightness = 0.5f;
+    EventView cmd = makeBacklightCommandEvent();
+    cmd->brightness = 0.5f;
     sendEvent(cmd);
 }
 
@@ -50,72 +50,72 @@ void FermentationBehaviour::onLogicTick(){
     }
 }
 
-void FermentationBehaviour::onHeartbeat(const Heartbeat& event){
+void FermentationBehaviour::onHeartbeat(const HeartbeatEvent& event){
     mHeartbeatReceived = true;
 }
 
-void FermentationBehaviour::onFanStatus(const FanStatus& event){
+void FermentationBehaviour::onFanStatus(const FanStatusEvent& event){
     LogDebug("FermentationBehaviour", "[FanStatus] state=%s, speed=%.1f%%",
-        FanStateToString(event.payload->state),
-        event.payload->targetSpeed * 100.0f
+        FanStateToString(event->state),
+        event->targetSpeed * 100.0f
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.fanEnabled = (event.payload->state != FanState::Disabled);
-    inputs.fanStalled = (event.payload->state == FanState::Stalled);
-    inputs.fanTargetSpeed = event.payload->targetSpeed;
+    inputs.fanEnabled = (event->state != FanState::Disabled);
+    inputs.fanStalled = (event->state == FanState::Stalled);
+    inputs.fanTargetSpeed = event->targetSpeed;
 }
 
-void FermentationBehaviour::onFanSample(const FanSample& event){
+void FermentationBehaviour::onFanSample(const FanSampleEvent& event){
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.fanMeasuredRpm = event.payload->measuredRpm;
+    inputs.fanMeasuredRpm = event->measuredRpm;
 }
 
-void FermentationBehaviour::onHeatpadStatus(const HeatpadStatus& event){
+void FermentationBehaviour::onHeatpadStatus(const HeatpadStatusEvent& event){
     LogDebug("FermentationBehaviour", "[HeatpadStatus] state=%s, duty=%.1f%%, period=%" PRIi32 "ms",
-        HeatpadStateToString(event.payload->state),
-        event.payload->dutyCycle * 100.0f,
-        event.payload->periodMicros / 1000
+        HeatpadStateToString(event->state),
+        event->dutyCycle * 100.0f,
+        event->periodMicros / 1000
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.heatpadEnabled = (event.payload->state != HeatpadState::Disabled);
-    inputs.heatpadPwmDuty = event.payload->dutyCycle;
-    inputs.heatpadPwmPeriodMicros = event.payload->periodMicros; 
+    inputs.heatpadEnabled = event->state != HeatpadState::Disabled;
+    inputs.heatpadPwmDuty = event->dutyCycle;
+    inputs.heatpadPwmPeriodMicros = event->periodMicros; 
 }
 
-void FermentationBehaviour::onTemperatureStatus(const TemperatureStatus& event){
+void FermentationBehaviour::onTemperatureStatus(const TemperatureStatusEvent& event){
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.temperatureEnabled = event.payload->powerEnabled && event.payload->driverEnabled;
-    inputs.temperatureError = !inputs.temperatureEnabled && !event.payload->resetting; 
+    inputs.temperatureEnabled = event->powerEnabled && event->driverEnabled;
+    inputs.temperatureError = !inputs.temperatureEnabled && !event->resetting; 
     LogDebug("FermentationBehaviour", "[TemperatureStatus] power=%u, driver=%u, reset=%u, error=%u",
-        event.payload->powerEnabled, event.payload->driverEnabled, event.payload->resetting, inputs.temperatureError
+        event->powerEnabled, event->driverEnabled, event->resetting, inputs.temperatureError
     );
 }
 
-void FermentationBehaviour::onTemperatureSample(const TemperatureSample& event){
+void FermentationBehaviour::onTemperatureSample(const TemperatureSampleEvent& event){
     LogDebug("FermentationBehaviour", "[TemperatureSample] temp=%.2f°C, hum=%.2f%%",
-        event.payload->temperatureCelcius,
-        event.payload->humidityRelative
+        event->temperatureCelcius,
+        event->humidityRelative
     );
     FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
-    inputs.temperatureCelcius = event.payload->temperatureCelcius;
-    inputs.humidityRelative = event.payload->humidityRelative;
+    inputs.temperatureCelcius = event->temperatureCelcius;
+    inputs.humidityRelative = event->humidityRelative;
 }
 
-void FermentationBehaviour::onButtonStateChanged(const ButtonStateChanged& event){
-    if(event.payload->newState == ButtonState::Released){
+void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& event){
+    if(event->newState == ButtonState::Released){
         static uint32_t b = 4;
         b = MathUtils::Wrap(b+1, 5u);
-        EventWrite cmd = makeBacklightCommandEvent();
-        cmd.payload->brightness = b/4.0f;
+        EventView cmd = makeBacklightCommandEvent();
+        cmd->brightness = b/4.0f;
         sendEvent(cmd);
     }
 }
     
-void FermentationBehaviour::onButtonRepeat(const ButtonRepeat& event){
+void FermentationBehaviour::onButtonRepeat(const ButtonRepeatEvent& event){
     // nothing to do
 }
     
-void FermentationBehaviour::onEncoderStep(const EncoderStep& event){
+void FermentationBehaviour::onEncoderStep(const EncoderStepEvent& event){
     // nothing to do
 }
 
@@ -138,9 +138,9 @@ void FermentationBehaviour::applySwitchState(){
 }
 
 void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
-    EventWrite event = makeFanCommandEvent();
-    event.payload->enabled = enabled;
-    event.payload->targetSpeed = speed;
+    EventView event = makeFanCommandEvent();
+    event->enabled = enabled;
+    event->targetSpeed = speed;
     sendEvent(event);
 }
 

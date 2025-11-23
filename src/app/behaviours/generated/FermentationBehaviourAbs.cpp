@@ -12,28 +12,28 @@ FermentationBehaviourAbs::FermentationBehaviourAbs():
     // nothing to do
 }
 
-FermentationBehaviourAbs::FanCommandWrite FermentationBehaviourAbs::makeFanCommandEvent(){
-    return makeEvent<EventPayload::FanCommand>();
+FanCommandEvent FermentationBehaviourAbs::makeFanCommandEvent(){
+    return makeEvent<EventType::FanCommand>();
 }
 
-FermentationBehaviourAbs::BacklightCommandWrite FermentationBehaviourAbs::makeBacklightCommandEvent(){
-    return makeEvent<EventPayload::BacklightCommand>();
+BacklightCommandEvent FermentationBehaviourAbs::makeBacklightCommandEvent(){
+    return makeEvent<EventType::BacklightCommand>();
 }
 
-FermentationBehaviourAbs::HeatpadCommandWrite FermentationBehaviourAbs::makeHeatpadCommandEvent(){
-    return makeEvent<EventPayload::HeatpadCommand>();
+HeatpadCommandEvent FermentationBehaviourAbs::makeHeatpadCommandEvent(){
+    return makeEvent<EventType::HeatpadCommand>();
 }
 
-void FermentationBehaviourAbs::sendEvent(const FanCommandWrite& event){
-    sendEvent(event.header);
+void FermentationBehaviourAbs::sendEvent(const FanCommandEvent& event){
+    sendEvent(event);
 }
 
-void FermentationBehaviourAbs::sendEvent(const BacklightCommandWrite& event){
-    sendEvent(event.header);
+void FermentationBehaviourAbs::sendEvent(const BacklightCommandEvent& event){
+    sendEvent(event);
 }
 
-void FermentationBehaviourAbs::sendEvent(const HeatpadCommandWrite& event){
-    sendEvent(event.header);
+void FermentationBehaviourAbs::sendEvent(const HeatpadCommandEvent& event){
+    sendEvent(event);
 }
 
 } // namespace Garbox

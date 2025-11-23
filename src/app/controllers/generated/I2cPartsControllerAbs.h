@@ -1,8 +1,8 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
-#pragma once
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -17,25 +17,18 @@ public:
     // tick handlers
     virtual void onInputTick() = 0;
 
-    // shorthand types for read events 
-    using ButtonStateChanged = EventRead<EventPayload::ButtonStateChanged>;
-
     // receive event handlers
-    virtual void onButtonStateChanged(const ButtonStateChanged& event) = 0;
+    virtual void onButtonStateChanged(const ButtonStateChangedEvent& event) = 0;
 
 protected:
 
-    // shorthand types for write events 
-    using TemperatureStatusWrite = EventWrite<EventPayload::TemperatureStatus>;
-    using TemperatureSampleWrite = EventWrite<EventPayload::TemperatureSample>;
-
     // make typed events
-    TemperatureStatusWrite makeTemperatureStatusEvent();
-    TemperatureSampleWrite makeTemperatureSampleEvent();
+    TemperatureStatusEvent makeTemperatureStatusEvent();
+    TemperatureSampleEvent makeTemperatureSampleEvent();
 
     // send typed events
-    void sendEvent(const TemperatureStatusWrite& event);
-    void sendEvent(const TemperatureSampleWrite& event);
+    void sendEvent(const TemperatureStatusEvent& event);
+    void sendEvent(const TemperatureSampleEvent& event);
 
 private:
 

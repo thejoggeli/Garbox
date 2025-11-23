@@ -14,14 +14,14 @@ namespace Garbox {
 {% if controller.sends %}
 {% for ev in controller.sends %}
 
-{{ name }}Abs::{{ ev }}Write {{ name }}Abs::make{{ ev }}Event(){
-    return makeEvent<EventPayload::{{ ev }}>();
+{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
+    return makeEvent<EventType::{{ ev }}>();
 }
 {% endfor %}
 {% for ev in controller.sends %}
 
-void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
-    sendEvent(event.header);
+void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
+    sendEvent(event);
 }
 {% endfor %}
 {% endif %}

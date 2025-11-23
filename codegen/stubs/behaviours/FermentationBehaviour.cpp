@@ -29,39 +29,39 @@ void FermentationBehaviour::onLogicTick(){
     // nothing to do
 }
 
-void FermentationBehaviour::onHeartbeat(const Heartbeat& event){
+void FermentationBehaviour::onHeartbeat(const HeartbeatEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onFanStatus(const FanStatus& event){
+void FermentationBehaviour::onFanStatus(const FanStatusEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onFanSample(const FanSample& event){
+void FermentationBehaviour::onFanSample(const FanSampleEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onHeatpadStatus(const HeatpadStatus& event){
+void FermentationBehaviour::onHeatpadStatus(const HeatpadStatusEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onTemperatureStatus(const TemperatureStatus& event){
+void FermentationBehaviour::onTemperatureStatus(const TemperatureStatusEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onTemperatureSample(const TemperatureSample& event){
+void FermentationBehaviour::onTemperatureSample(const TemperatureSampleEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onButtonStateChanged(const ButtonStateChanged& event){
+void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onButtonRepeat(const ButtonRepeat& event){
+void FermentationBehaviour::onButtonRepeat(const ButtonRepeatEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onEncoderStep(const EncoderStep& event){
+void FermentationBehaviour::onEncoderStep(const EncoderStepEvent& event){
     // nothing to do
 }
 

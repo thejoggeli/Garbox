@@ -22,16 +22,10 @@ public:
 {# ---- receives ---- #}
 {% if behaviour.receives %}
 
-    {# receive event shorthands #}
-    // shorthand types for read events 
-    {% for ev in behaviour.receives %}
-    using {{ ev }} = EventRead<EventPayload::{{ ev }}>;
-    {% endfor %}
-
     {# onEvent methods #}
     // receive event handlers
     {% for ev in behaviour.receives %}
-    virtual void on{{ ev }}(const {{ ev }}& event) = 0;
+    virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
     {% endfor %}
 {% endif %}
 
@@ -39,22 +33,16 @@ protected:
 {# send event methods #}
 {% if behaviour.sends %}
 
-    {# send event shorthands #}
-    // shorthand types for write events 
-    {% for ev in behaviour.sends %}
-    using {{ ev }}Write = EventWrite<EventPayload::{{ ev }}>;
-    {% endfor %}
-
     {# makeEvent methods #}
     // make typed events
     {% for ev in behaviour.sends %}
-    {{ ev }}Write make{{ ev }}Event();
+    {{ ev }}Event make{{ ev }}Event();
     {% endfor %}
 
     {# sendEvent methods #}
     // send typed events
     {% for ev in behaviour.sends %}
-    void sendEvent(const {{ ev }}Write& event);
+    void sendEvent(const {{ ev }}Event& event);
     {% endfor %}
 {% endif %}
 

@@ -81,23 +81,23 @@ void RuntimeAbs::applyQueuedBehaviour() {
         }
 
         // create event
-        EventWrite event = mEventFactory.make<EventPayload::ActiveBehaviourChanged>(mComponentDescriptor);
-        event.payload->newBehaviour = mQueuedBehaviour->getBehaviourId();
+        EventView event = mEventFactory.make<EventType::ActiveBehaviourChanged>(mComponentDescriptor);
+        event->newBehaviour = mQueuedBehaviour->getBehaviourId();
 
         // set queued behaviour active
         if(mActiveBehaviour){
             mActiveBehaviour->setActive(false);
-            event.payload->oldBehaviour = mActiveBehaviour->getBehaviourId();
+            event->oldBehaviour = mActiveBehaviour->getBehaviourId();
         }
         else {
-            event.payload->oldBehaviour = BehaviourId::Null;
+            event->oldBehaviour = BehaviourId::Null;
         }
         mActiveBehaviour = mQueuedBehaviour;
         mQueuedBehaviour = nullptr;
         mActiveBehaviour->setActive(true);
 
         // send event
-        publishEvent(event.header);
+        publishEvent(event.header());
     }
 }
 

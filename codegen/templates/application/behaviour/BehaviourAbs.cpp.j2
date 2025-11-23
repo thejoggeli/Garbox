@@ -13,15 +13,15 @@ namespace Garbox {
 {% if behaviour.sends %}
 {% for ev in behaviour.sends %}
 
-{{ name }}Abs::{{ ev }}Write {{ name }}Abs::make{{ ev }}Event(){
-    return makeEvent<EventPayload::{{ ev }}>();
+{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
+    return makeEvent<EventType::{{ ev }}>();
 }
 {% endfor %}
 {# sendEvent methods #}
 {% for ev in behaviour.sends %}
 
-void {{ name }}Abs::sendEvent(const {{ ev }}Write& event){
-    sendEvent(event.header);
+void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
+    sendEvent(event);
 }
 {% endfor %}
 {% endif %}

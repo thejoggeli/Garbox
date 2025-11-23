@@ -97,7 +97,7 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 {# ---- Route events ---- #}
 {% for event, routes in event_routes.items() %}
     case EventType::{{ event }}: {
-        const EventRead<EventPayload::{{ event }}> event(header);
+        const {{ event }}Event event(header);
     {# send event to controllers supporting this event #}
     {% for ctrl in routes["controllers"] %}
         m{{ ctrl }}.on{{ event }}(event);

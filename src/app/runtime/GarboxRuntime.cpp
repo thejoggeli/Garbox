@@ -98,12 +98,12 @@ void GarboxRuntime::onRenderTick(){
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
     case EventType::ActiveBehaviourChanged: {
-        const EventRead<EventPayload::ActiveBehaviourChanged> event(header);
+        const ActiveBehaviourChangedEvent event(header);
         mDisplayController.onActiveBehaviourChanged(event);
         break;
     }
     case EventType::Heartbeat: {
-        const EventRead<EventPayload::Heartbeat> event(header);
+        const HeartbeatEvent event(header);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -114,12 +114,12 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::BacklightCommand: {
-        const EventRead<EventPayload::BacklightCommand> event(header);
+        const BacklightCommandEvent event(header);
         mDisplayController.onBacklightCommand(event);
         break;
     }
     case EventType::FanStatus: {
-        const EventRead<EventPayload::FanStatus> event(header);
+        const FanStatusEvent event(header);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -130,7 +130,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::FanSample: {
-        const EventRead<EventPayload::FanSample> event(header);
+        const FanSampleEvent event(header);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -141,12 +141,12 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::FanCommand: {
-        const EventRead<EventPayload::FanCommand> event(header);
+        const FanCommandEvent event(header);
         mFanController.onFanCommand(event);
         break;
     }
     case EventType::HeatpadStatus: {
-        const EventRead<EventPayload::HeatpadStatus> event(header);
+        const HeatpadStatusEvent event(header);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -156,12 +156,12 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::HeatpadCommand: {
-        const EventRead<EventPayload::HeatpadCommand> event(header);
+        const HeatpadCommandEvent event(header);
         mHeatpadController.onHeatpadCommand(event);
         break;
     }
     case EventType::TemperatureStatus: {
-        const EventRead<EventPayload::TemperatureStatus> event(header);
+        const TemperatureStatusEvent event(header);
         mDisplayController.onTemperatureStatus(event);
  
         // send event to active behaviour (if supported)
@@ -172,7 +172,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::TemperatureSample: {
-        const EventRead<EventPayload::TemperatureSample> event(header);
+        const TemperatureSampleEvent event(header);
         mDisplayController.onTemperatureSample(event);
  
         // send event to active behaviour (if supported)
@@ -183,7 +183,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::ButtonStateChanged: {
-        const EventRead<EventPayload::ButtonStateChanged> event(header);
+        const ButtonStateChangedEvent event(header);
         mI2cPartsController.onButtonStateChanged(event);
  
         // send event to active behaviour (if supported)
@@ -194,7 +194,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::ButtonRepeat: {
-        const EventRead<EventPayload::ButtonRepeat> event(header);
+        const ButtonRepeatEvent event(header);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -204,7 +204,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         break;
     }
     case EventType::EncoderStep: {
-        const EventRead<EventPayload::EncoderStep> event(header);
+        const EncoderStepEvent event(header);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){

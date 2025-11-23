@@ -1,8 +1,8 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
-#pragma once
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -19,14 +19,11 @@ public:
 
 protected:
 
-    // shorthand types for write events 
-    using HeartbeatWrite = EventWrite<EventPayload::Heartbeat>;
-
     // make typed events
-    HeartbeatWrite makeHeartbeatEvent();
+    HeartbeatEvent makeHeartbeatEvent();
 
     // send typed events
-    void sendEvent(const HeartbeatWrite& event);
+    void sendEvent(const HeartbeatEvent& event);
 
 private:
 

@@ -1,8 +1,8 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
-#pragma once
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -17,17 +17,11 @@ public:
     // tick handlers
     virtual void onRenderTick() = 0;
 
-    // shorthand types for read events 
-    using TemperatureStatus = EventRead<EventPayload::TemperatureStatus>;
-    using TemperatureSample = EventRead<EventPayload::TemperatureSample>;
-    using BacklightCommand = EventRead<EventPayload::BacklightCommand>;
-    using ActiveBehaviourChanged = EventRead<EventPayload::ActiveBehaviourChanged>;
-
     // receive event handlers
-    virtual void onTemperatureStatus(const TemperatureStatus& event) = 0;
-    virtual void onTemperatureSample(const TemperatureSample& event) = 0;
-    virtual void onBacklightCommand(const BacklightCommand& event) = 0;
-    virtual void onActiveBehaviourChanged(const ActiveBehaviourChanged& event) = 0;
+    virtual void onTemperatureStatus(const TemperatureStatusEvent& event) = 0;
+    virtual void onTemperatureSample(const TemperatureSampleEvent& event) = 0;
+    virtual void onBacklightCommand(const BacklightCommandEvent& event) = 0;
+    virtual void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) = 0;
 
 protected:
 

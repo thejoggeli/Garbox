@@ -1,8 +1,8 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
-#pragma once
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -18,22 +18,16 @@ public:
     virtual void onInputTick() = 0;
     virtual void onOutputTick() = 0;
 
-    // shorthand types for read events 
-    using HeatpadCommand = EventRead<EventPayload::HeatpadCommand>;
-
     // receive event handlers
-    virtual void onHeatpadCommand(const HeatpadCommand& event) = 0;
+    virtual void onHeatpadCommand(const HeatpadCommandEvent& event) = 0;
 
 protected:
 
-    // shorthand types for write events 
-    using HeatpadStatusWrite = EventWrite<EventPayload::HeatpadStatus>;
-
     // make typed events
-    HeatpadStatusWrite makeHeatpadStatusEvent();
+    HeatpadStatusEvent makeHeatpadStatusEvent();
 
     // send typed events
-    void sendEvent(const HeatpadStatusWrite& event);
+    void sendEvent(const HeatpadStatusEvent& event);
 
 private:
 

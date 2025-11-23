@@ -25,7 +25,7 @@ void HeatpadController::onOutputTick(){
     // nothing to do
 }
 
-void HeatpadController::onHeatpadCommand(const HeatpadCommand& event){
+void HeatpadController::onHeatpadCommand(const HeatpadCommandEvent& event){
     // nothing to do
 }
 

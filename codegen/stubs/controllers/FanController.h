@@ -15,7 +15,7 @@ public:
     void onInputTick() final;
     void onOutputTick() final;
 
-    void onFanCommand(const FanCommand& event) final;
+    void onFanCommand(const FanCommandEvent& event) final;
 
 private:
 

@@ -12,12 +12,12 @@ CalibrationBehaviourAbs::CalibrationBehaviourAbs():
     // nothing to do
 }
 
-CalibrationBehaviourAbs::FanCommandWrite CalibrationBehaviourAbs::makeFanCommandEvent(){
-    return makeEvent<EventPayload::FanCommand>();
+FanCommandEvent CalibrationBehaviourAbs::makeFanCommandEvent(){
+    return makeEvent<EventType::FanCommand>();
 }
 
-void CalibrationBehaviourAbs::sendEvent(const FanCommandWrite& event){
-    sendEvent(event.header);
+void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
+    sendEvent(event);
 }
 
 } // namespace Garbox

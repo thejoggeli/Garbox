@@ -12,15 +12,15 @@ public:
     
     void onLogicTick() final;
 
-    void onHeartbeat(const Heartbeat& event) final;
-    void onFanStatus(const FanStatus& event) final;
-    void onFanSample(const FanSample& event) final;
-    void onHeatpadStatus(const HeatpadStatus& event) final;
-    void onTemperatureStatus(const TemperatureStatus& event) final;
-    void onTemperatureSample(const TemperatureSample& event) final;
-    void onButtonStateChanged(const ButtonStateChanged& event) final;
-    void onButtonRepeat(const ButtonRepeat& event) final;
-    void onEncoderStep(const EncoderStep& event) final;
+    void onHeartbeat(const HeartbeatEvent& event) final;
+    void onFanStatus(const FanStatusEvent& event) final;
+    void onFanSample(const FanSampleEvent& event) final;
+    void onHeatpadStatus(const HeatpadStatusEvent& event) final;
+    void onTemperatureStatus(const TemperatureStatusEvent& event) final;
+    void onTemperatureSample(const TemperatureSampleEvent& event) final;
+    void onButtonStateChanged(const ButtonStateChangedEvent& event) final;
+    void onButtonRepeat(const ButtonRepeatEvent& event) final;
+    void onEncoderStep(const EncoderStepEvent& event) final;
 
 private:
 

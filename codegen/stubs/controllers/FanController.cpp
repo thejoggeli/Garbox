@@ -25,7 +25,7 @@ void FanController::onOutputTick(){
     // nothing to do
 }
 
-void FanController::onFanCommand(const FanCommand& event){
+void FanController::onFanCommand(const FanCommandEvent& event){
     // nothing to do
 }
 

@@ -16,26 +16,18 @@ public:
     // tick handlers
     virtual void onLogicTick() = 0;
 
-    // shorthand types for read events 
-    using Heartbeat = EventRead<EventPayload::Heartbeat>;
-    using FanStatus = EventRead<EventPayload::FanStatus>;
-    using FanSample = EventRead<EventPayload::FanSample>;
-
     // receive event handlers
-    virtual void onHeartbeat(const Heartbeat& event) = 0;
-    virtual void onFanStatus(const FanStatus& event) = 0;
-    virtual void onFanSample(const FanSample& event) = 0;
+    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
+    virtual void onFanStatus(const FanStatusEvent& event) = 0;
+    virtual void onFanSample(const FanSampleEvent& event) = 0;
 
 protected:
 
-    // shorthand types for write events 
-    using FanCommandWrite = EventWrite<EventPayload::FanCommand>;
-
     // make typed events
-    FanCommandWrite makeFanCommandEvent();
+    FanCommandEvent makeFanCommandEvent();
 
     // send typed events
-    void sendEvent(const FanCommandWrite& event);
+    void sendEvent(const FanCommandEvent& event);
 
 private:
 

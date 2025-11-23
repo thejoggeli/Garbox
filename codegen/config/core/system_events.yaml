@@ -1,5 +1,8 @@
 ### System Events. DO NOT CHANGE THIS FILE ###
 
+payloads:
+  include_h: ["shared/types/BehaviourId.h"]
+
 types:
   ActiveBehaviourChanged:
     oldBehaviour: BehaviourId

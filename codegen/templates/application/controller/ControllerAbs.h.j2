@@ -1,6 +1,6 @@
-{% include "_common/header.j2" %}
-
 #pragma once
+
+{% include "_common/header.j2" %}
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -24,33 +24,23 @@ public:
 {# ---- Receive event typedefs + virtual handlers ---- #}
 {% if controller.receives %}
 
-    // shorthand types for read events 
-{% for ev in controller.receives %}
-    using {{ ev }} = EventRead<EventPayload::{{ ev }}>;
-{% endfor %}
-
     // receive event handlers
 {% for ev in controller.receives %}
-    virtual void on{{ ev }}(const {{ ev }}& event) = 0;
+    virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
 {% endfor %}
 {% endif %}
 
 protected:
 {% if controller.sends %}
 
-    // shorthand types for write events 
-{% for ev in controller.sends %}
-    using {{ ev }}Write = EventWrite<EventPayload::{{ ev }}>;
-{% endfor %}
-
     // make typed events
 {% for ev in controller.sends %}
-    {{ ev }}Write make{{ ev }}Event();
+    {{ ev }}Event make{{ ev }}Event();
 {% endfor %}
 
     // send typed events
 {% for ev in controller.sends %}
-    void sendEvent(const {{ ev }}Write& event);
+    void sendEvent(const {{ ev }}Event& event);
 {% endfor %}
 {% endif %}
 

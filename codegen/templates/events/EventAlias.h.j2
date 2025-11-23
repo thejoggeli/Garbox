@@ -1,0 +1,24 @@
+{# compute max name length for white space alignment #}
+{% set ns = namespace(maxlen=0) %}
+{% for name in types.keys() %}
+    {% set length = (name ~ "Event")|length %}
+    {% if length > ns.maxlen %}
+        {% set ns.maxlen = length %}
+    {% endif %}
+{% endfor %}
+{# include header #}
+#pragma once
+
+{% include "_common/header.j2" %}
+
+#include "core/application/event/EventView.h"
+#include "shared/types/EventType.h"
+
+namespace Garbox {
+
+// generated from config
+{% for name, fields in types.items() %}
+using {{ (name ~ "Event").ljust(ns.maxlen) }} = EventView<EventType::{{ name }}>;
+{% endfor %}
+
+} // namespace Garbox

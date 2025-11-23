@@ -21,19 +21,19 @@ void DisplayController::onRenderTick(){
     // nothing to do
 }
 
-void DisplayController::onTemperatureStatus(const TemperatureStatus& event){
+void DisplayController::onTemperatureStatus(const TemperatureStatusEvent& event){
     // nothing to do
 }
 
-void DisplayController::onTemperatureSample(const TemperatureSample& event){
+void DisplayController::onTemperatureSample(const TemperatureSampleEvent& event){
     // nothing to do
 }
 
-void DisplayController::onBacklightCommand(const BacklightCommand& event){
+void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
     // nothing to do
 }
 
-void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChanged& event){
+void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
     // nothing to do
 }
 

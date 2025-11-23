@@ -14,20 +14,20 @@ I2cPartsControllerAbs::I2cPartsControllerAbs():
     // nothing to do
 }
 
-I2cPartsControllerAbs::TemperatureStatusWrite I2cPartsControllerAbs::makeTemperatureStatusEvent(){
-    return makeEvent<EventPayload::TemperatureStatus>();
+TemperatureStatusEvent I2cPartsControllerAbs::makeTemperatureStatusEvent(){
+    return makeEvent<EventType::TemperatureStatus>();
 }
 
-I2cPartsControllerAbs::TemperatureSampleWrite I2cPartsControllerAbs::makeTemperatureSampleEvent(){
-    return makeEvent<EventPayload::TemperatureSample>();
+TemperatureSampleEvent I2cPartsControllerAbs::makeTemperatureSampleEvent(){
+    return makeEvent<EventType::TemperatureSample>();
 }
 
-void I2cPartsControllerAbs::sendEvent(const TemperatureStatusWrite& event){
-    sendEvent(event.header);
+void I2cPartsControllerAbs::sendEvent(const TemperatureStatusEvent& event){
+    sendEvent(event);
 }
 
-void I2cPartsControllerAbs::sendEvent(const TemperatureSampleWrite& event){
-    sendEvent(event.header);
+void I2cPartsControllerAbs::sendEvent(const TemperatureSampleEvent& event){
+    sendEvent(event);
 }
 
 } // namespace Garbox

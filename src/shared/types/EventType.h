@@ -1,12 +1,10 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
-#pragma once
-
 #include <cstdint>
-
-
 
 namespace Garbox {
 

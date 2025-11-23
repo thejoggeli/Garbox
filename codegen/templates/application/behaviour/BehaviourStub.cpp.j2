@@ -34,7 +34,7 @@ void {{ name }}::on{{ tick }}(){
 {% if behaviour.receives %}
 {% for ev in behaviour.receives %}
 
-void {{ name }}::on{{ ev }}(const {{ ev }}& event){
+void {{ name }}::on{{ ev }}(const {{ ev }}Event& event){
     // nothing to do
 }
 {% endfor %}

@@ -79,7 +79,8 @@ def extract_includes(config: dict, extension: str, remove: bool = True):
         includes_set = SortedSet()
         for config_entry in config.values():
             if include_key in config_entry:
-                for include in config_entry[include_key]:
+                include_vals = ensure_list(config_entry[include_key])
+                for include in include_vals:
                     includes_set.add(include)
         includes_list = list(includes_set)
 

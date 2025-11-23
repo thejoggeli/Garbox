@@ -14,9 +14,9 @@ public:
 
     void onLogicTick() final;
 
-    void onHeartbeat(const Heartbeat& event) final;
-    void onFanStatus(const FanStatus& event) final;
-    void onFanSample(const FanSample& event) final;
+    void onHeartbeat(const HeartbeatEvent& event) final;
+    void onFanStatus(const FanStatusEvent& event) final;
+    void onFanSample(const FanSampleEvent& event) final;
 
 private:
 

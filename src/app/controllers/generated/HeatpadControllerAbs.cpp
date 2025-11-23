@@ -14,12 +14,12 @@ HeatpadControllerAbs::HeatpadControllerAbs():
     // nothing to do
 }
 
-HeatpadControllerAbs::HeatpadStatusWrite HeatpadControllerAbs::makeHeatpadStatusEvent(){
-    return makeEvent<EventPayload::HeatpadStatus>();
+HeatpadStatusEvent HeatpadControllerAbs::makeHeatpadStatusEvent(){
+    return makeEvent<EventType::HeatpadStatus>();
 }
 
-void HeatpadControllerAbs::sendEvent(const HeatpadStatusWrite& event){
-    sendEvent(event.header);
+void HeatpadControllerAbs::sendEvent(const HeatpadStatusEvent& event){
+    sendEvent(event);
 }
 
 } // namespace Garbox

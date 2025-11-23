@@ -64,8 +64,8 @@ void I2cPartsController::onInputTick(){
     }
 }
 
-void I2cPartsController::onButtonStateChanged(const ButtonStateChanged& event){
-    if(event.payload->newState == ButtonState::Pressed){
+void I2cPartsController::onButtonStateChanged(const ButtonStateChangedEvent& event){
+    if(event->newState == ButtonState::Pressed){
         mFsm.forceTransition(FsmState::ResetPowerOffPhase);
     }
 }
@@ -107,17 +107,17 @@ void I2cPartsController::handleStateChanged(FsmState oldState, FsmState newState
 }
 
 void I2cPartsController::sendTemperatureStatusEvent(){
-    EventWrite event = makeTemperatureStatusEvent();
-    event.payload->powerEnabled = mEnablePowerGpio.readLevel();
-    event.payload->driverEnabled = mTemperatureSensor.isStarted();
-    event.payload->resetting = mResetting;
+    EventView event = makeTemperatureStatusEvent();
+    event->powerEnabled = mEnablePowerGpio.readLevel();
+    event->driverEnabled = mTemperatureSensor.isStarted();
+    event->resetting = mResetting;
     sendEvent(event);
 }
 
 void I2cPartsController::sendTemperatureSampleEvent(){
-    EventWrite event = makeTemperatureSampleEvent();
-    event.payload->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
-    event.payload->humidityRelative = mTemperatureSensor.getHumidityRelative();
+    EventView event = makeTemperatureSampleEvent();
+    event->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
+    event->humidityRelative = mTemperatureSensor.getHumidityRelative();
     sendEvent(event);
 }
 

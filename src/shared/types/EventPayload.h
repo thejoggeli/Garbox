@@ -1,95 +1,157 @@
+#pragma once
+
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
-#pragma once
-
 #include <cstdint>
 #include <cstring>
-#include "shared/types/BehaviourId.h"
 #include "shared/types/EventType.h"
 
 // included from config
 #include "modules/parts/button/ButtonState.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
+#include "shared/types/BehaviourId.h"
 
-namespace Garbox::EventPayload {
+namespace Garbox {
 
 // generated payloads
-struct ActiveBehaviourChanged {
-    static constexpr EventType Type = EventType::ActiveBehaviourChanged;
+struct ActiveBehaviourChangedPayload {
     BehaviourId oldBehaviour;
     BehaviourId newBehaviour;
 };
 
-struct Heartbeat {
-    static constexpr EventType Type = EventType::Heartbeat;
+struct HeartbeatPayload {
+    // no fields
 };
 
-struct BacklightCommand {
-    static constexpr EventType Type = EventType::BacklightCommand;
+struct BacklightCommandPayload {
     float brightness;
 };
 
-struct FanStatus {
-    static constexpr EventType Type = EventType::FanStatus;
+struct FanStatusPayload {
     FanState state;
     float targetSpeed;
 };
 
-struct FanSample {
-    static constexpr EventType Type = EventType::FanSample;
+struct FanSamplePayload {
     float measuredRpm;
 };
 
-struct FanCommand {
-    static constexpr EventType Type = EventType::FanCommand;
+struct FanCommandPayload {
     bool enabled;
     float targetSpeed;
 };
 
-struct HeatpadStatus {
-    static constexpr EventType Type = EventType::HeatpadStatus;
+struct HeatpadStatusPayload {
     HeatpadState state;
     float dutyCycle;
     uint32_t periodMicros;
 };
 
-struct HeatpadCommand {
-    static constexpr EventType Type = EventType::HeatpadCommand;
+struct HeatpadCommandPayload {
     bool enabled;
     float dutyCycle;
     uint32_t periodMicros;
 };
 
-struct TemperatureStatus {
-    static constexpr EventType Type = EventType::TemperatureStatus;
+struct TemperatureStatusPayload {
     bool driverEnabled;
     bool powerEnabled;
     bool resetting;
 };
 
-struct TemperatureSample {
-    static constexpr EventType Type = EventType::TemperatureSample;
+struct TemperatureSamplePayload {
     float temperatureCelcius;
     float humidityRelative;
 };
 
-struct ButtonStateChanged {
-    static constexpr EventType Type = EventType::ButtonStateChanged;
+struct ButtonStateChangedPayload {
     ButtonState oldState;
     ButtonState newState;
 };
 
-struct ButtonRepeat {
-    static constexpr EventType Type = EventType::ButtonRepeat;
+struct ButtonRepeatPayload {
     uint32_t count;
 };
 
-struct EncoderStep {
-    static constexpr EventType Type = EventType::EncoderStep;
+struct EncoderStepPayload {
     int32_t steps;
 };
 
-} // namespace Garbox::EventPayload
+
+// generated mappings
+template<EventType>
+struct ResolveEventPayload; // primary template (intentionally undefined)
+
+template<>
+struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
+    using type = ActiveBehaviourChangedPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::Heartbeat> {
+    using type = HeartbeatPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::BacklightCommand> {
+    using type = BacklightCommandPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::FanStatus> {
+    using type = FanStatusPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::FanSample> {
+    using type = FanSamplePayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::FanCommand> {
+    using type = FanCommandPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::HeatpadStatus> {
+    using type = HeatpadStatusPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::HeatpadCommand> {
+    using type = HeatpadCommandPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::TemperatureStatus> {
+    using type = TemperatureStatusPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::TemperatureSample> {
+    using type = TemperatureSamplePayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::ButtonStateChanged> {
+    using type = ButtonStateChangedPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::ButtonRepeat> {
+    using type = ButtonRepeatPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::EncoderStep> {
+    using type = EncoderStepPayload;
+};
+
+// resolve EventType to EventPayload
+template<EventType E>
+using EventPayload = typename ResolveEventPayload<E>::type;
+
+} // namespace 
