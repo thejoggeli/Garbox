@@ -1,11 +1,32 @@
 import copy
 from pathlib import Path
-
+from common.util import ensure_list
 from common.includes import extract_includes
 from common.template import render_template
-from common.item import Item
+from common.context import Context
 
-def generate_items(jinja_env, items : list[Item]):
+
+class Item:
+
+    yaml_config:    dict
+    yaml_keys:      list[str]
+    out_path:       Path
+    template_path:  str
+
+    def __init__(
+            self, 
+            yaml_config: dict,
+            yaml_keys: str | list[str], 
+            out_path: str | Path, 
+            template_path: str | Path
+        ):
+        self.yaml_config    = yaml_config
+        self.yaml_keys      = ensure_list(yaml_keys)
+        self.out_path       = Path(out_path)
+        self.template_path  = str(template_path)
+
+
+def generate_items(ctx: Context, items : list[Item]):
     """
     Generate the output files for each Item in 'items'.
 
@@ -32,4 +53,4 @@ def generate_items(jinja_env, items : list[Item]):
             config_copy["include"] = includes
 
         # Render via Jinja
-        render_template(jinja_env, template_path, out_path, **config_copy)
+        render_template(ctx.jinja_env, template_path, out_path, **config_copy)

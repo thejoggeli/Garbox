@@ -1,11 +1,10 @@
 from sortedcontainers import SortedSet
-from pathlib import Path
 from common.item import Item
-from common.generate_items import generate_items
-from common.generator_paths import GeneratorPaths
+from common.item import Item, generate_items
+from common.context import Context
 
 
-def generate_runtime(jinja_env, paths: GeneratorPaths, application_config, events_config):
+def generate_runtime(ctx: Context, application_config: dict, events_config: dict):
     """
     Generate runtime .h/.cpp files for the given application.
     """
@@ -13,23 +12,19 @@ def generate_runtime(jinja_env, paths: GeneratorPaths, application_config, event
     behaviours  = application_config["behaviours"]
     controllers = application_config["controllers"]
 
-    ticks            = SortedSet()
-    behaviour_ticks  = SortedSet()
-    controller_ticks = SortedSet()
-    event_routes     = {}
+    all_ticks = SortedSet()
+    event_routes = {}
 
     # Behaviour ticks
     for item in behaviours.values():
-        ticks.update(item["ticks"])
-        behaviour_ticks.update(item["ticks"])
+        all_ticks.update(item["ticks"])
 
     # Controller ticks
     for item in controllers.values():
-        ticks.update(item["ticks"])
-        controller_ticks.update(item["ticks"])
+        all_ticks.update(item["ticks"])
 
     # Event routing table
-    for event_key in events_config["type"].keys():
+    for event_key in events_config["types"].keys():
         event_routes[event_key] = {
             "controllers": SortedSet(),
             "behaviours":  SortedSet()
@@ -57,19 +52,17 @@ def generate_runtime(jinja_env, paths: GeneratorPaths, application_config, event
         route["behaviours"]  = list(route["behaviours"])
 
     # Output paths
-    name        = application_config["name"]
-    out_base    = paths.app_dir / f"runtime/{name}Runtime"
-    template    = "application/Runtime"
+    app_name = application_config["name"]
+    out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
+    template = "application/Runtime"
 
     # Aggregate runtime data
     runtime_dict = {
-        "name":               name,
+        "app_name":           app_name,
         "initial_behaviour":  application_config["initial_behaviour"],
         "behaviours":         behaviours,
         "controllers":        controllers,
-        "ticks":              list(ticks),
-        "behaviour_ticks":    list(behaviour_ticks),
-        "controller_ticks":   list(controller_ticks),
+        "all_ticks":          list(all_ticks),
         "event_routes":       event_routes,
     }
 
@@ -80,4 +73,4 @@ def generate_runtime(jinja_env, paths: GeneratorPaths, application_config, event
         Item(runtime_dict, keys, out_base.with_suffix(".cpp"), f"{template}.cpp.j2"),
     ]
 
-    generate_items(jinja_env, items)
+    generate_items(ctx, items)

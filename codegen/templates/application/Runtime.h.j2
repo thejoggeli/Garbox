@@ -1,4 +1,5 @@
 {% include "_common/header.j2" %}
+{% set RuntimeName = app_name ~ 'Runtime' %}
 
 #pragma once
 
@@ -14,15 +15,15 @@
 #include "app/controllers/{{ ctrl }}.h"
 {% endfor %}
 
-namespace {{ name }} {
+namespace Garbox {
 
-class {{ name }}Runtime : public RuntimeAbs {
+class {{ RuntimeName }} : public RuntimeAbs {
 public:
 
-    {{ name }}Runtime();
+    {{ RuntimeName }}();
 
     {# Generate tick method declarations #}
-    {% for tick in ticks %}
+    {% for tick in all_ticks %}
     void on{{ tick }}();
     {% endfor %}
 
@@ -48,4 +49,4 @@ private:
     void onRegisterControllers() final;
 };
 
-} // namespace {{ name }}
+} // namespace Garbox

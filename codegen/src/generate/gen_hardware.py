@@ -1,16 +1,15 @@
 from common.item import Item
-from common.util import ensure_suffix, ensure_value_suffix
-from common.generate_items import generate_items
-from common.generator_paths import GeneratorPaths
+from common.item import Item, generate_items
+from common.context import Context
 
 
-def generate_hardware(jinja_env, paths: GeneratorPaths, config):
+def generate_hardware(ctx: Context, config: dict):
     """
     Load hardware.yaml, normalize names, and generate all hardware-related
     .h and .cpp files.
     """
 
-    hw_dir = paths.app_dir / "hardware"
+    hw_dir = ctx.app_dir / "hardware"
 
     # list of Item objects to generate
     items = [
@@ -47,4 +46,4 @@ def generate_hardware(jinja_env, paths: GeneratorPaths, config):
     items.append(Item(config, "init", hw_dir / "HardwareInit.cpp", "hardware/HardwareInit.cpp.j2"))
 
     # generate to src_dir
-    generate_items(jinja_env, items)
+    generate_items(ctx, items)

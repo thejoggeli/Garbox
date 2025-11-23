@@ -12,7 +12,7 @@
 namespace Garbox::EventPayload {
 
 // generated payloads
-{% for name, fields in payload.items() %}
+{% for name, fields in payloads.items() %}
 struct {{ name }} {
     static constexpr EventType Type = EventType::{{ name }};
 {% if fields %}

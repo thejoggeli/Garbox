@@ -12,7 +12,7 @@ const char* EventTypeToString(EventType type){
 
         case EventType::Null: return "Null";
 
-{% for name, fields in type.items() %}
+{% for name, fields in types.items() %}
         case EventType::{{ name }}: return "{{ name }}";
 {% endfor %}
 

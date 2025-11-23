@@ -1,11 +1,11 @@
 {% include "_common/header.j2" %}
-{% set RuntimeName = name ~ 'Runtime' %}
+{% set RuntimeName = app_name ~ 'Runtime' %}
 
 #include "{{ RuntimeName }}.h"
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 
-namespace {{ name }} {
+namespace Garbox {
 
 {{ RuntimeName }}::{{ RuntimeName }}():
     {# init behaviours #}
@@ -43,7 +43,7 @@ void {{ RuntimeName }}::onStart(){
 }
 
 {# ---- GENERATE TICKS ---- #}
-{% for tick in ticks %}
+{% for tick in all_ticks %}
     {% set onTick = 'on' ~ tick %}
 void {{ RuntimeName }}::{{ onTick }}(){
     {# get number of controllers with this tick #}
@@ -150,4 +150,4 @@ BehaviourAbs* {{ RuntimeName }}::resolveBehaviour(BehaviourId id){
     return nullptr;
 }
 
-} // namespace {{ name }}
+} // namespace Garbox

@@ -1,6 +1,8 @@
 import yaml
+from copy import deepcopy
 from pathlib import Path
-from common.util import ensure_list, ensure_suffix, ensure_value_suffix
+from common.util import ensure_list, ensure_suffix, ensure_value_suffix, print_json
+
 
 def load_hardware_config(config_dir: Path):
     yaml_path = config_dir / "hardware.yaml"
@@ -12,6 +14,7 @@ def load_hardware_config(config_dir: Path):
     ensure_value_suffix(yaml_config, "ledcChannel", "timer", "Timer")
 
     return yaml_config
+
 
 def load_application_config(config_dir: Path):
 
@@ -39,13 +42,20 @@ def load_application_config(config_dir: Path):
 def load_events_config(config_dir: Path):
     events_path = config_dir / "events.yaml"
     system_events_path = config_dir / "core/system_events.yaml"
-    return load_yaml_multi([system_events_path, events_path])
+    config = load_yaml_multi([system_events_path, events_path])
 
+    # copy event types into payload (but keep payload includes seperate)
+    payloads: dict = deepcopy(config["types"])
+    payloads.pop("include_h", None)
+    payloads.pop("include_cpp", None)
 
-def load_events(script_dir: Path):
-    events_path = script_dir / "config/events.yaml"
-    system_events_path = script_dir / "config/core/system_events.yaml"
-    return load_yaml_multi([system_events_path, events_path])
+    # set or update (if already exists) payloads config entriy
+    if "payloads" not in config:
+        config["payloads"] = payloads
+    else:
+        config["payloads"].update(payloads)
+
+    return config
 
 
 def load_yaml(path: Path):

@@ -1,4 +1,4 @@
-payload:
+payloads:
 
   include_h: [
     "modules/parts/button/ButtonState.h",
@@ -6,7 +6,7 @@ payload:
     "modules/parts/heatpad/HeatpadState.h"
   ]
 
-type:
+types:
 
   ### Heartbeat ###
   Heartbeat: null
