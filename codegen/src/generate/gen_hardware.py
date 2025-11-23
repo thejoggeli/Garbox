@@ -5,8 +5,35 @@ from common.context import Context
 
 def generate_hardware(ctx: Context, config: dict):
     """
-    Load hardware.yaml, normalize names, and generate all hardware-related
-    .h and .cpp files.
+    Generate all hardware related files.
+
+    Hardware Initialization:
+    - app/hardware/HardwareInit.h
+    - app/hardware/HardwareInit.cpp
+
+    ADC:
+    - app/hardware/AdcInstances.h
+    - app/hardware/AdcInstances.cpp
+
+    GPIO:
+    - app/hardware/GpioInstances.h
+    - app/hardware/GpioInstances.cpp
+
+    I2C:
+    - app/hardware/I2cInstances.h
+    - app/hardware/I2cInstances.cpp
+
+    SPI:
+    - app/hardware/SpiInstances.h
+    - app/hardware/SpiInstances.cpp
+
+    Timer:
+    - app/hardware/TimerInstances.h
+    - app/hardware/TimerInstances.cpp
+
+    LEDC:
+    - app/hardware/LedcInstances.h
+    - app/hardware/LedcInstances.cpp
     """
 
     hw_dir = ctx.app_dir / "hardware"

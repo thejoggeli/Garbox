@@ -5,8 +5,10 @@ from common.context import Context
 
 def generate_events(ctx: Context, events_config: dict):
     """
-    Load event YAML, merge types into payload, and generate
-    EventType.h/.cpp + EventPayload.h.
+    Generates: 
+    - EventType.h
+    - EventType.cpp
+    - EventPayload.h
     """
 
     items = [

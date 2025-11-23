@@ -41,8 +41,7 @@ class Item:
 def generate_items(ctx: Context, items : list[Item]):
     """
     Generate the output files for each Item in 'items'.
-
-    - Extracts the subset of YAML based on item.yaml_keys
+    - Extracts the subset of config based on item.keys
     - Removes include_h/include_cpp and adds a merged 'include' list
     - Renders templates via Jinja
     """

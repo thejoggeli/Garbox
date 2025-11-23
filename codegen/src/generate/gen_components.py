@@ -3,7 +3,28 @@ from common.context import Context
 
 def generate_components(ctx: Context, app_config: dict):
     """
-    Generate everything together. This is what should be called by the user 
+    Generate all component files.
+    
+    # Abstract Classes:
+    - app/controller/generated/<Name>ControllerAbs.h
+    - app/controller/generated/<Name>ControllerAbs.cpp
+    - app/behaviour/generated/<Name>Behaviour.h
+    - app/behaviour/generated/<Name>Behaviour.cpp
+
+    # Stubs:
+    - godecen/stubs/controller/<Name>ControllerAbs.h
+    - godecen/stubs/controller/<Name>ControllerAbs.cpp
+    - godecen/stubs/behaviour/<Name>Behaviour.h
+    - godecen/stubs/behaviour/<Name>Behaviour.cpp
+    
+    # Types:
+    - shared/types/ComponentId.h
+    - shared/types/ComponentId.cpp
+    - shared/types/ControllerId.h
+    - shared/types/ControllerId.cpp
+    - shared/types/BehaviourId.h
+    - shared/types/BehaviourId.cpp
+
     """
     _generate_components_ids(ctx, app_config)
     _generate_components(ctx, app_config["controllers"], "controller", "Controller")
