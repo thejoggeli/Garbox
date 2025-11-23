@@ -11,7 +11,7 @@ def create_jinja_env(template_dir: Path):
     )
 
 
-def render_template(jinja_env, template_name: str, output_path: Path, **context):
+def render_template(jinja_env, template_name: str, output_path: Path, context: dict):
     template = jinja_env.get_template(template_name)
     result = template.render(**context)
 

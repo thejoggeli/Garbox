@@ -13,7 +13,7 @@ enum class EventType : uint16_t {
     // null event
     Null = 0,
 
-    // generated events
+    // generated from config
 {% for name, fields in types.items() %}
     {{ name }},
 {% endfor %}

@@ -16,7 +16,7 @@ enum class ComponentId : uint16_t {
     // default component ids
     Runtime,
 
-    // user component ids
+    // generated from config
 {% for name in names %}
     {{ name }},
 {% endfor %}

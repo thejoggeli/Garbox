@@ -1,4 +1,31 @@
 import json
+from copy import deepcopy
+
+def extract_dict(config: dict, keys: str | list[str], copy: bool):
+    """
+    Build a dedicated copy of the passed dict.
+
+    Example input:
+        config = { 'a': [1,2,3], 'b': [4,5,6], 'c': [7,8,9] }
+        keys = ['a', 'c']
+
+    Example output (deepcopy):
+        config_copy = { 'a': [1,2,3], 'c': [7,8,9] }
+    """
+    keys = ensure_list(keys)
+    ex_config = {}
+
+    # extrath with copy
+    if copy:
+        for key in keys:
+            ex_config[key] = deepcopy(config[key])
+
+    # extract without copy
+    else:
+        for key in keys:
+            ex_config[key] = config[key]
+
+    return ex_config
 
 
 def print_json(data):

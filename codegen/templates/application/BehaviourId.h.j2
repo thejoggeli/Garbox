@@ -13,7 +13,8 @@ enum class BehaviourId : uint16_t {
     // null event
     Null = 0,
 
-{% for name in behaviours %}
+    // generated from config
+{% for name in names %}
     {{ name.removesuffix("Behaviour") }},
 {% endfor %}
 

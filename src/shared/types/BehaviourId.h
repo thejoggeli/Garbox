@@ -13,6 +13,7 @@ enum class BehaviourId : uint16_t {
     // null event
     Null = 0,
 
+    // generated from config
     Calibration,
     Fermentation,
 

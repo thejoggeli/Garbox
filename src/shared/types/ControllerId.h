@@ -13,6 +13,7 @@ enum class ControllerId : uint16_t {
     // null event
     Null = 0,
 
+    // generated from config
     Display,
     Fan,
     Heartbeat,

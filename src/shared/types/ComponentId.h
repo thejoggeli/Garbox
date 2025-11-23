@@ -16,15 +16,15 @@ enum class ComponentId : uint16_t {
     // default component ids
     Runtime,
 
-    // user component ids
-    CalibrationBehaviour,
+    // generated from config
     DisplayController,
     FanController,
-    FermentationBehaviour,
     HeartbeatController,
     HeatpadController,
-    I2cPartsController,
     InputController,
+    I2cPartsController,
+    CalibrationBehaviour,
+    FermentationBehaviour,
 
     // enum size marker
     Count,

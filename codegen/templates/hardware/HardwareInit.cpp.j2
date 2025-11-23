@@ -3,8 +3,8 @@
 #include "HardwareInit.h"
 
 #include "core/assert/Assert.h"
-{% for name, item in init.items() %}
-#include "app/hardware/{{ item }}.h"
+{% for name in init %}
+#include "app/hardware/{{ name }}.h"
 {% endfor %}
 
 namespace Garbox {
@@ -14,8 +14,8 @@ static bool sInitialized = false;
 void HardwareInit::Init(){
     AssertExit(!sInitialized, "HardwareInit", "already initialized");
 
-{% for name, item in init.items() %}
-    {{ item }}::Init();
+{% for name in init %}
+    {{ name }}::Init();
 {% endfor %}
     
     sInitialized = true;

@@ -1,7 +1,7 @@
 import yaml
 from copy import deepcopy
 from pathlib import Path
-from common.util import ensure_list, ensure_suffix, ensure_value_suffix, print_json
+from common.util import ensure_list, ensure_suffix, ensure_value_suffix
 
 
 def load_hardware_config(config_dir: Path):

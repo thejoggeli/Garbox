@@ -10,7 +10,7 @@ namespace Garbox {
 const char* BehaviourIdToString(BehaviourId id){
     switch(id){
         case BehaviourId::Null: return "Null";
-{% for name in behaviours %}
+{% for name in names %}
         case BehaviourId::{{ name.removesuffix("Behaviour") }}: return "{{ name.removesuffix("Behaviour") }}";
 {% endfor %}
         case BehaviourId::Count: return "Count";

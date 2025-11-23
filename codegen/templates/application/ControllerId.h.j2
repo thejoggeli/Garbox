@@ -13,7 +13,8 @@ enum class ControllerId : uint16_t {
     // null event
     Null = 0,
 
-{% for name in controllers %}
+    // generated from config
+{% for name in names %}
     {{ name.removesuffix("Controller") }},
 {% endfor %}
 

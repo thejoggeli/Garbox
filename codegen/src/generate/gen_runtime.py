@@ -1,16 +1,15 @@
 from sortedcontainers import SortedSet
-from common.item import Item
 from common.item import Item, generate_items
 from common.context import Context
 
 
-def generate_runtime(ctx: Context, application_config: dict, events_config: dict):
+def generate_runtime(ctx: Context, app_config: dict, events_config: dict):
     """
     Generate runtime .h/.cpp files for the given application.
     """
 
-    behaviours  = application_config["behaviours"]
-    controllers = application_config["controllers"]
+    behaviours  = app_config["behaviours"]
+    controllers = app_config["controllers"]
 
     all_ticks = SortedSet()
     event_routes = {}
@@ -52,25 +51,23 @@ def generate_runtime(ctx: Context, application_config: dict, events_config: dict
         route["behaviours"]  = list(route["behaviours"])
 
     # Output paths
-    app_name = application_config["name"]
+    app_name = app_config["name"]
     out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
     template = "application/Runtime"
 
     # Aggregate runtime data
     runtime_dict = {
         "app_name":           app_name,
-        "initial_behaviour":  application_config["initial_behaviour"],
+        "initial_behaviour":  app_config["initial_behaviour"],
         "behaviours":         behaviours,
         "controllers":        controllers,
         "all_ticks":          list(all_ticks),
         "event_routes":       event_routes,
     }
 
-    keys = list(runtime_dict.keys())
-
     items = [
-        Item(runtime_dict, keys, out_base.with_suffix(".h"),   f"{template}.h.j2"),
-        Item(runtime_dict, keys, out_base.with_suffix(".cpp"), f"{template}.cpp.j2"),
+        Item(runtime_dict, "*", out_base.with_suffix(".h"),   f"{template}.h.j2"),
+        Item(runtime_dict, "*", out_base.with_suffix(".cpp"), f"{template}.cpp.j2"),
     ]
 
     generate_items(ctx, items)

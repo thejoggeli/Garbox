@@ -10,7 +10,7 @@ namespace Garbox {
 const char* ControllerIdToString(ControllerId id){
     switch(id){
         case ControllerId::Null: return "Null";
-{% for name in controllers %}
+{% for name in names %}
         case ControllerId::{{ name.removesuffix("Controller") }}: return "{{ name.removesuffix("Controller") }}";
 {% endfor %}
         case ControllerId::Count: return "Count";
