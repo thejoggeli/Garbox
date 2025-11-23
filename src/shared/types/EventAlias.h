@@ -17,6 +17,7 @@ using FanStatusEvent              = EventView<EventType::FanStatus>;
 using FanSampleEvent              = EventView<EventType::FanSample>;
 using FanCommandEvent             = EventView<EventType::FanCommand>;
 using HeatpadStatusEvent          = EventView<EventType::HeatpadStatus>;
+using HeatpadSampleEvent          = EventView<EventType::HeatpadSample>;
 using HeatpadCommandEvent         = EventView<EventType::HeatpadCommand>;
 using TemperatureStatusEvent      = EventView<EventType::TemperatureStatus>;
 using TemperatureSampleEvent      = EventView<EventType::TemperatureSample>;

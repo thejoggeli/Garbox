@@ -25,9 +25,11 @@ protected:
 
     // make typed events
     HeatpadStatusEvent makeHeatpadStatusEvent();
+    HeatpadSampleEvent makeHeatpadSampleEvent();
 
     // send typed events
     void sendEvent(const HeatpadStatusEvent& event);
+    void sendEvent(const HeatpadSampleEvent& event);
 
 private:
 

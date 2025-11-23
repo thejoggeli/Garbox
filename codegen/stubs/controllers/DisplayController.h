@@ -14,6 +14,10 @@ public:
 
     void onRenderTick() final;
 
+    void onFanStatus(const FanStatusEvent& event) final;
+    void onFanSample(const FanSampleEvent& event) final;
+    void onHeatpadStatus(const HeatpadStatusEvent& event) final;
+    void onHeatpadSample(const HeatpadSampleEvent& event) final;
     void onTemperatureStatus(const TemperatureStatusEvent& event) final;
     void onTemperatureSample(const TemperatureSampleEvent& event) final;
     void onBacklightCommand(const BacklightCommandEvent& event) final;

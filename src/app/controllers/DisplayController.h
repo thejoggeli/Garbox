@@ -14,12 +14,13 @@ class Display;
 class DisplayController : public DisplayControllerAbs {
 public:
 
-    struct State {
+    struct ShadowState {
         FanState fanState;
         float fanTargetSpeed;
         float fanMeasuredRpm;
         HeatpadState heatpadState;
         float heatpadDuty;
+        uint32_t heatpadPeriod;
         float heatpadVoltage;
         float heatpadCurrent;
         bool shtPower;
@@ -35,13 +36,26 @@ public:
     };
 
     struct Dirty {
+        bool displayState = true;
+        bool fanStatus = true;
+        bool fanMeasuredRpm = true;
+        bool heatpadState = true;
+        bool heatpadDuty = true;
+        bool heatpadSense = true;
         bool shtState = true;
         bool shtSample = true;
+        bool appState = true;
+        bool heapSpace = true;
     };
     
     DisplayController();
 
     void onRenderTick() final;
+
+    void onFanStatus(const FanStatusEvent& event) final;
+    void onFanSample(const FanSampleEvent& event) final;
+    void onHeatpadStatus(const HeatpadStatusEvent& event);
+    void onHeatpadSample(const HeatpadSampleEvent& event);
     void onTemperatureStatus(const TemperatureStatusEvent& event) final;
     void onTemperatureSample(const TemperatureSampleEvent& event) final;
     void onBacklightCommand(const BacklightCommandEvent& event) final;
@@ -53,9 +67,8 @@ private:
     SoftwareTimer mHeapTimer;
     TimeFader mBacklightFader;
 
-    Dirty mDirty;
-    State mOldState {};
-    State mNewState {};    
+    Dirty mDirtyFlags;
+    ShadowState mShadowState {};    
 
     uint32_t mRenderSkippedCount = 0;
 

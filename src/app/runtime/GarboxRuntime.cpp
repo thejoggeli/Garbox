@@ -120,6 +120,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FanStatus: {
         const FanStatusEvent event(header);
+        mDisplayController.onFanStatus(event);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -131,6 +132,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FanSample: {
         const FanSampleEvent event(header);
+        mDisplayController.onFanSample(event);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
@@ -147,12 +149,18 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::HeatpadStatus: {
         const HeatpadStatusEvent event(header);
+        mDisplayController.onHeatpadStatus(event);
  
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
             default: break; // active behaviour does not support event type
         }
+        break;
+    }
+    case EventType::HeatpadSample: {
+        const HeatpadSampleEvent event(header);
+        mDisplayController.onHeatpadSample(event);
         break;
     }
     case EventType::HeatpadCommand: {

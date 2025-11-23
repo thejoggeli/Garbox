@@ -50,6 +50,12 @@ struct HeatpadStatusPayload {
     uint32_t periodMicros;
 };
 
+struct HeatpadSamplePayload {
+    HeatpadState state;
+    float measuredVoltage;
+    float measuredCurrent;
+};
+
 struct HeatpadCommandPayload {
     bool enabled;
     float dutyCycle;
@@ -118,6 +124,11 @@ struct ResolveEventPayload<EventType::FanCommand> {
 template<>
 struct ResolveEventPayload<EventType::HeatpadStatus> {
     using type = HeatpadStatusPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::HeatpadSample> {
+    using type = HeatpadSamplePayload;
 };
 
 template<>

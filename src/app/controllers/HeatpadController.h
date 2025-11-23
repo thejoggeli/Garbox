@@ -20,6 +20,9 @@ public:
 
 private:
 
+    float mLastMeasuredVoltage = 0.0f;
+    float mLastMeasuredCurrent = 0.0f;
+
     bool mStateChanged = false;
     Heatpad& mHeatpad;
     RgbLed& mLed;

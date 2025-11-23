@@ -32,6 +32,11 @@ types:
     state: HeatpadState 
     dutyCycle: float
     periodMicros: uint32_t
+
+  HeatpadSample:  
+    state: HeatpadState 
+    measuredVoltage: float
+    measuredCurrent: float
     
   HeatpadCommand:  
     enabled: bool

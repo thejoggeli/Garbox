@@ -18,7 +18,15 @@ HeatpadStatusEvent HeatpadControllerAbs::makeHeatpadStatusEvent(){
     return makeEvent<EventType::HeatpadStatus>();
 }
 
+HeatpadSampleEvent HeatpadControllerAbs::makeHeatpadSampleEvent(){
+    return makeEvent<EventType::HeatpadSample>();
+}
+
 void HeatpadControllerAbs::sendEvent(const HeatpadStatusEvent& event){
+    sendEvent(event);
+}
+
+void HeatpadControllerAbs::sendEvent(const HeatpadSampleEvent& event){
     sendEvent(event);
 }
 

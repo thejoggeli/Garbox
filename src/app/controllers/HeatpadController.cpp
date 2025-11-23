@@ -31,6 +31,23 @@ void HeatpadController::onStart(){
 void HeatpadController::onInputTick(){
     mHeatpad.tick();
 
+    // send sample if measured voltage or current changed
+    bool sendSample = false;
+    if(mHeatpad.getMeasuredVoltage() != mLastMeasuredVoltage){
+        mLastMeasuredVoltage = true;
+        sendSample = true;
+    }
+    if(mHeatpad.getMeasuredCurrent() != mLastMeasuredCurrent){
+        mLastMeasuredCurrent = true;
+        sendSample = true;
+    }
+    if(sendSample){
+        HeatpadSampleEvent event = makeHeatpadSampleEvent();
+        event->measuredVoltage = mLastMeasuredVoltage;
+        event->measuredCurrent = mLastMeasuredCurrent;
+        sendEvent(event);
+    }
+
     // send changed event
     if(mStateChanged){
         sendStatusEvent();

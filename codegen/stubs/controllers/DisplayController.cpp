@@ -21,6 +21,22 @@ void DisplayController::onRenderTick(){
     // nothing to do
 }
 
+void DisplayController::onFanStatus(const FanStatusEvent& event){
+    // nothing to do
+}
+
+void DisplayController::onFanSample(const FanSampleEvent& event){
+    // nothing to do
+}
+
+void DisplayController::onHeatpadStatus(const HeatpadStatusEvent& event){
+    // nothing to do
+}
+
+void DisplayController::onHeatpadSample(const HeatpadSampleEvent& event){
+    // nothing to do
+}
+
 void DisplayController::onTemperatureStatus(const TemperatureStatusEvent& event){
     // nothing to do
 }

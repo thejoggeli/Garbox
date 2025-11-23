@@ -5,8 +5,16 @@ name: Garbox
 controllers:
 
   DisplayController:
-    ticks: [Render]
-    receives: [TemperatureStatus, TemperatureSample, BacklightCommand, ActiveBehaviourChanged]
+    ticks: Render
+    receives:
+      - FanStatus
+      - FanSample
+      - HeatpadStatus
+      - HeatpadSample
+      - TemperatureStatus 
+      - TemperatureSample 
+      - BacklightCommand 
+      - ActiveBehaviourChanged
     sends: null
 
   FanController:
@@ -22,7 +30,7 @@ controllers:
   HeatpadController:
     ticks: [Input, Output]
     receives: [HeatpadCommand]
-    sends: [HeatpadStatus]
+    sends: [HeatpadStatus, HeatpadSample]
 
   InputController:
     ticks: [Input]

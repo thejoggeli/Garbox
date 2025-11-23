@@ -6,8 +6,6 @@
 #include "core/util/function/default/EasingFunctions.h"
 #include "core/util/math/MathUtils.h"
 #include "modules/parts/display/Display.h"
-#include "modules/parts/fan/Fan.h"
-#include "modules/parts/heatpad/Heatpad.h"
 
 namespace Garbox {
 
@@ -29,88 +27,125 @@ void DisplayController::onStart(){
 
 void DisplayController::onRenderTick(){
 
+    // update display brightness
     if(mBacklightFader.isActive()){
         float brightness = mBacklightFader.updateValue();
         mDisplay.setBrightness(brightness);
+        mShadowState.brightness = brightness;
+        mDirtyFlags.displayState = true;
     }
 
+    // update heap space
     if(mHeapTimer.isExpired()){
-        mNewState.heapSpace = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+        uint32_t space = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+        if(space != mShadowState.heapSpace){
+            mDirtyFlags.heapSpace = true;
+            mShadowState.heapSpace = space;
+        }
         mHeapTimer.restart();
+    }
+
+    // update event count
+    if(mShadowState.eventCount != mContext->eventCount){
+        mShadowState.eventCount = mContext->eventCount;
+        mDirtyFlags.appState = true;
     }
 
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
 
         LvglObjects& lv = mDisplay.getLvglHandler().getObjects();
-        const Fan& fan = PartsProvider::GetFan();
-        const Heatpad& heatpad = PartsProvider::GetHeatpad();
 
-        mNewState.fanState = fan.getState();
-        mNewState.fanTargetSpeed = fan.getTargetSpeed();
-        mNewState.fanMeasuredRpm = fan.getMeasuredRpm();
-        mNewState.heatpadState = heatpad.getState();
-        mNewState.heatpadDuty = heatpad.getCurrentDutyCycle();
-        mNewState.heatpadVoltage = heatpad.getMeasuredVoltage();
-        mNewState.heatpadCurrent = heatpad.getMeasuredCurrent();
-        mNewState.renderSkippedCount = mRenderSkippedCount;
-        mNewState.brightness = mDisplay.getBrightness();
-        mNewState.eventCount = mContext->eventCount;
-
-        if(mNewState.fanState != mOldState.fanState || mNewState.fanTargetSpeed != mOldState.fanTargetSpeed){
-            lv.setFanState(FanStateToString(mNewState.fanState), mNewState.fanTargetSpeed);
+        if(mDirtyFlags.fanStatus){
+            lv.setFanState(FanStateToString(mShadowState.fanState), mShadowState.fanTargetSpeed);
+            mDirtyFlags.fanStatus = false;
         }
-        if(mNewState.fanMeasuredRpm != mOldState.fanMeasuredRpm){
-            lv.setFanMeasuredRpm(mNewState.fanMeasuredRpm);
+        if(mDirtyFlags.fanMeasuredRpm){
+            lv.setFanMeasuredRpm(mShadowState.fanMeasuredRpm);
+            mDirtyFlags.fanMeasuredRpm = false;
         }
-        if(mNewState.heatpadState != mOldState.heatpadState){
-            lv.setHeatpadState(HeatpadStateToString(mNewState.heatpadState));
+        if(mDirtyFlags.heatpadState){
+            lv.setHeatpadState(HeatpadStateToString(mShadowState.heatpadState));
+            mDirtyFlags.heatpadState = false;
         }
-        if(mNewState.heatpadDuty != mOldState.heatpadDuty){ 
-            lv.setHeatpadDuty(mNewState.heatpadDuty);
+        if(mDirtyFlags.heatpadDuty){ 
+            lv.setHeatpadDuty(mShadowState.heatpadDuty);
+            mDirtyFlags.heatpadDuty = false;
         }
-        if(mNewState.heatpadVoltage != mOldState.heatpadVoltage || mNewState.heatpadCurrent != mOldState.heatpadCurrent){
-            lv.setHeatpadSense(mNewState.heatpadVoltage, mNewState.heatpadCurrent);
+        if(mDirtyFlags.heatpadSense){
+            lv.setHeatpadSense(mShadowState.heatpadVoltage, mShadowState.heatpadCurrent);
+            mDirtyFlags.heatpadSense = false;
         }
-        if(mNewState.renderSkippedCount != mOldState.renderSkippedCount || mNewState.brightness != mOldState.brightness){
-            lv.setDisplayState(mNewState.brightness, mNewState.renderSkippedCount);
+        if(mDirtyFlags.displayState){
+            lv.setDisplayState(mShadowState.brightness, mShadowState.renderSkippedCount);
+            mDirtyFlags.displayState = false;
         } 
-        if(mDirty.shtState){
-            lv.setTemperatureState(mNewState.shtPower, mNewState.shtDriver, mNewState.shtReset);
-            mDirty.shtState = false;
+        if(mDirtyFlags.shtState){
+            lv.setTemperatureState(mShadowState.shtPower, mShadowState.shtDriver, mShadowState.shtReset);
+            mDirtyFlags.shtState = false;
         }
-        if(mDirty.shtSample){
-            lv.setTemperatureSample(mNewState.shtTemp, mNewState.shtHum);
-            mDirty.shtSample = false;
+        if(mDirtyFlags.shtSample){
+            lv.setTemperatureSample(mShadowState.shtTemp, mShadowState.shtHum);
+            mDirtyFlags.shtSample = false;
         }
-        if(mNewState.heapSpace != mOldState.heapSpace){
-            lv.setHeapSpace(mNewState.heapSpace);
+        if(mDirtyFlags.heapSpace){
+            lv.setHeapSpace(mShadowState.heapSpace);
+            mDirtyFlags.heapSpace = false;
         }
-        if(mNewState.behaviour != mOldState.behaviour || mNewState.eventCount != mOldState.eventCount){
-            lv.setAppInfo(BehaviourIdToString(mNewState.behaviour), mNewState.eventCount);
+        if(mDirtyFlags.appState){
+            lv.setAppInfo(BehaviourIdToString(mShadowState.behaviour), mShadowState.eventCount);
+            mDirtyFlags.appState = false;
         }
-
-        mOldState = mNewState;
 
         mDisplay.giveRenderTrigger();
     }
     else {
         mRenderSkippedCount++;
+        mDirtyFlags.displayState = true;
         LogDebug("DisplayController", "render skipped! total skip count = %" PRIi32, mRenderSkippedCount);
     }
 }
 
+void DisplayController::onFanStatus(const FanStatusEvent& event){ 
+    if(mShadowState.fanState != event->state || mShadowState.fanTargetSpeed != event->targetSpeed){
+        mDirtyFlags.fanStatus = true;
+        mShadowState.fanState = event->state;
+        mShadowState.fanTargetSpeed = event->targetSpeed;
+    }
+}
+
+void DisplayController::onFanSample(const FanSampleEvent& event){ 
+    if(mShadowState.fanMeasuredRpm != event->measuredRpm){
+        mDirtyFlags.fanMeasuredRpm = true;
+        mShadowState.fanMeasuredRpm = true;
+    }
+}
+
+void DisplayController::onHeatpadStatus(const HeatpadStatusEvent& event){
+    mShadowState.heatpadDuty = event->dutyCycle;
+    mShadowState.heatpadState = event->state;
+    mShadowState.heatpadPeriod = event->periodMicros;
+    mDirtyFlags.heatpadState = true;
+    mDirtyFlags.heatpadDuty = true;
+}
+
+void DisplayController::onHeatpadSample(const HeatpadSampleEvent& event){
+    mShadowState.heatpadVoltage = event->measuredVoltage;
+    mShadowState.heatpadCurrent = event->measuredCurrent;
+    mDirtyFlags.heatpadSense = true;
+}
+
 void DisplayController::onTemperatureStatus(const TemperatureStatusEvent& event){
-    mNewState.shtDriver = event->driverEnabled;
-    mNewState.shtPower = event->powerEnabled;
-    mNewState.shtReset = event->resetting;
-    mDirty.shtState = true;
+    mShadowState.shtDriver = event->driverEnabled;
+    mShadowState.shtPower = event->powerEnabled;
+    mShadowState.shtReset = event->resetting;
+    mDirtyFlags.shtState = true;
 }
 
 void DisplayController::onTemperatureSample(const TemperatureSampleEvent& event){
-    mNewState.shtTemp = event->temperatureCelcius;
-    mNewState.shtHum = event->humidityRelative;
-    mDirty.shtSample = true;
+    mShadowState.shtTemp = event->temperatureCelcius;
+    mShadowState.shtHum = event->humidityRelative;
+    mDirtyFlags.shtSample = true;
 }
 
 void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
@@ -118,7 +153,8 @@ void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
 };
 
 void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
-    mNewState.behaviour = event->newBehaviour;
+    mShadowState.behaviour = event->newBehaviour;
+    mDirtyFlags.appState = true;
 }
 
 void DisplayController::setBrightnessSmooth(float targetBrightness, uint32_t durationMicros){

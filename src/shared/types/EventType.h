@@ -21,6 +21,7 @@ enum class EventType : uint16_t {
     FanSample,
     FanCommand,
     HeatpadStatus,
+    HeatpadSample,
     HeatpadCommand,
     TemperatureStatus,
     TemperatureSample,

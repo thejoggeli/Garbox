@@ -29,7 +29,7 @@ protected:
     virtual void onBecomeActive() = 0;
     virtual void onBecomeInactive() = 0;
 
-    // behaviours can request to change to active behaviour
+    // behaviours can request to change the active behaviour
     void requestChangeBehaviour(BehaviourId BehaviourId);
 
     // get the host of this behaviour
