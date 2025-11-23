@@ -6,9 +6,9 @@ from common.context import Context
 def generate_events(ctx: Context, events_config: dict):
     """
     Generates: 
-    - EventType.h
-    - EventType.cpp
-    - EventPayload.h
+    - shared/types/EventType.h
+    - shared/types/EventType.cpp
+    - shared/types/EventPayload.h
     """
 
     items = [

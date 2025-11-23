@@ -8,12 +8,12 @@ def generate_components(ctx: Context, app_config: dict):
     # Abstract Classes:
     - app/controller/generated/<Name>ControllerAbs.h
     - app/controller/generated/<Name>ControllerAbs.cpp
-    - app/behaviour/generated/<Name>Behaviour.h
-    - app/behaviour/generated/<Name>Behaviour.cpp
+    - app/behaviour/generated/<Name>BehaviourAbs.h
+    - app/behaviour/generated/<Name>BehaviourAbs.cpp
 
     # Stubs:
-    - godecen/stubs/controller/<Name>ControllerAbs.h
-    - godecen/stubs/controller/<Name>ControllerAbs.cpp
+    - godecen/stubs/controller/<Name>Controller.h
+    - godecen/stubs/controller/<Name>Controller.cpp
     - godecen/stubs/behaviour/<Name>Behaviour.h
     - godecen/stubs/behaviour/<Name>Behaviour.cpp
     

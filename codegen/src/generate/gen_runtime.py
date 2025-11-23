@@ -6,8 +6,8 @@ from common.context import Context
 def generate_runtime(ctx: Context, app_config: dict, events_config: dict):
     """
     Generates 
-    - <Name>Runtime.h
-    - <Name>Runtime.cpp
+    - app/runtime/<Name>Runtime.h
+    - app/runtime/<Name>Runtime.cpp
     """
 
     behaviours  = app_config["behaviours"]
