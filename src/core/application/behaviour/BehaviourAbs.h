@@ -29,6 +29,9 @@ protected:
     virtual void onBecomeActive() = 0;
     virtual void onBecomeInactive() = 0;
 
+    // behaviours can request to change to active behaviour
+    void requestChangeBehaviour(BehaviourId BehaviourId);
+
     // get the host of this behaviour
     BehaviourHostIfc* getBehaviourHost() { return static_cast<BehaviourHostIfc*>(mHost); }
 

@@ -17,7 +17,7 @@ void FermentationBehaviour::onInit(){
 }
 
 void FermentationBehaviour::onStart(){
-    EventView cmd = makeBacklightCommandEvent();
+    BacklightCommandEvent cmd = makeBacklightCommandEvent();
     cmd->brightness = 0.5f;
     sendEvent(cmd);
 }
@@ -105,7 +105,7 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
     if(event->newState == ButtonState::Released){
         static uint32_t b = 4;
         b = MathUtils::Wrap(b+1, 5u);
-        EventView cmd = makeBacklightCommandEvent();
+        BacklightCommandEvent cmd = makeBacklightCommandEvent();
         cmd->brightness = b/4.0f;
         sendEvent(cmd);
     }
@@ -138,7 +138,7 @@ void FermentationBehaviour::applySwitchState(){
 }
 
 void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
-    EventView event = makeFanCommandEvent();
+    FanCommandEvent event = makeFanCommandEvent();
     event->enabled = enabled;
     event->targetSpeed = speed;
     sendEvent(event);

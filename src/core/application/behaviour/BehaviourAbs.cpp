@@ -32,4 +32,13 @@ void BehaviourAbs::setActive(bool active){
     }
 }
 
+void BehaviourAbs::requestChangeBehaviour(BehaviourId BehaviourId){
+    BehaviourHostIfc* host = getBehaviourHost();
+    if(host == nullptr){
+        TriggerExit("BehaviourAbs", "host is nullptr");
+        return;
+    }
+    host->requestChangeBehaviour(BehaviourId);
+}
+
 } // namespace

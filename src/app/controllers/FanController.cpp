@@ -86,14 +86,14 @@ void FanController::handleFanStalledAlert(uint32_t counter){
 }
 
 void FanController::sendStatusEvent(){
-    EventView event = makeFanStatusEvent();
+    FanStatusEvent event = makeFanStatusEvent();
     event->state = mFan.getState();
     event->targetSpeed = mFan.getTargetSpeed();
     sendEvent(event);
 }
 
 void FanController::sendSampleEvent(float measuredRpm){
-    EventView event = makeFanSampleEvent();
+    FanSampleEvent event = makeFanSampleEvent();
     event->measuredRpm = measuredRpm;
     sendEvent(event);
 }

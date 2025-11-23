@@ -75,7 +75,7 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 }
 
 void HeatpadController::sendStatusEvent(){
-    EventView event = makeHeatpadStatusEvent();
+    HeatpadStatusEvent event = makeHeatpadStatusEvent();
     event->state = mHeatpad.getState();
     event->dutyCycle = mHeatpad.getCurrentDutyCycle();
     event->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
