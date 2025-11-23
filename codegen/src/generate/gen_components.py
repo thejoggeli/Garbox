@@ -5,15 +5,15 @@ def generate_components(ctx: Context, app_config: dict):
     """
     Generate all component files.
     
-    # Abstract Classes:
+    # For each Controller:
     - app/controller/generated/<Name>ControllerAbs.h
     - app/controller/generated/<Name>ControllerAbs.cpp
-    - app/behaviour/generated/<Name>BehaviourAbs.h
-    - app/behaviour/generated/<Name>BehaviourAbs.cpp
-
-    # Stubs:
     - godecen/stubs/controller/<Name>Controller.h
     - godecen/stubs/controller/<Name>Controller.cpp
+
+    # For each Behaviour:
+    - app/behaviour/generated/<Name>BehaviourAbs.h
+    - app/behaviour/generated/<Name>BehaviourAbs.cpp
     - godecen/stubs/behaviour/<Name>Behaviour.h
     - godecen/stubs/behaviour/<Name>Behaviour.cpp
     
