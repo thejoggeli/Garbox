@@ -11,8 +11,8 @@ BehaviourAbs::BehaviourAbs(ComponentId componentId, BehaviourId behaviourId):
     // nothing to do
 }
 
-void BehaviourAbs::init(BehaviourHostIfc& host){
-    ComponentAbs::init(host);
+void BehaviourAbs::setBehaviourHost(BehaviourHostIfc& host){
+    setComponentHost(host);
 }
 
 void BehaviourAbs::setActive(bool active){

@@ -15,19 +15,19 @@ FanControllerAbs::FanControllerAbs():
 }
 
 FanStatusEvent FanControllerAbs::makeFanStatusEvent(){
-    return makeEvent<EventType::FanStatus>();
+    return ControllerAbs::makeEvent<EventType::FanStatus>();
 }
 
 FanSampleEvent FanControllerAbs::makeFanSampleEvent(){
-    return makeEvent<EventType::FanSample>();
+    return ControllerAbs::makeEvent<EventType::FanSample>();
 }
 
 void FanControllerAbs::sendEvent(const FanStatusEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 void FanControllerAbs::sendEvent(const FanSampleEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 } // namespace Garbox

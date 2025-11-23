@@ -1,6 +1,9 @@
 # The generated runtime instance will be called NameRuntime
 name: Garbox
 
+### General ###
+initial_behaviour: CalibrationBehaviour
+
 ### Controllers ###
 controllers:
 
@@ -41,9 +44,6 @@ controllers:
     ticks: [Input]
     receives: [ButtonStateChanged]
     sends: [TemperatureStatus, TemperatureSample]
-
-### General ###
-initial_behaviour: CalibrationBehaviour
 
 ### Behaviours ###
 behaviours:

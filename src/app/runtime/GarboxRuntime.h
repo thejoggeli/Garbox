@@ -6,9 +6,11 @@
 
 #include "core/application/runtime/RuntimeAbs.h"
 
+// include all behaviours
 #include "app/behaviours/CalibrationBehaviour.h"
 #include "app/behaviours/FermentationBehaviour.h"
 
+// include all controllers
 #include "app/controllers/DisplayController.h"
 #include "app/controllers/FanController.h"
 #include "app/controllers/HeartbeatController.h"

@@ -14,14 +14,14 @@ namespace Garbox {
 {% for ev in behaviour.sends %}
 
 {{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
-    return makeEvent<EventType::{{ ev }}>();
+    return BehaviourAbs::makeEvent<EventType::{{ ev }}>();
 }
 {% endfor %}
 {# sendEvent methods #}
 {% for ev in behaviour.sends %}
 
 void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 {% endfor %}
 {% endif %}

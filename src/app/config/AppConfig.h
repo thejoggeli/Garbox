@@ -14,6 +14,10 @@ public:
     static constexpr uint32_t DisplayTickDurationMillis = 13;
     static constexpr uint32_t TickFrequencyHz = 1000.0f / (MainTickDurationMillis + DisplayTickDurationMillis);
 
+    // Runtime
+    static constexpr uint32_t RuntimeEventPoolSizeBytes = 1024;
+    static constexpr uint32_t RuntimeEventQueueLength = 128;
+
     // Profiler
     static constexpr bool EnableProfiler = false;
 

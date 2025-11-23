@@ -15,27 +15,27 @@ InputControllerAbs::InputControllerAbs():
 }
 
 ButtonStateChangedEvent InputControllerAbs::makeButtonStateChangedEvent(){
-    return makeEvent<EventType::ButtonStateChanged>();
+    return ControllerAbs::makeEvent<EventType::ButtonStateChanged>();
 }
 
 ButtonRepeatEvent InputControllerAbs::makeButtonRepeatEvent(){
-    return makeEvent<EventType::ButtonRepeat>();
+    return ControllerAbs::makeEvent<EventType::ButtonRepeat>();
 }
 
 EncoderStepEvent InputControllerAbs::makeEncoderStepEvent(){
-    return makeEvent<EventType::EncoderStep>();
+    return ControllerAbs::makeEvent<EventType::EncoderStep>();
 }
 
 void InputControllerAbs::sendEvent(const ButtonStateChangedEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 void InputControllerAbs::sendEvent(const ButtonRepeatEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 void InputControllerAbs::sendEvent(const EncoderStepEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 } // namespace Garbox

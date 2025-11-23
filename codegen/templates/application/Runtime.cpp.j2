@@ -3,21 +3,10 @@
 
 #include "{{ RuntimeName }}.h"
 #include "core/assert/Assert.h"
-#include "core/log/Log.h"
 
 namespace Garbox {
 
-{{ RuntimeName }}::{{ RuntimeName }}():
-    {# init behaviours #}
-    // call behaviours constructors
-    {% for beh in behaviours %}
-    m{{ beh }}(){{ "," if not loop.last or controllers|length > 0 }}
-    {% endfor %}
-    {# init controllers #}
-    // call controllers constructors
-    {% for ctrl in controllers %}
-    m{{ ctrl }}(){{ "," if not loop.last }}
-    {% endfor %}{
+{{ RuntimeName }}::{{ RuntimeName }}(){
     // nothing to do
 }
 

@@ -18,8 +18,11 @@ public:
     ~ComponentAbs();
 
     // setup methhods
-    void init(ComponentHostIfc& host);
+    void init();
     void start();
+
+    // set host
+    void setComponentHost(ComponentHostIfc& host);
 
     // check if behaviour is initialized
     bool isInitialized() const { return mInitialized; }
@@ -57,7 +60,7 @@ protected:
     virtual void onStart() = 0;
 
     // send event
-    void sendEvent(EventHeader* header);
+    void publishEvent(const EventHeader* header);
 
     // make event
     template<EventType E>

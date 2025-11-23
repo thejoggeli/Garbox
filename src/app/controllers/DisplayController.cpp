@@ -26,7 +26,7 @@ void DisplayController::onStart(){
 }
 
 void DisplayController::onRenderTick(){
-
+    
     // update display brightness
     if(mBacklightFader.isActive()){
         float brightness = mBacklightFader.updateValue();

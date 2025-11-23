@@ -112,8 +112,8 @@ void setup(){
 
     // init main app
     gRuntime.init({
-        .eventPoolSizeBytes = 1024,
-        .eventQueueLength = 128,
+        .eventPoolSizeBytes = AppConfig::RuntimeEventPoolSizeBytes,
+        .eventQueueLength = AppConfig::RuntimeEventQueueLength,
     });
 
     // init main task

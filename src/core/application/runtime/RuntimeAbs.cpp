@@ -1,21 +1,22 @@
 #include "RuntimeAbs.h"
 
-#define GarboxDebugRuntimeAbs 0
+#define GarboxDebugRuntimeAbs 1
 
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "core/application/controller/ControllerAbs.h"
 #include "core/assert/Assert.h"
-#include "core/time/Time.h"
 
 #if GarboxDebugRuntimeAbs
 #include "core/log/Log.h"
+#include "core/time/Time.h"
 #endif
 
 namespace Garbox {
 
 RuntimeAbs::RuntimeAbs():
     // init members
-    mControllersSpan(nullptr, 0){
+    mControllersSpan(nullptr, 0),
+    mBehavioursSpan(nullptr, 0){
     // constructor body
 }
 
@@ -31,14 +32,24 @@ void RuntimeAbs::init(const Config& config){
     onRegisterControllers();
     onRegisterBehaviours();
 
+    // set all controller hosts
+    for(ControllerAbs* controller : mControllersSpan){
+        controller->setControllerHost(*this);
+    }
+
+    // set all behaviours hosts
+    for(BehaviourAbs* behaviour : mBehavioursSpan){
+        behaviour->setBehaviourHost(*this);
+    }
+
     // init all controllers
     for(ControllerAbs* controller : mControllersSpan){
-        controller->init(*this);
+        controller->init();
     }
 
     // init all behaviours
     for(BehaviourAbs* behaviour : mBehavioursSpan){
-        behaviour->init(*this);
+        behaviour->init();
     }
 
     // init derived class

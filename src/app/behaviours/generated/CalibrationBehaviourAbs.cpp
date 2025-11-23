@@ -13,11 +13,11 @@ CalibrationBehaviourAbs::CalibrationBehaviourAbs():
 }
 
 FanCommandEvent CalibrationBehaviourAbs::makeFanCommandEvent(){
-    return makeEvent<EventType::FanCommand>();
+    return BehaviourAbs::makeEvent<EventType::FanCommand>();
 }
 
 void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 } // namespace Garbox

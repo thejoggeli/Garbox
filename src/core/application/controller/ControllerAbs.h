@@ -11,8 +11,8 @@ public:
 
     ControllerAbs(ComponentId componentId, ControllerId behaviourId);
 
-    // setup method
-    void init(ControllerHostIfc& host);
+    // set host
+    void setControllerHost(ControllerHostIfc& host);
 
     // get the behaviour id
     ControllerId getControllerId() const { return mControllerId; }

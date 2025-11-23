@@ -43,7 +43,7 @@ private:
 
     // hide event methods
     using BehaviourAbs::makeEvent;
-    using BehaviourAbs::sendEvent;
+    using BehaviourAbs::publishEvent;
 
 };
 

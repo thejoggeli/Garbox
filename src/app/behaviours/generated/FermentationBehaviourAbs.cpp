@@ -13,27 +13,27 @@ FermentationBehaviourAbs::FermentationBehaviourAbs():
 }
 
 FanCommandEvent FermentationBehaviourAbs::makeFanCommandEvent(){
-    return makeEvent<EventType::FanCommand>();
+    return BehaviourAbs::makeEvent<EventType::FanCommand>();
 }
 
 BacklightCommandEvent FermentationBehaviourAbs::makeBacklightCommandEvent(){
-    return makeEvent<EventType::BacklightCommand>();
+    return BehaviourAbs::makeEvent<EventType::BacklightCommand>();
 }
 
 HeatpadCommandEvent FermentationBehaviourAbs::makeHeatpadCommandEvent(){
-    return makeEvent<EventType::HeatpadCommand>();
+    return BehaviourAbs::makeEvent<EventType::HeatpadCommand>();
 }
 
 void FermentationBehaviourAbs::sendEvent(const FanCommandEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 void FermentationBehaviourAbs::sendEvent(const BacklightCommandEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 void FermentationBehaviourAbs::sendEvent(const HeatpadCommandEvent& event){
-    sendEvent(event);
+    publishEvent(event.header());
 }
 
 } // namespace Garbox

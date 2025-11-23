@@ -11,8 +11,8 @@ public:
 
     BehaviourAbs(ComponentId componentId, BehaviourId behaviourId);
 
-    // setup method
-    void init(BehaviourHostIfc& host);
+    // set host
+    void setBehaviourHost(BehaviourHostIfc& host);
 
     // unlike controllers, behaviours can be active or inactive
     void setActive(bool active);
