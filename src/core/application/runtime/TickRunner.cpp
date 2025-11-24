@@ -7,7 +7,8 @@ namespace Garbox {
 
 TickRunner::TickRunner(size_t maxTickPhaseHandlers, uint32_t periodMillis):
     mTickPhaseHandlers(maxTickPhaseHandlers),
-    mPeriodMillis(periodMillis) {
+    mPeriodMillis(periodMillis),
+    mRemainingDelay(periodMillis){
     // nothing to do
 }
 
@@ -20,6 +21,10 @@ void TickRunner::setTickEndHandler(Handler handler){
 }
 
 void TickRunner::registerTickPhase(Handler handler, uint32_t delayMillis){
+
+    AssertExit(delayMillis < mRemainingDelay, "TickRunner", "sum of delays must be < period");
+    mRemainingDelay -= delayMillis;
+
     if(!mTickPhaseHandlers.push({ handler, delayMillis })){
         TriggerExit("TickRunner", "register tick failed");
     }
@@ -54,7 +59,7 @@ void TickRunner::run(){
         }
 
         // wait until period is complete
-        vTaskDelayUntil(&lastWakeTime, mPeriodMillis);
+        vTaskDelayUntil(&lastWakeTime, mRemainingDelay);
     }
 }
 

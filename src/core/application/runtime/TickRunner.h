@@ -29,6 +29,7 @@ private:
     Handler mTickEndHandler = nullptr;
 
     uint32_t mPeriodMillis;
+    uint32_t mRemainingDelay;
 
 };
 
