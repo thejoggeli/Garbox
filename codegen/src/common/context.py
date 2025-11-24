@@ -26,7 +26,6 @@ class Context:
         self.jinja_env = create_jinja_env(template_dir=self.templates_dir)
     
     def print(self):
-        print(f"generator will use the following directory paths:")
         print(f"config ----- {self.config_dir}")
         print(f"templates -- {self.templates_dir}")
         print(f"app -------- {self.app_dir}")

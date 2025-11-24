@@ -10,6 +10,7 @@ const char* ComponentIdToString(ComponentId id){
         case ComponentId::Null: return "Null";
         case ComponentId::Runtime: return "Runtime";
         case ComponentId::DisplayController: return "DisplayController";
+        case ComponentId::DevtoolsController: return "DevtoolsController";
         case ComponentId::FanController: return "FanController";
         case ComponentId::HeartbeatController: return "HeartbeatController";
         case ComponentId::HeatpadController: return "HeatpadController";

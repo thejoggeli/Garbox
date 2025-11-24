@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/controllers/generated/I2cPartsControllerAbs.h"
+#include "app/controllers/abstract/I2cPartsControllerAbs.h"
 #include "core/util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {

@@ -16,6 +16,7 @@ enum class ComponentId : uint16_t {
 
     // generated from config
     DisplayController,
+    DevtoolsController,
     FanController,
     HeartbeatController,
     HeatpadController,

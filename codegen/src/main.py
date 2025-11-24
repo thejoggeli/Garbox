@@ -1,6 +1,6 @@
 from pathlib import Path
 from common.context import Context
-from common.loader import load_hardware_config, load_events_config, load_application_config
+from common.loader import Loader
 from generate.gen_runtime import generate_runtime
 from generate.gen_hardware import generate_hardware
 from generate.gen_events import generate_events
@@ -21,23 +21,32 @@ def main():
         app_dir       = (codegen_dir / "../src/app").resolve(),
         shared_dir    = (codegen_dir / "../src/shared").resolve()
     )
+    print(f"generator will use the following directory paths")
     ctx.print()
+
+    # create loader
+    print("loading all config files")
+    loader = Loader(ctx.config_dir)
+    loader.preload_all()
     
     # hardware generation
-    hardware_config = load_hardware_config(ctx.config_dir)
-    generate_hardware(ctx, hardware_config)
+    print("generating hardware files")
+    generate_hardware(ctx, loader)
 
-    # types generation
-    events_config = load_events_config(ctx.config_dir)
-    generate_events(ctx, events_config)
+    # events generation
+    print("generating event files")
+    generate_events(ctx, loader)
 
     # components generation
-    app_config = load_application_config(ctx.config_dir)
-    generate_components(ctx, app_config)
+    print("generating component files")
+    generate_components(ctx, loader)
 
     # runtime generation
-    generate_runtime(ctx, app_config, events_config)
+    print("generating runtime files")
+    generate_runtime(ctx, loader)
 
+    # generation finished
+    print("all files generated successfully")
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include "app/controllers/generated/DisplayControllerAbs.h"
+#include "app/controllers/abstract/DisplayControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
 #include "core/util/container/vector/StaticVector.h"
 #include "core/util/helpers/TimeFader.h"

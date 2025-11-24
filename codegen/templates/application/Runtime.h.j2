@@ -4,12 +4,12 @@
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 {# include all behaviour headers #}
-{% for beh in behaviours %}
-#include "app/behaviours/{{ beh }}.h"
+{% for path in behaviour_paths | sort %}
+#include "{{ path }}.h"
 {% endfor %}
 {# include all controller headers #}
-{% for ctrl in controllers %}
-#include "app/controllers/{{ ctrl }}.h"
+{% for path in controller_paths | sort %}
+#include "{{ path }}.h"
 {% endfor %}
 
 namespace Garbox {

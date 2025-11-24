@@ -8,13 +8,17 @@ setup:
     { name: Input },
     { name: Logic },
     { name: Output },
+    { name: Logging },
     { name: Render, delay_millis: 20 }
   ]
+  stubs_prefix: "Example"
+  stubs_suffix: ""
 
 ### Controllers ###
 controllers:
 
   DisplayController:
+    subdir: "hmi"
     tick_phases: Render
     receives:
       - FanStatus
@@ -27,27 +31,38 @@ controllers:
       - ActiveBehaviourChanged
     sends: null
 
+  DevtoolsController:
+    subdir: "devtools"
+    tick_phases: [Logging]
+    receives: null
+    sends: null
+
   FanController:
+    subdir: "actuators"
     tick_phases: [Input, Output]
     receives: [FanCommand]
     sends: [FanStatus, FanSample]
 
   HeartbeatController:
+    subdir: "heartbeat"
     tick_phases: [Heartbeat]
     receives: null
     sends: [Heartbeat]
 
   HeatpadController:
+    subdir: "actuators"
     tick_phases: [Input, Output]
     receives: [HeatpadCommand]
     sends: [HeatpadStatus, HeatpadSample]
 
   InputController:
+    subdir: "hmi"
     tick_phases: [Input]
     receives: null
     sends: [ButtonStateChanged, ButtonRepeat, EncoderStep]
 
   I2cPartsController:
+    subdir: "sensors"
     tick_phases: [Input]
     receives: [ButtonStateChanged]
     sends: [TemperatureStatus, TemperatureSample]

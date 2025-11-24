@@ -6,12 +6,13 @@
 #include "core/application/runtime/TickRunner.h"
 #include "app/behaviours/CalibrationBehaviour.h"
 #include "app/behaviours/FermentationBehaviour.h"
-#include "app/controllers/DisplayController.h"
-#include "app/controllers/FanController.h"
-#include "app/controllers/HeartbeatController.h"
-#include "app/controllers/HeatpadController.h"
-#include "app/controllers/InputController.h"
-#include "app/controllers/I2cPartsController.h"
+#include "app/controllers/actuators/FanController.h"
+#include "app/controllers/actuators/HeatpadController.h"
+#include "app/controllers/devtools/DevtoolsController.h"
+#include "app/controllers/heartbeat/HeartbeatController.h"
+#include "app/controllers/hmi/DisplayController.h"
+#include "app/controllers/hmi/InputController.h"
+#include "app/controllers/sensors/I2cPartsController.h"
 
 namespace Garbox {
 
@@ -28,6 +29,7 @@ private:
     FermentationBehaviour mFermentationBehaviour;
 
     DisplayController mDisplayController;
+    DevtoolsController mDevtoolsController;
     FanController mFanController;
     HeartbeatController mHeartbeatController;
     HeatpadController mHeatpadController;
@@ -41,6 +43,7 @@ private:
     void handleInputTick();
     void handleLogicTick();
     void handleOutputTick();
+    void handleLoggingTick();
     void handleRenderTick();
 
     void onInit() final;

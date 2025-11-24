@@ -1,9 +1,10 @@
 from common.item import Item
 from common.item import Item, generate_items
 from common.context import Context
+from common.loader import Loader
 
 
-def generate_events(ctx: Context, events_config: dict):
+def generate_events(ctx: Context, loader: Loader):
     """
     Generates: 
     - shared/types/EventAlias.h
@@ -11,6 +12,8 @@ def generate_events(ctx: Context, events_config: dict):
     - shared/types/EventType.cpp
     - shared/types/EventPayload.h
     """
+
+    events_config = loader.get_events_config()
 
     items = [
         Item(events_config, "*", ctx.shared_dir / "types/EventAlias.h",   "events/EventAlias.h.j2"),

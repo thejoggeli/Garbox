@@ -9,6 +9,7 @@ const char* ControllerIdToString(ControllerId id){
     switch(id){
         case ControllerId::Null: return "Null";
         case ControllerId::Display: return "Display";
+        case ControllerId::Devtools: return "Devtools";
         case ControllerId::Fan: return "Fan";
         case ControllerId::Heartbeat: return "Heartbeat";
         case ControllerId::Heatpad: return "Heatpad";

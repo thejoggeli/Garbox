@@ -1,16 +1,16 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/controllers/generated/InputControllerAbs.h"
+#include "app/controllers/abstract/DevtoolsControllerAbs.h"
 
 namespace Garbox {
 
-class InputController : public InputControllerAbs {
+class DevtoolsController : public DevtoolsControllerAbs {
 public:
 
-    InputController();
+    DevtoolsController();
 
-    void onInputTick() final;
+    void onLoggingTick() final;
 
 private:
 

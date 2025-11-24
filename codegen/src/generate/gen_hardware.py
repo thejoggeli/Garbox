@@ -1,9 +1,10 @@
 from common.item import Item
 from common.item import Item, generate_items
 from common.context import Context
+from common.loader import Loader
 
 
-def generate_hardware(ctx: Context, config: dict):
+def generate_hardware(ctx: Context, loader: Loader):
     """
     Generate all hardware related files.
 
@@ -37,6 +38,8 @@ def generate_hardware(ctx: Context, config: dict):
     """
 
     hw_dir = ctx.app_dir / "hardware"
+
+    config = loader.get_hardware_config()
 
     # list of Item objects to generate
     items = [

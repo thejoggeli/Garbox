@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/controllers/generated/FanControllerAbs.h"
+#include "app/controllers/abstract/FanControllerAbs.h"
 #include "modules/parts/fan/Fan.h"
 
 namespace Garbox {

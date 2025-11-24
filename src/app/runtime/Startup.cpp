@@ -6,12 +6,9 @@
 #include "app/providers/PartsProvider.h"
 #include "app/runtime/GarboxRuntime.h"
 #include "core/assert/AssertHandler.h"
-#include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
-#include "core/util/helpers/StringUtils.h"
-#include "core/rtos/LockGuard.h"
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
@@ -92,10 +89,6 @@ void setup(){
         TriggerExit("Main", "gpio_install_isr_service failed");
     }
 
-    // init profiler
-    Profiler::Setup();
-    Profiler::SetEnabled(AppConfig::EnableProfiler);
-
     // init hardware instances
     HardwareInit::Init();
 
@@ -141,26 +134,3 @@ void loop(){
 void handleMainTask(){
     gRuntime.run();
 }
-
-void logProfiler(){
-    static uint32_t lastPrint = 0;
-    uint32_t now = Time::GetMicros();
-    if (now - lastPrint > 30'000'000){
-        Profiler::UpdateAll();
-        lastPrint = now;
-        
-        uint32_t seconds = Time::GetSeconds();
-        static char timeStringBuffer[20];
-        StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
-        LogInfo("Main", "===================== Diagnostics %s =====================", timeStringBuffer);
-        LogInfo("Main", " | ProfilerId    | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
-        for (uint32_t i = 0; i < static_cast<uint32_t>(ProfilerId::Count); ++i){
-            const ProfilerId id = static_cast<ProfilerId>(i);
-            const Profiler::Record& r = Profiler::GetRecord(id);
-            const char* idStr = ProfilerIdToString(id);
-            LogInfo("Main", " | %-13s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
-        }
-        LogInfo("Main", "====================================================================");
-    }
-}
-

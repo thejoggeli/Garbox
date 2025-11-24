@@ -13,6 +13,7 @@ enum class ControllerId : uint16_t {
 
     // generated from config
     Display,
+    Devtools,
     Fan,
     Heartbeat,
     Heatpad,

@@ -1,7 +1,7 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/behaviours/generated/CalibrationBehaviourAbs.h"
+#include "app/behaviours/abstract/CalibrationBehaviourAbs.h"
 
 namespace Garbox {
 

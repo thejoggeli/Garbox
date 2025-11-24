@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/controllers/generated/InputControllerAbs.h"
+#include "app/controllers/abstract/InputControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
 #include "modules/parts/button/ButtonIfc.h"
 

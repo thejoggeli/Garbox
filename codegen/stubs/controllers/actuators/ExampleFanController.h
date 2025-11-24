@@ -1,18 +1,19 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/controllers/generated/I2cPartsControllerAbs.h"
+#include "app/controllers/abstract/FanControllerAbs.h"
 
 namespace Garbox {
 
-class I2cPartsController : public I2cPartsControllerAbs {
+class FanController : public FanControllerAbs {
 public:
 
-    I2cPartsController();
+    FanController();
 
     void onInputTick() final;
+    void onOutputTick() final;
 
-    void onButtonStateChanged(const ButtonStateChangedEvent& event) final;
+    void onFanCommand(const FanCommandEvent& event) final;
 
 private:
 

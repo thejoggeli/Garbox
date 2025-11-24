@@ -8,13 +8,14 @@
 
 namespace Garbox {
 
-static constexpr size_t TickHandlersCount = 5;
-static constexpr size_t TickPeriodMillis = 30;
+static constexpr size_t TickHandlersCount = 6;
+static constexpr size_t TickPeriodMillis = 33;
 
 static constexpr uint32_t HeartbeatTickDelayMillis = 0;
 static constexpr uint32_t InputTickDelayMillis = 0;
 static constexpr uint32_t LogicTickDelayMillis = 0;
 static constexpr uint32_t OutputTickDelayMillis = 0;
+static constexpr uint32_t LoggingTickDelayMillis = 0;
 static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime(const RuntimeAbs::Config& config):
@@ -30,6 +31,7 @@ GarboxRuntime::GarboxRuntime(const RuntimeAbs::Config& config):
     mTickRunner.registerTickPhase([this](){ handleInputTick(); }, InputTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleLogicTick(); }, LogicTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleOutputTick(); }, OutputTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
 }
 
@@ -41,6 +43,7 @@ void GarboxRuntime::onRegister(){
     
     // register all controllers
     registerController(&mDisplayController);
+    registerController(&mDevtoolsController);
     registerController(&mFanController);
     registerController(&mHeartbeatController);
     registerController(&mHeatpadController);
@@ -49,12 +52,16 @@ void GarboxRuntime::onRegister(){
 }
 
 void GarboxRuntime::onInit(){
-    // behaviours and controllers are already initialized
+    // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&mCalibrationBehaviour);
+
+    // init profiler
+    Profiler::Setup();
+    Profiler::SetEnabled(true);
 }
 
 void GarboxRuntime::onStart(){
-    // behaviours and controllers are already started
+    // behaviours and controllers are already started when this method is called
     Profiler::Start();
 }
 
@@ -113,6 +120,15 @@ void GarboxRuntime::handleOutputTick(){
     // call controller tick_phases
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
+
+    // dispatch events
+    dispatchEvents();
+}
+
+void GarboxRuntime::handleLoggingTick(){
+
+    // call controller tick_phases
+    mDevtoolsController.onLoggingTick();
 
     // dispatch events
     dispatchEvents();
@@ -263,6 +279,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
 ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
     switch(id){
         case ControllerId::Display: return &mDisplayController;
+        case ControllerId::Devtools: return &mDevtoolsController;
         case ControllerId::Fan: return &mFanController;
         case ControllerId::Heartbeat: return &mHeartbeatController;
         case ControllerId::Heatpad: return &mHeatpadController;

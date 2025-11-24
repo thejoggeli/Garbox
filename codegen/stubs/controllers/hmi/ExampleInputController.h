@@ -1,19 +1,16 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/controllers/generated/FanControllerAbs.h"
+#include "app/controllers/abstract/InputControllerAbs.h"
 
 namespace Garbox {
 
-class FanController : public FanControllerAbs {
+class InputController : public InputControllerAbs {
 public:
 
-    FanController();
+    InputController();
 
     void onInputTick() final;
-    void onOutputTick() final;
-
-    void onFanCommand(const FanCommandEvent& event) final;
 
 private:
 

@@ -28,6 +28,26 @@ def extract_dict(config: dict, keys: str | list[str], copy: bool):
     return ex_config
 
 
+def nested_get(d, *keys, default=None):
+    cur = d
+    for k in keys:
+        if isinstance(cur, dict) and k in cur:
+            cur = cur[k]
+        else:
+            return default
+    return cur
+
+
+def nested_get_dot(d, path, default=None):
+    cur = d
+    for k in path.split("."):
+        if isinstance(cur, dict) and k in cur:
+            cur = cur[k]
+        else:
+            return default
+    return cur
+
+
 def print_json(data):
     print(json.dumps(data, indent=2))
 

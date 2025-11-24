@@ -42,12 +42,16 @@ void {{ RuntimeName }}::onRegister(){
 }
 
 void {{ RuntimeName }}::onInit(){
-    // behaviours and controllers are already initialized
+    // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&m{{ setup.initial_behaviour }});
+
+    // init profiler
+    Profiler::Setup();
+    Profiler::SetEnabled(true);
 }
 
 void {{ RuntimeName }}::onStart(){
-    // behaviours and controllers are already started
+    // behaviours and controllers are already started when this method is called
     Profiler::Start();
 }
 
