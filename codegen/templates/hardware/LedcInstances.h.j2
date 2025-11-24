@@ -1,28 +1,26 @@
 #pragma once
-
 {% include "_common/header.j2" %}
-
 #include "core/hardware/ledc/LedcTimer.h"
 #include "core/hardware/ledc/LedcChannel.h"
 {%- from "_common/includes.j2" import emit_includes -%}
-{{- emit_includes(include) -}}
+{{- emit_includes(meta) -}}
 
 namespace Garbox {
 
 class LedcInstances {
 public:
 
-{% for channel_name, entry in ledcChannel.items() %}
+{% for channel_name, entry in ledc_channel.items() %}
     static constexpr int32_t Pin{{ channel_name }} = {{ entry.pin }}; 
 {% endfor %}
 
     static void Init();
 
-{% for timer_name, t in ledcTimer.items() %}
+{% for timer_name, t in ledc_timer.items() %}
     static LedcTimer& Get{{ timer_name }}();
 {% endfor %}
 
-{% for channel_name, c in ledcChannel.items() %}
+{% for channel_name, c in ledc_channel.items() %}
     static LedcChannel& Get{{ channel_name }}();
 {% endfor %}
 

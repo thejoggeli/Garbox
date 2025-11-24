@@ -38,58 +38,24 @@ def ensure_list(x):
     return x if isinstance(x, list) else [x]
 
 
-def ensure_suffix(yaml_config: dict, parent: str, suffix: str):
-    block = yaml_config.get(parent)
-    if block is None:
-        raise KeyError(f"Parent key '{parent}' not found in YAML config")
+def ensure_dict_keys_have_suffix(in_dict: dict, suffix: str):
 
-    if not isinstance(block, dict):
-        raise TypeError(f"yaml_config['{parent}'] must be a dict")
+    out_dict = {}
 
-    renamed = {}
-
-    for key, value in block.items():
+    for key, value in in_dict.items():
         key_str = str(key)
-        if key_str in ("include_h", "include_cpp"):
-            renamed[key_str] = value
-            continue
-
         new_key = key_str if key_str.endswith(suffix) else key_str + suffix
-        if new_key in renamed:
+        if new_key in out_dict:
             raise KeyError(
                 f"Suffix operation would overwrite existing key '{new_key}'. "
                 f"Original key: '{key_str}'"
             )
-        renamed[new_key] = value
+        out_dict[new_key] = value
 
-    yaml_config[parent] = renamed
-    return yaml_config
+    return out_dict
 
 
-def ensure_value_suffix(yaml_config: dict, parent: str, field: str, suffix: str):
-    block = yaml_config.get(parent)
-    if block is None:
-        raise KeyError(f"Parent key '{parent}' not found")
-
-    if not isinstance(block, dict):
-        raise TypeError(f"yaml_config['{parent}'] must be a dict")
-
-    for key, entry in block.items():
-        if key in ("include_h", "include_cpp"):
-            continue
-        if field not in entry:
-            raise KeyError(
-                f"Entry '{key}' in '{parent}' does not contain required field '{field}'"
-            )
-
-        if isinstance(entry[field], list):
-            for i, v in enumerate(entry[field]):
-                val = str(v)
-                if not val.endswith(suffix):
-                    entry[field][i] = val + suffix
-        else:
-            val = str(entry[field])
-            if not val.endswith(suffix):
-                entry[field] = val + suffix
-
-    return yaml_config
+def ensure_str_has_suffix(value: str, suffix: str):
+    if not value.endswith(suffix):
+        return value + suffix
+    return value

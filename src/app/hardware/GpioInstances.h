@@ -1,9 +1,7 @@
 #pragma once
-
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "core/hardware/gpio/Gpio.h"
 
 namespace Garbox {

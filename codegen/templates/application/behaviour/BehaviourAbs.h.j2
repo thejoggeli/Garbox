@@ -1,8 +1,6 @@
+#pragma once
 {% include "_common/header.j2" %}
 {% set BehaviourName = name ~ 'Abs' %}
-
-#pragma once
-
 #include "core/application/behaviour/BehaviourAbs.h"
 
 namespace Garbox {
@@ -12,10 +10,10 @@ public:
 
     {{ BehaviourName }}();
 {# ---- Tick handlers ---- #}
-{% if behaviour.ticks %}
+{% if behaviour.tick_phases %}
 
     // tick handlers
-    {% for tick in behaviour.ticks %}
+    {% for tick in behaviour.tick_phases %}
     virtual void on{{ tick }}() = 0;
     {% endfor %}
 {% endif %}

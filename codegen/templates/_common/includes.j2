@@ -1,9 +1,7 @@
-{% macro emit_includes(include) %}
-{% if include is defined and include %}
+{% macro emit_includes(meta) %}
+{% if meta is defined and 'include' in meta %}
 
-
-// included from config
-{% for path in include %}
+{% for path in meta.include %}
 #include "{{ path }}"
 {% endfor %}
 

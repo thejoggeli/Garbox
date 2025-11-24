@@ -1,9 +1,7 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "HardwareInit.h"
-
 #include "core/assert/Assert.h"
 #include "app/hardware/AdcInstances.h"
 #include "app/hardware/GpioInstances.h"

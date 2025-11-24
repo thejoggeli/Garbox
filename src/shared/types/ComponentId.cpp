@@ -1,7 +1,6 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "ComponentId.h"
 
 namespace Garbox {

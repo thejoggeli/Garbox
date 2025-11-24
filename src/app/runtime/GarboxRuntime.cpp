@@ -1,7 +1,6 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "GarboxRuntime.h"
 #include "core/assert/Assert.h"
 
@@ -36,15 +35,16 @@ void GarboxRuntime::onStart(){
 
 void GarboxRuntime::onHeartbeatTick(){
 
-    // call controller ticks
+    // call controller tick_phases
     mHeartbeatController.onHeartbeatTick();
 
     // dispatch events
     dispatchEvents();
 }
+
 void GarboxRuntime::onInputTick(){
 
-    // call controller ticks
+    // call controller tick_phases
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
@@ -53,6 +53,7 @@ void GarboxRuntime::onInputTick(){
     // dispatch events
     dispatchEvents();
 }
+
 void GarboxRuntime::onLogicTick(){
 
     // call behaviour tick
@@ -65,18 +66,20 @@ void GarboxRuntime::onLogicTick(){
     // dispatch events
     dispatchEvents();
 }
+
 void GarboxRuntime::onOutputTick(){
 
-    // call controller ticks
+    // call controller tick_phases
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
 
     // dispatch events
     dispatchEvents();
 }
+
 void GarboxRuntime::onRenderTick(){
 
-    // call controller ticks
+    // call controller tick_phases
     mDisplayController.onRenderTick();
 
     // dispatch events

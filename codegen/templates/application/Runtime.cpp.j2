@@ -1,6 +1,5 @@
 {% include "_common/header.j2" %}
 {% set RuntimeName = app_name ~ 'Runtime' %}
-
 #include "{{ RuntimeName }}.h"
 #include "core/assert/Assert.h"
 
@@ -31,29 +30,29 @@ void {{ RuntimeName }}::onStart(){
     // behaviours and controllers are already started
 }
 
-{# ---- GENERATE TICKS ---- #}
-{% for tick in all_ticks %}
-    {% set onTick = 'on' ~ tick %}
+{# ---- GENERATE tick_phases ---- #}
+{% for tick in tick_phases %}
+    {% set onTick = 'on' ~ tick.name %}
 void {{ RuntimeName }}::{{ onTick }}(){
     {# get number of controllers with this tick #}
     {% set ns = namespace(ctrl_count=0, beha_count=0) %}
     {% for ctrl_key, ctrl in controllers.items() %}
-        {% if tick in ctrl['ticks'] %}
+        {% if tick.name in ctrl['tick_phases'] %}
             {% set ns.ctrl_count = ns.ctrl_count + 1 %}
         {% endif %}
     {% endfor %}
     {# get number of behaviours with this tick #}
     {% for beha_key, beha in behaviours.items() %}
-        {% if tick in beha['ticks'] %}
+        {% if tick.name in beha['tick_phases'] %}
             {% set ns.beha_count = ns.beha_count + 1 %}
         {% endif %}
     {% endfor %}
     {% if ns.ctrl_count > 0 %}
 
-    // call controller ticks
+    // call controller tick_phases
     {# Call tick on controllers supporting this tick #}
         {% for ctrl_key, ctrl in controllers.items() %}
-            {% if tick in ctrl['ticks'] %}
+            {% if tick.name in ctrl['tick_phases'] %}
     m{{ ctrl_key }}.{{ onTick }}();
             {% endif %}
         {% endfor %}
@@ -64,7 +63,7 @@ void {{ RuntimeName }}::{{ onTick }}(){
     // call behaviour tick
     switch(mActiveBehaviour->getBehaviourId()){
         {% for beha_key, beha in behaviours.items() %}
-            {% if tick in beha['ticks'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->{{ onTick }}(); break;
+            {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->{{ onTick }}(); break;
             {% endif %}
         {% endfor %}
         default: break; // active behaviour does not support tick type
@@ -76,11 +75,11 @@ void {{ RuntimeName }}::{{ onTick }}(){
     // dispatch events
     dispatchEvents();
     {% else %}
-        // no controller or behaviour with this tick
+    // no controller or behaviour with this tick
     {% endif %}
 }
-{% endfor %}
 
+{% endfor %}
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     switch(header->type){
 {# ---- Route events ---- #}

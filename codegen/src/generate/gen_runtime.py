@@ -13,18 +13,8 @@ def generate_runtime(ctx: Context, app_config: dict, events_config: dict):
     behaviours  = app_config["behaviours"]
     controllers = app_config["controllers"]
 
-    all_ticks = SortedSet()
+    # Build event routing table
     event_routes = {}
-
-    # Behaviour ticks
-    for item in behaviours.values():
-        all_ticks.update(item["ticks"])
-
-    # Controller ticks
-    for item in controllers.values():
-        all_ticks.update(item["ticks"])
-
-    # Event routing table
     for event_key in events_config["types"].keys():
         event_routes[event_key] = {
             "controllers": SortedSet(),
@@ -61,9 +51,9 @@ def generate_runtime(ctx: Context, app_config: dict, events_config: dict):
     runtime_dict = {
         "app_name":           app_name,
         "initial_behaviour":  app_config["initial_behaviour"],
+        "tick_phases":        app_config["tick_phases"],
         "behaviours":         behaviours,
-        "controllers":        controllers,
-        "all_ticks":          list(all_ticks),
+        "controllers":        controllers,  
         "event_routes":       event_routes,
     }
 

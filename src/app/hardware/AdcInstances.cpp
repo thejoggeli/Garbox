@@ -1,9 +1,7 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "AdcInstances.h"
-
 #include "core/assert/Assert.h"
 
 namespace Garbox {

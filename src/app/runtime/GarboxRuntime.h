@@ -1,9 +1,7 @@
+#pragma once
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
-#pragma once
-
 #include "core/application/runtime/RuntimeAbs.h"
 
 // include all behaviours

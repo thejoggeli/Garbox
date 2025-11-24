@@ -1,6 +1,6 @@
 ### System Events. DO NOT CHANGE THIS FILE ###
 
-payloads:
+payloads_meta:
   include_h: ["shared/types/BehaviourId.h"]
 
 types:

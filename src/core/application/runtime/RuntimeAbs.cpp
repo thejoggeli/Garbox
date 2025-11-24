@@ -81,31 +81,34 @@ void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
 }
 
 void RuntimeAbs::applyQueuedBehaviour() {
-    if(mQueuedBehaviour){
-        if(mQueuedBehaviour == mActiveBehaviour){
-            TriggerDebug("RuntimeAbs", "queued behaviour is already active");
-            return;
-        }
-
-        // create event
-        EventView event = mEventFactory.make<EventType::ActiveBehaviourChanged>(mComponentDescriptor);
-        event->newBehaviour = mQueuedBehaviour->getBehaviourId();
-
-        // set queued behaviour active
-        if(mActiveBehaviour){
-            mActiveBehaviour->setActive(false);
-            event->oldBehaviour = mActiveBehaviour->getBehaviourId();
-        }
-        else {
-            event->oldBehaviour = BehaviourId::Null;
-        }
-        mActiveBehaviour = mQueuedBehaviour;
-        mQueuedBehaviour = nullptr;
-        mActiveBehaviour->setActive(true);
-
-        // send event
-        publishEvent(event.header());
+    
+    if(!mQueuedBehaviour){
+        return;
     }
+
+    if(mQueuedBehaviour == mActiveBehaviour){
+        TriggerDebug("RuntimeAbs", "queued behaviour is already active");
+        return;
+    }
+
+    // create event
+    EventView event = mEventFactory.make<EventType::ActiveBehaviourChanged>(mComponentDescriptor);
+    event->newBehaviour = mQueuedBehaviour->getBehaviourId();
+
+    // set queued behaviour active
+    if(mActiveBehaviour){
+        mActiveBehaviour->setActive(false);
+        event->oldBehaviour = mActiveBehaviour->getBehaviourId();
+    }
+    else {
+        event->oldBehaviour = BehaviourId::Null;
+    }
+    mActiveBehaviour = mQueuedBehaviour;
+    mQueuedBehaviour = nullptr;
+    mActiveBehaviour->setActive(true);
+
+    // send event
+    publishEvent(event.header());   
 }
 
 void RuntimeAbs::requestChangeBehaviour(BehaviourId id){

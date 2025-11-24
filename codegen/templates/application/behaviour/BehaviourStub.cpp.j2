@@ -1,5 +1,4 @@
 {% include "_common/header_stub.j2" %}
-
 #include "{{ name }}.h"
 
 namespace Garbox {
@@ -23,8 +22,8 @@ void {{ name }}::onBecomeActive(){
 void {{ name }}::onBecomeInactive(){
     // nothing to do
 }
-{% if behaviour.ticks %}
-{% for tick in behaviour.ticks %}
+{% if behaviour.tick_phases %}
+{% for tick in behaviour.tick_phases %}
 
 void {{ name }}::on{{ tick }}(){
     // nothing to do

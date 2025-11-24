@@ -1,7 +1,6 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "FermentationBehaviourAbs.h"
 
 namespace Garbox {

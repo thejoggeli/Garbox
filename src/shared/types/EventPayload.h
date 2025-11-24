@@ -1,18 +1,14 @@
 #pragma once
-
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
-
-// included from config
+#include "shared/types/BehaviourId.h"
 #include "modules/parts/button/ButtonState.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
-#include "shared/types/BehaviourId.h"
 
 namespace Garbox {
 

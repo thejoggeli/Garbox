@@ -1,7 +1,5 @@
-{% include "_common/header_stub.j2" %}
-
 #pragma once
-
+{% include "_common/header_stub.j2" %}
 #include "app/controllers/generated/{{ name }}Abs.h"
 
 namespace Garbox {
@@ -10,9 +8,9 @@ class {{ name }} : public {{ name }}Abs {
 public:
 
     {{ name }}();
-    {% if controller.ticks %}
+    {% if controller.tick_phases %}
 
-        {% for tick in controller.ticks %}
+        {% for tick in controller.tick_phases %}
     void on{{ tick }}() final;
         {% endfor %}
     {% endif %}

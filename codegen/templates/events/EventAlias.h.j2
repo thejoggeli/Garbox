@@ -1,3 +1,5 @@
+#pragma once
+{% include "_common/header.j2" %}
 {# compute max name length for white space alignment #}
 {% set ns = namespace(maxlen=0) %}
 {% for name in types.keys() %}
@@ -7,10 +9,6 @@
     {% endif %}
 {% endfor %}
 {# include header #}
-#pragma once
-
-{% include "_common/header.j2" %}
-
 #include "core/application/event/EventView.h"
 #include "shared/types/EventType.h"
 

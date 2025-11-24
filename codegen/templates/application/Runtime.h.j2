@@ -1,8 +1,6 @@
+#pragma once
 {% include "_common/header.j2" %}
 {% set RuntimeName = app_name ~ 'Runtime' %}
-
-#pragma once
-
 #include "core/application/runtime/RuntimeAbs.h"
 
 {# include all behaviour headers #}
@@ -25,8 +23,8 @@ public:
     {{ RuntimeName }}(const RuntimeAbs::Config& config);
 
     {# Generate tick method declarations #}
-    {% for tick in all_ticks %}
-    void on{{ tick }}();
+    {% for tick in tick_phases %}
+    void on{{ tick.name }}();
     {% endfor %}
 
 private:

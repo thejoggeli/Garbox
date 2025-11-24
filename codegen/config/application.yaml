@@ -3,12 +3,20 @@ name: Garbox
 
 ### General ###
 initial_behaviour: CalibrationBehaviour
+tick_period_millis: 30
+tick_phases: [
+  { name: Heartbeat },
+  { name: Input },
+  { name: Logic },
+  { name: Output },
+  { name: Render, delay_until_millis: 20 }
+]
 
 ### Controllers ###
 controllers:
 
   DisplayController:
-    ticks: Render
+    tick_phases: Render
     receives:
       - FanStatus
       - FanSample
@@ -21,27 +29,27 @@ controllers:
     sends: null
 
   FanController:
-    ticks: [Input, Output]
+    tick_phases: [Input, Output]
     receives: [FanCommand]
     sends: [FanStatus, FanSample]
 
   HeartbeatController:
-    ticks: [Heartbeat]
+    tick_phases: [Heartbeat]
     receives: null
     sends: [Heartbeat]
 
   HeatpadController:
-    ticks: [Input, Output]
+    tick_phases: [Input, Output]
     receives: [HeatpadCommand]
     sends: [HeatpadStatus, HeatpadSample]
 
   InputController:
-    ticks: [Input]
+    tick_phases: [Input]
     receives: null
     sends: [ButtonStateChanged, ButtonRepeat, EncoderStep]
 
   I2cPartsController:
-    ticks: [Input]
+    tick_phases: [Input]
     receives: [ButtonStateChanged]
     sends: [TemperatureStatus, TemperatureSample]
 
@@ -49,11 +57,11 @@ controllers:
 behaviours:
 
   CalibrationBehaviour:
-    ticks: [Logic]
+    tick_phases: [Logic]
     receives: [Heartbeat, FanStatus, FanSample]
     sends: [FanCommand]
 
   FermentationBehaviour:
-    ticks: [Logic]
+    tick_phases: [Logic]
     receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]
     sends: [FanCommand, BacklightCommand, HeatpadCommand]

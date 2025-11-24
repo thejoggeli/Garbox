@@ -1,4 +1,4 @@
-payloads:
+payloads_meta:
 
   include_h: [
     "modules/parts/button/ButtonState.h",

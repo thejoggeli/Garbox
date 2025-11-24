@@ -1,9 +1,7 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "I2cPartsControllerAbs.h"
-
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {

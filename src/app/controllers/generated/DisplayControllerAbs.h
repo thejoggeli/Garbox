@@ -1,9 +1,7 @@
 #pragma once
-
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
 

@@ -1,7 +1,5 @@
 {% include "_common/header.j2" %}
-
 #include "HardwareInit.h"
-
 #include "core/assert/Assert.h"
 {% for name in init %}
 #include "app/hardware/{{ name }}.h"
