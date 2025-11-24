@@ -62,16 +62,16 @@ void LvglObjects::setHeatpadState(const char *stateText){
     setFormatted(mHeatpadStateLabel, "Heatpad state: %s", stateText);
 }
 
-void LvglObjects::setHeatpadDuty(float duty){
-    setFormatted(mHeatpadDutyLabel, "Heatpad duty:  %.1f%%", duty*100.0f);
+void LvglObjects::setHeatpadDuty(float duty, uint32_t periodMicros){
+    setFormatted(mHeatpadDutyLabel, "Heatpad duty: %.1f%%, period=%ums", duty*100.0f, periodMicros/1000);
 }
 
 void LvglObjects::setHeatpadSense(float voltageVolts, float currentAmps){
     setFormatted(mHeatpadSenseLabel, "Heatpad sense: %4.1fV, %3.1fA", voltageVolts, currentAmps);
 }
 
-void LvglObjects::setDisplayState(float brightness, uint32_t skipped){
-    setFormatted(mDisplayStateLabel, "Display: b=%.1f%%, skip=%u", brightness*100.0f, skipped);
+void LvglObjects::setDisplayState(float brightness, uint32_t skipped, uint32_t dirtyCount){
+    setFormatted(mDisplayStateLabel, "Display: b=%.1f%%, skip=%u, dirty=%u", brightness*100.0f, skipped, dirtyCount);
 }
 
 void LvglObjects::setTemperatureState(bool power, bool driver, bool reset){

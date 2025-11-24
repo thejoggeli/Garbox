@@ -37,19 +37,6 @@ public:
         BehaviourId behaviour;
         uint32_t eventCount = 0;
     };
-
-    struct Dirty {
-        bool displayState = true;
-        bool fanStatus = true;
-        bool fanMeasuredRpm = true;
-        bool heatpadState = true;
-        bool heatpadDuty = true;
-        bool heatpadSense = true;
-        bool shtState = true;
-        bool shtSample = true;
-        bool appState = true;
-        bool heapSpace = true;
-    };
     
     DisplayController();
 
@@ -66,15 +53,28 @@ public:
 
 private:
 
+    enum class Index : uint8_t {
+        FanStatus = 0,
+        FanMeasuredRpm,
+        HeatpadState,
+        HeatpadDuty,
+        HeatpadSense,
+        DisplayState,
+        ShtState,
+        ShtSample,
+        HeapSpace,
+        AppState,
+        Count,
+    };
+
     using UpdateFunction = std::function<void()>;
 
     struct UpdateHandler {
-        bool& dirtyFlag;
+        bool dirty = false;
         UpdateFunction updateFn;
 
         // constructor for emplace
-        UpdateHandler(bool& flag, UpdateFunction fn):
-            dirtyFlag(flag), updateFn(fn) {}
+        UpdateHandler(bool d, UpdateFunction fn): dirty(d), updateFn(fn) {}
     };
 
     Display& mDisplay;
@@ -83,19 +83,23 @@ private:
     SoftwareTimer mHeapTimer;
     TimeFader mBacklightFader;
 
-    Dirty mDirtyFlags;
-    ShadowState mShadowState {};    
+    ShadowState mShadowState {};
 
     uint32_t mRenderSkippedCount = 0;
+    uint32_t mDirtyCount = 0;
 
-    static constexpr size_t MaxUpdateHandlers = 32;
+    static constexpr size_t MaxUpdateHandlers = static_cast<size_t>(Index::Count);
     StaticVector<UpdateHandler, MaxUpdateHandlers> mUpdateHandlers;
+    StaticVector<UpdateHandler*, MaxUpdateHandlers> mDirtyUpdateHandlers;
 
     void onInit() final;
     void onStart() final;
 
-    void registerHandlers();
     void setBrightnessSmooth(float brightness, uint32_t durationMicros);
+
+    void registerHandler(UpdateFunction function);
+    void registerHandlers();
+    void markDirty(Index index);
 
 };
 

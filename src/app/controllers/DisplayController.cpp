@@ -23,36 +23,33 @@ void DisplayController::onInit(){
 }
 
 void DisplayController::registerHandlers(){
-    mUpdateHandlers.emplace(mDirtyFlags.fanStatus, [this](){
-        mObjects.setFanState(FanStateToString(mShadowState.fanState), mShadowState.fanTargetSpeed);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.fanMeasuredRpm, [this](){
-        mObjects.setFanMeasuredRpm(mShadowState.fanMeasuredRpm);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.heatpadState, [this](){
-        mObjects.setHeatpadState(HeatpadStateToString(mShadowState.heatpadState));
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.heatpadDuty, [this](){
-        mObjects.setHeatpadDuty(mShadowState.heatpadDuty);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.heatpadSense, [this](){
-        mObjects.setHeatpadSense(mShadowState.heatpadVoltage, mShadowState.heatpadCurrent);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.displayState, [this](){
-        mObjects.setDisplayState(mShadowState.brightness, mShadowState.renderSkippedCount);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.shtState, [this](){
-        mObjects.setTemperatureState(mShadowState.shtPower, mShadowState.shtDriver, mShadowState.shtReset);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.shtSample, [this](){
-        mObjects.setTemperatureSample(mShadowState.shtTemp, mShadowState.shtHum);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.heapSpace, [this](){
-        mObjects.setHeapSpace(mShadowState.heapSpace);
-    });
-    mUpdateHandlers.emplace(mDirtyFlags.appState, [this](){
-        mObjects.setAppInfo(BehaviourIdToString(mShadowState.behaviour), mShadowState.eventCount);
-    });
+    registerHandler([this](){ mObjects.setFanState(FanStateToString(mShadowState.fanState), mShadowState.fanTargetSpeed); });
+    registerHandler([this](){ mObjects.setFanMeasuredRpm(mShadowState.fanMeasuredRpm); });
+    registerHandler([this](){ mObjects.setHeatpadState(HeatpadStateToString(mShadowState.heatpadState)); });
+    registerHandler([this](){ mObjects.setHeatpadDuty(mShadowState.heatpadDuty, mShadowState.heatpadPeriod); });
+    registerHandler([this](){ mObjects.setHeatpadSense(mShadowState.heatpadVoltage, mShadowState.heatpadCurrent); });
+    registerHandler([this](){ mObjects.setDisplayState(mShadowState.brightness, mRenderSkippedCount, mDirtyCount); });
+    registerHandler([this](){ mObjects.setTemperatureState(mShadowState.shtPower, mShadowState.shtDriver, mShadowState.shtReset); });
+    registerHandler([this](){ mObjects.setTemperatureSample(mShadowState.shtTemp, mShadowState.shtHum); });
+    registerHandler([this](){ mObjects.setHeapSpace(mShadowState.heapSpace); });
+    registerHandler([this](){ mObjects.setAppInfo(BehaviourIdToString(mShadowState.behaviour), mShadowState.eventCount); });
+}
+
+void DisplayController::registerHandler(UpdateFunction function){
+    const bool dirty = true;
+    UpdateHandler* handler = mUpdateHandlers.emplace(dirty, function);
+    mDirtyUpdateHandlers.push(handler);
+}
+
+void DisplayController::markDirty(Index index){
+    UpdateHandler& handler = mUpdateHandlers[static_cast<size_t>(index)];
+    if(!handler.dirty){
+        handler.dirty = true;
+        mDirtyCount++;
+        bool ok = mDirtyUpdateHandlers.push(&handler) ;
+        AssertDebug(ok, "DisplayController", "push update handler failed");
+        markDirty(Index::DisplayState);
+    } 
 }
 
 void DisplayController::onStart(){
@@ -67,14 +64,14 @@ void DisplayController::onRenderTick(){
         float brightness = mBacklightFader.updateValue();
         mDisplay.setBrightness(brightness);
         mShadowState.brightness = brightness;
-        mDirtyFlags.displayState = true;
+        markDirty(Index::DisplayState);
     }
 
     // update heap space
     if(mHeapTimer.isExpired()){
         uint32_t space = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
         if(space != mShadowState.heapSpace){
-            mDirtyFlags.heapSpace = true;
+            markDirty(Index::HeapSpace);
             mShadowState.heapSpace = space;
         }
         mHeapTimer.restart();
@@ -83,18 +80,19 @@ void DisplayController::onRenderTick(){
     // update event count
     if(mShadowState.eventCount != mContext->eventCount){
         mShadowState.eventCount = mContext->eventCount;
-        mDirtyFlags.appState = true;
+        markDirty(Index::AppState);
     }
 
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
 
-        // update all dirty handlers
-        for(UpdateHandler& handler : mUpdateHandlers){
-            if(handler.dirtyFlag){
-                handler.updateFn();
-                handler.dirtyFlag = false;
+        if(mDirtyUpdateHandlers.size() > 0){
+            // update all dirty handlers
+            for(UpdateHandler* handler : mDirtyUpdateHandlers){
+                handler->dirty = false;
+                handler->updateFn();
             }
+            mDirtyUpdateHandlers.releaseAll();
         }
 
         // signal display to render frame
@@ -102,61 +100,56 @@ void DisplayController::onRenderTick(){
     }
     else {
         mRenderSkippedCount++;
-        mDirtyFlags.displayState = true;
+        markDirty(Index::DisplayState);
         LogDebug("DisplayController", "render skipped! total skip count = %" PRIi32, mRenderSkippedCount);
     }
 }
 
 void DisplayController::onFanStatus(const FanStatusEvent& event){ 
-    if(mShadowState.fanState != event->state || mShadowState.fanTargetSpeed != event->targetSpeed){
-        mDirtyFlags.fanStatus = true;
-        mShadowState.fanState = event->state;
-        mShadowState.fanTargetSpeed = event->targetSpeed;
-    }
+    mShadowState.fanState = event->state;
+    mShadowState.fanTargetSpeed = event->targetSpeed;
+    markDirty(Index::FanStatus);
 }
 
 void DisplayController::onFanSample(const FanSampleEvent& event){ 
-    if(mShadowState.fanMeasuredRpm != event->measuredRpm){
-        mDirtyFlags.fanMeasuredRpm = true;
-        mShadowState.fanMeasuredRpm = true;
-    }
+    mShadowState.fanMeasuredRpm = event->measuredRpm;
+    markDirty(Index::FanMeasuredRpm);
 }
 
 void DisplayController::onHeatpadStatus(const HeatpadStatusEvent& event){
     mShadowState.heatpadDuty = event->dutyCycle;
     mShadowState.heatpadState = event->state;
     mShadowState.heatpadPeriod = event->periodMicros;
-    mDirtyFlags.heatpadState = true;
-    mDirtyFlags.heatpadDuty = true;
+    markDirty(Index::HeatpadState);
+    markDirty(Index::HeatpadDuty);
 }
 
 void DisplayController::onHeatpadSample(const HeatpadSampleEvent& event){
     mShadowState.heatpadVoltage = event->measuredVoltage;
     mShadowState.heatpadCurrent = event->measuredCurrent;
-    mDirtyFlags.heatpadSense = true;
+    markDirty(Index::HeatpadSense);
 }
 
 void DisplayController::onTemperatureStatus(const TemperatureStatusEvent& event){
     mShadowState.shtDriver = event->driverEnabled;
     mShadowState.shtPower = event->powerEnabled;
     mShadowState.shtReset = event->resetting;
-    mDirtyFlags.shtState = true;
+    markDirty(Index::ShtState);
 }
 
 void DisplayController::onTemperatureSample(const TemperatureSampleEvent& event){
     mShadowState.shtTemp = event->temperatureCelcius;
     mShadowState.shtHum = event->humidityRelative;
-    mDirtyFlags.shtSample = true;
+    markDirty(Index::ShtSample);
+}
+void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
+    mShadowState.behaviour = event->newBehaviour;
+    markDirty(Index::AppState);
 }
 
 void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
     setBrightnessSmooth(event->brightness, 1000_ms);
 };
-
-void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
-    mShadowState.behaviour = event->newBehaviour;
-    mDirtyFlags.appState = true;
-}
 
 void DisplayController::setBrightnessSmooth(float targetBrightness, uint32_t durationMicros){
     const float startBrightness = mDisplay.getBrightness();

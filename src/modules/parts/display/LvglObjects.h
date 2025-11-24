@@ -18,10 +18,10 @@ public:
     void setFanMeasuredRpm(float rpmValue);
 
     void setHeatpadState(const char *stateText);
-    void setHeatpadDuty(float duty01);
+    void setHeatpadDuty(float duty, uint32_t periodMicros);
     void setHeatpadSense(float voltageVolts, float currentAmps);
 
-    void setDisplayState(float brightness, uint32_t skipped);
+    void setDisplayState(float brightness, uint32_t skipped, uint32_t dirtyCount);
 
     void setTemperatureState(bool power, bool driver, bool reset);
     void setTemperatureSample(float t, float h);
