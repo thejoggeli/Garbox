@@ -3,6 +3,7 @@
 #include "CalibrationBehaviour.h"
 
 #include "app/providers/PartsProvider.h"
+#include "core/log/Log.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
@@ -38,7 +39,8 @@ void CalibrationBehaviour::onLogicTick(){
 }
 
 void CalibrationBehaviour::onHeartbeat(const HeartbeatEvent& event){
-    static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
+    static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer();
+    LogDebug("CalibrationBehaviour", "TickCount=%u", mContext->tickCount); 
     if(mContext->tickCount > 10*30){
         requestChangeBehaviour(BehaviourId::Fermentation);
     }

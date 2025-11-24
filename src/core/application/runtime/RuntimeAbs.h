@@ -32,10 +32,7 @@ public:
 
     void init();
     void start();
-
-    // runtime context related methods
-    void beginTickSequence();
-    void incrementTickCount();
+    void run();
 
     // BaseHostIfc
     virtual void publishEvent(const EventHeader* header) final;
@@ -47,6 +44,10 @@ public:
     BehaviourAbs* getActiveBehaviour() const final;
 
 protected:
+
+    // Context for controllers and behaviours to use.
+    // The deriving class update the values at appropriate times
+    RuntimeContext mContext;
 
     // behaviour active and queued
     BehaviourAbs* mActiveBehaviour = nullptr;
@@ -74,21 +75,14 @@ protected:
     // to be implemented by user
     virtual void onInit() = 0;
     virtual void onStart() = 0;
-    virtual void onRegisterControllers() = 0;
-    virtual void onRegisterBehaviours() = 0;
+    virtual void onRun() = 0;
+    virtual void onRegister() = 0;
     virtual void onRouteEvent(const EventHeader* event) = 0;
 
 private:
 
     // component descriptor
     ComponentDescriptor mComponentDescriptor {ComponentType::Runtime, ComponentId::Runtime};
-
-    // Context for controllers and behaviours to use.
-    // RuntimeAbs only modifies this in init() and start().
-    // For all other updates, the user must call e.g.
-    // - incrementTickCount()
-    // at the appropriate time
-    RuntimeContext mContext;
 
     // members for events
     EventFactory mEventFactory;

@@ -5,8 +5,8 @@
 namespace Garbox {
 
 enum struct ProfilerId : uint8_t {
-    MainTask = 0,
-    MainTick,
+    MainPeriod = 0,
+    AllPhases,
     LogTick,
     DisplayTick,
     RenderTick,
@@ -17,8 +17,8 @@ enum struct ProfilerId : uint8_t {
 
 static constexpr const char* ProfilerIdToString(ProfilerId id){
     switch(id){
-        case ProfilerId::MainTask: return "MainTask";
-        case ProfilerId::MainTick: return "MainTick";
+        case ProfilerId::MainPeriod: return "MainPeriod";
+        case ProfilerId::AllPhases: return "AllPhases";
         case ProfilerId::LogTick: return "LogTick";
         case ProfilerId::DisplayTick: return "DisplayTick";
         case ProfilerId::RenderTick: return "RenderTick";

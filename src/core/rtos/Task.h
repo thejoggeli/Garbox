@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <functional>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
 namespace Garbox {
 

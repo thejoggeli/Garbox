@@ -27,7 +27,7 @@ def load_application_config(config_dir: Path):
     yaml_path = config_dir / "application.yaml"
     yaml_config = load_yaml(yaml_path)
 
-    for tick_phase in yaml_config["tick_phases"]:
+    for tick_phase in yaml_config["setup"]["tick_phases"]:
         tick_phase["name"] = ensure_str_has_suffix(tick_phase["name"], "Tick")
 
     for dict_item in yaml_config["behaviours"].values():
@@ -44,7 +44,6 @@ def load_application_config(config_dir: Path):
     ensure_dict_keys_have_suffix(yaml_config["controllers"], "Controller")
 
     for behaviour in yaml_config["behaviours"].values():
-        print(behaviour)
         behaviour["tick_phases"] = ensure_list(behaviour["tick_phases"])
         for idx, name in enumerate(behaviour["tick_phases"]):
             behaviour["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")            

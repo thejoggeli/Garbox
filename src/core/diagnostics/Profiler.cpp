@@ -101,6 +101,11 @@ void Profiler::End(ProfilerId id){
     r.countTotal++;
 }
 
+void Profiler::Periodic(ProfilerId id){
+    Profiler::End(id);
+    Profiler::Begin(id);
+}
+
 void Profiler::ProcessRecord(Record& r, uint32_t elapsed){
     if (r.countCurrent > 0){
         r.avgDuration = static_cast<float>(r.totalTime) / r.countCurrent;

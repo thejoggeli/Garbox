@@ -24,9 +24,8 @@ RuntimeAbs::RuntimeAbs(const Config& config):
 
 void RuntimeAbs::init(){
 
-    // derived class must register controllers and behaviours
-    onRegisterControllers();
-    onRegisterBehaviours();
+    // derived class must register controllers, behaviours and ticks
+    onRegister();
 
     // set all controller hosts
     for(ControllerAbs* controller : mControllersSpan){
@@ -71,9 +70,8 @@ void RuntimeAbs::start(){
     onStart();
 }
 
-void RuntimeAbs::beginTickSequence(){
-    incrementTickCount();
-    applyQueuedBehaviour();
+void RuntimeAbs::run(){
+    onRun();
 }
 
 void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
@@ -81,7 +79,7 @@ void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
 }
 
 void RuntimeAbs::applyQueuedBehaviour() {
-    
+
     if(!mQueuedBehaviour){
         return;
     }
@@ -174,10 +172,6 @@ void RuntimeAbs::dispatchEvents(){
         onRouteEvent(header);
     }
     mEventFactory.releaseDataPool();
-}
-
-void RuntimeAbs::incrementTickCount(){
-    mContext.tickCount++;
 }
 
 const RuntimeContext& RuntimeAbs::getContext() const {

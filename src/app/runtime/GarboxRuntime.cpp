@@ -3,19 +3,43 @@
 // *****************************************
 #include "GarboxRuntime.h"
 #include "core/assert/Assert.h"
+#include "core/diagnostics/Profiler.h"
+#include "core/time/Time.h"
 
 namespace Garbox {
 
-GarboxRuntime::GarboxRuntime(const RuntimeAbs::Config& config) : RuntimeAbs(config) {
-    // nothing to do
+static constexpr size_t TickHandlersCount = 5;
+static constexpr size_t TickPeriodMillis = 30;
+
+static constexpr uint32_t HeartbeatTickDelayMillis = 0;
+static constexpr uint32_t InputTickDelayMillis = 0;
+static constexpr uint32_t LogicTickDelayMillis = 0;
+static constexpr uint32_t OutputTickDelayMillis = 0;
+static constexpr uint32_t RenderTickDelayMillis = 20;
+
+GarboxRuntime::GarboxRuntime(const RuntimeAbs::Config& config):
+    RuntimeAbs(config),
+    mTickRunner(TickHandlersCount, TickPeriodMillis){
+
+    // set start and end tick handlers
+    mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
+    mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
+
+    //  register all tick phases
+    mTickRunner.registerTickPhase([this](){ handleHeartbeatTick(); }, HeartbeatTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleInputTick(); }, InputTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleLogicTick(); }, LogicTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleOutputTick(); }, OutputTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
 }
 
-void GarboxRuntime::onRegisterBehaviours(){
+void GarboxRuntime::onRegister(){
+
+    // register all behaviours
     registerBehaviour(&mCalibrationBehaviour);
     registerBehaviour(&mFermentationBehaviour);
-}
-
-void GarboxRuntime::onRegisterControllers(){
+    
+    // register all controllers
     registerController(&mDisplayController);
     registerController(&mFanController);
     registerController(&mHeartbeatController);
@@ -31,9 +55,26 @@ void GarboxRuntime::onInit(){
 
 void GarboxRuntime::onStart(){
     // behaviours and controllers are already started
+    Profiler::Start();
 }
 
-void GarboxRuntime::onHeartbeatTick(){
+void GarboxRuntime::onRun(){
+    mTickRunner.run();
+}
+
+void GarboxRuntime::handleTickStart(){
+    Time::Tick();
+    Profiler::Periodic(ProfilerId::MainPeriod);
+    Profiler::Begin(ProfilerId::AllPhases);
+    applyQueuedBehaviour();
+}
+
+void GarboxRuntime::handleTickEnd(){
+    mContext.tickCount++;
+    Profiler::End(ProfilerId::AllPhases);
+}
+
+void GarboxRuntime::handleHeartbeatTick(){
 
     // call controller tick_phases
     mHeartbeatController.onHeartbeatTick();
@@ -42,7 +83,7 @@ void GarboxRuntime::onHeartbeatTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onInputTick(){
+void GarboxRuntime::handleInputTick(){
 
     // call controller tick_phases
     mFanController.onInputTick();
@@ -54,7 +95,7 @@ void GarboxRuntime::onInputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onLogicTick(){
+void GarboxRuntime::handleLogicTick(){
 
     // call behaviour tick
     switch(mActiveBehaviour->getBehaviourId()){
@@ -67,7 +108,7 @@ void GarboxRuntime::onLogicTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onOutputTick(){
+void GarboxRuntime::handleOutputTick(){
 
     // call controller tick_phases
     mFanController.onOutputTick();
@@ -77,7 +118,7 @@ void GarboxRuntime::onOutputTick(){
     dispatchEvents();
 }
 
-void GarboxRuntime::onRenderTick(){
+void GarboxRuntime::handleRenderTick(){
 
     // call controller tick_phases
     mDisplayController.onRenderTick();

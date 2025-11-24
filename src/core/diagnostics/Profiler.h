@@ -50,6 +50,7 @@ public:
 
     static void Begin(ProfilerId id);
     static void End(ProfilerId id);
+    static void Periodic(ProfilerId id);
     static void Update(ProfilerId id);
     static void UpdateAll();
 

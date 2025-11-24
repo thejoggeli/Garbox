@@ -22,7 +22,6 @@ static GarboxRuntime gRuntime({
     .eventQueueLength = AppConfig::RuntimeEventQueueLength,    
 });
 static Task gMainTask;
-static bool gResetProfiler = false;
 
 void handleMainTask();
 void logProfiler();
@@ -125,10 +124,6 @@ void setup(){
     );
     gMainTask.setHandler(handleMainTask);
 
-    // start profiler
-    Profiler::Start();
-    gResetProfiler = true;
-
     // start main app
     gRuntime.start();
 
@@ -144,54 +139,7 @@ void loop(){
 }
 
 void handleMainTask(){
-    const TickType_t mainTickMillis = pdMS_TO_TICKS(AppConfig::MainTickDurationMillis);
-    const TickType_t displayTickMillis = pdMS_TO_TICKS(AppConfig::DisplayTickDurationMillis);
-    TickType_t lastWakeTime = xTaskGetTickCount();
-
-    while(true){
-
-        // reset profiler
-        if(gResetProfiler){
-            Profiler::Start();
-            gResetProfiler = false;
-        }
-
-        // begin main task
-        ProfilerScoped mainTaskProfilerScoped = ProfilerScoped(ProfilerId::MainTask);
-
-        // advance time
-        Time::Tick();
-
-        gRuntime.beginTickSequence();
-
-        // main tick
-        {
-            ProfilerScoped mainTickProfilerScoped = ProfilerScoped(ProfilerId::MainTick);
-            gRuntime.onHeartbeatTick();
-            gRuntime.onInputTick();
-            gRuntime.onLogicTick();
-            gRuntime.onOutputTick();
-        }
-
-        // logging
-        {
-            ProfilerScoped logTickProfilerScoped = ProfilerScoped(ProfilerId::LogTick);
-            logProfiler();
-        }
-
-        // wait until updateDisplayDuration millis are remaining before current cycle is finished
-        // this is done to ensure that the display is always updated at a fixed interval and to 
-        // give it enough time to transfer the previous ui state via SPI
-        {
-            vTaskDelayUntil(&lastWakeTime, mainTickMillis);
-            ProfilerScoped displayTickProfilerScoped = ProfilerScoped(ProfilerId::DisplayTick);
-            gRuntime.onRenderTick();
-        }
-        
-        // end main task
-        // sleep until next tick
-        vTaskDelayUntil(&lastWakeTime, displayTickMillis);
-    }
+    gRuntime.run();
 }
 
 void logProfiler(){
@@ -213,7 +161,6 @@ void logProfiler(){
             LogInfo("Main", " | %-13s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
         }
         LogInfo("Main", "====================================================================");
-        gResetProfiler = true;
     }
 }
 

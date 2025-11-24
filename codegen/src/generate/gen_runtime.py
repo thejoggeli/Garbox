@@ -43,18 +43,16 @@ def generate_runtime(ctx: Context, app_config: dict, events_config: dict):
         route["behaviours"]  = list(route["behaviours"])
 
     # Output paths
-    app_name = app_config["name"]
+    app_name = app_config["setup"]["name"]
     out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
     template = "application/Runtime"
 
     # Aggregate runtime data
     runtime_dict = {
-        "app_name":           app_name,
-        "initial_behaviour":  app_config["initial_behaviour"],
-        "tick_phases":        app_config["tick_phases"],
-        "behaviours":         behaviours,
-        "controllers":        controllers,  
-        "event_routes":       event_routes,
+        "setup":        app_config["setup"],
+        "behaviours":   behaviours,
+        "controllers":  controllers,  
+        "event_routes": event_routes,
     }
 
     items = [

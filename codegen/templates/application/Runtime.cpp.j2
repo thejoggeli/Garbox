@@ -1,39 +1,75 @@
 {% include "_common/header.j2" %}
-{% set RuntimeName = app_name ~ 'Runtime' %}
+{% set RuntimeName = setup.name ~ 'Runtime' %}
 #include "{{ RuntimeName }}.h"
 #include "core/assert/Assert.h"
+#include "core/diagnostics/Profiler.h"
+#include "core/time/Time.h"
 
 namespace Garbox {
 
-{{ RuntimeName }}::{{ RuntimeName }}(const RuntimeAbs::Config& config) : RuntimeAbs(config) {
-    // nothing to do
+static constexpr size_t TickHandlersCount = {{ setup.tick_phases | length }};
+static constexpr size_t TickPeriodMillis = {{ setup.tick_period_millis }};
+
+{% for tick in setup.tick_phases %}
+static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | default (0) }};
+{% endfor %}
+
+{{ RuntimeName }}::{{ RuntimeName }}(const RuntimeAbs::Config& config):
+    RuntimeAbs(config),
+    mTickRunner(TickHandlersCount, TickPeriodMillis){
+
+    // set start and end tick handlers
+    mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
+    mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
+
+    //  register all tick phases
+{% for tick in setup.tick_phases %}
+    mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
+{% endfor %}
 }
 
-void {{ RuntimeName }}::onRegisterBehaviours(){
-    {% for beh in behaviours %}
+void {{ RuntimeName }}::onRegister(){
+
+    // register all behaviours
+{% for beh in behaviours %}
     registerBehaviour(&m{{ beh }});
-    {% endfor %}
-}
-
-void {{ RuntimeName }}::onRegisterControllers(){
-    {% for ctrl in controllers %}
+{% endfor %}
+    
+    // register all controllers
+{% for ctrl in controllers %}
     registerController(&m{{ ctrl }});
-    {% endfor %}
+{% endfor %}
 }
 
 void {{ RuntimeName }}::onInit(){
     // behaviours and controllers are already initialized
-    setQueuedBehaviour(&m{{ initial_behaviour }});
+    setQueuedBehaviour(&m{{ setup.initial_behaviour }});
 }
 
 void {{ RuntimeName }}::onStart(){
     // behaviours and controllers are already started
+    Profiler::Start();
+}
+
+void {{ RuntimeName }}::onRun(){
+    mTickRunner.run();
+}
+
+void {{ RuntimeName}}::handleTickStart(){
+    Time::Tick();
+    Profiler::Periodic(ProfilerId::MainPeriod);
+    Profiler::Begin(ProfilerId::AllPhases);
+    applyQueuedBehaviour();
+}
+
+void {{ RuntimeName}}::handleTickEnd(){
+    mContext.tickCount++;
+    Profiler::End(ProfilerId::AllPhases);
 }
 
 {# ---- GENERATE tick_phases ---- #}
-{% for tick in tick_phases %}
-    {% set onTick = 'on' ~ tick.name %}
-void {{ RuntimeName }}::{{ onTick }}(){
+{% for tick in setup.tick_phases %}
+void {{ RuntimeName }}::handle{{ tick.name }}(){
     {# get number of controllers with this tick #}
     {% set ns = namespace(ctrl_count=0, beha_count=0) %}
     {% for ctrl_key, ctrl in controllers.items() %}
@@ -53,7 +89,7 @@ void {{ RuntimeName }}::{{ onTick }}(){
     {# Call tick on controllers supporting this tick #}
         {% for ctrl_key, ctrl in controllers.items() %}
             {% if tick.name in ctrl['tick_phases'] %}
-    m{{ ctrl_key }}.{{ onTick }}();
+    m{{ ctrl_key }}.on{{ tick.name }}();
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -63,7 +99,7 @@ void {{ RuntimeName }}::{{ onTick }}(){
     // call behaviour tick
     switch(mActiveBehaviour->getBehaviourId()){
         {% for beha_key, beha in behaviours.items() %}
-            {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->{{ onTick }}(); break;
+            {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
             {% endif %}
         {% endfor %}
         default: break; // active behaviour does not support tick type

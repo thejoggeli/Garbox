@@ -1,16 +1,15 @@
-# The generated runtime instance will be called NameRuntime
-name: Garbox
-
-### General ###
-initial_behaviour: CalibrationBehaviour
-tick_period_millis: 30
-tick_phases: [
-  { name: Heartbeat },
-  { name: Input },
-  { name: Logic },
-  { name: Output },
-  { name: Render, delay_until_millis: 20 }
-]
+### Setup ###
+setup:
+  name: Garbox # The generated runtime instance will be called NameRuntime
+  initial_behaviour: CalibrationBehaviour
+  tick_period_millis: 30
+  tick_phases: [
+    { name: Heartbeat },
+    { name: Input },
+    { name: Logic },
+    { name: Output },
+    { name: Render, delay_millis: 20 }
+  ]
 
 ### Controllers ###
 controllers:

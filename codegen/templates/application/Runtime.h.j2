@@ -1,15 +1,12 @@
 #pragma once
 {% include "_common/header.j2" %}
-{% set RuntimeName = app_name ~ 'Runtime' %}
+{% set RuntimeName = setup.name ~ 'Runtime' %}
 #include "core/application/runtime/RuntimeAbs.h"
-
+#include "core/application/runtime/TickRunner.h"
 {# include all behaviour headers #}
-// include all behaviours
 {% for beh in behaviours %}
 #include "app/behaviours/{{ beh }}.h"
 {% endfor %}
-
-// include all controllers
 {# include all controller headers #}
 {% for ctrl in controllers %}
 #include "app/controllers/{{ ctrl }}.h"
@@ -22,15 +19,9 @@ public:
 
     {{ RuntimeName }}(const RuntimeAbs::Config& config);
 
-    {# Generate tick method declarations #}
-    {% for tick in tick_phases %}
-    void on{{ tick.name }}();
-    {% endfor %}
-
 private:
 
-    ControllerAbs* resolveController(ControllerId id) final;
-    BehaviourAbs* resolveBehaviour(BehaviourId id) final;
+    TickRunner mTickRunner;
 
     {# behaviour instances #}
     {% for beh in behaviours %}
@@ -42,11 +33,23 @@ private:
     {{ ctrl }} m{{ ctrl }};
     {% endfor %}
 
+    void handleTickStart();
+    void handleTickEnd();
+
+    {# Generate tick method declarations #}
+    {% for tick in setup.tick_phases %}
+    void handle{{ tick.name }}();
+    {% endfor %}
+
     void onInit() final;
     void onStart() final;
+    void onRun() final;
     void onRouteEvent(const EventHeader* header) final;
-    void onRegisterBehaviours() final;
-    void onRegisterControllers() final;
+    void onRegister() final;
+
+    ControllerAbs* resolveController(ControllerId id) final;
+    BehaviourAbs* resolveBehaviour(BehaviourId id) final;
+    
 };
 
 } // namespace Garbox
