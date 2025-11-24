@@ -10,8 +10,8 @@ EventFactory::~EventFactory(){
     TriggerExit("EventFactory", "heap deconstructor");
 }
 
-void EventFactory::clearDataPool(){
-    mPool.clear();
+void EventFactory::releaseDataPool(){
+    mPool.releaseAll();
 }
 
 } // namespace

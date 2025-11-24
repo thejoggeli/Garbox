@@ -6,9 +6,9 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include "core/rtos/Task.h"
+#include "core/util/container/ringbuffer/StaticRingBuffer.h"
 #include "modules/parts/piezo/Piezo.h"
 #include "modules/parts/piezo/ToneSequence.h"
-#include "core/util/container/RingBuffer.h"
 
 namespace Garbox {
 
@@ -73,7 +73,7 @@ private:
     const ToneSequence* mCurrentSequence = nullptr;
 
     // playback state
-    RingBuffer<QueueItem, QueueSize> mQueue;
+    StaticRingBuffer<QueueItem, QueueSize> mQueue;
     size_t mCurrentToneIndex = 0;
     uint32_t mLastTimeMicros = 0;
     bool mPlaying = false;

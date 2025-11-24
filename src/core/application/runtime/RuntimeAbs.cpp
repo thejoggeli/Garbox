@@ -15,10 +15,10 @@ namespace Garbox {
 
 RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
-    mControllersSpan(nullptr, 0),
-    mBehavioursSpan(nullptr, 0),
     mEventFactory(config.eventPoolSizeBytes),
-    mEventQueue(config.eventQueueLength){
+    mEventQueue(config.eventQueueLength),
+    mControllersSpan(nullptr, 0),
+    mBehavioursSpan(nullptr, 0){
     // constructor body
 }
 
@@ -147,7 +147,7 @@ void RuntimeAbs::publishEvent(const EventHeader* header){
     if(header->bypassQueue){
         onRouteEvent(header);
     }
-    else if(!mEventQueue.push(header)){
+    else if(!mEventQueue.pushBack(header)){
         TriggerExit("RuntimeAbs", "event queue is full");
     }
 }
@@ -157,20 +157,20 @@ EventFactory& RuntimeAbs::getEventFactory(){
 }
 
 void RuntimeAbs::clearEventQueue(){
-    mEventQueue.clear();
-    mEventFactory.clearDataPool();
+    mEventQueue.releaseAll();
+    mEventFactory.releaseDataPool();
 }
 
 void RuntimeAbs::dispatchEvents(){
     const EventHeader* header;
-    while(mEventQueue.pop(header)){
+    while(mEventQueue.releaseFront(header)){
         if(header == nullptr){
             TriggerDebug("RuntimeAbs", "event header is nullptr");
             continue;
         }
         onRouteEvent(header);
     }
-    mEventFactory.clearDataPool();
+    mEventFactory.releaseDataPool();
 }
 
 void RuntimeAbs::incrementTickCount(){

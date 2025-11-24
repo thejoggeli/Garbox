@@ -3,7 +3,7 @@
 #include <functional>
 #include "app/controllers/generated/DisplayControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
-#include "core/util/container/StaticVector.h"
+#include "core/util/container/vector/StaticVector.h"
 #include "core/util/helpers/TimeFader.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"

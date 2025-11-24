@@ -6,7 +6,7 @@
 #include "core/application/event/EventBlock.h"
 #include "core/application/event/EventHeader.h"
 #include "core/assert/Assert.h"
-#include "core/util/container/DataPoolHeap.h"
+#include "core/util/container/datapool/HeapDataPool.h"
 #include "shared/types/EventType.h"
 #include "shared/types/EventPayload.h"
 
@@ -18,20 +18,17 @@ public:
     EventFactory(size_t poolSizeBytes);
     ~EventFactory();
 
-    void clearDataPool();
+    void releaseDataPool();
 
     template<EventType E>
     EventView<E> make(ComponentDescriptor componentDescriptor){
         
-        // allocate memory for the event block
-        void* memory = mPool.allocate<EventBlock<E>>();
-        if(!memory){
+        // consturct block in data pool with default values
+        EventBlock<E>* block = mPool.construct<EventBlock<E>>();
+        if(!block){
             TriggerDebug("EventFactory", "failed to allocate event");
             return EventView<E>((EventHeader*)nullptr);
         }
-
-        // use placement new with value-initialize (fills memory with either zeros or default values) 
-        EventBlock<E>* block = new (memory) EventBlock<E>();
 
         // fill header data
         EventHeader* header = &block->header;
@@ -46,7 +43,7 @@ public:
 private:
 
     int32_t mCurrentEventId = 0;
-    DataPoolHeap mPool;
+    HeapDataPool mPool;
 
     int32_t getNextEventId(){
         mCurrentEventId++;

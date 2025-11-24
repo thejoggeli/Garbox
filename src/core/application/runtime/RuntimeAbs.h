@@ -6,8 +6,8 @@
 #include "core/application/host/BehaviourHostIfc.h"
 #include "core/application/host/ControllerHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
+#include "core/util/container/ringbuffer/HeapRingBuffer.h"
 #include "core/util/container/Span.h"
-#include "core/util/container/RingBufferHeap.h"
 
 namespace Garbox {
 
@@ -92,7 +92,7 @@ private:
 
     // members for events
     EventFactory mEventFactory;
-    RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
+    HeapRingBuffer<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
     // controllers array
     static constexpr size_t MaxControllersCount = 16;

@@ -222,7 +222,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
     }
 
     // add sequence to queue
-    bool result = mQueue.push(QueueItem{
+    bool result = mQueue.pushBack(QueueItem{
         .type = QueueItemType::ToneSequence,
         .tone = Tone(0, 0),
         .sequence = &sequence,
@@ -234,7 +234,7 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
 
     // add silent time
     if(silentTimeMicros > 0){
-        result = mQueue.push(QueueItem{
+        result = mQueue.pushBack(QueueItem{
             .type = QueueItemType::SilentTime,
             .tone = Tone(silentTimeMicros),
             .sequence = nullptr,
@@ -270,7 +270,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
     }
 
     // add single tone to queue
-    bool result = mQueue.push(QueueItem{
+    bool result = mQueue.pushBack(QueueItem{
         .type = QueueItemType::SingleTone,
         .tone = tone,
         .sequence = nullptr,
@@ -282,7 +282,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
 
     // add silent time
     if(silentTimeMicros > 0){
-        result = mQueue.push(QueueItem{
+        result = mQueue.pushBack(QueueItem{
             .type = QueueItemType::SilentTime,
             .tone = Tone(silentTimeMicros),
             .sequence = nullptr,
@@ -303,8 +303,8 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
 void PiezoPlayer::playNextInQueue(){
     Garbox::LockGuard lock(mMutex);
 
-    QueueItem* nextItem = mQueue.popPtr();
-    if(nextItem != nullptr){
+    QueueItem* nextItem;
+    if(mQueue.releaseFront(nextItem)){
 
         // handle queue item type
         if(nextItem->type == QueueItemType::ToneSequence){
@@ -359,7 +359,7 @@ bool PiezoPlayer::isPlaying() const {
 
 void PiezoPlayer::clearQueue(){
     Garbox::LockGuard lock(mMutex);
-    mQueue.clear();
+    mQueue.releaseAll();
 }
 
 } // namespace Garbox
