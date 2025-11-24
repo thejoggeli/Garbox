@@ -73,7 +73,7 @@ void AnimatedLedGroup::handleTask(){
 
 void AnimatedLedGroup::tick(){
     LockGuard lock(mMutex);
-    ProfilerScoped profilerScoped = ProfilerScoped(ProfilerId::LedAnimation);
+    Profiler::MeasureScoped profiler { ProfilerId::LedAnimation };
 
     // must be initialized
     if(!mInitialized){

@@ -54,92 +54,72 @@ void GarboxRuntime::onRegister(){
 void GarboxRuntime::onInit(){
     // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&mCalibrationBehaviour);
-
-    // init profiler
-    Profiler::Setup();
-    Profiler::SetEnabled(true);
+    Profiler::Init();
 }
 
 void GarboxRuntime::onStart(){
     // behaviours and controllers are already started when this method is called
-    Profiler::Start();
+    Profiler::SetEnabled(true);
 }
 
 void GarboxRuntime::onRun(){
+    Profiler::Reset();
     mTickRunner.run();
 }
 
 void GarboxRuntime::handleTickStart(){
     Time::Tick();
-    Profiler::Periodic(ProfilerId::MainPeriod);
-    Profiler::Begin(ProfilerId::AllPhases);
+    Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
+    Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
 }
 
 void GarboxRuntime::handleTickEnd(){
     mContext.tickCount++;
-    Profiler::End(ProfilerId::AllPhases);
+    Profiler::MeasureEnd(ProfilerId::MainBusy);
 }
 
 void GarboxRuntime::handleHeartbeatTick(){
-
-    // call controller tick_phases
+    Profiler::MeasureScoped profiler(ProfilerId::HeartbeatTick);
     mHeartbeatController.onHeartbeatTick();
-
-    // dispatch events
     dispatchEvents();
 }
 
 void GarboxRuntime::handleInputTick(){
-
-    // call controller tick_phases
+    Profiler::MeasureScoped profiler(ProfilerId::InputTick);
     mFanController.onInputTick();
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
     mI2cPartsController.onInputTick();
-
-    // dispatch events
     dispatchEvents();
 }
 
 void GarboxRuntime::handleLogicTick(){
-
-    // call behaviour tick
+    Profiler::MeasureScoped profiler(ProfilerId::LogicTick);
     switch(mActiveBehaviour->getBehaviourId()){
         case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
         case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
         default: break; // active behaviour does not support tick type
     }
-
-    // dispatch events
     dispatchEvents();
 }
 
 void GarboxRuntime::handleOutputTick(){
-
-    // call controller tick_phases
+    Profiler::MeasureScoped profiler(ProfilerId::OutputTick);
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
-
-    // dispatch events
     dispatchEvents();
 }
 
 void GarboxRuntime::handleLoggingTick(){
-
-    // call controller tick_phases
+    Profiler::MeasureScoped profiler(ProfilerId::LoggingTick);
     mDevtoolsController.onLoggingTick();
-
-    // dispatch events
     dispatchEvents();
 }
 
 void GarboxRuntime::handleRenderTick(){
-
-    // call controller tick_phases
+    Profiler::MeasureScoped profiler(ProfilerId::RenderTick);
     mDisplayController.onRenderTick();
-
-    // dispatch events
     dispatchEvents();
 }
 

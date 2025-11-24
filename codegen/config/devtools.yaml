@@ -1,8 +1,7 @@
 profiler: 
-  enable: true, 
-  num_register_slots: 16, 
-  user_ids: [ 
-    UserId1, 
-    UserId2,  
+  custom_ids: [ 
+    LedAnimation, 
+    PiezoPlayer,  
+    DisplayRender
   ]   
 

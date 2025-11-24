@@ -3,7 +3,7 @@ from common.context import Context
 from common.loader import Loader
 from generate.gen_runtime import generate_runtime
 from generate.gen_hardware import generate_hardware
-from generate.gen_events import generate_events
+from generate.gen_types import generate_types
 from generate.gen_components import generate_components
 
 
@@ -34,8 +34,8 @@ def main():
     generate_hardware(ctx, loader)
 
     # events generation
-    print("generating event files")
-    generate_events(ctx, loader)
+    print("generating types files")
+    generate_types(ctx, loader)
 
     # components generation
     print("generating component files")

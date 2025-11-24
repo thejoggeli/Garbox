@@ -141,10 +141,9 @@ void Display::handleRenderTask(){
         xSemaphoreTake(mRenderTrigger, portMAX_DELAY);
 
         // render frame
-        {
-            ProfilerScoped profilerScoped = ProfilerScoped(ProfilerId::RenderTick);
-            mLvglHandler.startRender();
-        }
+        Profiler::MeasureBegin(ProfilerId::DisplayRender);
+        mLvglHandler.startRender();
+        Profiler::MeasureEnd(ProfilerId::DisplayRender);        
 
         // signal render ready
         xSemaphoreGive(mRenderReady);

@@ -12,51 +12,41 @@ static bool sInitialized = false;
 static uint32_t sLastUpdateTime = 0;
 static SemaphoreHandle_t sMutex = nullptr;
 
-ProfilerScoped::ProfilerScoped(ProfilerId id) : mId(id){ 
-    Profiler::Begin(mId); 
-}
-
-ProfilerScoped::~ProfilerScoped(){ 
-    Profiler::End(mId); 
-}
-
-bool Profiler::Setup(){
+bool Profiler::Init(){
     AssertExit(!sInitialized, "Profiler", "already initialized");
     AssertExit(RecordsCount != 0, "Profiler", "no records"); 
 
     sMutex = xSemaphoreCreateMutex();
     AssertExit(sMutex != nullptr, "Profiler", "failed to create mutex");
-
     for (uint8_t i = 0; i < RecordsCount; ++i){
-        sRecords[i] = {
-            0, 0, 0, 0,
-            0xFFFFFFFF, 0,
-            0xFFFFFFFF, 0,
-            0xFFFFFFFF, 0,
-            0, false,
-            0.0f, 0.0f
-        };
+        ResetRecord(static_cast<ProfilerId>(i));
     }
-
     sNextIndex = 0;
     sInitialized = true;
     sLastUpdateTime = Time::GetMicros();
     return true;
 }
 
-void Profiler::Start(){
+void Profiler::Reset(){
     AssertExit(sInitialized, "Profiler", "not initialized");
     LockGuard lock(sMutex);
     sLastUpdateTime = Time::GetMicros();
-    sEnabled = true;
-
-    // Optionally reset per-frame counters so first tick is clean
     for (uint8_t i = 0; i < RecordsCount; ++i){
-        sRecords[i].countCurrent = 0;
-        sRecords[i].totalTime = 0;
-        sRecords[i].minDurationCurrent = 0xFFFFFFFF;
-        sRecords[i].maxDurationCurrent = 0;
+        ResetRecord(static_cast<ProfilerId>(i));
     }
+    Profiler::ResetAllTotals();
+    Profiler::ResetIteration();
+}
+
+void Profiler::ResetRecord(ProfilerId id){
+    sRecords[static_cast<uint8_t>(id)] = {
+        0, 0, 0, 0,
+        0xFFFFFFFF, 0,
+        0xFFFFFFFF, 0,
+        0xFFFFFFFF, 0,
+        0, false,
+        0.0f, 0.0f
+    };
 }
 
 void Profiler::SetEnabled(bool on){
@@ -69,7 +59,7 @@ bool Profiler::IsEnabled(){
     return sEnabled;
 }
 
-void Profiler::Begin(ProfilerId id){
+void Profiler::MeasureBegin(ProfilerId id){
     if (!sEnabled) return;
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
@@ -79,7 +69,7 @@ void Profiler::Begin(ProfilerId id){
     r.active = true;
 }
 
-void Profiler::End(ProfilerId id){
+void Profiler::MeasureEnd(ProfilerId id){
     if (!sEnabled) return;
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
@@ -101,9 +91,9 @@ void Profiler::End(ProfilerId id){
     r.countTotal++;
 }
 
-void Profiler::Periodic(ProfilerId id){
-    Profiler::End(id);
-    Profiler::Begin(id);
+void Profiler::MeasurePeriodic(ProfilerId id){
+    Profiler::MeasureEnd(id);
+    Profiler::MeasureBegin(id);
 }
 
 void Profiler::ProcessRecord(Record& r, uint32_t elapsed){

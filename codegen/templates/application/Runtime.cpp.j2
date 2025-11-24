@@ -44,31 +44,29 @@ void {{ RuntimeName }}::onRegister(){
 void {{ RuntimeName }}::onInit(){
     // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&m{{ setup.initial_behaviour }});
-
-    // init profiler
-    Profiler::Setup();
-    Profiler::SetEnabled(true);
+    Profiler::Init();
 }
 
 void {{ RuntimeName }}::onStart(){
     // behaviours and controllers are already started when this method is called
-    Profiler::Start();
+    Profiler::SetEnabled(true);
 }
 
 void {{ RuntimeName }}::onRun(){
+    Profiler::Reset();
     mTickRunner.run();
 }
 
 void {{ RuntimeName}}::handleTickStart(){
     Time::Tick();
-    Profiler::Periodic(ProfilerId::MainPeriod);
-    Profiler::Begin(ProfilerId::AllPhases);
+    Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
+    Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
 }
 
 void {{ RuntimeName}}::handleTickEnd(){
     mContext.tickCount++;
-    Profiler::End(ProfilerId::AllPhases);
+    Profiler::MeasureEnd(ProfilerId::MainBusy);
 }
 
 {# ---- GENERATE tick_phases ---- #}
@@ -87,9 +85,8 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
             {% set ns.beha_count = ns.beha_count + 1 %}
         {% endif %}
     {% endfor %}
+    Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
     {% if ns.ctrl_count > 0 %}
-
-    // call controller tick_phases
     {# Call tick on controllers supporting this tick #}
         {% for ctrl_key, ctrl in controllers.items() %}
             {% if tick.name in ctrl['tick_phases'] %}
@@ -99,8 +96,6 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
     {% endif %}
     {# Call tick on active behaviour #}
     {% if ns.beha_count > 0 %}
-
-    // call behaviour tick
     switch(mActiveBehaviour->getBehaviourId()){
         {% for beha_key, beha in behaviours.items() %}
             {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
@@ -111,8 +106,6 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
     {% endif %}
     {# Call dispatch events #}
     {% if ns.ctrl_count > 0 or ns.beha_count > 0 %}
-
-    // dispatch events
     dispatchEvents();
     {% else %}
     // no controller or behaviour with this tick

@@ -12,16 +12,22 @@
 
 namespace Garbox {
 
-// Scoped RAII profiler
-struct ProfilerScoped {
-    ProfilerScoped(ProfilerId id);
-    ~ProfilerScoped();
-private:
-    ProfilerId mId;
-}; 
+
 
 class Profiler {
 public:
+
+    struct MeasureScoped {
+    public:
+        MeasureScoped(ProfilerId id) : mId(id) {
+            MeasureBegin(mId);
+        } 
+        ~MeasureScoped(){
+            MeasureEnd(mId);
+        }
+    private:
+        ProfilerId mId;
+    }; 
 
     struct Record {
         uint32_t countCurrent;
@@ -43,14 +49,16 @@ public:
         float avgDuration;
     };
 
-    static bool Setup();
-    static void Start();
+    static bool Init();
+    static void Reset();
+    
     static void SetEnabled(bool on);
     static bool IsEnabled();
 
-    static void Begin(ProfilerId id);
-    static void End(ProfilerId id);
-    static void Periodic(ProfilerId id);
+    static void MeasureBegin(ProfilerId id);
+    static void MeasureEnd(ProfilerId id);
+    static void MeasurePeriodic(ProfilerId id);
+
     static void Update(ProfilerId id);
     static void UpdateAll();
 
@@ -63,6 +71,7 @@ public:
 
 private:
     static void ProcessRecord(Record& r, uint32_t elapsed);
+    static void ResetRecord(ProfilerId id);
 };
 
 } // namespace Garbox

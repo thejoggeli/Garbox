@@ -1,33 +1,37 @@
 #pragma once
-
+// *****************************************
+// * THIS IS GENERATED CODE. DO NOT MODIFY *
+// *****************************************
 #include <cstdint>
 
 namespace Garbox {
 
-enum struct ProfilerId : uint8_t {
-    MainPeriod = 0,
-    AllPhases,
-    LogTick,
-    DisplayTick,
+enum class ProfilerId : uint16_t {
+
+    // null event
+    Null = 0,
+
+    // system
+    MainPeriod,
+    MainBusy,
+
+    // tick phases
+    HeartbeatTick,
+    InputTick,
+    LogicTick,
+    OutputTick,
+    LoggingTick,
     RenderTick,
-    PiezoPlayer,
+
+    // custom
     LedAnimation,
-    Count
+    PiezoPlayer,
+    DisplayRender,
+
+    // enum size marker
+    Count,
 };
 
-static constexpr const char* ProfilerIdToString(ProfilerId id){
-    switch(id){
-        case ProfilerId::MainPeriod: return "MainPeriod";
-        case ProfilerId::AllPhases: return "AllPhases";
-        case ProfilerId::LogTick: return "LogTick";
-        case ProfilerId::DisplayTick: return "DisplayTick";
-        case ProfilerId::RenderTick: return "RenderTick";
-        case ProfilerId::PiezoPlayer: return "PiezoPlayer";
-        case ProfilerId::LedAnimation: return "LedAnimation";
-        case ProfilerId::Count: return "Count";
-    }
-    static_assert("unhandled profiler config id");
-    return "undefined";
-}
+const char* ProfilerIdToString(ProfilerId id);
 
 } // namespace Garbox

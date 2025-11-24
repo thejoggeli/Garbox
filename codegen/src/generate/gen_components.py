@@ -30,30 +30,8 @@ def generate_components(ctx: Context, loader: Loader):
 
     """
 
-    _generate_components_ids(ctx, loader)
     _generate_components(ctx, loader, "controller", "Controller")
     _generate_components(ctx, loader, "behaviour", "Behaviour")
-
-
-def _generate_components_ids(ctx: Context, loader: Loader):
-    """
-    Generate ComponentId, BehaviourId, ControllerId files.
-    """
-
-    app_config = loader.get_application_config()
-
-    beha_dict = {"names": list(app_config["behaviours"].keys())}
-    ctrl_dict = {"names": list(app_config["controllers"].keys())}
-    comp_dict = {"names": list(app_config["controllers"].keys()) + list(app_config["behaviours"].keys())}
-    items = [
-        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.h",    "application/BehaviourId.h.j2"),
-        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.cpp",  "application/BehaviourId.cpp.j2"),
-        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.h",   "application/ControllerId.h.j2"),
-        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.cpp", "application/ControllerId.cpp.j2"),
-        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.h",    "application/ComponentId.h.j2"),
-        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.cpp",  "application/ComponentId.cpp.j2"),
-    ]
-    generate_items(ctx, items)
 
 
 def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name: str):

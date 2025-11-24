@@ -104,8 +104,7 @@ const Task& PiezoPlayer::getTask() const {
 
 void PiezoPlayer::playbackTick(){
     Garbox::LockGuard lock(mMutex);
-
-    ProfilerScoped profilerScoped = ProfilerScoped(ProfilerId::PiezoPlayer);
+    Profiler::MeasureScoped profiler { ProfilerId::PiezoPlayer };
 
     if (!mPlaying || !mCurrentSequence){
         return;
