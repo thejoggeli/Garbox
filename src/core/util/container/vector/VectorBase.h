@@ -9,14 +9,17 @@ namespace Garbox {
  * Fixed-capacity vector using custom storage.
  *
  * Supports:
- * - allocate()   => reserve uninitialized slot
- * - construct()  => default-construct element in-place
- * - assign()     => copy into uninitialized slot (no constructor)
- * - push()       => copy-construct element
- * - emplace()    => construct with args in-place
- * - destroyAll() => destroy all constructed elements
- * - releaseAll() => drop all elements without destruction
- *
+ * - allocate()    => reserve uninitialized slot
+ * - construct()   => default-construct element in-place
+ * - assign()      => copy into uninitialized slot (no constructor)
+ * - push()        => copy-construct element
+ * - emplace()     => construct with args in-place
+ * - destroyLast() => destroy last added elements
+ * - destroyAll()  => destroy all elements
+ * - releaseLast() => drop last added elements without destruction
+ * - releaseAll()  => drop all elements without destruction
+ * - at()          => get pointer or copy of element at index
+ * - peekLast()    => get pointer or copy to last element
  * No heap allocations occur. Capacity is fixed by Storage.
  */
 template <typename T, typename Storage>
@@ -176,6 +179,90 @@ public:
     // Drop everything without destruction
     void releaseAll(){
         mSize = 0;
+    }
+
+    // Destroy last element
+    bool destroyLast(){
+        if(mSize == 0){
+            return false;
+        }
+
+        T* ptr = storagePtr(mSize - 1);
+        ptr->~T();
+        mSize--;
+        return true;
+    }
+
+    // Destroy last element and copy it out
+    bool destroyLast(T& out){
+        if(mSize == 0){
+            return false;
+        }
+
+        T* ptr = storagePtr(mSize - 1);
+        out = *ptr;
+        ptr->~T();
+        mSize--;
+        return true;
+    }
+
+    // Release last element (no destructor)
+    bool releaseLast(){
+        if(mSize == 0){
+            return false;
+        }
+
+        mSize--;
+        return true;
+    }
+
+    // Release last element, copy it out
+    bool releaseLast(T& out){
+        if(mSize == 0){
+            return false;
+        }
+
+        T* ptr = storagePtr(mSize - 1);
+        out = *ptr;
+
+        mSize--;
+        return true;
+    }
+
+    // Peek last element (copy)
+    bool peekLast(T& out) const {
+        if(mSize == 0){
+            return false;
+        }
+        out = *storagePtr(mSize - 1);
+        return true;
+    }
+
+    // Pointer to last element
+    T* peekLast(){
+        if(mSize == 0){
+            return nullptr;
+        }
+        return storagePtr(mSize - 1);
+    }
+
+    // Copy element at index
+    bool at(std::size_t index, T& out) const {
+        const bool valid = (index < mSize);
+        if(!valid){
+            return false;
+        }
+        out = *storagePtr(index);
+        return true;
+    }
+
+    // Pointer to element at index
+    T* at(std::size_t index){
+        const bool valid = (index < mSize);
+        if(!valid){
+            return nullptr;
+        }
+        return storagePtr(index);
     }
 
 private:

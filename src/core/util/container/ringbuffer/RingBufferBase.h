@@ -14,8 +14,7 @@ namespace Garbox {
  * - construct() => in-place construction
  * - push()      => copy construction
  * - emplace()   => move construction
- * - peek()      => get copy of front/back element
- * - peekPtr()   => get pointer to front/back element
+ * - peek()      => get either pointer or copy of front/back element
  * - destroy()   => remove and call destructor
  * - release()   => remove without calling destructor. Optionally a pointer can be passed to access the (still valid) element.
  */
@@ -331,7 +330,7 @@ public:
     }
 
     // Pointer to element at front
-    T* peekPtrFront(){
+    T* peekFront(){
         if(isEmpty()){
             return 0;
         }
@@ -341,7 +340,7 @@ public:
     }
 
     // Pointer to element at back
-    T* peekPtrBack(){
+    T* peekBack(){
         if(isEmpty()){
             return 0;
         }
