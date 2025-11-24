@@ -5,6 +5,7 @@ from generate.gen_runtime import generate_runtime
 from generate.gen_hardware import generate_hardware
 from generate.gen_types import generate_types
 from generate.gen_components import generate_components
+from generate.gen_config import generate_config
 
 
 def main():
@@ -44,6 +45,10 @@ def main():
     # runtime generation
     print("generating runtime files")
     generate_runtime(ctx, loader)
+
+    # config generation
+    print("generating config files")
+    generate_config(ctx, loader)
 
     # generation finished
     print("all files generated successfully")

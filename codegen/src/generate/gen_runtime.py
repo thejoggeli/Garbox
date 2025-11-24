@@ -46,9 +46,8 @@ def generate_runtime(ctx: Context, loader: Loader):
         route["behaviours"]  = list(route["behaviours"])
 
     # Output paths
-    app_name = app_config["setup"]["name"]
+    app_name = app_config["setup"]["app_name"]
     out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
-    template = "application/Runtime"
 
     # behaviours paths
     behaviour_paths = []
@@ -78,8 +77,8 @@ def generate_runtime(ctx: Context, loader: Loader):
     }
 
     items = [
-        Item(runtime_dict, "*", out_base.with_suffix(".h"),   f"{template}.h.j2"),
-        Item(runtime_dict, "*", out_base.with_suffix(".cpp"), f"{template}.cpp.j2"),
+        Item(runtime_dict, "*", out_base.with_suffix(".h"),   "runtime/Runtime.h.j2"),
+        Item(runtime_dict, "*", out_base.with_suffix(".cpp"), "runtime/Runtime.cpp.j2"),
     ]
 
     generate_items(ctx, items)

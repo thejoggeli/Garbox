@@ -22,10 +22,10 @@ def _generate_events(ctx: Context, loader: Loader):
     events_config = loader.get_events_config()
 
     items = [
-        Item(events_config, "*", ctx.shared_dir / "types/EventAlias.h",   "events/EventAlias.h.j2"),
-        Item(events_config, "*", ctx.shared_dir / "types/EventType.h",    "events/EventType.h.j2"),
-        Item(events_config, "*", ctx.shared_dir / "types/EventType.cpp",  "events/EventType.cpp.j2"),
-        Item(events_config, "*", ctx.shared_dir / "types/EventPayload.h", "events/EventPayload.h.j2", meta_key="payloads_meta"),
+        Item(events_config, "*", ctx.shared_dir / "types/EventAlias.h",   "types/EventAlias.h.j2"),
+        Item(events_config, "*", ctx.shared_dir / "types/EventType.h",    "types/EventType.h.j2"),
+        Item(events_config, "*", ctx.shared_dir / "types/EventType.cpp",  "types/EventType.cpp.j2"),
+        Item(events_config, "*", ctx.shared_dir / "types/EventPayload.h", "types/EventPayload.h.j2", meta_key="payloads_meta"),
     ]
 
     generate_items(ctx, items)
@@ -42,12 +42,12 @@ def _generate_component_ids(ctx: Context, loader: Loader):
     ctrl_dict = {"names": list(app_config["controllers"].keys())}
     comp_dict = {"names": list(app_config["controllers"].keys()) + list(app_config["behaviours"].keys())}
     items = [
-        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.h",    "application/BehaviourId.h.j2"),
-        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.cpp",  "application/BehaviourId.cpp.j2"),
-        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.h",   "application/ControllerId.h.j2"),
-        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.cpp", "application/ControllerId.cpp.j2"),
-        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.h",    "application/ComponentId.h.j2"),
-        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.cpp",  "application/ComponentId.cpp.j2"),
+        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.h",    "types/BehaviourId.h.j2"),
+        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.cpp",  "types/BehaviourId.cpp.j2"),
+        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.h",   "types/ControllerId.h.j2"),
+        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.cpp", "types/ControllerId.cpp.j2"),
+        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.h",    "types/ComponentId.h.j2"),
+        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.cpp",  "types/ComponentId.cpp.j2"),
     ]
     generate_items(ctx, items)
 
@@ -64,7 +64,7 @@ def _generate_profiler_ids(ctx: Context, loader: Loader):
     config["all_ids"]    = config["system_ids"] + config["ticks_ids"] + config["custom_ids"]
 
     items = [
-        Item(config, "*", ctx.shared_dir/"types/ProfilerId.h",   "application/ProfilerId.h.j2"),
-        Item(config, "*", ctx.shared_dir/"types/ProfilerId.cpp", "application/ProfilerId.cpp.j2"),
+        Item(config, "*", ctx.shared_dir/"types/ProfilerId.h",   "types/ProfilerId.h.j2"),
+        Item(config, "*", ctx.shared_dir/"types/ProfilerId.cpp", "types/ProfilerId.cpp.j2"),
     ]
     generate_items(ctx, items)

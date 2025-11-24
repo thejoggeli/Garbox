@@ -1,0 +1,14 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include <cstdint>
+{%- from "_common/includes.j2" import emit_includes -%}
+{{- emit_includes(includes) -}}
+
+namespace Garbox::AppConfig {
+
+static constexpr const char* AppName = "{{ setup.app_name }}";
+static constexpr uint32_t TickPeriodMillis = {{ setup.tick_period_millis }};
+static constexpr uint32_t TickPeriodMicros = {{ setup.tick_period_millis }}*1000;
+static constexpr float TickFrequencyHz = 1000.0f / static_cast<float>({{ setup.tick_period_millis }});
+
+} // namespace

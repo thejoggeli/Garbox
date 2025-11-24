@@ -32,7 +32,7 @@ void DevtoolsController::logProfiler(){
     StringUtils::FormatDurationDHMS(seconds, timeStringBuffer, sizeof(timeStringBuffer));
     LogInfo("Dev", "===================== Diagnostics %s =====================", timeStringBuffer);
     LogInfo("Dev", " | ProfilerId    | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
-    for (uint32_t i = 0; i < static_cast<uint32_t>(ProfilerId::Count); ++i){
+    for (uint32_t i = 1; i < static_cast<uint32_t>(ProfilerId::Count); ++i){
         const ProfilerId id = static_cast<ProfilerId>(i);
         const Profiler::Record& r = Profiler::GetRecord(id);
         const char* idStr = ProfilerIdToString(id);

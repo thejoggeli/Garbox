@@ -5,43 +5,59 @@ from common.loader import Loader
 
 
 def generate_hardware(ctx: Context, loader: Loader):
+    _generate_instances(ctx, loader)
+    _generate_hardware_init(ctx, loader)
+
+
+def _generate_instances(ctx: Context, loader: Loader):
     """
-    Generate all hardware related files.
-
-    Hardware Initialization:
-    - app/hardware/HardwareInit.h
-    - app/hardware/HardwareInit.cpp
-
-    ADC:
     - app/hardware/AdcInstances.h
     - app/hardware/AdcInstances.cpp
-
-    GPIO:
     - app/hardware/GpioInstances.h
     - app/hardware/GpioInstances.cpp
-
-    I2C:
     - app/hardware/I2cInstances.h
     - app/hardware/I2cInstances.cpp
-
-    SPI:
     - app/hardware/SpiInstances.h
     - app/hardware/SpiInstances.cpp
-
-    Timer:
     - app/hardware/TimerInstances.h
     - app/hardware/TimerInstances.cpp
-
-    LEDC:
     - app/hardware/LedcInstances.h
     - app/hardware/LedcInstances.cpp
     """
 
-    hw_dir = ctx.app_dir / "hardware"
+    init_mapping = {
+        "adc":        "AdcInstances",
+        "gpio":       "GpioInstances",
+        "i2c":        "I2cInstances",
+        "spi":        "SpiInstances",
+        "timer":      "TimerInstances",
+        "ledc_timer": "LedcInstances",
+    }
 
+    hw_dir = ctx.app_dir / "hardware"
     config = loader.get_hardware_config()
 
-    # list of Item objects to generate
+    init_config = {"init": []}
+    for key, name in init_mapping.items():
+        if key in config and len(config[key]) > 0:
+            init_config["init"].append(name)
+
+    items = [
+        Item(init_config, "*", hw_dir / "HardwareInit.h",   "hardware/HardwareInit.h.j2"),
+        Item(init_config, "*", hw_dir / "HardwareInit.cpp", "hardware/HardwareInit.cpp.j2"),
+    ]
+    generate_items(ctx, items)
+
+
+def _generate_hardware_init(ctx: Context, loader: Loader):
+    """
+    - app/hardware/HardwareInit.h
+    - app/hardware/HardwareInit.cpp
+    """
+
+    hw_dir = ctx.app_dir / "hardware"
+    config = loader.get_hardware_config()
+
     items = [
         Item(config, keys=["adc"],   meta_key="adc_meta",   out_path=hw_dir/"AdcInstances.h",     template_path="hardware/AdcInstances.h.j2"),
         Item(config, keys=["adc"],   meta_key="adc_meta",   out_path=hw_dir/"AdcInstances.cpp",   template_path="hardware/AdcInstances.cpp.j2"),
@@ -56,24 +72,4 @@ def generate_hardware(ctx: Context, loader: Loader):
         Item(config, keys=["ledc_channel", "ledc_timer"], meta_key="ledc_meta", out_path=hw_dir/"LedcInstances.h",   template_path="hardware/LedcInstances.h.j2"),
         Item(config, keys=["ledc_channel", "ledc_timer"], meta_key="ledc_meta", out_path=hw_dir/"LedcInstances.cpp", template_path="hardware/LedcInstances.cpp.j2"),
     ]
-
-    # HardwareInit files
-    init_mapping = {
-        "adc":        "AdcInstances",
-        "gpio":       "GpioInstances",
-        "i2c":        "I2cInstances",
-        "spi":        "SpiInstances",
-        "timer":      "TimerInstances",
-        "ledc_timer": "LedcInstances",
-    }
-
-    init_config = {"init": []}
-    for key, name in init_mapping.items():
-        if key in config and len(config[key]) > 0:
-            init_config["init"].append(name)
-
-    items.append(Item(init_config, "*", hw_dir / "HardwareInit.h",   "hardware/HardwareInit.h.j2"))
-    items.append(Item(init_config, "*", hw_dir / "HardwareInit.cpp", "hardware/HardwareInit.cpp.j2"))
-
-    # generate to src_dir
     generate_items(ctx, items)

@@ -50,7 +50,7 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
     stubs = []
     for comp_key, comp_dict in components.items():
         out_path = ctx.app_dir /  f"{type_key}s/abstract/{comp_key}Abs"
-        template_path = f"application/{type_key}/{type_name}Abs"
+        template_path = f"components/{type_key}/{type_name}Abs"
         item_dict = {
             "name": comp_key,
             f"{type_key}": comp_dict
@@ -63,7 +63,7 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
         # generate stub files, e.g. codegen/stubs/controller/ExampleFanController.hy
         path_parts = [ctx.stubs_dir, f"{type_key}s/", comp_dict.get("subdir", ""), f"{stubs_prefix}{comp_key}{stubs_suffix}"]
         out_path = Path(*path_parts)
-        template_path = f"application/{type_key}/{type_name}Stub"
+        template_path = f"components/{type_key}/{type_name}Stub"
         stubs.append(Item(item_dict, "*", f"{out_path}.h", f"{template_path}.h.j2"))
         stubs.append(Item(item_dict, "*", f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
