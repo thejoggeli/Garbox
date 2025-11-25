@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-class FermentationControlEngine {
+class FermentationEngine {
 public:
 
     struct Inputs {
@@ -42,7 +42,7 @@ public:
         float heatpadPwmPeriodSeconds;
     };
 
-    FermentationControlEngine();
+    FermentationEngine();
 
     void init();
     void reset();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/behaviours/abstract/FermentationBehaviourAbs.h"
-#include "app/engine/FermentationControlEngine.h"
+#include "app/engine/FermentationEngine.h"
 
 namespace Garbox {
 
@@ -28,7 +28,7 @@ private:
     bool mSwitchStateChanged = false;
     uint32_t mSwitchState = 0;
 
-    FermentationControlEngine mControlEngine;
+    FermentationEngine mEngine;
 
     void applySwitchState();
     void sendFanCommand(bool enabled, float speed);

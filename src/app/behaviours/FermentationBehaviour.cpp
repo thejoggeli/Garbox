@@ -13,7 +13,7 @@ FermentationBehaviour::FermentationBehaviour():
 }
 
 void FermentationBehaviour::onInit(){
-    mControlEngine.init();
+    mEngine.init();
 }
 
 void FermentationBehaviour::onStart(){
@@ -23,7 +23,7 @@ void FermentationBehaviour::onStart(){
 }
 
 void FermentationBehaviour::onBecomeActive(){
-    mControlEngine.reset();
+    mEngine.reset();
 }
 
 void FermentationBehaviour::onBecomeInactive(){
@@ -33,10 +33,10 @@ void FermentationBehaviour::onBecomeInactive(){
 void FermentationBehaviour::onLogicTick(){
 
     // perform control engine step
-    mControlEngine.step();
+    mEngine.step();
 
     // get control engine outputs
-    [[maybe_unused]] const FermentationControlEngine::Outputs& outputs = mControlEngine.getOutputs();
+    [[maybe_unused]] const FermentationEngine::Outputs& outputs = mEngine.getOutputs();
     // TODO
 
     if(mHeartbeatReceived){
@@ -59,14 +59,14 @@ void FermentationBehaviour::onFanStatus(const FanStatusEvent& event){
         FanStateToString(event->state),
         event->targetSpeed * 100.0f
     );
-    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    FermentationEngine::Inputs& inputs = mEngine.getInputs();
     inputs.fanEnabled = (event->state != FanState::Disabled);
     inputs.fanStalled = (event->state == FanState::Stalled);
     inputs.fanTargetSpeed = event->targetSpeed;
 }
 
 void FermentationBehaviour::onFanSample(const FanSampleEvent& event){
-    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    FermentationEngine::Inputs& inputs = mEngine.getInputs();
     inputs.fanMeasuredRpm = event->measuredRpm;
 }
 
@@ -76,14 +76,14 @@ void FermentationBehaviour::onHeatpadStatus(const HeatpadStatusEvent& event){
         event->dutyCycle * 100.0f,
         event->periodMicros / 1000
     );
-    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    FermentationEngine::Inputs& inputs = mEngine.getInputs();
     inputs.heatpadEnabled = event->state != HeatpadState::Disabled;
     inputs.heatpadPwmDuty = event->dutyCycle;
     inputs.heatpadPwmPeriodMicros = event->periodMicros; 
 }
 
 void FermentationBehaviour::onTemperatureStatus(const TemperatureStatusEvent& event){
-    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    FermentationEngine::Inputs& inputs = mEngine.getInputs();
     inputs.temperatureEnabled = event->powerEnabled && event->driverEnabled;
     inputs.temperatureError = !inputs.temperatureEnabled && !event->resetting; 
     LogDebug("FermentationBehaviour", "[TemperatureStatus] power=%u, driver=%u, reset=%u, error=%u",
@@ -96,7 +96,7 @@ void FermentationBehaviour::onTemperatureSample(const TemperatureSampleEvent& ev
         event->temperatureCelcius,
         event->humidityRelative
     );
-    FermentationControlEngine::Inputs& inputs = mControlEngine.getInputs();
+    FermentationEngine::Inputs& inputs = mEngine.getInputs();
     inputs.temperatureCelcius = event->temperatureCelcius;
     inputs.humidityRelative = event->humidityRelative;
 }

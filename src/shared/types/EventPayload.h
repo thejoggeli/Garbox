@@ -82,7 +82,6 @@ struct EncoderStepPayload {
     int32_t steps;
 };
 
-
 // generated mappings
 template<EventType>
 struct ResolveEventPayload; // primary template (intentionally undefined)
