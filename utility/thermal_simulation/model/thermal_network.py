@@ -19,6 +19,7 @@ class ThermalNetwork:
         self.T = []     # temperature for each node
         self.edges = [] # (i, j, R)
         self.power = {} # node_index -> injected power (W)
+        self.names = [] # index -> name
 
         # ambient node is optional; created when used
         self.ambient_index = None
@@ -39,16 +40,24 @@ class ThermalNetwork:
         self.nodes[name] = idx
         self.C.append(float(C))
         self.T.append(self.T_init)
+        self.names.append(name)
 
         return idx
-
+    
     def add_link(self, name1, name2, R):
         if name1 not in self.nodes or name2 not in self.nodes:
             raise ValueError("Both nodes must exist before linking")
 
         i = self.nodes[name1]
         j = self.nodes[name2]
+
+        # Check if link already exists in either direction
+        for (a, b, _) in self.edges:
+            if (a == i and b == j) or (a == j and b == i):
+                raise ValueError(f"Link between '{name1}' and '{name2}' already exists")
+
         self.edges.append((i, j, float(R)))
+
 
     def inject_power(self, name, P):
         if name not in self.nodes:
@@ -104,6 +113,10 @@ class ThermalNetwork:
 
         self.T = T_new
 
+    def get_temperature(self, nameOrIndex):
+        # integer index
+        if isinstance(nameOrIndex, int):
+            return self.T[nameOrIndex]
 
-    def get_temperature(self, name):
-        return self.T[self.nodes[name]]
+        # string name
+        return self.T[self.nodes[nameOrIndex]]
