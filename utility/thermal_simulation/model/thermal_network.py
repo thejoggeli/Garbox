@@ -20,6 +20,7 @@ class ThermalNetwork:
         self.edges = [] # (i, j, R)
         self.power = {} # node_index -> injected power (W)
         self.names = [] # index -> name
+        self.meta = []
 
         # ambient node is optional; created when used
         self.ambient_index = None
@@ -32,7 +33,7 @@ class ThermalNetwork:
             self.T[self.ambient_index] = self.ambient_temperature
         self.power = {}
 
-    def add_node(self, name, C):
+    def add_node(self, name, C, meta={}):
         if name in self.nodes:
             raise ValueError(f"Node {name} already exists")
 
@@ -41,6 +42,7 @@ class ThermalNetwork:
         self.C.append(float(C))
         self.T.append(self.T_init)
         self.names.append(name)
+        self.meta.append(meta) 
 
         return idx
     

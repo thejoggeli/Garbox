@@ -49,16 +49,13 @@ class PidControl:
             self.Kd * derivative
         )
 
-        # Anti-windup: if saturated, freeze integrator
-        if u > self.max_output:
-            u = self.max_output
-            # prevent further windup
+        # saturate output
+        u = min(self.max_output, max(self.min_output, u))
+
+        # prevent further windup
+        if(u == self.min_output or u == self.max_output):
             if error > 0:
                 self.integral = old_integral
-
-        elif u < self.min_output:
-            u = self.min_output
-            # prevent wind-down
             if error < 0:
                 self.integral = old_integral
 

@@ -82,17 +82,21 @@ class Simulator:
         fig.add_trace(go.Scatter(
             x=temp_time[::plot_slicing],
             y=temp_target_list[::plot_slicing],
-            line=dict(color=px.colors.qualitative.Plotly[self.node_color_indices[0]]),
-            name="Target Temperature"),
-            row=2, col=1)
+            line=dict(color="black"),
+            name="Target Temperature"
+        ), row=2, col=1)
         
         for n in range(num_nodes):
+            color_default = px.colors.qualitative.Plotly[self.node_color_indices[n%10]]
+            color = self.model.meta[n].get("color", color_default)
+            visible = self.model.meta[n].get("visible", True)
             fig.add_trace(go.Scatter(
                 x=temp_time[::plot_slicing],
                 y=temp_nodes[n][::plot_slicing],
-                line=dict(color=px.colors.qualitative.Plotly[self.node_color_indices[n+1]]),
-                name=f"{self.model.names[n]} Temperature"),
-                row=2, col=1)
+                line=dict(color=color),
+                visible=visible,
+                name=f"{self.model.names[n]} Temperature"
+            ), row=2, col=1)
 
         padding = control.max_output * 10
         fig.update_yaxes(title_text="Duty (%)", row=1, col=1, range=[-padding, control.max_output*100+padding])
