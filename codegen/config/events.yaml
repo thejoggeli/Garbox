@@ -19,6 +19,7 @@ types:
   FanStatus:  
     state: FanState
     targetSpeed: float
+    usingPid: bool
 
   FanSample:  
     measuredRpm: float
@@ -26,6 +27,7 @@ types:
   FanCommand:  
     enabled: bool
     targetSpeed: float
+    usePid: bool
 
   ### Heatpad ###
   HeatpadStatus:  

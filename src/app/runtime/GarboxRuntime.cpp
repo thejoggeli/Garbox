@@ -53,7 +53,7 @@ void GarboxRuntime::onRegister(){
 
 void GarboxRuntime::onInit(){
     // behaviours and controllers are already initialized when this method is called
-    setQueuedBehaviour(&mCalibrationBehaviour);
+    setQueuedBehaviour(&mFermentationBehaviour);
     Profiler::Init();
 }
 
@@ -63,6 +63,7 @@ void GarboxRuntime::onStart(){
 }
 
 void GarboxRuntime::onRun(){
+    Time::Start();
     Profiler::Reset();
     mTickRunner.run();
 }

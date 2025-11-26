@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/controllers/abstract/FanControllerAbs.h"
+#include "core/util/control/PidControl.h"
 #include "modules/parts/fan/Fan.h"
 
 namespace Garbox {
@@ -22,6 +23,10 @@ private:
 
     Fan& mFan;
     AnimatedLed& mStatusLed;
+    PidControl mPid;
+
+    bool mUsePid = false;
+    float mTargetRpm = 0.0f;
 
     float mLastMeasuredRpm = 0.0f;
     bool mStateChanged = false;

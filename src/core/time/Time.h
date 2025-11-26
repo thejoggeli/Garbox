@@ -6,6 +6,8 @@ namespace Garbox {
 
 class Time {
 public:
+
+    static void Start();
     static void Tick();
 
     // microsecond timer
@@ -33,10 +35,14 @@ public:
     // works only up to cycles corresponding to ~17.89 seconds (at 240MHz CPU clock)
     static uint32_t CpuCyclesToMicros(uint32_t cycles);
 
-    // last tick snapshot accessors
+    // last tick time snapshot accessors
     static uint32_t GetTickMicros();
     static uint32_t GetTickMillis();
     static uint32_t GetTickSeconds();
+
+    // last tick delta snapshot accessors
+    static uint32_t GetTickDeltaMicros();
+    static float GetTickDeltaSeconds();
 
     // delays
     static void DelayMillis(uint32_t millis);  // yields to FreeRTOS scheduler

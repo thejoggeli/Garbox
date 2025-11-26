@@ -4,17 +4,25 @@
 #include "app/providers/PiezoSequences.h"
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
+#include "core/time/Time.h"
 #include "core/util/math/MathUtils.h"
 #include "modules/parts/led/single/AnimatedLed.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
 namespace Garbox {
 
+static constexpr float PidKp = 0.005f; 
+static constexpr float PidKi = 0.01f;
+static constexpr float PidKd = 0.0f;
+static constexpr float PidMin = 0.0f;
+static constexpr float PidMax = 1.0;
+
 FanController::FanController(): 
     // init members
     FanControllerAbs(),
     mFan(PartsProvider::GetFan()),
-    mStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom1)){
+    mStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom1)),
+    mPid(PidKp, PidKi, PidKd, PidMin, PidMax){
     // nothing to do
 }
 
@@ -50,21 +58,47 @@ void FanController::onInputTick(){
 }
 
 void FanController::onOutputTick(){
-    // nothing to do
+    if(mUsePid && mFan.isEnabled()){
+        const bool filtered = false;
+        const float measuredRpm = mFan.getMeasuredRpm(filtered);
+        const float dt = Time::GetTickDeltaSeconds();
+        float speed = mPid.step(measuredRpm, mTargetRpm, dt);
+        LogDebug("FanController", "speed=%.2f, measure=%.0f, target=%.0f, dt=%.3f", speed, measuredRpm, mTargetRpm, dt);
+        mFan.setTargetSpeed(speed);
+    }
 }
 
 void FanController::onFanCommand(const FanCommandEvent& event){
     // apply enabled
     if(mFan.isEnabled() != event->enabled){
         mFan.setEnabled(event->enabled);
+        if(!event->enabled){
+            mPid.reset(); // reset pid when disabling fan
+            mTargetRpm = 0.0f;
+        }
         mStateChanged = true;
     }
-    // apply speed
-    if(mFan.getTargetSpeed() != event->targetSpeed){
+    // apply use pid
+    if(event->usePid != mUsePid){
+        if(!event->usePid){
+            mPid.reset(); // reset pid when leaving pid mode 
+            mTargetRpm = 0.0f;
+        }
+        mUsePid = event->usePid;
+        mStateChanged = true;
+    }
+    // apply target speed
+    if(mUsePid){
+        if(mTargetRpm != event->targetSpeed){
+            mTargetRpm = event->targetSpeed;
+            mStateChanged = true;
+        }
+    }
+    else if(mFan.getTargetSpeed() != event->targetSpeed){
         mFan.setTargetSpeed(event->targetSpeed);
         mStateChanged = true;
     }
-    // send status 
+    // set status led
     if(mStateChanged){
         if(mFan.isEnabled()){
             float brightness = MathUtils::Map(mFan.getTargetSpeed(), 0.4f, 1.0f, 0.25f, 1.0f);
@@ -89,6 +123,7 @@ void FanController::sendStatusEvent(){
     FanStatusEvent event = makeFanStatusEvent();
     event->state = mFan.getState();
     event->targetSpeed = mFan.getTargetSpeed();
+    event->usingPid = mUsePid;
     sendEvent(event);
 }
 

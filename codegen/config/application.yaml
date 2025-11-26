@@ -1,7 +1,7 @@
 ### Setup ###
 setup:
   app_name: Garbox # The generated runtime instance will be called NameRuntime
-  initial_behaviour: CalibrationBehaviour
+  initial_behaviour: FermentationBehaviour
   tick_period_millis: 33 # ~30.3 FPS
   tick_phases: [
     { name: Heartbeat },

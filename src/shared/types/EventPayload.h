@@ -29,6 +29,7 @@ struct BacklightCommandPayload {
 struct FanStatusPayload {
     FanState state;
     float targetSpeed;
+    bool usingPid;
 };
 
 struct FanSamplePayload {
@@ -38,6 +39,7 @@ struct FanSamplePayload {
 struct FanCommandPayload {
     bool enabled;
     float targetSpeed;
+    bool usePid;
 };
 
 struct HeatpadStatusPayload {

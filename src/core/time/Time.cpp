@@ -14,6 +14,9 @@ static volatile uint32_t gTickMicros = 0;
 static volatile uint32_t gTickMillis = 0;
 static volatile uint32_t gTickSeconds = 0;
 
+static volatile uint32_t gTickDeltaMicros = 0;
+static volatile float gTickDeltaSeconds = 0;
+
 // Global spinlock for atomic access to tick snapshot
 static portMUX_TYPE gTimeMux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -23,11 +26,24 @@ static inline uint32_t IRAM_ATTR readCycleCount(){
     return ccount;
 }
 
-void Time::Tick(){
+void Time::Start(){
     taskENTER_CRITICAL(&gTimeMux);
     gTickMicros = GetMicros();
     gTickMillis = GetMillis();
     gTickSeconds = GetSeconds();
+    taskEXIT_CRITICAL(&gTimeMux);
+}
+
+void Time::Tick(){
+    taskENTER_CRITICAL(&gTimeMux);
+    const uint32_t nowMicros = GetMicros();
+    const uint32_t nowMillis = GetMillis();
+    const uint32_t newSeconds = GetSeconds();
+    gTickDeltaMicros = nowMicros - gTickMicros;
+    gTickDeltaSeconds = static_cast<float>(gTickDeltaMicros) * 1e-6f;
+    gTickMicros = nowMicros;
+    gTickMillis = nowMillis;
+    gTickSeconds = newSeconds;
     taskEXIT_CRITICAL(&gTimeMux);
 }
 
@@ -61,6 +77,14 @@ uint32_t Time::GetTickMillis(){
 
 uint32_t Time::GetTickSeconds(){ 
     return gTickSeconds; 
+}
+
+uint32_t Time::GetTickDeltaMicros(){
+    return gTickDeltaMicros;
+}
+
+float Time::GetTickDeltaSeconds(){
+    return gTickDeltaSeconds;
 }
 
 void Time::DelayMillis(uint32_t millis){ 

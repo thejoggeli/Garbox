@@ -53,6 +53,7 @@ void {{ RuntimeName }}::onStart(){
 }
 
 void {{ RuntimeName }}::onRun(){
+    Time::Start();
     Profiler::Reset();
     mTickRunner.run();
 }
