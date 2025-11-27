@@ -43,9 +43,9 @@ void FermentationBehaviour::onLogicTick(){
     
     // send actuator commands
     const HeaterEngine::Output& output = mHeaterEngine.getOutput();
-    sendHeatpadCommand(output);
-    sendFanCommand(output);
-    sendFermentationStatus(output);
+    sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
+    sendFanCommand(output.fanEnabled, output.fanTargetSpeed);
+    sendFermentationStatus();
 
     // handle heartbeat received
     if(mHeartbeatReceived){
@@ -55,37 +55,26 @@ void FermentationBehaviour::onLogicTick(){
 }
 
 void FermentationBehaviour::sendDisableActuatorsCommands(){
-
-    // disable heatpad
-    HeatpadCommandEvent heatpadCmd = makeHeatpadCommandEvent();
-    heatpadCmd->enabled = false;
-    heatpadCmd->dutyCycle = 0.0f;
-    heatpadCmd->periodMicros = 5000_ms;
-    sendEvent(heatpadCmd);
-
-    // disable fan
-    FanCommandEvent fanCmd = makeFanCommandEvent();
-    fanCmd->enabled = false;
-    fanCmd->targetSpeed = 0.0f;
-    sendEvent(fanCmd);
+    sendFanCommand(false, 0.0f);
+    sendHeatpadCommand(false, 0.0f, 5000_ms);
 }
 
-void FermentationBehaviour::sendHeatpadCommand(const HeaterEngine::Output& output){
+void FermentationBehaviour::sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros){
     HeatpadCommandEvent event = makeHeatpadCommandEvent();
-    event->enabled = output.heaterEnabled;
-    event->dutyCycle = output.heaterPwmDuty;
-    event->periodMicros = output.heaterPwmPeriodMicros;
+    event->enabled = enabled;
+    event->dutyCycle = dutyCycle;
+    event->periodMicros = periodMicros;
     sendEvent(event);
 }
 
-void FermentationBehaviour::sendFanCommand(const HeaterEngine::Output& output){
+void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
     FanCommandEvent event = makeFanCommandEvent();
-    event->enabled = output.fanEnabled;
-    event->targetSpeed = output.fanTargetSpeed;
+    event->enabled = enabled;
+    event->targetSpeed = speed;
     sendEvent(event);
 }
 
-void FermentationBehaviour::sendFermentationStatus(const HeaterEngine::Output& output){
+void FermentationBehaviour::sendFermentationStatus(){
     const HeaterEngine::Input& input = mHeaterEngine.getInput();
     FermentationStatusEvent event = makeFermentationStatusEvent();
     event->heaterEngineState = mHeaterEngine.getState();
@@ -172,13 +161,6 @@ void FermentationBehaviour::doFanTestStep(){
     default:
         TriggerDebug("FanController", "unhandled fan state", switchState);
     }
-}
-
-void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
-    FanCommandEvent event = makeFanCommandEvent();
-    event->enabled = enabled;
-    event->targetSpeed = speed;
-    sendEvent(event);
 }
 
 } // namespace

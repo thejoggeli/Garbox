@@ -29,7 +29,6 @@ private:
     HeaterEngine mHeaterEngine;
 
     void doFanTestStep();
-    void sendFanCommand(bool enabled, float speed);
     void sendDisableActuatorsCommands();
     
     void onInit() final;
@@ -37,9 +36,9 @@ private:
     void onBecomeActive() final;
     void onBecomeInactive() final;
 
-    void sendHeatpadCommand(const HeaterEngine::Output& output);
-    void sendFanCommand(const HeaterEngine::Output& output);
-    void sendFermentationStatus(const HeaterEngine::Output& output);
+    void sendFanCommand(bool enabled, float speed);
+    void sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros);
+    void sendFermentationStatus();
 
 };
 
