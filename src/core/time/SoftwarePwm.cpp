@@ -22,6 +22,7 @@ void SoftwarePwm::start(){
     if(isRunning()){
         return;
     }
+    mFirstTick = true;
     startNextCycle();
 }
 
@@ -34,7 +35,7 @@ void SoftwarePwm::stop(){
 }
 
 void SoftwarePwm::tick(){
-    
+
     // abort if not running
     if(!isRunning()){
         return;
@@ -48,6 +49,7 @@ void SoftwarePwm::tick(){
     else {
         updateState();
     }
+    mFirstTick = false;
 }
 
 void SoftwarePwm::startNextCycle(){
@@ -139,6 +141,11 @@ void SoftwarePwm::setPeriodDurationMicros(uint32_t durationMicros, bool finishCu
         return; 
     }
 
+    // pwm not started yet, we can still set the current period cycle
+    if(mFirstTick || !isRunning()){
+        mCurrentPeriodDurationMicros = durationMicros;
+    }
+
     // queue period duration for next pwm cycle 
     mNextPeriodDurationMicros = durationMicros;
 
@@ -153,6 +160,11 @@ void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
     if(duty < 0.0f || duty > 1.0f){
         TriggerDebug("SoftwarePwm", "invalid duty value");
         return; 
+    }
+
+    // pwm not started yet, we can still set the current duty cycle
+    if(mFirstTick || !isRunning()){
+        mCurrentDutyCycle = duty;
     }
 
     // queue duty cycle for next pwm cycle 
@@ -188,6 +200,14 @@ uint32_t SoftwarePwm::getCurrentPeriodDurationMicros() const {
 
 uint32_t SoftwarePwm::getNextPeriodDurationMicros() const {
     return mNextPeriodDurationMicros;
+}
+
+uint32_t SoftwarePwm::getProgressMicros() const {
+    return mTimer.getElapsedMicros();
+}
+
+float SoftwarePwm::getProgressRelative() const {
+    return mTimer.getElapsedFraction();
 }
 
 SoftwarePwm::State SoftwarePwm::getState() const {

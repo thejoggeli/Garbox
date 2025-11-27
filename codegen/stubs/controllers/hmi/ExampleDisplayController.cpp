@@ -52,4 +52,8 @@ void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEve
     // nothing to do
 }
 
+void DisplayController::onFermentationStatus(const FermentationStatusEvent& event){
+    // nothing to do
+}
+
 } // namespace Garbox

@@ -6,6 +6,7 @@ namespace Garbox {
 
 class PidControl {
 public:
+
     PidControl(
         float Kp,
         float Ki,
@@ -14,15 +15,11 @@ public:
         float maxOutput
     );
 
-    void init();
-
-    float step(
-        float measured,
-        float target,
-        float dtSeconds
-    );
-
     void reset();
+    float step(float measured, float target, float dtSeconds);
+
+    float getOutput() const { return mOutput; }
+    bool isReset() const { return mFirst; }
 
 private:
 

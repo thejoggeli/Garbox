@@ -14,14 +14,21 @@
 
 using namespace Garbox;
 
-static GarboxRuntime gRuntime({
-    .eventPoolSizeBytes = AppConfig::RuntimeEventPoolSizeBytes,
-    .eventQueueLength = AppConfig::RuntimeEventQueueLength,    
-});
-static Task gMainTask;
-
 void handleMainTask();
 void logProfiler();
+
+GarboxRuntime& getRuntime(){
+    static GarboxRuntime instance({
+        .eventPoolSizeBytes = AppConfig::RuntimeEventPoolSizeBytes,
+        .eventQueueLength = AppConfig::RuntimeEventQueueLength,    
+    });
+    return instance;
+}
+
+Task& getMainTask(){
+    static Task instance;
+    return instance;
+}
 
 void handleAssertDebug(const char* context, const char* message, int32_t arg){
 
@@ -98,7 +105,7 @@ void setup(){
     // start system tasks
     TaskManager::StartAll();
     TaskManager::RegisterStopHandler([](){
-        gMainTask.stop();
+        getMainTask().stop();
     });
 
     // run startup sequence
@@ -106,25 +113,19 @@ void setup(){
     startup.run();
 
     // init main app
-    gRuntime.init();
+    getRuntime().init();
 
     // init main task
-    gMainTask.configure(
+    getMainTask().configure(
         AppConfig::MainTaskName,
         AppConfig::MainTaskStackSize,
         AppConfig::MainTaskPriority,
         AppConfig::MainTaskCore
     );
-    gMainTask.setHandler(handleMainTask);
-
-    // start main app
-    gRuntime.start();
+    getMainTask().setHandler(handleMainTask);
 
     // start main task
-    gMainTask.start();
-
-    // setup complete
-    LogDebug("Main", "setup complete");
+    getMainTask().start();
 }
 
 void loop(){
@@ -132,5 +133,7 @@ void loop(){
 }
 
 void handleMainTask(){
-    gRuntime.run();
+    LogDebug("Main", "main task started");
+    getRuntime().start();
+    getRuntime().run();
 }

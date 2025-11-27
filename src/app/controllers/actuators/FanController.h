@@ -26,7 +26,7 @@ private:
     PidControl mPid;
 
     bool mUsePid = false;
-    float mTargetRpm = 0.0f;
+    float mTargetSpeed = 0.0f;
 
     float mLastMeasuredRpm = 0.0f;
     bool mStateChanged = false;

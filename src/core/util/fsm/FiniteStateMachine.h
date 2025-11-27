@@ -21,6 +21,9 @@ public:
     // initialize with initial optional state
     void init(StateType initialState = 0);
 
+    // reset the state machine
+    void reset();
+
     // must be called periodically to handle TransitionDelay and StateHoldTime timers
     void tick();
 
@@ -60,6 +63,7 @@ public:
 
 private:
 
+    StateType mInitialState = static_cast<StateType>(0);
     StateType mCurrentState = static_cast<StateType>(0);
     StateType mPendingState = static_cast<StateType>(0);
 

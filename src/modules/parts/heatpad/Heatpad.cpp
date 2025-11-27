@@ -83,7 +83,7 @@ void Heatpad::setEnabled(bool enabled){
 
 void Heatpad::setDutyCycle(float duty){
     bool const finishCurrent = true;
-    mPwm.setDutyCycle(duty, finishCurrent);
+    mPwm.setDutyCycle(duty, finishCurrent);    
 }
 
 void Heatpad::setStateChangedHandler(StateChangedHandler handler){
@@ -158,6 +158,14 @@ uint32_t Heatpad::getCurrentPeriodDurationMicros() const {
 
 uint32_t Heatpad::getNextPeriodDurationMicros() const {
     return mPwm.getNextPeriodDurationMicros();
+}
+
+uint32_t Heatpad::getPwmProgressMicros() const {
+    return mPwm.getProgressMicros();
+}
+
+float Heatpad::getPwmProgressRelative() const {
+    return mPwm.getProgressRelative();
 }
 
 float Heatpad::getMeasuredVoltage() const {

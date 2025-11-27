@@ -43,7 +43,6 @@ private:
 
     // lvgl objects
     lv_obj_t* mBackground;
-    lv_obj_t* mBox;
 
     // drawing buffer
     lv_draw_buf_t mDrawBuffer1;

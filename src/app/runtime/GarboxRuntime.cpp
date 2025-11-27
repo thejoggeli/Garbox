@@ -142,6 +142,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         }
         break;
     }
+    case EventType::FermentationStatus: {
+        const FermentationStatusEvent event(header);
+        mDisplayController.onFermentationStatus(event);
+        break;
+    }
     case EventType::BacklightCommand: {
         const BacklightCommandEvent event(header);
         mDisplayController.onBacklightCommand(event);

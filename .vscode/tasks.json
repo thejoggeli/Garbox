@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "Generate Code",
+        "type": "shell",
+        "command": "${workspaceFolder}/.venv/bin/python3 ${workspaceFolder}/codegen/src/main.py",
+        "args": [],
+        "problemMatcher": []
+    }]
+}

@@ -36,7 +36,6 @@ void FsmButton::tick(){
     }
 
     mFsm.tick();
-
     switch(mFsm.getState()){
     case ButtonState::Released:
         handleReleasedState();

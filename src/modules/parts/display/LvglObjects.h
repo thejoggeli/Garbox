@@ -18,7 +18,7 @@ public:
     void setFanMeasuredRpm(float rpmValue);
 
     void setHeatpadState(const char *stateText);
-    void setHeatpadDuty(float duty, uint32_t periodMicros);
+    void setHeatpadDuty(float currentDuty, float nextDuty, uint32_t currentPeriodMicros, uint32_t nextPeriodMicros);
     void setHeatpadSense(float voltageVolts, float currentAmps);
 
     void setDisplayState(float brightness, uint32_t skipped, uint32_t dirtyCount);
@@ -28,6 +28,10 @@ public:
 
     void setHeapSpace(uint32_t free);
     void setAppInfo(const char* behaviour, uint32_t eventCount);
+
+    void setFermentationStatus(const char* engineState, float measuredTemp, float targetTemp);
+
+    void setBoxPosition(float position);
 
 private:
     lv_obj_t* mFanStateLabel = nullptr;
@@ -40,6 +44,9 @@ private:
     lv_obj_t* mTemperatureSampleLabel = nullptr;
     lv_obj_t* mHeapSpaceLabel = nullptr;
     lv_obj_t* mAppInfoLabel = nullptr;
+    lv_obj_t* mFermentationStatusLabel = nullptr;
+
+    lv_obj_t* mBox;
 
     lv_obj_t* createLabel(lv_obj_t* parent, int16_t x, int16_t y, const char* text);
     void setFormatted(lv_obj_t* lbl, const char* fmt, ...);

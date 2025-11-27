@@ -35,8 +35,8 @@ void I2cPartsController::onStart(){
 
 void I2cPartsController::onInputTick(){
 
-    mFsm.tick();
     // handle current fsm state
+    mFsm.tick();
     switch(mFsm.getState()){
     case FsmState::ResetPowerOffPhase:
         mFsm.transition(FsmState::ResetPowerOnPhase);

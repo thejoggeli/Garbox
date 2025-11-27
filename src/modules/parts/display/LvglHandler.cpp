@@ -69,35 +69,11 @@ void LvglHandler::init(){
     lv_obj_set_style_bg_color(mBackground, lv_color_hex(0x0), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(mBackground, LV_OPA_COVER, LV_PART_MAIN);
 
-    // create box1
-    mBox = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(mBox, 48, 8);
-    lv_obj_set_style_bg_color(mBox, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(mBox, LV_OPA_COVER, LV_PART_MAIN);
-
     // init objects
     mObjects.init(lv_scr_act());
 }
 
-void LvglHandler::startRender(){
-
-    static float x = 320.0f/2 + 48.0f/2;
-    static uint32_t y = 240-8;
-    static float xSpeed = 1.6f;
-    static float xDir = 1.0f;
-    static float xMax = 320.0f-48.0f;
-    x += xDir * xSpeed;
-    if(x > xMax){
-        xDir = std::round(-xDir);
-        x = xMax;
-    }
-    else if (x < 0.0f){
-        xDir = std::round(-xDir);
-        x = 0.0f;
-    }
-    
-    lv_obj_set_pos(mBox, x, y);
-    
+void LvglHandler::startRender(){    
     lv_timer_handler();
 }
 

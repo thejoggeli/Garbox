@@ -22,10 +22,13 @@ public:
         float fanTargetSpeed;
         float fanMeasuredRpm;
         HeatpadState heatpadState;
-        float heatpadDuty;
-        uint32_t heatpadPeriod;
-        float heatpadVoltage;
-        float heatpadCurrent;
+        float heatpadCurrentDuty;
+        float heatpadNextDuty;
+        uint32_t heatpadCurrentPeriod;
+        uint32_t heatpadNextPeriod;
+        uint32_t heatpadPwmProgressMicros;
+        float heatpadMeasuredVoltage;
+        float heatpadMeasuredCurrent;
         bool shtPower;
         bool shtDriver;
         bool shtReset;
@@ -36,6 +39,10 @@ public:
         uint32_t heapSpace = 0;
         BehaviourId behaviour;
         uint32_t eventCount = 0;
+        HeaterEngineState engineState;
+        float engineTargetTemp;
+        float engineMeasuredTemp;
+        float engineMeasuredHum;
     };
     
     DisplayController();
@@ -50,6 +57,7 @@ public:
     void onTemperatureSample(const TemperatureSampleEvent& event) final;
     void onBacklightCommand(const BacklightCommandEvent& event) final;
     void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
+    void onFermentationStatus(const FermentationStatusEvent& event) final;
 
 private:
 
@@ -58,12 +66,14 @@ private:
         FanMeasuredRpm,
         HeatpadState,
         HeatpadDuty,
+        HeatpadProgress,
         HeatpadSense,
         DisplayState,
         ShtState,
         ShtSample,
         HeapSpace,
         AppState,
+        FermentationStatus,
         Count,
     };
 

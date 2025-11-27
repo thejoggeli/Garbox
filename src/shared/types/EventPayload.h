@@ -6,6 +6,7 @@
 #include <cstring>
 #include "shared/types/EventType.h"
 #include "shared/types/BehaviourId.h"
+#include "app/engine/HeaterEngineState.h"
 #include "modules/parts/button/ButtonState.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
@@ -22,6 +23,13 @@ struct HeartbeatPayload {
     // no fields
 };
 
+struct FermentationStatusPayload {
+    HeaterEngineState heaterEngineState;
+    float targetTemperature;
+    float measuredTemperature;
+    float measuredHumidity;
+};
+
 struct BacklightCommandPayload {
     float brightness;
 };
@@ -29,7 +37,7 @@ struct BacklightCommandPayload {
 struct FanStatusPayload {
     FanState state;
     float targetSpeed;
-    bool usingPid;
+    bool rpmControlEnabled;
 };
 
 struct FanSamplePayload {
@@ -39,13 +47,16 @@ struct FanSamplePayload {
 struct FanCommandPayload {
     bool enabled;
     float targetSpeed;
-    bool usePid;
+    bool enableRpmControl;
 };
 
 struct HeatpadStatusPayload {
     HeatpadState state;
-    float dutyCycle;
-    uint32_t periodMicros;
+    float currentDutyCycle;
+    uint32_t currentPeriodMicros;
+    float nextDutyCycle;
+    uint32_t nextPeriodMicros;
+    float pwmProgressMicros;
 };
 
 struct HeatpadSamplePayload {
@@ -78,6 +89,7 @@ struct ButtonStateChangedPayload {
 
 struct ButtonRepeatPayload {
     uint32_t count;
+    uint32_t holdTimeMicros;
 };
 
 struct EncoderStepPayload {
@@ -96,6 +108,11 @@ struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
 template<>
 struct ResolveEventPayload<EventType::Heartbeat> {
     using type = HeartbeatPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::FermentationStatus> {
+    using type = FermentationStatusPayload;
 };
 
 template<>

@@ -26,13 +26,26 @@ void DisplayController::registerHandlers(){
     registerHandler([this](){ mObjects.setFanState(FanStateToString(mShadowState.fanState), mShadowState.fanTargetSpeed); });
     registerHandler([this](){ mObjects.setFanMeasuredRpm(mShadowState.fanMeasuredRpm); });
     registerHandler([this](){ mObjects.setHeatpadState(HeatpadStateToString(mShadowState.heatpadState)); });
-    registerHandler([this](){ mObjects.setHeatpadDuty(mShadowState.heatpadDuty, mShadowState.heatpadPeriod); });
-    registerHandler([this](){ mObjects.setHeatpadSense(mShadowState.heatpadVoltage, mShadowState.heatpadCurrent); });
+    registerHandler([this](){ mObjects.setHeatpadDuty(
+        mShadowState.heatpadCurrentDuty, 
+        mShadowState.heatpadNextDuty, 
+        mShadowState.heatpadCurrentPeriod, 
+        mShadowState.heatpadNextPeriod
+    );});
+    registerHandler([this](){ mObjects.setBoxPosition(
+        static_cast<float>(mShadowState.heatpadPwmProgressMicros) / static_cast<float>(mShadowState.heatpadCurrentPeriod)
+    );});
+    registerHandler([this](){ mObjects.setHeatpadSense(mShadowState.heatpadMeasuredVoltage, mShadowState.heatpadMeasuredCurrent); });
     registerHandler([this](){ mObjects.setDisplayState(mShadowState.brightness, mRenderSkippedCount, mDirtyCount); });
     registerHandler([this](){ mObjects.setTemperatureState(mShadowState.shtPower, mShadowState.shtDriver, mShadowState.shtReset); });
     registerHandler([this](){ mObjects.setTemperatureSample(mShadowState.shtTemp, mShadowState.shtHum); });
     registerHandler([this](){ mObjects.setHeapSpace(mShadowState.heapSpace); });
     registerHandler([this](){ mObjects.setAppInfo(BehaviourIdToString(mShadowState.behaviour), mShadowState.eventCount); });
+    registerHandler([this](){ mObjects.setFermentationStatus(
+        HeaterEngineStateToString(mShadowState.engineState), 
+        mShadowState.engineMeasuredTemp, 
+        mShadowState.engineTargetTemp
+    );});
 }
 
 void DisplayController::registerHandler(UpdateFunction function){
@@ -117,16 +130,30 @@ void DisplayController::onFanSample(const FanSampleEvent& event){
 }
 
 void DisplayController::onHeatpadStatus(const HeatpadStatusEvent& event){
-    mShadowState.heatpadDuty = event->dutyCycle;
-    mShadowState.heatpadState = event->state;
-    mShadowState.heatpadPeriod = event->periodMicros;
-    markDirty(Index::HeatpadState);
-    markDirty(Index::HeatpadDuty);
+    if (mShadowState.heatpadCurrentDuty != event->currentDutyCycle ||
+        mShadowState.heatpadCurrentPeriod != event->currentPeriodMicros ||
+        mShadowState.heatpadNextDuty != event->nextDutyCycle ||
+        mShadowState.heatpadNextPeriod != event->nextPeriodMicros){
+        // update shadow state
+        mShadowState.heatpadCurrentDuty = event->currentDutyCycle;
+        mShadowState.heatpadCurrentPeriod = event->currentPeriodMicros;
+        mShadowState.heatpadNextDuty = event->nextDutyCycle;
+        mShadowState.heatpadNextPeriod = event->nextPeriodMicros;
+        markDirty(Index::HeatpadDuty);
+    }
+    if(mShadowState.heatpadPwmProgressMicros != event->pwmProgressMicros){
+        mShadowState.heatpadPwmProgressMicros = event->pwmProgressMicros;
+        markDirty(Index::HeatpadProgress);
+    }
+    if(mShadowState.heatpadState != event->state){
+        mShadowState.heatpadState = event->state;
+        markDirty(Index::HeatpadState);
+    }
 }
 
 void DisplayController::onHeatpadSample(const HeatpadSampleEvent& event){
-    mShadowState.heatpadVoltage = event->measuredVoltage;
-    mShadowState.heatpadCurrent = event->measuredCurrent;
+    mShadowState.heatpadMeasuredVoltage = event->measuredVoltage;
+    mShadowState.heatpadMeasuredCurrent = event->measuredCurrent;
     markDirty(Index::HeatpadSense);
 }
 
@@ -146,6 +173,21 @@ void DisplayController::onActiveBehaviourChanged(const ActiveBehaviourChangedEve
     mShadowState.behaviour = event->newBehaviour;
     markDirty(Index::AppState);
 }
+
+
+void DisplayController::onFermentationStatus(const FermentationStatusEvent& event){
+    if (mShadowState.engineState == event->heaterEngineState &&
+        mShadowState.engineTargetTemp == event->targetTemperature &&
+        mShadowState.engineMeasuredTemp == event->measuredTemperature &&
+        mShadowState.engineMeasuredHum == event->measuredHumidity){
+        return; 
+    }
+    mShadowState.engineState = event->heaterEngineState;
+    mShadowState.engineTargetTemp = event->targetTemperature;
+    mShadowState.engineMeasuredTemp = event->measuredTemperature;
+    mShadowState.engineMeasuredHum = event->measuredHumidity;
+    markDirty(Index::FermentationStatus);
+};
 
 void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
     setBrightnessSmooth(event->brightness, 1000_ms);

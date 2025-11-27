@@ -64,7 +64,7 @@ void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState
         // nothing to do
         break;
     }
-    // send event
+    // send button state changed event
     ButtonStateChangedEvent event = makeButtonStateChangedEvent();
     event->oldState = oldState;
     event->newState = newState;
@@ -80,6 +80,11 @@ void InputController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros
     else if(!mPiezoPlayer.isPlaying()){
         mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
     }
+    // send button repeat event
+    ButtonRepeatEvent event = makeButtonRepeatEvent();
+    event->count = counter;
+    event->holdTimeMicros = holdTimeMicros;
+    sendEvent(event);
 }
 
 } // namespace

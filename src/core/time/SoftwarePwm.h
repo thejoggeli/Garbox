@@ -44,6 +44,9 @@ public:
     uint32_t getCurrentPeriodDurationMicros() const;
     uint32_t getNextPeriodDurationMicros() const;
 
+    uint32_t getProgressMicros() const;
+    float getProgressRelative() const;
+
     State getState() const;
     bool isReset() const;
     bool isRunning() const;
@@ -67,6 +70,8 @@ private:
     State mState = State::Reset;
     Mode mMode = Mode::StartLow;
     Handler mHandler = nullptr;
+
+    bool mFirstTick = true;
 
 };
 

@@ -12,6 +12,7 @@ const char* EventTypeToString(EventType type){
 
         case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";
         case EventType::Heartbeat: return "Heartbeat";
+        case EventType::FermentationStatus: return "FermentationStatus";
         case EventType::BacklightCommand: return "BacklightCommand";
         case EventType::FanStatus: return "FanStatus";
         case EventType::FanSample: return "FanSample";

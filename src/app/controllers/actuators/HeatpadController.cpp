@@ -23,9 +23,10 @@ void HeatpadController::onInit(){
 }
 
 void HeatpadController::onStart(){
-    mHeatpad.setDutyCycle(0.5f);
+    // disable heatpad by default
+    mHeatpad.setEnabled(false);
+    mHeatpad.setDutyCycle(0.0f);
     mHeatpad.setPeriodDurationMicros(5000_ms);
-    mHeatpad.setEnabled(true);
 }
 
 void HeatpadController::onInputTick(){
@@ -35,7 +36,7 @@ void HeatpadController::onInputTick(){
     updateSensorValues();
 
     // send changed event
-    if(mStateChanged){
+    if(mHeatpad.isEnabled() || mStateChanged){
         sendStatusEvent();
         mStateChanged = false;
     }
@@ -80,8 +81,11 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
 void HeatpadController::sendStatusEvent(){
     HeatpadStatusEvent event = makeHeatpadStatusEvent();
     event->state = mHeatpad.getState();
-    event->dutyCycle = mHeatpad.getCurrentDutyCycle();
-    event->periodMicros = mHeatpad.getCurrentPeriodDurationMicros();
+    event->currentDutyCycle = mHeatpad.getCurrentDutyCycle();
+    event->currentPeriodMicros = mHeatpad.getCurrentPeriodDurationMicros();
+    event->nextDutyCycle = mHeatpad.getNextDutyCycle();
+    event->nextPeriodMicros = mHeatpad.getNextPeriodDurationMicros();
+    event->pwmProgressMicros = mHeatpad.getPwmProgressMicros();
     sendEvent(event);
 }
 

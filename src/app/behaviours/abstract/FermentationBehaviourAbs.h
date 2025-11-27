@@ -31,11 +31,13 @@ protected:
     FanCommandEvent makeFanCommandEvent();
     BacklightCommandEvent makeBacklightCommandEvent();
     HeatpadCommandEvent makeHeatpadCommandEvent();
+    FermentationStatusEvent makeFermentationStatusEvent();
 
     // send typed events
     void sendEvent(const FanCommandEvent& event);
     void sendEvent(const BacklightCommandEvent& event);
     void sendEvent(const HeatpadCommandEvent& event);
+    void sendEvent(const FermentationStatusEvent& event);
 
 private:
 

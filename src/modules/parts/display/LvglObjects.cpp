@@ -1,5 +1,6 @@
 #include "LvglObjects.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdarg>
 #include <lvgl.h>
@@ -32,42 +33,59 @@ void LvglObjects::init(lv_obj_t *parentObject){
 
     AssertExit((parentObject != nullptr), "LvglObjects", "parentObject is null");
 
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_bg_opa(&style, LV_OPA_TRANSP);
+    lv_obj_add_style(parentObject, &style, LV_PART_SCROLLBAR);
+
     const int16_t startXPx = 10;
     const int16_t startYPx = 10;
     const int16_t deltaYPx = 20;
 
     int16_t currentYPx = startYPx;
 
-    mFanStateLabel           = createLabel(parentObject, startXPx, currentYPx, "Fan state: "); currentYPx += deltaYPx;
-    mFanMeasuredRpmLabel     = createLabel(parentObject, startXPx, currentYPx, "Fan measured rpm: "); currentYPx += deltaYPx;
-    mHeatpadStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad state: "); currentYPx += deltaYPx;
-    mHeatpadDutyLabel        = createLabel(parentObject, startXPx, currentYPx, "Heatpad duty:  "); currentYPx += deltaYPx;
-    mHeatpadSenseLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad sense: ");currentYPx += deltaYPx;
-    mDisplayStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
-    mTemperatureStateLabel   = createLabel(parentObject, startXPx, currentYPx, "Sht31 state: "); currentYPx += deltaYPx;
-    mTemperatureSampleLabel  = createLabel(parentObject, startXPx, currentYPx, "Sht31 sample:"); currentYPx += deltaYPx;
+    mAppInfoLabel            = createLabel(parentObject, startXPx, currentYPx, "App:"); currentYPx += deltaYPx;
     mHeapSpaceLabel          = createLabel(parentObject, startXPx, currentYPx, "Heap space:"); currentYPx += deltaYPx;
-    mAppInfoLabel             = createLabel(parentObject, startXPx, currentYPx, "App:"); currentYPx += deltaYPx;
+    mDisplayStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
+    mFermentationStatusLabel = createLabel(parentObject, startXPx, currentYPx, "Eng:"); currentYPx += deltaYPx;
+    mTemperatureStateLabel   = createLabel(parentObject, startXPx, currentYPx, "Sht31"); currentYPx += deltaYPx;
+    mTemperatureSampleLabel  = createLabel(parentObject, startXPx, currentYPx, "Sht31"); currentYPx += deltaYPx;
+    mFanStateLabel           = createLabel(parentObject, startXPx, currentYPx, "Fan state"); currentYPx += deltaYPx;
+    mFanMeasuredRpmLabel     = createLabel(parentObject, startXPx, currentYPx, "Fan"); currentYPx += deltaYPx;
+    mHeatpadStateLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad"); currentYPx += deltaYPx;
+    mHeatpadSenseLabel       = createLabel(parentObject, startXPx, currentYPx, "Heatpad");currentYPx += deltaYPx;
+    mHeatpadDutyLabel        = createLabel(parentObject, startXPx, currentYPx, "Duty%:"); currentYPx += deltaYPx;
+
+    // create box1
+    mBox = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBox, 48, 8);
+    lv_obj_set_style_bg_color(mBox, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBox, LV_OPA_COVER, LV_PART_MAIN);
 }
 
 void LvglObjects::setFanState(const char *stateText, float targetSpeed){
-    setFormatted(mFanStateLabel, "Fan state: state=%s, speed=%.1f%%", stateText, targetSpeed*100.0f);
+    setFormatted(mFanStateLabel, "Fan state=%s, speed=%.1f%%", stateText, targetSpeed*100.0f);
 }
 
 void LvglObjects::setFanMeasuredRpm(float rpmValue){
-    setFormatted(mFanMeasuredRpmLabel, "Fan measured rpm: %.0f", rpmValue);
+    setFormatted(mFanMeasuredRpmLabel, "Fan rpm=%.0f", rpmValue);
 }
 
 void LvglObjects::setHeatpadState(const char *stateText){
-    setFormatted(mHeatpadStateLabel, "Heatpad state: %s", stateText);
+    setFormatted(mHeatpadStateLabel, "Heatpad state=%s", stateText);
 }
 
-void LvglObjects::setHeatpadDuty(float duty, uint32_t periodMicros){
-    setFormatted(mHeatpadDutyLabel, "Heatpad duty: %.1f%%, period=%ums", duty*100.0f, periodMicros/1000);
+void LvglObjects::setHeatpadDuty(float currentDuty, float nextDuty, uint32_t currentPeriodMicros, uint32_t nextPeriodMicros){
+    setFormatted(mHeatpadDutyLabel, "Duty%: %.0f%% => %.0f%%, ms: %u => %u", 
+        currentDuty*100.0f,
+        nextDuty*100.0f,
+        currentPeriodMicros/1000,
+        nextPeriodMicros/1000
+    );
 }
 
 void LvglObjects::setHeatpadSense(float voltageVolts, float currentAmps){
-    setFormatted(mHeatpadSenseLabel, "Heatpad sense: %4.1fV, %3.1fA", voltageVolts, currentAmps);
+    setFormatted(mHeatpadSenseLabel, "Heatpad U=%4.1fV, I=%3.1fA", voltageVolts, currentAmps);
 }
 
 void LvglObjects::setDisplayState(float brightness, uint32_t skipped, uint32_t dirtyCount){
@@ -75,11 +93,11 @@ void LvglObjects::setDisplayState(float brightness, uint32_t skipped, uint32_t d
 }
 
 void LvglObjects::setTemperatureState(bool power, bool driver, bool reset){
-    setFormatted(mTemperatureStateLabel, "Sht31 state:  power=%u, driver=%u, reset=%u", power, driver, reset);
+    setFormatted(mTemperatureStateLabel, "Sht31 power=%u, driver=%u, reset=%u", power, driver, reset);
 }
 
 void LvglObjects::setTemperatureSample(float t, float h){
-    setFormatted(mTemperatureSampleLabel, "Sht31 sample: t=%.2f°C, rh=%.2f%%", t, h);
+    setFormatted(mTemperatureSampleLabel, "Sht31 t=%.2f°C, rh=%.2f%%", t, h);
 }
 
 void LvglObjects::setHeapSpace(uint32_t space){
@@ -88,6 +106,21 @@ void LvglObjects::setHeapSpace(uint32_t space){
 
 void LvglObjects::setAppInfo(const char* behaviour, uint32_t eventCount){
     setFormatted(mAppInfoLabel, "App: %s, events=%u", behaviour, eventCount);
+}
+
+void LvglObjects::setFermentationStatus(const char* engineState, float measuredTemp, float targetTemp){
+    setFormatted(mFermentationStatusLabel, "Eng: s=%s, m=%.1f°C, t=%0.1f°C", engineState, measuredTemp, targetTemp);
+}
+
+void LvglObjects::setBoxPosition(float position){
+
+    static constexpr uint32_t y = 240-8;
+    static constexpr float wDisplay = 320.0f; 
+    static constexpr float wBox = 48.0f;
+    static constexpr float left = -wBox;
+    static constexpr float right = wDisplay;
+    const float x = std::clamp(position * (right - left) + left, left, right);
+    lv_obj_set_pos(mBox, x, y);
 }
 
 } // namespace Garbox

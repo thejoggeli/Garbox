@@ -24,6 +24,7 @@ public:
     virtual void onTemperatureSample(const TemperatureSampleEvent& event) = 0;
     virtual void onBacklightCommand(const BacklightCommandEvent& event) = 0;
     virtual void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) = 0;
+    virtual void onFermentationStatus(const FermentationStatusEvent& event) = 0;
 
 protected:
 

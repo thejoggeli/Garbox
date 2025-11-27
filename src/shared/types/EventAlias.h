@@ -10,6 +10,7 @@ namespace Garbox {
 // generated from config
 using ActiveBehaviourChangedEvent = EventView<EventType::ActiveBehaviourChanged>;
 using HeartbeatEvent              = EventView<EventType::Heartbeat>;
+using FermentationStatusEvent     = EventView<EventType::FermentationStatus>;
 using BacklightCommandEvent       = EventView<EventType::BacklightCommand>;
 using FanStatusEvent              = EventView<EventType::FanStatus>;
 using FanSampleEvent              = EventView<EventType::FanSample>;

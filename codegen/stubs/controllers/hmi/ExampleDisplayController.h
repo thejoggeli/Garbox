@@ -20,6 +20,7 @@ public:
     void onTemperatureSample(const TemperatureSampleEvent& event) final;
     void onBacklightCommand(const BacklightCommandEvent& event) final;
     void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
+    void onFermentationStatus(const FermentationStatusEvent& event) final;
 
 private:
 

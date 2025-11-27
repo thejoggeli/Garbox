@@ -1,6 +1,7 @@
 payloads_meta:
 
   include_h: [
+    "app/engine/HeaterEngineState.h",
     "modules/parts/button/ButtonState.h",
     "modules/parts/fan/FanState.h",
     "modules/parts/heatpad/HeatpadState.h"
@@ -11,6 +12,13 @@ types:
   ### Heartbeat ###
   Heartbeat: null
 
+  ## Fermentation ###
+  FermentationStatus:
+    heaterEngineState: HeaterEngineState
+    targetTemperature: float
+    measuredTemperature: float
+    measuredHumidity: float
+
   ### Display ###
   BacklightCommand:
     brightness: float
@@ -18,22 +26,25 @@ types:
   ### Fan ###
   FanStatus:  
     state: FanState
-    targetSpeed: float
-    usingPid: bool
+    targetSpeed: float # DutyCycle or RPM (depending on rpmControlEnabled)
+    rpmControlEnabled: bool
 
   FanSample:  
     measuredRpm: float
 
   FanCommand:  
     enabled: bool
-    targetSpeed: float
-    usePid: bool
+    targetSpeed: float # DutyCycle or RPM (depending on enableRpmControl) 
+    enableRpmControl: bool
 
   ### Heatpad ###
   HeatpadStatus:  
     state: HeatpadState 
-    dutyCycle: float
-    periodMicros: uint32_t
+    currentDutyCycle: float
+    currentPeriodMicros: uint32_t
+    nextDutyCycle: float
+    nextPeriodMicros: uint32_t
+    pwmProgressMicros: float
 
   HeatpadSample:  
     state: HeatpadState 
@@ -62,6 +73,7 @@ types:
 
   ButtonRepeat:  
     count: uint32_t
+    holdTimeMicros: uint32_t
 
   ### Encoder ###
   EncoderStep:  

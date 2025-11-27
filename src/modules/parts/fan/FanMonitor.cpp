@@ -26,7 +26,6 @@ void FanMonitor::tick(uint32_t rpmValue, bool shouldSpin){
     }
 
     mFsm.tick();
-
     switch(mFsm.getState()){
     case State::Idle:
         handleIdleState(rpmValue, shouldSpin);

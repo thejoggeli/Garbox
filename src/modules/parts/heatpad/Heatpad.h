@@ -46,6 +46,9 @@ public:
     float getMeasuredVoltage() const;
     float getMeasuredCurrent() const;
 
+    uint32_t getPwmProgressMicros() const;
+    float getPwmProgressRelative() const;
+
     // disallow copy and move 
     Heatpad(const Heatpad&) = delete;
     Heatpad& operator=(const Heatpad&) = delete;

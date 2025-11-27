@@ -17,19 +17,23 @@ FiniteStateMachine<StateType, NumStates>::~FiniteStateMachine(){
 template<typename StateType, StateType NumStates>
 void FiniteStateMachine<StateType, NumStates>::init(StateType initialState){
     AssertExit(!mInitialized, "FiniteStateMachine", "already initialized");
-    mCurrentState = initialState;
-    mPendingState = initialState;
+    mInitialState = initialState;
+    mInitialized = true;
+    reset();
+}
+
+template<typename StateType, StateType NumStates>
+void FiniteStateMachine<StateType, NumStates>::reset(){
+    AssertExit(mInitialized, "FiniteStateMachine", "not initialized");
+    mCurrentState = mInitialState;
+    mPendingState = mInitialState;
     mTransitionTimer.reset();
     mStateHoldTimer.start(mStateHoldTimeMicros[static_cast<size_t>(mCurrentState)]);
-    mInitialized = true;
 }
 
 template<typename StateType, StateType NumStates>
 void FiniteStateMachine<StateType, NumStates>::tick(){
-    if(!mInitialized){
-        TriggerDebug("FiniteStateMachine", "not initialized");
-        return;
-    }
+    AssertExit(mInitialized, "FiniteStateMachine", "not initialized");
 
     // state hold timer expired, reset to signal state change is now possible
     if(mStateHoldTimer.isExpired()){
@@ -70,10 +74,7 @@ void FiniteStateMachine<StateType, NumStates>::setStateChangedCallback(StateChan
 
 template<typename StateType, StateType NumStates>
 bool FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
-    if(!mInitialized){
-        TriggerDebug("FiniteStateMachine", "not initialized");
-        return false;
-    }
+    AssertExit(mInitialized, "FiniteStateMachine", "not initialized");
 
     // abort if new state equals current state or is already pending
     if((newState == mCurrentState) || (newState == mPendingState)){
@@ -106,10 +107,7 @@ bool FiniteStateMachine<StateType, NumStates>::transition(StateType newState){
 
 template<typename StateType, StateType NumStates>
 void FiniteStateMachine<StateType, NumStates>::forceTransition(StateType newState){
-    if(!mInitialized){
-        TriggerDebug("FiniteStateMachine", "not initialized");
-        return;
-    }
+    AssertExit(mInitialized, "FiniteStateMachine", "not initialized");
     if(newState == mCurrentState){
         return;
     }
