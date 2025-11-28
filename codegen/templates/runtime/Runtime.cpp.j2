@@ -16,8 +16,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 
 {{ RuntimeName }}::{{ RuntimeName }}():
     RuntimeAbs({
-        .maxControllers = {{ controllers | length }},
-        .maxBehaviours = {{ behaviours | length }},
+        .maxComponents = {{ (controllers|length) + (behaviours|length) }},
         .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
         .eventQueueLength = {{ application.event_queue_length }},
     }),
@@ -37,12 +36,12 @@ void {{ RuntimeName }}::onRegister(){
 
     // register all behaviours
 {% for beh in behaviours %}
-    registerBehaviour(&m{{ beh }});
+    registerComponent(&m{{ beh }});
 {% endfor %}
     
     // register all controllers
 {% for ctrl in controllers %}
-    registerController(&m{{ ctrl }});
+    registerComponent(&m{{ ctrl }});
 {% endfor %}
 }
 

@@ -20,8 +20,7 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime():
     RuntimeAbs({
-        .maxControllers = 7,
-        .maxBehaviours = 2,
+        .maxComponents = 9,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
     }),
@@ -43,17 +42,17 @@ GarboxRuntime::GarboxRuntime():
 void GarboxRuntime::onRegister(){
 
     // register all behaviours
-    registerBehaviour(&mCalibrationBehaviour);
-    registerBehaviour(&mFermentationBehaviour);
+    registerComponent(&mCalibrationBehaviour);
+    registerComponent(&mFermentationBehaviour);
     
     // register all controllers
-    registerController(&mDisplayController);
-    registerController(&mDevtoolsController);
-    registerController(&mFanController);
-    registerController(&mHeartbeatController);
-    registerController(&mHeatpadController);
-    registerController(&mInputController);
-    registerController(&mI2cPartsController);
+    registerComponent(&mDisplayController);
+    registerComponent(&mDevtoolsController);
+    registerComponent(&mFanController);
+    registerComponent(&mHeartbeatController);
+    registerComponent(&mHeatpadController);
+    registerComponent(&mInputController);
+    registerComponent(&mI2cPartsController);
 }
 
 void GarboxRuntime::onInit(){

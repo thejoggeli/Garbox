@@ -18,8 +18,7 @@ class RuntimeAbs : public ComponentHostIfc {
 public:
 
     struct Config {
-        size_t maxControllers = 16;
-        size_t maxBehaviours = 16;
+        size_t maxComponents = 16;
         size_t eventPoolSizeBytes = 1024;
         size_t eventQueueLength = 64;
     };
@@ -51,14 +50,11 @@ protected:
     BehaviourAbs* mActiveBehaviour = nullptr;
     BehaviourAbs* mQueuedBehaviour = nullptr;
 
-    // controllers setup
-    void registerController(ControllerAbs* controller);
-    Span<ControllerAbs*> getControllers();
-    virtual ControllerAbs* resolveController(ControllerId id) = 0;
+    // components setup
+    void registerComponent(ComponentAbs* component);
 
-    // behaviours setup
-    void registerBehaviour(BehaviourAbs* behaviour);
-    Span<BehaviourAbs*> getBehaviours();
+    // resolve specialized types
+    virtual ControllerAbs* resolveController(ControllerId id) = 0;
     virtual BehaviourAbs* resolveBehaviour(BehaviourId id) = 0;
 
     // event handling internal methods
@@ -85,13 +81,8 @@ private:
     EventFactory mEventFactory;
     HeapRingBuffer<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
-    // controllers array
-    HeapVector<ControllerAbs*> mControllers;
-    Span<ControllerAbs*> mControllersSpan;
-
-    // behaviours array
-    HeapVector<BehaviourAbs*> mBehaviours;
-    Span<BehaviourAbs*> mBehavioursSpan;
+    // components array
+    HeapVector<ComponentAbs*> mComponents;
 
 };
 

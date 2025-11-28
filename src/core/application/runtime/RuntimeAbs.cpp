@@ -17,10 +17,7 @@ RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
     mEventFactory(config.eventPoolSizeBytes),
     mEventQueue(config.eventQueueLength),
-    mControllers(config.maxControllers),
-    mControllersSpan(nullptr, 0),
-    mBehaviours(config.maxBehaviours),
-    mBehavioursSpan(nullptr, 0){
+    mComponents(config.maxComponents){
     // constructor body
 }
 
@@ -29,14 +26,9 @@ void RuntimeAbs::init(){
     // derived class must register controllers, behaviours and ticks
     onRegister();
 
-    // init all controllers
-    for(ControllerAbs* controller : mControllersSpan){
-        controller->init(*this);
-    }
-
-    // init all behaviours
-    for(BehaviourAbs* behaviour : mBehavioursSpan){
-        behaviour->init(*this);
+    // init all components
+    for(ComponentAbs* component : mComponents){
+        component->init(*this);
     }
 
     // init derived class
@@ -45,17 +37,11 @@ void RuntimeAbs::init(){
 
 void RuntimeAbs::start(){
 
-    AssertExit(mBehavioursSpan.size() > 0, "RuntimeAbs", "no behaviours registered");
-    AssertExit(mControllersSpan.size() > 0, "RuntimeAbs", "no controllers registered");
+    AssertExit(mComponents.size() > 0, "RuntimeAbs", "no components registered");
 
-    // start all controllers
-    for(ControllerAbs* controller : mControllersSpan){
-        controller->start();
-    }
-
-    // start all behaviours
-    for(BehaviourAbs* behaviour : mBehavioursSpan){
-        behaviour->start();
+    // start all components
+    for(ComponentAbs* component : mComponents){
+        component->start();
     }
 
     // start derived class
@@ -101,24 +87,9 @@ void RuntimeAbs::applyQueuedBehaviour() {
     publishEvent(event.header());   
 }
 
-void RuntimeAbs::registerController(ControllerAbs* controller){
-    AssertExit(!mControllers.full(), "RuntimeAbs", "max controllers count exceeded");
-    mControllers.push(controller);
-    mControllersSpan = Span<ControllerAbs*>(&mControllers[0], mControllers.size());
-}
-
-Span<ControllerAbs*> RuntimeAbs::getControllers(){
-    return mControllersSpan;
-}
-
-void RuntimeAbs::registerBehaviour(BehaviourAbs* behaviour){
-    AssertExit(!mBehaviours.full(), "RuntimeAbs", "max behaviours count exceeded");
-    mBehaviours.push(behaviour);
-    mBehavioursSpan = Span<BehaviourAbs*>(&mBehaviours[0], mBehaviours.size());
-}
-
-Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
-    return mBehavioursSpan;
+void RuntimeAbs::registerComponent(ComponentAbs* component){
+    AssertExit(!mComponents.full(), "RuntimeAbs", "max components count exceeded");
+    mComponents.push(component);
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
