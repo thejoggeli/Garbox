@@ -5,16 +5,16 @@ screens:
     sends: [BacklightCommand]
     states:
       Fan: 
-        - {source: Event, type: FanStatus, field: enabled}
-        - {source: Event, type: FanStatus, field: state}
-        - {source: Event, type: FanStatus, field: targetSpeed, epsilon: 1e-4}
-        - {source: Event, type: FanSample, field: measuredRpm, epsilon: 1e-4}      
+        - {event: FanStatus, field: enabled}
+        - {event: FanStatus, field: state}
+        - {event: FanStatus, field: targetSpeed, epsilon: 1e-4}
+        - {event: FanSample, field: measuredRpm, epsilon: 1e-4}      
       HeaterStatus: 
-        - {source: Event, type: HeaterStatus, field: enabled}
-        - {source: Event, type: HeaterStatus, field: dutyCycle, epsilon: 1e-4}
+        - {event: HeaterStatus, field: enabled}
+        - {event: HeaterStatus, field: dutyCycle, epsilon: 1e-4}
       HeaterSample:
-        - {source: Event, type: HeaterSample, field: measuredVoltage, epsilon: 1e-4}
-        - {source: Event, type: HeaterSample, field: measuredCurrent, epsilon: 1e-4}
+        - {event: HeaterSample, field: measuredVoltage, epsilon: 1e-4}
+        - {event: HeaterSample, field: measuredCurrent, epsilon: 1e-4}
     
   Debug:
     tick_phases: null
@@ -22,6 +22,6 @@ screens:
     sends: [BacklightCommand]
     states:
       Fan: 
-        - {source: Event, type: FanStatus, field: enabled}
-        - {source: Event, type: FanStatus, field: state}
+        - {event: FanStatus, field: enabled}
+        - {event: FanStatus, field: state}
       
