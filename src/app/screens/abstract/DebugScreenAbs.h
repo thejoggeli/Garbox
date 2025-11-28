@@ -14,6 +14,9 @@ public:
     // receive event handlers
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
 
+    // update handlers
+    void updateFanStatus(const FanStatusPayload& payload);
+
 protected:
 
     // make typed events

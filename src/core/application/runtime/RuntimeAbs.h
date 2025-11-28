@@ -79,6 +79,7 @@ protected:
     virtual void onInit() = 0;
     virtual void onStart() = 0;
     virtual void onRun() = 0;
+    virtual void onUpdateScreens();
     virtual void onRegister() = 0;
     virtual void onRouteEvent(const EventHeader* event) = 0;
 

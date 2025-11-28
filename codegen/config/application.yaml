@@ -16,3 +16,4 @@ application:
   ]
   stubs_prefix: "Example"
   stubs_suffix: ""
+  

@@ -1,27 +1,21 @@
 screens:
   Main:
     tick_phases: null
-    receives: [Heartbeat]
+    receives:
+      - FanStatus
+      - FanSample
+      - HeatpadStatus
+      - HeatpadSample
+      - TemperatureStatus 
+      - TemperatureSample 
+      - BacklightCommand 
+      - ActiveBehaviourChanged
+      - FermentationStatus
     sends: [BacklightCommand]
-    states:
-      Fan: 
-        - {event: FanStatus, field: enabled}
-        - {event: FanStatus, field: state}
-        - {event: FanStatus, field: targetSpeed, epsilon: 1e-4}
-        - {event: FanSample, field: measuredRpm, epsilon: 1e-4}      
-      HeaterStatus: 
-        - {event: HeaterStatus, field: enabled}
-        - {event: HeaterStatus, field: dutyCycle, epsilon: 1e-4}
-      HeaterSample:
-        - {event: HeaterSample, field: measuredVoltage, epsilon: 1e-4}
-        - {event: HeaterSample, field: measuredCurrent, epsilon: 1e-4}
     
   Debug:
     tick_phases: null
     receives: [Heartbeat]
     sends: [BacklightCommand]
-    states:
-      Fan: 
-        - {event: FanStatus, field: enabled}
-        - {event: FanStatus, field: state}
+    
       

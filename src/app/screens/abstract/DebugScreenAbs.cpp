@@ -19,4 +19,8 @@ void DebugScreenAbs::sendEvent(const BacklightCommandEvent& event){
     publishEvent(event.header());
 }
 
+void updateFanStatus(const FanStatusPayload& payload){
+    // nothing to do
+}
+
 } // namespace Garbox

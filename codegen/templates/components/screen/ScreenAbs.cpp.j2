@@ -24,5 +24,17 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
 }
 {% endfor %}
 {% endif %}
+{# ---- update ---- #}
+{% if screen.used_events %}
+{% for event_name in screen.used_events %}
+
+void update{{ event_name }}(const {{ event_name }}Payload& payload){
+    const bool changed =
+{%- for state_key, state_list in screen.states %}
+        state_data[]
+{% endfor %}
+}
+{% endfor %}
+{% endif %}
 
 } // namespace Garbox

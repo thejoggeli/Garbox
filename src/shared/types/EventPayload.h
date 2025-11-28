@@ -110,6 +110,10 @@ struct RequestChangeScreenPayload {
     ScreenId screen;
 };
 
+struct RequestUpdateScreensPayload {
+    // no fields
+};
+
 // generated mappings
 template<EventType>
 struct ResolveEventPayload; // primary template (intentionally undefined)
@@ -202,6 +206,11 @@ struct ResolveEventPayload<EventType::ActiveScreenChanged> {
 template<>
 struct ResolveEventPayload<EventType::RequestChangeScreen> {
     using type = RequestChangeScreenPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::RequestUpdateScreens> {
+    using type = RequestUpdateScreensPayload;
 };
 
 // resolve EventType to EventPayload

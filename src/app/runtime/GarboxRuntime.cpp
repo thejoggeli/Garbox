@@ -305,6 +305,9 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::RequestChangeScreen: {
         break;
     }
+    case EventType::RequestUpdateScreens: {
+        break;
+    }
     case EventType::Null:
     case EventType::Count:
         TriggerDebug("GarboxRuntime", "invalid event type");

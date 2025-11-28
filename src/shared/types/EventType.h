@@ -30,6 +30,7 @@ enum class EventType : uint16_t {
     RequestChangeBehaviour,
     ActiveScreenChanged,
     RequestChangeScreen,
+    RequestUpdateScreens,
 
     // enum size marker
     Count,

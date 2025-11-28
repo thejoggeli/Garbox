@@ -10,7 +10,7 @@ namespace Garbox {
 class DirtyDispatcher {
 public:
 
-    typedef void (*HandlerFunction)(void* context);
+    using HandlerFunction = void (*)(void* context);
 
     struct HandlerEntry {
         HandlerFunction function;

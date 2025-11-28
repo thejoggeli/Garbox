@@ -21,3 +21,4 @@ events:
     RequestChangeScreen:
       screen: ScreenId
 
+    RequestUpdateScreens: null

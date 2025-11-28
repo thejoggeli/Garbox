@@ -129,16 +129,24 @@ void RuntimeAbs::registerComponent(ComponentAbs* component){
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
 
-    // handle change behaviour request
-    if(header->type == EventType::RequestChangeBehaviour){
-        RequestChangeBehaviourEvent event(header);
-        setQueuedBehaviour(resolveBehaviour(event->behaviour));
-    }
-
-    // handle change screen request
-    if(header->type == EventType::RequestChangeScreen){
-        RequestChangeScreenEvent event(header);
-        setQueuedScreen(resolveScreen(event->screen));
+    switch(header->type){
+        case EventType::RequestChangeBehaviour: {
+            RequestChangeBehaviourEvent event(header);
+            setQueuedBehaviour(resolveBehaviour(event->behaviour));
+            break;
+        }
+        case EventType::RequestChangeScreen: {
+            RequestChangeScreenEvent event(header);
+            setQueuedScreen(resolveScreen(event->screen));
+            break;
+        }
+        case EventType::RequestUpdateScreens: {
+            onUpdateScreens();
+            break;
+        }
+        default: {
+            break;
+        }
     }
 
     // send event to router event

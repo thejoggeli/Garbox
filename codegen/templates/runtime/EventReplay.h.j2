@@ -1,0 +1,52 @@
+#pragma once
+{% include "_common/header.j2" %}
+{% for name, screen_data in screens.items() %}
+#include "app/screens/{{ name }}.h"
+{% endfor %}
+#include "core/application/screen/ScreenAbs.h"
+#include "core/util/helpers/DirtyDispatcher.h"
+#include "shared/types/EventAlias.h"
+#include "shared/types/EventPayload.h"
+#include "shared/types/EventType.h"
+#include "shared/types/ScreenId.h"
+
+namespace Garbox {
+
+class EventReplay {
+public:
+
+    EventReplay(
+{%- for name, screen_data in screens.items() %} 
+        {{ name }}Abs& {{ name[0]|lower ~ name[1:] }}{% if not loop.last %}, {% endif %}
+{% endfor %} 
+    );
+
+    void handleEvent(const EventHeader* header);
+    void replay(ScreenId screenId);
+
+private:
+
+{# ScreenName mScreenName #}
+{% for name, screen_data in screens.items() %}
+    {{ name }}Abs& m{{ name }};
+{% endfor %}
+
+{# DirtyDispatcher mScreenNameDispatcher #}
+{% for name, screen_data in screens.items() %}
+    DirtyDispatcher m{{ name }}Dispatcher {{ "{" ~ screen_data.used_events|length ~ "}" }};
+{% endfor %}
+
+{# EventPayload mEventShadow #}
+{% for name, data in events.items() %}
+    {{ name }}Payload m{{ name }}Shadow;
+{% endfor %}
+
+{% for screen_name, screen_data in screens.items() %}
+    {% for event_name in screen_data.used_events: %}
+    static void send{{ event_name }}To{{ screen_name }}(void* context);
+    {% endfor %}
+{% endfor %}
+
+};
+
+} // namespace

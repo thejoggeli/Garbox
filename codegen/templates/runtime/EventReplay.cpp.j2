@@ -1,0 +1,66 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include "EventReplay.h"
+#include "core/assert/Assert.h"
+
+namespace Garbox {
+
+{% for screen_name, screen_data in screens.items() %}
+    {% for event_name in screen_data.used_events: %}
+static constexpr size_t {{ screen_name }}_{{ event_name }}_Index = {{ loop.index0 }} ;
+    {% endfor %}
+{% endfor %}
+
+EventReplay::EventReplay(
+    // parameter list
+{%- for name, screen_data in screens.items() %} 
+    {{ name }}Abs& {{ name[0]|lower ~ name[1:] }}{% if not loop.last %}, {% endif %}
+{% endfor %}):
+    // init members
+{%- for name, screen_data in screens.items() %} 
+    m{{ name }}({{ name[0]|lower ~ name[1:] }}){% if not loop.last %}, {% endif %}
+{% endfor %}{
+    // register handlers
+{% for screen_name, screen_data in screens.items() %}
+    {% for event_name in screen_data.used_events: %}
+    m{{ screen_name }}Dispatcher.registerHandler(send{{ event_name }}To{{ screen_name }}, this);
+    {% endfor %}
+{% endfor %}
+}
+
+void EventReplay::handleEvent(const EventHeader* header){
+    switch(header->type){
+{% for event_name, event_data in events.items() %}
+        case EventType::{{ event_name }}:
+    {% for screen_name, screen_data in screens.items() %}
+        {% if event_name in screen_data.used_events %}
+            m{{ screen_name }}Dispatcher.markDirty({{ screen_name }}_{{ event_name }}_Index);
+        {% endif %}
+    {% endfor %}
+            break;
+{% endfor %}
+        default: // no screen listens to event type
+    }
+}
+
+void EventReplay::replay(ScreenId screenId){
+    switch(screenId){
+{% for screen_name, screen_data in screens.items() %}
+        case ScreenId::{{ screen_name.removesuffix("Screen") }}:
+            m{{ screen_name }}Dispatcher.dispatch();
+            break;
+{% endfor %}
+        default: TriggerExit("EventReplay", "invalid screen id");
+    }
+}
+
+{% for screen_name, screen_data in screens.items() %}
+    {% for event_name in screen_data.used_events: %}
+void EventReplay::send{{ event_name }}To{{ screen_name }}(void* context){ 
+    EventReplay* self = static_cast<EventReplay*>(context);
+    self->m{{ screen_name }}.update{{ event_name }}(self->m{{ event_name }}Shadow); 
+}
+
+    {% endfor %}
+{% endfor %}
+} // namespace
