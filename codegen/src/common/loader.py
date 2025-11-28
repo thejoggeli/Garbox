@@ -104,14 +104,6 @@ class Loader:
 
     def process_screens_config(self):
         self._process_components_config("screens", "Screen")
-
-        # extract pre-screen used events
-        for screen_name, screen_data in self.config["screens"].items():
-            per_state_used_events = SortedSet()
-            for state_list in screen_data["states"].values():
-                for state_entry in state_list:
-                    per_state_used_events.add(state_entry["event"])
-            screen_data["used_events"] = per_state_used_events
         
 
     def process_events_config(self):

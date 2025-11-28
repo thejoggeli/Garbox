@@ -8,14 +8,15 @@ screens:
       - HeatpadSample
       - TemperatureStatus 
       - TemperatureSample 
-      - BacklightCommand 
+      - DisplayCommand 
       - ActiveBehaviourChanged
       - FermentationStatus
-    sends: [BacklightCommand]
+      - DisplayStatus
+    sends: [DisplayCommand]
     
   Debug:
     tick_phases: null
     receives: [Heartbeat]
-    sends: [BacklightCommand]
+    sends: [DisplayCommand]
     
       

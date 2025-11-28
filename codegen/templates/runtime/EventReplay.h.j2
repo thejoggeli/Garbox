@@ -33,16 +33,16 @@ private:
 
 {# DirtyDispatcher mScreenNameDispatcher #}
 {% for name, screen_data in screens.items() %}
-    DirtyDispatcher m{{ name }}Dispatcher {{ "{" ~ screen_data.used_events|length ~ "}" }};
+    DirtyDispatcher m{{ name }}Dispatcher {{ "{" ~ screen_data.receives|length ~ "}" }};
 {% endfor %}
 
-{# EventPayload mEventShadow #}
+{# EventBlock for mEventBlock #}
 {% for name, data in events.items() %}
-    {{ name }}Payload m{{ name }}Shadow;
+    EventBlock<EventType::{{ name }}> m{{ name }}Block;
 {% endfor %}
 
 {% for screen_name, screen_data in screens.items() %}
-    {% for event_name in screen_data.used_events: %}
+    {% for event_name in screen_data.receives: %}
     static void send{{ event_name }}To{{ screen_name }}(void* context);
     {% endfor %}
 {% endfor %}

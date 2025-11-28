@@ -55,7 +55,7 @@ public:
     void onHeatpadSample(const HeatpadSampleEvent& event);
     void onTemperatureStatus(const TemperatureStatusEvent& event) final;
     void onTemperatureSample(const TemperatureSampleEvent& event) final;
-    void onBacklightCommand(const BacklightCommandEvent& event) final;
+    void onDisplayCommand(const DisplayCommandEvent& event) final;
     void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
     void onFermentationStatus(const FermentationStatusEvent& event) final;
 

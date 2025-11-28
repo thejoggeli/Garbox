@@ -12,7 +12,7 @@ BehaviourAbs::BehaviourAbs(ComponentId componentId, BehaviourId behaviourId):
 }
 
 void BehaviourAbs::setActive(bool active){
-    if(!mInitialized){
+    if(!isInitialized()){
         TriggerExit("BehaviourAbs", "not initialized");
     }
     if(active == mActive){
@@ -26,18 +26,6 @@ void BehaviourAbs::setActive(bool active){
     else {
         onBecomeInactive();
     }
-}
-
-void BehaviourAbs::requestChangeBehaviour(BehaviourId behaviourId){
-    RequestChangeBehaviourEvent event = makeEvent<EventType::RequestChangeBehaviour>();
-    event->behaviour = behaviourId;
-    publishEvent(event.header());
-}
-
-void BehaviourAbs::requestChangeScreen(ScreenId screenId){
-    RequestChangeScreenEvent event = makeEvent<EventType::RequestChangeScreen>();
-    event->screen = screenId;
-    publishEvent(event.header());
 }
 
 } // namespace

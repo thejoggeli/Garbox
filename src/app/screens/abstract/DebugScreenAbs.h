@@ -14,16 +14,13 @@ public:
     // receive event handlers
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
 
-    // update handlers
-    void updateFanStatus(const FanStatusPayload& payload);
-
 protected:
 
     // make typed events
-    BacklightCommandEvent makeBacklightCommandEvent();
+    DisplayCommandEvent makeDisplayCommandEvent();
 
     // send typed events
-    void sendEvent(const BacklightCommandEvent& event);
+    void sendEvent(const DisplayCommandEvent& event);
 
 private:
 

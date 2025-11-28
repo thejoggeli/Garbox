@@ -11,14 +11,7 @@ events:
       oldBehaviour: BehaviourId
       newBehaviour: BehaviourId
 
-    RequestChangeBehaviour:
-      behaviour: BehaviourId
-
     ActiveScreenChanged:
       oldScreen: ScreenId
       newScreen: ScreenId
-
-    RequestChangeScreen:
-      screen: ScreenId
-
-    RequestUpdateScreens: null
+      

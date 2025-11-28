@@ -6,7 +6,7 @@
 namespace Garbox {
 
 {% for screen_name, screen_data in screens.items() %}
-    {% for event_name in screen_data.used_events: %}
+    {% for event_name in screen_data.receives: %}
 static constexpr size_t {{ screen_name }}_{{ event_name }}_Index = {{ loop.index0 }} ;
     {% endfor %}
 {% endfor %}
@@ -22,9 +22,15 @@ EventReplay::EventReplay(
 {% endfor %}{
     // register handlers
 {% for screen_name, screen_data in screens.items() %}
-    {% for event_name in screen_data.used_events: %}
+    {% for event_name in screen_data.receives: %}
     m{{ screen_name }}Dispatcher.registerHandler(send{{ event_name }}To{{ screen_name }}, this);
     {% endfor %}
+{% endfor %}
+    // init event headers
+    const ComponentDescriptor descriptor { ComponentType::Replay, ComponentId::Replay };
+{% for name, data in events.items() %}
+    m{{ name }}Block.header.type = EventType::{{ name }};
+    m{{ name }}Block.header.sender = descriptor;
 {% endfor %}
 }
 
@@ -33,7 +39,9 @@ void EventReplay::handleEvent(const EventHeader* header){
 {% for event_name, event_data in events.items() %}
         case EventType::{{ event_name }}:
     {% for screen_name, screen_data in screens.items() %}
-        {% if event_name in screen_data.used_events %}
+        {% if event_name in screen_data.receives %}
+            m{{ event_name }}Block.header.id = header->id;
+            m{{ event_name }}Block.payload = *static_cast<{{ event_name }}Event>(header).payload();
             m{{ screen_name }}Dispatcher.markDirty({{ screen_name }}_{{ event_name }}_Index);
         {% endif %}
     {% endfor %}
@@ -55,10 +63,10 @@ void EventReplay::replay(ScreenId screenId){
 }
 
 {% for screen_name, screen_data in screens.items() %}
-    {% for event_name in screen_data.used_events: %}
+    {% for event_name in screen_data.receives: %}
 void EventReplay::send{{ event_name }}To{{ screen_name }}(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->m{{ screen_name }}.update{{ event_name }}(self->m{{ event_name }}Shadow); 
+    self->m{{ screen_name }}.on{{ event_name }}(&self->m{{ event_name }}Block.header); 
 }
 
     {% endfor %}

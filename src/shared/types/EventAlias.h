@@ -11,7 +11,8 @@ namespace Garbox {
 // event view aliases
 using HeartbeatEvent              = EventView<EventType::Heartbeat>;
 using FermentationStatusEvent     = EventView<EventType::FermentationStatus>;
-using BacklightCommandEvent       = EventView<EventType::BacklightCommand>;
+using DisplayCommandEvent         = EventView<EventType::DisplayCommand>;
+using DisplayStatusEvent          = EventView<EventType::DisplayStatus>;
 using FanStatusEvent              = EventView<EventType::FanStatus>;
 using FanSampleEvent              = EventView<EventType::FanSample>;
 using FanCommandEvent             = EventView<EventType::FanCommand>;
@@ -24,15 +25,13 @@ using ButtonStateChangedEvent     = EventView<EventType::ButtonStateChanged>;
 using ButtonRepeatEvent           = EventView<EventType::ButtonRepeat>;
 using EncoderStepEvent            = EventView<EventType::EncoderStep>;
 using ActiveBehaviourChangedEvent = EventView<EventType::ActiveBehaviourChanged>;
-using RequestChangeBehaviourEvent = EventView<EventType::RequestChangeBehaviour>;
 using ActiveScreenChangedEvent    = EventView<EventType::ActiveScreenChanged>;
-using RequestChangeScreenEvent    = EventView<EventType::RequestChangeScreen>;
-using RequestUpdateScreensEvent   = EventView<EventType::RequestUpdateScreens>;
 
 // event payload aliases
 using HeartbeatPayload              = EventPayload<EventType::Heartbeat>;
 using FermentationStatusPayload     = EventPayload<EventType::FermentationStatus>;
-using BacklightCommandPayload       = EventPayload<EventType::BacklightCommand>;
+using DisplayCommandPayload         = EventPayload<EventType::DisplayCommand>;
+using DisplayStatusPayload          = EventPayload<EventType::DisplayStatus>;
 using FanStatusPayload              = EventPayload<EventType::FanStatus>;
 using FanSamplePayload              = EventPayload<EventType::FanSample>;
 using FanCommandPayload             = EventPayload<EventType::FanCommand>;
@@ -45,9 +44,6 @@ using ButtonStateChangedPayload     = EventPayload<EventType::ButtonStateChanged
 using ButtonRepeatPayload           = EventPayload<EventType::ButtonRepeat>;
 using EncoderStepPayload            = EventPayload<EventType::EncoderStep>;
 using ActiveBehaviourChangedPayload = EventPayload<EventType::ActiveBehaviourChanged>;
-using RequestChangeBehaviourPayload = EventPayload<EventType::RequestChangeBehaviour>;
 using ActiveScreenChangedPayload    = EventPayload<EventType::ActiveScreenChanged>;
-using RequestChangeScreenPayload    = EventPayload<EventType::RequestChangeScreen>;
-using RequestUpdateScreensPayload   = EventPayload<EventType::RequestUpdateScreens>;
 
 } // namespace Garbox

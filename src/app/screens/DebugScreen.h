@@ -10,6 +10,8 @@ public:
 
     DebugScreen();
 
+    void onUpdateScreen() final;
+
     void onHeartbeat(const HeartbeatEvent& event) final;
 
 private:

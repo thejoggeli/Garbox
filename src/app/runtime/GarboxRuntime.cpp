@@ -24,7 +24,8 @@ GarboxRuntime::GarboxRuntime():
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis){
+    mTickRunner(TickHandlersCount, TickPeriodMillis),
+    mEventReplay(mMainScreen, mDebugScreen){
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -69,6 +70,14 @@ void GarboxRuntime::onRun(){
     Time::Start();
     Profiler::Reset();
     mTickRunner.run();
+}
+
+void GarboxRuntime::onActiveBehaviourChanged(){
+    // nothing to do
+}
+
+void GarboxRuntime::onActiveScreenChanged(){
+    mEventReplay.replay();
 }
 
 void GarboxRuntime::handleTickStart(){
@@ -136,7 +145,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             mCalibrationBehaviour.onHeartbeat(event);
             mFermentationBehaviour.onHeartbeat(event);
             mDebugScreen.onHeartbeat(event);
-            mMainScreen.onHeartbeat(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
@@ -146,7 +154,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             }
             switch(mActiveScreen->getScreenId()){
                 case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeartbeat(event); break;
                 default: break; // active screen does not support event type
             }
         }
@@ -155,11 +162,42 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::FermentationStatus: {
         const FermentationStatusEvent event(header);
         mDisplayController.onFermentationStatus(event);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onFermentationStatus(event);
+        }
+        else {
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFermentationStatus(event); break;
+                default: break; // active screen does not support event type
+            }
+        }
         break;
     }
-    case EventType::BacklightCommand: {
-        const BacklightCommandEvent event(header);
-        mDisplayController.onBacklightCommand(event);
+    case EventType::DisplayCommand: {
+        const DisplayCommandEvent event(header);
+        mDisplayController.onDisplayCommand(event);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onDisplayCommand(event);
+        }
+        else {
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayCommand(event); break;
+                default: break; // active screen does not support event type
+            }
+        }
+        break;
+    }
+    case EventType::DisplayStatus: {
+        const DisplayStatusEvent event(header);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onDisplayStatus(event);
+        }
+        else {
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayStatus(event); break;
+                default: break; // active screen does not support event type
+            }
+        }
         break;
     }
     case EventType::FanStatus: {
@@ -168,12 +206,17 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         if(header->sendToInactiveComponents){
             mCalibrationBehaviour.onFanStatus(event);
             mFermentationBehaviour.onFanStatus(event);
+            mMainScreen.onFanStatus(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
                 default: break; // active behaviour does not support event type
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanStatus(event); break;
+                default: break; // active screen does not support event type
             }
         }
         break;
@@ -184,12 +227,17 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         if(header->sendToInactiveComponents){
             mCalibrationBehaviour.onFanSample(event);
             mFermentationBehaviour.onFanSample(event);
+            mMainScreen.onFanSample(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
                 default: break; // active behaviour does not support event type
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanSample(event); break;
+                default: break; // active screen does not support event type
             }
         }
         break;
@@ -204,11 +252,16 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         mDisplayController.onHeatpadStatus(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onHeatpadStatus(event);
+            mMainScreen.onHeatpadStatus(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
                 default: break; // active behaviour does not support event type
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadStatus(event); break;
+                default: break; // active screen does not support event type
             }
         }
         break;
@@ -216,6 +269,15 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::HeatpadSample: {
         const HeatpadSampleEvent event(header);
         mDisplayController.onHeatpadSample(event);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onHeatpadSample(event);
+        }
+        else {
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadSample(event); break;
+                default: break; // active screen does not support event type
+            }
+        }
         break;
     }
     case EventType::HeatpadCommand: {
@@ -228,11 +290,16 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         mDisplayController.onTemperatureStatus(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onTemperatureStatus(event);
+            mMainScreen.onTemperatureStatus(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatus(event); break;
                 default: break; // active behaviour does not support event type
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureStatus(event); break;
+                default: break; // active screen does not support event type
             }
         }
         break;
@@ -242,11 +309,16 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         mDisplayController.onTemperatureSample(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onTemperatureSample(event);
+            mMainScreen.onTemperatureSample(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSample(event); break;
                 default: break; // active behaviour does not support event type
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureSample(event); break;
+                default: break; // active screen does not support event type
             }
         }
         break;
@@ -294,18 +366,18 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::ActiveBehaviourChanged: {
         const ActiveBehaviourChangedEvent event(header);
         mDisplayController.onActiveBehaviourChanged(event);
-        break;
-    }
-    case EventType::RequestChangeBehaviour: {
+        if(header->sendToInactiveComponents){
+            mMainScreen.onActiveBehaviourChanged(event);
+        }
+        else {
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onActiveBehaviourChanged(event); break;
+                default: break; // active screen does not support event type
+            }
+        }
         break;
     }
     case EventType::ActiveScreenChanged: {
-        break;
-    }
-    case EventType::RequestChangeScreen: {
-        break;
-    }
-    case EventType::RequestUpdateScreens: {
         break;
     }
     case EventType::Null:

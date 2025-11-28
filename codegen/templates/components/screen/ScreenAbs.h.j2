@@ -26,15 +26,6 @@ public:
     virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
     {% endfor %}
 {% endif %}
-{# ---- update ---- #}
-{% if screen.used_events %}
-
-    {# update methods #}
-    // update handlers
-    {% for event_name in screen.used_events %}
-    void update{{ event_name }}(const {{ event_name }}Payload& payload);
-    {% endfor %}
-{% endif %}
 
 protected:
 {# send event methods #}

@@ -11,16 +11,12 @@ DebugScreenAbs::DebugScreenAbs():
     // nothing to do
 }
 
-BacklightCommandEvent DebugScreenAbs::makeBacklightCommandEvent(){
-    return ScreenAbs::makeEvent<EventType::BacklightCommand>();
+DisplayCommandEvent DebugScreenAbs::makeDisplayCommandEvent(){
+    return ScreenAbs::makeEvent<EventType::DisplayCommand>();
 }
 
-void DebugScreenAbs::sendEvent(const BacklightCommandEvent& event){
+void DebugScreenAbs::sendEvent(const DisplayCommandEvent& event){
     publishEvent(event.header());
-}
-
-void updateFanStatus(const FanStatusPayload& payload){
-    // nothing to do
 }
 
 } // namespace Garbox

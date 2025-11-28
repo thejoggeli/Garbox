@@ -17,7 +17,7 @@ void FermentationBehaviour::onInit(){
 }
 
 void FermentationBehaviour::onStart(){
-    BacklightCommandEvent cmd = makeBacklightCommandEvent();
+    DisplayCommandEvent cmd = makeDisplayCommandEvent();
     cmd->brightness = 0.5f;
     sendEvent(cmd);
 }
@@ -123,7 +123,7 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
     if(event->newState == ButtonState::Released){
         static uint32_t b = 4;
         b = MathUtils::Wrap(b+1, 5u);
-        BacklightCommandEvent cmd = makeBacklightCommandEvent();
+        DisplayCommandEvent cmd = makeDisplayCommandEvent();
         cmd->brightness = b/4.0f;
         sendEvent(cmd);
     }
@@ -134,7 +134,7 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
     
 void FermentationBehaviour::onButtonRepeat(const ButtonRepeatEvent& event){
     if(event->count == 5){
-        requestChangeBehaviour(BehaviourId::Calibration);
+        getHost()->requestChangeBehaviour(BehaviourId::Calibration);
     }
 }
     

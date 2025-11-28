@@ -10,7 +10,7 @@ controllers:
       - HeatpadSample
       - TemperatureStatus 
       - TemperatureSample 
-      - BacklightCommand 
+      - DisplayCommand 
       - ActiveBehaviourChanged
       - FermentationStatus
     sends: null

@@ -44,7 +44,7 @@ void DisplayController::onTemperatureSample(const TemperatureSampleEvent& event)
     // nothing to do
 }
 
-void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
+void DisplayController::onDisplayCommand(const DisplayCommandEvent& event){
     // nothing to do
 }
 

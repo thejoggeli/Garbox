@@ -8,4 +8,4 @@ behaviours:
   FermentationBehaviour:
     tick_phases: [Logic]
     receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]
-    sends: [FanCommand, BacklightCommand, HeatpadCommand, FermentationStatus]
+    sends: [FanCommand, DisplayCommand, HeatpadCommand, FermentationStatus]

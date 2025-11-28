@@ -21,8 +21,12 @@ events:
       measuredHumidity: float
 
     ### Display ###
-    BacklightCommand:
+    DisplayCommand:
       brightness: float
+
+    DisplayStatus:
+      brightness: float
+      skipped: uint32_t
 
     ### Fan ###
     FanStatus:  

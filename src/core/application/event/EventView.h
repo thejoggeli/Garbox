@@ -39,12 +39,12 @@ public:
 
     // non-const access
     EventHeader* header() { return mHeader; }
-    EventHeader* payload() { return mPayload; }
+    EventPayload<E>* payload() { return mPayload; }
     EventPayload<E>* operator->() { return mPayload; }
 
     // const access
     const EventHeader* header() const { return mHeader; }
-    const EventHeader* payload() const { return mPayload; }
+    const EventPayload<E>* payload() const { return mPayload; }
     const EventPayload<E>* operator->() const { return mPayload; }
 
 private:

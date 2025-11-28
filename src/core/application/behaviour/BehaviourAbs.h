@@ -26,9 +26,6 @@ protected:
     virtual void onBecomeActive() = 0;
     virtual void onBecomeInactive() = 0;
 
-    void requestChangeBehaviour(BehaviourId screenId);
-    void requestChangeScreen(ScreenId screenId);
-
 private:
 
     bool mActive = false;

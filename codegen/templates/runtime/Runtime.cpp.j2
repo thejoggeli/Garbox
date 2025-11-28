@@ -20,7 +20,12 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
         .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
         .eventQueueLength = {{ application.event_queue_length }},
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis){
+    mTickRunner(TickHandlersCount, TickPeriodMillis),
+    mEventReplay(
+{%- for name, screen_data in screens.items() -%} 
+        m{{ name }}{% if not loop.last %}, {% endif %}
+{%- endfor -%} 
+    ){
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -60,6 +65,14 @@ void {{ RuntimeName }}::onRun(){
     Time::Start();
     Profiler::Reset();
     mTickRunner.run();
+}
+
+void {{ RuntimeName}}::onActiveBehaviourChanged(){
+    // nothing to do
+}
+
+void {{ RuntimeName}}::onActiveScreenChanged(){
+    mEventReplay.replay();
 }
 
 void {{ RuntimeName}}::handleTickStart(){

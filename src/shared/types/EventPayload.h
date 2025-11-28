@@ -26,8 +26,13 @@ struct FermentationStatusPayload {
     float measuredHumidity;
 };
 
-struct BacklightCommandPayload {
+struct DisplayCommandPayload {
     float brightness;
+};
+
+struct DisplayStatusPayload {
+    float brightness;
+    uint32_t skipped;
 };
 
 struct FanStatusPayload {
@@ -97,21 +102,9 @@ struct ActiveBehaviourChangedPayload {
     BehaviourId newBehaviour;
 };
 
-struct RequestChangeBehaviourPayload {
-    BehaviourId behaviour;
-};
-
 struct ActiveScreenChangedPayload {
     ScreenId oldScreen;
     ScreenId newScreen;
-};
-
-struct RequestChangeScreenPayload {
-    ScreenId screen;
-};
-
-struct RequestUpdateScreensPayload {
-    // no fields
 };
 
 // generated mappings
@@ -129,8 +122,13 @@ struct ResolveEventPayload<EventType::FermentationStatus> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::BacklightCommand> {
-    using type = BacklightCommandPayload;
+struct ResolveEventPayload<EventType::DisplayCommand> {
+    using type = DisplayCommandPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::DisplayStatus> {
+    using type = DisplayStatusPayload;
 };
 
 template<>
@@ -194,23 +192,8 @@ struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::RequestChangeBehaviour> {
-    using type = RequestChangeBehaviourPayload;
-};
-
-template<>
 struct ResolveEventPayload<EventType::ActiveScreenChanged> {
     using type = ActiveScreenChangedPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::RequestChangeScreen> {
-    using type = RequestChangeScreenPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::RequestUpdateScreens> {
-    using type = RequestUpdateScreensPayload;
 };
 
 // resolve EventType to EventPayload

@@ -8,14 +8,19 @@ class {{ name }} : public {{ name }}Abs {
 public:
 
     {{ name }}();
+
+    // update all user interface elements in this method
+    void onUpdateScreen() final;
 {% if screen.tick_phases %}
 
+    // tick handlers
     {% for tick in screen.tick_phases %}
     void on{{ tick }}() final;
     {% endfor %}
 {% endif %}
 {% if screen.receives %}
 
+    // event handlers
     {% for ev in screen.receives %}
     void on{{ ev }}(const {{ ev }}Event& event) final;
     {% endfor %}

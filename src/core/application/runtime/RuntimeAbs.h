@@ -36,10 +36,13 @@ public:
     void start();
     void run();
 
-    // BaseHostIfc
-    virtual void publishEvent(const EventHeader* header) final;
-    virtual EventFactory& getEventFactory() final;
-    virtual const RuntimeContext& getContext() const final;
+    // ComponentHostIfc
+    void requestChangeBehaviour(BehaviourId id) final;
+    void requestChangeScreen(ScreenId id) final;
+    void requestUpdateScreenNow() final;
+    void publishEvent(const EventHeader* header) final;
+    EventFactory& getEventFactory() final;
+    const RuntimeContext& getContext() const final;
 
 protected:
 
@@ -58,11 +61,6 @@ protected:
     // components setup
     void registerComponent(ComponentAbs* component);
 
-    // resolve specialized types
-    virtual BehaviourAbs* resolveBehaviour(BehaviourId id) = 0;
-    virtual ControllerAbs* resolveController(ControllerId id) = 0;
-    virtual ScreenAbs* resolveScreen(ScreenId id) = 0;
-
     // event handling internal methods
     void dispatchEvents();
     void clearEventQueue();
@@ -79,9 +77,15 @@ protected:
     virtual void onInit() = 0;
     virtual void onStart() = 0;
     virtual void onRun() = 0;
-    virtual void onUpdateScreens();
     virtual void onRegister() = 0;
     virtual void onRouteEvent(const EventHeader* event) = 0;
+    virtual void onActiveBehaviourChanged() = 0;
+    virtual void onActiveScreenChanged() = 0;
+
+    // resolve specialized types
+    virtual BehaviourAbs* resolveBehaviour(BehaviourId id) = 0;
+    virtual ControllerAbs* resolveController(ControllerId id) = 0;
+    virtual ScreenAbs* resolveScreen(ScreenId id) = 0;
 
 private:
 

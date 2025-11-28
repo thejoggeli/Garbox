@@ -10,7 +10,18 @@ public:
 
     MainScreen();
 
-    void onHeartbeat(const HeartbeatEvent& event) final;
+    void onUpdateScreen() final;
+
+    void onFanStatus(const FanStatusEvent& event) final;
+    void onFanSample(const FanSampleEvent& event) final;
+    void onHeatpadStatus(const HeatpadStatusEvent& event) final;
+    void onHeatpadSample(const HeatpadSampleEvent& event) final;
+    void onTemperatureStatus(const TemperatureStatusEvent& event) final;
+    void onTemperatureSample(const TemperatureSampleEvent& event) final;
+    void onDisplayCommand(const DisplayCommandEvent& event) final;
+    void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
+    void onFermentationStatus(const FermentationStatusEvent& event) final;
+    void onDisplayStatus(const DisplayStatusEvent& event) final;
 
 private:
 

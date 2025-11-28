@@ -12,21 +12,24 @@ public:
     MainScreenAbs();
 
     // receive event handlers
-    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
-
-    // update handlers
-    void updateFanSample(const FanSamplePayload& payload);
-    void updateFanStatus(const FanStatusPayload& payload);
-    void updateHeatpadSample(const HeatpadSamplePayload& payload);
-    void updateHeatpadStatus(const HeatpadStatusPayload& payload);
+    virtual void onFanStatus(const FanStatusEvent& event) = 0;
+    virtual void onFanSample(const FanSampleEvent& event) = 0;
+    virtual void onHeatpadStatus(const HeatpadStatusEvent& event) = 0;
+    virtual void onHeatpadSample(const HeatpadSampleEvent& event) = 0;
+    virtual void onTemperatureStatus(const TemperatureStatusEvent& event) = 0;
+    virtual void onTemperatureSample(const TemperatureSampleEvent& event) = 0;
+    virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
+    virtual void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) = 0;
+    virtual void onFermentationStatus(const FermentationStatusEvent& event) = 0;
+    virtual void onDisplayStatus(const DisplayStatusEvent& event) = 0;
 
 protected:
 
     // make typed events
-    BacklightCommandEvent makeBacklightCommandEvent();
+    DisplayCommandEvent makeDisplayCommandEvent();
 
     // send typed events
-    void sendEvent(const BacklightCommandEvent& event);
+    void sendEvent(const DisplayCommandEvent& event);
 
 private:
 

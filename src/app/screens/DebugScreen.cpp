@@ -24,6 +24,10 @@ void DebugScreen::onBecomeInactive(){
     // nothing to do
 }
 
+void DebugScreen::onUpdateScreen(){
+    // nothing to do   
+}
+
 void DebugScreen::onHeartbeat(const HeartbeatEvent& event){
     // nothing to do
 }

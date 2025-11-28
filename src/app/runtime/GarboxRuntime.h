@@ -2,8 +2,10 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+#include "app/runtime/EventReplay.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
+// include all components
 #include "app/behaviours/CalibrationBehaviour.h"
 #include "app/behaviours/FermentationBehaviour.h"
 #include "app/controllers/actuators/FanController.h"
@@ -26,6 +28,7 @@ public:
 private:
 
     TickRunner mTickRunner;
+    EventReplay mEventReplay;
 
     CalibrationBehaviour mCalibrationBehaviour;
     FermentationBehaviour mFermentationBehaviour;
@@ -54,8 +57,10 @@ private:
     void onInit() final;
     void onStart() final;
     void onRun() final;
-    void onRouteEvent(const EventHeader* header) final;
     void onRegister() final;
+    void onRouteEvent(const EventHeader* header) final;
+    void onActiveBehaviourChanged() final;
+    void onActiveScreenChanged() final;
 
     BehaviourAbs* resolveBehaviour(BehaviourId id) final;
     ControllerAbs* resolveController(ControllerId id) final;

@@ -15,8 +15,8 @@ FanCommandEvent FermentationBehaviourAbs::makeFanCommandEvent(){
     return BehaviourAbs::makeEvent<EventType::FanCommand>();
 }
 
-BacklightCommandEvent FermentationBehaviourAbs::makeBacklightCommandEvent(){
-    return BehaviourAbs::makeEvent<EventType::BacklightCommand>();
+DisplayCommandEvent FermentationBehaviourAbs::makeDisplayCommandEvent(){
+    return BehaviourAbs::makeEvent<EventType::DisplayCommand>();
 }
 
 HeatpadCommandEvent FermentationBehaviourAbs::makeHeatpadCommandEvent(){
@@ -31,7 +31,7 @@ void FermentationBehaviourAbs::sendEvent(const FanCommandEvent& event){
     publishEvent(event.header());
 }
 
-void FermentationBehaviourAbs::sendEvent(const BacklightCommandEvent& event){
+void FermentationBehaviourAbs::sendEvent(const DisplayCommandEvent& event){
     publishEvent(event.header());
 }
 

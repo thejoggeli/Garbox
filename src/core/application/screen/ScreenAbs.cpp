@@ -11,8 +11,12 @@ ScreenAbs::ScreenAbs(ComponentId componentId, ScreenId ScreenId):
     // nothing to do
 }
 
+void ScreenAbs::updateScreen(){
+    onUpdateScreen();
+}
+
 void ScreenAbs::setActive(bool active){
-    if(!mInitialized){
+    if(!isInitialized()){
         TriggerExit("ScreenAbs", "not initialized");
     }
     if(active == mActive){
@@ -26,18 +30,6 @@ void ScreenAbs::setActive(bool active){
     else {
         onBecomeInactive();
     }
-}
-
-void ScreenAbs::requestChangeBehaviour(BehaviourId behaviourId){
-    RequestChangeBehaviourEvent event = makeEvent<EventType::RequestChangeBehaviour>();
-    event->behaviour = behaviourId;
-    publishEvent(event.header());
-}
-
-void ScreenAbs::requestChangeScreen(ScreenId screenId){
-    RequestChangeScreenEvent event = makeEvent<EventType::RequestChangeScreen>();
-    event->screen = screenId;
-    publishEvent(event.header());
 }
 
 } // namespace

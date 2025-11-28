@@ -11,6 +11,8 @@ public:
 
     ScreenAbs(ComponentId componentId, ScreenId screenId);
 
+    void updateScreen();
+
     // unlike controllers, behaviours can be active or inactive
     void setActive(bool active);
     bool isActive() const { return mActive; }
@@ -25,9 +27,7 @@ protected:
     // abstract methods for user of class
     virtual void onBecomeActive() = 0;
     virtual void onBecomeInactive() = 0;
-
-    void requestChangeBehaviour(BehaviourId screenId);
-    void requestChangeScreen(ScreenId screenId);
+    virtual void onUpdateScreen() = 0;
 
 private:
 

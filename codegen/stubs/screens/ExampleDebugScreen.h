@@ -10,6 +10,10 @@ public:
 
     DebugScreen();
 
+    // update all user interface elements in this method
+    void onUpdateScreen() final;
+
+    // event handlers
     void onHeartbeat(const HeartbeatEvent& event) final;
 
 private:

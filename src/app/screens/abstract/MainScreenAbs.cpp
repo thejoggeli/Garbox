@@ -11,28 +11,12 @@ MainScreenAbs::MainScreenAbs():
     // nothing to do
 }
 
-BacklightCommandEvent MainScreenAbs::makeBacklightCommandEvent(){
-    return ScreenAbs::makeEvent<EventType::BacklightCommand>();
+DisplayCommandEvent MainScreenAbs::makeDisplayCommandEvent(){
+    return ScreenAbs::makeEvent<EventType::DisplayCommand>();
 }
 
-void MainScreenAbs::sendEvent(const BacklightCommandEvent& event){
+void MainScreenAbs::sendEvent(const DisplayCommandEvent& event){
     publishEvent(event.header());
-}
-
-void updateFanSample(const FanSamplePayload& payload){
-    // nothing to do
-}
-
-void updateFanStatus(const FanStatusPayload& payload){
-    // nothing to do
-}
-
-void updateHeatpadSample(const HeatpadSamplePayload& payload){
-    // nothing to do
-}
-
-void updateHeatpadStatus(const HeatpadStatusPayload& payload){
-    // nothing to do
 }
 
 } // namespace Garbox

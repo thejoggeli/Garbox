@@ -29,19 +29,32 @@ private:
     MainScreenAbs& mMainScreen;
     DebugScreenAbs& mDebugScreen;
 
-    DirtyDispatcher mMainScreenDispatcher {4};
+    DirtyDispatcher mMainScreenDispatcher {10};
     DirtyDispatcher mDebugScreenDispatcher {1};
 
-    FanStatusPayload mFanStatusShadow;
-    FanSamplePayload mFanSampleShadow;
-    HeatpadStatusPayload mHeatpadStatusShadow;
-    HeatpadSamplePayload mHeatpadSampleShadow;
+    EventBlock<EventType::Heartbeat> mHeartbeatBlock;
+    EventBlock<EventType::FermentationStatus> mFermentationStatusBlock;
+    EventBlock<EventType::DisplayCommand> mDisplayCommandBlock;
+    EventBlock<EventType::DisplayStatus> mDisplayStatusBlock;
+    EventBlock<EventType::FanStatus> mFanStatusBlock;
+    EventBlock<EventType::FanSample> mFanSampleBlock;
+    EventBlock<EventType::HeatpadStatus> mHeatpadStatusBlock;
+    EventBlock<EventType::HeatpadSample> mHeatpadSampleBlock;
+    EventBlock<EventType::TemperatureStatus> mTemperatureStatusBlock;
+    EventBlock<EventType::TemperatureSample> mTemperatureSampleBlock;
+    EventBlock<EventType::ActiveBehaviourChanged> mActiveBehaviourChangedBlock;
 
-    static void sendFanSampleToMainScreen(void* context);
     static void sendFanStatusToMainScreen(void* context);
-    static void sendHeatpadSampleToMainScreen(void* context);
+    static void sendFanSampleToMainScreen(void* context);
     static void sendHeatpadStatusToMainScreen(void* context);
-    static void sendFanStatusToDebugScreen(void* context);
+    static void sendHeatpadSampleToMainScreen(void* context);
+    static void sendTemperatureStatusToMainScreen(void* context);
+    static void sendTemperatureSampleToMainScreen(void* context);
+    static void sendDisplayCommandToMainScreen(void* context);
+    static void sendActiveBehaviourChangedToMainScreen(void* context);
+    static void sendFermentationStatusToMainScreen(void* context);
+    static void sendDisplayStatusToMainScreen(void* context);
+    static void sendHeartbeatToDebugScreen(void* context);
 
 };
 

@@ -12,7 +12,8 @@ const char* EventTypeToString(EventType type){
 
         case EventType::Heartbeat: return "Heartbeat";
         case EventType::FermentationStatus: return "FermentationStatus";
-        case EventType::BacklightCommand: return "BacklightCommand";
+        case EventType::DisplayCommand: return "DisplayCommand";
+        case EventType::DisplayStatus: return "DisplayStatus";
         case EventType::FanStatus: return "FanStatus";
         case EventType::FanSample: return "FanSample";
         case EventType::FanCommand: return "FanCommand";
@@ -25,10 +26,7 @@ const char* EventTypeToString(EventType type){
         case EventType::ButtonRepeat: return "ButtonRepeat";
         case EventType::EncoderStep: return "EncoderStep";
         case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";
-        case EventType::RequestChangeBehaviour: return "RequestChangeBehaviour";
         case EventType::ActiveScreenChanged: return "ActiveScreenChanged";
-        case EventType::RequestChangeScreen: return "RequestChangeScreen";
-        case EventType::RequestUpdateScreens: return "RequestUpdateScreens";
 
         case EventType::Count: return "Count";
     }

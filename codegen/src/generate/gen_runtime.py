@@ -84,9 +84,8 @@ def _generate_event_replay(ctx: Context, loader: Loader):
     # extract used events
     used_events = SortedSet()
     for screen_name, screen_data in loader.config["screens"].items():
-        for state_list in screen_data["states"].values():
-            for state_entry in state_list:
-                used_events.add(state_entry["event"])
+        for event_name in screen_data["receives"]:
+            used_events.add(event_name)
     for event_name, event in loader.config["events"]["types"].items():
         if(event_name in used_events):
             replay_dict["events"][event_name] = event

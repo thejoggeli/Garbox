@@ -189,7 +189,7 @@ void DisplayController::onFermentationStatus(const FermentationStatusEvent& even
     markDirty(Index::FermentationStatus);
 };
 
-void DisplayController::onBacklightCommand(const BacklightCommandEvent& event){
+void DisplayController::onDisplayCommand(const DisplayCommandEvent& event){
     setBrightnessSmooth(event->brightness, 1000_ms);
 };
 

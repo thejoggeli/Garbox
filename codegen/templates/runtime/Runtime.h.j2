@@ -1,8 +1,10 @@
 #pragma once
 {% include "_common/header.j2" %}
 {% set RuntimeName = application.app_name ~ 'Runtime' %}
+#include "app/runtime/EventReplay.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
+// include all components
 {# include all behaviour headers #}
 {% for path in behaviour_paths | sort %}
 #include "{{ path }}.h"
@@ -26,6 +28,7 @@ public:
 private:
 
     TickRunner mTickRunner;
+    EventReplay mEventReplay;
 
     {# behaviour instances #}
     {% for beh in behaviours %}
@@ -53,8 +56,10 @@ private:
     void onInit() final;
     void onStart() final;
     void onRun() final;
-    void onRouteEvent(const EventHeader* header) final;
     void onRegister() final;
+    void onRouteEvent(const EventHeader* header) final;
+    void onActiveBehaviourChanged() final;
+    void onActiveScreenChanged() final;
 
     BehaviourAbs* resolveBehaviour(BehaviourId id) final;
     ControllerAbs* resolveController(ControllerId id) final;

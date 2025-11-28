@@ -1,6 +1,8 @@
 #pragma once
 
 #include "core/application/runtime/RuntimeContext.h"
+#include "shared/types/BehaviourId.h"
+#include "shared/types/ScreenId.h"
 
 namespace Garbox {
 
@@ -9,6 +11,10 @@ class EventFactory;
 
 class ComponentHostIfc {
 public:
+
+    virtual void requestChangeBehaviour(BehaviourId id) = 0;
+    virtual void requestChangeScreen(ScreenId id) = 0;
+    virtual void requestUpdateScreenNow() = 0;
 
     virtual void publishEvent(const EventHeader* header) = 0;
     virtual EventFactory& getEventFactory() = 0;

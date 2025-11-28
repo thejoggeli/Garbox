@@ -22,6 +22,10 @@ void {{ name }}::onBecomeActive(){
 void {{ name }}::onBecomeInactive(){
     // nothing to do
 }
+
+void {{ name }}::onUpdateScreen(){
+    // nothing to do   
+}
 {% if screen.tick_phases %}
 {% for tick in screen.tick_phases %}
 

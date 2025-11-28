@@ -24,6 +24,12 @@ public:
     // check if behaviour is initialized
     bool isInitialized() const { return mInitialized; }
 
+    // get runtime context
+    const RuntimeContext* getContext() { return mContext; }
+
+    // get the host of this behaviour
+    ComponentHostIfc* getHost() { return mHost; }
+
     // component descriptor
     ComponentDescriptor getComponentDescriptor() const { return mComponentDescriptor; }
     ComponentType getComponentType() const { return mComponentDescriptor.type; }
@@ -36,21 +42,9 @@ public:
     ComponentAbs& operator=(ComponentAbs&&) = delete;
 
 protected:
-    
-    // runtime context (injected in init() through host)
-    const RuntimeContext* mContext = nullptr;
-
-    // host of this component
-    ComponentHostIfc* mHost = nullptr;
-
-    // initialized flag
-    bool mInitialized = false;
 
     // the descriptor of this component
     const ComponentDescriptor mComponentDescriptor;
-
-    // get the host of this behaviour
-    ComponentHostIfc* getComponentHost() { return mHost; }
 
     // abstract methods for deriving class
     virtual void onInit() = 0;
@@ -73,6 +67,15 @@ protected:
     }
 
 private:
+
+    // initialized flag
+    bool mInitialized = false;
+    
+    // runtime context (injected in init() through host)
+    const RuntimeContext* mContext = nullptr;
+
+    // host of this component
+    ComponentHostIfc* mHost = nullptr;
 
     // event factory (injected in init() through host)
     EventFactory* mEventFactory = nullptr;

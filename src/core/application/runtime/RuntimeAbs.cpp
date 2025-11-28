@@ -84,6 +84,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
     mActiveBehaviour->setActive(true);
 
     // send event
+    onActiveBehaviourChanged();
     publishEvent(event.header());   
 }
 
@@ -119,6 +120,7 @@ void RuntimeAbs::applyQueuedScreen() {
     mActiveScreen->setActive(true);
 
     // send event
+    onActiveScreenChanged();
     publishEvent(event.header());   
 }
 
@@ -128,27 +130,6 @@ void RuntimeAbs::registerComponent(ComponentAbs* component){
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
-
-    switch(header->type){
-        case EventType::RequestChangeBehaviour: {
-            RequestChangeBehaviourEvent event(header);
-            setQueuedBehaviour(resolveBehaviour(event->behaviour));
-            break;
-        }
-        case EventType::RequestChangeScreen: {
-            RequestChangeScreenEvent event(header);
-            setQueuedScreen(resolveScreen(event->screen));
-            break;
-        }
-        case EventType::RequestUpdateScreens: {
-            onUpdateScreens();
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-
     // send event to router event
     mContext.eventCount++;
     if(header->bypassQueue){
@@ -182,6 +163,20 @@ void RuntimeAbs::dispatchEvents(){
 
 const RuntimeContext& RuntimeAbs::getContext() const {
     return mContext;
+}
+
+void RuntimeAbs::requestChangeBehaviour(BehaviourId id){
+    setQueuedBehaviour(resolveBehaviour(id));
+}
+
+void RuntimeAbs::requestChangeScreen(ScreenId id){
+    setQueuedScreen(resolveScreen(id));
+}
+
+void RuntimeAbs::requestUpdateScreenNow(){
+    if(mActiveScreen){
+        mActiveScreen->updateScreen();
+    }
 }
 
 } // namespace

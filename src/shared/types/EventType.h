@@ -14,7 +14,8 @@ enum class EventType : uint16_t {
     // generated from config
     Heartbeat,
     FermentationStatus,
-    BacklightCommand,
+    DisplayCommand,
+    DisplayStatus,
     FanStatus,
     FanSample,
     FanCommand,
@@ -27,10 +28,7 @@ enum class EventType : uint16_t {
     ButtonRepeat,
     EncoderStep,
     ActiveBehaviourChanged,
-    RequestChangeBehaviour,
     ActiveScreenChanged,
-    RequestChangeScreen,
-    RequestUpdateScreens,
 
     // enum size marker
     Count,
