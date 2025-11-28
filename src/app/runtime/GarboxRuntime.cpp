@@ -132,15 +132,23 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
     case EventType::Heartbeat: {
         const HeartbeatEvent event(header);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mCalibrationBehaviour.onHeartbeat(event);
+            mFermentationBehaviour.onHeartbeat(event);
+            mDebugScreen.onHeartbeat(event);
+            mMainScreen.onHeartbeat(event);
         }
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
-            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeartbeat(event); break;
-            default: break; // active screen does not support event type
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
+                default: break; // active behaviour does not support event type
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeartbeat(event); break;
+                default: break; // active screen does not support event type
+            }
         }
         break;
     }
@@ -157,20 +165,32 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::FanStatus: {
         const FanStatusEvent event(header);
         mDisplayController.onFanStatus(event);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mCalibrationBehaviour.onFanStatus(event);
+            mFermentationBehaviour.onFanStatus(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
     case EventType::FanSample: {
         const FanSampleEvent event(header);
         mDisplayController.onFanSample(event);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mCalibrationBehaviour.onFanSample(event);
+            mFermentationBehaviour.onFanSample(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
@@ -182,9 +202,14 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::HeatpadStatus: {
         const HeatpadStatusEvent event(header);
         mDisplayController.onHeatpadStatus(event);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onHeatpadStatus(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
@@ -201,43 +226,68 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::TemperatureStatus: {
         const TemperatureStatusEvent event(header);
         mDisplayController.onTemperatureStatus(event);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatus(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onTemperatureStatus(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatus(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
     case EventType::TemperatureSample: {
         const TemperatureSampleEvent event(header);
         mDisplayController.onTemperatureSample(event);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSample(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onTemperatureSample(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSample(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
     case EventType::ButtonStateChanged: {
         const ButtonStateChangedEvent event(header);
         mI2cPartsController.onButtonStateChanged(event);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChanged(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onButtonStateChanged(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChanged(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
     case EventType::ButtonRepeat: {
         const ButtonRepeatEvent event(header);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeat(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onButtonRepeat(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeat(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }
     case EventType::EncoderStep: {
         const EncoderStepEvent event(header);
-        switch(mActiveBehaviour->getBehaviourId()){
-            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStep(event); break;
-            default: break; // active behaviour does not support event type
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onEncoderStep(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStep(event); break;
+                default: break; // active behaviour does not support event type
+            }
         }
         break;
     }

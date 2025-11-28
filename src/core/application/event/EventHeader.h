@@ -17,6 +17,9 @@ struct EventHeader {
     // component type + id of event sender
     ComponentDescriptor sender = {ComponentType::Null, ComponentId::Null};
 
+    // if set, the event will also be sent to inactive components
+    bool sendToInactiveComponents = false;
+
     // if set, the event will not be queued and instead the handlers will be called immediately
     bool bypassQueue = false;
 

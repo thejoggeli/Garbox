@@ -121,21 +121,33 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
         m{{ ctrl }}.on{{ event }}(event);
     {% endfor %}
     {# send event to active behaviour (if it supports this event) #}
-    {% if routes["behaviours"] | length > 0 %}
-        switch(mActiveBehaviour->getBehaviourId()){
-            {% for beha in routes["behaviours"] %}
-            case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event }}(event); break;
-            {% endfor %}
-            default: break; // active behaviour does not support event type
+    {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 %}
+        if(header->sendToInactiveComponents){
+        {% for beha in routes["behaviours"] %}
+            m{{ beha }}.on{{ event }}(event);
+        {% endfor %}
+        {% for screen in routes["screens"] %}
+            m{{ screen }}.on{{ event }}(event);
+        {% endfor %}
         }
-    {% endif %}
-    {# send event to active screen (if it supports this event) #}
-    {% if routes["screens"] | length > 0 %}
-        switch(mActiveScreen->getScreenId()){
-            {% for screen in routes["screens"] %}
-            case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ event }}(event); break;
+        else {
+        {% if routes["behaviours"] | length > 0 %}
+            switch(mActiveBehaviour->getBehaviourId()){
+            {% for beha in routes["behaviours"] %}
+                case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event }}(event); break;
             {% endfor %}
-            default: break; // active screen does not support event type
+                default: break; // active behaviour does not support event type
+            }
+        {% endif %}
+    {# send event to active screen (if it supports this event) #}
+        {% if routes["screens"] | length > 0 %}
+            switch(mActiveScreen->getScreenId()){
+            {% for screen in routes["screens"] %}
+                case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ event }}(event); break;
+            {% endfor %}
+                default: break; // active screen does not support event type
+            }
+        {% endif %}
         }
     {% endif %}
         break;
