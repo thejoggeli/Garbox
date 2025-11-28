@@ -3,21 +3,23 @@
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "core/application/controller/ControllerAbs.h"
 #include "core/application/event/EventFactory.h"
-#include "core/application/host/BehaviourHostIfc.h"
-#include "core/application/host/ControllerHostIfc.h"
+#include "core/application/component/ComponentHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "core/util/container/ringbuffer/HeapRingBuffer.h"
 #include "core/util/container/Span.h"
+#include "core/util/container/vector/HeapVector.h"
 
 namespace Garbox {
 
 /**
  * Extend this class in the application
  */
-class RuntimeAbs : public BehaviourHostIfc, public ControllerHostIfc {
+class RuntimeAbs : public ComponentHostIfc {
 public:
 
     struct Config {
+        size_t maxControllers = 16;
+        size_t maxBehaviours = 16;
         size_t eventPoolSizeBytes = 1024;
         size_t eventQueueLength = 64;
     };
@@ -38,10 +40,6 @@ public:
     virtual void publishEvent(const EventHeader* header) final;
     virtual EventFactory& getEventFactory() final;
     virtual const RuntimeContext& getContext() const final;
-
-    // BehaviourHostIfc
-    void requestChangeBehaviour(BehaviourId id) final;
-    BehaviourAbs* getActiveBehaviour() const final;
 
 protected:
 
@@ -70,7 +68,6 @@ protected:
     // behaviours internal methods
     void setQueuedBehaviour(BehaviourAbs* behaviour);
     void applyQueuedBehaviour(); 
-    bool hasQueuedBehaviour() const;
 
     // to be implemented by user
     virtual void onInit() = 0;
@@ -89,13 +86,11 @@ private:
     HeapRingBuffer<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
     // controllers array
-    static constexpr size_t MaxControllersCount = 16;
-    ControllerAbs* mControllersRawArray[MaxControllersCount];
+    HeapVector<ControllerAbs*> mControllers;
     Span<ControllerAbs*> mControllersSpan;
 
     // behaviours array
-    static constexpr size_t MaxBehavioursCount = 16;
-    BehaviourAbs* mBehavioursRawArray[MaxBehavioursCount];
+    HeapVector<BehaviourAbs*> mBehaviours;
     Span<BehaviourAbs*> mBehavioursSpan;
 
 };

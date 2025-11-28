@@ -20,6 +20,8 @@ public:
 
 private:
 
+    uint32_t mCounter = 0;
+
     void onInit() final;
     void onStart() final;
     void onBecomeActive() final;

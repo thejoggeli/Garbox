@@ -11,8 +11,4 @@ ControllerAbs::ControllerAbs(ComponentId componentId, ControllerId controllerId)
     // nothing to do
 }
 
-void ControllerAbs::setControllerHost(ControllerHostIfc& host){
-    setComponentHost(host);
-}
-
 } // namespace

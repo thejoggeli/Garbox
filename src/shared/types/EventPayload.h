@@ -96,6 +96,10 @@ struct ActiveBehaviourChangedPayload {
     BehaviourId newBehaviour;
 };
 
+struct RequestChangeBehaviourPayload {
+    BehaviourId behaviour;
+};
+
 // generated mappings
 template<EventType>
 struct ResolveEventPayload; // primary template (intentionally undefined)
@@ -173,6 +177,11 @@ struct ResolveEventPayload<EventType::EncoderStep> {
 template<>
 struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
     using type = ActiveBehaviourChangedPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::RequestChangeBehaviour> {
+    using type = RequestChangeBehaviourPayload;
 };
 
 // resolve EventType to EventPayload

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/application/component/ComponentDescriptor.h"
+#include "core/application/component/ComponentHostIfc.h"
 #include "core/application/event/EventFactory.h"
 #include "core/application/event/EventView.h"
-#include "core/application/host/ComponentHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "shared/types/EventAlias.h"
 #include "shared/types/EventPayload.h"
@@ -18,11 +18,8 @@ public:
     ~ComponentAbs();
 
     // setup methhods
-    void init();
+    void init(ComponentHostIfc& host);
     void start();
-
-    // set host
-    void setComponentHost(ComponentHostIfc& host);
 
     // check if behaviour is initialized
     bool isInitialized() const { return mInitialized; }

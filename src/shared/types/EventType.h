@@ -27,6 +27,7 @@ enum class EventType : uint16_t {
     ButtonRepeat,
     EncoderStep,
     ActiveBehaviourChanged,
+    RequestChangeBehaviour,
 
     // enum size marker
     Count,

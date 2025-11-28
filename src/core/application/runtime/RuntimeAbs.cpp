@@ -17,7 +17,9 @@ RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
     mEventFactory(config.eventPoolSizeBytes),
     mEventQueue(config.eventQueueLength),
+    mControllers(config.maxControllers),
     mControllersSpan(nullptr, 0),
+    mBehaviours(config.maxBehaviours),
     mBehavioursSpan(nullptr, 0){
     // constructor body
 }
@@ -27,24 +29,14 @@ void RuntimeAbs::init(){
     // derived class must register controllers, behaviours and ticks
     onRegister();
 
-    // set all controller hosts
-    for(ControllerAbs* controller : mControllersSpan){
-        controller->setControllerHost(*this);
-    }
-
-    // set all behaviours hosts
-    for(BehaviourAbs* behaviour : mBehavioursSpan){
-        behaviour->setBehaviourHost(*this);
-    }
-
     // init all controllers
     for(ControllerAbs* controller : mControllersSpan){
-        controller->init();
+        controller->init(*this);
     }
 
     // init all behaviours
     for(BehaviourAbs* behaviour : mBehavioursSpan){
-        behaviour->init();
+        behaviour->init(*this);
     }
 
     // init derived class
@@ -109,22 +101,10 @@ void RuntimeAbs::applyQueuedBehaviour() {
     publishEvent(event.header());   
 }
 
-void RuntimeAbs::requestChangeBehaviour(BehaviourId id){
-    BehaviourAbs* behaviour = resolveBehaviour(id);
-    AssertExit(behaviour != nullptr, "RuntimeAbs", "failed to resolve behaviour", static_cast<uint32_t>(id));
-    setQueuedBehaviour(behaviour);
-}
-
-BehaviourAbs* RuntimeAbs::getActiveBehaviour() const {
-    return mActiveBehaviour;
-}
-
 void RuntimeAbs::registerController(ControllerAbs* controller){
-    const size_t maxIndex = MaxControllersCount - 1;
-    const size_t nextIndex = mControllersSpan.size();
-    AssertExit(nextIndex <= maxIndex, "RuntimeAbs", "max controllers count exceeded");
-    mControllersRawArray[nextIndex] = controller;
-    mControllersSpan = Span<ControllerAbs*>(mControllersRawArray, mControllersSpan.size()+1);
+    AssertExit(!mControllers.full(), "RuntimeAbs", "max controllers count exceeded");
+    mControllers.push(controller);
+    mControllersSpan = Span<ControllerAbs*>(&mControllers[0], mControllers.size());
 }
 
 Span<ControllerAbs*> RuntimeAbs::getControllers(){
@@ -132,11 +112,9 @@ Span<ControllerAbs*> RuntimeAbs::getControllers(){
 }
 
 void RuntimeAbs::registerBehaviour(BehaviourAbs* behaviour){
-    const size_t maxIndex = MaxBehavioursCount - 1;
-    const size_t nextIndex = mBehavioursSpan.size();
-    AssertExit(nextIndex <= maxIndex, "RuntimeAbs", "max behaviours count exceeded");
-    mBehavioursRawArray[nextIndex] = behaviour;
-    mBehavioursSpan = Span<BehaviourAbs*>(mBehavioursRawArray, mBehavioursSpan.size()+1);
+    AssertExit(!mBehaviours.full(), "RuntimeAbs", "max behaviours count exceeded");
+    mBehaviours.push(behaviour);
+    mBehavioursSpan = Span<BehaviourAbs*>(&mBehaviours[0], mBehaviours.size());
 }
 
 Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
@@ -144,6 +122,14 @@ Span<BehaviourAbs*> RuntimeAbs::getBehaviours(){
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
+
+    // handle change behaviour request
+    if(header->type == EventType::RequestChangeBehaviour){
+        RequestChangeBehaviourEvent event(header);
+        setQueuedBehaviour(resolveBehaviour(event->behaviour));
+    }
+
+    // send event to router event
     mContext.eventCount++;
     if(header->bypassQueue){
         onRouteEvent(header);

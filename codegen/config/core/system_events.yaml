@@ -4,6 +4,10 @@ events:
     include_h: ["shared/types/BehaviourId.h"]
 
   types:
+
     ActiveBehaviourChanged:
       oldBehaviour: BehaviourId
       newBehaviour: BehaviourId
+
+    RequestChangeBehaviour:
+      behaviour: BehaviourId

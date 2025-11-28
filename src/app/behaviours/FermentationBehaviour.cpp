@@ -133,7 +133,9 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
 }
     
 void FermentationBehaviour::onButtonRepeat(const ButtonRepeatEvent& event){
-    // nothing to do
+    if(event->count == 5){
+        requestChangeBehaviour(BehaviourId::Calibration);
+    }
 }
     
 void FermentationBehaviour::onEncoderStep(const EncoderStepEvent& event){

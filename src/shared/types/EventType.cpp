@@ -25,6 +25,7 @@ const char* EventTypeToString(EventType type){
         case EventType::ButtonRepeat: return "ButtonRepeat";
         case EventType::EncoderStep: return "EncoderStep";
         case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";
+        case EventType::RequestChangeBehaviour: return "RequestChangeBehaviour";
 
         case EventType::Count: return "Count";
     }

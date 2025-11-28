@@ -14,8 +14,13 @@ static constexpr size_t TickPeriodMillis = {{ application.tick_period_millis }};
 static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | default (0) }};
 {% endfor %}
 
-{{ RuntimeName }}::{{ RuntimeName }}(const RuntimeAbs::Config& config):
-    RuntimeAbs(config),
+{{ RuntimeName }}::{{ RuntimeName }}():
+    RuntimeAbs({
+        .maxControllers = {{ controllers | length }},
+        .maxBehaviours = {{ behaviours | length }},
+        .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
+        .eventQueueLength = {{ application.event_queue_length }},
+    }),
     mTickRunner(TickHandlersCount, TickPeriodMillis){
 
     // set start and end tick handlers

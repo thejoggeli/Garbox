@@ -23,5 +23,6 @@ using ButtonStateChangedEvent     = EventView<EventType::ButtonStateChanged>;
 using ButtonRepeatEvent           = EventView<EventType::ButtonRepeat>;
 using EncoderStepEvent            = EventView<EventType::EncoderStep>;
 using ActiveBehaviourChangedEvent = EventView<EventType::ActiveBehaviourChanged>;
+using RequestChangeBehaviourEvent = EventView<EventType::RequestChangeBehaviour>;
 
 } // namespace Garbox

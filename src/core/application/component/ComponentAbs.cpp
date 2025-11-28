@@ -13,8 +13,11 @@ ComponentAbs::~ComponentAbs(){
     TriggerExit("ComponentAbs", "components must not be destroyed");
 }
 
-void ComponentAbs::init(){
+void ComponentAbs::init(ComponentHostIfc& host){
     AssertExit(!mInitialized, "ComponentAbs", "already initialized");
+    mHost = &host;
+    mContext = &host.getContext();
+    mEventFactory = &host.getEventFactory();
     onInit();
     mInitialized = true;
 }
@@ -24,12 +27,6 @@ void ComponentAbs::start(){
         TriggerExit("ComponentAbs", "not initialized");
     }
     onStart();
-}
-
-void ComponentAbs::setComponentHost(ComponentHostIfc& host){
-    mHost = &host;
-    mContext = &host.getContext();
-    mEventFactory = &host.getEventFactory();
 }
 
 void ComponentAbs::publishEvent(const EventHeader* header){

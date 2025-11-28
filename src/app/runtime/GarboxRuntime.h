@@ -19,7 +19,7 @@ namespace Garbox {
 class GarboxRuntime : public RuntimeAbs {
 public:
 
-    GarboxRuntime(const RuntimeAbs::Config& config);
+    GarboxRuntime();
 
 private:
 

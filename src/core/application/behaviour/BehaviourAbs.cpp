@@ -11,10 +11,6 @@ BehaviourAbs::BehaviourAbs(ComponentId componentId, BehaviourId behaviourId):
     // nothing to do
 }
 
-void BehaviourAbs::setBehaviourHost(BehaviourHostIfc& host){
-    setComponentHost(host);
-}
-
 void BehaviourAbs::setActive(bool active){
     if(!mInitialized){
         TriggerExit("BehaviourAbs", "not initialized");
@@ -32,13 +28,10 @@ void BehaviourAbs::setActive(bool active){
     }
 }
 
-void BehaviourAbs::requestChangeBehaviour(BehaviourId BehaviourId){
-    BehaviourHostIfc* host = getBehaviourHost();
-    if(host == nullptr){
-        TriggerExit("BehaviourAbs", "host is nullptr");
-        return;
-    }
-    host->requestChangeBehaviour(BehaviourId);
+void BehaviourAbs::requestChangeBehaviour(BehaviourId behaviourId){
+    RequestChangeBehaviourEvent event = makeEvent<EventType::RequestChangeBehaviour>();
+    event->behaviour = behaviourId;
+    publishEvent(event.header());
 }
 
 } // namespace

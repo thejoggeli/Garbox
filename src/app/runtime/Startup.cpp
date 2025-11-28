@@ -18,10 +18,7 @@ void handleMainTask();
 void logProfiler();
 
 GarboxRuntime& getRuntime(){
-    static GarboxRuntime instance({
-        .eventPoolSizeBytes = AppConfig::RuntimeEventPoolSizeBytes,
-        .eventQueueLength = AppConfig::RuntimeEventQueueLength,    
-    });
+    static GarboxRuntime instance;
     return instance;
 }
 

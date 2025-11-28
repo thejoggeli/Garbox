@@ -18,8 +18,13 @@ static constexpr uint32_t OutputTickDelayMillis = 0;
 static constexpr uint32_t LoggingTickDelayMillis = 0;
 static constexpr uint32_t RenderTickDelayMillis = 20;
 
-GarboxRuntime::GarboxRuntime(const RuntimeAbs::Config& config):
-    RuntimeAbs(config),
+GarboxRuntime::GarboxRuntime():
+    RuntimeAbs({
+        .maxControllers = 7,
+        .maxBehaviours = 2,
+        .eventPoolSizeBytes = 1024,
+        .eventQueueLength = 128,
+    }),
     mTickRunner(TickHandlersCount, TickPeriodMillis){
 
     // set start and end tick handlers
@@ -253,6 +258,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::ActiveBehaviourChanged: {
         const ActiveBehaviourChangedEvent event(header);
         mDisplayController.onActiveBehaviourChanged(event);
+        break;
+    }
+    case EventType::RequestChangeBehaviour: {
+        const RequestChangeBehaviourEvent event(header);
         break;
     }
     case EventType::Null:
