@@ -28,6 +28,12 @@ void ScreenAbs::setActive(bool active){
     }
 }
 
+void ScreenAbs::requestChangeBehaviour(BehaviourId behaviourId){
+    RequestChangeBehaviourEvent event = makeEvent<EventType::RequestChangeBehaviour>();
+    event->behaviour = behaviourId;
+    publishEvent(event.header());
+}
+
 void ScreenAbs::requestChangeScreen(ScreenId screenId){
     RequestChangeScreenEvent event = makeEvent<EventType::RequestChangeScreen>();
     event->screen = screenId;

@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "core/application/component/ComponentAbs.h"
+#include "shared/types/BehaviourId.h"
 #include "shared/types/ScreenId.h"
 
 namespace Garbox {
@@ -25,7 +26,7 @@ protected:
     virtual void onBecomeActive() = 0;
     virtual void onBecomeInactive() = 0;
 
-    // behaviours can request to change the active behaviour
+    void requestChangeBehaviour(BehaviourId screenId);
     void requestChangeScreen(ScreenId screenId);
 
 private:

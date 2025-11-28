@@ -34,4 +34,10 @@ void BehaviourAbs::requestChangeBehaviour(BehaviourId behaviourId){
     publishEvent(event.header());
 }
 
+void BehaviourAbs::requestChangeScreen(ScreenId screenId){
+    RequestChangeScreenEvent event = makeEvent<EventType::RequestChangeScreen>();
+    event->screen = screenId;
+    publishEvent(event.header());
+}
+
 } // namespace
