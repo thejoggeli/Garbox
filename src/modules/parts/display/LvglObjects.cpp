@@ -33,10 +33,17 @@ void LvglObjects::init(lv_obj_t *parentObject){
 
     AssertExit((parentObject != nullptr), "LvglObjects", "parentObject is null");
 
+    // disable scrollbar
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_bg_opa(&style, LV_OPA_TRANSP);
     lv_obj_add_style(parentObject, &style, LV_PART_SCROLLBAR);
+
+    // create background
+    mBackground = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(mBackground, 320, 240);
+    lv_obj_set_style_bg_color(mBackground, lv_color_hex(0x0), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(mBackground, LV_OPA_COVER, LV_PART_MAIN);
 
     const int16_t startXPx = 10;
     const int16_t startYPx = 10;
@@ -121,6 +128,10 @@ void LvglObjects::setBoxPosition(float position){
     static constexpr float right = wDisplay;
     const float x = std::clamp(position * (right - left) + left, left, right);
     lv_obj_set_pos(mBox, x, y);
+}
+
+void LvglObjects::setBackgroundColor(uint32_t color){
+    lv_obj_set_style_bg_color(mBackground, lv_color_hex(color), LV_PART_MAIN);
 }
 
 } // namespace Garbox

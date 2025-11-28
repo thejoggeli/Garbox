@@ -21,7 +21,7 @@ public:
 {% endfor %} 
     );
 
-    void handleEvent(const EventHeader* header);
+    void storeEvent(const EventHeader* header);
     void replay(ScreenId screenId);
 
 private:

@@ -29,6 +29,19 @@ void DirtyDispatcher::markDirty(uint32_t index){
     }
 }
 
+void DirtyDispatcher::markAllDirty(){
+    for(uint32_t idx = 0; idx < mHandlers.size(); idx++){
+        markDirty(idx);
+    }
+}
+
+void DirtyDispatcher::clearAllDirty(){
+    HandlerEntry* entry;
+    while(mQueue.releaseFront(entry)){
+        entry->dirty = false;
+    }
+}
+
 void DirtyDispatcher::dispatch(){
     HandlerEntry* entry;
     while(mQueue.releaseFront(entry)){

@@ -5,6 +5,8 @@
 
 namespace Garbox {
 
+class LvglObjects;
+
 class DebugScreen : public DebugScreenAbs {
 public:
 
@@ -15,6 +17,9 @@ public:
     void onHeartbeat(const HeartbeatEvent& event) final;
 
 private:
+
+    LvglObjects& mObjects;
+    bool mFirstUpdate = true;
 
     void onInit() final;
     void onStart() final;

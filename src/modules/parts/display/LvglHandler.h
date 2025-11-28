@@ -41,9 +41,6 @@ private:
     lv_display_t* mLvDisplay = nullptr;
     LvglObjects mObjects;
 
-    // lvgl objects
-    lv_obj_t* mBackground;
-
     // drawing buffer
     lv_draw_buf_t mDrawBuffer1;
     lv_draw_buf_t mDrawBuffer2;

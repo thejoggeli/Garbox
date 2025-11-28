@@ -21,7 +21,7 @@ public:
         DebugScreenAbs& debugScreen 
     );
 
-    void handleEvent(const EventHeader* header);
+    void storeEvent(const EventHeader* header);
     void replay(ScreenId screenId);
 
 private:
@@ -29,12 +29,11 @@ private:
     MainScreenAbs& mMainScreen;
     DebugScreenAbs& mDebugScreen;
 
-    DirtyDispatcher mMainScreenDispatcher {10};
+    DirtyDispatcher mMainScreenDispatcher {9};
     DirtyDispatcher mDebugScreenDispatcher {1};
 
     EventBlock<EventType::Heartbeat> mHeartbeatBlock;
     EventBlock<EventType::FermentationStatus> mFermentationStatusBlock;
-    EventBlock<EventType::DisplayCommand> mDisplayCommandBlock;
     EventBlock<EventType::DisplayStatus> mDisplayStatusBlock;
     EventBlock<EventType::FanStatus> mFanStatusBlock;
     EventBlock<EventType::FanSample> mFanSampleBlock;
@@ -50,7 +49,6 @@ private:
     static void sendHeatpadSampleToMainScreen(void* context);
     static void sendTemperatureStatusToMainScreen(void* context);
     static void sendTemperatureSampleToMainScreen(void* context);
-    static void sendDisplayCommandToMainScreen(void* context);
     static void sendActiveBehaviourChangedToMainScreen(void* context);
     static void sendFermentationStatusToMainScreen(void* context);
     static void sendDisplayStatusToMainScreen(void* context);

@@ -12,4 +12,12 @@ DisplayControllerAbs::DisplayControllerAbs():
     // nothing to do
 }
 
+DisplayStatusEvent DisplayControllerAbs::makeDisplayStatusEvent(){
+    return ControllerAbs::makeEvent<EventType::DisplayStatus>();
+}
+
+void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
+    publishEvent(event.header());
+}
+
 } // namespace Garbox

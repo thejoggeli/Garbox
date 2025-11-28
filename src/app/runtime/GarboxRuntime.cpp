@@ -77,7 +77,9 @@ void GarboxRuntime::onActiveBehaviourChanged(){
 }
 
 void GarboxRuntime::onActiveScreenChanged(){
-    mEventReplay.replay();
+    if(mActiveScreen){
+        mEventReplay.replay(mActiveScreen->getScreenId());
+    }
 }
 
 void GarboxRuntime::handleTickStart(){
@@ -138,6 +140,11 @@ void GarboxRuntime::handleRenderTick(){
 }
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
+
+    // store event for replay
+    mEventReplay.storeEvent(header);
+
+    // route event to components
     switch(header->type){
     case EventType::Heartbeat: {
         const HeartbeatEvent event(header);
@@ -161,7 +168,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FermentationStatus: {
         const FermentationStatusEvent event(header);
-        mDisplayController.onFermentationStatus(event);
         if(header->sendToInactiveComponents){
             mMainScreen.onFermentationStatus(event);
         }
@@ -176,15 +182,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::DisplayCommand: {
         const DisplayCommandEvent event(header);
         mDisplayController.onDisplayCommand(event);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onDisplayCommand(event);
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayCommand(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
         break;
     }
     case EventType::DisplayStatus: {
@@ -202,7 +199,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FanStatus: {
         const FanStatusEvent event(header);
-        mDisplayController.onFanStatus(event);
         if(header->sendToInactiveComponents){
             mCalibrationBehaviour.onFanStatus(event);
             mFermentationBehaviour.onFanStatus(event);
@@ -223,7 +219,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FanSample: {
         const FanSampleEvent event(header);
-        mDisplayController.onFanSample(event);
         if(header->sendToInactiveComponents){
             mCalibrationBehaviour.onFanSample(event);
             mFermentationBehaviour.onFanSample(event);
@@ -249,7 +244,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::HeatpadStatus: {
         const HeatpadStatusEvent event(header);
-        mDisplayController.onHeatpadStatus(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onHeatpadStatus(event);
             mMainScreen.onHeatpadStatus(event);
@@ -268,7 +262,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::HeatpadSample: {
         const HeatpadSampleEvent event(header);
-        mDisplayController.onHeatpadSample(event);
         if(header->sendToInactiveComponents){
             mMainScreen.onHeatpadSample(event);
         }
@@ -287,7 +280,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::TemperatureStatus: {
         const TemperatureStatusEvent event(header);
-        mDisplayController.onTemperatureStatus(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onTemperatureStatus(event);
             mMainScreen.onTemperatureStatus(event);
@@ -306,7 +298,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::TemperatureSample: {
         const TemperatureSampleEvent event(header);
-        mDisplayController.onTemperatureSample(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onTemperatureSample(event);
             mMainScreen.onTemperatureSample(event);
@@ -365,7 +356,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::ActiveBehaviourChanged: {
         const ActiveBehaviourChangedEvent event(header);
-        mDisplayController.onActiveBehaviourChanged(event);
         if(header->sendToInactiveComponents){
             mMainScreen.onActiveBehaviourChanged(event);
         }

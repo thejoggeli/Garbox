@@ -33,7 +33,11 @@ public:
 
     void setBoxPosition(float position);
 
+    void setBackgroundColor(uint32_t color);
+
 private:
+
+    lv_obj_t* mBackground;
     lv_obj_t* mFanStateLabel = nullptr;
     lv_obj_t* mFanMeasuredRpmLabel = nullptr;
     lv_obj_t* mHeatpadStateLabel = nullptr;

@@ -3,17 +3,8 @@ controllers:
   DisplayController:
     subdir: "hmi"
     tick_phases: Render
-    receives:
-      - FanStatus
-      - FanSample
-      - HeatpadStatus
-      - HeatpadSample
-      - TemperatureStatus 
-      - TemperatureSample 
-      - DisplayCommand 
-      - ActiveBehaviourChanged
-      - FermentationStatus
-    sends: null
+    receives: [DisplayCommand]
+    sends: [DisplayStatus]
 
   DevtoolsController:
     subdir: "devtools"

@@ -20,7 +20,6 @@ public:
     void onHeatpadSample(const HeatpadSampleEvent& event) final;
     void onTemperatureStatus(const TemperatureStatusEvent& event) final;
     void onTemperatureSample(const TemperatureSampleEvent& event) final;
-    void onDisplayCommand(const DisplayCommandEvent& event) final;
     void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
     void onFermentationStatus(const FermentationStatusEvent& event) final;
     void onDisplayStatus(const DisplayStatusEvent& event) final;

@@ -1,4 +1,3 @@
-#pragma once
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
@@ -13,10 +12,9 @@ static constexpr size_t MainScreen_HeatpadStatus_Index = 2 ;
 static constexpr size_t MainScreen_HeatpadSample_Index = 3 ;
 static constexpr size_t MainScreen_TemperatureStatus_Index = 4 ;
 static constexpr size_t MainScreen_TemperatureSample_Index = 5 ;
-static constexpr size_t MainScreen_DisplayCommand_Index = 6 ;
-static constexpr size_t MainScreen_ActiveBehaviourChanged_Index = 7 ;
-static constexpr size_t MainScreen_FermentationStatus_Index = 8 ;
-static constexpr size_t MainScreen_DisplayStatus_Index = 9 ;
+static constexpr size_t MainScreen_ActiveBehaviourChanged_Index = 6 ;
+static constexpr size_t MainScreen_FermentationStatus_Index = 7 ;
+static constexpr size_t MainScreen_DisplayStatus_Index = 8 ;
 static constexpr size_t DebugScreen_Heartbeat_Index = 0 ;
 
 EventReplay::EventReplay(
@@ -33,7 +31,6 @@ EventReplay::EventReplay(
     mMainScreenDispatcher.registerHandler(sendHeatpadSampleToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendTemperatureStatusToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendTemperatureSampleToMainScreen, this);
-    mMainScreenDispatcher.registerHandler(sendDisplayCommandToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendActiveBehaviourChangedToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendFermentationStatusToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendDisplayStatusToMainScreen, this);
@@ -44,8 +41,6 @@ EventReplay::EventReplay(
     mHeartbeatBlock.header.sender = descriptor;
     mFermentationStatusBlock.header.type = EventType::FermentationStatus;
     mFermentationStatusBlock.header.sender = descriptor;
-    mDisplayCommandBlock.header.type = EventType::DisplayCommand;
-    mDisplayCommandBlock.header.sender = descriptor;
     mDisplayStatusBlock.header.type = EventType::DisplayStatus;
     mDisplayStatusBlock.header.sender = descriptor;
     mFanStatusBlock.header.type = EventType::FanStatus;
@@ -64,7 +59,7 @@ EventReplay::EventReplay(
     mActiveBehaviourChangedBlock.header.sender = descriptor;
 }
 
-void EventReplay::handleEvent(const EventHeader* header){
+void EventReplay::storeEvent(const EventHeader* header){
     switch(header->type){
         case EventType::Heartbeat:
             mHeartbeatBlock.header.id = header->id;
@@ -75,11 +70,6 @@ void EventReplay::handleEvent(const EventHeader* header){
             mFermentationStatusBlock.header.id = header->id;
             mFermentationStatusBlock.payload = *static_cast<FermentationStatusEvent>(header).payload();
             mMainScreenDispatcher.markDirty(MainScreen_FermentationStatus_Index);
-            break;
-        case EventType::DisplayCommand:
-            mDisplayCommandBlock.header.id = header->id;
-            mDisplayCommandBlock.payload = *static_cast<DisplayCommandEvent>(header).payload();
-            mMainScreenDispatcher.markDirty(MainScreen_DisplayCommand_Index);
             break;
         case EventType::DisplayStatus:
             mDisplayStatusBlock.header.id = header->id;
@@ -121,7 +111,7 @@ void EventReplay::handleEvent(const EventHeader* header){
             mActiveBehaviourChangedBlock.payload = *static_cast<ActiveBehaviourChangedEvent>(header).payload();
             mMainScreenDispatcher.markDirty(MainScreen_ActiveBehaviourChanged_Index);
             break;
-        default: // no screen listens to event type
+        default: break; // no screen listens to event type
     }
 }
 
@@ -165,11 +155,6 @@ void EventReplay::sendTemperatureStatusToMainScreen(void* context){
 void EventReplay::sendTemperatureSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
     self->mMainScreen.onTemperatureSample(&self->mTemperatureSampleBlock.header); 
-}
-
-void EventReplay::sendDisplayCommandToMainScreen(void* context){ 
-    EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.onDisplayCommand(&self->mDisplayCommandBlock.header); 
 }
 
 void EventReplay::sendActiveBehaviourChangedToMainScreen(void* context){ 

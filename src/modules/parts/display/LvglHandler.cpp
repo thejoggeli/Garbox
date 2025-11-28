@@ -63,12 +63,6 @@ void LvglHandler::init(){
     lv_display_set_flush_cb(mLvDisplay, handleFlush);
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
 
-    // create background
-    mBackground = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(mBackground, mWidth, mHeight);
-    lv_obj_set_style_bg_color(mBackground, lv_color_hex(0x0), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(mBackground, LV_OPA_COVER, LV_PART_MAIN);
-
     // init objects
     mObjects.init(lv_scr_act());
 }

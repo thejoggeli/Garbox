@@ -121,11 +121,21 @@ void FermentationBehaviour::onTemperatureSample(const TemperatureSampleEvent& ev
 
 void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& event){
     if(event->newState == ButtonState::Released){
-        static uint32_t b = 4;
-        b = MathUtils::Wrap(b+1, 5u);
-        DisplayCommandEvent cmd = makeDisplayCommandEvent();
-        cmd->brightness = b/4.0f;
-        sendEvent(cmd);
+
+        static bool s = false;
+        s = !s;
+        if(s){
+            getHost()->requestChangeScreen(ScreenId::Debug);
+        }
+        else {
+            getHost()->requestChangeScreen(ScreenId::Main);
+        }
+
+        // static uint32_t b = 4;
+        // b = MathUtils::Wrap(b+1, 5u);
+        // DisplayCommandEvent cmd = makeDisplayCommandEvent();
+        // cmd->brightness = b/4.0f;
+        // sendEvent(cmd);
     }
     else if(event->newState == ButtonState::PressedLong){
         mHeaterEngine.setRegulationEnabled(!mHeaterEngine.isRegulationEnabled());

@@ -52,10 +52,6 @@ void MainScreen::onTemperatureSample(const TemperatureSampleEvent& event){
     // nothing to do
 }
 
-void MainScreen::onDisplayCommand(const DisplayCommandEvent& event){
-    // nothing to do
-}
-
 void MainScreen::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
     // nothing to do
 }

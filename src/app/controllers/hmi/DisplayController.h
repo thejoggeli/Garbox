@@ -16,100 +16,24 @@ class LvglObjects;
 
 class DisplayController : public DisplayControllerAbs {
 public:
-
-    struct ShadowState {
-        FanState fanState;
-        float fanTargetSpeed;
-        float fanMeasuredRpm;
-        HeatpadState heatpadState;
-        float heatpadCurrentDuty;
-        float heatpadNextDuty;
-        uint32_t heatpadCurrentPeriod;
-        uint32_t heatpadNextPeriod;
-        uint32_t heatpadPwmProgressMicros;
-        float heatpadMeasuredVoltage;
-        float heatpadMeasuredCurrent;
-        bool shtPower;
-        bool shtDriver;
-        bool shtReset;
-        float shtTemp;
-        float shtHum;
-        uint32_t renderSkippedCount = 0;
-        float brightness;
-        uint32_t heapSpace = 0;
-        BehaviourId behaviour;
-        uint32_t eventCount = 0;
-        HeaterEngineState engineState;
-        float engineTargetTemp;
-        float engineMeasuredTemp;
-        float engineMeasuredHum;
-    };
     
     DisplayController();
 
     void onRenderTick() final;
-
-    void onFanStatus(const FanStatusEvent& event) final;
-    void onFanSample(const FanSampleEvent& event) final;
-    void onHeatpadStatus(const HeatpadStatusEvent& event);
-    void onHeatpadSample(const HeatpadSampleEvent& event);
-    void onTemperatureStatus(const TemperatureStatusEvent& event) final;
-    void onTemperatureSample(const TemperatureSampleEvent& event) final;
     void onDisplayCommand(const DisplayCommandEvent& event) final;
-    void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) final;
-    void onFermentationStatus(const FermentationStatusEvent& event) final;
 
 private:
 
-    enum class Index : uint8_t {
-        FanStatus = 0,
-        FanMeasuredRpm,
-        HeatpadState,
-        HeatpadDuty,
-        HeatpadProgress,
-        HeatpadSense,
-        DisplayState,
-        ShtState,
-        ShtSample,
-        HeapSpace,
-        AppState,
-        FermentationStatus,
-        Count,
-    };
-
-    using UpdateFunction = std::function<void()>;
-
-    struct UpdateHandler {
-        bool dirty = false;
-        UpdateFunction updateFn;
-
-        // constructor for emplace
-        UpdateHandler(bool d, UpdateFunction fn): dirty(d), updateFn(fn) {}
-    };
-
     Display& mDisplay;
-    LvglObjects& mObjects;
 
-    SoftwareTimer mHeapTimer;
     TimeFader mBacklightFader;
 
-    ShadowState mShadowState {};
-
     uint32_t mRenderSkippedCount = 0;
-    uint32_t mDirtyCount = 0;
-
-    static constexpr size_t MaxUpdateHandlers = static_cast<size_t>(Index::Count);
-    StaticVector<UpdateHandler, MaxUpdateHandlers> mUpdateHandlers;
-    StaticVector<UpdateHandler*, MaxUpdateHandlers> mDirtyUpdateHandlers;
 
     void onInit() final;
     void onStart() final;
 
     void setBrightnessSmooth(float brightness, uint32_t durationMicros);
-
-    void registerHandler(UpdateFunction function);
-    void registerHandlers();
-    void markDirty(Index index);
 
 };
 

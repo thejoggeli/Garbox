@@ -1,4 +1,3 @@
-#pragma once
 {% include "_common/header.j2" %}
 #include "EventReplay.h"
 #include "core/assert/Assert.h"
@@ -34,7 +33,7 @@ EventReplay::EventReplay(
 {% endfor %}
 }
 
-void EventReplay::handleEvent(const EventHeader* header){
+void EventReplay::storeEvent(const EventHeader* header){
     switch(header->type){
 {% for event_name, event_data in events.items() %}
         case EventType::{{ event_name }}:
@@ -47,7 +46,7 @@ void EventReplay::handleEvent(const EventHeader* header){
     {% endfor %}
             break;
 {% endfor %}
-        default: // no screen listens to event type
+        default: break; // no screen listens to event type
     }
 }
 

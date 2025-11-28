@@ -2,9 +2,13 @@
 // code. It can be used as a starting or reference point. 
 #include "DebugScreen.h"
 
+#include "app/providers/PartsProvider.h"
+#include "core/log/Log.h"
+#include "modules/parts/display/Display.h"
+
 namespace Garbox {
 
-DebugScreen::DebugScreen() : DebugScreenAbs(){
+DebugScreen::DebugScreen() : DebugScreenAbs(), mObjects(PartsProvider::GetDisplay().getLvglHandler().getObjects()) {
     // nothing to do
 }
 
@@ -17,7 +21,7 @@ void DebugScreen::onStart(){
 }
 
 void DebugScreen::onBecomeActive(){
-    // nothing to do
+    mFirstUpdate = true;
 }
 
 void DebugScreen::onBecomeInactive(){
@@ -25,7 +29,10 @@ void DebugScreen::onBecomeInactive(){
 }
 
 void DebugScreen::onUpdateScreen(){
-    // nothing to do   
+    if(mFirstUpdate){
+        mObjects.setBackgroundColor(0xFF7700);
+    }
+    mFirstUpdate = false;
 }
 
 void DebugScreen::onHeartbeat(const HeartbeatEvent& event){

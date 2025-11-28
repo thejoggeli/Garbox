@@ -22,7 +22,11 @@ public:
 
     void registerHandler(HandlerFunction function, void* context);
     void markDirty(uint32_t index);
+    void markAllDirty();
+    void clearAllDirty();
     void dispatch();
+
+    uint32_t getDirtyCount() const { return mQueue.size(); }
 
 private:
     bool mInitialized = false;

@@ -8,7 +8,6 @@ screens:
       - HeatpadSample
       - TemperatureStatus 
       - TemperatureSample 
-      - DisplayCommand 
       - ActiveBehaviourChanged
       - FermentationStatus
       - DisplayStatus

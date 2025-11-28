@@ -18,7 +18,6 @@ public:
     virtual void onHeatpadSample(const HeatpadSampleEvent& event) = 0;
     virtual void onTemperatureStatus(const TemperatureStatusEvent& event) = 0;
     virtual void onTemperatureSample(const TemperatureSampleEvent& event) = 0;
-    virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
     virtual void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) = 0;
     virtual void onFermentationStatus(const FermentationStatusEvent& event) = 0;
     virtual void onDisplayStatus(const DisplayStatusEvent& event) = 0;

@@ -72,7 +72,9 @@ void {{ RuntimeName}}::onActiveBehaviourChanged(){
 }
 
 void {{ RuntimeName}}::onActiveScreenChanged(){
-    mEventReplay.replay();
+    if(mActiveScreen){
+        mEventReplay.replay(mActiveScreen->getScreenId());
+    }
 }
 
 void {{ RuntimeName}}::handleTickStart(){
@@ -122,6 +124,11 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
 
 {% endfor %}
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
+
+    // store event for replay
+    mEventReplay.storeEvent(header);
+
+    // route event to components
     switch(header->type){
 {# ---- Route events ---- #}
 {% for event, routes in event_routes.items() %}
