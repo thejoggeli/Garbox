@@ -1,9 +1,9 @@
-### System Events. DO NOT CHANGE THIS FILE ###
+events:
 
-payloads_meta:
-  include_h: ["shared/types/BehaviourId.h"]
+  payloads_meta:
+    include_h: ["shared/types/BehaviourId.h"]
 
-types:
-  ActiveBehaviourChanged:
-    oldBehaviour: BehaviourId
-    newBehaviour: BehaviourId
+  types:
+    ActiveBehaviourChanged:
+      oldBehaviour: BehaviourId
+      newBehaviour: BehaviourId

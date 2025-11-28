@@ -1,81 +1,82 @@
-payloads_meta:
+events:
 
-  include_h: [
-    "app/engine/HeaterEngineState.h",
-    "modules/parts/button/ButtonState.h",
-    "modules/parts/fan/FanState.h",
-    "modules/parts/heatpad/HeatpadState.h"
-  ]
+  payloads_meta:
+    include_h: [
+      "app/engine/HeaterEngineState.h",
+      "modules/parts/button/ButtonState.h",
+      "modules/parts/fan/FanState.h",
+      "modules/parts/heatpad/HeatpadState.h"
+    ]
 
-types:
+  types:
 
-  ### Heartbeat ###
-  Heartbeat: null
+    ### Heartbeat ###
+    Heartbeat: null
 
-  ## Fermentation ###
-  FermentationStatus:
-    heaterEngineState: HeaterEngineState
-    targetTemperature: float
-    measuredTemperature: float
-    measuredHumidity: float
+    ## Fermentation ###
+    FermentationStatus:
+      heaterEngineState: HeaterEngineState
+      targetTemperature: float
+      measuredTemperature: float
+      measuredHumidity: float
 
-  ### Display ###
-  BacklightCommand:
-    brightness: float
+    ### Display ###
+    BacklightCommand:
+      brightness: float
 
-  ### Fan ###
-  FanStatus:  
-    state: FanState
-    targetSpeed: float # DutyCycle or RPM (depending on rpmControlEnabled)
-    rpmControlEnabled: bool
+    ### Fan ###
+    FanStatus:  
+      state: FanState
+      targetSpeed: float # DutyCycle or RPM (depending on rpmControlEnabled)
+      rpmControlEnabled: bool
 
-  FanSample:  
-    measuredRpm: float
+    FanSample:  
+      measuredRpm: float
 
-  FanCommand:  
-    enabled: bool
-    targetSpeed: float # DutyCycle or RPM (depending on enableRpmControl) 
-    enableRpmControl: bool
+    FanCommand:  
+      enabled: bool
+      targetSpeed: float # DutyCycle or RPM (depending on enableRpmControl) 
+      enableRpmControl: bool
 
-  ### Heatpad ###
-  HeatpadStatus:  
-    state: HeatpadState 
-    currentDutyCycle: float
-    currentPeriodMicros: uint32_t
-    nextDutyCycle: float
-    nextPeriodMicros: uint32_t
-    pwmProgressMicros: float
+    ### Heatpad ###
+    HeatpadStatus:  
+      state: HeatpadState 
+      currentDutyCycle: float
+      currentPeriodMicros: uint32_t
+      nextDutyCycle: float
+      nextPeriodMicros: uint32_t
+      pwmProgressMicros: float
 
-  HeatpadSample:  
-    state: HeatpadState 
-    measuredVoltage: float
-    measuredCurrent: float
+    HeatpadSample:  
+      state: HeatpadState 
+      measuredVoltage: float
+      measuredCurrent: float
+      
+    HeatpadCommand:  
+      enabled: bool
+      dutyCycle: float
+      periodMicros: uint32_t
     
-  HeatpadCommand:  
-    enabled: bool
-    dutyCycle: float
-    periodMicros: uint32_t
-  
-  ### Temperature ###
-  TemperatureStatus:
-    driverEnabled: bool  
-    powerEnabled: bool
-    resetting: bool
+    ### Temperature ###
+    TemperatureStatus:
+      driverEnabled: bool  
+      powerEnabled: bool
+      resetting: bool
 
-  TemperatureSample:  
-    temperatureCelcius: float
-    humidityRelative: float
-  
-  ### Button ###
-  ButtonStateChanged:  
-    oldState: ButtonState 
-    newState: ButtonState
+    TemperatureSample:  
+      temperatureCelcius: float
+      humidityRelative: float
+    
+    ### Button ###
+    ButtonStateChanged:  
+      oldState: ButtonState 
+      newState: ButtonState
 
-  ButtonRepeat:  
-    count: uint32_t
-    holdTimeMicros: uint32_t
+    ButtonRepeat:  
+      count: uint32_t
+      holdTimeMicros: uint32_t
 
-  ### Encoder ###
-  EncoderStep:  
-    steps: int32_t
-  
+    ### Encoder ###
+    EncoderStep:  
+      steps: int32_t
+    

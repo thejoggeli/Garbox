@@ -1,7 +1,9 @@
-profiler: 
-  custom_ids: [ 
-    LedAnimation, 
-    PiezoPlayer,  
-    DisplayRender
-  ]   
+devtools:
+
+  profiler: 
+    custom_ids: [ 
+      LedAnimation, 
+      PiezoPlayer,  
+      DisplayRender
+    ]   
 

@@ -1,5 +1,5 @@
-### Setup ###
-setup:
+application:
+
   app_name: Garbox # The generated runtime instance will be called NameRuntime
   initial_behaviour: FermentationBehaviour
   tick_period_millis: 33 # ~30.3 FPS
@@ -13,70 +13,3 @@ setup:
   ]
   stubs_prefix: "Example"
   stubs_suffix: ""
-
-### Controllers ###
-controllers:
-
-  DisplayController:
-    subdir: "hmi"
-    tick_phases: Render
-    receives:
-      - FanStatus
-      - FanSample
-      - HeatpadStatus
-      - HeatpadSample
-      - TemperatureStatus 
-      - TemperatureSample 
-      - BacklightCommand 
-      - ActiveBehaviourChanged
-      - FermentationStatus
-    sends: null
-
-  DevtoolsController:
-    subdir: "devtools"
-    tick_phases: [Logging]
-    receives: null
-    sends: null
-
-  FanController:
-    subdir: "actuators"
-    tick_phases: [Input, Output]
-    receives: [FanCommand]
-    sends: [FanStatus, FanSample]
-
-  HeartbeatController:
-    subdir: "heartbeat"
-    tick_phases: [Heartbeat]
-    receives: null
-    sends: [Heartbeat]
-
-  HeatpadController:
-    subdir: "actuators"
-    tick_phases: [Input, Output]
-    receives: [HeatpadCommand]
-    sends: [HeatpadStatus, HeatpadSample]
-
-  InputController:
-    subdir: "hmi"
-    tick_phases: [Input]
-    receives: null
-    sends: [ButtonStateChanged, ButtonRepeat, EncoderStep]
-
-  I2cPartsController:
-    subdir: "sensors"
-    tick_phases: [Input]
-    receives: [ButtonStateChanged]
-    sends: [TemperatureStatus, TemperatureSample]
-
-### Behaviours ###
-behaviours:
-
-  CalibrationBehaviour:
-    tick_phases: [Logic]
-    receives: [Heartbeat, FanStatus, FanSample]
-    sends: [FanCommand]
-
-  FermentationBehaviour:
-    tick_phases: [Logic]
-    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]
-    sends: [FanCommand, BacklightCommand, HeatpadCommand, FermentationStatus]
