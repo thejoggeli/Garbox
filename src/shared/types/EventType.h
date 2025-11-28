@@ -28,6 +28,8 @@ enum class EventType : uint16_t {
     EncoderStep,
     ActiveBehaviourChanged,
     RequestChangeBehaviour,
+    ActiveScreenChanged,
+    RequestChangeScreen,
 
     // enum size marker
     Count,

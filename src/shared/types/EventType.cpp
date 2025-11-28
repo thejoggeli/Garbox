@@ -26,6 +26,8 @@ const char* EventTypeToString(EventType type){
         case EventType::EncoderStep: return "EncoderStep";
         case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";
         case EventType::RequestChangeBehaviour: return "RequestChangeBehaviour";
+        case EventType::ActiveScreenChanged: return "ActiveScreenChanged";
+        case EventType::RequestChangeScreen: return "RequestChangeScreen";
 
         case EventType::Count: return "Count";
     }

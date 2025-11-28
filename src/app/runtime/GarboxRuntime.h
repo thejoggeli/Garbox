@@ -13,6 +13,8 @@
 #include "app/controllers/hmi/DisplayController.h"
 #include "app/controllers/hmi/InputController.h"
 #include "app/controllers/sensors/I2cPartsController.h"
+#include "app/screens/DebugScreen.h"
+#include "app/screens/MainScreen.h"
 
 namespace Garbox {
 
@@ -36,6 +38,9 @@ private:
     InputController mInputController;
     I2cPartsController mI2cPartsController;
 
+    MainScreen mMainScreen;
+    DebugScreen mDebugScreen;
+
     void handleTickStart();
     void handleTickEnd();
 
@@ -52,8 +57,9 @@ private:
     void onRouteEvent(const EventHeader* header) final;
     void onRegister() final;
 
-    ControllerAbs* resolveController(ControllerId id) final;
     BehaviourAbs* resolveBehaviour(BehaviourId id) final;
+    ControllerAbs* resolveController(ControllerId id) final;
+    ScreenAbs* resolveScreen(ScreenId id) final;
     
 };
 

@@ -16,7 +16,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 
 {{ RuntimeName }}::{{ RuntimeName }}():
     RuntimeAbs({
-        .maxComponents = {{ (controllers|length) + (behaviours|length) }},
+        .maxComponents = {{ (controllers|length) + (behaviours|length) + (screens|length) }},
         .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
         .eventQueueLength = {{ application.event_queue_length }},
     }),
@@ -33,21 +33,21 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 }
 
 void {{ RuntimeName }}::onRegister(){
-
-    // register all behaviours
 {% for beh in behaviours %}
     registerComponent(&m{{ beh }});
 {% endfor %}
-    
-    // register all controllers
 {% for ctrl in controllers %}
     registerComponent(&m{{ ctrl }});
+{% endfor %}
+{% for screen in screens %}
+    registerComponent(&m{{ screen }});
 {% endfor %}
 }
 
 void {{ RuntimeName }}::onInit(){
     // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&m{{ application.initial_behaviour }});
+    setQueuedScreen(&m{{ application.initial_screen }});
     Profiler::Init();
 }
 
@@ -77,44 +77,31 @@ void {{ RuntimeName}}::handleTickEnd(){
 {# ---- GENERATE tick_phases ---- #}
 {% for tick in application.tick_phases %}
 void {{ RuntimeName }}::handle{{ tick.name }}(){
-    {# get number of controllers with this tick #}
-    {% set ns = namespace(ctrl_count=0, beha_count=0) %}
+    Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
+    {# Call tick on controllers supporting this tick #}
     {% for ctrl_key, ctrl in controllers.items() %}
         {% if tick.name in ctrl['tick_phases'] %}
-            {% set ns.ctrl_count = ns.ctrl_count + 1 %}
-        {% endif %}
-    {% endfor %}
-    {# get number of behaviours with this tick #}
-    {% for beha_key, beha in behaviours.items() %}
-        {% if tick.name in beha['tick_phases'] %}
-            {% set ns.beha_count = ns.beha_count + 1 %}
-        {% endif %}
-    {% endfor %}
-    Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
-    {% if ns.ctrl_count > 0 %}
-    {# Call tick on controllers supporting this tick #}
-        {% for ctrl_key, ctrl in controllers.items() %}
-            {% if tick.name in ctrl['tick_phases'] %}
     m{{ ctrl_key }}.on{{ tick.name }}();
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+        {% endif %}
+    {% endfor %}
     {# Call tick on active behaviour #}
-    {% if ns.beha_count > 0 %}
     switch(mActiveBehaviour->getBehaviourId()){
-        {% for beha_key, beha in behaviours.items() %}
-            {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
-            {% endif %}
-        {% endfor %}
+    {% for beha_key, beha in behaviours.items() %}
+        {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
+        {% endif %}
+    {% endfor %}
         default: break; // active behaviour does not support tick type
     }
-    {% endif %}
+    {# Call tick on active screen #}
+    switch(mActiveScreen->getScreenId()){
+    {% for screen_key, screen in screens.items() %}
+        {% if tick.name in screen['tick_phases'] %}        case ScreenId::{{ screen_key.removesuffix("Screen") }}: static_cast<{{ screen_key }}*>(mActiveScreen)->on{{ tick.name }}(); break;
+        {% endif %}
+    {% endfor %}
+        default: break; // active behaviour does not support tick type
+    }
     {# Call dispatch events #}
-    {% if ns.ctrl_count > 0 or ns.beha_count > 0 %}
     dispatchEvents();
-    {% else %}
-    // no controller or behaviour with this tick
-    {% endif %}
 }
 
 {% endfor %}
@@ -128,15 +115,21 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     {% for ctrl in routes["controllers"] %}
         m{{ ctrl }}.on{{ event }}(event);
     {% endfor %}
-    {% set ns = namespace(count=0) %}
+    {% set ns = namespace(beha_count=0, screen_count=0) %}
     {# get number of behaviours with this event #}
     {% for beha_key, beha in behaviours.items() %}
         {% if event in beha['receives'] %}
-            {% set ns.count = ns.count + 1 %}
+            {% set ns.beha_count = ns.beha_count + 1 %}
+        {% endif %}
+    {% endfor %}
+    {# get number of screens with this event #}
+    {% for screen_key, screen in screens.items() %}
+        {% if event in screen['receives'] %}
+            {% set ns.screen_count = ns.screen_count + 1 %}
         {% endif %}
     {% endfor %}
     {# send event to active behaviour (if it supports this event) #}
-    {% if ns.count > 0 %} 
+    {% if ns.beha_count > 0 %} 
         // send event to active behaviour (if supported)
         switch(mActiveBehaviour->getBehaviourId()){
             {% for beha_key, beha in behaviours.items() %}
@@ -144,6 +137,17 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
                 {% endif %}
             {% endfor %}
             default: break; // active behaviour does not support event type
+        }
+    {% endif %}
+    {# send event to active screen (if it supports this event) #}
+    {% if ns.screen_count > 0 %} 
+        // send event to active screen (if supported)
+        switch(mActiveScreen->getScreenId()){
+            {% for screen_key, screen in screens.items() %}
+                {% if event in screen['receives'] %}            case ScreenId::{{ screen_key.removesuffix("Screen") }}: static_cast<{{ screen_key }}*>(mActiveScreen)->on{{ event }}(event); break;
+                {% endif %}
+            {% endfor %}
+            default: break; // active screen does not support event type
         }
     {% endif %}
         break;
@@ -156,6 +160,16 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     }
 }
 
+BehaviourAbs* {{ RuntimeName }}::resolveBehaviour(BehaviourId id){
+    switch(id){
+{% for key in behaviours %}
+        case BehaviourId::{{ key.removesuffix("Behaviour") }}: return &m{{ key }};
+{% endfor %}
+        default: TriggerExit("{{ RuntimeName }}", "behaviour with id not found", static_cast<uint32_t>(id));
+    }
+    return nullptr;
+}
+
 ControllerAbs* {{ RuntimeName }}::resolveController(ControllerId id){
     switch(id){
 {% for key in controllers %}
@@ -166,12 +180,12 @@ ControllerAbs* {{ RuntimeName }}::resolveController(ControllerId id){
     return nullptr;
 }
 
-BehaviourAbs* {{ RuntimeName }}::resolveBehaviour(BehaviourId id){
+ScreenAbs* {{ RuntimeName }}::resolveScreen(ScreenId id){
     switch(id){
-{% for key in behaviours %}
-        case BehaviourId::{{ key.removesuffix("Behaviour") }}: return &m{{ key }};
+{% for key in screens %}
+        case ScreenId::{{ key.removesuffix("Screen") }}: return &m{{ key }};
 {% endfor %}
-        default: TriggerExit("{{ RuntimeName }}", "behaviour with id not found", static_cast<uint32_t>(id));
+        default: TriggerExit("{{ RuntimeName }}", "screen with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }

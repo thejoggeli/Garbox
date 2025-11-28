@@ -11,6 +11,10 @@
 {% for path in controller_paths | sort %}
 #include "{{ path }}.h"
 {% endfor %}
+{# include all screen headers #}
+{% for path in screen_paths | sort %}
+#include "{{ path }}.h"
+{% endfor %}
 
 namespace Garbox {
 
@@ -33,6 +37,11 @@ private:
     {{ ctrl }} m{{ ctrl }};
     {% endfor %}
 
+    {# screen instances #}
+    {% for screen in screens %}
+    {{ screen }} m{{ screen }};
+    {% endfor %}
+
     void handleTickStart();
     void handleTickEnd();
 
@@ -47,8 +56,9 @@ private:
     void onRouteEvent(const EventHeader* header) final;
     void onRegister() final;
 
-    ControllerAbs* resolveController(ControllerId id) final;
     BehaviourAbs* resolveBehaviour(BehaviourId id) final;
+    ControllerAbs* resolveController(ControllerId id) final;
+    ScreenAbs* resolveScreen(ScreenId id) final;
     
 };
 

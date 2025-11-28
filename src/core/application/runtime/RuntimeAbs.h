@@ -1,10 +1,11 @@
 #pragma once 
 
 #include "core/application/behaviour/BehaviourAbs.h"
+#include "core/application/component/ComponentHostIfc.h"
 #include "core/application/controller/ControllerAbs.h"
 #include "core/application/event/EventFactory.h"
-#include "core/application/component/ComponentHostIfc.h"
 #include "core/application/runtime/RuntimeContext.h"
+#include "core/application/screen/ScreenAbs.h"
 #include "core/util/container/ringbuffer/HeapRingBuffer.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/vector/HeapVector.h"
@@ -50,12 +51,17 @@ protected:
     BehaviourAbs* mActiveBehaviour = nullptr;
     BehaviourAbs* mQueuedBehaviour = nullptr;
 
+    // screen active and queued
+    ScreenAbs* mActiveScreen = nullptr;
+    ScreenAbs* mQueuedScreen = nullptr;
+
     // components setup
     void registerComponent(ComponentAbs* component);
 
     // resolve specialized types
-    virtual ControllerAbs* resolveController(ControllerId id) = 0;
     virtual BehaviourAbs* resolveBehaviour(BehaviourId id) = 0;
+    virtual ControllerAbs* resolveController(ControllerId id) = 0;
+    virtual ScreenAbs* resolveScreen(ScreenId id) = 0;
 
     // event handling internal methods
     void dispatchEvents();
@@ -64,6 +70,10 @@ protected:
     // behaviours internal methods
     void setQueuedBehaviour(BehaviourAbs* behaviour);
     void applyQueuedBehaviour(); 
+
+    // screens internal methods
+    void setQueuedScreen(ScreenAbs* screen);
+    void applyQueuedScreen(); 
 
     // to be implemented by user
     virtual void onInit() = 0;

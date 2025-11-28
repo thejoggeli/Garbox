@@ -1,7 +1,9 @@
 events:
 
   payloads_meta:
-    include_h: ["shared/types/BehaviourId.h"]
+    include_h: 
+      - "shared/types/BehaviourId.h"
+      - "shared/types/ScreenId.h"
 
   types:
 
@@ -11,3 +13,11 @@ events:
 
     RequestChangeBehaviour:
       behaviour: BehaviourId
+
+    ActiveScreenChanged:
+      oldScreen: ScreenId
+      newScreen: ScreenId
+
+    RequestChangeScreen:
+      screen: ScreenId
+

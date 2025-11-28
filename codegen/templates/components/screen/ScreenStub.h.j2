@@ -1,0 +1,33 @@
+#pragma once
+{% include "_common/header_stub.j2" %}
+#include "app/screens/abstract/{{ name }}Abs.h"
+
+namespace Garbox {
+
+class {{ name }} : public {{ name }}Abs {
+public:
+
+    {{ name }}();
+{% if screen.tick_phases %}
+
+    {% for tick in screen.tick_phases %}
+    void on{{ tick }}() final;
+    {% endfor %}
+{% endif %}
+{% if screen.receives %}
+
+    {% for ev in screen.receives %}
+    void on{{ ev }}(const {{ ev }}Event& event) final;
+    {% endfor %}
+{% endif %}
+
+private:
+
+    void onInit() final;
+    void onStart() final;
+    void onBecomeActive() final;
+    void onBecomeInactive() final;
+
+};
+
+} // namespace Garbox

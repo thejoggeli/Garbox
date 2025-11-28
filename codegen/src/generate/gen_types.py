@@ -36,16 +36,20 @@ def _generate_component_ids(ctx: Context, loader: Loader):
     Generate ComponentId, BehaviourId, ControllerId files.
     """
 
-    beha_dict = {"names": list(loader.config["behaviours"].keys())}
-    ctrl_dict = {"names": list(loader.config["controllers"].keys())}
-    comp_dict = {"names": list(loader.config["controllers"].keys()) + list(loader.config["behaviours"].keys())}
+    beha_dict   = {"names": list(loader.config["behaviours"].keys())}
+    ctrl_dict   = {"names": list(loader.config["controllers"].keys())}
+    screen_dict = {"names": list(loader.config["screens"].keys())}
+    comp_dict   = {"names": list(loader.config["controllers"].keys()) + list(loader.config["behaviours"].keys()) + list(loader.config["screens"].keys())}
+    
     items = [
-        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.h",    "types/BehaviourId.h.j2"),
-        Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.cpp",  "types/BehaviourId.cpp.j2"),
-        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.h",   "types/ControllerId.h.j2"),
-        Item(ctrl_dict, "names", ctx.shared_dir / "types/ControllerId.cpp", "types/ControllerId.cpp.j2"),
-        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.h",    "types/ComponentId.h.j2"),
-        Item(comp_dict, "names", ctx.shared_dir / "types/ComponentId.cpp",  "types/ComponentId.cpp.j2"),
+        Item(beha_dict,   "names", ctx.shared_dir / "types/BehaviourId.h",    "types/BehaviourId.h.j2"),
+        Item(beha_dict,   "names", ctx.shared_dir / "types/BehaviourId.cpp",  "types/BehaviourId.cpp.j2"),
+        Item(ctrl_dict,   "names", ctx.shared_dir / "types/ControllerId.h",   "types/ControllerId.h.j2"),
+        Item(ctrl_dict,   "names", ctx.shared_dir / "types/ControllerId.cpp", "types/ControllerId.cpp.j2"),
+        Item(screen_dict, "names", ctx.shared_dir / "types/ScreenId.h",       "types/ScreenId.h.j2"),
+        Item(screen_dict, "names", ctx.shared_dir / "types/ScreenId.cpp",     "types/ScreenId.cpp.j2"),
+        Item(comp_dict,   "names", ctx.shared_dir / "types/ComponentId.h",    "types/ComponentId.h.j2"),
+        Item(comp_dict,   "names", ctx.shared_dir / "types/ComponentId.cpp",  "types/ComponentId.cpp.j2"),
     ]
     generate_items(ctx, items)
 

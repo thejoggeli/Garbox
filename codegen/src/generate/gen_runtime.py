@@ -5,6 +5,29 @@ from common.context import Context
 from common.loader import Loader
 
 
+def _collect_event_routes(loader: Loader):
+    event_routes = {}
+    for event_key in loader.config["events"]["types"].keys():
+        event_routes[event_key] = {
+            "controllers": SortedSet(),
+            "behaviours":  SortedSet(),
+            "screens":  SortedSet(),
+        }
+    for section in ("controllers", "behaviours", "screens"):
+        for key, data in loader.config[section].items():
+            for event in data.get("receives", []):
+                event_routes[event][section].add(key)
+    return event_routes
+
+def _collect_paths(loader: Loader, type: str):
+    paths = []
+    for key, data in loader.config[type].items():
+        path = Path(f"app/{type}")
+        if("subdir" in data): 
+            path = path / data["subdir"]
+        paths.append(path / key)
+    return paths
+
 def generate_runtime(ctx: Context, loader: Loader):
     """
     Generates 
@@ -12,64 +35,21 @@ def generate_runtime(ctx: Context, loader: Loader):
     - app/runtime/<Name>Runtime.cpp
     """
 
-    # Build event routing table
-    event_routes = {}
-    for event_key in loader.config["events"]["types"].keys():
-        event_routes[event_key] = {
-            "controllers": SortedSet(),
-            "behaviours":  SortedSet()
-        }
-
-    # Controller event targets
-    for ctrl_key, ctrl_dict in loader.config["controllers"].items():
-        r = ctrl_dict.get("receives")
-        if not r:
-            continue
-        for event in r:
-            event_routes[event]["controllers"].add(ctrl_key)
-
-    # Behaviour event targets
-    for beh_key, beh_dict in loader.config["behaviours"].items():
-        r = beh_dict.get("receives")
-        if not r:
-            continue
-        for event in r:
-            event_routes[event]["behaviours"].add(beh_key)
-
-    # Convert sets → lists
-    for route in event_routes.values():
-        route["controllers"] = list(route["controllers"])
-        route["behaviours"]  = list(route["behaviours"])
-
     # Output paths
     app_name = loader.config["application"]["app_name"]
     out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
 
-    # behaviours paths
-    behaviour_paths = []
-    for name, behaviour in loader.config["behaviours"].items():
-        path = Path("app/behaviours")
-        if("subdir" in behaviour): 
-            path = path / behaviour["subdir"]
-        behaviour_paths.append(path / name)
-        
-    # controllers paths
-    controller_paths = []
-    for name, controller in loader.config["controllers"].items():
-        path = Path("app/controllers")
-        if("subdir" in controller): 
-            path = path / controller["subdir"]
-        controller_paths.append(path / name)
-
     # Aggregate runtime data
     runtime_dict = {
+        "devtools":         loader.config["devtools"],
+        "event_routes":     _collect_event_routes(loader),
         "application":      loader.config["application"],
         "behaviours":       loader.config["behaviours"],
         "controllers":      loader.config["controllers"],
-        "devtools":         loader.config["devtools"],
-        "event_routes":     event_routes,
-        "behaviour_paths":  behaviour_paths,
-        "controller_paths": controller_paths,
+        "screens":          loader.config["screens"],
+        "behaviour_paths":  _collect_paths(loader, 'behaviours'),
+        "controller_paths": _collect_paths(loader, 'controllers'),
+        "screen_paths":     _collect_paths(loader, 'screens'),
     }
 
     items = [

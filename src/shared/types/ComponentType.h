@@ -9,6 +9,7 @@ enum class ComponentType : uint8_t {
     Runtime,
     Controller,
     Behaviour,
+    Screen,
     Count
 };
 

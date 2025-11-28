@@ -87,6 +87,41 @@ void RuntimeAbs::applyQueuedBehaviour() {
     publishEvent(event.header());   
 }
 
+void RuntimeAbs::setQueuedScreen(ScreenAbs* screen){
+    mQueuedScreen = screen;
+}
+
+void RuntimeAbs::applyQueuedScreen() {
+
+    if(!mQueuedScreen){
+        return;
+    }
+
+    if(mQueuedScreen == mActiveScreen){
+        TriggerDebug("RuntimeAbs", "queued behaviour is already active");
+        return;
+    }
+
+    // create event
+    EventView event = mEventFactory.make<EventType::ActiveScreenChanged>(mComponentDescriptor);
+    event->newScreen = mQueuedScreen->getScreenId();
+
+    // set queued screen active
+    if(mActiveScreen){
+        mActiveScreen->setActive(false);
+        event->oldScreen = mActiveScreen->getScreenId();
+    }
+    else {
+        event->oldScreen = ScreenId::Null;
+    }
+    mActiveScreen = mQueuedScreen;
+    mQueuedScreen = nullptr;
+    mActiveScreen->setActive(true);
+
+    // send event
+    publishEvent(event.header());   
+}
+
 void RuntimeAbs::registerComponent(ComponentAbs* component){
     AssertExit(!mComponents.full(), "RuntimeAbs", "max components count exceeded");
     mComponents.push(component);
@@ -98,6 +133,12 @@ void RuntimeAbs::publishEvent(const EventHeader* header){
     if(header->type == EventType::RequestChangeBehaviour){
         RequestChangeBehaviourEvent event(header);
         setQueuedBehaviour(resolveBehaviour(event->behaviour));
+    }
+
+    // handle change screen request
+    if(header->type == EventType::RequestChangeScreen){
+        RequestChangeScreenEvent event(header);
+        setQueuedScreen(resolveScreen(event->screen));
     }
 
     // send event to router event

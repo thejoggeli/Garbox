@@ -1,0 +1,28 @@
+{% include "_common/header.j2" %}
+#include "{{ name }}Abs.h"
+
+namespace Garbox {
+
+{{ name }}Abs::{{ name }}Abs(): 
+    // init memberes
+    ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}){
+    // nothing to do
+}
+{# makeEvent methods #}
+{% if screen.sends %}
+{% for ev in screen.sends %}
+
+{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
+    return ScreenAbs::makeEvent<EventType::{{ ev }}>();
+}
+{% endfor %}
+{# sendEvent methods #}
+{% for ev in screen.sends %}
+
+void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
+    publishEvent(event.header());
+}
+{% endfor %}
+{% endif %}
+
+} // namespace Garbox

@@ -24,6 +24,8 @@ enum class ComponentId : uint16_t {
     I2cPartsController,
     CalibrationBehaviour,
     FermentationBehaviour,
+    MainScreen,
+    DebugScreen,
 
     // enum size marker
     Count,

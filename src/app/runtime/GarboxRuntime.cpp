@@ -20,7 +20,7 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime():
     RuntimeAbs({
-        .maxComponents = 9,
+        .maxComponents = 11,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
     }),
@@ -40,12 +40,8 @@ GarboxRuntime::GarboxRuntime():
 }
 
 void GarboxRuntime::onRegister(){
-
-    // register all behaviours
     registerComponent(&mCalibrationBehaviour);
     registerComponent(&mFermentationBehaviour);
-    
-    // register all controllers
     registerComponent(&mDisplayController);
     registerComponent(&mDevtoolsController);
     registerComponent(&mFanController);
@@ -53,11 +49,14 @@ void GarboxRuntime::onRegister(){
     registerComponent(&mHeatpadController);
     registerComponent(&mInputController);
     registerComponent(&mI2cPartsController);
+    registerComponent(&mMainScreen);
+    registerComponent(&mDebugScreen);
 }
 
 void GarboxRuntime::onInit(){
     // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&mFermentationBehaviour);
+    setQueuedScreen(&mMainScreen);
     Profiler::Init();
 }
 
@@ -77,6 +76,7 @@ void GarboxRuntime::handleTickStart(){
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
+    applyQueuedScreen();
 }
 
 void GarboxRuntime::handleTickEnd(){
@@ -87,6 +87,12 @@ void GarboxRuntime::handleTickEnd(){
 void GarboxRuntime::handleHeartbeatTick(){
     Profiler::MeasureScoped profiler(ProfilerId::HeartbeatTick);
     mHeartbeatController.onHeartbeatTick();
+    switch(mActiveBehaviour->getBehaviourId()){
+        default: break; // active behaviour does not support tick type
+    }
+    switch(mActiveScreen->getScreenId()){
+        default: break; // active behaviour does not support tick type
+    }
     dispatchEvents();
 }
 
@@ -96,6 +102,12 @@ void GarboxRuntime::handleInputTick(){
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
     mI2cPartsController.onInputTick();
+    switch(mActiveBehaviour->getBehaviourId()){
+        default: break; // active behaviour does not support tick type
+    }
+    switch(mActiveScreen->getScreenId()){
+        default: break; // active behaviour does not support tick type
+    }
     dispatchEvents();
 }
 
@@ -106,6 +118,9 @@ void GarboxRuntime::handleLogicTick(){
         case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
         default: break; // active behaviour does not support tick type
     }
+    switch(mActiveScreen->getScreenId()){
+        default: break; // active behaviour does not support tick type
+    }
     dispatchEvents();
 }
 
@@ -113,18 +128,36 @@ void GarboxRuntime::handleOutputTick(){
     Profiler::MeasureScoped profiler(ProfilerId::OutputTick);
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
+    switch(mActiveBehaviour->getBehaviourId()){
+        default: break; // active behaviour does not support tick type
+    }
+    switch(mActiveScreen->getScreenId()){
+        default: break; // active behaviour does not support tick type
+    }
     dispatchEvents();
 }
 
 void GarboxRuntime::handleLoggingTick(){
     Profiler::MeasureScoped profiler(ProfilerId::LoggingTick);
     mDevtoolsController.onLoggingTick();
+    switch(mActiveBehaviour->getBehaviourId()){
+        default: break; // active behaviour does not support tick type
+    }
+    switch(mActiveScreen->getScreenId()){
+        default: break; // active behaviour does not support tick type
+    }
     dispatchEvents();
 }
 
 void GarboxRuntime::handleRenderTick(){
     Profiler::MeasureScoped profiler(ProfilerId::RenderTick);
     mDisplayController.onRenderTick();
+    switch(mActiveBehaviour->getBehaviourId()){
+        default: break; // active behaviour does not support tick type
+    }
+    switch(mActiveScreen->getScreenId()){
+        default: break; // active behaviour does not support tick type
+    }
     dispatchEvents();
 }
 
@@ -138,6 +171,13 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
             default: break; // active behaviour does not support event type
+        }
+ 
+        // send event to active screen (if supported)
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeartbeat(event); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -263,11 +303,28 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         const RequestChangeBehaviourEvent event(header);
         break;
     }
+    case EventType::ActiveScreenChanged: {
+        const ActiveScreenChangedEvent event(header);
+        break;
+    }
+    case EventType::RequestChangeScreen: {
+        const RequestChangeScreenEvent event(header);
+        break;
+    }
     case EventType::Null:
     case EventType::Count:
         TriggerDebug("GarboxRuntime", "invalid event type");
         break;
     }
+}
+
+BehaviourAbs* GarboxRuntime::resolveBehaviour(BehaviourId id){
+    switch(id){
+        case BehaviourId::Calibration: return &mCalibrationBehaviour;
+        case BehaviourId::Fermentation: return &mFermentationBehaviour;
+        default: TriggerExit("GarboxRuntime", "behaviour with id not found", static_cast<uint32_t>(id));
+    }
+    return nullptr;
 }
 
 ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
@@ -284,11 +341,11 @@ ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
     return nullptr;
 }
 
-BehaviourAbs* GarboxRuntime::resolveBehaviour(BehaviourId id){
+ScreenAbs* GarboxRuntime::resolveScreen(ScreenId id){
     switch(id){
-        case BehaviourId::Calibration: return &mCalibrationBehaviour;
-        case BehaviourId::Fermentation: return &mFermentationBehaviour;
-        default: TriggerExit("GarboxRuntime", "behaviour with id not found", static_cast<uint32_t>(id));
+        case ScreenId::Main: return &mMainScreen;
+        case ScreenId::Debug: return &mDebugScreen;
+        default: TriggerExit("GarboxRuntime", "screen with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
 }

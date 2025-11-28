@@ -18,6 +18,8 @@ const char* ComponentIdToString(ComponentId id){
         case ComponentId::I2cPartsController: return "I2cPartsController";
         case ComponentId::CalibrationBehaviour: return "CalibrationBehaviour";
         case ComponentId::FermentationBehaviour: return "FermentationBehaviour";
+        case ComponentId::MainScreen: return "MainScreen";
+        case ComponentId::DebugScreen: return "DebugScreen";
         case ComponentId::Count: return "Count";
     }
     return "Invalid";

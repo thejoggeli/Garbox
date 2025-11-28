@@ -28,6 +28,7 @@ class Loader:
         self.process_application_config()
         self.process_behaviours_config()
         self.process_controllers_config()
+        self.process_screens_config()
         self.process_events_config()
     
 
@@ -79,6 +80,10 @@ class Loader:
 
     def process_controllers_config(self):
         self._process_components_config("controllers", "Controller")
+             
+
+    def process_screens_config(self):
+        self._process_components_config("screens", "Screen")
         
 
     def process_events_config(self):

@@ -1,0 +1,25 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include <cstdint>
+{%- from "_common/includes.j2" import emit_includes -%}
+{{- emit_includes(includes) -}}
+
+namespace Garbox {
+
+enum class ScreenId : uint16_t {
+
+    // null event
+    Null = 0,
+
+    // generated from config
+{% for name in names %}
+    {{ name.removesuffix("Screen") }},
+{% endfor %}
+
+    // enum size marker
+    Count,
+};
+
+const char* ScreenIdToString(ScreenId id);
+
+} // namespace Garbox

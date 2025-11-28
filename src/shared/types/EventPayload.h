@@ -10,6 +10,7 @@
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 #include "shared/types/BehaviourId.h"
+#include "shared/types/ScreenId.h"
 
 namespace Garbox {
 
@@ -100,6 +101,15 @@ struct RequestChangeBehaviourPayload {
     BehaviourId behaviour;
 };
 
+struct ActiveScreenChangedPayload {
+    ScreenId oldScreen;
+    ScreenId newScreen;
+};
+
+struct RequestChangeScreenPayload {
+    ScreenId screen;
+};
+
 // generated mappings
 template<EventType>
 struct ResolveEventPayload; // primary template (intentionally undefined)
@@ -182,6 +192,16 @@ struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
 template<>
 struct ResolveEventPayload<EventType::RequestChangeBehaviour> {
     using type = RequestChangeBehaviourPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::ActiveScreenChanged> {
+    using type = ActiveScreenChangedPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::RequestChangeScreen> {
+    using type = RequestChangeScreenPayload;
 };
 
 // resolve EventType to EventPayload

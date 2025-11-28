@@ -7,12 +7,6 @@ from pathlib import Path
 def generate_components(ctx: Context, loader: Loader):
     """
     Generate all component files.
-    
-    # For each Controller:
-    - app/controller/abstract/<Name>ControllerAbs.h
-    - app/controller/abstract/<Name>ControllerAbs.cpp
-    - godecen/stubs/controller/<Name>Controller.h
-    - godecen/stubs/controller/<Name>Controller.cpp
 
     # For each Behaviour:
     - app/behaviour/abstract/<Name>BehaviourAbs.h
@@ -20,18 +14,25 @@ def generate_components(ctx: Context, loader: Loader):
     - godecen/stubs/behaviour/<Name>Behaviour.h
     - godecen/stubs/behaviour/<Name>Behaviour.cpp
     
+    # For each Controller:
+    - app/controller/abstract/<Name>ControllerAbs.h
+    - app/controller/abstract/<Name>ControllerAbs.cpp
+    - godecen/stubs/controller/<Name>Controller.h
+    - godecen/stubs/controller/<Name>Controller.cpp
+    
     # Types:
     - shared/types/ComponentId.h
     - shared/types/ComponentId.cpp
-    - shared/types/ControllerId.h
-    - shared/types/ControllerId.cpp
     - shared/types/BehaviourId.h
     - shared/types/BehaviourId.cpp
+    - shared/types/ControllerId.h
+    - shared/types/ControllerId.cpp
 
     """
 
-    _generate_components(ctx, loader, "controller", "Controller")
     _generate_components(ctx, loader, "behaviour", "Behaviour")
+    _generate_components(ctx, loader, "controller", "Controller")
+    _generate_components(ctx, loader, "screen", "Screen")
 
 
 def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name: str):
