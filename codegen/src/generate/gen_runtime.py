@@ -12,20 +12,16 @@ def generate_runtime(ctx: Context, loader: Loader):
     - app/runtime/<Name>Runtime.cpp
     """
 
-    app_config = loader.get_application_config()
-    devtools_config = loader.get_devtools_config()
-    events_config = loader.get_events_config()
-
     # Build event routing table
     event_routes = {}
-    for event_key in events_config["types"].keys():
+    for event_key in loader.config["events"]["types"].keys():
         event_routes[event_key] = {
             "controllers": SortedSet(),
             "behaviours":  SortedSet()
         }
 
     # Controller event targets
-    for ctrl_key, ctrl_dict in app_config["controllers"].items():
+    for ctrl_key, ctrl_dict in loader.config["controllers"].items():
         r = ctrl_dict.get("receives")
         if not r:
             continue
@@ -33,7 +29,7 @@ def generate_runtime(ctx: Context, loader: Loader):
             event_routes[event]["controllers"].add(ctrl_key)
 
     # Behaviour event targets
-    for beh_key, beh_dict in app_config["behaviours"].items():
+    for beh_key, beh_dict in loader.config["behaviours"].items():
         r = beh_dict.get("receives")
         if not r:
             continue
@@ -46,12 +42,12 @@ def generate_runtime(ctx: Context, loader: Loader):
         route["behaviours"]  = list(route["behaviours"])
 
     # Output paths
-    app_name = app_config["setup"]["app_name"]
+    app_name = loader.config["application"]["app_name"]
     out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
 
     # behaviours paths
     behaviour_paths = []
-    for name, behaviour in app_config["behaviours"].items():
+    for name, behaviour in loader.config["behaviours"].items():
         path = Path("app/behaviours")
         if("subdir" in behaviour): 
             path = path / behaviour["subdir"]
@@ -59,7 +55,7 @@ def generate_runtime(ctx: Context, loader: Loader):
         
     # controllers paths
     controller_paths = []
-    for name, controller in app_config["controllers"].items():
+    for name, controller in loader.config["controllers"].items():
         path = Path("app/controllers")
         if("subdir" in controller): 
             path = path / controller["subdir"]
@@ -67,13 +63,13 @@ def generate_runtime(ctx: Context, loader: Loader):
 
     # Aggregate runtime data
     runtime_dict = {
-        "setup":            app_config["setup"],
-        "behaviours":       app_config["behaviours"],
-        "controllers":      app_config["controllers"],
+        "application":      loader.config["application"],
+        "behaviours":       loader.config["behaviours"],
+        "controllers":      loader.config["controllers"],
+        "devtools":         loader.config["devtools"],
         "event_routes":     event_routes,
         "behaviour_paths":  behaviour_paths,
         "controller_paths": controller_paths,
-        "devtools":         devtools_config,
     }
 
     items = [

@@ -10,7 +10,6 @@ const char* EventTypeToString(EventType type){
 
         case EventType::Null: return "Null";
 
-        case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";
         case EventType::Heartbeat: return "Heartbeat";
         case EventType::FermentationStatus: return "FermentationStatus";
         case EventType::BacklightCommand: return "BacklightCommand";
@@ -25,6 +24,7 @@ const char* EventTypeToString(EventType type){
         case EventType::ButtonStateChanged: return "ButtonStateChanged";
         case EventType::ButtonRepeat: return "ButtonRepeat";
         case EventType::EncoderStep: return "EncoderStep";
+        case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";
 
         case EventType::Count: return "Count";
     }

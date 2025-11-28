@@ -1,5 +1,5 @@
 {% include "_common/header.j2" %}
-{% set RuntimeName = setup.app_name ~ 'Runtime' %}
+{% set RuntimeName = application.app_name ~ 'Runtime' %}
 #include "{{ RuntimeName }}.h"
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
@@ -7,10 +7,10 @@
 
 namespace Garbox {
 
-static constexpr size_t TickHandlersCount = {{ setup.tick_phases | length }};
-static constexpr size_t TickPeriodMillis = {{ setup.tick_period_millis }};
+static constexpr size_t TickHandlersCount = {{ application.tick_phases | length }};
+static constexpr size_t TickPeriodMillis = {{ application.tick_period_millis }};
 
-{% for tick in setup.tick_phases %}
+{% for tick in application.tick_phases %}
 static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | default (0) }};
 {% endfor %}
 
@@ -23,7 +23,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
     mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
 
     //  register all tick phases
-{% for tick in setup.tick_phases %}
+{% for tick in application.tick_phases %}
     mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
 {% endfor %}
 }
@@ -43,7 +43,7 @@ void {{ RuntimeName }}::onRegister(){
 
 void {{ RuntimeName }}::onInit(){
     // behaviours and controllers are already initialized when this method is called
-    setQueuedBehaviour(&m{{ setup.initial_behaviour }});
+    setQueuedBehaviour(&m{{ application.initial_behaviour }});
     Profiler::Init();
 }
 
@@ -71,7 +71,7 @@ void {{ RuntimeName}}::handleTickEnd(){
 }
 
 {# ---- GENERATE tick_phases ---- #}
-{% for tick in setup.tick_phases %}
+{% for tick in application.tick_phases %}
 void {{ RuntimeName }}::handle{{ tick.name }}(){
     {# get number of controllers with this tick #}
     {% set ns = namespace(ctrl_count=0, beha_count=0) %}

@@ -19,7 +19,7 @@ def _generate_events(ctx: Context, loader: Loader):
     - shared/types/EventPayload.h
     """
 
-    events_config = loader.get_events_config()
+    events_config = loader.config["events"]
 
     items = [
         Item(events_config, "*", ctx.shared_dir / "types/EventAlias.h",   "types/EventAlias.h.j2"),
@@ -36,11 +36,9 @@ def _generate_component_ids(ctx: Context, loader: Loader):
     Generate ComponentId, BehaviourId, ControllerId files.
     """
 
-    app_config = loader.get_application_config()
-
-    beha_dict = {"names": list(app_config["behaviours"].keys())}
-    ctrl_dict = {"names": list(app_config["controllers"].keys())}
-    comp_dict = {"names": list(app_config["controllers"].keys()) + list(app_config["behaviours"].keys())}
+    beha_dict = {"names": list(loader.config["behaviours"].keys())}
+    ctrl_dict = {"names": list(loader.config["controllers"].keys())}
+    comp_dict = {"names": list(loader.config["controllers"].keys()) + list(loader.config["behaviours"].keys())}
     items = [
         Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.h",    "types/BehaviourId.h.j2"),
         Item(beha_dict, "names", ctx.shared_dir / "types/BehaviourId.cpp",  "types/BehaviourId.cpp.j2"),
@@ -54,12 +52,12 @@ def _generate_component_ids(ctx: Context, loader: Loader):
 
 def _generate_profiler_ids(ctx: Context, loader: Loader):
 
-    app_config = loader.get_application_config()
-    dev_config = loader.get_devtools_config()
+    app_config = loader.config["application"]
+    dev_config = loader.config["devtools"]
 
     config = {}
     config["system_ids"] = ["MainPeriod", "MainBusy"]
-    config["ticks_ids"]  = [phase["name"] for phase in app_config["setup"]["tick_phases"]]
+    config["ticks_ids"]  = [phase["name"] for phase in app_config["tick_phases"]]
     config["custom_ids"] = nested_get_dot(dev_config, "profiler.custom_ids", [])
     config["all_ids"]    = config["system_ids"] + config["ticks_ids"] + config["custom_ids"]
 

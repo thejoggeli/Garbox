@@ -1,6 +1,6 @@
 #pragma once
 {% include "_common/header.j2" %}
-{% set RuntimeName = setup.app_name ~ 'Runtime' %}
+{% set RuntimeName = application.app_name ~ 'Runtime' %}
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 {# include all behaviour headers #}
@@ -37,7 +37,7 @@ private:
     void handleTickEnd();
 
     {# Generate tick method declarations #}
-    {% for tick in setup.tick_phases %}
+    {% for tick in application.tick_phases %}
     void handle{{ tick.name }}();
     {% endfor %}
 

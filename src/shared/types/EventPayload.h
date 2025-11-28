@@ -5,20 +5,15 @@
 #include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
-#include "shared/types/BehaviourId.h"
 #include "app/engine/HeaterEngineState.h"
 #include "modules/parts/button/ButtonState.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
+#include "shared/types/BehaviourId.h"
 
 namespace Garbox {
 
 // generated payloads
-struct ActiveBehaviourChangedPayload {
-    BehaviourId oldBehaviour;
-    BehaviourId newBehaviour;
-};
-
 struct HeartbeatPayload {
     // no fields
 };
@@ -96,14 +91,14 @@ struct EncoderStepPayload {
     int32_t steps;
 };
 
+struct ActiveBehaviourChangedPayload {
+    BehaviourId oldBehaviour;
+    BehaviourId newBehaviour;
+};
+
 // generated mappings
 template<EventType>
 struct ResolveEventPayload; // primary template (intentionally undefined)
-
-template<>
-struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
-    using type = ActiveBehaviourChangedPayload;
-};
 
 template<>
 struct ResolveEventPayload<EventType::Heartbeat> {
@@ -173,6 +168,11 @@ struct ResolveEventPayload<EventType::ButtonRepeat> {
 template<>
 struct ResolveEventPayload<EventType::EncoderStep> {
     using type = EncoderStepPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::ActiveBehaviourChanged> {
+    using type = ActiveBehaviourChangedPayload;
 };
 
 // resolve EventType to EventPayload

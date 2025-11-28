@@ -8,7 +8,6 @@
 namespace Garbox {
 
 // generated from config
-using ActiveBehaviourChangedEvent = EventView<EventType::ActiveBehaviourChanged>;
 using HeartbeatEvent              = EventView<EventType::Heartbeat>;
 using FermentationStatusEvent     = EventView<EventType::FermentationStatus>;
 using BacklightCommandEvent       = EventView<EventType::BacklightCommand>;
@@ -23,5 +22,6 @@ using TemperatureSampleEvent      = EventView<EventType::TemperatureSample>;
 using ButtonStateChangedEvent     = EventView<EventType::ButtonStateChanged>;
 using ButtonRepeatEvent           = EventView<EventType::ButtonRepeat>;
 using EncoderStepEvent            = EventView<EventType::EncoderStep>;
+using ActiveBehaviourChangedEvent = EventView<EventType::ActiveBehaviourChanged>;
 
 } // namespace Garbox

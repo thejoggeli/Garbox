@@ -6,9 +6,9 @@
 
 namespace Garbox::AppConfig {
 
-static constexpr const char* AppName = "{{ setup.app_name }}";
-static constexpr uint32_t TickPeriodMillis = {{ setup.tick_period_millis }};
-static constexpr uint32_t TickPeriodMicros = {{ setup.tick_period_millis }}*1000;
-static constexpr float TickFrequencyHz = 1000.0f / static_cast<float>({{ setup.tick_period_millis }});
+static constexpr const char* AppName = "{{ application.app_name }}";
+static constexpr uint32_t TickPeriodMillis = {{ application.tick_period_millis }};
+static constexpr uint32_t TickPeriodMicros = {{ application.tick_period_millis }}*1000;
+static constexpr float TickFrequencyHz = 1000.0f / static_cast<float>({{ application.tick_period_millis }});
 
 } // namespace

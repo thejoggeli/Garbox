@@ -12,7 +12,6 @@ enum class EventType : uint16_t {
     Null = 0,
 
     // generated from config
-    ActiveBehaviourChanged,
     Heartbeat,
     FermentationStatus,
     BacklightCommand,
@@ -27,6 +26,7 @@ enum class EventType : uint16_t {
     ButtonStateChanged,
     ButtonRepeat,
     EncoderStep,
+    ActiveBehaviourChanged,
 
     // enum size marker
     Count,

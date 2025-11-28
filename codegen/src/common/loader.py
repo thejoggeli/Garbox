@@ -4,107 +4,86 @@ from pathlib import Path
 from common.util import ( 
     ensure_list,
     ensure_dict_keys_have_suffix, 
-    ensure_str_has_suffix
+    ensure_str_has_suffix,
+    print_json
 )
 
 
 class Loader:
 
-    _config_dir : Path
-    _application_config : dict = None
-    _devtools_config : dict = None
-    _events_config : dict = None
-    _hardware_config : dict = None
+    config_dir : Path
+    config: dict = None
 
     def __init__(self, config_dir: Path):
         self.config_dir = config_dir
         pass
 
-
     def preload_all(self):
-        self.get_application_config()
-        self.get_devtools_config()
-        self.get_events_config()
-        self.get_hardware_config()
+        paths = [p for p in self.config_dir.rglob("*") if p.is_file()]
+        self.config = load_yaml_multi(paths)
 
+        print_json(self.config)
 
-    def get_devtools_config(self):
+        self.process_hardware_config()
+        self.process_application_config()
+        self.process_behaviours_config()
+        self.process_controllers_config()
+        self.process_events_config()
+    
 
-        if(self._devtools_config is not None):
-            return self._devtools_config
-
-        yaml_path = self.config_dir / "devtools.yaml"
-        yaml_config = load_yaml(yaml_path)
-
-        self._devtools_config = yaml_config
-        return self._devtools_config
-
-
-    def get_hardware_config(self):
-
-        if(self._hardware_config is not None):
-            return self._hardware_config
-
-        yaml_path = self.config_dir / "hardware.yaml"
-        yaml_config = load_yaml(yaml_path)
+    def process_hardware_config(self):
 
         # enforce required suffix rules
-        yaml_config["ledc_timer"] = ensure_dict_keys_have_suffix(yaml_config["ledc_timer"], "Timer")
-        yaml_config["ledc_channel"] = ensure_dict_keys_have_suffix(yaml_config["ledc_channel"], "Channel")
+        hardware = self.config["hardware"]
+        hardware["ledc_timer"] = ensure_dict_keys_have_suffix(hardware["ledc_timer"], "Timer")
+        hardware["ledc_channel"] = ensure_dict_keys_have_suffix(hardware["ledc_channel"], "Channel")
 
-        for channel in yaml_config["ledc_channel"].values():
+        for channel in hardware["ledc_channel"].values():
             channel["timer"] = ensure_str_has_suffix(channel["timer"], "Timer")
 
-        self._hardware_config = yaml_config
-        return self._hardware_config
 
+    def process_application_config(self):
 
-    def get_application_config(self):
+        config = self.config["application"]
 
-        if(self._application_config is not None):
-            return self._application_config
-
-        yaml_path = self.config_dir / "application.yaml"
-        yaml_config = load_yaml(yaml_path)
-
-        for tick_phase in yaml_config["setup"]["tick_phases"]:
+        for tick_phase in config["tick_phases"]:
             tick_phase["name"] = ensure_str_has_suffix(tick_phase["name"], "Tick")
 
-        for dict_item in yaml_config["behaviours"].values():
+        # order tick phases
+        next_order = 0
+        for tick_dict in config["tick_phases"]:
+            if("order" not in tick_dict):
+                tick_dict["order"] = next_order
+                next_order += 1
+        config["tick_phases"] = sorted(config["tick_phases"], key=lambda x: x["order"])
+
+    
+    def _process_components_config(self, key, suffix):
+
+        self.config[key] = ensure_dict_keys_have_suffix(self.config[key], suffix)
+
+        for dict_item in self.config[key].values():
             dict_item["tick_phases"] = ensure_list(dict_item["tick_phases"])
             dict_item["sends"] = ensure_list(dict_item["sends"])
             dict_item["receives"] = ensure_list(dict_item["receives"])
 
-        for dict_item in yaml_config["controllers"].values():
-            dict_item["tick_phases"] = ensure_list(dict_item["tick_phases"])
-            dict_item["sends"] = ensure_list(dict_item["sends"])
-            dict_item["receives"] = ensure_list(dict_item["receives"])
-
-        ensure_dict_keys_have_suffix(yaml_config["behaviours"], "Behaviour")
-        ensure_dict_keys_have_suffix(yaml_config["controllers"], "Controller")
-
-        for behaviour in yaml_config["behaviours"].values():
-            behaviour["tick_phases"] = ensure_list(behaviour["tick_phases"])
-            for idx, name in enumerate(behaviour["tick_phases"]):
-                behaviour["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")            
-
-        for controller in yaml_config["controllers"].values():
-            controller["tick_phases"] = ensure_list(controller["tick_phases"])
-            for idx, name in enumerate(controller["tick_phases"]):
-                controller["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")        
-
-        self._application_config = yaml_config
-        return self._application_config
+        for component in self.config[key].values():
+            component["tick_phases"] = ensure_list(component["tick_phases"])
+            for idx, name in enumerate(component["tick_phases"]):
+                component["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")  
 
 
-    def get_events_config(self):
+    def process_behaviours_config(self):
+        self._process_components_config("behaviours", "Behaviour")  
+             
 
-        if(self._events_config is not None):
-            return self._events_config
+    def process_controllers_config(self):
+        self._process_components_config("controllers", "Controller")
+        
 
-        events_path = self.config_dir / "events.yaml"
-        system_events_path = self.config_dir / "core/system_events.yaml"
-        config = load_yaml_multi([system_events_path, events_path])
+    def process_events_config(self):
+
+        config = self.config["events"]
 
         # copy event types into payload (but keep payload includes seperate)
         payloads: dict = deepcopy(config["types"])
@@ -116,9 +95,6 @@ class Loader:
             config["payloads"] = payloads
         else:
             config["payloads"].update(payloads)
-
-        self._events_config = config
-        return self._events_config
 
 
 def load_yaml(path: Path):

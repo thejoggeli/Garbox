@@ -39,11 +39,11 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
     Generates either behaviours or controllers, depending on passed parameters
     """
 
-    app_config = loader.get_application_config()
-    components = app_config[f"{type_key}s"]
+    config = loader.config
+    components = config[f"{type_key}s"]
 
-    stubs_prefix = nested_get_dot(app_config, "setup.stubs_prefix", "Example")
-    stubs_suffix = nested_get_dot(app_config, "setup.stubs_suffix", "")
+    stubs_prefix = nested_get_dot(config, "application.stubs_prefix", "Example")
+    stubs_suffix = nested_get_dot(config, "application.stubs_suffix", "")
     
     # list of items to be generated
     items = []

@@ -35,7 +35,7 @@ def _generate_instances(ctx: Context, loader: Loader):
     }
 
     hw_dir = ctx.app_dir / "hardware"
-    config = loader.get_hardware_config()
+    config = loader.config["hardware"]
 
     init_config = {"init": []}
     for key, name in init_mapping.items():
@@ -56,7 +56,7 @@ def _generate_hardware_init(ctx: Context, loader: Loader):
     """
 
     hw_dir = ctx.app_dir / "hardware"
-    config = loader.get_hardware_config()
+    config = loader.config["hardware"]
 
     items = [
         Item(config, keys=["adc"],   meta_key="adc_meta",   out_path=hw_dir/"AdcInstances.h",     template_path="hardware/AdcInstances.h.j2"),

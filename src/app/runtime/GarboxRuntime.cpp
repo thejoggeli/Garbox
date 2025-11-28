@@ -126,11 +126,6 @@ void GarboxRuntime::handleRenderTick(){
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
     switch(header->type){
-    case EventType::ActiveBehaviourChanged: {
-        const ActiveBehaviourChangedEvent event(header);
-        mDisplayController.onActiveBehaviourChanged(event);
-        break;
-    }
     case EventType::Heartbeat: {
         const HeartbeatEvent event(header);
  
@@ -253,6 +248,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStep(event); break;
             default: break; // active behaviour does not support event type
         }
+        break;
+    }
+    case EventType::ActiveBehaviourChanged: {
+        const ActiveBehaviourChangedEvent event(header);
+        mDisplayController.onActiveBehaviourChanged(event);
         break;
     }
     case EventType::Null:
