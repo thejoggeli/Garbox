@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from sortedcontainers import SortedSet
 from common.item import Item, generate_items
@@ -12,11 +13,13 @@ def _collect_event_routes(loader: Loader):
             "controllers": SortedSet(),
             "behaviours":  SortedSet(),
             "screens":  SortedSet(),
+            "count": 0
         }
     for section in ("controllers", "behaviours", "screens"):
         for key, data in loader.config[section].items():
             for event in data.get("receives", []):
                 event_routes[event][section].add(key)
+                event_routes[event]["count"] += 1
     return event_routes
 
 def _collect_paths(loader: Loader, type: str):
@@ -27,6 +30,7 @@ def _collect_paths(loader: Loader, type: str):
             path = path / data["subdir"]
         paths.append(path / key)
     return paths
+
 
 def generate_runtime(ctx: Context, loader: Loader):
     """

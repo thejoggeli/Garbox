@@ -1,6 +1,6 @@
 screens:
   Main:
-    tick_phases: []
+    tick_phases: null
     receives: [Heartbeat]
     sends: [BacklightCommand]
     states:
@@ -17,7 +17,7 @@ screens:
         - {source: Event, type: HeaterSample, field: measuredCurrent, epsilon: 1e-4}
     
   Debug:
-    tick_phases: []
+    tick_phases: null
     receives: [Heartbeat]
     sends: [BacklightCommand]
     states:

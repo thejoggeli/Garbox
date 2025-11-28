@@ -25,10 +25,10 @@ class Loader:
         print_json(self.config)
 
         self.process_hardware_config()
-        self.process_application_config()
         self.process_behaviours_config()
         self.process_controllers_config()
         self.process_screens_config()
+        self.process_application_config()
         self.process_events_config()
     
 
@@ -50,6 +50,8 @@ class Loader:
         for tick_phase in config["tick_phases"]:
             tick_phase["name"] = ensure_str_has_suffix(tick_phase["name"], "Tick")
 
+        self.build_tick_phase_usage()
+
         # order tick phases
         next_order = 0
         for tick_dict in config["tick_phases"]:
@@ -57,6 +59,23 @@ class Loader:
                 tick_dict["order"] = next_order
                 next_order += 1
         config["tick_phases"] = sorted(config["tick_phases"], key=lambda x: x["order"])
+
+
+    def build_tick_phase_usage(self):
+        phases = self.config["application"]["tick_phases"]
+        idx = {}
+        for i, phase in enumerate(phases):
+            phase["behaviours"] = []
+            phase["controllers"] = []
+            phase["screens"] = []
+            idx[phase["name"]] = i
+        for section in ("controllers", "behaviours", "screens"):
+            for comp_key, comp_data in self.config[section].items(): 
+                comp_data["tick_phases"] = ensure_list(comp_data["tick_phases"])
+                for phase in comp_data["tick_phases"]:
+                    phases[idx[phase]][section].append(comp_key)
+
+        print_json(phases)
 
     
     def _process_components_config(self, key, suffix):

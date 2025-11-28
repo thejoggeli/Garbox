@@ -67,6 +67,7 @@ void {{ RuntimeName}}::handleTickStart(){
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
+    applyQueuedScreen();
 }
 
 void {{ RuntimeName}}::handleTickEnd(){
@@ -85,21 +86,23 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
         {% endif %}
     {% endfor %}
     {# Call tick on active behaviour #}
+    {% if tick["behaviours"] | length > 0 %}
     switch(mActiveBehaviour->getBehaviourId()){
-    {% for beha_key, beha in behaviours.items() %}
-        {% if tick.name in beha['tick_phases'] %}        case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
-        {% endif %}
+    {% for beha in tick["behaviours"] %}
+        case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
     {% endfor %}
         default: break; // active behaviour does not support tick type
     }
+    {% endif %}
     {# Call tick on active screen #}
+    {% if tick["screens"] | length > 0 %}
     switch(mActiveScreen->getScreenId()){
-    {% for screen_key, screen in screens.items() %}
-        {% if tick.name in screen['tick_phases'] %}        case ScreenId::{{ screen_key.removesuffix("Screen") }}: static_cast<{{ screen_key }}*>(mActiveScreen)->on{{ tick.name }}(); break;
-        {% endif %}
+    {% for screen in tick["screens"] %}
+        case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ tick.name }}(); break;
     {% endfor %}
         default: break; // active behaviour does not support tick type
     }
+    {% endif %}
     {# Call dispatch events #}
     dispatchEvents();
 }
@@ -110,49 +113,34 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 {# ---- Route events ---- #}
 {% for event, routes in event_routes.items() %}
     case EventType::{{ event }}: {
+    {% if routes["count"] > 0 %}
         const {{ event }}Event event(header);
+    {% endif %}
     {# send event to controllers supporting this event #}
     {% for ctrl in routes["controllers"] %}
         m{{ ctrl }}.on{{ event }}(event);
     {% endfor %}
-    {% set ns = namespace(beha_count=0, screen_count=0) %}
-    {# get number of behaviours with this event #}
-    {% for beha_key, beha in behaviours.items() %}
-        {% if event in beha['receives'] %}
-            {% set ns.beha_count = ns.beha_count + 1 %}
-        {% endif %}
-    {% endfor %}
-    {# get number of screens with this event #}
-    {% for screen_key, screen in screens.items() %}
-        {% if event in screen['receives'] %}
-            {% set ns.screen_count = ns.screen_count + 1 %}
-        {% endif %}
-    {% endfor %}
     {# send event to active behaviour (if it supports this event) #}
-    {% if ns.beha_count > 0 %} 
-        // send event to active behaviour (if supported)
+    {% if routes["behaviours"] | length > 0 %}
         switch(mActiveBehaviour->getBehaviourId()){
-            {% for beha_key, beha in behaviours.items() %}
-                {% if event in beha['receives'] %}            case BehaviourId::{{ beha_key.removesuffix("Behaviour") }}: static_cast<{{ beha_key }}*>(mActiveBehaviour)->on{{ event }}(event); break;
-                {% endif %}
+            {% for beha in routes["behaviours"] %}
+            case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event }}(event); break;
             {% endfor %}
             default: break; // active behaviour does not support event type
         }
     {% endif %}
     {# send event to active screen (if it supports this event) #}
-    {% if ns.screen_count > 0 %} 
-        // send event to active screen (if supported)
+    {% if routes["screens"] | length > 0 %}
         switch(mActiveScreen->getScreenId()){
-            {% for screen_key, screen in screens.items() %}
-                {% if event in screen['receives'] %}            case ScreenId::{{ screen_key.removesuffix("Screen") }}: static_cast<{{ screen_key }}*>(mActiveScreen)->on{{ event }}(event); break;
-                {% endif %}
+            {% for screen in routes["screens"] %}
+            case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ event }}(event); break;
             {% endfor %}
             default: break; // active screen does not support event type
         }
     {% endif %}
         break;
     }
-    {% endfor %}
+{% endfor %}
     case EventType::Null:
     case EventType::Count:
         TriggerDebug("{{ RuntimeName }}", "invalid event type");
