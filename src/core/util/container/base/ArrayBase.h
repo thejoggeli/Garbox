@@ -49,6 +49,14 @@ public:
         const T* mPtr;
     };
 
+protected:
+
+    struct without_count_t {};
+    static constexpr without_count_t without_count{};
+
+    struct with_count_t {};
+    static constexpr with_count_t with_count{};
+
 public:
 
     ArrayBase() : Storage(){
@@ -60,7 +68,12 @@ public:
     }
 
     template<typename... Args>
-    ArrayBase(std::size_t elementCount, Args&&... args) : Storage(elementCount){
+    ArrayBase(without_count_t, Args&&... args) : Storage(){
+        constructAllWith(std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    ArrayBase(with_count_t, std::size_t elementCount, Args&&... args) : Storage(elementCount){
         constructAllWith(std::forward<Args>(args)...);
     }
 

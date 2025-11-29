@@ -19,11 +19,29 @@ static constexpr uint32_t LoggingTickDelayMillis = 0;
 static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime():
-    RuntimeAbs({
-        .maxComponents = 11,
-        .eventPoolSizeBytes = 1024,
-        .eventQueueLength = 128,
-    }),
+    RuntimeAbs(
+        RuntimeAbs::Config {
+            .eventPoolSizeBytes = 1024,
+            .eventQueueLength = 128,
+        }, 
+        std::initializer_list<ComponentAbs*> { 
+            &mDisplayController,  
+            &mDevtoolsController,  
+            &mFanController,  
+            &mHeartbeatController,  
+            &mHeatpadController,  
+            &mInputController,  
+            &mI2cPartsController 
+        },
+        std::initializer_list<ComponentAbs*> { 
+            &mCalibrationBehaviour,  
+            &mFermentationBehaviour
+        },
+        std::initializer_list<ComponentAbs*> { 
+            &mMainScreen,  
+            &mDebugScreen 
+        }
+    ),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
     mEventReplay(mMainScreen, mDebugScreen){
 

@@ -3,8 +3,8 @@
 #include "core/application/component/ComponentAbs.h"
 #include "core/application/event/EventHeader.h"
 #include "core/util/container/heap/ArrayHeap.h"
-#include "core/util/container/static/ArrayStatic.h"
 #include "core/util/container/heap/MaskedArrayHeap.h"
+#include "core/util/container/static/ArrayStatic.h"
 #include "shared/types/TickPhase.h"
 
 namespace Garbox {
@@ -23,23 +23,18 @@ public:
 
     ComponentGroup(std::initializer_list<ComponentAbs*> components);
 
-    void setComponentEnabled(ComponentId id, bool enabled);
+    void setComponentEnabled(ComponentAbs* component, bool enabled);
     void enableAllComponents();
     void disableAllComponents();
 
-    void setReceiveTick(ComponentId id, TickPhase phase, bool receive);
-    void setReceiveEvent(ComponentId id, EventType type, bool receive);
+    void setReceiveTick(ComponentAbs* component, TickPhase phase, bool receive);
+    void setReceiveEvent(ComponentAbs* component, EventType type, bool receive);
 
     void receiveTick(TickPhase phase);
     void receiveEvent(const EventHeader* event);
 
 private:
-
-    struct MaskEntry {
-        ComponentAbs* component = nullptr;
-        bool receive = false;
-    };
-
+ 
     ArrayHeap<ComponentAbs*> mComponents; 
 
     /**
@@ -60,8 +55,8 @@ private:
     ArrayStatic<MaskedArrayHeap<bool>, TickPhasesCount> mTickMatrix;
     ArrayStatic<MaskedArrayHeap<bool>, EventTypesCount> mEventMatrix;
 
-    void setTicksEnabled(ComponentId id, bool enabled);
-    void setEventsEnabled(ComponentId id, bool enabled);
+    void setTicksEnabled(size_t componentIndex, bool enabled);
+    void setEventsEnabled(size_t componentIndex, bool enabled);
 
 };
 

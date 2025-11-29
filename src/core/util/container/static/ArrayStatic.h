@@ -12,7 +12,9 @@ public:
     ArrayStatic() : ArrayBase<T, StaticStorage<T, N>>() {}
 
     template<typename... Args>
-    ArrayStatic(std::size_t elementCount, Args&&... args) : ArrayBase<T, HeapStorage<T>>(elementCount, std::forward<Args>(args)...) {}
+    ArrayStatic(Args&&... args) : ArrayBase<T, StaticStorage<T, N>>(
+        ArrayBase<T, StaticStorage<T, N>>::without_count,
+        std::forward<Args>(args)...) {}
 
 };
 

@@ -13,11 +13,18 @@
 
 namespace Garbox {
 
-RuntimeAbs::RuntimeAbs(const Config& config):
+RuntimeAbs::RuntimeAbs(
+    const Config& config,
+    std::initializer_list<ComponentAbs*> controllers,
+    std::initializer_list<ComponentAbs*> behaviours,
+    std::initializer_list<ComponentAbs*> screens):
     // init members
     mEventFactory(config.eventPoolSizeBytes),
     mEventQueue(config.eventQueueLength),
-    mComponents(config.maxComponents){
+    mComponents(controllers.size() + behaviours.size() + screens.size()),
+    mControllers(controllers),
+    mBehaviours(behaviours),
+    mScreens(screens){
     // constructor body
 }
 
@@ -73,7 +80,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
 
     // set queued behaviour active
     if(mActiveBehaviour){
-        mActiveBehaviour->setEnabled(false);
+        mBehaviours.setComponentEnabled(mActiveBehaviour, false);
         event->oldBehaviour = mActiveBehaviour->getBehaviourId();
     }
     else {
@@ -81,7 +88,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
     }
     mActiveBehaviour = mQueuedBehaviour;
     mQueuedBehaviour = nullptr;
-    mActiveBehaviour->setEnabled(true);
+    mBehaviours.setComponentEnabled(mActiveBehaviour, true);
 
     // send event
     onActiveBehaviourChanged();
@@ -109,7 +116,7 @@ void RuntimeAbs::applyQueuedScreen() {
 
     // set queued screen active
     if(mActiveScreen){
-        mActiveScreen->setEnabled(false);
+        mScreens.setComponentEnabled(mActiveScreen, false);
         event->oldScreen = mActiveScreen->getScreenId();
     }
     else {
@@ -117,7 +124,7 @@ void RuntimeAbs::applyQueuedScreen() {
     }
     mActiveScreen = mQueuedScreen;
     mQueuedScreen = nullptr;
-    mActiveScreen->setEnabled(true);
+    mScreens.setComponentEnabled(mActiveScreen, true);
 
     // send event
     onActiveScreenChanged();
@@ -163,6 +170,16 @@ void RuntimeAbs::dispatchEvents(){
 
 const RuntimeContext& RuntimeAbs::getContext() const {
     return mContext;
+}
+
+void RuntimeAbs::requestEnableController(ControllerId id){
+    // TODO implement
+    // question: should be let the current tick finish before enabling?
+}
+
+void RuntimeAbs::requestDisableController(ControllerId id){
+    // TODO implement
+    // question: should be let the current tick finish before disabling?
 }
 
 void RuntimeAbs::requestChangeBehaviour(BehaviourId id){

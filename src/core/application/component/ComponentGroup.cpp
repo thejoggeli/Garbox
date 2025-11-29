@@ -9,16 +9,16 @@ ComponentGroup::ComponentGroup(std::initializer_list<ComponentAbs*> components):
     mEventMatrix(components.size(), false){ // initialize ArrayMaskHeap(elementCount, defaultEnabled)
 
     // store components pointers
-    std::size_t idx = 0;
-    for(ComponentAbs* c : components) {
-        mComponents[idx] = c;
-        idx++;
+    size_t index = 0;
+    for(ComponentAbs* component : components) {
+        component->setComponentGroup(this, index);
+        mComponents[index] = component;
+        index++;
     }
 }
 
-void ComponentGroup::setTicksEnabled(ComponentId id, bool enabled){
-    // enable all ticks this component should receive
-    const size_t componentIndex = static_cast<size_t>(id);
+void ComponentGroup::setTicksEnabled(size_t componentIndex, bool enabled){
+    // enable/disable all ticks this component should receive
     for (size_t tickIndex = 0; tickIndex < static_cast<size_t>(TickPhase::Count); tickIndex++){
         if(mTickMatrix[tickIndex][componentIndex]){
             mTickMatrix[tickIndex].setIndexEnabled(componentIndex, enabled);
@@ -26,9 +26,8 @@ void ComponentGroup::setTicksEnabled(ComponentId id, bool enabled){
     }
 }
 
-void ComponentGroup::setEventsEnabled(ComponentId id, bool enabled){
-    // enable all events this component should receive
-    const size_t componentIndex = static_cast<size_t>(id); 
+void ComponentGroup::setEventsEnabled(size_t componentIndex, bool enabled){
+    // enable/disable all events this component should receive
     for (size_t eventIndex = 0; eventIndex < static_cast<size_t>(EventType::Count); eventIndex++){
         if(mEventMatrix[eventIndex][componentIndex]){
             mEventMatrix[eventIndex].setIndexEnabled(componentIndex, enabled);
@@ -36,30 +35,32 @@ void ComponentGroup::setEventsEnabled(ComponentId id, bool enabled){
     }
 }
 
-void ComponentGroup::setComponentEnabled(ComponentId id, bool enabled) {
-    const size_t index = static_cast<size_t>(id); 
+void ComponentGroup::setComponentEnabled(ComponentAbs* component, bool enabled) {
+    AssertExit(component->getComponentGroup() == this, "ComponentGroup", "invalid component");
+    const size_t index = component->getComponentGroupIndex(); 
     if(mComponents[index]->isEnabled() == enabled){
         return;
     }
     mComponents[index]->setEnabled(enabled);
-    setTicksEnabled(id, enabled);
-    setEventsEnabled(id, enabled);
+    setTicksEnabled(index, enabled);
+    setEventsEnabled(index, enabled);
 }
 
 void ComponentGroup::enableAllComponents() {
-    for(std::size_t i = 0; i < mComponents.size(); i++) {
-        setComponentEnabled(static_cast<ComponentId>(i), true);
+    for(ComponentAbs* component : mComponents) {
+        setComponentEnabled(component, true);
     }
 }
 
 void ComponentGroup::disableAllComponents() {
-    for(std::size_t i = 0; i < mComponents.size(); i++) {
-        setComponentEnabled(static_cast<ComponentId>(i), false);
+    for(ComponentAbs* component : mComponents) {
+        setComponentEnabled(component, false);
     }
 }
 
-void ComponentGroup::setReceiveTick(ComponentId id, TickPhase phase, bool receive){
-    const size_t componentIndex = static_cast<size_t>(id);
+void ComponentGroup::setReceiveTick(ComponentAbs* component, TickPhase phase, bool receive){
+    AssertExit(component->getComponentGroup() == this, "ComponentGroup", "invalid component");
+    const size_t componentIndex = component->getComponentGroupIndex();
     const size_t tickIndex = static_cast<size_t>(phase); 
     mTickMatrix[tickIndex][componentIndex] = receive;
     if(mComponents[componentIndex]->isEnabled()){
@@ -67,9 +68,10 @@ void ComponentGroup::setReceiveTick(ComponentId id, TickPhase phase, bool receiv
     }
 }
 
-void ComponentGroup::setReceiveEvent(ComponentId id, EventType type, bool receive){
-    const size_t componentIndex = static_cast<size_t>(id);
-    const size_t eventIndex = static_cast<size_t>(type);
+void ComponentGroup::setReceiveEvent(ComponentAbs* component, EventType event, bool receive){
+    AssertExit(component->getComponentGroup() == this, "ComponentGroup", "invalid component");
+    const size_t componentIndex = component->getComponentGroupIndex();
+    const size_t eventIndex = static_cast<size_t>(event);
     mEventMatrix[eventIndex][componentIndex] = receive;
     if(mComponents[componentIndex]->isEnabled()){
         mEventMatrix[eventIndex].setIndexEnabled(componentIndex, receive);

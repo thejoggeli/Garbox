@@ -10,7 +10,7 @@ namespace Garbox {
  * Enabled indices form an O(1) doubly-linked active chain for fast iteration.
  * Elements are always present; masking only affects iteration and lookup.
  */
-template<typename T, typename Storage>
+template<typename T, typename Storage, typename IndexStorage, typename BoolStorage>
 class MaskedArrayBase : private Storage {
 public:
     static constexpr std::size_t INVALID = static_cast<std::size_t>(-1);
@@ -41,22 +41,26 @@ public:
         std::size_t mIdx;
     };
 
-    MaskedArrayBase(bool defaultEnabled) : Storage(){
+    MaskedArrayBase(bool defaultEnabled): Storage(){
         initElements();
         initLinks(defaultEnabled);
     }
 
-    MaskedArrayBase(size_t elementCount, bool defaultEnabled) : Storage(elementCount){
+    MaskedArrayBase(size_t elementCount, bool defaultEnabled): 
+        Storage(elementCount),
+        mPrev(elementCount),
+        mNext(elementCount),
+        mEnabled(elementCount){
         initElements();
         initLinks(defaultEnabled);
     }
 
     Iterator begin(){
-        return Iterator(Storage::elementPtr(0), mNext, mHead);
+        return Iterator(Storage::elementPtr(0), mNext.data(), mHead);
     }
 
     Iterator end(){
-        return Iterator(Storage::elementPtr(0), mNext, INVALID);
+        return Iterator(Storage::elementPtr(0), mNext.data(), INVALID);
     }
 
     T& operator[](std::size_t index){
@@ -165,10 +169,9 @@ private:
         mEnabled[i] = true;
     }
 
-
-    std::size_t mPrev[Storage::capacityElements()];
-    std::size_t mNext[Storage::capacityElements()];
-    bool        mEnabled[Storage::capacityElements()];
+    IndexStorage mPrev;
+    IndexStorage mNext;
+    BoolStorage mEnabled;
     std::size_t mHead;
 };
 

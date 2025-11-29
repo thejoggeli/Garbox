@@ -12,8 +12,11 @@ public:
     ArrayHeap(std::size_t n) : ArrayBase<T, HeapStorage<T>>(n) {}
 
     template<typename... Args>
-    ArrayBase(std::size_t elementCount, Args&&... args) : ArrayBase<T, HeapStorage<T>>(elementCount, std::forward<Args>(args)...) {}
-    
+    ArrayHeap(std::size_t elementCount, Args&&... args) : ArrayBase<T, HeapStorage<T>>(
+        ArrayBase<T, HeapStorage<T>>::without_count,
+        elementCount, 
+        std::forward<Args>(args)...) {}
+
 };
 
 } // namespace Garbox

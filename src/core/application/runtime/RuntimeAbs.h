@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "core/application/behaviour/BehaviourAbs.h"
+#include "core/application/component/ComponentGroup.h"
 #include "core/application/component/ComponentHostIfc.h"
 #include "core/application/controller/ControllerAbs.h"
 #include "core/application/event/EventFactory.h"
@@ -19,12 +20,16 @@ class RuntimeAbs : public ComponentHostIfc {
 public:
 
     struct Config {
-        size_t maxComponents = 16;
         size_t eventPoolSizeBytes = 1024;
         size_t eventQueueLength = 64;
     };
 
-    RuntimeAbs(const Config& config);
+    RuntimeAbs(
+        const Config& config,
+        std::initializer_list<ComponentAbs*> controllers,
+        std::initializer_list<ComponentAbs*> behaviours,
+        std::initializer_list<ComponentAbs*> screens
+    );
 
     // disallow copy and move 
     RuntimeAbs(const RuntimeAbs&) = delete;
@@ -37,6 +42,8 @@ public:
     void run();
 
     // ComponentHostIfc
+    void requestEnableController(ControllerId id) final;
+    void requestDisableController(ControllerId id) final;
     void requestChangeBehaviour(BehaviourId id) final;
     void requestChangeScreen(ScreenId id) final;
     void requestUpdateScreenNow() final;
@@ -96,9 +103,11 @@ private:
     EventFactory mEventFactory;
     RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
-    // components array
+    // components
     VectorHeap<ComponentAbs*> mComponents;
-
+    ComponentGroup mControllers;
+    ComponentGroup mBehaviours;
+    ComponentGroup mScreens;
 };
 
 } // namespace

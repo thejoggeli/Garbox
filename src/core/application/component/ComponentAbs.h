@@ -92,9 +92,19 @@ private:
     // event factory (injected in init() through host)
     EventFactory* mEventFactory = nullptr;
 
+    // component group
+    ComponentGroup* mComponentGroup = nullptr;
+    size_t mComponentGroupIndex = static_cast<size_t>(-1);
+
+    // only the ComponentGroup class is allowed to access this
+    void setComponentGroup(ComponentGroup* group, size_t index);
+    ComponentGroup* getComponentGroup() const;
+    size_t getComponentGroupIndex() const;
+
     // only the ComponentGroup class is allowed to access setEnabled(), because it needs to 
     // update the receive tick/event matrices when a component is enabled or disabled
     void setEnabled(bool enabled);
+
     friend class ComponentGroup;
 };
 

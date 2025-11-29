@@ -53,4 +53,18 @@ void ComponentAbs::publishEvent(const EventHeader* header){
     mHost->publishEvent(header);
 }
 
+void ComponentAbs::setComponentGroup(ComponentGroup* group, size_t index){
+    AssertExit(mComponentGroup == nullptr, "ComponentAbs", "already has component group");
+    mComponentGroup = group;
+    mComponentGroupIndex = index; 
+}
+
+ComponentGroup* ComponentAbs::getComponentGroup() const{
+    return mComponentGroup;
+}
+
+size_t ComponentAbs::getComponentGroupIndex() const{
+    return mComponentGroupIndex;
+}
+
 } // namespace
