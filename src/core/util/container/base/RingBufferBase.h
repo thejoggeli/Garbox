@@ -31,10 +31,9 @@ public:
         // nothing to do
     }
 
-    template<typename... Args>
-    RingBufferBase(Args... storageArgs):
+    RingBufferBase(size_t elementCount):
         // initialize members
-        Storage(storageArgs...),
+        Storage(elementCount),
         mFront(0),
         mBack(0),
         mCount(0){

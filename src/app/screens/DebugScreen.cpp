@@ -20,11 +20,11 @@ void DebugScreen::onStart(){
     // nothing to do
 }
 
-void DebugScreen::onBecomeActive(){
+void DebugScreen::onBecomeEnabled(){
     mFirstUpdate = true;
 }
 
-void DebugScreen::onBecomeInactive(){
+void DebugScreen::onBecomeDisabled(){
     // nothing to do
 }
 

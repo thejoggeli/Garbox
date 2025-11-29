@@ -9,6 +9,9 @@ class {{ ScreenName }} : public ScreenAbs {
 public:
 
     {{ ScreenName }}();
+
+    void receiveTick(TickPhase phase) final {};
+    void receiveEvent(const EventHeader* event) final {};
 {# ---- Tick handlers ---- #}
 {% if screen.tick_phases %}
 

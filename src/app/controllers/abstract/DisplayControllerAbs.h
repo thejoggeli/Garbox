@@ -12,6 +12,9 @@ public:
     
     DisplayControllerAbs();
 
+    void receiveTick(TickPhase phase) final {};
+    void receiveEvent(const EventHeader* event) final {};
+
     // tick handlers
     virtual void onRenderTick() = 0;
 

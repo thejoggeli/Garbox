@@ -11,6 +11,9 @@ public:
 
     DebugScreenAbs();
 
+    void receiveTick(TickPhase phase) final {};
+    void receiveEvent(const EventHeader* event) final {};
+
     // receive event handlers
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
 

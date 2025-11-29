@@ -22,12 +22,12 @@ void FermentationBehaviour::onStart(){
     sendEvent(cmd);
 }
 
-void FermentationBehaviour::onBecomeActive(){
+void FermentationBehaviour::onBecomeEnabled(){
     mHeaterEngine.reset();
     mHeaterEngine.setRegulationEnabled(true);
 }
 
-void FermentationBehaviour::onBecomeInactive(){
+void FermentationBehaviour::onBecomeDisabled(){
     mHeaterEngine.reset();
     sendDisableActuatorsCommands();
 }

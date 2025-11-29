@@ -16,11 +16,11 @@ void CalibrationBehaviour::onStart(){
     // nothing to do
 }
 
-void CalibrationBehaviour::onBecomeActive(){
+void CalibrationBehaviour::onBecomeEnabled(){
     // nothing to do
 }
 
-void CalibrationBehaviour::onBecomeInactive(){
+void CalibrationBehaviour::onBecomeDisabled(){
     // nothing to do
 }
 

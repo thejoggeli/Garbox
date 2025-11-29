@@ -33,8 +33,8 @@ private:
     
     void onInit() final;
     void onStart() final;
-    void onBecomeActive() final;
-    void onBecomeInactive() final;
+    void onBecomeEnabled() final;
+    void onBecomeDisabled() final;
 
     void sendFanCommand(bool enabled, float speed);
     void sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros);

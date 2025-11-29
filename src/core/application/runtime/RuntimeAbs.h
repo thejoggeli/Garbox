@@ -6,7 +6,7 @@
 #include "core/application/event/EventFactory.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "core/application/screen/ScreenAbs.h"
-#include "core/util/container/heap/RingBufferStatic.h"
+#include "core/util/container/heap/RingBufferHeap.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/heap/VectorHeap.h"
 

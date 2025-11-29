@@ -11,6 +11,9 @@ public:
 
     MainScreenAbs();
 
+    void receiveTick(TickPhase phase) final {};
+    void receiveEvent(const EventHeader* event) final {};
+
     // receive event handlers
     virtual void onFanStatus(const FanStatusEvent& event) = 0;
     virtual void onFanSample(const FanSampleEvent& event) = 0;

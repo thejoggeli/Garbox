@@ -11,6 +11,9 @@ class {{ name }}Abs : public ControllerAbs {
 public:
     
     {{ name }}Abs();
+
+    void receiveTick(TickPhase phase) final {};
+    void receiveEvent(const EventHeader* event) final {};
     {# ---- Tick handlers ---- #}
 {% if controller.tick_phases %}
 

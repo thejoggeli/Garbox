@@ -22,7 +22,7 @@ void CalibrationBehaviour::onStart(){
     // nothing to do
 }
 
-void CalibrationBehaviour::onBecomeActive(){
+void CalibrationBehaviour::onBecomeEnabled(){
     mCounter = 0;
     static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
     piezo.playTone(Tone(75_ms).sweep(1000, 1500), 50_ms); 
@@ -30,7 +30,7 @@ void CalibrationBehaviour::onBecomeActive(){
     piezo.playTone(Tone(75_ms).sweep(1000, 3000), 50_ms);
 }
 
-void CalibrationBehaviour::onBecomeInactive(){
+void CalibrationBehaviour::onBecomeDisabled(){
     static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer(); 
     piezo.playTone(Tone(400_ms).sweep(1000, 2500));
 }

@@ -8,7 +8,12 @@ namespace Garbox {
 template<typename T, std::size_t N>
 class ArrayStatic : public ArrayBase<T, StaticStorage<T, N>> {
 public:
-    ArrayStatic() = default;
+
+    ArrayStatic() : ArrayBase<T, StaticStorage<T, N>>() {}
+
+    template<typename... Args>
+    ArrayStatic(std::size_t elementCount, Args&&... args) : ArrayBase<T, HeapStorage<T>>(elementCount, std::forward<Args>(args)...) {}
+
 };
 
 } // namespace Garbox

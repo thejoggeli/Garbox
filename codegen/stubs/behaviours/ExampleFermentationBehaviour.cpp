@@ -16,11 +16,11 @@ void FermentationBehaviour::onStart(){
     // nothing to do
 }
 
-void FermentationBehaviour::onBecomeActive(){
+void FermentationBehaviour::onBecomeEnabled(){
     // nothing to do
 }
 
-void FermentationBehaviour::onBecomeInactive(){
+void FermentationBehaviour::onBecomeDisabled(){
     // nothing to do
 }
 

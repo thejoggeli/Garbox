@@ -9,6 +9,9 @@ class {{ BehaviourName }} : public BehaviourAbs {
 public:
 
     {{ BehaviourName }}();
+
+    void receiveTick(TickPhase phase) final {};
+    void receiveEvent(const EventHeader* event) final {};
 {# ---- Tick handlers ---- #}
 {% if behaviour.tick_phases %}
 

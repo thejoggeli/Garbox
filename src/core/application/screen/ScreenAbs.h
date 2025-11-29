@@ -13,10 +13,6 @@ public:
 
     void updateScreen();
 
-    // unlike controllers, behaviours can be active or inactive
-    void setActive(bool active);
-    bool isActive() const { return mActive; }
-
     // get the behaviour id
     ScreenId getScreenId() const { return mScreenId; }
 
@@ -24,9 +20,7 @@ protected:
 
     const ScreenId mScreenId;
 
-    // abstract methods for user of class
-    virtual void onBecomeActive() = 0;
-    virtual void onBecomeInactive() = 0;
+    // abstract methods for user implementation
     virtual void onUpdateScreen() = 0;
 
 private:

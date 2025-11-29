@@ -31,21 +31,24 @@ public:
             return mIdx != other.mIdx;
         }
 
+        size_t index() const {
+            return mIdx;
+        }
+
     private:
         T* mData;
         const std::size_t* mNext;
         std::size_t mIdx;
     };
 
-    MaskedArrayBase() : Storage(){
+    MaskedArrayBase(bool defaultEnabled) : Storage(){
         initElements();
-        initLinks();
+        initLinks(defaultEnabled);
     }
 
-    template<typename... Args>
-    MaskedArrayBase(Args&&... args) : Storage(std::forward<Args>(args)...){
+    MaskedArrayBase(size_t elementCount, bool defaultEnabled) : Storage(elementCount){
         initElements();
-        initLinks();
+        initLinks(defaultEnabled);
     }
 
     Iterator begin(){

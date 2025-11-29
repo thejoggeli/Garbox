@@ -34,11 +34,11 @@ void MainScreen::onStart(){
     mDirtyDispatcher.markAllDirty();
 }
 
-void MainScreen::onBecomeActive(){
+void MainScreen::onBecomeEnabled(){
     mFirstUpdate = true;
 }
 
-void MainScreen::onBecomeInactive(){
+void MainScreen::onBecomeDisabled(){
     // nothing to do
 }
 

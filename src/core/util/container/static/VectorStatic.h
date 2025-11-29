@@ -8,12 +8,7 @@ namespace Garbox {
 template <typename T, std::size_t N>
 class VectorStatic : public VectorBase<T, StaticStorage<T, N>> {
 public:
-
-    VectorStatic():
-        // initialize members
-        VectorBase<T, StaticStorage<T, N>>() {
-        // nothing to do
-    }
+    VectorStatic() : VectorBase<T, StaticStorage<T, N>>() {}
 };
 
 } // namespace Garbox

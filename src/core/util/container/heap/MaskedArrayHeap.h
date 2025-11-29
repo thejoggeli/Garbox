@@ -8,7 +8,7 @@ namespace Garbox {
 template<typename T>
 class MaskedArrayHeap : public MaskedArrayBase<T, HeapStorage<T>> {
 public:
-    MaskedArrayHeap(std::size_t elementCount) : MaskedArrayHeap<T, HeapStorage<T>>(elementCount) {}
+    MaskedArrayHeap(std::size_t elementCount, bool defaultEnabled) : MaskedArrayHeap<T, HeapStorage<T>>(elementCount) {}
 };
 
 } // namespace Garbox

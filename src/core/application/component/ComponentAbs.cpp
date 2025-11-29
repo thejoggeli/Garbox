@@ -29,9 +29,26 @@ void ComponentAbs::start(){
     onStart();
 }
 
+void ComponentAbs::setEnabled(bool enabled){
+    if(mInitialized){
+        TriggerExit("ComponentAbs", "not initialized");
+    }
+    if(enabled == mEnabled){
+        TriggerDebug("ComponentAbs", "already in enabled state", enabled);
+        return;
+    }
+    mEnabled = enabled;
+    if(enabled){
+        onBecomeEnabled();
+    }
+    else {
+        onBecomeDisabled();
+    }
+}
+
 void ComponentAbs::publishEvent(const EventHeader* header){
     if(!mInitialized){
-        TriggerExit("BehaviourAbs", "not initialized");
+        TriggerExit("ComponentAbs", "not initialized");
     }
     mHost->publishEvent(header);
 }

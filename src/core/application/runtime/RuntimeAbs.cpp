@@ -73,7 +73,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
 
     // set queued behaviour active
     if(mActiveBehaviour){
-        mActiveBehaviour->setActive(false);
+        mActiveBehaviour->setEnabled(false);
         event->oldBehaviour = mActiveBehaviour->getBehaviourId();
     }
     else {
@@ -81,7 +81,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
     }
     mActiveBehaviour = mQueuedBehaviour;
     mQueuedBehaviour = nullptr;
-    mActiveBehaviour->setActive(true);
+    mActiveBehaviour->setEnabled(true);
 
     // send event
     onActiveBehaviourChanged();
@@ -109,7 +109,7 @@ void RuntimeAbs::applyQueuedScreen() {
 
     // set queued screen active
     if(mActiveScreen){
-        mActiveScreen->setActive(false);
+        mActiveScreen->setEnabled(false);
         event->oldScreen = mActiveScreen->getScreenId();
     }
     else {
@@ -117,7 +117,7 @@ void RuntimeAbs::applyQueuedScreen() {
     }
     mActiveScreen = mQueuedScreen;
     mQueuedScreen = nullptr;
-    mActiveScreen->setActive(true);
+    mActiveScreen->setEnabled(true);
 
     // send event
     onActiveScreenChanged();

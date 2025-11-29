@@ -8,7 +8,7 @@ namespace Garbox {
 template<typename T, std::size_t N>
 class MaskedArrayStatic : public MaskedArrayBase<T, StaticStorage<T, N>> {
 public:
-    MaskedArrayStatic() : MaskedArrayStatic<T, StaticStorage<T, N>>() {}
+    MaskedArrayStatic(bool defaultEnabled) : MaskedArrayStatic<T, StaticStorage<T, N>>() {}
 };
 
 } // namespace Garbox

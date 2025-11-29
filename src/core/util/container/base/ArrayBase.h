@@ -55,9 +55,13 @@ public:
         constructAll();
     }
 
-    template<typename... Args>
-    ArrayBase(Args&&... storageArgs) : Storage(std::forward<Args>(storageArgs)...){
+    ArrayBase(std::size_t elementCount) : Storage(elementCount){
         constructAll();
+    }
+
+    template<typename... Args>
+    ArrayBase(std::size_t elementCount, Args&&... args) : Storage(elementCount){
+        constructAllWith(std::forward<Args>(args)...);
     }
 
     T& operator[](std::size_t index) {
@@ -116,6 +120,15 @@ private:
             new (Storage::elementPtr(i)) T();
         }
     }
+
+    template<typename... Args>
+    void constructAllWith(Args&&... args) {
+        const std::size_t n = Storage::capacityElements();
+        for(std::size_t i = 0; i < n; i++) {
+            new (Storage::elementPtr(i)) T(std::forward<Args>(args)...);
+        }
+    }
+
 };
 
 } // namespace Garbox

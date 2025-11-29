@@ -16,11 +16,11 @@ void MainScreen::onStart(){
     // nothing to do
 }
 
-void MainScreen::onBecomeActive(){
+void MainScreen::onBecomeEnabled(){
     // nothing to do
 }
 
-void MainScreen::onBecomeInactive(){
+void MainScreen::onBecomeDisabled(){
     // nothing to do
 }
 

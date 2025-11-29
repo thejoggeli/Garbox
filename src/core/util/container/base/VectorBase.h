@@ -59,18 +59,11 @@ public:
 
 public:
 
-    VectorBase():
-        // initialize members
-        Storage(),
-        mSize(0){
+    VectorBase() : Storage(), mSize(0){
         // nothing to do
     }
 
-    template<typename... Args>
-    VectorBase(Args... storageArgs):
-        // initialize members
-        Storage(storageArgs...),
-        mSize(0){
+    VectorBase(size_t elementCount) : Storage(elementCount), mSize(0){
         // nothing to do
     }
 

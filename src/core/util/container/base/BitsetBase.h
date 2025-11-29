@@ -8,7 +8,13 @@ namespace Garbox {
 template <typename Storage>
 class BitsetBase : private Storage {
 public:
-    BitsetBase(std::size_t bitCount, std::size_t storageArg = 0) : Storage(storageArg), mBitCount(bitCount) {
+
+    BitsetBase(std::size_t bitCount) : Storage(), mBitCount(bitCount) {
+        const bool fits = requiredBytes(bitCount) <= Storage::capacityBytes();
+        AssertExit(fits, "BitsetBase", "capacity too small for bit count");
+    }
+
+    BitsetBase(std::size_t bitCount, std::size_t elementCount) : Storage(elementCount), mBitCount(bitCount) {
         const bool fits = requiredBytes(bitCount) <= Storage::capacityBytes();
         AssertExit(fits, "BitsetBase", "capacity too small for bit count");
     }

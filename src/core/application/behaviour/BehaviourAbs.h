@@ -11,25 +11,13 @@ public:
 
     BehaviourAbs(ComponentId componentId, BehaviourId behaviourId);
 
-    // unlike controllers, behaviours can be active or inactive
-    void setActive(bool active);
-    bool isActive() const { return mActive; }
-
     // get the behaviour id
     BehaviourId getBehaviourId() const { return mBehaviourId; }
 
 protected:
 
     const BehaviourId mBehaviourId;
-
-    // abstract methods for user of class
-    virtual void onBecomeActive() = 0;
-    virtual void onBecomeInactive() = 0;
-
-private:
-
-    bool mActive = false;
-
+    
 };
 
 } // namespace
