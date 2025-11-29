@@ -13,11 +13,27 @@ public:
     }
 
     uint8_t* dataBytes() {
-        return &mBytes[0];
+        return mBytes;
     }
 
     const uint8_t* dataBytes() const {
-        return &mBytes[0];
+        return mBytes;
+    }
+
+    T* dataElements() {
+        return reinterpret_cast<T*>(mBytes);
+    }
+
+    const T* dataElements() const {
+        return reinterpret_cast<const T*>(mBytes);
+    }
+
+    T* elementPtr(std::size_t index) {
+        return reinterpret_cast<T*>(mBytes + index * sizeof(T));
+    }
+
+    const T* elementPtr(std::size_t index) const {
+        return reinterpret_cast<const T*>(mBytes + index * sizeof(T));
     }
 
     std::size_t capacityElements() const {

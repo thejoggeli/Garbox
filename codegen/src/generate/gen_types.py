@@ -8,6 +8,7 @@ def generate_types(ctx: Context, loader: Loader):
     _generate_events(ctx, loader)
     _generate_component_ids(ctx, loader)
     _generate_profiler_ids(ctx, loader)
+    _generate_tick_phases(ctx, loader)
 
 
 def _generate_events(ctx: Context, loader: Loader):
@@ -68,5 +69,16 @@ def _generate_profiler_ids(ctx: Context, loader: Loader):
     items = [
         Item(config, "*", ctx.shared_dir/"types/ProfilerId.h",   "types/ProfilerId.h.j2"),
         Item(config, "*", ctx.shared_dir/"types/ProfilerId.cpp", "types/ProfilerId.cpp.j2"),
+    ]
+    generate_items(ctx, items)
+
+
+def _generate_tick_phases(ctx: Context, loader: Loader):
+
+    config = loader.config["application"]
+
+    items = [
+        Item(config, "tick_phases", ctx.shared_dir/"types/TickPhase.h",   "types/TickPhase.h.j2"),
+        Item(config, "tick_phases", ctx.shared_dir/"types/TickPhase.cpp", "types/TickPhase.cpp.j2"),
     ]
     generate_items(ctx, items)

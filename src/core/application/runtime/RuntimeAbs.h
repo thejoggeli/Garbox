@@ -6,9 +6,9 @@
 #include "core/application/event/EventFactory.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "core/application/screen/ScreenAbs.h"
-#include "core/util/container/ringbuffer/HeapRingBuffer.h"
+#include "core/util/container/heap/RingBufferStatic.h"
 #include "core/util/container/Span.h"
-#include "core/util/container/vector/HeapVector.h"
+#include "core/util/container/heap/VectorHeap.h"
 
 namespace Garbox {
 
@@ -94,10 +94,10 @@ private:
 
     // members for events
     EventFactory mEventFactory;
-    HeapRingBuffer<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
+    RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
     // components array
-    HeapVector<ComponentAbs*> mComponents;
+    VectorHeap<ComponentAbs*> mComponents;
 
 };
 

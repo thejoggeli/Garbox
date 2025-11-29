@@ -6,7 +6,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include "core/rtos/Task.h"
-#include "core/util/container/ringbuffer/StaticRingBuffer.h"
+#include "core/util/container/static/RingBufferStatic.h"
 #include "modules/parts/piezo/Piezo.h"
 #include "modules/parts/piezo/ToneSequence.h"
 
@@ -73,7 +73,7 @@ private:
     const ToneSequence* mCurrentSequence = nullptr;
 
     // playback state
-    StaticRingBuffer<QueueItem, QueueSize> mQueue;
+    RingBufferStatic<QueueItem, QueueSize> mQueue;
     size_t mCurrentToneIndex = 0;
     uint32_t mLastTimeMicros = 0;
     bool mPlaying = false;

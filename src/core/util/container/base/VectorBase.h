@@ -82,7 +82,7 @@ public:
             return nullptr;
         }
 
-        T* ptr = storagePtr(mSize);
+        T* ptr = Storage::elementPtr(mSize);
         mSize++;
         return ptr;
     }
@@ -113,7 +113,7 @@ public:
             return false;
         }
 
-        new(storagePtr(mSize)) T(value);
+        new(Storage::elementPtr(mSize)) T(value);
         mSize++;
         return true;
     }
@@ -127,26 +127,26 @@ public:
             return nullptr;
         }
 
-        T* ptr = storagePtr(mSize);
+        T* ptr = Storage::elementPtr(mSize);
         new(ptr) T(args...);
         mSize++;
         return ptr;
     }
 
     Iterator begin() {
-        return Iterator(storagePtr(0));
+        return Iterator(Storage::elementPtr(0));
     }
 
     Iterator end() {
-        return Iterator(storagePtr(mSize));
+        return Iterator(Storage::elementPtr(mSize));
     }
 
     T& operator[](std::size_t index) {
-        return *storagePtr(index);
+        return *Storage::elementPtr(index);
     }
 
     const T& operator[](std::size_t index) const {
-        return *storagePtr(index);
+        return *Storage::elementPtr(index);
     }
 
     std::size_t size() const {
@@ -169,7 +169,7 @@ public:
     void destroyAll() {
         std::size_t i = 0;
         while(i < mSize){
-            T* ptr = storagePtr(i);
+            T* ptr = Storage::elementPtr(i);
             ptr->~T();
             i++;
         }
@@ -187,7 +187,7 @@ public:
             return false;
         }
 
-        T* ptr = storagePtr(mSize - 1);
+        T* ptr = Storage::elementPtr(mSize - 1);
         ptr->~T();
         mSize--;
         return true;
@@ -199,7 +199,7 @@ public:
             return false;
         }
 
-        T* ptr = storagePtr(mSize - 1);
+        T* ptr = Storage::elementPtr(mSize - 1);
         out = *ptr;
         ptr->~T();
         mSize--;
@@ -222,7 +222,7 @@ public:
             return false;
         }
 
-        T* ptr = storagePtr(mSize - 1);
+        T* ptr = Storage::elementPtr(mSize - 1);
         out = *ptr;
 
         mSize--;
@@ -234,7 +234,7 @@ public:
         if(mSize == 0){
             return false;
         }
-        out = *storagePtr(mSize - 1);
+        out = *Storage::elementPtr(mSize - 1);
         return true;
     }
 
@@ -243,7 +243,7 @@ public:
         if(mSize == 0){
             return nullptr;
         }
-        return storagePtr(mSize - 1);
+        return Storage::elementPtr(mSize - 1);
     }
 
     // Copy element at index
@@ -252,7 +252,7 @@ public:
         if(!valid){
             return false;
         }
-        out = *storagePtr(index);
+        out = *Storage::elementPtr(index);
         return true;
     }
 
@@ -262,17 +262,7 @@ public:
         if(!valid){
             return nullptr;
         }
-        return storagePtr(index);
-    }
-
-private:
-
-    T* storagePtr(std::size_t index){
-        return reinterpret_cast<T*>(Storage::dataBytes() + index * sizeof(T));
-    }
-
-    const T* storagePtr(std::size_t index) const {
-        return reinterpret_cast<const T*>(Storage::dataBytes() + index * sizeof(T));
+        return Storage::elementPtr(index);
     }
 
 private:

@@ -1,0 +1,19 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include <cstdint>
+{%- from "_common/includes.j2" import emit_includes -%}
+{{- emit_includes(includes) -}}
+
+namespace Garbox {
+
+enum class TickPhase : uint16_t {
+    Null = 0,
+{% for tick_phase in tick_phases %}
+    {{ tick_phase["name"].removesuffix("Tick") }},
+{% endfor %}
+    Count,
+};
+
+const char* TickPhaseToString(TickPhase phase);
+
+} // namespace Garbox

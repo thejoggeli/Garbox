@@ -75,7 +75,7 @@ public:
 
     // Destroy all constructed elements
     void destroyAll(){
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
 
         std::size_t index = mFront;
         std::size_t destroyed = 0;
@@ -97,7 +97,7 @@ public:
         }
 
         mFront = prevIndex(mFront);
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         T* slot = &buffer[mFront];
 
         mCount++;
@@ -110,7 +110,7 @@ public:
             return 0;
         }
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         T* slot = &buffer[mBack];
 
         mBack = nextIndex(mBack);
@@ -172,7 +172,7 @@ public:
             return false;
         }
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         buffer[mFront].~T();
 
         mFront = nextIndex(mFront);
@@ -186,7 +186,7 @@ public:
             return false;
         }
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         out = buffer[mFront];
 
         buffer[mFront].~T();
@@ -213,7 +213,7 @@ public:
             return false;
         }
         
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         ptr = &buffer[mFront];
 
         mFront = nextIndex(mFront);
@@ -226,7 +226,7 @@ public:
             return false;
         }
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         out = buffer[mFront];
 
         mFront = nextIndex(mFront);
@@ -242,7 +242,7 @@ public:
 
         mBack = prevIndex(mBack);
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         buffer[mBack].~T();
 
         mCount--;
@@ -257,7 +257,7 @@ public:
 
         mBack = prevIndex(mBack);
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         out = buffer[mBack];
 
         buffer[mBack].~T();
@@ -285,7 +285,7 @@ public:
 
         mBack = prevIndex(mBack);
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         ptr = &buffer[mBack];
 
         mCount--;
@@ -299,7 +299,7 @@ public:
 
         mBack = prevIndex(mBack);
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         out = buffer[mBack];
 
         mCount--;
@@ -312,7 +312,7 @@ public:
             return false;
         }
 
-        const T* buffer = reinterpret_cast<const T*>(Storage::dataBytes());
+        const T* buffer = Storage::dataElements();
         out = buffer[mFront];
         return true;
     }
@@ -324,7 +324,7 @@ public:
         }
 
         const std::size_t last = prevIndex(mBack);
-        const T* buffer = reinterpret_cast<const T*>(Storage::dataBytes());
+        const T* buffer = Storage::dataElements();
         out = buffer[last];
         return true;
     }
@@ -335,7 +335,7 @@ public:
             return 0;
         }
 
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         return &buffer[mFront];
     }
 
@@ -346,7 +346,7 @@ public:
         }
 
         const std::size_t last = prevIndex(mBack);
-        T* buffer = reinterpret_cast<T*>(Storage::dataBytes());
+        T* buffer = Storage::dataElements();
         return &buffer[last];
     }
 

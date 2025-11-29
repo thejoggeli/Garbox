@@ -2,8 +2,8 @@
 
 #include <array>
 #include <cstdint>
-#include "core/util/container/ringbuffer/HeapRingBuffer.h"
-#include "core/util/container/vector/HeapVector.h"
+#include "core/util/container/heap/RingBufferStatic.h"
+#include "core/util/container/heap/VectorHeap.h"
 
 namespace Garbox {
 
@@ -30,8 +30,8 @@ public:
 
 private:
     bool mInitialized = false;
-    HeapVector<HandlerEntry> mHandlers;
-    HeapRingBuffer<HandlerEntry*> mQueue; 
+    VectorHeap<HandlerEntry> mHandlers;
+    RingBufferHeap<HandlerEntry*> mQueue; 
 
 };
 

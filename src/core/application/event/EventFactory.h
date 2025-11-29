@@ -6,7 +6,7 @@
 #include "core/application/event/EventBlock.h"
 #include "core/application/event/EventHeader.h"
 #include "core/assert/Assert.h"
-#include "core/util/container/datapool/HeapDataPool.h"
+#include "core/util/container/heap/DataPoolHeap.h"
 #include "shared/types/EventType.h"
 #include "shared/types/EventPayload.h"
 
@@ -43,7 +43,7 @@ public:
 private:
 
     int32_t mCurrentEventId = 0;
-    HeapDataPool mPool;
+    DataPoolHeap mPool;
 
     int32_t getNextEventId(){
         mCurrentEventId++;

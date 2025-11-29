@@ -12,7 +12,7 @@ namespace Garbox {
  * that provides raw byte memory and a fixed capacity in bytes.
  *
  * It is intended primarily for simple POD types. Allocations only move
- * an internal offset forward; clear() just resets the offset without
+ * an internal offset forward; releaseAll() just resets the offset without
  * calling destructors.
  */
 template <typename Storage>
@@ -20,21 +20,11 @@ class DataPoolBase : private Storage {
 public:
 
     // Construct with default Storage
-    DataPoolBase():
-        // initialize members
-        Storage(),
-        mOffsetBytes(0){
-        // nothing to do
-    }
+    DataPoolBase() : Storage(), mOffsetBytes(0){}
 
     // Construct with arguments forwarded to Storage
     template<typename... Args>
-    DataPoolBase(Args... storageArgs):
-        // initialize members
-        Storage(storageArgs...),
-        mOffsetBytes(0){
-        // nothing to do
-    }
+    DataPoolBase(Args... storageArgs) : Storage(storageArgs...) , mOffsetBytes(0){}
 
     // Reset the allocation offset (does not destruct objects)
     void releaseAll(){
@@ -64,7 +54,7 @@ public:
     T* allocate(){
         return static_cast<T*>(allocateRaw(sizeof(T), alignof(T)));
     }
-    
+
     // Allocate space and construct T in-place using value initialization.
     // Default member initializers are applied; otherwise POD members are zero-initialized.
     template<typename T>
@@ -73,8 +63,7 @@ public:
         if(rawPtr == 0){
             return 0;
         }
-        T* ptr = new(rawPtr) T();
-        return ptr;
+        return new(rawPtr) T();
     }
 
     // Copy-construct T into storage using placement new
@@ -84,9 +73,7 @@ public:
         if(rawPtr == 0){
             return 0;
         }
-
-        T* ptr = new(rawPtr) T(value);
-        return ptr;
+        return new(rawPtr) T(value);
     }
 
     // Construct T in-place with arbitrary constructor arguments
@@ -96,9 +83,7 @@ public:
         if(rawPtr == 0){
             return 0;
         }
-
-        T* ptr = new(rawPtr) T(args...);
-        return ptr;
+        return new(rawPtr) T(args...);
     }
 
     // Total capacity in bytes provided by the Storage

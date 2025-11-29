@@ -1,0 +1,19 @@
+{% include "_common/header.j2" %}
+#include "TickPhase.h"
+{%- from "_common/includes.j2" import emit_includes -%}
+{{- emit_includes(includes) -}}
+
+namespace Garbox {
+
+const char* TickPhaseToString(TickPhase phase){
+    switch(phase){
+        case TickPhase::Null: return "Null";
+{% for tick_phase in tick_phases %}
+        case TickPhase::{{ tick_phase["name"].removesuffix("Tick") }}: return "{{ tick_phase["name"].removesuffix("Tick") }}";
+{% endfor %}
+        case TickPhase::Count: return "Count";
+    }
+    return "Invalid";
+}
+
+} // namespace Garbox

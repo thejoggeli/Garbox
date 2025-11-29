@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include "core/util/container/vector/HeapVector.h"
+#include "core/util/container/heap/VectorHeap.h"
 
 namespace Garbox {
 
@@ -24,7 +24,7 @@ public:
 
 private:
 
-    HeapVector<TickPhase> mTickPhaseHandlers;
+    VectorHeap<TickPhase> mTickPhaseHandlers;
     Handler mTickStartHandler = nullptr;
     Handler mTickEndHandler = nullptr;
 

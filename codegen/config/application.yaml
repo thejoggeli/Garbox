@@ -6,14 +6,13 @@ application:
   event_pool_size_bytes: 1024
   event_queue_length: 128
   tick_period_millis: 33 # ~30.3 FPS
-  tick_phases: [
-    { name: Heartbeat },
-    { name: Input },
-    { name: Logic },
-    { name: Output },
-    { name: Logging },
-    { name: Render, delay_millis: 20 }
-  ]
+  tick_phases: 
+    - { name: Heartbeat }
+    - { name: Input }
+    - { name: Logic }
+    - { name: Output }
+    - { name: Logging }
+    - { name: Render, delay_millis: 20 }
   stubs_prefix: "Example"
   stubs_suffix: ""
   
