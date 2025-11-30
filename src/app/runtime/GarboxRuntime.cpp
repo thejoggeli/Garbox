@@ -19,31 +19,26 @@ static constexpr uint32_t LoggingTickDelayMillis = 0;
 static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime():
-    RuntimeAbs(
-        RuntimeAbs::Config {
-            .eventPoolSizeBytes = 1024,
-            .eventQueueLength = 128,
-        }, 
-        std::initializer_list<ComponentAbs*> { 
-            &mDisplayController,  
-            &mDevtoolsController,  
-            &mFanController,  
-            &mHeartbeatController,  
-            &mHeatpadController,  
-            &mInputController,  
-            &mI2cPartsController 
-        },
-        std::initializer_list<ComponentAbs*> { 
-            &mCalibrationBehaviour,  
-            &mFermentationBehaviour
-        },
-        std::initializer_list<ComponentAbs*> { 
-            &mMainScreen,  
-            &mDebugScreen 
-        }
-    ),
+    RuntimeAbs(RuntimeAbs::Config {
+        .numComponents = 11,
+        .eventPoolSizeBytes = 1024,
+        .eventQueueLength = 128,
+    }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
     mEventReplay(mMainScreen, mDebugScreen){
+
+    // register components
+    registerComponent(&mCalibrationBehaviour);
+    registerComponent(&mFermentationBehaviour);
+    registerComponent(&mDisplayController);
+    registerComponent(&mDevtoolsController);
+    registerComponent(&mFanController);
+    registerComponent(&mHeartbeatController);
+    registerComponent(&mHeatpadController);
+    registerComponent(&mInputController);
+    registerComponent(&mI2cPartsController);
+    registerComponent(&mMainScreen);
+    registerComponent(&mDebugScreen);
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -56,20 +51,6 @@ GarboxRuntime::GarboxRuntime():
     mTickRunner.registerTickPhase([this](){ handleOutputTick(); }, OutputTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
-}
-
-void GarboxRuntime::onRegister(){
-    registerComponent(&mCalibrationBehaviour);
-    registerComponent(&mFermentationBehaviour);
-    registerComponent(&mDisplayController);
-    registerComponent(&mDevtoolsController);
-    registerComponent(&mFanController);
-    registerComponent(&mHeartbeatController);
-    registerComponent(&mHeatpadController);
-    registerComponent(&mInputController);
-    registerComponent(&mI2cPartsController);
-    registerComponent(&mMainScreen);
-    registerComponent(&mDebugScreen);
 }
 
 void GarboxRuntime::onInit(){

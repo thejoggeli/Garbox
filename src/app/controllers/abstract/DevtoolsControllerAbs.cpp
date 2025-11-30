@@ -6,10 +6,8 @@
 
 namespace Garbox {
 
-DevtoolsControllerAbs::DevtoolsControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::DevtoolsController, ControllerId::Devtools){
+DevtoolsControllerAbs::DevtoolsControllerAbs() : ControllerAbs(ComponentId::DevtoolsController, ControllerId::Devtools){
     // nothing to do
 }
-
+ 
 } // namespace Garbox

@@ -9,11 +9,8 @@ namespace Garbox {
 
 class HeartbeatControllerAbs : public ControllerAbs {
 public:
-    
-    HeartbeatControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    HeartbeatControllerAbs();
 
     // tick handlers
     virtual void onHeartbeatTick() = 0;

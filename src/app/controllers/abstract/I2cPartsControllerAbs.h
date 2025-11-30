@@ -9,11 +9,8 @@ namespace Garbox {
 
 class I2cPartsControllerAbs : public ControllerAbs {
 public:
-    
-    I2cPartsControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    I2cPartsControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;

@@ -13,25 +13,17 @@
 
 namespace Garbox {
 
-RuntimeAbs::RuntimeAbs(
-    const Config& config,
-    std::initializer_list<ComponentAbs*> controllers,
-    std::initializer_list<ComponentAbs*> behaviours,
-    std::initializer_list<ComponentAbs*> screens):
+RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
     mEventFactory(config.eventPoolSizeBytes),
     mEventQueue(config.eventQueueLength),
-    mComponents(controllers.size() + behaviours.size() + screens.size()),
-    mControllers(controllers),
-    mBehaviours(behaviours),
-    mScreens(screens){
+    mComponents(config.numComponents){
     // constructor body
 }
 
 void RuntimeAbs::init(){
 
-    // derived class must register controllers, behaviours and ticks
-    onRegister();
+    AssertExit(mComponents.size() > 0, "RuntimeAbs", "no components registered");
 
     // init all components
     for(ComponentAbs* component : mComponents){
@@ -80,7 +72,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
 
     // set queued behaviour active
     if(mActiveBehaviour){
-        mBehaviours.setComponentEnabled(mActiveBehaviour, false);
+        mActiveBehaviour->setEnabled(false);
         event->oldBehaviour = mActiveBehaviour->getBehaviourId();
     }
     else {
@@ -88,7 +80,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
     }
     mActiveBehaviour = mQueuedBehaviour;
     mQueuedBehaviour = nullptr;
-    mBehaviours.setComponentEnabled(mActiveBehaviour, true);
+    mActiveBehaviour->setEnabled(true);
 
     // send event
     onActiveBehaviourChanged();
@@ -116,7 +108,7 @@ void RuntimeAbs::applyQueuedScreen() {
 
     // set queued screen active
     if(mActiveScreen){
-        mScreens.setComponentEnabled(mActiveScreen, false);
+        mActiveScreen->setEnabled(false);
         event->oldScreen = mActiveScreen->getScreenId();
     }
     else {
@@ -124,7 +116,7 @@ void RuntimeAbs::applyQueuedScreen() {
     }
     mActiveScreen = mQueuedScreen;
     mQueuedScreen = nullptr;
-    mScreens.setComponentEnabled(mActiveScreen, true);
+    mActiveScreen->setEnabled(true);
 
     // send event
     onActiveScreenChanged();

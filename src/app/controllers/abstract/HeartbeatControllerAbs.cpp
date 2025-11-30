@@ -6,18 +6,16 @@
 
 namespace Garbox {
 
-HeartbeatControllerAbs::HeartbeatControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::HeartbeatController, ControllerId::Heartbeat){
+HeartbeatControllerAbs::HeartbeatControllerAbs() : ControllerAbs(ComponentId::HeartbeatController, ControllerId::Heartbeat){
     // nothing to do
 }
 
 HeartbeatEvent HeartbeatControllerAbs::makeHeartbeatEvent(){
-    return ControllerAbs::makeEvent<EventType::Heartbeat>();
+    return ComponentAbs::makeEvent<EventType::Heartbeat>();
 }
 
 void HeartbeatControllerAbs::sendEvent(const HeartbeatEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

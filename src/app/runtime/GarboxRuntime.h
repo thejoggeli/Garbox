@@ -57,7 +57,6 @@ private:
     void onInit() final;
     void onStart() final;
     void onRun() final;
-    void onRegister() final;
     void onRouteEvent(const EventHeader* header) final;
     void onActiveBehaviourChanged() final;
     void onActiveScreenChanged() final;

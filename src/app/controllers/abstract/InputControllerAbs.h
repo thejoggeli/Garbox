@@ -9,11 +9,8 @@ namespace Garbox {
 
 class InputControllerAbs : public ControllerAbs {
 public:
-    
-    InputControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    InputControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;

@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -10,9 +11,6 @@ class MainScreenAbs : public ScreenAbs {
 public:
 
     MainScreenAbs();
-
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
 
     // receive event handlers
     virtual void onFanStatus(const FanStatusEvent& event) = 0;

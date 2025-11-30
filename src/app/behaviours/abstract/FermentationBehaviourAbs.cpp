@@ -2,29 +2,28 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "FermentationBehaviourAbs.h"
+#include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
-FermentationBehaviourAbs::FermentationBehaviourAbs(): 
-    // init memberes
-    BehaviourAbs(ComponentId::FermentationBehaviour, BehaviourId::Fermentation){
+FermentationBehaviourAbs::FermentationBehaviourAbs() : BehaviourAbs(ComponentId::FermentationBehaviour, BehaviourId::Fermentation){
     // nothing to do
 }
 
 FanCommandEvent FermentationBehaviourAbs::makeFanCommandEvent(){
-    return BehaviourAbs::makeEvent<EventType::FanCommand>();
+    return ComponentAbs::makeEvent<EventType::FanCommand>();
 }
 
 DisplayCommandEvent FermentationBehaviourAbs::makeDisplayCommandEvent(){
-    return BehaviourAbs::makeEvent<EventType::DisplayCommand>();
+    return ComponentAbs::makeEvent<EventType::DisplayCommand>();
 }
 
 HeatpadCommandEvent FermentationBehaviourAbs::makeHeatpadCommandEvent(){
-    return BehaviourAbs::makeEvent<EventType::HeatpadCommand>();
+    return ComponentAbs::makeEvent<EventType::HeatpadCommand>();
 }
 
 FermentationStatusEvent FermentationBehaviourAbs::makeFermentationStatusEvent(){
-    return BehaviourAbs::makeEvent<EventType::FermentationStatus>();
+    return ComponentAbs::makeEvent<EventType::FermentationStatus>();
 }
 
 void FermentationBehaviourAbs::sendEvent(const FanCommandEvent& event){
@@ -42,5 +41,5 @@ void FermentationBehaviourAbs::sendEvent(const HeatpadCommandEvent& event){
 void FermentationBehaviourAbs::sendEvent(const FermentationStatusEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

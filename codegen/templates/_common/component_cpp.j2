@@ -1,0 +1,32 @@
+{# constructor #}
+{% macro constructor(type, name, component) %}
+{{ name }}Abs::{{ name }}Abs() : {{ type }}Abs(ComponentId::{{ name }}, {{ type }}Id::{{ name.removesuffix(type) }}){
+    // nothing to do
+}
+{% endmacro %}
+
+
+{# make events #}
+{% macro make_events(name, component) %}
+{% if component.sends %}
+{% for ev in component.sends %}
+
+{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
+    return ComponentAbs::makeEvent<EventType::{{ ev }}>();
+}
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# send events #}
+{% macro send_events(name, component) %}
+{% if component.sends %}
+{% for ev in component.sends %}
+
+void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
+    publishEvent(event.header());
+}
+{% endfor %}
+{% endif %}
+{% endmacro %}

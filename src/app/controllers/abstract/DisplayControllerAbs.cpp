@@ -6,18 +6,16 @@
 
 namespace Garbox {
 
-DisplayControllerAbs::DisplayControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::DisplayController, ControllerId::Display){
+DisplayControllerAbs::DisplayControllerAbs() : ControllerAbs(ComponentId::DisplayController, ControllerId::Display){
     // nothing to do
 }
 
 DisplayStatusEvent DisplayControllerAbs::makeDisplayStatusEvent(){
-    return ControllerAbs::makeEvent<EventType::DisplayStatus>();
+    return ComponentAbs::makeEvent<EventType::DisplayStatus>();
 }
 
 void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

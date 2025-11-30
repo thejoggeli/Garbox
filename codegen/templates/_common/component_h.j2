@@ -1,0 +1,62 @@
+{# constructor #}
+{% macro constructor(name) %}
+
+    {{ name }}Abs();
+{% endmacro %}
+
+
+{# receive ticks #}
+{% macro on_ticks(component) %}
+{% if component.tick_phases %}
+
+    // tick handlers
+{% for tick in component.tick_phases %}
+    virtual void on{{ tick }}() = 0;
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# receive events #}
+{% macro on_events(component) %}
+{% if component.receives %}
+
+    // receive event handlers
+{% for ev in component.receives %}
+    virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# make events #}
+{% macro make_events(component) %}
+{% if component.sends %}
+
+    // make typed events
+{% for ev in component.sends %}
+    {{ ev }}Event make{{ ev }}Event();
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# send events #}
+{% macro send_events(component) %}
+{% if component.sends %}
+
+    // send typed events
+{% for ev in component.sends %}
+    void sendEvent(const {{ ev }}Event& event);
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# hide #}
+{% macro hide_events(type) %}
+
+    // hide event methods
+    using {{ type }}Abs::makeEvent;
+    using {{ type }}Abs::publishEvent;
+{% endmacro %}

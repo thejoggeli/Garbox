@@ -9,11 +9,8 @@ namespace Garbox {
 
 class DevtoolsControllerAbs : public ControllerAbs {
 public:
-    
-    DevtoolsControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    DevtoolsControllerAbs();
 
     // tick handlers
     virtual void onLoggingTick() = 0;

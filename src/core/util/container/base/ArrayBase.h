@@ -76,6 +76,14 @@ public:
     ArrayBase(with_count_t, std::size_t elementCount, Args&&... args) : Storage(elementCount){
         constructAllWith(std::forward<Args>(args)...);
     }
+        
+    T& at(std::size_t index) {
+        return *Storage::elementPtr(index);
+    }
+
+    const T& at(std::size_t index) const {
+        return *Storage::elementPtr(index);
+    }
 
     T& operator[](std::size_t index) {
         return *Storage::elementPtr(index);

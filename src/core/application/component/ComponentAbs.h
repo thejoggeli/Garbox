@@ -12,7 +12,7 @@
 
 namespace Garbox {
 
-class ComponentGroup;
+class RuntimeAbs;
 
 class ComponentAbs {
 public:
@@ -23,10 +23,6 @@ public:
     // setup methhods
     void init(ComponentHostIfc& host);
     void start();
-
-    // components can receive ticks and events
-    virtual void receiveTick(TickPhase phase) = 0;
-    virtual void receiveEvent(const EventHeader* header) = 0;
 
     // components can be enabled and disabled
     bool isEnabled() const { return mEnabled; }
@@ -52,9 +48,6 @@ public:
     ComponentAbs& operator=(ComponentAbs&&) = delete;
 
 protected:
-
-    // the descriptor of this component
-    const ComponentDescriptor mComponentDescriptor;
 
     // abstract methods for user implementation
     virtual void onInit() {};
@@ -82,6 +75,9 @@ private:
 
     bool mEnabled = false;
     bool mInitialized = false;
+
+    // the descriptor of this component
+    const ComponentDescriptor mComponentDescriptor;
     
     // runtime context (injected in init() through host)
     const RuntimeContext* mContext = nullptr;
@@ -92,20 +88,10 @@ private:
     // event factory (injected in init() through host)
     EventFactory* mEventFactory = nullptr;
 
-    // component group
-    ComponentGroup* mComponentGroup = nullptr;
-    size_t mComponentGroupIndex = static_cast<size_t>(-1);
-
-    // only the ComponentGroup class is allowed to access this
-    void setComponentGroup(ComponentGroup* group, size_t index);
-    ComponentGroup* getComponentGroup() const;
-    size_t getComponentGroupIndex() const;
-
-    // only the ComponentGroup class is allowed to access setEnabled(), because it needs to 
-    // update the receive tick/event matrices when a component is enabled or disabled
+    // only the RuntimeAbs class is allowed to access setEnabled()
     void setEnabled(bool enabled);
 
-    friend class ComponentGroup;
+    friend class RuntimeAbs;
 };
 
 } // namespace

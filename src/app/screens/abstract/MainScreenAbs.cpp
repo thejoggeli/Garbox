@@ -2,21 +2,20 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "MainScreenAbs.h"
+#include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
-MainScreenAbs::MainScreenAbs(): 
-    // init memberes
-    ScreenAbs(ComponentId::MainScreen, ScreenId::Main){
+MainScreenAbs::MainScreenAbs() : ScreenAbs(ComponentId::MainScreen, ScreenId::Main){
     // nothing to do
 }
 
 DisplayCommandEvent MainScreenAbs::makeDisplayCommandEvent(){
-    return ScreenAbs::makeEvent<EventType::DisplayCommand>();
+    return ComponentAbs::makeEvent<EventType::DisplayCommand>();
 }
 
 void MainScreenAbs::sendEvent(const DisplayCommandEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

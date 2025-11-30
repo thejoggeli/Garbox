@@ -15,27 +15,11 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 {% endfor %}
 
 {{ RuntimeName }}::{{ RuntimeName }}():
-    RuntimeAbs(
-        RuntimeAbs::Config {
-            .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
-            .eventQueueLength = {{ application.event_queue_length }},
-        }, 
-        std::initializer_list<ComponentAbs*> {
-{%- for name in controllers.keys() %} 
-            &m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-        },
-        std::initializer_list<ComponentAbs*> {
-{%- for name in behaviours.keys() %} 
-            &m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-        },
-        std::initializer_list<ComponentAbs*> {
-{%- for name in screens.keys() %} 
-            &m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-        }
-    ),
+    RuntimeAbs(RuntimeAbs::Config {
+        .numComponents = {{ controllers | length + behaviours | length + screens | length }},
+        .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
+        .eventQueueLength = {{ application.event_queue_length }},
+    }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
     mEventReplay(
 {%- for name, screen_data in screens.items() -%} 
@@ -43,17 +27,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 {%- endfor -%} 
     ){
 
-    // set start and end tick handlers
-    mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
-    mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
-
-    //  register all tick phases
-{% for tick in application.tick_phases %}
-    mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
-{% endfor %}
-}
-
-void {{ RuntimeName }}::onRegister(){
+    // register components
 {% for beh in behaviours %}
     registerComponent(&m{{ beh }});
 {% endfor %}
@@ -62,6 +36,15 @@ void {{ RuntimeName }}::onRegister(){
 {% endfor %}
 {% for screen in screens %}
     registerComponent(&m{{ screen }});
+{% endfor %}
+
+    // set start and end tick handlers
+    mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
+    mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
+
+    //  register all tick phases
+{% for tick in application.tick_phases %}
+    mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
 {% endfor %}
 }
 

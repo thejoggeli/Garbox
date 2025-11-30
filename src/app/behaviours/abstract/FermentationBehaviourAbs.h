@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/behaviour/BehaviourAbs.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -10,9 +11,6 @@ class FermentationBehaviourAbs : public BehaviourAbs {
 public:
 
     FermentationBehaviourAbs();
-
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
 
     // tick handlers
     virtual void onLogicTick() = 0;

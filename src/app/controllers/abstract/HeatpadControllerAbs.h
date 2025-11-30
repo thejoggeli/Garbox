@@ -9,11 +9,8 @@ namespace Garbox {
 
 class HeatpadControllerAbs : public ControllerAbs {
 public:
-    
-    HeatpadControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    HeatpadControllerAbs();
 
     // tick handlers
     virtual void onInputTick() = 0;

@@ -6,18 +6,16 @@
 
 namespace Garbox {
 
-FanControllerAbs::FanControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::FanController, ControllerId::Fan){
+FanControllerAbs::FanControllerAbs() : ControllerAbs(ComponentId::FanController, ControllerId::Fan){
     // nothing to do
 }
 
 FanStatusEvent FanControllerAbs::makeFanStatusEvent(){
-    return ControllerAbs::makeEvent<EventType::FanStatus>();
+    return ComponentAbs::makeEvent<EventType::FanStatus>();
 }
 
 FanSampleEvent FanControllerAbs::makeFanSampleEvent(){
-    return ControllerAbs::makeEvent<EventType::FanSample>();
+    return ComponentAbs::makeEvent<EventType::FanSample>();
 }
 
 void FanControllerAbs::sendEvent(const FanStatusEvent& event){
@@ -27,5 +25,5 @@ void FanControllerAbs::sendEvent(const FanStatusEvent& event){
 void FanControllerAbs::sendEvent(const FanSampleEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox
