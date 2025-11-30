@@ -1,4 +1,4 @@
-from common.bracket_string import parse_bracket_string
+from common.bracket_string import BracketString
 from common.parse_type import render_value
 
 def parse_updaters(updaters: dict, event_types: dict):
@@ -45,17 +45,17 @@ def parse_updaters(updaters: dict, event_types: dict):
             entry_raw_string = entry_raw_string.strip()
 
             # bracket-style event mapping
-            parsed_entry = parse_bracket_string(entry_raw_string)
+            bracket_string = BracketString(entry_raw_string)
             
-            entry_type = parsed_entry["name"]
+            entry_type = bracket_string.name
 
             if(entry_type == "FromEvent"):
 
-                if(len(parsed_entry["args"]) != 2):
+                if(len(bracket_string.args) != 2):
                     raise ValueError("expected two positional arguments (event_type, field_name) for type 'FromEvent'")
 
-                event_name = parsed_entry["args"][0]
-                field_name = parsed_entry["args"][1]
+                event_name = bracket_string.require_get_arg(0)
+                field_name = bracket_string.require_get_arg(1)
                 field_type = infer_field_type_from_event(event_types, event_name, field_name)
 
                 parsed_entries.append({
@@ -63,28 +63,26 @@ def parse_updaters(updaters: dict, event_types: dict):
                     "event_name": event_name,
                     "field_name": field_name,
                     "field_type": field_type,
-                    "kwargs": parsed_entry["kwargs"],
+                    "kwargs": bracket_string.kwargs,
                 })
 
             elif(entry_type == "Manual"):
 
-                if(len(parsed_entry["args"]) != 2):
+                if(len(bracket_string.args) != 2):
                     raise ValueError("expected two positional argument (field_name, field_type) for type 'Manual'")
 
-                field_name = parsed_entry["args"][0]
-                field_type = parsed_entry["args"][1]
+                field_name = bracket_string.require_get_arg(0)
+                field_type = bracket_string.require_get_arg(1)
 
                 parsed_entries.append({
                     "type": "Manual",
                     "field_name": field_name,
                     "field_type": field_type,
-                    "kwargs": parsed_entry["kwargs"],
+                    "kwargs": bracket_string.kwargs,
                 })
                 
             else:
                 raise ValueError(f"invalid updater entry type: {entry_type} in {entry_raw_string}")
-            
-        print(parsed_entries)
 
         # After all entries for one updater are parsed → type them
         render_kwargs(parsed_entries)
