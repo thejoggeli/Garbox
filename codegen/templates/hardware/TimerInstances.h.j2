@@ -1,9 +1,8 @@
 #pragma once
 {% include "_common/header.j2" %}
 #include "core/hardware/timer/Timer.h"
-{%- from "_common/includes.j2" import emit_includes -%}
-{{- emit_includes(meta) -}}
-
+{% from "_common/includes.j2" import include_h %}
+{{ include_h(timer) }}
 namespace Garbox {
 
 class TimerInstances {
@@ -11,7 +10,7 @@ public:
 
     static void Init();
 
-{% for name, entry in timer.items() %}
+{% for name, entry in timer.instances.items() %}
     static Timer& Get{{ name }}();
 {% endfor %}
 

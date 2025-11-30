@@ -3,7 +3,6 @@ INT_TYPES = {
     "int16_t", "uint16_t",
     "int32_t", "uint32_t",
     "int64_t", "uint64_t",
-
     "int", "signed int",
     "unsigned", "unsigned int",
     "long", "signed long",
@@ -18,8 +17,31 @@ TRUE_SET  = {"1", "yes" "true",  "on",  "enable",  "enabled"}
 FALSE_SET = {"0", "no", "false", "off", "disable", "disabled", "none", "null", "undefined"}
 
 
-def is_int_type(name):
-    return name in INT_TYPES
+def preprocess_type(type_name: str):
+    result = type_name.lower().strip()
+    if(result == "str"):
+        result = "string"
+    elif(result == "boolean"):
+        result = "bool"
+    return result
+
+
+def get_null_value(type_name: str):
+    type_name = preprocess_type(type_name)
+    if(type_name == "string"):
+        return ""
+    if(type_name == "bool"):
+        return False
+    if(type_name == "float"):
+        return 0.0
+    if(is_int_type(type_name)):
+        return 0
+    return None
+ 
+
+def is_int_type(type_name: str):
+    type_name = type_name.lower().strip()
+    return type_name in INT_TYPES
 
 
 def parse_bool(value):
@@ -44,7 +66,7 @@ def parse_bool(value):
     raise ValueError(f"Invalid boolean literal: {value!r}")
 
 
-def parse_int_for_type(value, field_type):
+def parse_int_for_type(value, type_name):
     """
     Strict integer parsing for:
         - int8_t,  uint8_t
@@ -58,6 +80,8 @@ def parse_int_for_type(value, field_type):
 
     Raises ValueError on invalid or out-of-range values.
     """
+
+    type_name = preprocess_type(type_name)
 
     # Fixed-width integer ranges
     FIXED_INT_RANGES = {
@@ -75,14 +99,14 @@ def parse_int_for_type(value, field_type):
     try:
         n = int(value)
     except Exception:
-        raise ValueError(f"Invalid integer literal for {field_type}: {value!r}")
+        raise ValueError(f"Invalid integer literal for {type_name}: {value!r}")
 
     # Check fixed-width ranges
-    if field_type in FIXED_INT_RANGES:
-        lo, hi = FIXED_INT_RANGES[field_type]
+    if type_name in FIXED_INT_RANGES:
+        lo, hi = FIXED_INT_RANGES[type_name]
         if not (lo <= n <= hi):
             raise ValueError(
-                f"{field_type} out of range: {n}, must be in [{lo}, {hi}]"
+                f"{type_name} out of range: {n}, must be in [{lo}, {hi}]"
             )
         return n
 
@@ -103,19 +127,19 @@ def parse_int_for_type(value, field_type):
     }
 
     # Signed -> accept any Python int
-    if field_type in SIGNED_GENERIC:
+    if type_name in SIGNED_GENERIC:
         return n
 
     # Unsigned -> must be >= 0
-    if field_type in UNSIGNED_GENERIC:
+    if type_name in UNSIGNED_GENERIC:
         if n < 0:
-            raise ValueError(f"{field_type} cannot be negative: {n}")
+            raise ValueError(f"{type_name} cannot be negative: {n}")
         return n
 
-    raise ValueError(f"Unsupported integer type: {field_type}")
+    raise ValueError(f"Unsupported integer type: {type_name}")
 
 
-def render_value(value, field_type):
+def render_value(value, type_name):
     """
     Convert a Python value + string field type into a strictly typed code-generation literal.
 
@@ -132,15 +156,17 @@ def render_value(value, field_type):
       - no silent fallbacks or coercions
     """
 
+    type_name = preprocess_type(type_name)
+
     if value is None:
         return None
 
     # bool
-    if field_type == "bool":
+    if type_name == "bool":
         return parse_bool(value)
 
     # float
-    if field_type == "float":
+    if type_name == "float":
         try:
             num = float(value)
         except Exception:
@@ -151,19 +177,19 @@ def render_value(value, field_type):
         return f"{num}f"
 
     # integers
-    if field_type in INT_TYPES:
-        return parse_int_for_type(value, field_type)
+    if type_name in INT_TYPES:
+        return parse_int_for_type(value, type_name)
 
     # string
-    if field_type == "string":
+    if type_name == "string":
         if not isinstance(value, str):
             raise ValueError(f"String literal required, got {value!r}")
         return f"\"{value}\""
 
     # enum (anything not primitive)
-    if field_type not in ("float", "bool", "string") and field_type not in INT_TYPES:
+    if type_name not in ("float", "bool", "string") and type_name not in INT_TYPES:
         if not isinstance(value, str) or not value:
-            raise ValueError(f"Invalid enum literal {value!r} for type {field_type}")
+            raise ValueError(f"Invalid enum literal {value!r} for type {type_name}")
         return value
 
-    raise ValueError(f"Unhandled field type: {field_type!r}")
+    raise ValueError(f"Unhandled field type: {type_name!r}")

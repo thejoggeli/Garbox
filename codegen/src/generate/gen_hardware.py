@@ -1,7 +1,7 @@
 from common.item import Item
 from common.item import Item, generate_items
 from common.context import Context
-from common.loader import Loader
+from loader.loader import Loader
 
 
 def generate_hardware(ctx: Context, loader: Loader):
@@ -26,12 +26,12 @@ def _generate_instances(ctx: Context, loader: Loader):
     """
 
     init_mapping = {
-        "adc":        "AdcInstances",
-        "gpio":       "GpioInstances",
-        "i2c":        "I2cInstances",
-        "spi":        "SpiInstances",
-        "timer":      "TimerInstances",
-        "ledc_timer": "LedcInstances",
+        "adc":   "AdcInstances",
+        "gpio":  "GpioInstances",
+        "i2c":   "I2cInstances",
+        "spi":   "SpiInstances",
+        "timer": "TimerInstances",
+        "ledc":  "LedcInstances",
     }
 
     hw_dir = ctx.app_dir / "hardware"
@@ -59,17 +59,17 @@ def _generate_hardware_init(ctx: Context, loader: Loader):
     config = loader.config["hardware"]
 
     items = [
-        Item(config, keys=["adc"],   meta_key="adc_meta",   out_path=hw_dir/"AdcInstances.h",     template_path="hardware/AdcInstances.h.j2"),
-        Item(config, keys=["adc"],   meta_key="adc_meta",   out_path=hw_dir/"AdcInstances.cpp",   template_path="hardware/AdcInstances.cpp.j2"),
-        Item(config, keys=["gpio"],  meta_key="gpio_meta",  out_path=hw_dir/"GpioInstances.h",    template_path="hardware/GpioInstances.h.j2"),
-        Item(config, keys=["gpio"],  meta_key="gpio_meta",  out_path=hw_dir/"GpioInstances.cpp",  template_path="hardware/GpioInstances.cpp.j2"),
-        Item(config, keys=["i2c"],   meta_key="i2c_meta",   out_path=hw_dir/"I2cInstances.h",     template_path="hardware/I2cInstances.h.j2"),
-        Item(config, keys=["i2c"],   meta_key="i2c_meta",   out_path=hw_dir/"I2cInstances.cpp",   template_path="hardware/I2cInstances.cpp.j2"),
-        Item(config, keys=["spi"],   meta_key="spi_meta",   out_path=hw_dir/"SpiInstances.h",     template_path="hardware/SpiInstances.h.j2"),
-        Item(config, keys=["spi"],   meta_key="spi_meta",   out_path=hw_dir/"SpiInstances.cpp",   template_path="hardware/SpiInstances.cpp.j2"),
-        Item(config, keys=["timer"], meta_key="timer_meta", out_path=hw_dir/"TimerInstances.h",   template_path="hardware/TimerInstances.h.j2"),
-        Item(config, keys=["timer"], meta_key="timer_meta", out_path=hw_dir/"TimerInstances.cpp", template_path="hardware/TimerInstances.cpp.j2"),
-        Item(config, keys=["ledc_channel", "ledc_timer"], meta_key="ledc_meta", out_path=hw_dir/"LedcInstances.h",   template_path="hardware/LedcInstances.h.j2"),
-        Item(config, keys=["ledc_channel", "ledc_timer"], meta_key="ledc_meta", out_path=hw_dir/"LedcInstances.cpp", template_path="hardware/LedcInstances.cpp.j2"),
+        Item(config, "*", hw_dir/"AdcInstances.h",     "hardware/AdcInstances.h.j2"),
+        Item(config, "*", hw_dir/"AdcInstances.cpp",   "hardware/AdcInstances.cpp.j2"),
+        Item(config, "*", hw_dir/"GpioInstances.h",    "hardware/GpioInstances.h.j2"),
+        Item(config, "*", hw_dir/"GpioInstances.cpp",  "hardware/GpioInstances.cpp.j2"),
+        Item(config, "*", hw_dir/"I2cInstances.h",     "hardware/I2cInstances.h.j2"),
+        Item(config, "*", hw_dir/"I2cInstances.cpp",   "hardware/I2cInstances.cpp.j2"),
+        Item(config, "*", hw_dir/"SpiInstances.h",     "hardware/SpiInstances.h.j2"),
+        Item(config, "*", hw_dir/"SpiInstances.cpp",   "hardware/SpiInstances.cpp.j2"),
+        Item(config, "*", hw_dir/"TimerInstances.h",   "hardware/TimerInstances.h.j2"),
+        Item(config, "*", hw_dir/"TimerInstances.cpp", "hardware/TimerInstances.cpp.j2"),
+        Item(config, "*", hw_dir/"LedcInstances.h",    "hardware/LedcInstances.h.j2"),
+        Item(config, "*", hw_dir/"LedcInstances.cpp",  "hardware/LedcInstances.cpp.j2"),
     ]
     generate_items(ctx, items)

@@ -1,10 +1,8 @@
 #pragma once
 {% include "_common/header.j2" %}
-{%- from "_common/includes.j2" import emit_includes -%}
 {%- from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events -%}
 #include "core/application/screen/ScreenAbs.h"
 #include "shared/types/EventType.h"
-{{- emit_includes(meta) -}}
 
 namespace Garbox {
 

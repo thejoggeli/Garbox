@@ -1,5 +1,4 @@
 import yaml
-from sortedcontainers import SortedSet
 from copy import deepcopy
 from pathlib import Path
 from common.util import ( 
@@ -8,7 +7,8 @@ from common.util import (
     ensure_str_has_suffix,
     print_json
 )
-from common.screen_utils import parse_updaters
+from loader.screen_utils import parse_updaters
+from loader.event_utils import parse_event_types
 
 class Loader:
 
@@ -23,22 +23,23 @@ class Loader:
         paths = [p for p in self.config_dir.rglob("*") if p.is_file()]
         self.config = load_yaml_multi(paths)
 
+        self.process_events_config()
         self.process_hardware_config()
         self.process_behaviours_config()
         self.process_controllers_config()
         self.process_screens_config()
         self.process_application_config()
-        self.process_events_config()
 
 
     def process_hardware_config(self):
 
         # enforce required suffix rules
         hardware = self.config["hardware"]
-        hardware["ledc_timer"] = ensure_dict_keys_have_suffix(hardware["ledc_timer"], "Timer")
-        hardware["ledc_channel"] = ensure_dict_keys_have_suffix(hardware["ledc_channel"], "Channel")
+        hardware["ledc"]["instances"]["timers"] = ensure_dict_keys_have_suffix(hardware["ledc"]["instances"]["timers"], "Timer")
+        hardware["ledc"]["instances"]["channels"] = ensure_dict_keys_have_suffix(hardware["ledc"]["instances"]["channels"], "Channel")
 
-        for channel in hardware["ledc_channel"].values():
+        # ensure timer bindings in ledc channels have 'Timer' suffix
+        for channel in hardware["ledc"]["instances"]["channels"].values():
             channel["timer"] = ensure_str_has_suffix(channel["timer"], "Timer")
 
 
@@ -103,25 +104,14 @@ class Loader:
 
         for screen_data in self.config["screens"].values():
             if "updaters" in screen_data:
-                parse_updaters(screen_data["updaters"], self.config["events"]["types"])
+                parse_updaters(screen_data["updaters"], self.config["event_types"])
                 # print_json(screen_data["updaters"])
                 print_json(screen_data["updaters"]["HeatpadSense"])
-        exit()
+                
 
     def process_events_config(self):
 
-        config = self.config["events"]
-
-        # copy event types into payload (but keep payload includes seperate)
-        payloads: dict = deepcopy(config["types"])
-        payloads.pop("include_h", None)
-        payloads.pop("include_cpp", None)
-
-        # set or update (if already exists) payloads config entriy
-        if "payloads" not in config:
-            config["payloads"] = payloads
-        else:
-            config["payloads"].update(payloads)
+        parse_event_types(self.config["event_types"])
 
 
 def load_yaml(path: Path):

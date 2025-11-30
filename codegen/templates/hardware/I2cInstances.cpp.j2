@@ -1,9 +1,8 @@
 {% include "_common/header.j2" %}
 #include "I2cInstances.h"
 #include "core/assert/Assert.h"
-{%- from "_common/includes.j2" import emit_includes -%}
-{{- emit_includes(meta) -}}
-
+{% from "_common/includes.j2" import include_cpp %}
+{{ include_cpp(i2c) }}
 namespace Garbox {
 
 static bool sInitialized = false;
@@ -12,7 +11,7 @@ void I2cInstances::Init(){
     
     AssertExit(!sInitialized, "I2cInstances", "already initialized");
 
-{% for name, entry in i2c.items() %}
+{% for name, entry in i2c.instances.items() %}
     Get{{ name }}().init({
         .port = I2c::Port::Num{{ entry.port }},
         .pinSda = PinSda{{ name }},
@@ -26,7 +25,7 @@ void I2cInstances::Init(){
     sInitialized = true;
 }
 
-{% for name, entry in i2c.items() %}
+{% for name, entry in i2c.instances.items() %}
 I2c& I2cInstances::Get{{ name }}(){
     static I2c instance;
     return instance;

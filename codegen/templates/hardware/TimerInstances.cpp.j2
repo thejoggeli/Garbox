@@ -1,9 +1,8 @@
 {% include "_common/header.j2" %}
 #include "TimerInstances.h"
 #include "core/assert/Assert.h"
-{%- from "_common/includes.j2" import emit_includes -%}
-{{- emit_includes(meta) -}}
-
+{% from "_common/includes.j2" import include_cpp %}
+{{ include_cpp(timer) }}
 namespace Garbox {
     
 static bool sInitialized = false;
@@ -11,7 +10,7 @@ static bool sInitialized = false;
 void TimerInstances::Init(){
     AssertExit(!sInitialized, "TimerInstances", "already initialized");
 
-{% for name, t in timer.items() %}
+{% for name, t in timer.instances.items() %}
     Get{{ name }}().init({
         .group = TIMER_GROUP_{{ t.group }},
         .index = TIMER_{{ t.index }},
@@ -32,7 +31,7 @@ void TimerInstances::Init(){
     sInitialized = true;
 }
 
-{% for name, t in timer.items() %}
+{% for name, t in timer.instances.items() %}
 Timer& TimerInstances::Get{{ name }}(){
     static Timer instance;
     return instance;

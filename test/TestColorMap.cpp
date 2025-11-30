@@ -88,7 +88,7 @@ static void test_uniform_three_entries_auto(){
 }
 
 // --------------------------------------------------------------
-// TEST 3: Non-uniform R → B → R
+// TEST 3: Non-uniform R -> B -> R
 // --------------------------------------------------------------
 static void test_non_uniform_rbr(){
 
@@ -182,7 +182,7 @@ static void test_hsl_interpolation(){
     TEST_ASSERT_FLOAT_WITHIN(eps, 0.0f, h0.h);   // red
 
     HslColor hm = map.interpolateHsl(0.5f);
-    TEST_ASSERT_FLOAT_WITHIN(5.0f, 60.0f/360.0f, hm.h); // halfway between 0° → 120°
+    TEST_ASSERT_FLOAT_WITHIN(5.0f, 60.0f/360.0f, hm.h); // halfway between 0° -> 120°
 
     HslColor h1 = map.interpolateHsl(1.0f);
     TEST_ASSERT_FLOAT_WITHIN(eps, 120.0f/360.0f, h1.h);

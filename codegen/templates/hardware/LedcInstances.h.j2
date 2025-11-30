@@ -2,25 +2,24 @@
 {% include "_common/header.j2" %}
 #include "core/hardware/ledc/LedcTimer.h"
 #include "core/hardware/ledc/LedcChannel.h"
-{%- from "_common/includes.j2" import emit_includes -%}
-{{- emit_includes(meta) -}}
-
+{% from "_common/includes.j2" import include_h %}
+{{ include_h(ledc) }}
 namespace Garbox {
 
 class LedcInstances {
 public:
 
-{% for channel_name, entry in ledc_channel.items() %}
+{% for channel_name, entry in ledc.instances.channels.items() %}
     static constexpr int32_t Pin{{ channel_name }} = {{ entry.pin }}; 
 {% endfor %}
 
     static void Init();
 
-{% for timer_name, t in ledc_timer.items() %}
+{% for timer_name, t in ledc.instances.timers.items() %}
     static LedcTimer& Get{{ timer_name }}();
 {% endfor %}
 
-{% for channel_name, c in ledc_channel.items() %}
+{% for channel_name, c in ledc.instances.channels.items() %}
     static LedcChannel& Get{{ channel_name }}();
 {% endfor %}
 

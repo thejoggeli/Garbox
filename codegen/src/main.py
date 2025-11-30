@@ -1,6 +1,6 @@
 from pathlib import Path
 from common.context import Context
-from common.loader import Loader
+from loader.loader import Loader
 from generate.gen_runtime import generate_runtime
 from generate.gen_hardware import generate_hardware
 from generate.gen_types import generate_types

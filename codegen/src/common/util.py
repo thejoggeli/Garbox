@@ -15,7 +15,7 @@ def extract_dict(config: dict, keys: str | list[str], copy: bool):
     keys = ensure_list(keys)
     ex_config = {}
 
-    # extrath with copy
+    # extract with copy
     if copy:
         for key in keys:
             ex_config[key] = deepcopy(config[key])

@@ -6,8 +6,8 @@ class BracketString:
     args: list = []
     kwargs: dict = {}
 
-    def __init__(self, raw_string):
-        self.raw_string = raw_string
+    def __init__(self, raw_string: str):
+        self.raw_string =  raw_string.strip()
         self.parse_bracket_string()
 
     
@@ -69,7 +69,7 @@ class BracketString:
         # Match: Name(argstuff)
         m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*(.*?)\s*\)$", string)
         if not m:
-            raise ValueError(f"Invalid bracket expression: {string!r}")
+            raise ValueError(f"Invalid bracket expression: {string!r} in {self.raw_string}")
 
         self.name = m.group(1)
         inside = m.group(2).strip()

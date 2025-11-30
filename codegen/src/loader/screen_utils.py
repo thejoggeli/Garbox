@@ -41,11 +41,9 @@ def parse_updaters(updaters: dict, event_types: dict):
     for updater_name, entry_list in updaters.items():
         parsed_entries = []
 
-        for entry_raw_string in entry_list:
-            entry_raw_string = entry_raw_string.strip()
+        for raw_entry_string in entry_list:
 
-            # bracket-style event mapping
-            bracket_string = BracketString(entry_raw_string)
+            bracket_string = BracketString(raw_entry_string)
             
             entry_type = bracket_string.name
 
@@ -59,7 +57,7 @@ def parse_updaters(updaters: dict, event_types: dict):
                 field_type = infer_field_type_from_event(event_types, event_name, field_name)
 
                 parsed_entries.append({
-                    "type": "FromEvent",
+                    "entry_type": "FromEvent",
                     "event_name": event_name,
                     "field_name": field_name,
                     "field_type": field_type,
@@ -75,16 +73,16 @@ def parse_updaters(updaters: dict, event_types: dict):
                 field_type = bracket_string.require_get_arg(1)
 
                 parsed_entries.append({
-                    "type": "Manual",
+                    "entry_type": "Manual",
                     "field_name": field_name,
                     "field_type": field_type,
                     "kwargs": bracket_string.kwargs,
                 })
                 
             else:
-                raise ValueError(f"invalid updater entry type: {entry_type} in {entry_raw_string}")
+                raise ValueError(f"invalid updater entry type: {entry_type} in {raw_entry_string}")
 
-        # After all entries for one updater are parsed → type them
+        # After all entries for one updater are parsed -> type them
         render_kwargs(parsed_entries)
 
         updaters[updater_name] = parsed_entries
@@ -96,17 +94,19 @@ def infer_field_type_from_event(event_types: dict, event_name: str, field_name: 
     """
     
     if event_name not in event_types:
-        raise ValueError(f"Unknown event type {event_name!r}")
+        raise ValueError(f"Unknown event type {event_name}")
 
-    if field_name not in event_types[event_name]:
+    if field_name not in event_types[event_name]["fields"]:
         raise ValueError(f"Field {field_name!r} not found in event {event_name!r}")
-    
-    return event_types[event_name][field_name]
+        
+    return event_types[event_name]["fields"][field_name]["type"]
 
 
-def render_kwargs(updater_list: dict):
+def render_kwargs(updater_entries: dict):
 
-    for entry in updater_list:
+    for entry in updater_entries:
+
+        # print(entry)
 
         kwargs = entry["kwargs"]
         for arg_name, arg_value in kwargs.items():

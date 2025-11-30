@@ -1,17 +1,16 @@
-events:
+event_payloads:
 
-  payloads_meta:
-    include_h: 
-      - "shared/types/BehaviourId.h"
-      - "shared/types/ScreenId.h"
+  include_h: 
+    - "shared/types/BehaviourId.h"
+    - "shared/types/ScreenId.h"
 
-  types:
+event_types:
 
-    ActiveBehaviourChanged:
-      oldBehaviour: BehaviourId
-      newBehaviour: BehaviourId
+  ActiveBehaviourChanged:
+    - Field(oldBehaviour, BehaviourId)
+    - Field(newBehaviour, BehaviourId)
 
-    ActiveScreenChanged:
-      oldScreen: ScreenId
-      newScreen: ScreenId
-      
+  ActiveScreenChanged:
+    - Field(oldScreen, ScreenId)
+    - Field(newScreen, ScreenId)
+    

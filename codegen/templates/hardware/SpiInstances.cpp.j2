@@ -1,9 +1,8 @@
 {% include "_common/header.j2" %}
 #include "SpiInstances.h"
 #include "core/assert/Assert.h"
-{%- from "_common/includes.j2" import emit_includes -%}
-{{- emit_includes(meta) -}}
-
+{% from "_common/includes.j2" import include_cpp %}
+{{ include_cpp(spi) }}
 namespace Garbox {
 
 static bool sInitialized = false;
@@ -12,7 +11,7 @@ void SpiInstances::Init(){
     
     AssertExit(!sInitialized, "SpiInstances", "already initialized");
 
-{% for name, entry in spi.items() %}
+{% for name, entry in spi.instances.items() %}
     Get{{ name }}().init({
         .hostDevice = {{ entry.hostDevice }},
         .pinMosi = PinMosi{{ name }},
@@ -29,7 +28,7 @@ void SpiInstances::Init(){
     sInitialized = true;
 }
 
-{% for name, entry in spi.items() %}
+{% for name, entry in spi.instances.items() %}
 SpiDma& SpiInstances::Get{{ name }}(){
     static SpiDma instance;
     return instance;

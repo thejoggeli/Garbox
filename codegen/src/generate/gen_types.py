@@ -1,7 +1,7 @@
 from common.util import nested_get_dot
 from common.item import Item, generate_items
 from common.context import Context
-from common.loader import Loader
+from loader.loader import Loader
 
 
 def generate_types(ctx: Context, loader: Loader):
@@ -20,13 +20,16 @@ def _generate_events(ctx: Context, loader: Loader):
     - shared/types/EventPayload.h
     """
 
-    events_config = loader.config["events"]
+    payloads_dict = {
+        "event_payloads": loader.config["event_payloads"],
+        "event_types": loader.config["event_types"],
+    }
 
     items = [
-        Item(events_config, "*", ctx.shared_dir / "types/EventAlias.h",   "types/EventAlias.h.j2"),
-        Item(events_config, "*", ctx.shared_dir / "types/EventType.h",    "types/EventType.h.j2"),
-        Item(events_config, "*", ctx.shared_dir / "types/EventType.cpp",  "types/EventType.cpp.j2"),
-        Item(events_config, "*", ctx.shared_dir / "types/EventPayload.h", "types/EventPayload.h.j2", meta_key="payloads_meta"),
+        Item(loader.config, "event_types", ctx.shared_dir / "types/EventAlias.h",   "types/EventAlias.h.j2"),
+        Item(loader.config, "event_types", ctx.shared_dir / "types/EventType.h",    "types/EventType.h.j2"),
+        Item(loader.config, "event_types", ctx.shared_dir / "types/EventType.cpp",  "types/EventType.cpp.j2"),
+        Item(payloads_dict, "*",           ctx.shared_dir / "types/EventPayload.h", "types/EventPayload.h.j2"),
     ]
 
     generate_items(ctx, items)

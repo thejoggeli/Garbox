@@ -3,7 +3,7 @@ from pathlib import Path
 from sortedcontainers import SortedSet
 from common.item import Item, generate_items
 from common.context import Context
-from common.loader import Loader
+from loader.loader import Loader
 
 
 def generate_runtime(ctx: Context, loader: Loader):
@@ -13,7 +13,7 @@ def generate_runtime(ctx: Context, loader: Loader):
 
 def _collect_event_routes(loader: Loader):
     event_routes = {}
-    for event_key in loader.config["events"]["types"].keys():
+    for event_key in loader.config["event_types"].keys():
         event_routes[event_key] = {
             "controllers": SortedSet(),
             "behaviours":  SortedSet(),
@@ -86,7 +86,7 @@ def _generate_event_replay(ctx: Context, loader: Loader):
     for screen_name, screen_data in loader.config["screens"].items():
         for event_name in screen_data["receives"]:
             used_events.add(event_name)
-    for event_name, event in loader.config["events"]["types"].items():
+    for event_name, event in loader.config["event_types"].items():
         if(event_name in used_events):
             replay_dict["events"][event_name] = event
         

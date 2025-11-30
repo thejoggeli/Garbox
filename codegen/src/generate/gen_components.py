@@ -1,6 +1,6 @@
 from common.item import Item, generate_items
 from common.context import Context
-from common.loader import Loader
+from loader.loader import Loader
 from common.util import nested_get_dot
 from pathlib import Path
 
