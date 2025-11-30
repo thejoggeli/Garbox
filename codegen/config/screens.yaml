@@ -15,53 +15,45 @@ screens:
       - DisplayCommand
     updaters: 
       FanState: 
-        - FanStatus(state)
-        - FanStatus(targetSpeed)
+        - FromEvent(FanStatus, state)
+        - FromEvent(FanStatus, targetSpeed)
       FanMeasuredRpm: 
-        - FanSample(measuredRpm)
+        - FromEvent(FanSample, measuredRpm)
       HeatpadState:
-        - HeatpadStatus(state)
+        - FromEvent(HeatpadStatus, state)
       HeatpadDuty: 
-        - HeatpadStatus(currentDutyCycle)
-        - HeatpadStatus(currentPeriodMicros)
-        - HeatpadStatus(nextDutyCycle)
-        - HeatpadStatus(nextPeriodMicros)
+        - FromEvent(HeatpadStatus, currentDutyCycle)
+        - FromEvent(HeatpadStatus, currentPeriodMicros)
+        - FromEvent(HeatpadStatus, nextDutyCycle)
+        - FromEvent(HeatpadStatus, nextPeriodMicros)
       BoxPosition:
-        - HeatpadStatus(pwmProgressMicros)
+        - FromEvent(HeatpadSample, pwmProgressMicros)
       HeatpadSense: 
-        - HeatpadSample(measuredVoltage)
-        - HeatpadSample(measuredCurrent)
+        - FromEvent(HeatpadSample, measuredVoltage, epsilon=1e-3)
+        - FromEvent(HeatpadSample, measuredCurrent, epsilon=1e-3)
       DisplayStatus: 
-        - DisplayStatus(brightness)
-        - DisplayStatus(skipped)
-        - dirtyCount
+        - FromEvent(DisplayStatus, brightness)
+        - FromEvent(DisplayStatus, skipped)
+        - Manual(dirtyCount, uint32_t)
       ShtState: 
-        - TemperatureStatus(driverEnabled)
-        - TemperatureStatus(powerEnabled)
-        - TemperatureStatus(resetting)
+        - FromEvent(TemperatureStatus, driverEnabled)
+        - FromEvent(TemperatureStatus, powerEnabled)
+        - FromEvent(TemperatureStatus, resetting)
       ShtSample: 
-        - TemperatureSample(temperatureCelcius)
-        - TemperatureSample(humidityRelative)
+        - FromEvent(TemperatureSample, temperatureCelcius)
+        - FromEvent(TemperatureSample, humidityRelative)
       HeapSpace:
-        - heapSpace
+        - Manual(heapSpace, uint32_t) 
       AppState:
-        - eventCount
-        - ActiveBehaviourChanged(behaviour)
+        - Manual(eventCount, uint32_t)
+        - FromEvent(ActiveBehaviourChanged, newBehaviour)
       FermentationStatus: 
-        - FermentationStatus(heaterEngineState)
-        - FermentationStatus(targetTemperature)
-        - FermentationStatus(measuredTemperature)
-        - FermentationStatus(measuredHumidity)
-
+        - FromEvent(FermentationStatus, heaterEngineState)
+        - FromEvent(FermentationStatus, targetTemperature)
+        - FromEvent(FermentationStatus, measuredTemperature)
+        - FromEvent(FermentationStatus, measuredHumidity)
 
   Debug:
     tick_phases: null
     receives: [Heartbeat]
     sends: [DisplayCommand]
-    
-      
-
-        - HeatpadState -> currentDutyCycle
-        - HeatpadState -> currentPeriodMicros
-        - HeatpadState -> nextDutyCycle
-        - HeatpadState -> nextPeriodMicros

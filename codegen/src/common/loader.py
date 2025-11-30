@@ -8,7 +8,7 @@ from common.util import (
     ensure_str_has_suffix,
     print_json
 )
-
+from common.screen_utils import parse_updaters
 
 class Loader:
 
@@ -22,8 +22,6 @@ class Loader:
     def preload_all(self):
         paths = [p for p in self.config_dir.rglob("*") if p.is_file()]
         self.config = load_yaml_multi(paths)
-
-        print_json(self.config)
 
         self.process_hardware_config()
         self.process_behaviours_config()
@@ -76,8 +74,6 @@ class Loader:
                 for phase in comp_data["tick_phases"]:
                     phases[idx[phase]][section].append(comp_key)
 
-        print_json(phases)
-
     
     def _process_components_config(self, key, suffix):
 
@@ -104,7 +100,13 @@ class Loader:
 
     def process_screens_config(self):
         self._process_components_config("screens", "Screen")
-        
+
+        for screen_data in self.config["screens"].values():
+            if "updaters" in screen_data:
+                parse_updaters(screen_data["updaters"], self.config["events"]["types"])
+                # print_json(screen_data["updaters"])
+                print_json(screen_data["updaters"]["HeatpadSense"])
+        exit()
 
     def process_events_config(self):
 
