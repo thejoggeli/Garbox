@@ -12,7 +12,46 @@ screens:
       - FermentationStatus
       - DisplayStatus
     sends: [DisplayCommand]
-    
+    updaters: 
+      FanState: 
+        - state <- FanStatus
+        - targetSpeed <- FanStatus
+      FanMeasuredRpm: 
+        - measuredRpm <- FanSample
+      HeatpadState:
+        - state <- HeatpadStatus
+      HeatpadDuty: 
+        - currentDutyCycle <- HeatpadState
+        - currentPeriodMicros <- HeatpadState
+        - nextDutyCycle <- HeatpadState
+        - nextPeriodMicros <- HeatpadState
+      BoxPosition:
+        - pwmProgressMicros <- HeatpadSample
+      HeatpadSense: 
+        - measuredVoltage <- HeatpadSample
+        - measuredCurrent <- HeatpadSample
+      DisplayStatus: 
+        - brightness <- DisplayStatus
+        - skipped <- DisplayStatus
+        - dirtyCount
+      ShtState: 
+        - driverEnabled <- TemperatureStatus
+        - powerEnabled <- TemperatureStatus
+        - resetting <- TemperatureStatus
+      ShtSample: 
+        - temperatureCelcius <- TemperatureSample
+        - humidityRelative <- TemperatureSample
+      HeapSpace:
+        - heapSpace
+      AppState:
+        - eventCount
+        - behaviour <- ActiveBehaviourChanged
+      FermentationStatus: 
+        - heaterEngineState <- FermentationStatus
+        - targetTemperature <- FermentationStatus
+        - measuredTemperature <- FermentationStatus
+        - measuredHumidity <- FermentationStatus
+
   Debug:
     tick_phases: null
     receives: [Heartbeat]

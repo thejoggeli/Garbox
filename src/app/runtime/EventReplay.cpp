@@ -170,7 +170,7 @@ void EventReplay::sendFermentationStatusToMainScreen(void* context){
 void EventReplay::sendDisplayStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
     self->mMainScreen.onDisplayStatus(&self->mDisplayStatusBlock.header); 
-} 
+}
 
 void EventReplay::sendHeartbeatToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);

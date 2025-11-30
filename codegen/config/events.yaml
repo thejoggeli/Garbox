@@ -49,12 +49,11 @@ events:
       currentPeriodMicros: uint32_t
       nextDutyCycle: float
       nextPeriodMicros: uint32_t
-      pwmProgressMicros: float
 
     HeatpadSample:  
-      state: HeatpadState 
       measuredVoltage: float
       measuredCurrent: float
+      pwmProgressMicros: float
       
     HeatpadCommand:  
       enabled: bool

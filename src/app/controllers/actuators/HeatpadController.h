@@ -23,7 +23,9 @@ private:
     float mLastMeasuredVoltage = 0.0f;
     float mLastMeasuredCurrent = 0.0f;
 
-    bool mStateChanged = false;
+    bool mStateChanged = true;
+    bool mSensorValuesChanged = true;
+
     Heatpad& mHeatpad;
     RgbLed& mLed;
 

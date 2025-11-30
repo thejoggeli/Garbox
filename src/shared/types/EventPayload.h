@@ -57,13 +57,12 @@ struct HeatpadStatusPayload {
     uint32_t currentPeriodMicros;
     float nextDutyCycle;
     uint32_t nextPeriodMicros;
-    float pwmProgressMicros;
 };
 
 struct HeatpadSamplePayload {
-    HeatpadState state;
     float measuredVoltage;
     float measuredCurrent;
+    float pwmProgressMicros;
 };
 
 struct HeatpadCommandPayload {

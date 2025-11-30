@@ -99,10 +99,6 @@ void MainScreen::onHeatpadStatus(const HeatpadStatusEvent& event){
         mShadowState.heatpadNextPeriod = event->nextPeriodMicros;
         mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadDuty));
     }
-    if(mShadowState.heatpadPwmProgressMicros != event->pwmProgressMicros){
-        mShadowState.heatpadPwmProgressMicros = event->pwmProgressMicros;
-        mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadProgress));
-    }
     if(mShadowState.heatpadState != event->state){
         mShadowState.heatpadState = event->state;
         mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadState));
@@ -110,6 +106,8 @@ void MainScreen::onHeatpadStatus(const HeatpadStatusEvent& event){
 }
 
 void MainScreen::onHeatpadSample(const HeatpadSampleEvent& event){
+    mShadowState.heatpadPwmProgressMicros = event->pwmProgressMicros;
+    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadProgress));
     mShadowState.heatpadMeasuredVoltage = event->measuredVoltage;
     mShadowState.heatpadMeasuredCurrent = event->measuredCurrent;
     mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadSense));
@@ -127,11 +125,11 @@ void MainScreen::onTemperatureSample(const TemperatureSampleEvent& event){
     mShadowState.shtHum = event->humidityRelative;
     mDirtyDispatcher.markDirty(static_cast<size_t>(Index::ShtSample));
 }
+
 void MainScreen::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
     mShadowState.behaviour = event->newBehaviour;
     mDirtyDispatcher.markDirty(static_cast<size_t>(Index::AppState));
 }
-
 
 void MainScreen::onFermentationStatus(const FermentationStatusEvent& event){
     if (mShadowState.engineState == event->heaterEngineState &&
@@ -145,7 +143,7 @@ void MainScreen::onFermentationStatus(const FermentationStatusEvent& event){
     mShadowState.engineMeasuredTemp = event->measuredTemperature;
     mShadowState.engineMeasuredHum = event->measuredHumidity;
     mDirtyDispatcher.markDirty(static_cast<size_t>(Index::FermentationStatus));
-};
+}
 
 void MainScreen::onDisplayStatus(const DisplayStatusEvent& event){
     if (mShadowState.brightness == event->brightness &&
