@@ -11,46 +11,48 @@ screens:
       - ActiveBehaviourChanged
       - FermentationStatus
       - DisplayStatus
-    sends: [DisplayCommand]
+    sends: 
+      - DisplayCommand
     updaters: 
       FanState: 
-        - state <- FanStatus
-        - targetSpeed <- FanStatus
+        - FanStatus(state)
+        - FanStatus(targetSpeed)
       FanMeasuredRpm: 
-        - measuredRpm <- FanSample
+        - FanSample(measuredRpm)
       HeatpadState:
-        - state <- HeatpadStatus
+        - HeatpadStatus(state)
       HeatpadDuty: 
-        - currentDutyCycle <- HeatpadState
-        - currentPeriodMicros <- HeatpadState
-        - nextDutyCycle <- HeatpadState
-        - nextPeriodMicros <- HeatpadState
+        - HeatpadStatus(currentDutyCycle)
+        - HeatpadStatus(currentPeriodMicros)
+        - HeatpadStatus(nextDutyCycle)
+        - HeatpadStatus(nextPeriodMicros)
       BoxPosition:
-        - pwmProgressMicros <- HeatpadSample
+        - HeatpadStatus(pwmProgressMicros)
       HeatpadSense: 
-        - measuredVoltage <- HeatpadSample
-        - measuredCurrent <- HeatpadSample
+        - HeatpadSample(measuredVoltage)
+        - HeatpadSample(measuredCurrent)
       DisplayStatus: 
-        - brightness <- DisplayStatus
-        - skipped <- DisplayStatus
+        - DisplayStatus(brightness)
+        - DisplayStatus(skipped)
         - dirtyCount
       ShtState: 
-        - driverEnabled <- TemperatureStatus
-        - powerEnabled <- TemperatureStatus
-        - resetting <- TemperatureStatus
+        - TemperatureStatus(driverEnabled)
+        - TemperatureStatus(powerEnabled)
+        - TemperatureStatus(resetting)
       ShtSample: 
-        - temperatureCelcius <- TemperatureSample
-        - humidityRelative <- TemperatureSample
+        - TemperatureSample(temperatureCelcius)
+        - TemperatureSample(humidityRelative)
       HeapSpace:
         - heapSpace
       AppState:
         - eventCount
-        - behaviour <- ActiveBehaviourChanged
+        - ActiveBehaviourChanged(behaviour)
       FermentationStatus: 
-        - heaterEngineState <- FermentationStatus
-        - targetTemperature <- FermentationStatus
-        - measuredTemperature <- FermentationStatus
-        - measuredHumidity <- FermentationStatus
+        - FermentationStatus(heaterEngineState)
+        - FermentationStatus(targetTemperature)
+        - FermentationStatus(measuredTemperature)
+        - FermentationStatus(measuredHumidity)
+
 
   Debug:
     tick_phases: null
@@ -58,3 +60,8 @@ screens:
     sends: [DisplayCommand]
     
       
+
+        - HeatpadState -> currentDutyCycle
+        - HeatpadState -> currentPeriodMicros
+        - HeatpadState -> nextDutyCycle
+        - HeatpadState -> nextPeriodMicros
