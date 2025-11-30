@@ -4,6 +4,9 @@ devtools:
     custom_ids: [ 
       LedAnimation, 
       PiezoPlayer,  
-      DisplayRender
+      DisplayRender,
+      Runtime1,
+      Runtime2,
+      Runtime3,
     ]   
 

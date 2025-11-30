@@ -19,6 +19,9 @@ const char* ProfilerIdToString(ProfilerId id){
         case ProfilerId::LedAnimation: return "LedAnimation";
         case ProfilerId::PiezoPlayer: return "PiezoPlayer";
         case ProfilerId::DisplayRender: return "DisplayRender";
+        case ProfilerId::Runtime1: return "Runtime1";
+        case ProfilerId::Runtime2: return "Runtime2";
+        case ProfilerId::Runtime3: return "Runtime3";
         case ProfilerId::Count: return "Count";
     }
     return "Invalid";

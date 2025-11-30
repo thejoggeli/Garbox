@@ -15,33 +15,37 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 {% endfor %}
 
 {{ RuntimeName }}::{{ RuntimeName }}():
-    RuntimeAbs(
-        RuntimeAbs::Config {
-            .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
-            .eventQueueLength = {{ application.event_queue_length }},
-        }, 
-        std::initializer_list<ComponentAbs*> {
-{%- for name in controllers.keys() %} 
-            &m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-        },
-        std::initializer_list<ComponentAbs*> {
-{%- for name in behaviours.keys() %} 
-            &m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-        },
-        std::initializer_list<ComponentAbs*> {
-{%- for name in screens.keys() %} 
-            &m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-        }
-    ),
+    RuntimeAbs(RuntimeAbs::Config {
+        .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
+        .eventQueueLength = {{ application.event_queue_length }},
+    }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
     mEventReplay(
 {%- for name, screen_data in screens.items() -%} 
         m{{ name }}{% if not loop.last %}, {% endif %}
 {%- endfor -%} 
     ){
+
+    // register components
+    registerControllers({
+{%- for name in controllers.keys() %} 
+        &m{{ name }}{% if not loop.last %}, {% endif %}
+{% endfor %} 
+    });
+    registerBehaviours({
+{%- for name in behaviours.keys() %} 
+        &m{{ name }}{% if not loop.last %}, {% endif %}
+{% endfor %} 
+    });
+    registerScreens({
+{%- for name in screens.keys() %} 
+        &m{{ name }}{% if not loop.last %}, {% endif %}
+{% endfor %} 
+    });
+
+    // setup routing
+    setupTickRouting();
+    setupEventRouting();
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -50,18 +54,6 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
     //  register all tick phases
 {% for tick in application.tick_phases %}
     mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
-{% endfor %}
-}
-
-void {{ RuntimeName }}::onRegister(){
-{% for beh in behaviours %}
-    registerComponent(&m{{ beh }});
-{% endfor %}
-{% for ctrl in controllers %}
-    registerComponent(&m{{ ctrl }});
-{% endfor %}
-{% for screen in screens %}
-    registerComponent(&m{{ screen }});
 {% endfor %}
 }
 
@@ -110,90 +102,22 @@ void {{ RuntimeName}}::handleTickEnd(){
 {% for tick in application.tick_phases %}
 void {{ RuntimeName }}::handle{{ tick.name }}(){
     Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
-    {# Call tick on controllers supporting this tick #}
-    {% for ctrl_key, ctrl in controllers.items() %}
-        {% if tick.name in ctrl['tick_phases'] %}
-    m{{ ctrl_key }}.on{{ tick.name }}();
-        {% endif %}
-    {% endfor %}
-    {# Call tick on active behaviour #}
-    {% if tick["behaviours"] | length > 0 %}
-    switch(mActiveBehaviour->getBehaviourId()){
-    {% for beha in tick["behaviours"] %}
-        case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
-    {% endfor %}
-        default: break; // active behaviour does not support tick type
-    }
-    {% endif %}
-    {# Call tick on active screen #}
-    {% if tick["screens"] | length > 0 %}
-    switch(mActiveScreen->getScreenId()){
-    {% for screen in tick["screens"] %}
-        case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ tick.name }}(); break;
-    {% endfor %}
-        default: break; // active behaviour does not support tick type
-    }
-    {% endif %}
-    {# Call dispatch events #}
+    mControllers.routeTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+    mBehaviours.routeTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+    mScreens.routeTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
     dispatchEvents();
 }
 
 {% endfor %}
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
-
+    
     // store event for replay
     mEventReplay.storeEvent(header);
 
     // route event to components
-    switch(header->type){
-{# ---- Route events ---- #}
-{% for event, routes in event_routes.items() %}
-    case EventType::{{ event }}: {
-    {% if routes["count"] > 0 %}
-        const {{ event }}Event event(header);
-    {% endif %}
-    {# send event to controllers supporting this event #}
-    {% for ctrl in routes["controllers"] %}
-        m{{ ctrl }}.on{{ event }}(event);
-    {% endfor %}
-    {# send event to active behaviour (if it supports this event) #}
-    {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 %}
-        if(header->sendToInactiveComponents){
-        {% for beha in routes["behaviours"] %}
-            m{{ beha }}.on{{ event }}(event);
-        {% endfor %}
-        {% for screen in routes["screens"] %}
-            m{{ screen }}.on{{ event }}(event);
-        {% endfor %}
-        }
-        else {
-        {% if routes["behaviours"] | length > 0 %}
-            switch(mActiveBehaviour->getBehaviourId()){
-            {% for beha in routes["behaviours"] %}
-                case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event }}(event); break;
-            {% endfor %}
-                default: break; // active behaviour does not support event type
-            }
-        {% endif %}
-    {# send event to active screen (if it supports this event) #}
-        {% if routes["screens"] | length > 0 %}
-            switch(mActiveScreen->getScreenId()){
-            {% for screen in routes["screens"] %}
-                case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ event }}(event); break;
-            {% endfor %}
-                default: break; // active screen does not support event type
-            }
-        {% endif %}
-        }
-    {% endif %}
-        break;
-    }
-{% endfor %}
-    case EventType::Null:
-    case EventType::Count:
-        TriggerDebug("{{ RuntimeName }}", "invalid event type");
-        break;
-    }
+    mControllers.routeEvent(header);
+    mBehaviours.routeEvent(header);
+    mScreens.routeEvent(header);
 }
 
 BehaviourAbs* {{ RuntimeName }}::resolveBehaviour(BehaviourId id){
@@ -224,6 +148,26 @@ ScreenAbs* {{ RuntimeName }}::resolveScreen(ScreenId id){
         default: TriggerExit("{{ RuntimeName }}", "screen with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
+}
+
+void {{ RuntimeName }}::setupTickRouting(){
+{% for comp_name, (category, comp_data) in components.items() %}
+    {% if comp_data.tick_phases %}
+        {% for tick_name in comp_data.tick_phases %}
+    m{{category}}.setRouteTick(&m{{comp_name}}, TickPhase::{{tick_name.removesuffix("Tick")}}, true);
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+}
+
+void {{ RuntimeName }}::setupEventRouting(){
+{% for comp_name, (category, comp_data) in components.items() %}
+    {% if comp_data.receives %}
+        {% for event_name in comp_data.receives %}
+    m{{category}}.setRouteEvent(&m{{comp_name}}, EventType::{{event_name}}, true);
+        {% endfor %}
+    {% endif %}
+{% endfor %}
 }
 
 } // namespace Garbox

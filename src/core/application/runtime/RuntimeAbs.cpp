@@ -13,28 +13,59 @@
 
 namespace Garbox {
 
-RuntimeAbs::RuntimeAbs(
-    const Config& config,
-    std::initializer_list<ComponentAbs*> controllers,
-    std::initializer_list<ComponentAbs*> behaviours,
-    std::initializer_list<ComponentAbs*> screens):
+RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
     mEventFactory(config.eventPoolSizeBytes),
-    mEventQueue(config.eventQueueLength),
-    mComponents(controllers.size() + behaviours.size() + screens.size()),
-    mControllers(controllers),
-    mBehaviours(behaviours),
-    mScreens(screens){
+    mEventQueue(config.eventQueueLength){
     // constructor body
+}
+
+void RuntimeAbs::registerControllers(std::initializer_list<ComponentAbs*> controllers){
+    for(ComponentAbs* component : controllers){
+        const ComponentType type = component->getComponentType(); 
+        const bool valid = (type == ComponentType::Controller);
+        AssertExit(valid, "RuntimeAbs", "expected controller", static_cast<uint32_t>(type));
+    }
+    mControllers.init(controllers);
+}
+
+void RuntimeAbs::registerBehaviours(std::initializer_list<ComponentAbs*> behaviours){
+    for(ComponentAbs* component : behaviours){
+        const ComponentType type = component->getComponentType(); 
+        const bool valid = (type == ComponentType::Behaviour);
+        AssertExit(valid, "RuntimeAbs", "expected behaviour", static_cast<uint32_t>(type));
+    }
+    mBehaviours.init(behaviours);
+}
+
+void RuntimeAbs::registerScreens(std::initializer_list<ComponentAbs*> screens){
+    for(ComponentAbs* component : screens){
+        const ComponentType type = component->getComponentType(); 
+        const bool valid = (type == ComponentType::Screen);
+        AssertExit(valid, "RuntimeAbs", "expected screen", static_cast<uint32_t>(type));
+    }
+    mScreens.init(screens);
 }
 
 void RuntimeAbs::init(){
 
-    // derived class must register controllers, behaviours and ticks
-    onRegister();
+    AssertExit(mControllers.isInitialized(), "RuntimeAbs", "controllers group not initialized");
+    AssertExit(mBehaviours.isInitialized(), "RuntimeAbs", "behaviours group not initialized");
+    AssertExit(mScreens.isInitialized(), "RuntimeAbs", "screens group not initialized");
 
-    // init all components
-    for(ComponentAbs* component : mComponents){
+    // init all controllers
+    for(ComponentAbs* component : mControllers.getComponents()){
+        component->init(*this);
+    }
+    mControllers.enableAllComponents();
+
+    // init all behaviours
+    for(ComponentAbs* component : mBehaviours.getComponents()){
+        component->init(*this);
+    }
+
+    // init all screens
+    for(ComponentAbs* component : mScreens.getComponents()){
         component->init(*this);
     }
 
@@ -44,10 +75,18 @@ void RuntimeAbs::init(){
 
 void RuntimeAbs::start(){
 
-    AssertExit(mComponents.size() > 0, "RuntimeAbs", "no components registered");
+    // start all controllers
+    for(ComponentAbs* component : mControllers.getComponents()){
+        component->start();
+    }
 
-    // start all components
-    for(ComponentAbs* component : mComponents){
+    // start all behaviours
+    for(ComponentAbs* component : mBehaviours.getComponents()){
+        component->start();
+    }
+
+    // start all screens
+    for(ComponentAbs* component : mScreens.getComponents()){
         component->start();
     }
 
@@ -131,11 +170,6 @@ void RuntimeAbs::applyQueuedScreen() {
     publishEvent(event.header());   
 }
 
-void RuntimeAbs::registerComponent(ComponentAbs* component){
-    AssertExit(!mComponents.full(), "RuntimeAbs", "max components count exceeded");
-    mComponents.push(component);
-}
-
 void RuntimeAbs::publishEvent(const EventHeader* header){
     // send event to router event
     mContext.eventCount++;
@@ -145,15 +179,6 @@ void RuntimeAbs::publishEvent(const EventHeader* header){
     else if(!mEventQueue.pushBack(header)){
         TriggerExit("RuntimeAbs", "event queue is full");
     }
-}
-
-EventFactory& RuntimeAbs::getEventFactory(){
-    return mEventFactory;
-}
-
-void RuntimeAbs::clearEventQueue(){
-    mEventQueue.releaseAll();
-    mEventFactory.releaseDataPool();
 }
 
 void RuntimeAbs::dispatchEvents(){
@@ -166,6 +191,15 @@ void RuntimeAbs::dispatchEvents(){
         onRouteEvent(header);
     }
     mEventFactory.releaseDataPool();
+}
+
+void RuntimeAbs::clearEventQueue(){
+    mEventQueue.releaseAll();
+    mEventFactory.releaseDataPool();
+}
+
+EventFactory& RuntimeAbs::getEventFactory(){
+    return mEventFactory;
 }
 
 const RuntimeContext& RuntimeAbs::getContext() const {

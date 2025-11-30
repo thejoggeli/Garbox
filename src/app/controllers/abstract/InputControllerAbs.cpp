@@ -6,22 +6,31 @@
 
 namespace Garbox {
 
-InputControllerAbs::InputControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::InputController, ControllerId::Input){
+InputControllerAbs::InputControllerAbs() : ControllerAbs(ComponentId::InputController, ControllerId::Input){
     // nothing to do
 }
 
+void InputControllerAbs::receiveTick(TickPhase phase){
+    switch(phase){
+        case TickPhase::Input: onInputTick(); break;
+        default: TriggerDebug("InputControllerAbs", "received unhandled tick");
+    };
+};
+
+void InputControllerAbs::receiveEvent(const EventHeader* header){
+    // no events configured
+};
+
 ButtonStateChangedEvent InputControllerAbs::makeButtonStateChangedEvent(){
-    return ControllerAbs::makeEvent<EventType::ButtonStateChanged>();
+    return ComponentAbs::makeEvent<EventType::ButtonStateChanged>();
 }
 
 ButtonRepeatEvent InputControllerAbs::makeButtonRepeatEvent(){
-    return ControllerAbs::makeEvent<EventType::ButtonRepeat>();
+    return ComponentAbs::makeEvent<EventType::ButtonRepeat>();
 }
 
 EncoderStepEvent InputControllerAbs::makeEncoderStepEvent(){
-    return ControllerAbs::makeEvent<EventType::EncoderStep>();
+    return ComponentAbs::makeEvent<EventType::EncoderStep>();
 }
 
 void InputControllerAbs::sendEvent(const ButtonStateChangedEvent& event){
@@ -35,5 +44,5 @@ void InputControllerAbs::sendEvent(const ButtonRepeatEvent& event){
 void InputControllerAbs::sendEvent(const EncoderStepEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

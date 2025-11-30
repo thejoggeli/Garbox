@@ -53,9 +53,6 @@ public:
 
 protected:
 
-    // the descriptor of this component
-    const ComponentDescriptor mComponentDescriptor;
-
     // abstract methods for user implementation
     virtual void onInit() {};
     virtual void onStart() {};
@@ -82,6 +79,9 @@ private:
 
     bool mEnabled = false;
     bool mInitialized = false;
+
+    // the descriptor of this component
+    const ComponentDescriptor mComponentDescriptor;
     
     // runtime context (injected in init() through host)
     const RuntimeContext* mContext = nullptr;

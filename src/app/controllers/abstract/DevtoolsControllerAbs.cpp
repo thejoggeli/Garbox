@@ -6,10 +6,19 @@
 
 namespace Garbox {
 
-DevtoolsControllerAbs::DevtoolsControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::DevtoolsController, ControllerId::Devtools){
+DevtoolsControllerAbs::DevtoolsControllerAbs() : ControllerAbs(ComponentId::DevtoolsController, ControllerId::Devtools){
     // nothing to do
 }
 
+void DevtoolsControllerAbs::receiveTick(TickPhase phase){
+    switch(phase){
+        case TickPhase::Logging: onLoggingTick(); break;
+        default: TriggerDebug("DevtoolsControllerAbs", "received unhandled tick");
+    };
+};
+
+void DevtoolsControllerAbs::receiveEvent(const EventHeader* header){
+    // no events configured
+};
+ 
 } // namespace Garbox

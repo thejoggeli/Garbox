@@ -9,19 +9,19 @@ namespace Garbox {
 
 class DisplayControllerAbs : public ControllerAbs {
 public:
-    
+
     DisplayControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    void receiveTick(TickPhase phase) final;
+    void receiveEvent(const EventHeader* header) final;
+
+protected:
 
     // tick handlers
     virtual void onRenderTick() = 0;
 
     // receive event handlers
     virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
-
-protected:
 
     // make typed events
     DisplayStatusEvent makeDisplayStatusEvent();

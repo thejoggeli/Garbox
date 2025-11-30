@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/behaviour/BehaviourAbs.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -11,8 +12,10 @@ public:
 
     FermentationBehaviourAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    void receiveTick(TickPhase phase) final;
+    void receiveEvent(const EventHeader* header) final;
+
+protected:
 
     // tick handlers
     virtual void onLogicTick() = 0;
@@ -27,8 +30,6 @@ public:
     virtual void onButtonStateChanged(const ButtonStateChangedEvent& event) = 0;
     virtual void onButtonRepeat(const ButtonRepeatEvent& event) = 0;
     virtual void onEncoderStep(const EncoderStepEvent& event) = 0;
-
-protected:
 
     // make typed events
     FanCommandEvent makeFanCommandEvent();

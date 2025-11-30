@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/behaviour/BehaviourAbs.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -11,8 +12,10 @@ public:
 
     CalibrationBehaviourAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    void receiveTick(TickPhase phase) final;
+    void receiveEvent(const EventHeader* header) final;
+
+protected:
 
     // tick handlers
     virtual void onLogicTick() = 0;
@@ -21,8 +24,6 @@ public:
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
     virtual void onFanStatus(const FanStatusEvent& event) = 0;
     virtual void onFanSample(const FanSampleEvent& event) = 0;
-
-protected:
 
     // make typed events
     FanCommandEvent makeFanCommandEvent();

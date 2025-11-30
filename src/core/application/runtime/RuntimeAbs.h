@@ -24,12 +24,7 @@ public:
         size_t eventQueueLength = 64;
     };
 
-    RuntimeAbs(
-        const Config& config,
-        std::initializer_list<ComponentAbs*> controllers,
-        std::initializer_list<ComponentAbs*> behaviours,
-        std::initializer_list<ComponentAbs*> screens
-    );
+    RuntimeAbs(const Config& config);
 
     // disallow copy and move 
     RuntimeAbs(const RuntimeAbs&) = delete;
@@ -53,6 +48,15 @@ public:
 
 protected:
 
+    // components
+    ComponentGroup mControllers;
+    ComponentGroup mBehaviours;
+    ComponentGroup mScreens;
+
+    void registerControllers(std::initializer_list<ComponentAbs*> controllers);
+    void registerBehaviours(std::initializer_list<ComponentAbs*> behaviours);
+    void registerScreens(std::initializer_list<ComponentAbs*> screens);
+
     // Context for controllers and behaviours to use.
     // The deriving class update the values at appropriate times
     RuntimeContext mContext;
@@ -64,9 +68,6 @@ protected:
     // screen active and queued
     ScreenAbs* mActiveScreen = nullptr;
     ScreenAbs* mQueuedScreen = nullptr;
-
-    // components setup
-    void registerComponent(ComponentAbs* component);
 
     // event handling internal methods
     void dispatchEvents();
@@ -84,7 +85,6 @@ protected:
     virtual void onInit() = 0;
     virtual void onStart() = 0;
     virtual void onRun() = 0;
-    virtual void onRegister() = 0;
     virtual void onRouteEvent(const EventHeader* event) = 0;
     virtual void onActiveBehaviourChanged() = 0;
     virtual void onActiveScreenChanged() = 0;
@@ -102,12 +102,6 @@ private:
     // members for events
     EventFactory mEventFactory;
     RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
-
-    // components
-    VectorHeap<ComponentAbs*> mComponents;
-    ComponentGroup mControllers;
-    ComponentGroup mBehaviours;
-    ComponentGroup mScreens;
 };
 
 } // namespace

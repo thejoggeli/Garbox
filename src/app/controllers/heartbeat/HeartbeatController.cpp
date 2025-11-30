@@ -24,14 +24,13 @@ void HeartbeatController::onStart(){
     mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 0.0f,  1.0f);
     mHeartbeatLed.animationAddDelay(200_ms);
     mHeartbeatLed.animationAddFrame(EasingFunctions::GetInOutSine(), 800_ms, 1.0f,  0.0f);
-    mHeartbeatLed.animationStart();
-    mHeartbeatTimer.start(mIntervalMicros);
+    mHeartbeatTimer.start(0);
 }
 
 void HeartbeatController::onHeartbeatTick(){
     if(mHeartbeatTimer.isExpired()){
         mHeartbeatLed.animationStart();
-        mHeartbeatTimer.restart();
+        mHeartbeatTimer.restart(mIntervalMicros);
 
         // send heartbeat event
         HeartbeatEvent event = makeHeartbeatEvent();

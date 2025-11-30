@@ -65,7 +65,7 @@ void EventReplay::replay(ScreenId screenId){
     {% for event_name in screen_data.receives: %}
 void EventReplay::send{{ event_name }}To{{ screen_name }}(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->m{{ screen_name }}.on{{ event_name }}(&self->m{{ event_name }}Block.header); 
+    self->m{{ screen_name }}.receiveEvent(&self->m{{ event_name }}Block.header); 
 }
 
     {% endfor %}

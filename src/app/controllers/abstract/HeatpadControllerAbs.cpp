@@ -6,18 +6,31 @@
 
 namespace Garbox {
 
-HeatpadControllerAbs::HeatpadControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::HeatpadController, ControllerId::Heatpad){
+HeatpadControllerAbs::HeatpadControllerAbs() : ControllerAbs(ComponentId::HeatpadController, ControllerId::Heatpad){
     // nothing to do
 }
 
+void HeatpadControllerAbs::receiveTick(TickPhase phase){
+    switch(phase){
+        case TickPhase::Input: onInputTick(); break;
+        case TickPhase::Output: onOutputTick(); break;
+        default: TriggerDebug("HeatpadControllerAbs", "received unhandled tick");
+    };
+};
+
+void HeatpadControllerAbs::receiveEvent(const EventHeader* header){
+    switch(header->type){
+        case EventType::HeatpadCommand: onHeatpadCommand(HeatpadCommandEvent(header)); break;
+        default: TriggerDebug("HeatpadControllerAbs", "received unhandled event");
+    };
+};
+
 HeatpadStatusEvent HeatpadControllerAbs::makeHeatpadStatusEvent(){
-    return ControllerAbs::makeEvent<EventType::HeatpadStatus>();
+    return ComponentAbs::makeEvent<EventType::HeatpadStatus>();
 }
 
 HeatpadSampleEvent HeatpadControllerAbs::makeHeatpadSampleEvent(){
-    return ControllerAbs::makeEvent<EventType::HeatpadSample>();
+    return ComponentAbs::makeEvent<EventType::HeatpadSample>();
 }
 
 void HeatpadControllerAbs::sendEvent(const HeatpadStatusEvent& event){
@@ -27,5 +40,5 @@ void HeatpadControllerAbs::sendEvent(const HeatpadStatusEvent& event){
 void HeatpadControllerAbs::sendEvent(const HeatpadSampleEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

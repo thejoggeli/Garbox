@@ -1,27 +1,13 @@
 {% include "_common/header.j2" %}
+{%- from "_common/component_cpp.j2" import constructor, receive_ticks, receive_events, make_events, send_events -%}
 #include "{{ name }}Abs.h"
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs():
-    // init memberes
-    ControllerAbs(ComponentId::{{ name }}, ControllerId::{{ name.removesuffix("Controller") }}){
-    // nothing to do
-}
-{% if controller.sends %}
-{% for ev in controller.sends %}
-
-{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
-    return ControllerAbs::makeEvent<EventType::{{ ev }}>();
-}
-{% endfor %}
-{% for ev in controller.sends %}
-
-void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
-    publishEvent(event.header());
-}
-{% endfor %}
-{% endif %}
-
+{{ constructor("Controller", name, controller) }}
+{{ receive_ticks(name, controller) }}
+{{ receive_events(name, controller) -}}
+{{ make_events(name, controller) -}}
+{{- send_events(name, controller) }} 
 } // namespace Garbox

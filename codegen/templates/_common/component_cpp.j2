@@ -1,0 +1,62 @@
+{# constructor #}
+{% macro constructor(type, name, component) %}
+{{ name }}Abs::{{ name }}Abs() : {{ type }}Abs(ComponentId::{{ name }}, {{ type }}Id::{{ name.removesuffix(type) }}){
+    // nothing to do
+}
+{% endmacro %}
+
+{# receive ticks #}
+{% macro receive_ticks(name, component) %}
+void {{ name }}Abs::receiveTick(TickPhase phase){
+{% if component.tick_phases %}
+    switch(phase){
+{% for tick_name in component.tick_phases %}
+        case TickPhase::{{ tick_name.removesuffix("Tick") }}: on{{tick_name}}(); break;
+{% endfor %}
+        default: TriggerDebug("{{name}}Abs", "received unhandled tick");
+    };
+{% else %}
+    // no tick phases configured
+{% endif %}
+};
+{% endmacro %}
+
+{# receive events #}
+{% macro receive_events(name, component) %}
+void {{ name }}Abs::receiveEvent(const EventHeader* header){
+{% if component.receives %}
+    switch(header->type){
+{% for event_name in component.receives %}
+        case EventType::{{ event_name }}: on{{event_name}}({{event_name}}Event(header)); break;
+{% endfor %}
+        default: TriggerDebug("{{name}}Abs", "received unhandled event");
+    };
+{% else %}
+    // no events configured
+{% endif %}
+};
+{% endmacro %}
+
+{# make events #}
+{% macro make_events(name, component) %}
+{% if component.sends %}
+{% for ev in component.sends %}
+
+{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
+    return ComponentAbs::makeEvent<EventType::{{ ev }}>();
+}
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+{# send events #}
+{% macro send_events(name, component) %}
+{% if component.sends %}
+{% for ev in component.sends %}
+
+void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
+    publishEvent(event.header());
+}
+{% endfor %}
+{% endif %}
+{% endmacro %}

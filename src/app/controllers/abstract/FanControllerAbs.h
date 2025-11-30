@@ -9,11 +9,13 @@ namespace Garbox {
 
 class FanControllerAbs : public ControllerAbs {
 public:
-    
+
     FanControllerAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    void receiveTick(TickPhase phase) final;
+    void receiveEvent(const EventHeader* header) final;
+
+protected:
 
     // tick handlers
     virtual void onInputTick() = 0;
@@ -21,8 +23,6 @@ public:
 
     // receive event handlers
     virtual void onFanCommand(const FanCommandEvent& event) = 0;
-
-protected:
 
     // make typed events
     FanStatusEvent makeFanStatusEvent();

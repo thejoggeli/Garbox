@@ -19,31 +19,35 @@ static constexpr uint32_t LoggingTickDelayMillis = 0;
 static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime():
-    RuntimeAbs(
-        RuntimeAbs::Config {
-            .eventPoolSizeBytes = 1024,
-            .eventQueueLength = 128,
-        }, 
-        std::initializer_list<ComponentAbs*> { 
-            &mDisplayController,  
-            &mDevtoolsController,  
-            &mFanController,  
-            &mHeartbeatController,  
-            &mHeatpadController,  
-            &mInputController,  
-            &mI2cPartsController 
-        },
-        std::initializer_list<ComponentAbs*> { 
-            &mCalibrationBehaviour,  
-            &mFermentationBehaviour
-        },
-        std::initializer_list<ComponentAbs*> { 
-            &mMainScreen,  
-            &mDebugScreen 
-        }
-    ),
+    RuntimeAbs(RuntimeAbs::Config {
+        .eventPoolSizeBytes = 1024,
+        .eventQueueLength = 128,
+    }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
     mEventReplay(mMainScreen, mDebugScreen){
+
+    // register components
+    registerControllers({ 
+        &mDisplayController,  
+        &mDevtoolsController,  
+        &mFanController,  
+        &mHeartbeatController,  
+        &mHeatpadController,  
+        &mInputController,  
+        &mI2cPartsController 
+    });
+    registerBehaviours({ 
+        &mCalibrationBehaviour,  
+        &mFermentationBehaviour 
+    });
+    registerScreens({ 
+        &mMainScreen,  
+        &mDebugScreen 
+    });
+
+    // setup routing
+    setupTickRouting();
+    setupEventRouting();
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -56,20 +60,6 @@ GarboxRuntime::GarboxRuntime():
     mTickRunner.registerTickPhase([this](){ handleOutputTick(); }, OutputTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
-}
-
-void GarboxRuntime::onRegister(){
-    registerComponent(&mCalibrationBehaviour);
-    registerComponent(&mFermentationBehaviour);
-    registerComponent(&mDisplayController);
-    registerComponent(&mDevtoolsController);
-    registerComponent(&mFanController);
-    registerComponent(&mHeartbeatController);
-    registerComponent(&mHeatpadController);
-    registerComponent(&mInputController);
-    registerComponent(&mI2cPartsController);
-    registerComponent(&mMainScreen);
-    registerComponent(&mDebugScreen);
 }
 
 void GarboxRuntime::onInit(){
@@ -115,284 +105,61 @@ void GarboxRuntime::handleTickEnd(){
 
 void GarboxRuntime::handleHeartbeatTick(){
     Profiler::MeasureScoped profiler(ProfilerId::HeartbeatTick);
-    mHeartbeatController.onHeartbeatTick();
+    mControllers.routeTick(TickPhase::Heartbeat);
+    mBehaviours.routeTick(TickPhase::Heartbeat);
+    mScreens.routeTick(TickPhase::Heartbeat);
     dispatchEvents();
 }
 
 void GarboxRuntime::handleInputTick(){
     Profiler::MeasureScoped profiler(ProfilerId::InputTick);
-    mFanController.onInputTick();
-    mHeatpadController.onInputTick();
-    mInputController.onInputTick();
-    mI2cPartsController.onInputTick();
+    mControllers.routeTick(TickPhase::Input);
+    mBehaviours.routeTick(TickPhase::Input);
+    mScreens.routeTick(TickPhase::Input);
     dispatchEvents();
 }
 
 void GarboxRuntime::handleLogicTick(){
     Profiler::MeasureScoped profiler(ProfilerId::LogicTick);
-    switch(mActiveBehaviour->getBehaviourId()){
-        case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
-        case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
-        default: break; // active behaviour does not support tick type
-    }
+    mControllers.routeTick(TickPhase::Logic);
+    mBehaviours.routeTick(TickPhase::Logic);
+    mScreens.routeTick(TickPhase::Logic);
     dispatchEvents();
 }
 
 void GarboxRuntime::handleOutputTick(){
     Profiler::MeasureScoped profiler(ProfilerId::OutputTick);
-    mFanController.onOutputTick();
-    mHeatpadController.onOutputTick();
+    mControllers.routeTick(TickPhase::Output);
+    mBehaviours.routeTick(TickPhase::Output);
+    mScreens.routeTick(TickPhase::Output);
     dispatchEvents();
 }
 
 void GarboxRuntime::handleLoggingTick(){
     Profiler::MeasureScoped profiler(ProfilerId::LoggingTick);
-    mDevtoolsController.onLoggingTick();
+    mControllers.routeTick(TickPhase::Logging);
+    mBehaviours.routeTick(TickPhase::Logging);
+    mScreens.routeTick(TickPhase::Logging);
     dispatchEvents();
 }
 
 void GarboxRuntime::handleRenderTick(){
     Profiler::MeasureScoped profiler(ProfilerId::RenderTick);
-    mDisplayController.onRenderTick();
+    mControllers.routeTick(TickPhase::Render);
+    mBehaviours.routeTick(TickPhase::Render);
+    mScreens.routeTick(TickPhase::Render);
     dispatchEvents();
 }
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){
-
+    
     // store event for replay
     mEventReplay.storeEvent(header);
 
     // route event to components
-    switch(header->type){
-    case EventType::Heartbeat: {
-        const HeartbeatEvent event(header);
-        if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onHeartbeat(event);
-            mFermentationBehaviour.onHeartbeat(event);
-            mDebugScreen.onHeartbeat(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
-                default: break; // active behaviour does not support event type
-            }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::FermentationStatus: {
-        const FermentationStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onFermentationStatus(event);
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFermentationStatus(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::DisplayCommand: {
-        const DisplayCommandEvent event(header);
-        mDisplayController.onDisplayCommand(event);
-        break;
-    }
-    case EventType::DisplayStatus: {
-        const DisplayStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onDisplayStatus(event);
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayStatus(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::FanStatus: {
-        const FanStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onFanStatus(event);
-            mFermentationBehaviour.onFanStatus(event);
-            mMainScreen.onFanStatus(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
-                default: break; // active behaviour does not support event type
-            }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanStatus(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::FanSample: {
-        const FanSampleEvent event(header);
-        if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onFanSample(event);
-            mFermentationBehaviour.onFanSample(event);
-            mMainScreen.onFanSample(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
-                default: break; // active behaviour does not support event type
-            }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanSample(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::FanCommand: {
-        const FanCommandEvent event(header);
-        mFanController.onFanCommand(event);
-        break;
-    }
-    case EventType::HeatpadStatus: {
-        const HeatpadStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onHeatpadStatus(event);
-            mMainScreen.onHeatpadStatus(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
-                default: break; // active behaviour does not support event type
-            }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadStatus(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::HeatpadSample: {
-        const HeatpadSampleEvent event(header);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onHeatpadSample(event);
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadSample(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::HeatpadCommand: {
-        const HeatpadCommandEvent event(header);
-        mHeatpadController.onHeatpadCommand(event);
-        break;
-    }
-    case EventType::TemperatureStatus: {
-        const TemperatureStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onTemperatureStatus(event);
-            mMainScreen.onTemperatureStatus(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatus(event); break;
-                default: break; // active behaviour does not support event type
-            }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureStatus(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::TemperatureSample: {
-        const TemperatureSampleEvent event(header);
-        if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onTemperatureSample(event);
-            mMainScreen.onTemperatureSample(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSample(event); break;
-                default: break; // active behaviour does not support event type
-            }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureSample(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::ButtonStateChanged: {
-        const ButtonStateChangedEvent event(header);
-        mI2cPartsController.onButtonStateChanged(event);
-        if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonStateChanged(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChanged(event); break;
-                default: break; // active behaviour does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::ButtonRepeat: {
-        const ButtonRepeatEvent event(header);
-        if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonRepeat(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeat(event); break;
-                default: break; // active behaviour does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::EncoderStep: {
-        const EncoderStepEvent event(header);
-        if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onEncoderStep(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStep(event); break;
-                default: break; // active behaviour does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::ActiveBehaviourChanged: {
-        const ActiveBehaviourChangedEvent event(header);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onActiveBehaviourChanged(event);
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onActiveBehaviourChanged(event); break;
-                default: break; // active screen does not support event type
-            }
-        }
-        break;
-    }
-    case EventType::ActiveScreenChanged: {
-        break;
-    }
-    case EventType::Null:
-    case EventType::Count:
-        TriggerDebug("GarboxRuntime", "invalid event type");
-        break;
-    }
+    mControllers.routeEvent(header);
+    mBehaviours.routeEvent(header);
+    mScreens.routeEvent(header);
 }
 
 BehaviourAbs* GarboxRuntime::resolveBehaviour(BehaviourId id){
@@ -425,6 +192,49 @@ ScreenAbs* GarboxRuntime::resolveScreen(ScreenId id){
         default: TriggerExit("GarboxRuntime", "screen with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;
+}
+
+void GarboxRuntime::setupTickRouting(){
+    mControllers.setRouteTick(&mDisplayController, TickPhase::Render, true);
+    mControllers.setRouteTick(&mDevtoolsController, TickPhase::Logging, true);
+    mControllers.setRouteTick(&mFanController, TickPhase::Input, true);
+    mControllers.setRouteTick(&mFanController, TickPhase::Output, true);
+    mControllers.setRouteTick(&mHeartbeatController, TickPhase::Heartbeat, true);
+    mControllers.setRouteTick(&mHeatpadController, TickPhase::Input, true);
+    mControllers.setRouteTick(&mHeatpadController, TickPhase::Output, true);
+    mControllers.setRouteTick(&mInputController, TickPhase::Input, true);
+    mControllers.setRouteTick(&mI2cPartsController, TickPhase::Input, true);
+    mBehaviours.setRouteTick(&mCalibrationBehaviour, TickPhase::Logic, true);
+    mBehaviours.setRouteTick(&mFermentationBehaviour, TickPhase::Logic, true);
+}
+
+void GarboxRuntime::setupEventRouting(){
+    mControllers.setRouteEvent(&mDisplayController, EventType::DisplayCommand, true);
+    mControllers.setRouteEvent(&mFanController, EventType::FanCommand, true);
+    mControllers.setRouteEvent(&mHeatpadController, EventType::HeatpadCommand, true);
+    mControllers.setRouteEvent(&mI2cPartsController, EventType::ButtonStateChanged, true);
+    mBehaviours.setRouteEvent(&mCalibrationBehaviour, EventType::Heartbeat, true);
+    mBehaviours.setRouteEvent(&mCalibrationBehaviour, EventType::FanStatus, true);
+    mBehaviours.setRouteEvent(&mCalibrationBehaviour, EventType::FanSample, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::Heartbeat, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::FanStatus, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::FanSample, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::HeatpadStatus, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::TemperatureStatus, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::TemperatureSample, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::ButtonStateChanged, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::ButtonRepeat, true);
+    mBehaviours.setRouteEvent(&mFermentationBehaviour, EventType::EncoderStep, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::FanStatus, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::FanSample, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::HeatpadStatus, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::HeatpadSample, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::TemperatureStatus, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::TemperatureSample, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::ActiveBehaviourChanged, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::FermentationStatus, true);
+    mScreens.setRouteEvent(&mMainScreen, EventType::DisplayStatus, true);
+    mScreens.setRouteEvent(&mDebugScreen, EventType::Heartbeat, true);
 }
 
 } // namespace Garbox

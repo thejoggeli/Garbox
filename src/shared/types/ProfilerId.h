@@ -27,6 +27,9 @@ enum class ProfilerId : uint16_t {
     LedAnimation,
     PiezoPlayer,
     DisplayRender,
+    Runtime1,
+    Runtime2,
+    Runtime3,
 
     // enum size marker
     Count,

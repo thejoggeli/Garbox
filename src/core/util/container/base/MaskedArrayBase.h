@@ -63,6 +63,14 @@ public:
         return Iterator(Storage::elementPtr(0), mNext.data(), INVALID);
     }
 
+    T& at(std::size_t index) {
+        return *Storage::elementPtr(index);
+    }
+
+    const T& at(std::size_t index) const {
+        return *Storage::elementPtr(index);
+    }
+
     T& operator[](std::size_t index){
         return *Storage::elementPtr(index);
     }

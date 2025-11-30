@@ -30,7 +30,7 @@ void ComponentAbs::start(){
 }
 
 void ComponentAbs::setEnabled(bool enabled){
-    if(mInitialized){
+    if(!mInitialized){
         TriggerExit("ComponentAbs", "not initialized");
     }
     if(enabled == mEnabled){

@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
+#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -11,8 +12,10 @@ public:
 
     MainScreenAbs();
 
-    void receiveTick(TickPhase phase) final {};
-    void receiveEvent(const EventHeader* event) final {};
+    void receiveTick(TickPhase phase) final;
+    void receiveEvent(const EventHeader* header) final;
+
+protected:
 
     // receive event handlers
     virtual void onFanStatus(const FanStatusEvent& event) = 0;
@@ -24,8 +27,6 @@ public:
     virtual void onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event) = 0;
     virtual void onFermentationStatus(const FermentationStatusEvent& event) = 0;
     virtual void onDisplayStatus(const DisplayStatusEvent& event) = 0;
-
-protected:
 
     // make typed events
     DisplayCommandEvent makeDisplayCommandEvent();

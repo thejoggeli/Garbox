@@ -1,28 +1,13 @@
 {% include "_common/header.j2" %}
+{%- from "_common/component_cpp.j2" import constructor, receive_ticks, receive_events, make_events, send_events -%}
 #include "{{ name }}Abs.h"
+#include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
-{{ name }}Abs::{{ name }}Abs(): 
-    // init memberes
-    ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}){
-    // nothing to do
-}
-{# makeEvent methods #}
-{% if screen.sends %}
-{% for ev in screen.sends %}
-
-{{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
-    return ScreenAbs::makeEvent<EventType::{{ ev }}>();
-}
-{% endfor %}
-{# sendEvent methods #}
-{% for ev in screen.sends %}
-
-void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
-    publishEvent(event.header());
-}
-{% endfor %}
-{% endif %}
-
+{{ constructor("Screen", name, screen) }}
+{{ receive_ticks(name, screen) }}
+{{ receive_events(name, screen) -}}
+{{ make_events(name, screen) -}}
+{{- send_events(name, screen) }} 
 } // namespace Garbox

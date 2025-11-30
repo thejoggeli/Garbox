@@ -6,18 +6,31 @@
 
 namespace Garbox {
 
-FanControllerAbs::FanControllerAbs():
-    // init memberes
-    ControllerAbs(ComponentId::FanController, ControllerId::Fan){
+FanControllerAbs::FanControllerAbs() : ControllerAbs(ComponentId::FanController, ControllerId::Fan){
     // nothing to do
 }
 
+void FanControllerAbs::receiveTick(TickPhase phase){
+    switch(phase){
+        case TickPhase::Input: onInputTick(); break;
+        case TickPhase::Output: onOutputTick(); break;
+        default: TriggerDebug("FanControllerAbs", "received unhandled tick");
+    };
+};
+
+void FanControllerAbs::receiveEvent(const EventHeader* header){
+    switch(header->type){
+        case EventType::FanCommand: onFanCommand(FanCommandEvent(header)); break;
+        default: TriggerDebug("FanControllerAbs", "received unhandled event");
+    };
+};
+
 FanStatusEvent FanControllerAbs::makeFanStatusEvent(){
-    return ControllerAbs::makeEvent<EventType::FanStatus>();
+    return ComponentAbs::makeEvent<EventType::FanStatus>();
 }
 
 FanSampleEvent FanControllerAbs::makeFanSampleEvent(){
-    return ControllerAbs::makeEvent<EventType::FanSample>();
+    return ComponentAbs::makeEvent<EventType::FanSample>();
 }
 
 void FanControllerAbs::sendEvent(const FanStatusEvent& event){
@@ -27,5 +40,5 @@ void FanControllerAbs::sendEvent(const FanStatusEvent& event){
 void FanControllerAbs::sendEvent(const FanSampleEvent& event){
     publishEvent(event.header());
 }
-
+ 
 } // namespace Garbox

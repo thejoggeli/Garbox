@@ -27,6 +27,7 @@ public:
 
 private:
 
+    bool firstTick = true;
     TickRunner mTickRunner;
     EventReplay mEventReplay;
 
@@ -57,7 +58,6 @@ private:
     void onInit() final;
     void onStart() final;
     void onRun() final;
-    void onRegister() final;
     void onRouteEvent(const EventHeader* header) final;
     void onActiveBehaviourChanged() final;
     void onActiveScreenChanged() final;
@@ -65,6 +65,9 @@ private:
     BehaviourAbs* resolveBehaviour(BehaviourId id) final;
     ControllerAbs* resolveController(ControllerId id) final;
     ScreenAbs* resolveScreen(ScreenId id) final;
+
+    void setupTickRouting();
+    void setupEventRouting();
     
 };
 
