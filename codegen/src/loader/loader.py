@@ -5,6 +5,7 @@ from pathlib import Path
 from loader.parse_application import parse_application
 from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
+from common.util import decycle
 
 class Loader:
 
@@ -38,7 +39,7 @@ class Loader:
         print(f"saving: {path}")
         os.makedirs(path.parent, exist_ok=True)
         with open(path, "w") as file:
-            json.dump(config, file, indent=2)
+            json.dump(decycle(config), file, indent=2)
 
 
     def save_config(self, path: Path):

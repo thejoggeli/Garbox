@@ -17,7 +17,7 @@ def _collect_event_routes(loader: Loader):
             "controllers": SortedSet(),
             "behaviours":  SortedSet(),
             "screens":  SortedSet(),
-            "screen_updaters": SortedSet(),
+            "screens_with_fields": SortedSet(),
             "count": 0
         }
     for section in ("controllers", "behaviours", "screens"):
@@ -27,8 +27,8 @@ def _collect_event_routes(loader: Loader):
                 event_routes[event]["count"] += 1
 
     for screen_key, screen_data in loader.config["screens"].items():
-        for event in screen_data["updaters_by_event"].keys():
-            event_routes[event]["screen_updaters"].add(screen_key)
+        for event in screen_data["model"]["events"].keys():
+            event_routes[event]["screens_with_fields"].add(screen_key)
             event_routes[event]["count"] += 1
 
     return event_routes

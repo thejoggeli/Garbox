@@ -9,9 +9,9 @@
       },
       "HeatpadCurrent": {
         "pin": 9,
-        "attenuation": 12,
-        "bitWidth": 12,
-        "calibration": true
+        "attenuation": "<ref>",
+        "bitWidth": "<ref>",
+        "calibration": "<ref>"
       }
     }
   },
@@ -28,64 +28,64 @@
         "pin": 4,
         "mode": "Output",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "FanTacho": {
         "pin": 5,
         "mode": "Input",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "I2cEnable": {
         "pin": 15,
         "mode": "Output",
         "pull": "Disable",
         "level": 1,
-        "invert": false
+        "invert": "<ref>"
       },
       "DisplayDc": {
         "pin": 18,
         "mode": "Output",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "DisplayCs": {
         "pin": 17,
         "mode": "Output",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "DisplayRst": {
         "pin": 10,
         "mode": "Output",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "HeatpadEnable": {
         "pin": 14,
         "mode": "Output",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "EncoderButton": {
-        "pin": 1,
+        "pin": "<ref>",
         "mode": "Input",
         "pull": "Disable",
-        "level": 0,
-        "invert": true
+        "level": "<ref>",
+        "invert": "<ref>"
       },
       "RgbLed": {
         "pin": 48,
         "mode": "Output",
         "pull": "Disable",
-        "level": 0,
-        "invert": false
+        "level": "<ref>",
+        "invert": "<ref>"
       }
     }
   },
@@ -93,10 +93,10 @@
     "instances": {
       "I2c": {
         "pinSda": 7,
-        "pinScl": 6,
+        "pinScl": "<ref>",
         "pullSda": "Disable",
         "pullScl": "Disable",
-        "port": 0,
+        "port": "<ref>",
         "frequencyHz": 100000
       }
     }
@@ -105,63 +105,63 @@
     "instances": {
       "timers": {
         "DimmingTimer": {
-          "id": 0,
+          "id": "<ref>",
           "frequencyHz": 5000,
-          "resolutionBits": 10
+          "resolutionBits": "<ref>"
         },
         "FanSpeedTimer": {
-          "id": 1,
+          "id": "<ref>",
           "frequencyHz": 25000,
-          "resolutionBits": 8
+          "resolutionBits": "<ref>"
         },
         "PiezoTimer": {
           "id": 2,
           "frequencyHz": 1000,
-          "resolutionBits": 6
+          "resolutionBits": "<ref>"
         }
       },
       "channels": {
         "StatusLed0Channel": {
           "pin": 47,
-          "id": 0,
+          "id": "<ref>",
           "timer": "DimmingTimer",
-          "invert": false
+          "invert": "<ref>"
         },
         "StatusLed1Channel": {
           "pin": 21,
-          "id": 1,
+          "id": "<ref>",
           "timer": "DimmingTimer",
-          "invert": false
+          "invert": "<ref>"
         },
         "StatusLed2Channel": {
           "pin": 40,
-          "id": 2,
+          "id": "<ref>",
           "timer": "DimmingTimer",
-          "invert": false
+          "invert": "<ref>"
         },
         "StatusLed3Channel": {
           "pin": 39,
           "id": 3,
           "timer": "DimmingTimer",
-          "invert": false
+          "invert": "<ref>"
         },
         "BacklightChannel": {
           "pin": 16,
-          "id": 4,
+          "id": "<ref>",
           "timer": "DimmingTimer",
-          "invert": false
+          "invert": "<ref>"
         },
         "FanSpeedChannel": {
           "pin": 13,
-          "id": 5,
+          "id": "<ref>",
           "timer": "FanSpeedTimer",
-          "invert": true
+          "invert": "<ref>"
         },
         "PiezoChannel": {
           "pin": 38,
-          "id": 6,
+          "id": "<ref>",
           "timer": "PiezoTimer",
-          "invert": false
+          "invert": "<ref>"
         }
       }
     }
@@ -175,28 +175,28 @@
         "hostDevice": "SPI2_HOST",
         "pinMosi": 11,
         "pinMiso": -1,
-        "pinClk": 12,
-        "pinCs": -1,
-        "mode": 3,
+        "pinClk": "<ref>",
+        "pinCs": "<ref>",
+        "mode": "<ref>",
         "frequencyHz": "AppConfig::SpiDmaFrequencyHz",
         "maxTransferSizeBytes": "static_cast<int32_t>(AppConfig::SpiDmaMaxTransferSizeBytes)",
-        "queueSize": 5
+        "queueSize": "<ref>"
       }
     }
   },
   "timer": {
     "instances": {
       "FanTacho": {
-        "group": 0,
-        "index": 0,
+        "group": "<ref>",
+        "index": "<ref>",
         "frequencyHz": "10'000'000",
-        "maxValue": 0,
+        "maxValue": "<ref>",
         "alarm_en": "TIMER_ALARM_DIS",
         "counter_en": "TIMER_START",
         "intr_type": "TIMER_INTR_LEVEL",
         "counter_dir": "TIMER_COUNT_UP",
         "auto_reload": "TIMER_AUTORELOAD_EN",
-        "divider": 0,
+        "divider": "<ref>",
         "clk_src": "TIMER_SRC_CLK_APB"
       }
     }

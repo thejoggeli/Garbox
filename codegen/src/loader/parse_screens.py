@@ -1,131 +1,120 @@
-from copy import deepcopy
 from common.parse_type import render_value
 from sortedcontainers import SortedSet
+from common.util import print_json, ensure_list
+from common.template import upper_first
 
 def parse_screens(config: dict):
 
     # process screen data
     for screen_data in config["screens"].values():
-        if "updaters" not in screen_data:
-            screen_data["updaters"] = {}
-        parse_updaters(screen_data["updaters"], config["event_types"])
-        group_event_updaters(screen_data)
+        if "model" not in screen_data:
+            screen_data["model"] = {
+                "fields": []
+            }
+        parse_model(screen_data["model"], config["event_types"])
+        group_event_updaters(screen_data["model"])
         collect_replay_events(screen_data)
 
 
-def parse_updaters(updaters: dict, event_types: dict):
+def parse_model(model: dict, event_types: dict):
     """
     Infers field types and default values from event
     """
 
-    for updater_name, updater_list in updaters.items():
+    parsed_fields = {}
+    
+    for field_data in model["fields"]:
 
-        if not isinstance(updater_list, list):
-            raise ValueError("updater value must be list")
+        if not isinstance(field_data, dict):
+            raise TypeError("model field descriptors must be of type dict")
 
-        parsed_entries = []
+        parsed = {
+            "name":        field_data.get("name",    None),
+            "type":        field_data.get("type",    None),
+            "bind":        field_data.get("bind",    None),
+            "dirty":       field_data.get("dirty",   None),
+            "group":       field_data.get("group",   None),
+            "epsilon":     field_data.get("epsilon", None),
+            "default":     field_data.get("default", None),
+        }
         
-        for field_data in updater_list:
+        if parsed["name"] is None:
+            raise KeyError("expected 'name' key")
+        
+        if parsed["name"] in parsed_fields:
+            raise ValueError(f"duplicate model field name: {parsed['name']}")
+        
+        if (parsed["type"] is None and parsed["bind"] is None):
+            raise KeyError("expected one of either 'bind' or 'type' to be present")
 
-            event_name = field_data.get("event", None)
+        if (parsed["type"] is not None and parsed["bind"] is not None):
+            raise KeyError("expected either only 'bind' or only 'type' key, not both")
 
-            field_name = None
-            field_type = None
-            default_value = None
+        if parsed["bind"] is not None:
 
-            if(event_name is None):
+            event_type, event_field = parsed["bind"].split("->")
 
-                # check if required fields are in entry
-                if "name" not in field_data:
-                    raise KeyError("expected 'name' key in updater list entry")                
-                if "type" not in field_data:
-                    raise KeyError("expected 'type' key in updater list entry")
-                
-                field_name = field_data["name"]
-                field_type = field_data["type"]
-                default_value = field_data.get("default", None)
+            # check if referenced event and field exists
+            if event_type not in event_types:
+                raise ValueError(f"Unknown event type {event_type}")                
+            if event_field not in event_types[event_type]["fields"]:
+                raise ValueError(f"Field {event_field!r} not found in event {event_type!r}")
 
-            else:
-
-                # check if required fields are in entry
-                if "name" not in field_data:
-                    raise KeyError("expected 'name' key in updater list entry")                
-                if "type" in field_data:
-                    raise KeyError("expected no 'type' key in updater list entry if 'event' key is present")          
-
-                # check if referenced event and field exists
-                field_name = field_data["name"]
-                if event_name not in event_types:
-                    raise ValueError(f"Unknown event type {event_name}")                
-                if field_name not in event_types[event_name]["fields"]:
-                    raise ValueError(f"Field {field_name!r} not found in event {event_name!r}")
-
-                # infer field type from event
-                field_type = event_types[event_name]["fields"][field_name]["type"]
-                
-                # infer default value from event if no default value set in entry
-                if "default" in field_data:
-                    default_value = field_data["default"]
-                else: 
-                    default_value = event_types[event_name]["fields"][field_name].get("default", None)
-
-            parsed_entries.append({
-                "event": event_name,
-                "name": field_name,
-                "type": field_type,
-                "default": render_value(default_value, field_type),
-            })
+            # infer field type from event
+            parsed["type"] = event_types[event_type]["fields"][event_field]["type"]
+            parsed["event_type"] = event_type.strip()
+            parsed["event_field"] = event_field.strip()
             
-        updaters[updater_name] = parsed_entries
+            # infer default value from event if no default value set in entry
+            if parsed["default"] is None:
+                parsed["default"] = event_types[event_type]["fields"][event_field].get("default", None)
+
+        if parsed["group"] is None:
+            parsed["group"] = upper_first(parsed["name"])
+        
+        if parsed["dirty"] is not None:
+            parsed["dirty"] = ensure_list(parsed["dirty"])
+
+        parsed["default"] = render_value(parsed["default"], parsed["type"])
+        parsed = {k: v for k, v in parsed.items() if v is not None} # remove all 'None' key/value pairs
+        parsed_fields[parsed["name"]] = parsed
+        
+    model["fields"] = parsed_fields
 
 
-def group_event_updaters(screen_data: dict):
+def group_event_updaters(model: dict):
 
     events = {}
-    manual = []
+    manual = {}
+    groups = {}
 
-    for updater_name, updater_list in screen_data["updaters"].items():
+    for field_name, field_data in model["fields"].items():
         
-        for field_data in updater_list:
+        event_type = field_data.get("event_type", None)
 
-            event_name = field_data.get("event", None)
+        # add to manual
+        if event_type is None:
+            manual[field_name] = field_data
+        
+        # add to events
+        else: 
+            if event_type not in events:
+                events[event_type] = {}
+            events[event_type][field_name] = field_data
 
-            if(event_name is None):
-                manual_entry_data = deepcopy(field_data)
-                manual_entry_data["updater"] = updater_name
-                manual.append(manual_entry_data)
-            
-            else:
-                if event_name not in events:
-                    events[event_name] = {
-                        "updaters": [],
-                        "updater_types": [],
-                    }
+        # add to groups
+        group = field_data.get("group", None)
+        if group is not None:
+            if group not in groups:
+                groups[group] = {}
+            groups[group][field_name] = field_data
 
-                event_entry_data = deepcopy(field_data)
-                del event_entry_data["event"]
-                event_entry_data["updater"] = updater_name
+    model["events"] = events
+    model["manual"] = manual
+    model["groups"] = groups
 
-                events[event_name]["updaters"].append(event_entry_data)
-
-    for event_name, event_data in events.items():
-        updater_types = SortedSet()
-        for event_updater in event_data["updaters"]:
-            updater_types.add(event_updater["updater"])
-        events[event_name]["updater_types"] = list(updater_types)        
-
-    screen_data["updaters_by_event"] = events
-    screen_data["updaters_manual"] = manual
-
-
-def collect_replay_events(screen_data: dict):
-
+def collect_replay_events(screen: dict):
     events_set = SortedSet()
-
-    for events_name in screen_data["updaters_by_event"].keys():
-        events_set.add(events_name)
-
-    for events_name in screen_data["receives"]:
-        events_set.add(events_name)
-
-    screen_data["replay_events"] = list(events_set)
+    events_set.update(screen["model"]["events"].keys())
+    events_set.update(screen["receives"])
+    screen["replay_events"] = list(events_set)

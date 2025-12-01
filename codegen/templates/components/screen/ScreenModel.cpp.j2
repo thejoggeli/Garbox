@@ -1,0 +1,25 @@
+{{ name }}Abs::Model::Model({{ name }}Abs& screen) : mScreen(screen){ 
+    // nothing to do 
+}
+
+{% for field in screen.model.fields.values() %}
+{{ field.type }} {{ name }}Abs::Model::get{{ field.name|upper_first }}() const { 
+    return m{{ field.name|upper_first }}; 
+}
+
+{% endfor %}
+
+{% for field in screen.model.fields.values() %}
+void {{ name }}Abs::Model::set{{ field.name|upper_first }}({{ field.type }} value){ 
+    if (m{{ field.name|upper_first }} != value) { 
+        m{{ field.name|upper_first }} = value; 
+        mScreen.markDirty(Model::Index::{{ field.group }});
+    {% if field.get("dirty") %}
+        {% for dirty in field.dirty %}
+        mScreen.markDirty(Model::Index::{{ dirty|upper_first }});
+        {% endfor %}
+    {% endif %}
+    } 
+}
+
+{% endfor %}

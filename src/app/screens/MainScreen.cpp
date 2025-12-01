@@ -38,18 +38,18 @@ void MainScreen::onUpdateScreen(){
 
     // update heap space
     if(mHeapTimer.isExpired()){
-        writeHeapSpaceHeapSpace(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+        mModel.setHeapSpace(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
         mHeapTimer.restart();
     }
 
     // update event count
-    writeAppInfoEventCount(getContext()->eventCount);
+    mModel.setEventCount(getContext()->eventCount);
 
     // last dispatched count must be updated manually, otherwise a dispatch is
     // triggered by itself on each tick
     if(mLastDispatchedCount != getDispatchedCount()){
         mLastDispatchedCount = getDispatchedCount();
-        if(!isMarkedDirty(UpdaterIndex::DisplayStatus)){
+        if(!isMarkedDirty(Model::Index::DisplayStatus)){
             onApplyDisplayStatus();
         }
     }
@@ -59,66 +59,66 @@ void MainScreen::onUpdateScreen(){
 }
 
 void MainScreen::onApplyFanState(){
-    mObjects.setFanState(FanStateToString(mFanState.state), mFanState.targetSpeed);
+    mObjects.setFanState(FanStateToString(mModel.getFanState()), mModel.getFanTargetSpeed());
 }
 
 void MainScreen::onApplyFanMeasuredRpm(){
-    mObjects.setFanMeasuredRpm(mFanMeasuredRpm.measuredRpm);
+    mObjects.setFanMeasuredRpm(mModel.getFanMeasuredRpm());
 }
 
 void MainScreen::onApplyHeatpadState(){
-    mObjects.setHeatpadState(HeatpadStateToString(mHeatpadState.state));
+    mObjects.setHeatpadState(HeatpadStateToString(mModel.getHeatpadState()));
 }
 
 void MainScreen::onApplyHeatpadDuty(){
     mObjects.setHeatpadDuty(
-        mHeatpadDuty.currentDutyCycle,
-        mHeatpadDuty.nextDutyCycle,
-        mHeatpadDuty.currentPeriodMicros,
-        mHeatpadDuty.nextPeriodMicros
+        mModel.getHeatpadCurrentDuty(),
+        mModel.getHeatpadNextDuty(),
+        mModel.getHeatpadCurrentPeriod(),
+        mModel.getHeatpadNextPeriod()
     );
 }
 
 void MainScreen::onApplyBoxPosition(){
-    mObjects.setBoxPosition(static_cast<float>(mBoxPosition.pwmProgressMicros) / static_cast<float>(mHeatpadDuty.currentPeriodMicros));
+    mObjects.setBoxPosition(static_cast<float>(mModel.getHeatpadPwmProgress()) / static_cast<float>(mModel.getHeatpadCurrentPeriod()));
 }
 
 void MainScreen::onApplyHeatpadSense(){
-    mObjects.setHeatpadSense(mHeatpadSense.measuredVoltage, mHeatpadSense.measuredCurrent);
+    mObjects.setHeatpadSense(mModel.getHeatpadMeasuredVoltage(), mModel.getHeatpadMeasuredCurrent());
 }
 
 void MainScreen::onApplyDisplayStatus(){
-    mObjects.setDisplayState(mDisplayStatus.brightness, mDisplayStatus.skipped, getDispatchedCount());
+    mObjects.setDisplayState(mModel.getDisplayBrightness(), mModel.getDisplaySkipped(), getDispatchedCount());
 }
 
 void MainScreen::onApplyTemperatureState(){
     mObjects.setTemperatureState(
-        mTemperatureState.powerEnabled,
-        mTemperatureState.driverEnabled,
-        mTemperatureState.resetting
+        mModel.getShtPowerEnabled(),
+        mModel.getShtDriverEnabled(),
+        mModel.getShtResetting()
     );
 }
 
 void MainScreen::onApplyTemperatureSample(){
     mObjects.setTemperatureSample(
-        mTemperatureSample.temperatureCelcius,
-        mTemperatureSample.humidityRelative
+        mModel.getSensorTemperatureCelcius(),
+        mModel.getSensorHumidityRelative()
     );
 }
 
 void MainScreen::onApplyHeapSpace(){
-    mObjects.setHeapSpace(mHeapSpace.heapSpace);
+    mObjects.setHeapSpace(mModel.getHeapSpace());
 }
 
 void MainScreen::onApplyAppInfo(){
-    mObjects.setAppInfo(BehaviourIdToString(mAppInfo.newBehaviour), mAppInfo.eventCount);
+    mObjects.setAppInfo(BehaviourIdToString(mModel.getBehaviour()), mModel.getEventCount());
 }
 
 void MainScreen::onApplyFermentationStatus(){
     mObjects.setFermentationStatus(
-        HeaterEngineStateToString(mFermentationStatus.heaterEngineState),
-        mFermentationStatus.measuredTemperature,
-        mFermentationStatus.targetTemperature
+        HeaterEngineStateToString(mModel.getEngineState()),
+        mModel.getEngineMeasuredTemperature(),
+        mModel.getEngineTargetTemperature()
     );
 }
 

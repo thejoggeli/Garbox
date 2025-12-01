@@ -150,7 +150,7 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
             m{{ screen }}.on{{ event }}(event);
             {% endfor %}
         {% else %}
-            // no inactive receivers for this event type
+            // no inactive receivers for '{{ event }}' event
         {% endif %}
         }
         else {
@@ -159,7 +159,7 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
             {% for beha in routes["behaviours"] %}
                 case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event }}(event); break;
             {% endfor %}
-                default: break; // active behaviour does not support event type
+                default: break; // active behaviour does not receive '{{ event }}' event
             }
         {% else %}
             // no active receivers for this event type
@@ -170,18 +170,24 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
             {% for screen_name in routes["screens"] %}
                 case ScreenId::{{ screen_name.removesuffix("Screen") }}: static_cast<{{ screen_name }}*>(mActiveScreen)->on{{ event }}(event); break;
             {% endfor %}
-                default: break; // active screen does not support event type
+                default: break; // active screen does not receive '{{ event }}' event
             }
         {% endif %}
         }
     {% endif %}
         {# call receiveEvent() handlers on active screen (if it supports this event) #}
-    {% if routes["screen_updaters"] | length > 0 %}
+    {% if routes["screens_with_fields"] | length > 0 %}
         switch(mActiveScreen->getScreenId()){
-        {% for screen_name in routes["screen_updaters"] %}
-            case ScreenId::{{ screen_name.removesuffix("Screen") }}: static_cast<{{ screen_name }}*>(mActiveScreen)->write{{ event }}(event); break;
+        {% for screen_name in routes["screens_with_fields"] %}
+            case ScreenId::{{ screen_name.removesuffix("Screen") }}: {
+                {{ screen_name }}::Model& model = static_cast<{{ screen_name }}*>(mActiveScreen)->getModel();
+            {% for field in screens[screen_name]["model"]["events"][event].values() %}
+                model.set{{ field.name|upper_first }}(event->{{ field.event_field }});
+            {% endfor %}
+                break;
+            }
         {% endfor %}
-            default: break; // active screen does not support event type
+            default: break; // active screen has no model binding to any field of '{{ event }}' event
         }
     {% endif %}
         break;

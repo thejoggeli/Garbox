@@ -4,44 +4,33 @@ screens:
     receives: null
     sends: 
       - DisplayCommand
-    updaters:
-      FanState:
-        - { event: FanStatus, name: state }
-        - { event: FanStatus, name: targetSpeed }
-      FanMeasuredRpm:
-        - { event: FanSample, name: measuredRpm }
-      HeatpadState:
-        - { event: HeatpadStatus, name: state }
-      HeatpadDuty:
-        - { event: HeatpadStatus, name: currentDutyCycle }
-        - { event: HeatpadStatus, name: currentPeriodMicros }
-        - { event: HeatpadStatus, name: nextDutyCycle }
-        - { event: HeatpadStatus, name: nextPeriodMicros }
-      BoxPosition:
-        - { event: HeatpadSample, name: pwmProgressMicros }
-      HeatpadSense:
-        - { event: HeatpadSample, name: measuredVoltage, epsilon: 1e-3 }
-        - { event: HeatpadSample, name: measuredCurrent, epsilon: 1e-3 }
-      DisplayStatus:
-        - { event: DisplayStatus, name: brightness }
-        - { event: DisplayStatus, name: skipped }
-      TemperatureState:
-        - { event: TemperatureStatus, name: driverEnabled }
-        - { event: TemperatureStatus, name: powerEnabled }
-        - { event: TemperatureStatus, name: resetting }
-      TemperatureSample:
-        - { event: TemperatureSample, name: temperatureCelcius }
-        - { event: TemperatureSample, name: humidityRelative }
-      HeapSpace:
-        - { name: heapSpace, type: uint32_t }
-      AppInfo:
-        - { name: eventCount, type: uint32_t }
-        - { event: ActiveBehaviourChanged, name: newBehaviour }
-      FermentationStatus:
-        - { event: FermentationStatus, name: heaterEngineState }
-        - { event: FermentationStatus, name: targetTemperature }
-        - { event: FermentationStatus, name: measuredTemperature }
-        - { event: FermentationStatus, name: measuredHumidity }
+    model:
+      fields:
+        - { name: fanState,                   bind: FanStatus->state,                         group: FanState }
+        - { name: fanTargetSpeed,             bind: FanStatus->targetSpeed,                   group: FanState }
+        - { name: fanMeasuredRpm,             bind: FanSample->measuredRpm,                   group: null }
+        - { name: heatpadState,               bind: HeatpadStatus->state,                     group: HeatpadState }
+        - { name: heatpadCurrentDuty,         bind: HeatpadStatus->currentDutyCycle,          group: HeatpadDuty }
+        - { name: heatpadCurrentPeriod,       bind: HeatpadStatus->currentPeriodMicros,       group: HeatpadDuty }
+        - { name: heatpadNextDuty,            bind: HeatpadStatus->nextDutyCycle,             group: HeatpadDuty }
+        - { name: heatpadNextPeriod,          bind: HeatpadStatus->nextPeriodMicros,          group: HeatpadDuty }
+        - { name: heatpadPwmProgress,         bind: HeatpadSample->pwmProgressMicros,         group: BoxPosition }
+        - { name: heatpadMeasuredVoltage,     bind: HeatpadSample->measuredVoltage,           group: HeatpadSense, epsilon: 1e-3 }
+        - { name: heatpadMeasuredCurrent,     bind: HeatpadSample->measuredCurrent,           group: HeatpadSense, epsilon: 1e-3 }
+        - { name: displayBrightness,          bind: DisplayStatus->brightness,                group: DisplayStatus }
+        - { name: displaySkipped,             bind: DisplayStatus->skipped,                   group: DisplayStatus }
+        - { name: shtDriverEnabled,           bind: TemperatureStatus->driverEnabled,         group: TemperatureState }
+        - { name: shtPowerEnabled,            bind: TemperatureStatus->powerEnabled,          group: TemperatureState }
+        - { name: shtResetting,               bind: TemperatureStatus->resetting,             group: TemperatureState }
+        - { name: sensorTemperatureCelcius,   bind: TemperatureSample->temperatureCelcius,    group: TemperatureSample }
+        - { name: sensorHumidityRelative,     bind: TemperatureSample->humidityRelative,      group: TemperatureSample }
+        - { name: eventCount,                 type: uint32_t,                                 group: AppInfo }
+        - { name: behaviour,                  bind: ActiveBehaviourChanged->newBehaviour,     group: AppInfo }
+        - { name: engineState,                bind: FermentationStatus->heaterEngineState,    group: FermentationStatus }
+        - { name: engineTargetTemperature,    bind: FermentationStatus->targetTemperature,    group: FermentationStatus }
+        - { name: engineMeasuredTemperature,  bind: FermentationStatus->measuredTemperature,  group: FermentationStatus }
+        - { name: engineMeasuredHumidity,     bind: FermentationStatus->measuredHumidity,     group: FermentationStatus }
+        - { name: heapSpace,                  type: uint32_t,                                 group: null}
 
   Debug:
     tick_phases: null

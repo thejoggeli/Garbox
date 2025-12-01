@@ -5,413 +5,314 @@
     "sends": [
       "DisplayCommand"
     ],
-    "updaters": {
-      "FanState": [
-        {
-          "event": "FanStatus",
-          "name": "state",
+    "model": {
+      "fields": {
+        "fanState": {
+          "name": "fanState",
           "type": "FanState",
-          "default": null
+          "bind": "FanStatus->state",
+          "group": "FanState",
+          "event_type": "FanStatus",
+          "event_field": "state"
         },
-        {
-          "event": "FanStatus",
-          "name": "targetSpeed",
+        "fanTargetSpeed": {
+          "name": "fanTargetSpeed",
           "type": "float",
-          "default": null
-        }
-      ],
-      "FanMeasuredRpm": [
-        {
-          "event": "FanSample",
-          "name": "measuredRpm",
+          "bind": "FanStatus->targetSpeed",
+          "group": "FanState",
+          "event_type": "FanStatus",
+          "event_field": "targetSpeed"
+        },
+        "fanMeasuredRpm": {
+          "name": "fanMeasuredRpm",
           "type": "float",
-          "default": null
-        }
-      ],
-      "HeatpadState": [
-        {
-          "event": "HeatpadStatus",
-          "name": "state",
+          "bind": "FanSample->measuredRpm",
+          "group": "FanMeasuredRpm",
+          "event_type": "FanSample",
+          "event_field": "measuredRpm"
+        },
+        "heatpadState": {
+          "name": "heatpadState",
           "type": "HeatpadState",
-          "default": null
-        }
-      ],
-      "HeatpadDuty": [
-        {
-          "event": "HeatpadStatus",
-          "name": "currentDutyCycle",
-          "type": "float",
-          "default": null
+          "bind": "HeatpadStatus->state",
+          "group": "HeatpadState",
+          "event_type": "HeatpadStatus",
+          "event_field": "state"
         },
-        {
-          "event": "HeatpadStatus",
-          "name": "currentPeriodMicros",
+        "heatpadCurrentDuty": {
+          "name": "heatpadCurrentDuty",
+          "type": "float",
+          "bind": "HeatpadStatus->currentDutyCycle",
+          "group": "HeatpadDuty",
+          "event_type": "HeatpadStatus",
+          "event_field": "currentDutyCycle"
+        },
+        "heatpadCurrentPeriod": {
+          "name": "heatpadCurrentPeriod",
           "type": "uint32_t",
-          "default": null
+          "bind": "HeatpadStatus->currentPeriodMicros",
+          "group": "HeatpadDuty",
+          "event_type": "HeatpadStatus",
+          "event_field": "currentPeriodMicros"
         },
-        {
-          "event": "HeatpadStatus",
-          "name": "nextDutyCycle",
+        "heatpadNextDuty": {
+          "name": "heatpadNextDuty",
           "type": "float",
-          "default": null
+          "bind": "HeatpadStatus->nextDutyCycle",
+          "group": "HeatpadDuty",
+          "event_type": "HeatpadStatus",
+          "event_field": "nextDutyCycle"
         },
-        {
-          "event": "HeatpadStatus",
-          "name": "nextPeriodMicros",
+        "heatpadNextPeriod": {
+          "name": "heatpadNextPeriod",
           "type": "uint32_t",
-          "default": null
-        }
-      ],
-      "BoxPosition": [
-        {
-          "event": "HeatpadSample",
-          "name": "pwmProgressMicros",
-          "type": "float",
-          "default": null
-        }
-      ],
-      "HeatpadSense": [
-        {
-          "event": "HeatpadSample",
-          "name": "measuredVoltage",
-          "type": "float",
-          "default": null
+          "bind": "HeatpadStatus->nextPeriodMicros",
+          "group": "HeatpadDuty",
+          "event_type": "HeatpadStatus",
+          "event_field": "nextPeriodMicros"
         },
-        {
-          "event": "HeatpadSample",
-          "name": "measuredCurrent",
+        "heatpadPwmProgress": {
+          "name": "heatpadPwmProgress",
           "type": "float",
-          "default": null
-        }
-      ],
-      "DisplayStatus": [
-        {
-          "event": "DisplayStatus",
-          "name": "brightness",
-          "type": "float",
-          "default": null
+          "bind": "HeatpadSample->pwmProgressMicros",
+          "group": "BoxPosition",
+          "event_type": "HeatpadSample",
+          "event_field": "pwmProgressMicros"
         },
-        {
-          "event": "DisplayStatus",
-          "name": "skipped",
+        "heatpadMeasuredVoltage": {
+          "name": "heatpadMeasuredVoltage",
+          "type": "float",
+          "bind": "HeatpadSample->measuredVoltage",
+          "group": "HeatpadSense",
+          "epsilon": "1e-3",
+          "event_type": "HeatpadSample",
+          "event_field": "measuredVoltage"
+        },
+        "heatpadMeasuredCurrent": {
+          "name": "heatpadMeasuredCurrent",
+          "type": "float",
+          "bind": "HeatpadSample->measuredCurrent",
+          "group": "HeatpadSense",
+          "epsilon": "1e-3",
+          "event_type": "HeatpadSample",
+          "event_field": "measuredCurrent"
+        },
+        "displayBrightness": {
+          "name": "displayBrightness",
+          "type": "float",
+          "bind": "DisplayStatus->brightness",
+          "group": "DisplayStatus",
+          "event_type": "DisplayStatus",
+          "event_field": "brightness"
+        },
+        "displaySkipped": {
+          "name": "displaySkipped",
           "type": "uint32_t",
-          "default": null
-        }
-      ],
-      "TemperatureState": [
-        {
-          "event": "TemperatureStatus",
-          "name": "driverEnabled",
+          "bind": "DisplayStatus->skipped",
+          "group": "DisplayStatus",
+          "event_type": "DisplayStatus",
+          "event_field": "skipped"
+        },
+        "shtDriverEnabled": {
+          "name": "shtDriverEnabled",
           "type": "bool",
-          "default": null
+          "bind": "TemperatureStatus->driverEnabled",
+          "group": "TemperatureState",
+          "event_type": "TemperatureStatus",
+          "event_field": "driverEnabled"
         },
-        {
-          "event": "TemperatureStatus",
-          "name": "powerEnabled",
+        "shtPowerEnabled": {
+          "name": "shtPowerEnabled",
           "type": "bool",
-          "default": null
+          "bind": "TemperatureStatus->powerEnabled",
+          "group": "TemperatureState",
+          "event_type": "TemperatureStatus",
+          "event_field": "powerEnabled"
         },
-        {
-          "event": "TemperatureStatus",
-          "name": "resetting",
+        "shtResetting": {
+          "name": "shtResetting",
           "type": "bool",
-          "default": null
-        }
-      ],
-      "TemperatureSample": [
-        {
-          "event": "TemperatureSample",
-          "name": "temperatureCelcius",
-          "type": "float",
-          "default": null
+          "bind": "TemperatureStatus->resetting",
+          "group": "TemperatureState",
+          "event_type": "TemperatureStatus",
+          "event_field": "resetting"
         },
-        {
-          "event": "TemperatureSample",
-          "name": "humidityRelative",
+        "sensorTemperatureCelcius": {
+          "name": "sensorTemperatureCelcius",
           "type": "float",
-          "default": null
-        }
-      ],
-      "HeapSpace": [
-        {
-          "event": null,
-          "name": "heapSpace",
-          "type": "uint32_t",
-          "default": null
-        }
-      ],
-      "AppInfo": [
-        {
-          "event": null,
+          "bind": "TemperatureSample->temperatureCelcius",
+          "group": "TemperatureSample",
+          "event_type": "TemperatureSample",
+          "event_field": "temperatureCelcius"
+        },
+        "sensorHumidityRelative": {
+          "name": "sensorHumidityRelative",
+          "type": "float",
+          "bind": "TemperatureSample->humidityRelative",
+          "group": "TemperatureSample",
+          "event_type": "TemperatureSample",
+          "event_field": "humidityRelative"
+        },
+        "eventCount": {
           "name": "eventCount",
           "type": "uint32_t",
-          "default": null
+          "group": "AppInfo"
         },
-        {
-          "event": "ActiveBehaviourChanged",
-          "name": "newBehaviour",
+        "behaviour": {
+          "name": "behaviour",
           "type": "BehaviourId",
-          "default": null
-        }
-      ],
-      "FermentationStatus": [
-        {
-          "event": "FermentationStatus",
-          "name": "heaterEngineState",
+          "bind": "ActiveBehaviourChanged->newBehaviour",
+          "group": "AppInfo",
+          "event_type": "ActiveBehaviourChanged",
+          "event_field": "newBehaviour"
+        },
+        "engineState": {
+          "name": "engineState",
           "type": "HeaterEngineState",
-          "default": null
+          "bind": "FermentationStatus->heaterEngineState",
+          "group": "FermentationStatus",
+          "event_type": "FermentationStatus",
+          "event_field": "heaterEngineState"
         },
-        {
-          "event": "FermentationStatus",
-          "name": "targetTemperature",
+        "engineTargetTemperature": {
+          "name": "engineTargetTemperature",
           "type": "float",
-          "default": null
+          "bind": "FermentationStatus->targetTemperature",
+          "group": "FermentationStatus",
+          "event_type": "FermentationStatus",
+          "event_field": "targetTemperature"
         },
-        {
-          "event": "FermentationStatus",
-          "name": "measuredTemperature",
+        "engineMeasuredTemperature": {
+          "name": "engineMeasuredTemperature",
           "type": "float",
-          "default": null
+          "bind": "FermentationStatus->measuredTemperature",
+          "group": "FermentationStatus",
+          "event_type": "FermentationStatus",
+          "event_field": "measuredTemperature"
         },
-        {
-          "event": "FermentationStatus",
-          "name": "measuredHumidity",
+        "engineMeasuredHumidity": {
+          "name": "engineMeasuredHumidity",
           "type": "float",
-          "default": null
+          "bind": "FermentationStatus->measuredHumidity",
+          "group": "FermentationStatus",
+          "event_type": "FermentationStatus",
+          "event_field": "measuredHumidity"
+        },
+        "heapSpace": {
+          "name": "heapSpace",
+          "type": "uint32_t",
+          "group": "HeapSpace"
         }
-      ]
-    },
-    "updaters_by_event": {
-      "FanStatus": {
-        "updaters": [
-          {
-            "name": "state",
-            "type": "FanState",
-            "default": null,
-            "updater": "FanState"
-          },
-          {
-            "name": "targetSpeed",
-            "type": "float",
-            "default": null,
-            "updater": "FanState"
-          }
-        ],
-        "updater_types": [
-          "FanState"
-        ]
       },
-      "FanSample": {
-        "updaters": [
-          {
-            "name": "measuredRpm",
-            "type": "float",
-            "default": null,
-            "updater": "FanMeasuredRpm"
-          }
-        ],
-        "updater_types": [
-          "FanMeasuredRpm"
-        ]
+      "events": {
+        "FanStatus": {
+          "fanState": "<ref>",
+          "fanTargetSpeed": "<ref>"
+        },
+        "FanSample": {
+          "fanMeasuredRpm": "<ref>"
+        },
+        "HeatpadStatus": {
+          "heatpadState": "<ref>",
+          "heatpadCurrentDuty": "<ref>",
+          "heatpadCurrentPeriod": "<ref>",
+          "heatpadNextDuty": "<ref>",
+          "heatpadNextPeriod": "<ref>"
+        },
+        "HeatpadSample": {
+          "heatpadPwmProgress": "<ref>",
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
+        },
+        "DisplayStatus": {
+          "displayBrightness": "<ref>",
+          "displaySkipped": "<ref>"
+        },
+        "TemperatureStatus": {
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>"
+        },
+        "TemperatureSample": {
+          "sensorTemperatureCelcius": "<ref>",
+          "sensorHumidityRelative": "<ref>"
+        },
+        "ActiveBehaviourChanged": {
+          "behaviour": "<ref>"
+        },
+        "FermentationStatus": {
+          "engineState": "<ref>",
+          "engineTargetTemperature": "<ref>",
+          "engineMeasuredTemperature": "<ref>",
+          "engineMeasuredHumidity": "<ref>"
+        }
       },
-      "HeatpadStatus": {
-        "updaters": [
-          {
-            "name": "state",
-            "type": "HeatpadState",
-            "default": null,
-            "updater": "HeatpadState"
-          },
-          {
-            "name": "currentDutyCycle",
-            "type": "float",
-            "default": null,
-            "updater": "HeatpadDuty"
-          },
-          {
-            "name": "currentPeriodMicros",
-            "type": "uint32_t",
-            "default": null,
-            "updater": "HeatpadDuty"
-          },
-          {
-            "name": "nextDutyCycle",
-            "type": "float",
-            "default": null,
-            "updater": "HeatpadDuty"
-          },
-          {
-            "name": "nextPeriodMicros",
-            "type": "uint32_t",
-            "default": null,
-            "updater": "HeatpadDuty"
-          }
-        ],
-        "updater_types": [
-          "HeatpadDuty",
-          "HeatpadState"
-        ]
+      "manual": {
+        "eventCount": "<ref>",
+        "heapSpace": "<ref>"
       },
-      "HeatpadSample": {
-        "updaters": [
-          {
-            "name": "pwmProgressMicros",
-            "type": "float",
-            "default": null,
-            "updater": "BoxPosition"
-          },
-          {
-            "name": "measuredVoltage",
-            "type": "float",
-            "default": null,
-            "updater": "HeatpadSense"
-          },
-          {
-            "name": "measuredCurrent",
-            "type": "float",
-            "default": null,
-            "updater": "HeatpadSense"
-          }
-        ],
-        "updater_types": [
-          "BoxPosition",
-          "HeatpadSense"
-        ]
-      },
-      "DisplayStatus": {
-        "updaters": [
-          {
-            "name": "brightness",
-            "type": "float",
-            "default": null,
-            "updater": "DisplayStatus"
-          },
-          {
-            "name": "skipped",
-            "type": "uint32_t",
-            "default": null,
-            "updater": "DisplayStatus"
-          }
-        ],
-        "updater_types": [
-          "DisplayStatus"
-        ]
-      },
-      "TemperatureStatus": {
-        "updaters": [
-          {
-            "name": "driverEnabled",
-            "type": "bool",
-            "default": null,
-            "updater": "TemperatureState"
-          },
-          {
-            "name": "powerEnabled",
-            "type": "bool",
-            "default": null,
-            "updater": "TemperatureState"
-          },
-          {
-            "name": "resetting",
-            "type": "bool",
-            "default": null,
-            "updater": "TemperatureState"
-          }
-        ],
-        "updater_types": [
-          "TemperatureState"
-        ]
-      },
-      "TemperatureSample": {
-        "updaters": [
-          {
-            "name": "temperatureCelcius",
-            "type": "float",
-            "default": null,
-            "updater": "TemperatureSample"
-          },
-          {
-            "name": "humidityRelative",
-            "type": "float",
-            "default": null,
-            "updater": "TemperatureSample"
-          }
-        ],
-        "updater_types": [
-          "TemperatureSample"
-        ]
-      },
-      "ActiveBehaviourChanged": {
-        "updaters": [
-          {
-            "name": "newBehaviour",
-            "type": "BehaviourId",
-            "default": null,
-            "updater": "AppInfo"
-          }
-        ],
-        "updater_types": [
-          "AppInfo"
-        ]
-      },
-      "FermentationStatus": {
-        "updaters": [
-          {
-            "name": "heaterEngineState",
-            "type": "HeaterEngineState",
-            "default": null,
-            "updater": "FermentationStatus"
-          },
-          {
-            "name": "targetTemperature",
-            "type": "float",
-            "default": null,
-            "updater": "FermentationStatus"
-          },
-          {
-            "name": "measuredTemperature",
-            "type": "float",
-            "default": null,
-            "updater": "FermentationStatus"
-          },
-          {
-            "name": "measuredHumidity",
-            "type": "float",
-            "default": null,
-            "updater": "FermentationStatus"
-          }
-        ],
-        "updater_types": [
-          "FermentationStatus"
-        ]
+      "groups": {
+        "FanState": {
+          "fanState": "<ref>",
+          "fanTargetSpeed": "<ref>"
+        },
+        "FanMeasuredRpm": {
+          "fanMeasuredRpm": "<ref>"
+        },
+        "HeatpadState": {
+          "heatpadState": "<ref>"
+        },
+        "HeatpadDuty": {
+          "heatpadCurrentDuty": "<ref>",
+          "heatpadCurrentPeriod": "<ref>",
+          "heatpadNextDuty": "<ref>",
+          "heatpadNextPeriod": "<ref>"
+        },
+        "BoxPosition": {
+          "heatpadPwmProgress": "<ref>"
+        },
+        "HeatpadSense": {
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
+        },
+        "DisplayStatus": {
+          "displayBrightness": "<ref>",
+          "displaySkipped": "<ref>"
+        },
+        "TemperatureState": {
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>"
+        },
+        "TemperatureSample": {
+          "sensorTemperatureCelcius": "<ref>",
+          "sensorHumidityRelative": "<ref>"
+        },
+        "AppInfo": {
+          "eventCount": "<ref>",
+          "behaviour": "<ref>"
+        },
+        "FermentationStatus": {
+          "engineState": "<ref>",
+          "engineTargetTemperature": "<ref>",
+          "engineMeasuredTemperature": "<ref>",
+          "engineMeasuredHumidity": "<ref>"
+        },
+        "HeapSpace": {
+          "heapSpace": "<ref>"
+        }
       }
     },
-    "updaters_manual": [
-      {
-        "event": null,
-        "name": "heapSpace",
-        "type": "uint32_t",
-        "default": null,
-        "updater": "HeapSpace"
-      },
-      {
-        "event": null,
-        "name": "eventCount",
-        "type": "uint32_t",
-        "default": null,
-        "updater": "AppInfo"
-      }
-    ],
     "replay_events": [
-      "ActiveBehaviourChanged",
-      "DisplayStatus",
-      "FanSample",
-      "FanStatus",
-      "FermentationStatus",
-      "HeatpadSample",
-      "HeatpadStatus",
-      "TemperatureSample",
-      "TemperatureStatus"
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>"
     ]
   },
   "DebugScreen": {
@@ -422,11 +323,14 @@
     "sends": [
       "DisplayCommand"
     ],
-    "updaters": {},
-    "updaters_by_event": {},
-    "updaters_manual": [],
+    "model": {
+      "fields": {},
+      "events": {},
+      "manual": {},
+      "groups": {}
+    },
     "replay_events": [
-      "Heartbeat"
+      "<ref>"
     ]
   }
 }

@@ -2,13 +2,29 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 import re
 
+
+def upper_first(s):
+    if not isinstance(s, str) or not s:
+        return s
+    return s[0].upper() + s[1:]
+
+
+def lower_first(s):
+    if not isinstance(s, str) or not s:
+        return s
+    return s[0].lower() + s[1:]
+
+
 def create_jinja_env(template_dir: Path):
-    return Environment(
+    env = Environment(
         loader=FileSystemLoader(template_dir),
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=StrictUndefined,
     )
+    env.filters["upper_first"] = upper_first
+    env.filters["lower_first"] = lower_first
+    return env
 
 
 def render_template(jinja_env, template_name: str, output_path: Path, context: dict):

@@ -10,10 +10,10 @@ class {{ name }}Abs : public ScreenAbs {
 protected:
 
 {# update user handlers #}
-{% if screen.updaters %}
-    // updater callbacks to update specific parts of the screen (to be implmeneted by user)
-{% for name in screen.updaters.keys() %}
-    virtual void onApply{{ name }}() = 0;
+{% if screen.model.fields %}
+    // model field callbacks to update specific parts of the screen (to be implmeneted by user)
+{% for group_name, fields in screen.model.groups.items() %}
+    virtual void onApply{{ group_name|upper_first }}() = 0;
 {% endfor %}
 {% endif %}
 
@@ -28,57 +28,23 @@ public:
 {# constructor #}
 {{ constructor(name) }}
 
-{# updater event handlers #}
-{% if screen.updaters_by_event %}
-    // receive events for updaters (called by runtime)
-{% for event_name in screen.updaters_by_event.keys() %}
-    void write{{ event_name }}(const {{ event_name }}Event& event);
-{% endfor %}
-{% endif %}
+{% set block %}
+    {% include "components/screen/ScreenModel.h.j2" %}
+{% endset %}
+{{ block | indent(4, true) }}
+
+    Model& getModel();
+    const Model& getModel() const;
 
 protected:
 
-{# updater indices enum #}
-{% if screen.updaters %}
-    enum class UpdaterIndex : uint8_t {
-{% for name in screen.updaters.keys() %}
-        {{ name }}{% if loop.index0 == 0 %} = 0{% endif %},
-{% endfor %}
-        Count
-    };
-{% endif %}
+    Model mModel;
 
 {# markDirty() #}
-{% if screen.updaters %}
-    // method to mark an updater index dirty (for manually updated values)
-    void markDirty(UpdaterIndex index);
-    bool isMarkedDirty(UpdaterIndex index) const;
-{% endif %}
+    // method to mark an model field index dirty (for manually updated values)
+    void markDirty(Model::Index index);
+    bool isMarkedDirty(Model::Index index) const;
 
-{# updater structs #}
-{% if screen.updaters %}
-{% for updater_name, updater_list in screen.updaters.items() %}
-    // shadow copy struct for '{{ updater_name }}' updater
-    struct {{ updater_name }}ShadowCopy {
-    {% for updater_field in updater_list %}
-        {% if updater_field["default"] is none %}
-        {{ updater_field["type"] }} {{ updater_field["name"] }};
-        {% else %}
-        {{ updater_field["type"] }} {{ updater_field["name"] }} = {{ updater_field["default"] }};
-        {% endif %}
-    {% endfor %}
-    } m{{ updater_name }} {};
-
-{% endfor %}
-{% endif %}
-
-{# write updater value methods #}
-{% if screen.updaters %}
-    // write updater value methods
-{% for u in screen.updaters_manual %}
-    void write{{ u.updater }}{{ u.name[0]|upper ~ u.name[1:] }}({{ u.type }} {{ u.name }});
-{% endfor %}
-{% endif %}
 
 {# make and send events #}
 {{ make_events(screen) }}
@@ -89,11 +55,11 @@ private:
 {# initScreen() #}
     void onInitScreen() final;
 
-{# updater trampolines #}
-{% if screen.updaters %}
-    // updater trampolines
-{% for name in screen.updaters.keys() %}
-    static void apply{{ name }}Trampoline(void* context);
+{# model field apply trampolines #}
+{% if screen.model.fields %}
+    // model field apply trampolines
+{% for name in screen.model.groups.keys() %}
+    static void apply{{ name|upper_first }}Trampoline(void* context);
 {% endfor %}
 {% endif %}
 

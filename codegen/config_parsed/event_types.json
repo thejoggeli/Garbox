@@ -14,17 +14,17 @@
       "targetTemperature": {
         "name": "targetTemperature",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "measuredTemperature": {
         "name": "measuredTemperature",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "measuredHumidity": {
         "name": "measuredHumidity",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -34,7 +34,7 @@
       "brightness": {
         "name": "brightness",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -44,12 +44,12 @@
       "brightness": {
         "name": "brightness",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "skipped": {
         "name": "skipped",
         "type": "uint32_t",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -59,17 +59,17 @@
       "state": {
         "name": "state",
         "type": "FanState",
-        "default": null
+        "default": "<ref>"
       },
       "targetSpeed": {
         "name": "targetSpeed",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "rpmControlEnabled": {
         "name": "rpmControlEnabled",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -79,7 +79,7 @@
       "measuredRpm": {
         "name": "measuredRpm",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -89,17 +89,17 @@
       "enabled": {
         "name": "enabled",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       },
       "targetSpeed": {
         "name": "targetSpeed",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "enableRpmControl": {
         "name": "enableRpmControl",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -109,27 +109,27 @@
       "state": {
         "name": "state",
         "type": "HeatpadState",
-        "default": null
+        "default": "<ref>"
       },
       "currentDutyCycle": {
         "name": "currentDutyCycle",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "currentPeriodMicros": {
         "name": "currentPeriodMicros",
         "type": "uint32_t",
-        "default": null
+        "default": "<ref>"
       },
       "nextDutyCycle": {
         "name": "nextDutyCycle",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "nextPeriodMicros": {
         "name": "nextPeriodMicros",
         "type": "uint32_t",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -139,17 +139,17 @@
       "measuredVoltage": {
         "name": "measuredVoltage",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "measuredCurrent": {
         "name": "measuredCurrent",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "pwmProgressMicros": {
         "name": "pwmProgressMicros",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -159,17 +159,17 @@
       "enabled": {
         "name": "enabled",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       },
       "dutyCycle": {
         "name": "dutyCycle",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "periodMicros": {
         "name": "periodMicros",
         "type": "uint32_t",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -179,17 +179,17 @@
       "driverEnabled": {
         "name": "driverEnabled",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       },
       "powerEnabled": {
         "name": "powerEnabled",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       },
       "resetting": {
         "name": "resetting",
         "type": "bool",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -199,12 +199,12 @@
       "temperatureCelcius": {
         "name": "temperatureCelcius",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       },
       "humidityRelative": {
         "name": "humidityRelative",
         "type": "float",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -214,12 +214,12 @@
       "oldState": {
         "name": "oldState",
         "type": "ButtonState",
-        "default": null
+        "default": "<ref>"
       },
       "newState": {
         "name": "newState",
         "type": "ButtonState",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -229,12 +229,12 @@
       "count": {
         "name": "count",
         "type": "uint32_t",
-        "default": null
+        "default": "<ref>"
       },
       "holdTimeMicros": {
         "name": "holdTimeMicros",
         "type": "uint32_t",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -244,7 +244,7 @@
       "steps": {
         "name": "steps",
         "type": "int32_t",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -254,12 +254,12 @@
       "oldBehaviour": {
         "name": "oldBehaviour",
         "type": "BehaviourId",
-        "default": null
+        "default": "<ref>"
       },
       "newBehaviour": {
         "name": "newBehaviour",
         "type": "BehaviourId",
-        "default": null
+        "default": "<ref>"
       }
     }
   },
@@ -269,12 +269,12 @@
       "oldScreen": {
         "name": "oldScreen",
         "type": "ScreenId",
-        "default": null
+        "default": "<ref>"
       },
       "newScreen": {
         "name": "newScreen",
         "type": "ScreenId",
-        "default": null
+        "default": "<ref>"
       }
     }
   }

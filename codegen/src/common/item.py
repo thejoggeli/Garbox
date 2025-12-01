@@ -1,4 +1,3 @@
-from copy import deepcopy
 from sortedcontainers import SortedSet
 from pathlib import Path
 from common.template import render_template
@@ -53,7 +52,7 @@ def generate_items(ctx: Context, items : list[Item]):
         template_path = item.template_path
 
         # extract and clone relevant data for current item into new dict
-        config = extract_dict(item.config, item.keys, copy=False)
+        config = extract_dict(item.config, item.keys)
 
         # Render via Jinja
         render_template(ctx.jinja_env, template_path, out_path, config)

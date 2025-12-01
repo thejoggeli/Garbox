@@ -1,0 +1,42 @@
+class Model { 
+public: 
+
+    // dirty-flag indices (one per group) 
+    enum class Index : uint8_t { 
+{% for group_name, group_fields in screen.model.groups.items() %}
+        {{ group_name }}{% if loop.first %} = 0{% endif %},
+{% endfor %}
+        Count 
+    }; 
+
+    Model({{ name }}Abs& screen); 
+
+    // disallow copy and move 
+    Model(const Model&) = delete;
+    Model& operator=(const Model&) = delete;
+    Model(Model&&) = delete;
+    Model& operator=(Model&&) = delete;
+
+    // getters
+{% for field in screen.model.fields.values() %}
+    {{ field.type }} get{{ field.name|upper_first }}() const;
+{% endfor %}
+
+    // setters 
+{% for field in screen.model.fields.values() %}
+    void set{{ field.name|upper_first }}({{ field.type }} value);
+{% endfor %}
+
+private: 
+
+    {{ name }}Abs& mScreen; 
+
+{% for field in screen.model.fields.values() %}
+    {% if field.get("default") %}
+    {{ field.type }} m{{ field.name|upper_first }} = {{ field.default }};
+    {% else %}
+    {{ field.type }} m{{ field.name|upper_first }};
+    {% endif %}
+{% endfor %}
+
+};

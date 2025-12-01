@@ -1,29 +1,31 @@
 import json
-from copy import deepcopy
 
-def extract_dict(config: dict, keys: str | list[str], copy: bool):
+def decycle(obj, seen=None):
+    if seen is None:
+        seen = set()
+    if id(obj) in seen:
+        return "<ref>"
+    seen.add(id(obj))
+
+    if isinstance(obj, dict):
+        return {k: decycle(v, seen) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [decycle(i, seen) for i in obj]
+    return obj
+
+def extract_dict(config: dict, keys: str | list[str]):
     """
     Build a dedicated copy of the passed dict.
 
     Example input:
         config = { 'a': [1,2,3], 'b': [4,5,6], 'c': [7,8,9] }
         keys = ['a', 'c']
-
-    Example output (deepcopy):
-        config_copy = { 'a': [1,2,3], 'c': [7,8,9] }
     """
     keys = ensure_list(keys)
     ex_config = {}
 
-    # extract with copy
-    if copy:
-        for key in keys:
-            ex_config[key] = deepcopy(config[key])
-
-    # extract without copy
-    else:
-        for key in keys:
-            ex_config[key] = config[key]
+    for key in keys:
+        ex_config[key] = config[key]
 
     return ex_config
 

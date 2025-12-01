@@ -41,8 +41,8 @@
       "name": "OutputTick",
       "behaviours": [],
       "controllers": [
-        "FanController",
-        "HeatpadController"
+        "<ref>",
+        "<ref>"
       ],
       "screens": [],
       "order": 3

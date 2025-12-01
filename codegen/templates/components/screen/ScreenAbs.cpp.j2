@@ -5,89 +5,60 @@
 
 namespace Garbox {
 
-{% if screen.updaters %}
 
 {# constructor #}
 {{ name }}Abs::{{ name }}Abs(): 
-    ScreenAbs(ComponentId::{{ name }}, 
-    ScreenId::{{ name.removesuffix("Screen") }}, 
-    static_cast<uint32_t>({{ name }}Abs::UpdaterIndex::Count)) {
+    ScreenAbs(
+        ComponentId::{{ name }}, 
+        ScreenId::{{ name.removesuffix("Screen") }}, 
+        static_cast<uint32_t>(Model::Index::Count)
+    ),
+    mModel(*this){
     // nothing to do
 }
-{% else %}
-{{ name }}Abs::{{ name }}Abs() : ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}, 0) {
-    // nothing to do
-}
-{% endif %}
 
 {# onInitScreen() #}
 void {{ name }}Abs::onInitScreen(){
-{% if screen.updaters %}
-{% for updater_name in screen.updaters.keys() %}
-    registerUpdateHandler(apply{{ updater_name }}Trampoline, this);
+{% if screen.model.fields %}
+{% for group_name in screen.model.groups.keys() %}
+    registerUpdateHandler(apply{{ group_name|upper_first }}Trampoline, this);
 {% endfor %}
 {% else %}
-    // no updaters configured
+    // no model fields configured
 {% endif %}
+}
+
+{{ name }}Abs::Model& {{ name }}Abs::getModel(){
+    return mModel;
+}
+
+const {{ name }}Abs::Model& {{ name }}Abs::getModel() const {
+    return mModel;
+}
+
+{# dirty dispatch #}
+void {{ name }}Abs::markDirty(Model::Index index){
+    markDirtyRaw(static_cast<size_t>(index));
+}
+
+bool {{ name }}Abs::isMarkedDirty(Model::Index index) const {
+    return isMarkedDirtyRaw(static_cast<size_t>(index));
 }
 
 {# make and send events #}
 {{ make_events(name, screen) }}
 {{ send_events(name, screen) }}
 
-{# dirty dispatch #}
-{% if screen.updaters %}
-void {{ name }}Abs::markDirty(UpdaterIndex index){
-    markDirtyRaw(static_cast<size_t>(index));
-}
-
-bool {{ name }}Abs::isMarkedDirty(UpdaterIndex index) const {
-    return isMarkedDirtyRaw(static_cast<size_t>(index));
-}
-{% endif %}
-
-{# update handlers #}
-{% if screen.updaters %}
-{% for event_name, updater_fields in screen.updaters_by_event.items() %}
-void {{ name }}Abs::write{{ event_name }}(const {{ event_name }}Event& event){
-    {% for updater_type in updater_fields["updater_types"] %}
-    bool {{ updater_type[0]|lower ~ updater_type[1:] }}Changed = false;
-    {% endfor %}
-    {% for updater_field in updater_fields["updaters"] %}
-    if(m{{ updater_field.updater }}.{{ updater_field.name }} != event->{{ updater_field.name }}){
-        m{{ updater_field.updater }}.{{ updater_field.name }} = event->{{ updater_field.name }};
-        {{ updater_field.updater[0]|lower ~ updater_field.updater[1:] }}Changed = true;
-    }
-    {% endfor %}
-    {% for updater_type in updater_fields["updater_types"] %}
-    if({{ updater_type[0]|lower ~ updater_type[1:] }}Changed){
-        markDirty(UpdaterIndex::{{ updater_type }});
-    }
-    {% endfor %}
+{# model groups trampolines #}
+{% if screen.model.fields %}
+{% for group_name, fields in screen.model.groups.items() %}
+void {{ name }}Abs::apply{{ group_name|upper_first }}Trampoline(void* context){
+    static_cast<{{ name }}Abs*>(context)->onApply{{ group_name|upper_first }}();
 }
 
 {% endfor %}
 {% endif %}
 
-{# write updater value methods #}
-{% if screen.updaters %}
-{% for u in screen.updaters_manual %}
-void {{ name }}Abs::write{{ u.updater }}{{ u.name[0]|upper ~ u.name[1:] }}({{ u.type }} {{ u.name }}){
-    if(m{{ u.updater}}.{{ u.name }} != {{ u.name }}){
-        m{{ u.updater}}.{{ u.name }} = {{ u.name }};
-        markDirty(UpdaterIndex::{{ u.updater }});
-    }
-}
-{% endfor %}
-{% endif %}
+{% include "components/screen/ScreenModel.cpp.j2" %}
 
-{# updater trampolines #}
-{% if screen.updaters %}
-{% for updater_name in screen.updaters.keys() %}
-void {{ name }}Abs::apply{{ updater_name }}Trampoline(void* context){
-    static_cast<{{ name }}Abs*>(context)->onApply{{ updater_name }}();
-}
-
-{% endfor %}
-{% endif %}
 } // namespace Garbox
