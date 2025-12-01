@@ -12,16 +12,16 @@ public:
 
     HeatpadControllerAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onInputTick() = 0;
     virtual void onOutputTick() = 0;
 
-    // receive event handlers
+    // receive event handlers (to be implmeneted by user)
     virtual void onHeatpadCommand(const HeatpadCommandEvent& event) = 0;
 
 protected:
 
-    // make typed events
+    // make typed events 
     HeatpadStatusEvent makeHeatpadStatusEvent();
     HeatpadSampleEvent makeHeatpadSampleEvent();
 

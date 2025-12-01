@@ -12,15 +12,15 @@ public:
 
     DisplayControllerAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onRenderTick() = 0;
 
-    // receive event handlers
+    // receive event handlers (to be implmeneted by user)
     virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
 
 protected:
 
-    // make typed events
+    // make typed events 
     DisplayStatusEvent makeDisplayStatusEvent();
 
     // send typed events

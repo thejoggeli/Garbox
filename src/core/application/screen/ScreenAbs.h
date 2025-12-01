@@ -11,7 +11,8 @@ public:
 
     ScreenAbs(ComponentId componentId, ScreenId screenId);
 
-    void updateScreen();
+    virtual void init(ComponentHostIfc& host) final;
+    virtual void updateScreen();
 
     // get the behaviour id
     ScreenId getScreenId() const { return mScreenId; }
@@ -19,6 +20,9 @@ public:
 protected:
 
     const ScreenId mScreenId;
+
+    // called in ScreenAbs::init()
+    virtual void initScreen();
 
     // abstract methods for user implementation
     virtual void onUpdateScreen() = 0;

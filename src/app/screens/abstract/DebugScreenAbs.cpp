@@ -17,5 +17,5 @@ DisplayCommandEvent DebugScreenAbs::makeDisplayCommandEvent(){
 void DebugScreenAbs::sendEvent(const DisplayCommandEvent& event){
     publishEvent(event.header());
 }
- 
+
 } // namespace Garbox

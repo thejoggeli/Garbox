@@ -1,21 +1,126 @@
 #pragma once
 {% include "_common/header.j2" %}
-{%- from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events -%}
+{% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
 #include "core/application/screen/ScreenAbs.h"
+#include "core/util/helpers/DirtyDispatcher.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
 
 class {{ name }}Abs : public ScreenAbs {
-public:
-{{ constructor(name) -}}
-{{- on_ticks(screen) -}}
-{{- on_events(screen) }}
 protected:
-{{ make_events(screen) -}}
-{{- send_events(screen) }}
+
+{# update user handlers #}
+{% if screen.updaters %}
+    // updater callbacks to update specific parts of the screen (to be implmeneted by user)
+{% for name in screen.updaters.keys() %}
+    virtual void onApply{{ name }}() = 0;
+{% endfor %}
+{% endif %}
+
+public:
+
+{# onTick() #}
+{{ on_ticks(screen) }}
+
+{# onEvent() #}
+{{ on_events(screen) }}
+
+{# constructor #}
+{{ constructor(name) }}
+
+{# updateScreen() #}
+{% if screen.updaters %}
+    void updateScreen() final;
+{% endif %}
+
+{# updater event handlers #}
+{% if screen.updaters_by_event %}
+    // receive events for updaters (called by runtime)
+{% for event_name in screen.updaters_by_event.keys() %}
+    void receive{{ event_name }}(const {{ event_name }}Event& event);
+{% endfor %}
+{% endif %}
+
+protected:
+
+{# updater indices enum #}
+{% if screen.updaters %}
+    enum class UpdaterIndex : uint8_t {
+{% for name in screen.updaters.keys() %}
+        {{ name }}{% if loop.index0 == 0 %} = 0{% endif %},
+{% endfor %}
+        Count
+    };
+{% endif %}
+
+{# markDirty() #}
+{% if screen.updaters %}
+    // method to mark and updater index dirty (for manually updated values)
+    void markDirty(UpdaterIndex index);
+    bool isMarkedDirty(UpdaterIndex index) const { return mDirtyDispatcher.isMarkedDirty(static_cast<uint32_t>(index)); }
+{% endif %}
+
+{# updater structs #}
+{% if screen.updaters %}
+{% for updater_name, updater_list in screen.updaters.items() %}
+    // shadow copy struct for '{{ updater_name }}' updater
+    struct {{ updater_name }}ShadowCopy {
+    {% for updater_field in updater_list %}
+        {% if updater_field["default"] is none %}
+        {{ updater_field["type"] }} {{ updater_field["name"] }};
+        {% else %}
+        {{ updater_field["type"] }} {{ updater_field["name"] }} = {{ updater_field["default"] }};
+        {% endif %}
+    {% endfor %}
+    } m{{ updater_name }} {};
+
+{% endfor %}
+{% endif %}
+
+{# write updater value methods #}
+{% if screen.updaters %}
+    // write updater value methods
+{% for u in screen.updaters_manual %}
+    void write{{ u.updater }}{{ u.name[0]|upper ~ u.name[1:] }}({{ u.type }} {{ u.name }});
+{% endfor %}
+{% endif %}
+
+{# make and send events #}
+{{ make_events(screen) }}
+{{ send_events(screen) }}
+
+{# getDispatchedCount() #}
+{% if screen.updaters %}
+    // number of times any apply-handler method was called
+    uint32_t getDispatchedCount() const { return mDispatchedCount; }
+{% endif %}
+
 private:
+
+{# dirty dispatcher #}
+{% if screen.updaters %}
+    // dispatcher for udpater 
+    DirtyDispatcher mDirtyDispatcher {static_cast<size_t>(UpdaterIndex::Count)};
+    uint32_t mDispatchedCount = 0;
+{% endif %}
+
+{# initScreen() #}
+{% if screen.updaters %}
+    void initScreen() final;
+{% endif %}
+
+{# updater trampolines #}
+{% if screen.updaters %}
+    // updater trampolines
+{% for name in screen.updaters.keys() %}
+    static void apply{{ name }}Trampoline(void* context);
+{% endfor %}
+{% endif %}
+
+{# hide events #}
 {{ hide_events("Screen") }}
+
 };
 
 } // namespace Garbox

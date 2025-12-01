@@ -12,7 +12,7 @@ public:
 
     DevtoolsControllerAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onLoggingTick() = 0;
 
 protected:

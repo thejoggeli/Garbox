@@ -21,8 +21,8 @@ public:
     ~ComponentAbs();
 
     // setup methhods
-    void init(ComponentHostIfc& host);
-    void start();
+    virtual void init(ComponentHostIfc& host);
+    virtual void start();
 
     // components can be enabled and disabled
     bool isEnabled() const { return mEnabled; }

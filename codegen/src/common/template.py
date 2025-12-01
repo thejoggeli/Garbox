@@ -1,6 +1,6 @@
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
-
+import re
 
 def create_jinja_env(template_dir: Path):
     return Environment(
@@ -13,9 +13,12 @@ def create_jinja_env(template_dir: Path):
 
 def render_template(jinja_env, template_name: str, output_path: Path, context: dict):
     template = jinja_env.get_template(template_name)
-    result = template.render(**context)
+    result_text = template.render(**context)
+
+    # collapse 2+ blank lines into exactly one
+    result_text = re.sub(r'\n{2,}', '\n\n', result_text)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(result)
+    output_path.write_text(result_text)
 
     print(f"{output_path}")

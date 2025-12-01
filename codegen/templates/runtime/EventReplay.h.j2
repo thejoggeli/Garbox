@@ -16,7 +16,7 @@ class EventReplay {
 public:
 
     EventReplay(
-{%- for name, screen_data in screens.items() %} 
+{% for name, screen_data in screens.items() %} 
         {{ name }}Abs& {{ name[0]|lower ~ name[1:] }}{% if not loop.last %}, {% endif %}
 {% endfor %} 
     );
@@ -33,7 +33,7 @@ private:
 
 {# DirtyDispatcher mScreenNameDispatcher #}
 {% for name, screen_data in screens.items() %}
-    DirtyDispatcher m{{ name }}Dispatcher {{ "{" ~ screen_data.receives|length ~ "}" }};
+    DirtyDispatcher m{{ name }}Dispatcher {{ "{" ~ screen_data.replay_events|length ~ "}" }};
 {% endfor %}
 
 {# EventBlock for mEventBlock #}
@@ -42,7 +42,7 @@ private:
 {% endfor %}
 
 {% for screen_name, screen_data in screens.items() %}
-    {% for event_name in screen_data.receives: %}
+    {% for event_name in screen_data.replay_events: %}
     static void send{{ event_name }}To{{ screen_name }}(void* context);
     {% endfor %}
 {% endfor %}

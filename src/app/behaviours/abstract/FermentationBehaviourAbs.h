@@ -12,10 +12,10 @@ public:
 
     FermentationBehaviourAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onLogicTick() = 0;
 
-    // receive event handlers
+    // receive event handlers (to be implmeneted by user)
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
     virtual void onFanStatus(const FanStatusEvent& event) = 0;
     virtual void onFanSample(const FanSampleEvent& event) = 0;
@@ -28,7 +28,7 @@ public:
 
 protected:
 
-    // make typed events
+    // make typed events 
     FanCommandEvent makeFanCommandEvent();
     DisplayCommandEvent makeDisplayCommandEvent();
     HeatpadCommandEvent makeHeatpadCommandEvent();

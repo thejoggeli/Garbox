@@ -1,12 +1,17 @@
+from copy import deepcopy
 from common.parse_type import render_value
+from sortedcontainers import SortedSet
 
 def parse_screens(config: dict):
 
     # process screen data
     for screen_data in config["screens"].values():
-        if "updaters" in screen_data:
-            parse_updaters(screen_data["updaters"], config["event_types"])
-            group_event_updaters(screen_data["updaters"])
+        if "updaters" not in screen_data:
+            screen_data["updaters"] = {}
+        parse_updaters(screen_data["updaters"], config["event_types"])
+        group_event_updaters(screen_data)
+        collect_replay_events(screen_data)
+
 
 def parse_updaters(updaters: dict, event_types: dict):
     """
@@ -74,26 +79,53 @@ def parse_updaters(updaters: dict, event_types: dict):
         updaters[updater_name] = parsed_entries
 
 
-def group_event_updaters(updaters: dict):
+def group_event_updaters(screen_data: dict):
 
-    for updater_name, updater_list in updaters.items():
+    events = {}
+    manual = []
 
-        groups = {
-            "events": {},
-            "manual": {},
-        }
+    for updater_name, updater_list in screen_data["updaters"].items():
         
         for field_data in updater_list:
 
             event_name = field_data.get("event", None)
-            field_name = field_data["name"]
 
             if(event_name is None):
-                groups["manual"][field_name] = field_data
+                manual_entry_data = deepcopy(field_data)
+                manual_entry_data["updater"] = updater_name
+                manual.append(manual_entry_data)
             
             else:
-                if event_name not in groups["events"]:
-                    groups["events"][event_name] = {}
-                groups["events"][event_name][field_name] = field_data
+                if event_name not in events:
+                    events[event_name] = {
+                        "updaters": [],
+                        "updater_types": [],
+                    }
 
-        updaters[updater_name] = groups
+                event_entry_data = deepcopy(field_data)
+                del event_entry_data["event"]
+                event_entry_data["updater"] = updater_name
+
+                events[event_name]["updaters"].append(event_entry_data)
+
+    for event_name, event_data in events.items():
+        updater_types = SortedSet()
+        for event_updater in event_data["updaters"]:
+            updater_types.add(event_updater["updater"])
+        events[event_name]["updater_types"] = list(updater_types)        
+
+    screen_data["updaters_by_event"] = events
+    screen_data["updaters_manual"] = manual
+
+
+def collect_replay_events(screen_data: dict):
+
+    events_set = SortedSet()
+
+    for events_name in screen_data["updaters_by_event"].keys():
+        events_set.add(events_name)
+
+    for events_name in screen_data["receives"]:
+        events_set.add(events_name)
+
+    screen_data["replay_events"] = list(events_set)

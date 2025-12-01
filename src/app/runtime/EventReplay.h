@@ -16,7 +16,8 @@ namespace Garbox {
 class EventReplay {
 public:
 
-    EventReplay( 
+    EventReplay(
+ 
         MainScreenAbs& mainScreen,  
         DebugScreenAbs& debugScreen 
     );
@@ -43,15 +44,15 @@ private:
     EventBlock<EventType::TemperatureSample> mTemperatureSampleBlock;
     EventBlock<EventType::ActiveBehaviourChanged> mActiveBehaviourChangedBlock;
 
-    static void sendFanStatusToMainScreen(void* context);
-    static void sendFanSampleToMainScreen(void* context);
-    static void sendHeatpadStatusToMainScreen(void* context);
-    static void sendHeatpadSampleToMainScreen(void* context);
-    static void sendTemperatureStatusToMainScreen(void* context);
-    static void sendTemperatureSampleToMainScreen(void* context);
     static void sendActiveBehaviourChangedToMainScreen(void* context);
-    static void sendFermentationStatusToMainScreen(void* context);
     static void sendDisplayStatusToMainScreen(void* context);
+    static void sendFanSampleToMainScreen(void* context);
+    static void sendFanStatusToMainScreen(void* context);
+    static void sendFermentationStatusToMainScreen(void* context);
+    static void sendHeatpadSampleToMainScreen(void* context);
+    static void sendHeatpadStatusToMainScreen(void* context);
+    static void sendTemperatureSampleToMainScreen(void* context);
+    static void sendTemperatureStatusToMainScreen(void* context);
     static void sendHeartbeatToDebugScreen(void* context);
 
 };

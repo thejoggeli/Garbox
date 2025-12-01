@@ -11,6 +11,15 @@ ScreenAbs::ScreenAbs(ComponentId componentId, ScreenId ScreenId):
     // nothing to do
 }
 
+void ScreenAbs::init(ComponentHostIfc& host){
+    ComponentAbs::init(host);
+    initScreen();
+};
+
+void ScreenAbs::initScreen(){
+    // nothing to do
+}
+
 void ScreenAbs::updateScreen(){
     onUpdateScreen();
 }

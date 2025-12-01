@@ -12,12 +12,12 @@ public:
 
     HeartbeatControllerAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onHeartbeatTick() = 0;
 
 protected:
 
-    // make typed events
+    // make typed events 
     HeartbeatEvent makeHeartbeatEvent();
 
     // send typed events

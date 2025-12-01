@@ -3,21 +3,24 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
+#include "core/util/helpers/DirtyDispatcher.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
 
 class DebugScreenAbs : public ScreenAbs {
+protected:
+
 public:
+
+    // receive event handlers (to be implmeneted by user)
+    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
 
     DebugScreenAbs();
 
-    // receive event handlers
-    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
-
 protected:
 
-    // make typed events
+    // make typed events 
     DisplayCommandEvent makeDisplayCommandEvent();
 
     // send typed events

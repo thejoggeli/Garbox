@@ -27,5 +27,4 @@ void HardwareInit::Init(){
     sInitialized = true;
 }
 
-
 } // namespace

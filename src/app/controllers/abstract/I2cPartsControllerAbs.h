@@ -12,15 +12,15 @@ public:
 
     I2cPartsControllerAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onInputTick() = 0;
 
-    // receive event handlers
+    // receive event handlers (to be implmeneted by user)
     virtual void onButtonStateChanged(const ButtonStateChangedEvent& event) = 0;
 
 protected:
 
-    // make typed events
+    // make typed events 
     TemperatureStatusEvent makeTemperatureStatusEvent();
     TemperatureSampleEvent makeTemperatureSampleEvent();
 

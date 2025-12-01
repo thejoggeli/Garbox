@@ -1,12 +1,13 @@
 #include "RuntimeAbs.h"
 
-#define GarboxDebugRuntimeAbs 1
+#define GarboxRuntimeAbsDebug 1
+#define GarboxRuntimeAbsPrintEvents 0
 
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "core/application/controller/ControllerAbs.h"
 #include "core/assert/Assert.h"
 
-#if GarboxDebugRuntimeAbs
+#if GarboxRuntimeAbsDebug || GarboxRuntimeAbsPrintEvents
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #endif
@@ -129,6 +130,10 @@ void RuntimeAbs::registerComponent(ComponentAbs* component){
 }
 
 void RuntimeAbs::publishEvent(const EventHeader* header){
+#if GarboxRuntimeAbsPrintEvents
+    LogDebug("Event", "[%u] %s: %s", header->id, ComponentIdToString(header->sender.id), EventTypeToString(header->type));
+#endif
+ 
     // send event to router event
     mContext.eventCount++;
     if(header->bypassQueue){

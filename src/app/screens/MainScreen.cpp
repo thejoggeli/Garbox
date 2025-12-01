@@ -15,23 +15,11 @@ MainScreen::MainScreen():
 }
 
 void MainScreen::onInit(){
-    mDirtyDispatcher.registerHandler(onUpdateFanState, this);
-    mDirtyDispatcher.registerHandler(onUpdateFanMeasuredRpm, this);
-    mDirtyDispatcher.registerHandler(onUpdateHeatpadState, this);
-    mDirtyDispatcher.registerHandler(onUpdateHeatpadDuty, this);
-    mDirtyDispatcher.registerHandler(onUpdateBoxPosition, this);
-    mDirtyDispatcher.registerHandler(onUpdateHeatpadSense, this);
-    mDirtyDispatcher.registerHandler(onUpdateDisplayStatus, this);
-    mDirtyDispatcher.registerHandler(onUpdateTemperatureState, this);
-    mDirtyDispatcher.registerHandler(onUpdateTemperatureSample, this);
-    mDirtyDispatcher.registerHandler(onUpdateHeapSpace, this);
-    mDirtyDispatcher.registerHandler(onUpdateAppInfo, this);
-    mDirtyDispatcher.registerHandler(onUpdateFermentationStatus, this);
+    // nothing to do
 }
 
 void MainScreen::onStart(){
     mHeapTimer.start(1000_ms);
-    mDirtyDispatcher.markAllDirty();
 }
 
 void MainScreen::onBecomeEnabled(){
@@ -50,202 +38,87 @@ void MainScreen::onUpdateScreen(){
 
     // update heap space
     if(mHeapTimer.isExpired()){
-        uint32_t space = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
-        if(space != mShadowState.heapSpace){
-            mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeapSpace));
-            mShadowState.heapSpace = space;
-        }
+        writeHeapSpaceHeapSpace(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
         mHeapTimer.restart();
     }
 
     // update event count
-    if(mShadowState.eventCount != getContext()->eventCount){
-        mShadowState.eventCount = getContext()->eventCount;
-        mDirtyDispatcher.markDirty(static_cast<size_t>(Index::AppState));
+    writeAppInfoEventCount(getContext()->eventCount);
+
+    // last dispatched count must be updated manually, otherwise a dispatch is
+    // triggered by itself on each tick
+    if(mLastDispatchedCount != getDispatchedCount()){
+        mLastDispatchedCount = getDispatchedCount();
+        if(!isMarkedDirty(UpdaterIndex::DisplayStatus)){
+            onApplyDisplayStatus();
+        }
     }
 
-    // update dirty count
-    uint32_t count = mShadowState.dirtyCount + mDirtyDispatcher.getDirtyCount();
-    if(mShadowState.dirtyCount != count){
-        mShadowState.dirtyCount = count;
-        mDirtyDispatcher.markDirty(static_cast<size_t>(Index::DisplayStatus));
-    }
-
-    // dispatch dirty
-    mDirtyDispatcher.dispatch();
+    // update complete
     mFirstUpdate = false;
 }
 
-void MainScreen::onFanStatus(const FanStatusEvent& event){ 
-    mShadowState.fanState = event->state;
-    mShadowState.fanTargetSpeed = event->targetSpeed;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::FanStatus));
+void MainScreen::onApplyFanState(){
+    mObjects.setFanState(FanStateToString(mFanState.state), mFanState.targetSpeed);
 }
 
-void MainScreen::onFanSample(const FanSampleEvent& event){ 
-    mShadowState.fanMeasuredRpm = event->measuredRpm;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::FanMeasuredRpm));
+void MainScreen::onApplyFanMeasuredRpm(){
+    mObjects.setFanMeasuredRpm(mFanMeasuredRpm.measuredRpm);
 }
 
-void MainScreen::onHeatpadStatus(const HeatpadStatusEvent& event){
-    if (mShadowState.heatpadCurrentDuty != event->currentDutyCycle ||
-        mShadowState.heatpadCurrentPeriod != event->currentPeriodMicros ||
-        mShadowState.heatpadNextDuty != event->nextDutyCycle ||
-        mShadowState.heatpadNextPeriod != event->nextPeriodMicros){
-        // update shadow state
-        mShadowState.heatpadCurrentDuty = event->currentDutyCycle;
-        mShadowState.heatpadCurrentPeriod = event->currentPeriodMicros;
-        mShadowState.heatpadNextDuty = event->nextDutyCycle;
-        mShadowState.heatpadNextPeriod = event->nextPeriodMicros;
-        mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadDuty));
-    }
-    if(mShadowState.heatpadState != event->state){
-        mShadowState.heatpadState = event->state;
-        mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadState));
-    }
+void MainScreen::onApplyHeatpadState(){
+    mObjects.setHeatpadState(HeatpadStateToString(mHeatpadState.state));
 }
 
-void MainScreen::onHeatpadSample(const HeatpadSampleEvent& event){
-    mShadowState.heatpadPwmProgressMicros = event->pwmProgressMicros;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadProgress));
-    mShadowState.heatpadMeasuredVoltage = event->measuredVoltage;
-    mShadowState.heatpadMeasuredCurrent = event->measuredCurrent;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::HeatpadSense));
-}
-
-void MainScreen::onTemperatureStatus(const TemperatureStatusEvent& event){
-    mShadowState.shtDriver = event->driverEnabled;
-    mShadowState.shtPower = event->powerEnabled;
-    mShadowState.shtReset = event->resetting;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::ShtState));
-}
-
-void MainScreen::onTemperatureSample(const TemperatureSampleEvent& event){
-    mShadowState.shtTemp = event->temperatureCelcius;
-    mShadowState.shtHum = event->humidityRelative;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::ShtSample));
-}
-
-void MainScreen::onActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
-    mShadowState.behaviour = event->newBehaviour;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::AppState));
-}
-
-void MainScreen::onFermentationStatus(const FermentationStatusEvent& event){
-    if (mShadowState.engineState == event->heaterEngineState &&
-        mShadowState.engineTargetTemp == event->targetTemperature &&
-        mShadowState.engineMeasuredTemp == event->measuredTemperature &&
-        mShadowState.engineMeasuredHum == event->measuredHumidity){
-        return; 
-    }
-    mShadowState.engineState = event->heaterEngineState;
-    mShadowState.engineTargetTemp = event->targetTemperature;
-    mShadowState.engineMeasuredTemp = event->measuredTemperature;
-    mShadowState.engineMeasuredHum = event->measuredHumidity;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::FermentationStatus));
-}
-
-void MainScreen::onDisplayStatus(const DisplayStatusEvent& event){
-    if (mShadowState.brightness == event->brightness &&
-        mShadowState.renderSkippedCount == event->skipped){
-        return; 
-    }
-    mShadowState.brightness = event->brightness;
-    mShadowState.renderSkippedCount = event->skipped;
-    mDirtyDispatcher.markDirty(static_cast<size_t>(Index::DisplayStatus));
-}
-
-void MainScreen::onUpdateFanState(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setFanState(
-        FanStateToString(self->mShadowState.fanState),
-        self->mShadowState.fanTargetSpeed
+void MainScreen::onApplyHeatpadDuty(){
+    mObjects.setHeatpadDuty(
+        mHeatpadDuty.currentDutyCycle,
+        mHeatpadDuty.nextDutyCycle,
+        mHeatpadDuty.currentPeriodMicros,
+        mHeatpadDuty.nextPeriodMicros
     );
 }
 
-void MainScreen::onUpdateFanMeasuredRpm(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setFanMeasuredRpm(self->mShadowState.fanMeasuredRpm);
+void MainScreen::onApplyBoxPosition(){
+    mObjects.setBoxPosition(static_cast<float>(mBoxPosition.pwmProgressMicros) / static_cast<float>(mHeatpadDuty.currentPeriodMicros));
 }
 
-void MainScreen::onUpdateHeatpadState(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setHeatpadState(
-        HeatpadStateToString(self->mShadowState.heatpadState)
+void MainScreen::onApplyHeatpadSense(){
+    mObjects.setHeatpadSense(mHeatpadSense.measuredVoltage, mHeatpadSense.measuredCurrent);
+}
+
+void MainScreen::onApplyDisplayStatus(){
+    mObjects.setDisplayState(mDisplayStatus.brightness, mDisplayStatus.skipped, getDispatchedCount());
+}
+
+void MainScreen::onApplyTemperatureState(){
+    mObjects.setTemperatureState(
+        mTemperatureState.powerEnabled,
+        mTemperatureState.driverEnabled,
+        mTemperatureState.resetting
     );
 }
 
-void MainScreen::onUpdateHeatpadDuty(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setHeatpadDuty(
-        self->mShadowState.heatpadCurrentDuty,
-        self->mShadowState.heatpadNextDuty,
-        self->mShadowState.heatpadCurrentPeriod,
-        self->mShadowState.heatpadNextPeriod
+void MainScreen::onApplyTemperatureSample(){
+    mObjects.setTemperatureSample(
+        mTemperatureSample.temperatureCelcius,
+        mTemperatureSample.humidityRelative
     );
 }
 
-void MainScreen::onUpdateBoxPosition(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setBoxPosition(
-        static_cast<float>(self->mShadowState.heatpadPwmProgressMicros) /
-        static_cast<float>(self->mShadowState.heatpadCurrentPeriod)
-    );
+void MainScreen::onApplyHeapSpace(){
+    mObjects.setHeapSpace(mHeapSpace.heapSpace);
 }
 
-void MainScreen::onUpdateHeatpadSense(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setHeatpadSense(
-        self->mShadowState.heatpadMeasuredVoltage,
-        self->mShadowState.heatpadMeasuredCurrent
-    );
+void MainScreen::onApplyAppInfo(){
+    mObjects.setAppInfo(BehaviourIdToString(mAppInfo.newBehaviour), mAppInfo.eventCount);
 }
 
-void MainScreen::onUpdateDisplayStatus(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setDisplayState(
-        self->mShadowState.brightness,
-        self->mShadowState.renderSkippedCount,
-        self->mShadowState.dirtyCount
-    );
-}
-
-void MainScreen::onUpdateTemperatureState(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setTemperatureState(
-        self->mShadowState.shtPower,
-        self->mShadowState.shtDriver,
-        self->mShadowState.shtReset
-    );
-}
-
-void MainScreen::onUpdateTemperatureSample(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setTemperatureSample(
-        self->mShadowState.shtTemp,
-        self->mShadowState.shtHum
-    );
-}
-
-void MainScreen::onUpdateHeapSpace(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setHeapSpace(self->mShadowState.heapSpace);
-}
-
-void MainScreen::onUpdateAppInfo(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setAppInfo(
-        BehaviourIdToString(self->mShadowState.behaviour),
-        self->mShadowState.eventCount
-    );
-}
-
-void MainScreen::onUpdateFermentationStatus(void* context){
-    auto* self = static_cast<MainScreen*>(context);
-    self->mObjects.setFermentationStatus(
-        HeaterEngineStateToString(self->mShadowState.engineState),
-        self->mShadowState.engineMeasuredTemp,
-        self->mShadowState.engineTargetTemp
+void MainScreen::onApplyFermentationStatus(){
+    mObjects.setFermentationStatus(
+        HeaterEngineStateToString(mFermentationStatus.heaterEngineState),
+        mFermentationStatus.measuredTemperature,
+        mFermentationStatus.targetTemperature
     );
 }
 

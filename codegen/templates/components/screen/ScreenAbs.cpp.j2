@@ -1,11 +1,85 @@
 {% include "_common/header.j2" %}
-{%- from "_common/component_cpp.j2" import constructor, make_events, send_events -%}
+{% from "_common/component_cpp.j2" import constructor, make_events, send_events %}
 #include "{{ name }}Abs.h"
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
-{{ constructor("Screen", name, screen) -}}
-{{ make_events(name, screen) -}}
-{{- send_events(name, screen) }} 
+{# update constructor #}
+{{ constructor("Screen", name, screen) }}
+
+{# initScreen() #}
+{% if screen.updaters %}
+void {{ name }}Abs::initScreen(){
+    ScreenAbs::initScreen();
+{% for updater_name in screen.updaters.keys() %}
+    mDirtyDispatcher.registerHandler(apply{{ updater_name }}Trampoline, this);
+{% endfor %}
+}
+{% endif %}
+
+{# updateScreen() #}
+{% if screen.updaters %}
+void {{ name }}Abs::updateScreen(){
+    ScreenAbs::updateScreen();
+    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
+    mDirtyDispatcher.dispatch();
+}
+{% endif %}
+
+{# make and send events #}
+{{ make_events(name, screen) }}
+{{ send_events(name, screen) }}
+
+{# dirty dispatch #}
+{% if screen.updaters %}
+void {{ name }}Abs::markDirty(UpdaterIndex index){
+    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
+}
+{% endif %}
+
+{# update handlers #}
+{% if screen.updaters %}
+{% for event_name, updater_fields in screen.updaters_by_event.items() %}
+void {{ name }}Abs::receive{{ event_name }}(const {{ event_name }}Event& event){
+    {% for updater_type in updater_fields["updater_types"] %}
+    bool {{ updater_type[0]|lower ~ updater_type[1:] }}Changed = false;
+    {% endfor %}
+    {% for updater_field in updater_fields["updaters"] %}
+    if(m{{ updater_field.updater }}.{{ updater_field.name }} != event->{{ updater_field.name }}){
+        m{{ updater_field.updater }}.{{ updater_field.name }} = event->{{ updater_field.name }};
+        {{ updater_field.updater[0]|lower ~ updater_field.updater[1:] }}Changed = true;
+    }
+    {% endfor %}
+    {% for updater_type in updater_fields["updater_types"] %}
+    if({{ updater_type[0]|lower ~ updater_type[1:] }}Changed){
+        markDirty(UpdaterIndex::{{ updater_type }});
+    }
+    {% endfor %}
+}
+
+{% endfor %}
+{% endif %}
+
+{# write updater value methods #}
+{% if screen.updaters %}
+{% for u in screen.updaters_manual %}
+void {{ name }}Abs::write{{ u.updater }}{{ u.name[0]|upper ~ u.name[1:] }}({{ u.type }} {{ u.name }}){
+    if(m{{ u.updater}}.{{ u.name }} != {{ u.name }}){
+        m{{ u.updater}}.{{ u.name }} = {{ u.name }};
+        markDirty(UpdaterIndex::{{ u.updater }});
+    }
+}
+{% endfor %}
+{% endif %}
+
+{# updater trampolines #}
+{% if screen.updaters %}
+{% for updater_name in screen.updaters.keys() %}
+void {{ name }}Abs::apply{{ updater_name }}Trampoline(void* context){
+    static_cast<{{ name }}Abs*>(context)->onApply{{ updater_name }}();
+}
+
+{% endfor %}
+{% endif %}
 } // namespace Garbox

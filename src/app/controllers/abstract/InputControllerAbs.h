@@ -12,12 +12,12 @@ public:
 
     InputControllerAbs();
 
-    // tick handlers
+    // tick handlers (to be implmeneted by user)
     virtual void onInputTick() = 0;
 
 protected:
 
-    // make typed events
+    // make typed events 
     ButtonStateChangedEvent makeButtonStateChangedEvent();
     ButtonRepeatEvent makeButtonRepeatEvent();
     EncoderStepEvent makeEncoderStepEvent();

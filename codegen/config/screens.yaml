@@ -1,16 +1,7 @@
 screens:
   Main:
     tick_phases: null
-    receives:
-      - FanStatus
-      - FanSample
-      - HeatpadStatus
-      - HeatpadSample
-      - TemperatureStatus 
-      - TemperatureSample 
-      - ActiveBehaviourChanged
-      - FermentationStatus
-      - DisplayStatus
+    receives: null
     sends: 
       - DisplayCommand
     updaters:
@@ -34,17 +25,16 @@ screens:
       DisplayStatus:
         - { event: DisplayStatus, name: brightness }
         - { event: DisplayStatus, name: skipped }
-        - { name: dirtyCount, type: uint32_t }
-      ShtState:
+      TemperatureState:
         - { event: TemperatureStatus, name: driverEnabled }
         - { event: TemperatureStatus, name: powerEnabled }
         - { event: TemperatureStatus, name: resetting }
-      ShtSample:
+      TemperatureSample:
         - { event: TemperatureSample, name: temperatureCelcius }
         - { event: TemperatureSample, name: humidityRelative }
       HeapSpace:
         - { name: heapSpace, type: uint32_t }
-      AppState:
+      AppInfo:
         - { name: eventCount, type: uint32_t }
         - { event: ActiveBehaviourChanged, name: newBehaviour }
       FermentationStatus:

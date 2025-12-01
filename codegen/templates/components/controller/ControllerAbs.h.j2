@@ -1,6 +1,6 @@
 #pragma once
 {% include "_common/header.j2" %}
-{%- from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events -%}
+{% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
 
@@ -8,12 +8,12 @@ namespace Garbox {
 
 class {{ name }}Abs : public ControllerAbs {
 public:
-{{ constructor(name) -}}
-{{- on_ticks(controller) -}}
-{{- on_events(controller) }}
+{{ constructor(name) }}
+{{ on_ticks(controller) }}
+{{ on_events(controller) }}
 protected:
-{{ make_events(controller) -}}
-{{- send_events(controller) }}
+{{ make_events(controller) }}
+{{ send_events(controller) }}
 private:
 {{ hide_events("Controller") }}
 };
