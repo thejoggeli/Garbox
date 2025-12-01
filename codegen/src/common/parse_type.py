@@ -192,4 +192,4 @@ def render_value(value, type_name):
             raise ValueError(f"Invalid enum literal {value!r} for type {type_name}")
         return value
 
-    raise ValueError(f"Unhandled field type: {type_name!r}")
+    return value

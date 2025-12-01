@@ -1,4 +1,3 @@
-
 event_payloads:
   include_h: [
     "app/engine/HeaterEngineState.h",
@@ -8,68 +7,53 @@ event_payloads:
   ]
 
 event_types:
-
   Heartbeat: null
-
   FermentationStatus:
-    - Field(heaterEngineState, HeaterEngineState)
-    - Field(targetTemperature, float)
-    - Field(measuredTemperature, float)
-    - Field(measuredHumidity, float)
-
+    - { name: heaterEngineState, type: HeaterEngineState }
+    - { name: targetTemperature, type: float }
+    - { name: measuredTemperature, type: float }
+    - { name: measuredHumidity, type: float }
   DisplayCommand:
-    - Field(brightness, float)
-
+    - { name: brightness, type: float }
   DisplayStatus:
-    - Field(brightness, float)
-    - Field(skipped, uint32_t)
-
+    - { name: brightness, type: float }
+    - { name: skipped, type: uint32_t }
   FanStatus:
-    - Field(state, FanState)
-    - Field(targetSpeed, float)
-    - Field(rpmControlEnabled, bool) # DutyCycle or RPM (depending on rpmControlEnabled)
-
+    - { name: state, type: FanState }
+    - { name: targetSpeed, type: float }
+    - { name: rpmControlEnabled, type: bool } # DutyCycle or RPM (depending on rpmControlEnabled)
   FanSample:
-    - Field(measuredRpm, float)
-
+    - { name: measuredRpm, type: float }
   FanCommand:
-    - Field(enabled, bool)
-    - Field(targetSpeed, float)
-    - Field(enableRpmControl, bool) # DutyCycle or RPM (depending on enableRpmControl) 
-
+    - { name: enabled, type: bool }
+    - { name: targetSpeed, type: float }
+    - { name: enableRpmControl, type: bool } # DutyCycle or RPM (depending on enableRpmControl)
   HeatpadStatus:
-    - Field(state, HeatpadState)
-    - Field(currentDutyCycle, float)
-    - Field(currentPeriodMicros, uint32_t)
-    - Field(nextDutyCycle, float)
-    - Field(nextPeriodMicros, uint32_t)
-
+    - { name: state, type: HeatpadState }
+    - { name: currentDutyCycle, type: float }
+    - { name: currentPeriodMicros, type: uint32_t }
+    - { name: nextDutyCycle, type: float }
+    - { name: nextPeriodMicros, type: uint32_t }
   HeatpadSample:
-    - Field(measuredVoltage, float)
-    - Field(measuredCurrent, float)
-    - Field(pwmProgressMicros, float)
-
+    - { name: measuredVoltage, type: float }
+    - { name: measuredCurrent, type: float }
+    - { name: pwmProgressMicros, type: float }
   HeatpadCommand:
-    - Field(enabled, bool)
-    - Field(dutyCycle, float)
-    - Field(periodMicros, uint32_t)
-
+    - { name: enabled, type: bool }
+    - { name: dutyCycle, type: float }
+    - { name: periodMicros, type: uint32_t }
   TemperatureStatus:
-    - Field(driverEnabled, bool)
-    - Field(powerEnabled, bool)
-    - Field(resetting, bool)
-
+    - { name: driverEnabled, type: bool }
+    - { name: powerEnabled, type: bool }
+    - { name: resetting, type: bool }
   TemperatureSample:
-    - Field(temperatureCelcius, float)
-    - Field(humidityRelative, float)
-
+    - { name: temperatureCelcius, type: float }
+    - { name: humidityRelative, type: float }
   ButtonStateChanged:
-    - Field(oldState, ButtonState)
-    - Field(newState, ButtonState)
-
+    - { name: oldState, type: ButtonState }
+    - { name: newState, type: ButtonState }
   ButtonRepeat:
-    - Field(count, uint32_t)
-    - Field(holdTimeMicros, uint32_t)
-
+    - { name: count, type: uint32_t }
+    - { name: holdTimeMicros, type: uint32_t }
   EncoderStep:
-    - Field(steps, int32_t)
+    - { name: steps, type: int32_t }

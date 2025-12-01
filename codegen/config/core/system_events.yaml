@@ -5,12 +5,9 @@ event_payloads:
     - "shared/types/ScreenId.h"
 
 event_types:
-
   ActiveBehaviourChanged:
-    - Field(oldBehaviour, BehaviourId)
-    - Field(newBehaviour, BehaviourId)
-
+    - { name: oldBehaviour, type: BehaviourId }
+    - { name: newBehaviour, type: BehaviourId }
   ActiveScreenChanged:
-    - Field(oldScreen, ScreenId)
-    - Field(newScreen, ScreenId)
-    
+    - { name: oldScreen, type: ScreenId }
+    - { name: newScreen, type: ScreenId }

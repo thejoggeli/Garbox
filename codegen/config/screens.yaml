@@ -13,45 +13,46 @@ screens:
       - DisplayStatus
     sends: 
       - DisplayCommand
-    updaters: 
-      FanState: 
-        - FromEvent(FanStatus, state)
-        - FromEvent(FanStatus, targetSpeed)
-      FanMeasuredRpm: 
-        - FromEvent(FanSample, measuredRpm)
+    updaters:
+      FanState:
+        - { event: FanStatus, name: state }
+        - { event: FanStatus, name: targetSpeed }
+      FanMeasuredRpm:
+        - { event: FanSample, name: measuredRpm }
       HeatpadState:
-        - FromEvent(HeatpadStatus, state)
-      HeatpadDuty: 
-        - FromEvent(HeatpadStatus, currentDutyCycle)
-        - FromEvent(HeatpadStatus, currentPeriodMicros)
-        - FromEvent(HeatpadStatus, nextDutyCycle)
-        - FromEvent(HeatpadStatus, nextPeriodMicros)
+        - { event: HeatpadStatus, name: state }
+      HeatpadDuty:
+        - { event: HeatpadStatus, name: currentDutyCycle }
+        - { event: HeatpadStatus, name: currentPeriodMicros }
+        - { event: HeatpadStatus, name: nextDutyCycle }
+        - { event: HeatpadStatus, name: nextPeriodMicros }
       BoxPosition:
-        - FromEvent(HeatpadSample, pwmProgressMicros)
-      HeatpadSense: 
-        - FromEvent(HeatpadSample, measuredVoltage, epsilon=1e-3)
-        - FromEvent(HeatpadSample, measuredCurrent, epsilon=1e-3)
-      DisplayStatus: 
-        - FromEvent(DisplayStatus, brightness)
-        - FromEvent(DisplayStatus, skipped)
-        - Manual(dirtyCount, uint32_t)
-      ShtState: 
-        - FromEvent(TemperatureStatus, driverEnabled)
-        - FromEvent(TemperatureStatus, powerEnabled)
-        - FromEvent(TemperatureStatus, resetting)
-      ShtSample: 
-        - FromEvent(TemperatureSample, temperatureCelcius)
-        - FromEvent(TemperatureSample, humidityRelative)
+        - { event: HeatpadSample, name: pwmProgressMicros }
+      HeatpadSense:
+        - { event: HeatpadSample, name: measuredVoltage, epsilon: 1e-3 }
+        - { event: HeatpadSample, name: measuredCurrent, epsilon: 1e-3 }
+      DisplayStatus:
+        - { event: DisplayStatus, name: brightness }
+        - { event: DisplayStatus, name: skipped }
+        - { name: dirtyCount, type: uint32_t }
+      ShtState:
+        - { event: TemperatureStatus, name: driverEnabled }
+        - { event: TemperatureStatus, name: powerEnabled }
+        - { event: TemperatureStatus, name: resetting }
+      ShtSample:
+        - { event: TemperatureSample, name: temperatureCelcius }
+        - { event: TemperatureSample, name: humidityRelative }
       HeapSpace:
-        - Manual(heapSpace, uint32_t) 
+        - { name: heapSpace, type: uint32_t }
       AppState:
-        - Manual(eventCount, uint32_t)
-        - FromEvent(ActiveBehaviourChanged, newBehaviour)
-      FermentationStatus: 
-        - FromEvent(FermentationStatus, heaterEngineState)
-        - FromEvent(FermentationStatus, targetTemperature)
-        - FromEvent(FermentationStatus, measuredTemperature)
-        - FromEvent(FermentationStatus, measuredHumidity)
+        - { name: eventCount, type: uint32_t }
+        - { event: ActiveBehaviourChanged, name: newBehaviour }
+      FermentationStatus:
+        - { event: FermentationStatus, name: heaterEngineState }
+        - { event: FermentationStatus, name: targetTemperature }
+        - { event: FermentationStatus, name: measuredTemperature }
+        - { event: FermentationStatus, name: measuredHumidity }
+
 
   Debug:
     tick_phases: null

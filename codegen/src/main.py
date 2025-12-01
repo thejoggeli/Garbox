@@ -1,4 +1,6 @@
+import json
 from pathlib import Path
+from common.util import print_json
 from common.context import Context
 from loader.loader import Loader
 from generate.gen_runtime import generate_runtime
@@ -29,6 +31,12 @@ def main():
     print("loading all config files")
     loader = Loader(ctx.config_dir)
     loader.preload_all()
+
+    # safe parsed config to json
+    with open(script_dir / "parsed_config.json", "w") as file:
+        json.dump(loader.config, file, indent=2)
+
+    print_json(loader.config)
     
     # hardware generation
     print("generating hardware files")

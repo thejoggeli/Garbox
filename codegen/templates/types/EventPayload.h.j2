@@ -12,7 +12,11 @@ namespace Garbox {
 struct {{ event_name }}Payload {
     {% if type_data["fields"] %}
         {% for field_data in type_data["fields"].values() %}
+            {% if field_data["default"] is none %}
     {{ field_data["type"] }} {{ field_data["name"] }};
+            {% else %}
+    {{ field_data["type"] }} {{ field_data["name"] }} = {{ field_data["default"] }};
+            {% endif %}
         {% endfor %}
     {% else %}
     // no fields
