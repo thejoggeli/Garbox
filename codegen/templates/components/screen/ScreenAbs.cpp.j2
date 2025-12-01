@@ -5,27 +5,31 @@
 
 namespace Garbox {
 
-{# update constructor #}
-{{ constructor("Screen", name, screen) }}
-
-{# initScreen() #}
 {% if screen.updaters %}
-void {{ name }}Abs::initScreen(){
-    ScreenAbs::initScreen();
+
+{# constructor #}
+{{ name }}Abs::{{ name }}Abs(): 
+    ScreenAbs(ComponentId::{{ name }}, 
+    ScreenId::{{ name.removesuffix("Screen") }}, 
+    static_cast<uint32_t>({{ name }}Abs::UpdaterIndex::Count)) {
+    // nothing to do
+}
+{% else %}
+{{ name }}Abs::{{ name }}Abs() : ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}, 0) {
+    // nothing to do
+}
+{% endif %}
+
+{# onInitScreen() #}
+void {{ name }}Abs::onInitScreen(){
+{% if screen.updaters %}
 {% for updater_name in screen.updaters.keys() %}
-    mDirtyDispatcher.registerHandler(apply{{ updater_name }}Trampoline, this);
+    registerUpdateHandler(apply{{ updater_name }}Trampoline, this);
 {% endfor %}
-}
+{% else %}
+    // no updaters configured
 {% endif %}
-
-{# updateScreen() #}
-{% if screen.updaters %}
-void {{ name }}Abs::updateScreen(){
-    ScreenAbs::updateScreen();
-    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
-    mDirtyDispatcher.dispatch();
 }
-{% endif %}
 
 {# make and send events #}
 {{ make_events(name, screen) }}
@@ -34,7 +38,11 @@ void {{ name }}Abs::updateScreen(){
 {# dirty dispatch #}
 {% if screen.updaters %}
 void {{ name }}Abs::markDirty(UpdaterIndex index){
-    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
+    markDirtyRaw(static_cast<size_t>(index));
+}
+
+bool {{ name }}Abs::isMarkedDirty(UpdaterIndex index) const {
+    return isMarkedDirtyRaw(static_cast<size_t>(index));
 }
 {% endif %}
 

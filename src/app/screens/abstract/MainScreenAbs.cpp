@@ -6,30 +6,26 @@
 
 namespace Garbox {
 
-MainScreenAbs::MainScreenAbs() : ScreenAbs(ComponentId::MainScreen, ScreenId::Main){
+MainScreenAbs::MainScreenAbs(): 
+    ScreenAbs(ComponentId::MainScreen, 
+    ScreenId::Main, 
+    static_cast<uint32_t>(MainScreenAbs::UpdaterIndex::Count)) {
     // nothing to do
 }
 
-void MainScreenAbs::initScreen(){
-    ScreenAbs::initScreen();
-    mDirtyDispatcher.registerHandler(applyFanStateTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyFanMeasuredRpmTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeatpadStateTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeatpadDutyTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyBoxPositionTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeatpadSenseTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyDisplayStatusTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyTemperatureStateTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyTemperatureSampleTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeapSpaceTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyAppInfoTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyFermentationStatusTrampoline, this);
-}
-
-void MainScreenAbs::updateScreen(){
-    ScreenAbs::updateScreen();
-    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
-    mDirtyDispatcher.dispatch();
+void MainScreenAbs::onInitScreen(){
+    registerUpdateHandler(applyFanStateTrampoline, this);
+    registerUpdateHandler(applyFanMeasuredRpmTrampoline, this);
+    registerUpdateHandler(applyHeatpadStateTrampoline, this);
+    registerUpdateHandler(applyHeatpadDutyTrampoline, this);
+    registerUpdateHandler(applyBoxPositionTrampoline, this);
+    registerUpdateHandler(applyHeatpadSenseTrampoline, this);
+    registerUpdateHandler(applyDisplayStatusTrampoline, this);
+    registerUpdateHandler(applyTemperatureStateTrampoline, this);
+    registerUpdateHandler(applyTemperatureSampleTrampoline, this);
+    registerUpdateHandler(applyHeapSpaceTrampoline, this);
+    registerUpdateHandler(applyAppInfoTrampoline, this);
+    registerUpdateHandler(applyFermentationStatusTrampoline, this);
 }
 
 DisplayCommandEvent MainScreenAbs::makeDisplayCommandEvent(){
@@ -41,7 +37,11 @@ void MainScreenAbs::sendEvent(const DisplayCommandEvent& event){
 }
 
 void MainScreenAbs::markDirty(UpdaterIndex index){
-    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
+    markDirtyRaw(static_cast<size_t>(index));
+}
+
+bool MainScreenAbs::isMarkedDirty(UpdaterIndex index) const {
+    return isMarkedDirtyRaw(static_cast<size_t>(index));
 }
 
 void MainScreenAbs::receiveFanStatus(const FanStatusEvent& event){

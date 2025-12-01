@@ -3,7 +3,6 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
-#include "core/util/helpers/DirtyDispatcher.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
@@ -28,9 +27,16 @@ protected:
 
 private:
 
+    void onInitScreen() final;
+
     // hide event methods
     using ScreenAbs::makeEvent;
     using ScreenAbs::publishEvent;
+
+    // hide dangerous raw access
+    using ScreenAbs::registerUpdateHandler;
+    using ScreenAbs::markDirtyRaw;
+    using ScreenAbs::isMarkedDirtyRaw;
 
 };
 

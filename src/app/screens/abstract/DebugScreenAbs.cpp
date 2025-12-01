@@ -6,8 +6,12 @@
 
 namespace Garbox {
 
-DebugScreenAbs::DebugScreenAbs() : ScreenAbs(ComponentId::DebugScreen, ScreenId::Debug){
+DebugScreenAbs::DebugScreenAbs() : ScreenAbs(ComponentId::DebugScreen, ScreenId::Debug, 0) {
     // nothing to do
+}
+
+void DebugScreenAbs::onInitScreen(){
+    // no updaters configured
 }
 
 DisplayCommandEvent DebugScreenAbs::makeDisplayCommandEvent(){

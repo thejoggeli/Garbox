@@ -3,7 +3,6 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
-#include "core/util/helpers/DirtyDispatcher.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
@@ -28,8 +27,6 @@ protected:
 public:
 
     MainScreenAbs();
-
-    void updateScreen() final;
 
     // receive events for updaters (called by runtime)
     void receiveFanStatus(const FanStatusEvent& event);
@@ -60,9 +57,9 @@ protected:
         Count
     };
 
-    // method to mark and updater index dirty (for manually updated values)
+    // method to mark an updater index dirty (for manually updated values)
     void markDirty(UpdaterIndex index);
-    bool isMarkedDirty(UpdaterIndex index) const { return mDirtyDispatcher.isMarkedDirty(static_cast<uint32_t>(index)); }
+    bool isMarkedDirty(UpdaterIndex index) const;
 
     // shadow copy struct for 'FanState' updater
     struct FanStateShadowCopy {
@@ -147,16 +144,9 @@ protected:
     // send typed events
     void sendEvent(const DisplayCommandEvent& event);
 
-    // number of times any apply-handler method was called
-    uint32_t getDispatchedCount() const { return mDispatchedCount; }
-
 private:
 
-    // dispatcher for udpater 
-    DirtyDispatcher mDirtyDispatcher {static_cast<size_t>(UpdaterIndex::Count)};
-    uint32_t mDispatchedCount = 0;
-
-    void initScreen() final;
+    void onInitScreen() final;
 
     // updater trampolines
     static void applyFanStateTrampoline(void* context);
@@ -175,6 +165,11 @@ private:
     // hide event methods
     using ScreenAbs::makeEvent;
     using ScreenAbs::publishEvent;
+
+    // hide dangerous raw access
+    using ScreenAbs::registerUpdateHandler;
+    using ScreenAbs::markDirtyRaw;
+    using ScreenAbs::isMarkedDirtyRaw;
 
 };
 

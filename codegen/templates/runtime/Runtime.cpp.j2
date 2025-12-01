@@ -140,14 +140,18 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
         m{{ ctrl }}.on{{ event }}(event);
     {% endfor %}
     {# send event to active behaviour (if it supports this event) #}
-    {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 %}
+    {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 or routes["screen_updaters"] | length > 0 %}
         if(header->sendToInactiveComponents){
-        {% for beha in routes["behaviours"] %}
+        {% if routes["behaviours"] | length > 0 or routes["screens"] %}
+            {% for beha in routes["behaviours"] %}
             m{{ beha }}.on{{ event }}(event);
-        {% endfor %}
-        {% for screen in routes["screens"] %}
+          {% endfor %}
+            {% for screen in routes["screens"] %}
             m{{ screen }}.on{{ event }}(event);
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            // no inactive receivers for this event type
+        {% endif %}
         }
         else {
         {% if routes["behaviours"] | length > 0 %}

@@ -16,13 +16,13 @@ public:
         mBytes(0),
         mCapacity(elementCount),
         mCapacityBytes(elementCount * sizeof(T)){
-        // allocate aligned raw storage on heap
-        const bool invalidSize = (elementCount == 0);
-        AssertExit(!invalidSize, "HeapStorage", "capacity must be greater than zero");
 
-        mBytes = new (std::nothrow) uint8_t[elementCount * sizeof(T)];
-        const bool allocFailed = (mBytes == 0);
-        AssertExit(!allocFailed, "HeapStorage", "failed to allocate heap memory");
+        // allocate aligned raw storage on heap
+        if(elementCount > 0){
+            mBytes = new (std::nothrow) uint8_t[elementCount * sizeof(T)];
+            const bool allocFailed = (mBytes == 0);
+            AssertExit(!allocFailed, "HeapStorage", "failed to allocate heap memory");
+        }
     }
 
     ~HeapStorage(){

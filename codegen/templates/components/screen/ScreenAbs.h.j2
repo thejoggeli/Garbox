@@ -2,7 +2,6 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
 #include "core/application/screen/ScreenAbs.h"
-#include "core/util/helpers/DirtyDispatcher.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
@@ -29,11 +28,6 @@ public:
 {# constructor #}
 {{ constructor(name) }}
 
-{# updateScreen() #}
-{% if screen.updaters %}
-    void updateScreen() final;
-{% endif %}
-
 {# updater event handlers #}
 {% if screen.updaters_by_event %}
     // receive events for updaters (called by runtime)
@@ -56,9 +50,9 @@ protected:
 
 {# markDirty() #}
 {% if screen.updaters %}
-    // method to mark and updater index dirty (for manually updated values)
+    // method to mark an updater index dirty (for manually updated values)
     void markDirty(UpdaterIndex index);
-    bool isMarkedDirty(UpdaterIndex index) const { return mDirtyDispatcher.isMarkedDirty(static_cast<uint32_t>(index)); }
+    bool isMarkedDirty(UpdaterIndex index) const;
 {% endif %}
 
 {# updater structs #}
@@ -90,25 +84,10 @@ protected:
 {{ make_events(screen) }}
 {{ send_events(screen) }}
 
-{# getDispatchedCount() #}
-{% if screen.updaters %}
-    // number of times any apply-handler method was called
-    uint32_t getDispatchedCount() const { return mDispatchedCount; }
-{% endif %}
-
 private:
 
-{# dirty dispatcher #}
-{% if screen.updaters %}
-    // dispatcher for udpater 
-    DirtyDispatcher mDirtyDispatcher {static_cast<size_t>(UpdaterIndex::Count)};
-    uint32_t mDispatchedCount = 0;
-{% endif %}
-
 {# initScreen() #}
-{% if screen.updaters %}
-    void initScreen() final;
-{% endif %}
+    void onInitScreen() final;
 
 {# updater trampolines #}
 {% if screen.updaters %}
@@ -120,6 +99,11 @@ private:
 
 {# hide events #}
 {{ hide_events("Screen") }}
+
+    // hide dangerous raw access
+    using ScreenAbs::registerUpdateHandler;
+    using ScreenAbs::markDirtyRaw;
+    using ScreenAbs::isMarkedDirtyRaw;
 
 };
 
