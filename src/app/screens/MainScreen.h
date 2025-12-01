@@ -25,7 +25,6 @@ private:
     void onBecomeDisabled() final;
 
     void onUpdateScreen() final;
-
     void onApplyFanState() final;
     void onApplyFanMeasuredRpm() final;
     void onApplyHeatpadState() final;

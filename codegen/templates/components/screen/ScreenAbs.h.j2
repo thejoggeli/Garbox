@@ -2,6 +2,9 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
 #include "core/application/screen/ScreenAbs.h"
+{% if screen.model.get("debounce") %}
+#include "core/time/SoftwareTimer.h"
+{% endif %}
 #include "shared/types/EventType.h"
 
 namespace Garbox {
@@ -28,6 +31,14 @@ public:
 {# constructor #}
 {{ constructor(name) }}
 
+    void init(ComponentHostIfc& host) final;
+
+{% if screen.model.get("debounce") %}
+    void updateScreen() final;
+    void becomeEnabled() final;
+    void becomeDisabled() final;
+{% endif %}
+
 {% set block %}
     {% include "components/screen/ScreenModel.h.j2" %}
 {% endset %}
@@ -51,9 +62,6 @@ protected:
 {{ send_events(screen) }}
 
 private:
-
-{# initScreen() #}
-    void onInitScreen() final;
 
 {# model field apply trampolines #}
 {% if screen.model.fields %}

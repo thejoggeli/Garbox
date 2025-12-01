@@ -12,8 +12,7 @@ public:
 
     ScreenAbs(ComponentId componentId, ScreenId screenId, uint32_t dispatcherCapacity);
 
-    void init(ComponentHostIfc& host) final;
-    void updateScreen();
+    virtual void updateScreen();
 
     // get the behaviour id
     ScreenId getScreenId() const { return mScreenId; }
@@ -22,7 +21,6 @@ protected:
 
     const ScreenId mScreenId;
 
-    virtual void onInitScreen() = 0;
     virtual void onUpdateScreen() = 0;
 
     // register update handler

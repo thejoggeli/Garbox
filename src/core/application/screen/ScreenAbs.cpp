@@ -12,11 +12,6 @@ ScreenAbs::ScreenAbs(ComponentId componentId, ScreenId ScreenId, uint32_t dispat
     // nothing to do
 }
 
-void ScreenAbs::init(ComponentHostIfc& host){
-    ComponentAbs::init(host);
-    onInitScreen();
-}
-
 void ScreenAbs::updateScreen(){
     onUpdateScreen();
     mDispatchedCount += mDirtyDispatcher.getDirtyCount();

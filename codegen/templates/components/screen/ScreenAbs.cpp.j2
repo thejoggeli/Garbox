@@ -1,6 +1,7 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_cpp.j2" import constructor, make_events, send_events %}
 #include "{{ name }}Abs.h"
+#include <math.h>
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
@@ -18,7 +19,8 @@ namespace Garbox {
 }
 
 {# onInitScreen() #}
-void {{ name }}Abs::onInitScreen(){
+void {{ name }}Abs::init(ComponentHostIfc& host){
+    ScreenAbs::init(host);
 {% if screen.model.fields %}
 {% for group_name in screen.model.groups.keys() %}
     registerUpdateHandler(apply{{ group_name|upper_first }}Trampoline, this);
@@ -27,6 +29,23 @@ void {{ name }}Abs::onInitScreen(){
     // no model fields configured
 {% endif %}
 }
+
+{% if screen.model.get("debounce") %}
+void {{ name }}Abs::updateScreen(){
+    mModel.updateTimers();
+    ScreenAbs::updateScreen();
+}
+
+void {{ name }}Abs::becomeEnabled(){
+    mModel.resetTimers();
+    ScreenAbs::becomeEnabled();
+}
+
+void {{ name }}Abs::becomeDisabled(){
+    mModel.resetTimers();
+    ScreenAbs::becomeDisabled();
+}
+{% endif %}
 
 {{ name }}Abs::Model& {{ name }}Abs::getModel(){
     return mModel;

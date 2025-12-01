@@ -28,6 +28,8 @@ public:
 
     MainScreenAbs();
 
+    void init(ComponentHostIfc& host) final;
+
     class Model { 
     public: 
 
@@ -114,6 +116,7 @@ public:
 
         MainScreenAbs& mScreen; 
 
+        // all model fields
         FanState mFanState;
         float mFanTargetSpeed;
         float mFanMeasuredRpm;
@@ -160,8 +163,6 @@ protected:
     void sendEvent(const DisplayCommandEvent& event);
 
 private:
-
-    void onInitScreen() final;
 
     // model field apply trampolines
     static void applyFanStateTrampoline(void* context);

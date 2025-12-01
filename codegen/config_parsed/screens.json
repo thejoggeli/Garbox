@@ -84,7 +84,6 @@
           "type": "float",
           "bind": "HeatpadSample->measuredVoltage",
           "group": "HeatpadSense",
-          "epsilon": "1e-3",
           "event_type": "HeatpadSample",
           "event_field": "measuredVoltage"
         },
@@ -93,7 +92,6 @@
           "type": "float",
           "bind": "HeatpadSample->measuredCurrent",
           "group": "HeatpadSense",
-          "epsilon": "1e-3",
           "event_type": "HeatpadSample",
           "event_field": "measuredCurrent"
         },
@@ -301,7 +299,8 @@
         "HeapSpace": {
           "heapSpace": "<ref>"
         }
-      }
+      },
+      "debounce": {}
     },
     "replay_events": [
       "<ref>",
@@ -327,7 +326,8 @@
       "fields": {},
       "events": {},
       "manual": {},
-      "groups": {}
+      "groups": {},
+      "debounce": {}
     },
     "replay_events": [
       "<ref>"

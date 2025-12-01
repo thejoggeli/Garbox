@@ -15,8 +15,8 @@ screens:
         - { name: heatpadNextDuty,            bind: HeatpadStatus->nextDutyCycle,             group: HeatpadDuty }
         - { name: heatpadNextPeriod,          bind: HeatpadStatus->nextPeriodMicros,          group: HeatpadDuty }
         - { name: heatpadPwmProgress,         bind: HeatpadSample->pwmProgressMicros,         group: BoxPosition }
-        - { name: heatpadMeasuredVoltage,     bind: HeatpadSample->measuredVoltage,           group: HeatpadSense, epsilon: 1e-3 }
-        - { name: heatpadMeasuredCurrent,     bind: HeatpadSample->measuredCurrent,           group: HeatpadSense, epsilon: 1e-3 }
+        - { name: heatpadMeasuredVoltage,     bind: HeatpadSample->measuredVoltage,           group: HeatpadSense }
+        - { name: heatpadMeasuredCurrent,     bind: HeatpadSample->measuredCurrent,           group: HeatpadSense }
         - { name: displayBrightness,          bind: DisplayStatus->brightness,                group: DisplayStatus }
         - { name: displaySkipped,             bind: DisplayStatus->skipped,                   group: DisplayStatus }
         - { name: shtDriverEnabled,           bind: TemperatureStatus->driverEnabled,         group: TemperatureState }

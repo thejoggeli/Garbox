@@ -17,6 +17,8 @@ public:
 
     DebugScreenAbs();
 
+    void init(ComponentHostIfc& host) final;
+
     class Model { 
     public: 
 
@@ -41,6 +43,8 @@ public:
 
         DebugScreenAbs& mScreen; 
 
+        // all model fields
+
     };
 
     Model& getModel();
@@ -61,8 +65,6 @@ protected:
     void sendEvent(const DisplayCommandEvent& event);
 
 private:
-
-    void onInitScreen() final;
 
     // hide event methods
     using ScreenAbs::makeEvent;

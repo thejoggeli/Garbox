@@ -49,6 +49,9 @@ public:
 
 protected:
 
+    virtual void becomeEnabled();
+    virtual void becomeDisabled();
+
     // abstract methods for user implementation
     virtual void onInit() {};
     virtual void onStart() {};

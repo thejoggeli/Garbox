@@ -2,6 +2,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "DebugScreenAbs.h"
+#include <math.h>
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
@@ -16,7 +17,8 @@ DebugScreenAbs::DebugScreenAbs():
     // nothing to do
 }
 
-void DebugScreenAbs::onInitScreen(){
+void DebugScreenAbs::init(ComponentHostIfc& host){
+    ScreenAbs::init(host);
     // no model fields configured
 }
 

@@ -39,11 +39,19 @@ void ComponentAbs::setEnabled(bool enabled){
     }
     mEnabled = enabled;
     if(enabled){
-        onBecomeEnabled();
+        becomeEnabled();
     }
     else {
-        onBecomeDisabled();
+        becomeDisabled();
     }
+}
+
+void ComponentAbs::becomeEnabled(){
+    onBecomeEnabled();
+}
+
+void ComponentAbs::becomeDisabled(){
+    onBecomeDisabled();
 }
 
 void ComponentAbs::publishEvent(const EventHeader* header){

@@ -95,6 +95,11 @@ def parse_int_for_type(value, type_name):
         "uint64_t": (0, 18446744073709551615),
     }
 
+    if isinstance(value, str):
+        value = value.replace("'", "")
+
+    print("VALUE", value)
+
     # Try converting to int
     try:
         n = int(value)

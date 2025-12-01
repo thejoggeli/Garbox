@@ -17,6 +17,11 @@ public:
     Model(Model&&) = delete;
     Model& operator=(Model&&) = delete;
 
+{% if screen.model.get("debounce") %}
+    void resetTimers();
+    void updateTimers();
+{% endif %}
+
     // getters
 {% for field in screen.model.fields.values() %}
     {{ field.type }} get{{ field.name|upper_first }}() const;
@@ -31,6 +36,19 @@ private:
 
     {{ name }}Abs& mScreen; 
 
+{% if screen.model.get("debounce") %}
+    // debounce timers
+    {% for field in screen.model.debounce.values() %}
+    SoftwareTimer mDebounceTimer{{ field.name|upper_first }};
+    {% endfor %}
+
+    // debounce flag
+    {% for field in screen.model.debounce.values() %}
+    bool mDebounceRepeatFlag{{ field.name|upper_first }} = false;
+    {% endfor %}
+{% endif %}
+
+    // all model fields
 {% for field in screen.model.fields.values() %}
     {% if field.get("default") %}
     {{ field.type }} m{{ field.name|upper_first }} = {{ field.default }};
