@@ -6,7 +6,7 @@ def parse_screens(config: dict):
     for screen_data in config["screens"].values():
         if "updaters" in screen_data:
             parse_updaters(screen_data["updaters"], config["event_types"])
-
+            group_event_updaters(screen_data["updaters"])
 
 def parse_updaters(updaters: dict, event_types: dict):
     """
@@ -66,9 +66,34 @@ def parse_updaters(updaters: dict, event_types: dict):
 
             parsed_entries.append({
                 "event": event_name,
-                "field": field_name,
+                "name": field_name,
                 "type": field_type,
                 "default": render_value(default_value, field_type),
             })
             
         updaters[updater_name] = parsed_entries
+
+
+def group_event_updaters(updaters: dict):
+
+    for updater_name, updater_list in updaters.items():
+
+        groups = {
+            "events": {},
+            "manual": {},
+        }
+        
+        for field_data in updater_list:
+
+            event_name = field_data.get("event", None)
+            field_name = field_data["name"]
+
+            if(event_name is None):
+                groups["manual"][field_name] = field_data
+            
+            else:
+                if event_name not in groups["events"]:
+                    groups["events"][event_name] = {}
+                groups["events"][event_name][field_name] = field_data
+
+        updaters[updater_name] = groups

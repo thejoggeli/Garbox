@@ -1,0 +1,37 @@
+{
+  "CalibrationBehaviour": {
+    "tick_phases": [
+      "LogicTick"
+    ],
+    "receives": [
+      "Heartbeat",
+      "FanStatus",
+      "FanSample"
+    ],
+    "sends": [
+      "FanCommand"
+    ]
+  },
+  "FermentationBehaviour": {
+    "tick_phases": [
+      "LogicTick"
+    ],
+    "receives": [
+      "Heartbeat",
+      "FanStatus",
+      "FanSample",
+      "HeatpadStatus",
+      "TemperatureStatus",
+      "TemperatureSample",
+      "ButtonStateChanged",
+      "ButtonRepeat",
+      "EncoderStep"
+    ],
+    "sends": [
+      "FanCommand",
+      "DisplayCommand",
+      "HeatpadCommand",
+      "FermentationStatus"
+    ]
+  }
+}

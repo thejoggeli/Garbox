@@ -1,12 +1,7 @@
 import yaml
-from copy import deepcopy
+import json
+import os
 from pathlib import Path
-from common.util import ( 
-    ensure_list,
-    ensure_dict_keys_have_suffix, 
-    ensure_str_has_suffix,
-    print_json
-)
 from loader.parse_application import parse_application
 from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
@@ -38,6 +33,18 @@ class Loader:
         # requires events to already be parsed)
         parse_application(self.config)
 
+
+    def save_json(self, path: Path, config):
+        print(f"saving: {path}")
+        os.makedirs(path.parent, exist_ok=True)
+        with open(path, "w") as file:
+            json.dump(config, file, indent=2)
+
+
+    def save_config(self, path: Path):
+        for name in self.config.keys():
+            self.save_json(path / f"{name}.json", self.config[name])
+            
 
 def load_yaml(path: Path):
     print(f"{path}")

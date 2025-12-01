@@ -1,0 +1,72 @@
+{
+  "app_name": "Garbox",
+  "initial_behaviour": "FermentationBehaviour",
+  "initial_screen": "MainScreen",
+  "event_pool_size_bytes": 1024,
+  "event_queue_length": 128,
+  "tick_period_millis": 33,
+  "tick_phases": [
+    {
+      "name": "HeartbeatTick",
+      "behaviours": [],
+      "controllers": [
+        "HeartbeatController"
+      ],
+      "screens": [],
+      "order": 0
+    },
+    {
+      "name": "InputTick",
+      "behaviours": [],
+      "controllers": [
+        "FanController",
+        "HeatpadController",
+        "InputController",
+        "I2cPartsController"
+      ],
+      "screens": [],
+      "order": 1
+    },
+    {
+      "name": "LogicTick",
+      "behaviours": [
+        "CalibrationBehaviour",
+        "FermentationBehaviour"
+      ],
+      "controllers": [],
+      "screens": [],
+      "order": 2
+    },
+    {
+      "name": "OutputTick",
+      "behaviours": [],
+      "controllers": [
+        "FanController",
+        "HeatpadController"
+      ],
+      "screens": [],
+      "order": 3
+    },
+    {
+      "name": "LoggingTick",
+      "behaviours": [],
+      "controllers": [
+        "DevtoolsController"
+      ],
+      "screens": [],
+      "order": 4
+    },
+    {
+      "name": "RenderTick",
+      "delay_millis": 20,
+      "behaviours": [],
+      "controllers": [
+        "DisplayController"
+      ],
+      "screens": [],
+      "order": 5
+    }
+  ],
+  "stubs_prefix": "Example",
+  "stubs_suffix": ""
+}

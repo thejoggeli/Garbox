@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from common.util import print_json
 from common.context import Context
@@ -33,10 +32,7 @@ def main():
     loader.preload_all()
 
     # safe parsed config to json
-    with open(script_dir / "parsed_config.json", "w") as file:
-        json.dump(loader.config, file, indent=2)
-
-    print_json(loader.config)
+    loader.save_config(codegen_dir / "config_parsed")
     
     # hardware generation
     print("generating hardware files")

@@ -53,7 +53,6 @@ screens:
         - { event: FermentationStatus, name: measuredTemperature }
         - { event: FermentationStatus, name: measuredHumidity }
 
-
   Debug:
     tick_phases: null
     receives: [Heartbeat]

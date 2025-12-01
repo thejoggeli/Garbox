@@ -1,0 +1,85 @@
+{
+  "DisplayController": {
+    "subdir": "hmi",
+    "tick_phases": [
+      "RenderTick"
+    ],
+    "receives": [
+      "DisplayCommand"
+    ],
+    "sends": [
+      "DisplayStatus"
+    ]
+  },
+  "DevtoolsController": {
+    "subdir": "devtools",
+    "tick_phases": [
+      "LoggingTick"
+    ],
+    "receives": [],
+    "sends": []
+  },
+  "FanController": {
+    "subdir": "actuators",
+    "tick_phases": [
+      "InputTick",
+      "OutputTick"
+    ],
+    "receives": [
+      "FanCommand"
+    ],
+    "sends": [
+      "FanStatus",
+      "FanSample"
+    ]
+  },
+  "HeartbeatController": {
+    "subdir": "heartbeat",
+    "tick_phases": [
+      "HeartbeatTick"
+    ],
+    "receives": [],
+    "sends": [
+      "Heartbeat"
+    ]
+  },
+  "HeatpadController": {
+    "subdir": "actuators",
+    "tick_phases": [
+      "InputTick",
+      "OutputTick"
+    ],
+    "receives": [
+      "HeatpadCommand"
+    ],
+    "sends": [
+      "HeatpadStatus",
+      "HeatpadSample"
+    ]
+  },
+  "InputController": {
+    "subdir": "hmi",
+    "tick_phases": [
+      "InputTick"
+    ],
+    "receives": [],
+    "sends": [
+      "ButtonStateChanged",
+      "ButtonRepeat",
+      "EncoderStep"
+    ]
+  },
+  "I2cPartsController": {
+    "subdir": "sensors",
+    "tick_phases": [
+      "InputTick"
+    ],
+    "receives": [
+      "ButtonStateChanged"
+    ],
+    "sends": [
+      "TemperatureStatus",
+      "TemperatureSample"
+    ]
+  }
+}
