@@ -29,15 +29,15 @@ public:
     MainScreenAbs();
 
     // receive events for updaters (called by runtime)
-    void receiveFanStatus(const FanStatusEvent& event);
-    void receiveFanSample(const FanSampleEvent& event);
-    void receiveHeatpadStatus(const HeatpadStatusEvent& event);
-    void receiveHeatpadSample(const HeatpadSampleEvent& event);
-    void receiveDisplayStatus(const DisplayStatusEvent& event);
-    void receiveTemperatureStatus(const TemperatureStatusEvent& event);
-    void receiveTemperatureSample(const TemperatureSampleEvent& event);
-    void receiveActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event);
-    void receiveFermentationStatus(const FermentationStatusEvent& event);
+    void writeFanStatus(const FanStatusEvent& event);
+    void writeFanSample(const FanSampleEvent& event);
+    void writeHeatpadStatus(const HeatpadStatusEvent& event);
+    void writeHeatpadSample(const HeatpadSampleEvent& event);
+    void writeDisplayStatus(const DisplayStatusEvent& event);
+    void writeTemperatureStatus(const TemperatureStatusEvent& event);
+    void writeTemperatureSample(const TemperatureSampleEvent& event);
+    void writeActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event);
+    void writeFermentationStatus(const FermentationStatusEvent& event);
 
 protected:
 

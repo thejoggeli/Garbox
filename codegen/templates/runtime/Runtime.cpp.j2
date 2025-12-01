@@ -139,8 +139,8 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     {% for ctrl in routes["controllers"] %}
         m{{ ctrl }}.on{{ event }}(event);
     {% endfor %}
-    {# send event to active behaviour (if it supports this event) #}
-    {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 or routes["screen_updaters"] | length > 0 %}
+    {# send event to active behaviour + screen (if  event supported) #}
+    {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 %}
         if(header->sendToInactiveComponents){
         {% if routes["behaviours"] | length > 0 or routes["screens"] %}
             {% for beha in routes["behaviours"] %}
@@ -161,25 +161,27 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
             {% endfor %}
                 default: break; // active behaviour does not support event type
             }
+        {% else %}
+            // no active receivers for this event type
         {% endif %}
-    {# send event to active screen (if it supports this event) #}
-        {% if routes["screens"] | length > 0 or routes["screen_updaters"] | length > 0 %}
+        {# call onEvent() handlers on active screen (if it supports this event) #}
+        {% if routes["screens"] | length > 0 %}
             switch(mActiveScreen->getScreenId()){
-            {% for screen_name, screen_data in screens.items() %}
-                {% if screen_name in routes.screens or screen_name in routes["screen_updaters"] %}
-                case ScreenId::{{ screen_name.removesuffix("Screen") }}:
-                    {% if event in screen_data.updaters_by_event %}
-                    static_cast<{{ screen_name }}*>(mActiveScreen)->receive{{ event }}(event);
-                    {% endif %}
-                    {% if event in screen_data.receives %}
-                    static_cast<{{ screen_name }}*>(mActiveScreen)->on{{ event }}(event);
-                    {% endif %}
-                    break;
-                {% endif %}
+            {% for screen_name in routes["screens"] %}
+                case ScreenId::{{ screen_name.removesuffix("Screen") }}: static_cast<{{ screen_name }}*>(mActiveScreen)->on{{ event }}(event); break;
             {% endfor %}
                 default: break; // active screen does not support event type
             }
         {% endif %}
+        }
+    {% endif %}
+        {# call receiveEvent() handlers on active screen (if it supports this event) #}
+    {% if routes["screen_updaters"] | length > 0 %}
+        switch(mActiveScreen->getScreenId()){
+        {% for screen_name in routes["screen_updaters"] %}
+            case ScreenId::{{ screen_name.removesuffix("Screen") }}: static_cast<{{ screen_name }}*>(mActiveScreen)->write{{ event }}(event); break;
+        {% endfor %}
+            default: break; // active screen does not support event type
         }
     {% endif %}
         break;

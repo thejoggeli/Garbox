@@ -49,7 +49,7 @@ bool {{ name }}Abs::isMarkedDirty(UpdaterIndex index) const {
 {# update handlers #}
 {% if screen.updaters %}
 {% for event_name, updater_fields in screen.updaters_by_event.items() %}
-void {{ name }}Abs::receive{{ event_name }}(const {{ event_name }}Event& event){
+void {{ name }}Abs::write{{ event_name }}(const {{ event_name }}Event& event){
     {% for updater_type in updater_fields["updater_types"] %}
     bool {{ updater_type[0]|lower ~ updater_type[1:] }}Changed = false;
     {% endfor %}

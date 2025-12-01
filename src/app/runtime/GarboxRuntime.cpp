@@ -163,9 +163,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 default: break; // active behaviour does not support event type
             }
             switch(mActiveScreen->getScreenId()){
-                case ScreenId::Debug:
-                    static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event);
-                    break;
+                case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
                 default: break; // active screen does not support event type
             }
         }
@@ -173,16 +171,9 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::FermentationStatus: {
         const FermentationStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            // no inactive receivers for this event type
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveFermentationStatus(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeFermentationStatus(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -193,16 +184,9 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::DisplayStatus: {
         const DisplayStatusEvent event(header);
-        if(header->sendToInactiveComponents){
-            // no inactive receivers for this event type
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveDisplayStatus(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeDisplayStatus(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -218,12 +202,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
                 default: break; // active behaviour does not support event type
             }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveFanStatus(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeFanStatus(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -239,12 +221,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
                 default: break; // active behaviour does not support event type
             }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveFanSample(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeFanSample(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -263,27 +243,18 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadStatus(event); break;
                 default: break; // active behaviour does not support event type
             }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveHeatpadStatus(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeHeatpadStatus(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
     case EventType::HeatpadSample: {
         const HeatpadSampleEvent event(header);
-        if(header->sendToInactiveComponents){
-            // no inactive receivers for this event type
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveHeatpadSample(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeHeatpadSample(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -302,12 +273,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatus(event); break;
                 default: break; // active behaviour does not support event type
             }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveTemperatureStatus(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeTemperatureStatus(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -321,12 +290,10 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSample(event); break;
                 default: break; // active behaviour does not support event type
             }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveTemperatureSample(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeTemperatureSample(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }
@@ -372,16 +339,9 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::ActiveBehaviourChanged: {
         const ActiveBehaviourChangedEvent event(header);
-        if(header->sendToInactiveComponents){
-            // no inactive receivers for this event type
-        }
-        else {
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main:
-                    static_cast<MainScreen*>(mActiveScreen)->receiveActiveBehaviourChanged(event);
-                    break;
-                default: break; // active screen does not support event type
-            }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->writeActiveBehaviourChanged(event); break;
+            default: break; // active screen does not support event type
         }
         break;
     }

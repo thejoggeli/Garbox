@@ -32,7 +32,7 @@ public:
 {% if screen.updaters_by_event %}
     // receive events for updaters (called by runtime)
 {% for event_name in screen.updaters_by_event.keys() %}
-    void receive{{ event_name }}(const {{ event_name }}Event& event);
+    void write{{ event_name }}(const {{ event_name }}Event& event);
 {% endfor %}
 {% endif %}
 

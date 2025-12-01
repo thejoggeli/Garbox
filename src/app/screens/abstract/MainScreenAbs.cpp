@@ -44,7 +44,7 @@ bool MainScreenAbs::isMarkedDirty(UpdaterIndex index) const {
     return isMarkedDirtyRaw(static_cast<size_t>(index));
 }
 
-void MainScreenAbs::receiveFanStatus(const FanStatusEvent& event){
+void MainScreenAbs::writeFanStatus(const FanStatusEvent& event){
     bool fanStateChanged = false;
     if(mFanState.state != event->state){
         mFanState.state = event->state;
@@ -59,7 +59,7 @@ void MainScreenAbs::receiveFanStatus(const FanStatusEvent& event){
     }
 }
 
-void MainScreenAbs::receiveFanSample(const FanSampleEvent& event){
+void MainScreenAbs::writeFanSample(const FanSampleEvent& event){
     bool fanMeasuredRpmChanged = false;
     if(mFanMeasuredRpm.measuredRpm != event->measuredRpm){
         mFanMeasuredRpm.measuredRpm = event->measuredRpm;
@@ -70,7 +70,7 @@ void MainScreenAbs::receiveFanSample(const FanSampleEvent& event){
     }
 }
 
-void MainScreenAbs::receiveHeatpadStatus(const HeatpadStatusEvent& event){
+void MainScreenAbs::writeHeatpadStatus(const HeatpadStatusEvent& event){
     bool heatpadDutyChanged = false;
     bool heatpadStateChanged = false;
     if(mHeatpadState.state != event->state){
@@ -101,7 +101,7 @@ void MainScreenAbs::receiveHeatpadStatus(const HeatpadStatusEvent& event){
     }
 }
 
-void MainScreenAbs::receiveHeatpadSample(const HeatpadSampleEvent& event){
+void MainScreenAbs::writeHeatpadSample(const HeatpadSampleEvent& event){
     bool boxPositionChanged = false;
     bool heatpadSenseChanged = false;
     if(mBoxPosition.pwmProgressMicros != event->pwmProgressMicros){
@@ -124,7 +124,7 @@ void MainScreenAbs::receiveHeatpadSample(const HeatpadSampleEvent& event){
     }
 }
 
-void MainScreenAbs::receiveDisplayStatus(const DisplayStatusEvent& event){
+void MainScreenAbs::writeDisplayStatus(const DisplayStatusEvent& event){
     bool displayStatusChanged = false;
     if(mDisplayStatus.brightness != event->brightness){
         mDisplayStatus.brightness = event->brightness;
@@ -139,7 +139,7 @@ void MainScreenAbs::receiveDisplayStatus(const DisplayStatusEvent& event){
     }
 }
 
-void MainScreenAbs::receiveTemperatureStatus(const TemperatureStatusEvent& event){
+void MainScreenAbs::writeTemperatureStatus(const TemperatureStatusEvent& event){
     bool temperatureStateChanged = false;
     if(mTemperatureState.driverEnabled != event->driverEnabled){
         mTemperatureState.driverEnabled = event->driverEnabled;
@@ -158,7 +158,7 @@ void MainScreenAbs::receiveTemperatureStatus(const TemperatureStatusEvent& event
     }
 }
 
-void MainScreenAbs::receiveTemperatureSample(const TemperatureSampleEvent& event){
+void MainScreenAbs::writeTemperatureSample(const TemperatureSampleEvent& event){
     bool temperatureSampleChanged = false;
     if(mTemperatureSample.temperatureCelcius != event->temperatureCelcius){
         mTemperatureSample.temperatureCelcius = event->temperatureCelcius;
@@ -173,7 +173,7 @@ void MainScreenAbs::receiveTemperatureSample(const TemperatureSampleEvent& event
     }
 }
 
-void MainScreenAbs::receiveActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
+void MainScreenAbs::writeActiveBehaviourChanged(const ActiveBehaviourChangedEvent& event){
     bool appInfoChanged = false;
     if(mAppInfo.newBehaviour != event->newBehaviour){
         mAppInfo.newBehaviour = event->newBehaviour;
@@ -184,7 +184,7 @@ void MainScreenAbs::receiveActiveBehaviourChanged(const ActiveBehaviourChangedEv
     }
 }
 
-void MainScreenAbs::receiveFermentationStatus(const FermentationStatusEvent& event){
+void MainScreenAbs::writeFermentationStatus(const FermentationStatusEvent& event){
     bool fermentationStatusChanged = false;
     if(mFermentationStatus.heaterEngineState != event->heaterEngineState){
         mFermentationStatus.heaterEngineState = event->heaterEngineState;

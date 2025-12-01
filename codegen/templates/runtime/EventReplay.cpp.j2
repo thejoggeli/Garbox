@@ -69,7 +69,7 @@ void EventReplay::send{{ event_name }}To{{ screen_name }}(void* context){
     self->m{{ screen_name }}.on{{ event_name }}(&self->m{{ event_name }}Block.header); 
     {% endif %}
     {% if event_name in screen_data["updaters_by_event"] %}
-    self->m{{ screen_name }}.receive{{ event_name }}(&self->m{{ event_name }}Block.header); 
+    self->m{{ screen_name }}.write{{ event_name }}(&self->m{{ event_name }}Block.header); 
     {% endif %}
 }
 

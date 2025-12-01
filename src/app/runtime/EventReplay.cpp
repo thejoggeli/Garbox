@@ -131,47 +131,47 @@ void EventReplay::replay(ScreenId screenId){
 
 void EventReplay::sendActiveBehaviourChangedToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveActiveBehaviourChanged(&self->mActiveBehaviourChangedBlock.header); 
+    self->mMainScreen.writeActiveBehaviourChanged(&self->mActiveBehaviourChangedBlock.header); 
 }
 
 void EventReplay::sendDisplayStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveDisplayStatus(&self->mDisplayStatusBlock.header); 
+    self->mMainScreen.writeDisplayStatus(&self->mDisplayStatusBlock.header); 
 }
 
 void EventReplay::sendFanSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveFanSample(&self->mFanSampleBlock.header); 
+    self->mMainScreen.writeFanSample(&self->mFanSampleBlock.header); 
 }
 
 void EventReplay::sendFanStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveFanStatus(&self->mFanStatusBlock.header); 
+    self->mMainScreen.writeFanStatus(&self->mFanStatusBlock.header); 
 }
 
 void EventReplay::sendFermentationStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveFermentationStatus(&self->mFermentationStatusBlock.header); 
+    self->mMainScreen.writeFermentationStatus(&self->mFermentationStatusBlock.header); 
 }
 
 void EventReplay::sendHeatpadSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveHeatpadSample(&self->mHeatpadSampleBlock.header); 
+    self->mMainScreen.writeHeatpadSample(&self->mHeatpadSampleBlock.header); 
 }
 
 void EventReplay::sendHeatpadStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveHeatpadStatus(&self->mHeatpadStatusBlock.header); 
+    self->mMainScreen.writeHeatpadStatus(&self->mHeatpadStatusBlock.header); 
 }
 
 void EventReplay::sendTemperatureSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveTemperatureSample(&self->mTemperatureSampleBlock.header); 
+    self->mMainScreen.writeTemperatureSample(&self->mTemperatureSampleBlock.header); 
 }
 
 void EventReplay::sendTemperatureStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    self->mMainScreen.receiveTemperatureStatus(&self->mTemperatureStatusBlock.header); 
+    self->mMainScreen.writeTemperatureStatus(&self->mTemperatureStatusBlock.header); 
 }
 
 void EventReplay::sendHeartbeatToDebugScreen(void* context){ 
