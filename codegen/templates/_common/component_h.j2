@@ -2,16 +2,25 @@
 {% macro constructor(name) %}
 
     {{ name }}Abs();
+
 {% endmacro %}
 
 
 {# receive ticks #}
 {% macro on_ticks(component) %}
+
+{% if component.tick_phases_all %}
+
+    // tick handler (to be implmeneted by user)
+    virtual void onTick(TickPhase phase) = 0;
+    
+{% endif %}
 {% if component.tick_phases %}
 
     // tick handlers (to be implmeneted by user)
 {% for tick in component.tick_phases %}
     virtual void on{{ tick }}() = 0;
+
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -19,11 +28,18 @@
 
 {# receive events #}
 {% macro on_events(component) %}
+{% if component.receives_all %}
+
+    // event handler (to be implmeneted by user)
+    virtual void onEvent(const EventHeader* header) = 0;
+
+{% endif %}
 {% if component.receives %}
 
-    // receive event handlers (to be implmeneted by user)
+    // event handlers (to be implmeneted by user)
 {% for ev in component.receives %}
     virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
+
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -37,6 +53,7 @@
 {% for ev in component.sends %}
     {{ ev }}Event make{{ ev }}Event();
 {% endfor %}
+
 {% endif %}
 {% endmacro %}
 
@@ -49,6 +66,7 @@
 {% for ev in component.sends %}
     void sendEvent(const {{ ev }}Event& event);
 {% endfor %}
+
 {% endif %}
 {% endmacro %}
 
@@ -59,4 +77,5 @@
     // hide event methods
     using {{ type }}Abs::makeEvent;
     using {{ type }}Abs::publishEvent;
+
 {% endmacro %}

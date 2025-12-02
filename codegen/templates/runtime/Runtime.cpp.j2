@@ -22,10 +22,13 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
     }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
     mEventReplay(
-{% for name, screen_data in screens.items() %} 
-        m{{ name }}{% if not loop.last %}, {% endif %}
-{% endfor %} 
-    ){
+{%- set ns = namespace(delim="") -%}
+{%- for name, screen_data in screens.items() -%} 
+    {%- if screen_data.replay -%}
+        {{- ns.delim }}m{{- name -}}{%- if not loop.last -%}{%- endif -%}
+        {%- set ns.delim = ", " -%}
+    {%- endif -%}
+{%- endfor -%}){
 
     // register components
 {% for beh in behaviours %}
@@ -93,30 +96,40 @@ void {{ RuntimeName}}::handleTickEnd(){
 {% for tick in application.tick_phases %}
 void {{ RuntimeName }}::handle{{ tick.name }}(){
     Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
-    {# Call tick on controllers supporting this tick #}
-    {% for ctrl_key, ctrl in controllers.items() %}
-        {% if tick.name in ctrl['tick_phases'] %}
-    m{{ ctrl_key }}.on{{ tick.name }}();
-        {% endif %}
-    {% endfor %}
-    {# Call tick on active behaviour #}
-    {% if tick["behaviours"] | length > 0 %}
+{# ---- Call tick on controllers ---- #}
+{% for ctrl in tick["controllers"].values() %}
+{% if ctrl['tick_phases_all'] %}
+    m{{ ctrl.name }}.onTick(TickPhase::{{ tick.name }});
+{% else %}
+    m{{ ctrl.name }}.on{{ tick.name }}();
+{% endif %}
+{% endfor %}
+{# ---- Call tick on active behaviour ----#}
+{% if tick["behaviours"] | length > 0 %}
     switch(mActiveBehaviour->getBehaviourId()){
-    {% for beha in tick["behaviours"] %}
-        case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
-    {% endfor %}
+{% for beha in tick["behaviours"].values() %}
+    {% if beha["tick_phases_all"] %}
+        case BehaviourId::{{ beha.name.removesuffix("Behaviour") }}: static_cast<{{ beha.name }}*>(mActiveBehaviour)->onTick(TickPhase::{{ tick.name }});
+    {% else %}
+        case BehaviourId::{{ beha.name.removesuffix("Behaviour") }}: static_cast<{{ beha.name }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
+    {% endif %}
+{% endfor %}
         default: break; // active behaviour does not support tick type
     }
-    {% endif %}
-    {# Call tick on active screen #}
-    {% if tick["screens"] | length > 0 %}
+{% endif %}
+{# ---- Call tick on active screen ----#}
+{% if tick["screens"] | length > 0 %}
     switch(mActiveScreen->getScreenId()){
-    {% for screen in tick["screens"] %}
-        case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ tick.name }}(); break;
-    {% endfor %}
+{% for screen in tick["screens"].values() %}
+    {% if screen["tick_phases_all"] %}
+        case ScreenId::{{ screen.name.removesuffix("Screen") }}: static_cast<{{ screen.name }}*>(mActiveScreen)->onTick(TickPhase::{{ tick.name }});
+    {% else %}
+        case ScreenId::{{ screen.name.removesuffix("Screen") }}: static_cast<{{ screen.name }}*>(mActiveScreen)->on{{ tick.name }}(); break;
+    {% endif %}
+{% endfor %}
         default: break; // active behaviour does not support tick type
     }
-    {% endif %}
+{% endif %}
     {# Call dispatch events #}
     dispatchEvents();
 }
@@ -126,6 +139,17 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 
     // store event for replay
     mEventReplay.storeEvent(header);
+
+{% set ns = namespace(printed=0) %}
+{% for component in components.values() %}
+    {% if component["receives_all"]: %}
+        {% if ns.printed == 0 %}
+    // receive all events
+        {% endif %}
+    m{{ component.name }}.onEvent(header);
+    {% set ns.printed = ns.printed + 1 %}
+    {% endif %}
+{% endfor %}
 
     // route event to components
     switch(header->type){

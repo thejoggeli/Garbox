@@ -23,8 +23,8 @@ private:
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
+    void onUpdateScreen() final; // safe to update ui elements in this method
 
-    void onUpdateScreen() final;
     void onApplyFanState() final;
     void onApplyFanMeasuredRpm() final;
     void onApplyHeatpadState() final;

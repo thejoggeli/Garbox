@@ -8,6 +8,7 @@
 namespace Garbox {
 
 class MainScreenAbs : public ScreenAbs {
+
 protected:
 
     // model field callbacks to update specific parts of the screen (to be implmeneted by user)
@@ -28,6 +29,7 @@ public:
 
     MainScreenAbs();
 
+    // init override from component
     void init(ComponentHostIfc& host) final;
 
     class Model { 
@@ -155,6 +157,7 @@ protected:
     // method to mark an model field index dirty (for manually updated values)
     void markDirty(Model::Index index);
     bool isMarkedDirty(Model::Index index) const;
+    
 
     // make typed events 
     DisplayCommandEvent makeDisplayCommandEvent();

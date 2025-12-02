@@ -13,6 +13,7 @@ enum class ScreenId : uint16_t {
 
     // generated from config
     Main,
+    EventLog,
     Debug,
 
     // enum size marker

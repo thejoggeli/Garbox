@@ -1,4 +1,5 @@
 {% include "_common/header_stub.j2" %}
+{% from "_common/component_stub_cpp.j2" import on_ticks, on_events %}
 #include "{{ name }}.h"
 
 namespace Garbox {
@@ -14,21 +15,8 @@ void {{ name }}::onInit(){
 void {{ name }}::onStart(){
     // nothing to do
 }
-{% if controller.tick_phases %}
-{% for tick in controller.tick_phases %}
 
-void {{ name }}::on{{ tick }}(){
-    // nothing to do
-}
-{% endfor %}
-{% endif %}
-{% if controller.receives %}
-{% for ev in controller.receives %}
-
-void {{ name }}::on{{ ev }}(const {{ ev }}Event& event){
-    // nothing to do
-}
-{% endfor %}
-{% endif %}
+{{ on_ticks(controller) }}
+{{ on_events(controller) }}
 
 } // namespace Garbox

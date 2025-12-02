@@ -9,6 +9,7 @@ const char* ScreenIdToString(ScreenId id){
     switch(id){
         case ScreenId::Null: return "Null";
         case ScreenId::Main: return "Main";
+        case ScreenId::EventLog: return "EventLog";
         case ScreenId::Debug: return "Debug";
         case ScreenId::Count: return "Count";
     }

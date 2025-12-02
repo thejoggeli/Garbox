@@ -3,7 +3,6 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "app/screens/MainScreen.h"
-#include "app/screens/DebugScreen.h"
 #include "core/application/screen/ScreenAbs.h"
 #include "core/util/helpers/DirtyDispatcher.h"
 #include "shared/types/EventAlias.h"
@@ -18,8 +17,7 @@ public:
 
     EventReplay(
  
-        MainScreenAbs& mainScreen,  
-        DebugScreenAbs& debugScreen 
+        MainScreenAbs& mainScreen 
     );
 
     void storeEvent(const EventHeader* header);
@@ -28,12 +26,9 @@ public:
 private:
 
     MainScreenAbs& mMainScreen;
-    DebugScreenAbs& mDebugScreen;
 
     DirtyDispatcher mMainScreenDispatcher {9};
-    DirtyDispatcher mDebugScreenDispatcher {1};
 
-    EventBlock<EventType::Heartbeat> mHeartbeatBlock;
     EventBlock<EventType::FermentationStatus> mFermentationStatusBlock;
     EventBlock<EventType::DisplayStatus> mDisplayStatusBlock;
     EventBlock<EventType::FanStatus> mFanStatusBlock;
@@ -44,6 +39,7 @@ private:
     EventBlock<EventType::TemperatureSample> mTemperatureSampleBlock;
     EventBlock<EventType::ActiveBehaviourChanged> mActiveBehaviourChangedBlock;
 
+    // send event to 'MainScreen' 
     static void sendActiveBehaviourChangedToMainScreen(void* context);
     static void sendDisplayStatusToMainScreen(void* context);
     static void sendFanSampleToMainScreen(void* context);
@@ -53,7 +49,6 @@ private:
     static void sendHeatpadStatusToMainScreen(void* context);
     static void sendTemperatureSampleToMainScreen(void* context);
     static void sendTemperatureStatusToMainScreen(void* context);
-    static void sendHeartbeatToDebugScreen(void* context);
 
 };
 

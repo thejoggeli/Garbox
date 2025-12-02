@@ -1,23 +1,19 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/screens/abstract/DebugScreenAbs.h"
+#include "app/screens/abstract/EventLogScreenAbs.h"
 
 namespace Garbox {
 
-class LvglObjects;
-
-class DebugScreen : public DebugScreenAbs {
+class EventLogScreen : public EventLogScreenAbs {
 public:
 
-    DebugScreen();
+    EventLogScreen();
 
-    void onHeartbeat(const HeartbeatEvent& event) final;
+    // event handler
+    void onEvent(const EventHeader* header) final;
 
 private:
-
-    LvglObjects& mObjects;
-    bool mFirstUpdate = true;
 
     void onInit() final;
     void onStart() final;

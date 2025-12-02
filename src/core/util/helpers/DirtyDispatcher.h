@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <cstdint>
 #include "core/util/container/heap/RingBufferHeap.h"
 #include "core/util/container/heap/VectorHeap.h"

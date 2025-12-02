@@ -10,9 +10,11 @@ public:
 
     I2cPartsController();
 
+    // tick handlers
     void onInputTick() final;
 
-    void onButtonStateChanged(const ButtonStateChangedEvent& event) final;
+    // event handlers
+    virtual void onButtonStateChanged(const ButtonStateChangedEvent& event) = 0;
 
 private:
 

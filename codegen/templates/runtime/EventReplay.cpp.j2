@@ -57,7 +57,7 @@ void EventReplay::replay(ScreenId screenId){
             m{{ screen_name }}Dispatcher.dispatch();
             break;
 {% endfor %}
-        default: TriggerExit("EventReplay", "invalid screen id");
+        default: break; // replay not enabled for this screen
     }
 }
 

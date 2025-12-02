@@ -8,15 +8,17 @@ namespace Garbox {
 
 
 {# constructor #}
+{% if screen.model.fields %}
 {{ name }}Abs::{{ name }}Abs(): 
     ScreenAbs(
         ComponentId::{{ name }}, 
         ScreenId::{{ name.removesuffix("Screen") }}, 
         static_cast<uint32_t>(Model::Index::Count)
     ),
-    mModel(*this){
-    // nothing to do
-}
+    mModel(*this){}
+{% else %}
+{{ name }}Abs::{{ name }}Abs() : ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}, 0){}
+{% endif %}
 
 {# onInitScreen() #}
 void {{ name }}Abs::init(ComponentHostIfc& host){
@@ -47,6 +49,7 @@ void {{ name }}Abs::becomeDisabled(){
 }
 {% endif %}
 
+{% if screen.model.fields %}
 {{ name }}Abs::Model& {{ name }}Abs::getModel(){
     return mModel;
 }
@@ -63,6 +66,7 @@ void {{ name }}Abs::markDirty(Model::Index index){
 bool {{ name }}Abs::isMarkedDirty(Model::Index index) const {
     return isMarkedDirtyRaw(static_cast<size_t>(index));
 }
+{% endif %}
 
 {# make and send events #}
 {{ make_events(name, screen) }}
@@ -78,6 +82,8 @@ void {{ name }}Abs::apply{{ group_name|upper_first }}Trampoline(void* context){
 {% endfor %}
 {% endif %}
 
+{% if screen.model.fields %}
 {% include "components/screen/ScreenModel.cpp.j2" %}
+{% endif %}
 
 } // namespace Garbox

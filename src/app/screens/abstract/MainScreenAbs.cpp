@@ -13,9 +13,7 @@ MainScreenAbs::MainScreenAbs():
         ScreenId::Main, 
         static_cast<uint32_t>(Model::Index::Count)
     ),
-    mModel(*this){
-    // nothing to do
-}
+    mModel(*this){}
 
 void MainScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);

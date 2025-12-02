@@ -7,25 +7,19 @@
 
 namespace Garbox {
 
-class DebugScreenAbs : public ScreenAbs {
+class EventLogScreenAbs : public ScreenAbs {
 
 public:
 
-    // event handlers (to be implmeneted by user)
-    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
+    // event handler (to be implmeneted by user)
+    virtual void onEvent(const EventHeader* header) = 0;
 
-    DebugScreenAbs();
+    EventLogScreenAbs();
 
     // init override from component
     void init(ComponentHostIfc& host) final;
 
 protected:
-
-    // make typed events 
-    DisplayCommandEvent makeDisplayCommandEvent();
-
-    // send typed events
-    void sendEvent(const DisplayCommandEvent& event);
 
 private:
 

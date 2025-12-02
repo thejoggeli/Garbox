@@ -26,6 +26,7 @@ enum class ComponentId : uint16_t {
     CalibrationBehaviour,
     FermentationBehaviour,
     MainScreen,
+    EventLogScreen,
     DebugScreen,
 
     // enum size marker

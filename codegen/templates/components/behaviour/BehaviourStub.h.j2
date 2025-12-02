@@ -1,5 +1,6 @@
 #pragma once
 {% include "_common/header_stub.j2" %}
+{% from "_common/component_stub_h.j2" import constructor, on_ticks, on_events %}
 #include "app/behaviours/abstract/{{ name }}Abs.h"
 
 namespace Garbox {
@@ -7,19 +8,9 @@ namespace Garbox {
 class {{ name }} : public {{ name }}Abs {
 public:
 
-    {{ name }}();
-{% if behaviour.tick_phases %}
-
-    {% for tick in behaviour.tick_phases %}
-    void on{{ tick }}() final;
-    {% endfor %}
-{% endif %}
-{% if behaviour.receives %}
-
-    {% for ev in behaviour.receives %}
-    void on{{ ev }}(const {{ ev }}Event& event) final;
-    {% endfor %}
-{% endif %}
+{{ constructor(behaviour) }}
+{{ on_ticks(behaviour) }}
+{{ on_events(behaviour) }}
 
 private:
 

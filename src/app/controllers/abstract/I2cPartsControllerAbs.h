@@ -15,7 +15,7 @@ public:
     // tick handlers (to be implmeneted by user)
     virtual void onInputTick() = 0;
 
-    // receive event handlers (to be implmeneted by user)
+    // event handlers (to be implmeneted by user)
     virtual void onButtonStateChanged(const ButtonStateChangedEvent& event) = 0;
 
 protected:

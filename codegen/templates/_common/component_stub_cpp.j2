@@ -1,0 +1,40 @@
+{# receive ticks #}
+{% macro on_ticks(component) %}
+{% if component.tick_phases_all %}
+
+void {{ component.name }}::onTick(TickPhase phase){
+    // nothing to do
+}
+
+{% endif %}
+{% if component.tick_phases %}
+{% for tick in component.tick_phases %}
+
+void {{ component.name }}::on{{ tick }}(){
+    // nothing to do
+}
+
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# receive events #}
+{% macro on_events(component) %}
+{% if component.receives_all %}
+
+void {{ component.name }}::onEvent(const EventHeader* header){
+    // nothing to do
+}
+
+{% endif %}
+{% if component.receives %}
+{% for ev in component.receives %}
+
+void {{ component.name }}::on{{ ev }}(const {{ ev }}Event& event){
+    // nothing to do
+}
+
+{% endfor %}
+{% endif %}
+{% endmacro %}

@@ -15,15 +15,23 @@ public:
     // tick handlers (to be implmeneted by user)
     virtual void onLogicTick() = 0;
 
-    // receive event handlers (to be implmeneted by user)
+    // event handlers (to be implmeneted by user)
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
+
     virtual void onFanStatus(const FanStatusEvent& event) = 0;
+
     virtual void onFanSample(const FanSampleEvent& event) = 0;
+
     virtual void onHeatpadStatus(const HeatpadStatusEvent& event) = 0;
+
     virtual void onTemperatureStatus(const TemperatureStatusEvent& event) = 0;
+
     virtual void onTemperatureSample(const TemperatureSampleEvent& event) = 0;
+
     virtual void onButtonStateChanged(const ButtonStateChangedEvent& event) = 0;
+
     virtual void onButtonRepeat(const ButtonRepeatEvent& event) = 0;
+
     virtual void onEncoderStep(const EncoderStepEvent& event) = 0;
 
 protected:

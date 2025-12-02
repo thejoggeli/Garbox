@@ -14,9 +14,10 @@ public:
 
     // tick handlers (to be implmeneted by user)
     virtual void onInputTick() = 0;
+
     virtual void onOutputTick() = 0;
 
-    // receive event handlers (to be implmeneted by user)
+    // event handlers (to be implmeneted by user)
     virtual void onFanCommand(const FanCommandEvent& event) = 0;
 
 protected:

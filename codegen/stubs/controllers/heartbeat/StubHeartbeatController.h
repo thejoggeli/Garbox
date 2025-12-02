@@ -1,16 +1,17 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/controllers/abstract/DevtoolsControllerAbs.h"
+#include "app/controllers/abstract/HeartbeatControllerAbs.h"
 
 namespace Garbox {
 
-class DevtoolsController : public DevtoolsControllerAbs {
+class HeartbeatController : public HeartbeatControllerAbs {
 public:
 
-    DevtoolsController();
+    HeartbeatController();
 
-    void onLoggingTick() final;
+    // tick handlers
+    void onHeartbeatTick() final;
 
 private:
 

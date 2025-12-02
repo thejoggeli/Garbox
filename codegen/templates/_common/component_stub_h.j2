@@ -1,0 +1,44 @@
+{# constructor #}
+{% macro constructor(component) %}
+
+    {{ component.name }}();
+
+{% endmacro %}
+
+
+{# receive ticks #}
+{% macro on_ticks(component) %}
+{% if component.tick_phases_all %}
+
+    // tick handler
+    void onTick(TickPhase phase) final;
+
+{% endif %}
+{% if component.tick_phases %}
+
+    // tick handlers
+{% for tick in component.tick_phases %}
+    void on{{ tick }}() final;
+{% endfor %}
+
+{% endif %}
+{% endmacro %}
+
+
+{# receive events #}
+{% macro on_events(component) %}
+{% if component.receives_all %}
+
+    // event handler
+    void onEvent(const EventHeader* header) final;
+
+{% endif %}
+{% if component.receives %}
+
+    // event handlers
+{% for ev in component.receives %}
+    virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
+{% endfor %}
+
+{% endif %}
+{% endmacro %}

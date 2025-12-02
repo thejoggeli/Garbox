@@ -20,16 +20,12 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 
 GarboxRuntime::GarboxRuntime():
     RuntimeAbs(RuntimeAbs::Config {
-        .numComponents = 11,
+        .numComponents = 12,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
     }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
-    mEventReplay(
- 
-        mMainScreen,  
-        mDebugScreen 
-    ){
+    mEventReplay(mMainScreen){
 
     // register components
     registerComponent(&mCalibrationBehaviour);
@@ -42,6 +38,7 @@ GarboxRuntime::GarboxRuntime():
     registerComponent(&mInputController);
     registerComponent(&mI2cPartsController);
     registerComponent(&mMainScreen);
+    registerComponent(&mEventLogScreen);
     registerComponent(&mDebugScreen);
 
     // set start and end tick handlers
@@ -146,6 +143,9 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
 
     // store event for replay
     mEventReplay.storeEvent(header);
+
+    // receive all events
+    mEventLogScreen.onEvent(header);
 
     // route event to components
     switch(header->type){
@@ -431,6 +431,7 @@ ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
 ScreenAbs* GarboxRuntime::resolveScreen(ScreenId id){
     switch(id){
         case ScreenId::Main: return &mMainScreen;
+        case ScreenId::EventLog: return &mEventLogScreen;
         case ScreenId::Debug: return &mDebugScreen;
         default: TriggerExit("GarboxRuntime", "screen with id not found", static_cast<uint32_t>(id));
     }

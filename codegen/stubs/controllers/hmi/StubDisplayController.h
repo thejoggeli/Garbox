@@ -10,9 +10,11 @@ public:
 
     DisplayController();
 
+    // tick handlers
     void onRenderTick() final;
 
-    void onDisplayCommand(const DisplayCommandEvent& event) final;
+    // event handlers
+    virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
 
 private:
 

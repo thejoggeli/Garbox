@@ -10,11 +10,13 @@ public:
 
     CalibrationBehaviour();
 
+    // tick handlers
     void onLogicTick() final;
 
-    void onHeartbeat(const HeartbeatEvent& event) final;
-    void onFanStatus(const FanStatusEvent& event) final;
-    void onFanSample(const FanSampleEvent& event) final;
+    // event handlers
+    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
+    virtual void onFanStatus(const FanStatusEvent& event) = 0;
+    virtual void onFanSample(const FanSampleEvent& event) = 0;
 
 private:
 

@@ -1,4 +1,5 @@
 {% include "_common/header_stub.j2" %}
+{% from "_common/component_stub_cpp.j2" import on_ticks, on_events %}
 #include "{{ name }}.h"
 
 namespace Garbox {
@@ -26,21 +27,8 @@ void {{ name }}::onBecomeDisabled(){
 void {{ name }}::onUpdateScreen(){
     // nothing to do   
 }
-{% if screen.tick_phases %}
-{% for tick in screen.tick_phases %}
 
-void {{ name }}::on{{ tick }}(){
-    // nothing to do
-}
-{% endfor %}
-{% endif %}
-{% if screen.receives %}
-{% for ev in screen.receives %}
-
-void {{ name }}::on{{ ev }}(const {{ ev }}Event& event){
-    // nothing to do
-}
-{% endfor %}
-{% endif %}
+{{ on_ticks(screen) }}
+{{ on_events(screen) }}
 
 } // namespace Garbox

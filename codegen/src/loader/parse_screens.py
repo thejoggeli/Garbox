@@ -15,6 +15,9 @@ def parse_screens(config: dict):
         parse_model_helpers(screen_data["model"])
         collect_replay_events(screen_data)
 
+        # replace
+        screen_data = screen_data.get("replay", False)
+
 
 def keys_difference(all_keys: list, keys_to_remove: list):
     remove = set(keys_to_remove)

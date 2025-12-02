@@ -1,16 +1,17 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/controllers/abstract/HeartbeatControllerAbs.h"
+#include "app/controllers/abstract/InputControllerAbs.h"
 
 namespace Garbox {
 
-class HeartbeatController : public HeartbeatControllerAbs {
+class InputController : public InputControllerAbs {
 public:
 
-    HeartbeatController();
+    InputController();
 
-    void onHeartbeatTick() final;
+    // tick handlers
+    void onInputTick() final;
 
 private:
 

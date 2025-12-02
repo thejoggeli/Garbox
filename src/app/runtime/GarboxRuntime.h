@@ -16,6 +16,7 @@
 #include "app/controllers/hmi/InputController.h"
 #include "app/controllers/sensors/I2cPartsController.h"
 #include "app/screens/DebugScreen.h"
+#include "app/screens/EventLogScreen.h"
 #include "app/screens/MainScreen.h"
 
 namespace Garbox {
@@ -42,6 +43,7 @@ private:
     I2cPartsController mI2cPartsController;
 
     MainScreen mMainScreen;
+    EventLogScreen mEventLogScreen;
     DebugScreen mDebugScreen;
 
     void handleTickStart();

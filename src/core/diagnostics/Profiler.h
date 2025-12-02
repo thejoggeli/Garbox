@@ -12,8 +12,6 @@
 
 namespace Garbox {
 
-
-
 class Profiler {
 public:
 

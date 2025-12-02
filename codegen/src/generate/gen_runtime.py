@@ -58,6 +58,7 @@ def _generate_runtime(ctx: Context, loader: Loader):
     runtime_dict = {
         "devtools":         loader.config["devtools"],
         "event_routes":     _collect_event_routes(loader),
+        "components":       loader.config["components"],
         "application":      loader.config["application"],
         "behaviours":       loader.config["behaviours"],
         "controllers":      loader.config["controllers"],
@@ -82,18 +83,23 @@ def _generate_event_replay(ctx: Context, loader: Loader):
     - app/runtime/EventReplay.cpp
     """
 
+    # filter only screens with 'replay=true'
+    screens = {name: screen for name, screen in loader.config["screens"].items() if screen["replay"] == True}
+
     replay_dict = {
         "events": {},
-        "screens": loader.config["screens"],
+        "screens": screens
     }
 
-    # extract used events
-    used_events = SortedSet()
-    for screen_name, screen_data in loader.config["screens"].items():
+    # collect all event types used by any screen
+    all_replay_events = SortedSet()
+    for screen_data in screens.values():
         for event_name in screen_data["replay_events"]:
-            used_events.add(event_name)
+            all_replay_events.add(event_name)
+
+    # add all used event to dict
     for event_name, event in loader.config["event_types"].items():
-        if(event_name in used_events):
+        if(event_name in all_replay_events):
             replay_dict["events"][event_name] = event
         
     items = [

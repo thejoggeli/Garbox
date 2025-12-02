@@ -41,7 +41,10 @@ private:
     EventBlock<EventType::{{ name }}> m{{ name }}Block;
 {% endfor %}
 
+{# sender callbacks #}
 {% for screen_name, screen_data in screens.items() %}
+
+    // send event to '{{ screen_name }}' 
     {% for event_name in screen_data.replay_events: %}
     static void send{{ event_name }}To{{ screen_name }}(void* context);
     {% endfor %}

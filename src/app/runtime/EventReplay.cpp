@@ -15,17 +15,14 @@ static constexpr size_t MainScreen_HeatpadSample_Index = 5 ;
 static constexpr size_t MainScreen_HeatpadStatus_Index = 6 ;
 static constexpr size_t MainScreen_TemperatureSample_Index = 7 ;
 static constexpr size_t MainScreen_TemperatureStatus_Index = 8 ;
-static constexpr size_t DebugScreen_Heartbeat_Index = 0 ;
 
 EventReplay::EventReplay(
     // parameter list
  
-    MainScreenAbs& mainScreen,  
-    DebugScreenAbs& debugScreen):
+    MainScreenAbs& mainScreen):
     // init members
  
-    mMainScreen(mainScreen),  
-    mDebugScreen(debugScreen){
+    mMainScreen(mainScreen){
     // register handlers
     mMainScreenDispatcher.registerHandler(sendActiveBehaviourChangedToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendDisplayStatusToMainScreen, this);
@@ -36,11 +33,8 @@ EventReplay::EventReplay(
     mMainScreenDispatcher.registerHandler(sendHeatpadStatusToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendTemperatureSampleToMainScreen, this);
     mMainScreenDispatcher.registerHandler(sendTemperatureStatusToMainScreen, this);
-    mDebugScreenDispatcher.registerHandler(sendHeartbeatToDebugScreen, this);
     // init event headers
     const ComponentDescriptor descriptor { ComponentType::Replay, ComponentId::Replay };
-    mHeartbeatBlock.header.type = EventType::Heartbeat;
-    mHeartbeatBlock.header.sender = descriptor;
     mFermentationStatusBlock.header.type = EventType::FermentationStatus;
     mFermentationStatusBlock.header.sender = descriptor;
     mDisplayStatusBlock.header.type = EventType::DisplayStatus;
@@ -63,11 +57,6 @@ EventReplay::EventReplay(
 
 void EventReplay::storeEvent(const EventHeader* header){
     switch(header->type){
-        case EventType::Heartbeat:
-            mHeartbeatBlock.header.id = header->id;
-            mHeartbeatBlock.payload = *static_cast<HeartbeatEvent>(header).payload();
-            mDebugScreenDispatcher.markDirty(DebugScreen_Heartbeat_Index);
-            break;
         case EventType::FermentationStatus:
             mFermentationStatusBlock.header.id = header->id;
             mFermentationStatusBlock.payload = *static_cast<FermentationStatusEvent>(header).payload();
@@ -122,10 +111,7 @@ void EventReplay::replay(ScreenId screenId){
         case ScreenId::Main:
             mMainScreenDispatcher.dispatch();
             break;
-        case ScreenId::Debug:
-            mDebugScreenDispatcher.dispatch();
-            break;
-        default: TriggerExit("EventReplay", "invalid screen id");
+        default: break; // replay not enabled for this screen
     }
 }
 
@@ -204,11 +190,6 @@ void EventReplay::sendTemperatureStatusToMainScreen(void* context){
     model.setShtDriverEnabled(payload.driverEnabled); 
     model.setShtPowerEnabled(payload.powerEnabled); 
     model.setShtResetting(payload.resetting); 
-}
-
-void EventReplay::sendHeartbeatToDebugScreen(void* context){ 
-    EventReplay* self = static_cast<EventReplay*>(context);
-    self->mDebugScreen.onHeartbeat(&self->mHeartbeatBlock.header); 
 }
 
 } // namespace

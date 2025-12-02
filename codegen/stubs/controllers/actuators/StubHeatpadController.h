@@ -10,10 +10,12 @@ public:
 
     HeatpadController();
 
+    // tick handlers
     void onInputTick() final;
     void onOutputTick() final;
 
-    void onHeatpadCommand(const HeatpadCommandEvent& event) final;
+    // event handlers
+    virtual void onHeatpadCommand(const HeatpadCommandEvent& event) = 0;
 
 private:
 

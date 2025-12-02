@@ -1,5 +1,6 @@
 screens:
   Main:
+    replay: true
     tick_phases: null
     receives: null
     sends: 
@@ -32,7 +33,14 @@ screens:
         - { name: engineMeasuredHumidity,     bind: FermentationStatus->measuredHumidity,     group: FermentationStatus }
         - { name: heapSpace,                  type: uint32_t,                                 group: null}
 
+  EventLog:
+    replay: false
+    tick_phases: null
+    receives: RECEIVE_ALL
+    sends: null
+    
   Debug:
+    replay: false
     tick_phases: null
     receives: [Heartbeat]
     sends: [DisplayCommand]

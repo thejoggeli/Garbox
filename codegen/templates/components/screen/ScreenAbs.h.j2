@@ -10,10 +10,11 @@
 namespace Garbox {
 
 class {{ name }}Abs : public ScreenAbs {
-protected:
 
 {# update user handlers #}
 {% if screen.model.fields %}
+protected:
+
     // model field callbacks to update specific parts of the screen (to be implmeneted by user)
 {% for group_name, fields in screen.model.groups.items() %}
     virtual void onApply{{ group_name|upper_first }}() = 0;
@@ -31,6 +32,7 @@ public:
 {# constructor #}
 {{ constructor(name) }}
 
+    // init override from component
     void init(ComponentHostIfc& host) final;
 
 {% if screen.model.get("debounce") %}
@@ -39,22 +41,29 @@ public:
     void becomeDisabled() final;
 {% endif %}
 
+{% if screen.model.fields %}
 {% set block %}
     {% include "components/screen/ScreenModel.h.j2" %}
 {% endset %}
 {{ block | indent(4, true) }}
+{% endif %}
 
+{% if screen.model.fields %}
     Model& getModel();
     const Model& getModel() const;
+{% endif %}
 
 protected:
 
+{% if screen.model.fields %}
     Model mModel;
 
 {# markDirty() #}
     // method to mark an model field index dirty (for manually updated values)
     void markDirty(Model::Index index);
     bool isMarkedDirty(Model::Index index) const;
+    
+{% endif %}
 
 
 {# make and send events #}

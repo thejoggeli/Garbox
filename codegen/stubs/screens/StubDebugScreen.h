@@ -10,11 +10,8 @@ public:
 
     DebugScreen();
 
-    // update all user interface elements in this method
-    void onUpdateScreen() final;
-
     // event handlers
-    void onHeartbeat(const HeartbeatEvent& event) final;
+    virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
 
 private:
 
@@ -22,6 +19,7 @@ private:
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
+    void onUpdateScreen() final; // safe to update ui elements in this method
 
 };
 

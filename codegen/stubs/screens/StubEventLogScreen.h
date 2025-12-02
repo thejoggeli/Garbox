@@ -1,17 +1,17 @@
 #pragma once
 // This stub always gets generated along, together with the remaining
 // code. It can be used as a starting or reference point. 
-#include "app/screens/abstract/MainScreenAbs.h"
+#include "app/screens/abstract/EventLogScreenAbs.h"
 
 namespace Garbox {
 
-class MainScreen : public MainScreenAbs {
+class EventLogScreen : public EventLogScreenAbs {
 public:
 
-    MainScreen();
+    EventLogScreen();
 
-    // update all user interface elements in this method
-    void onUpdateScreen() final;
+    // event handler
+    void onEvent(const EventHeader* header) final;
 
 private:
 
@@ -19,6 +19,7 @@ private:
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
+    void onUpdateScreen() final; // safe to update ui elements in this method
 
 };
 
