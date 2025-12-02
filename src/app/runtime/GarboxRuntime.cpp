@@ -113,9 +113,13 @@ void GarboxRuntime::handleInputTick(){
 void GarboxRuntime::handleLogicTick(){
     Profiler::MeasureScoped profiler(ProfilerId::LogicTick);
     switch(mActiveBehaviour->getBehaviourId()){
-        case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
-        case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick(); break;
-        default: break; // active behaviour does not support tick type
+        case BehaviourId::Calibration:
+            static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick();
+            break;
+        case BehaviourId::Fermentation:
+            static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick();
+            break;
+        default: break; // active behaviour does not receive tick type
     }
     dispatchEvents();
 }

@@ -98,36 +98,42 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
     Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
 {# ---- Call tick on controllers ---- #}
 {% for ctrl in tick["controllers"].values() %}
-{% if ctrl['tick_phases_all'] %}
-    m{{ ctrl.name }}.onTick(TickPhase::{{ tick.name }});
-{% else %}
+{% if ctrl["tick_phases_all"] %}
+    m{{ ctrl.name }}.onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+{% endif %}
+{% if tick.name in ctrl["tick_phases"] %}
     m{{ ctrl.name }}.on{{ tick.name }}();
 {% endif %}
 {% endfor %}
 {# ---- Call tick on active behaviour ----#}
 {% if tick["behaviours"] | length > 0 %}
     switch(mActiveBehaviour->getBehaviourId()){
-{% for beha in tick["behaviours"].values() %}
-    {% if beha["tick_phases_all"] %}
-        case BehaviourId::{{ beha.name.removesuffix("Behaviour") }}: static_cast<{{ beha.name }}*>(mActiveBehaviour)->onTick(TickPhase::{{ tick.name }});
-    {% else %}
-        case BehaviourId::{{ beha.name.removesuffix("Behaviour") }}: static_cast<{{ beha.name }}*>(mActiveBehaviour)->on{{ tick.name }}(); break;
-    {% endif %}
-{% endfor %}
-        default: break; // active behaviour does not support tick type
+    {% for beha in tick["behaviours"].values() %}
+        case BehaviourId::{{ beha.name.removesuffix("Behaviour") }}:
+        {% if beha["tick_phases_all"] %}
+            static_cast<{{ beha.name }}*>(mActiveBehaviour)->onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+        {% endif %}
+        {% if tick.name in beha["tick_phases"] %}
+            static_cast<{{ beha.name }}*>(mActiveBehaviour)->on{{ tick.name }}();
+        {% endif %}
+            break;
+    {% endfor %}
+        default: break; // active behaviour does not receive tick type
     }
 {% endif %}
 {# ---- Call tick on active screen ----#}
 {% if tick["screens"] | length > 0 %}
     switch(mActiveScreen->getScreenId()){
-{% for screen in tick["screens"].values() %}
-    {% if screen["tick_phases_all"] %}
-        case ScreenId::{{ screen.name.removesuffix("Screen") }}: static_cast<{{ screen.name }}*>(mActiveScreen)->onTick(TickPhase::{{ tick.name }});
-    {% else %}
-        case ScreenId::{{ screen.name.removesuffix("Screen") }}: static_cast<{{ screen.name }}*>(mActiveScreen)->on{{ tick.name }}(); break;
-    {% endif %}
-{% endfor %}
-        default: break; // active behaviour does not support tick type
+    {% for screen in tick["screens"].values() %}
+        case ScreenId::{{ screen.name.removesuffix("Screen") }}:
+        {% if screen["tick_phases_all"] %}
+            static_cast<{{ screen.name }}*>(mActiveScreen)->onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+        {% else %}
+            static_cast<{{ screen.name }}*>(mActiveScreen)->on{{ tick.name }}();
+        {% endif %}
+        break;
+    {% endfor %}
+        default: break; // active behaviour does not receive tick type
     }
 {% endif %}
     {# Call dispatch events #}

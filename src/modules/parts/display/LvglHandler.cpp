@@ -9,7 +9,6 @@
 namespace Garbox {
 
 LvglHandler::LvglHandler(const Config& config):
-    mObjects(),
     mWidth(config.width),
     mHeight(config.height),
     mBytesPerPixel(config.bytesPerPixel),
@@ -29,11 +28,13 @@ LvglHandler::~LvglHandler(){
     TriggerExit("LvglHandler", "std::function can use heap");
 }
 
-LvglObjects& LvglHandler::getObjects(){
-    return mObjects;
+LvglContext& LvglHandler::getContext(){
+    AssertExit(mContext != nullptr, "LvglHandler", "context is nullptr");
+    return *mContext;
 }
 
 void LvglHandler::init(){
+    AssertExit(!mInitialized, "LvglHandler", "already initialized");
 
     // initialize lvgl
     lv_init();
@@ -64,7 +65,10 @@ void LvglHandler::init(){
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
 
     // init objects
-    mObjects.init(lv_scr_act());
+    mContext = new LvglContext(lv_scr_act());
+    mContext->init();
+
+    mInitialized = true;
 }
 
 void LvglHandler::startRender(){    

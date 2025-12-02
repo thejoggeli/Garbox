@@ -1,11 +1,12 @@
 #pragma once
 
 #include "app/screens/abstract/MainScreenAbs.h"
+#include "core/lvgl/LvLabel.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
-class LvglObjects;
+class LvglContext;
 
 class MainScreen : public MainScreenAbs {
 public:
@@ -14,9 +15,21 @@ public:
 
 private:
 
+    LvglContext& mLvgl;
+    LvLabel mFanStateLabel;
+    LvLabel mFanMeasuredRpmLabel;
+    LvLabel mHeatpadStateLabel;
+    LvLabel mHeatpadDutyLabel;
+    LvLabel mHeatpadSenseLabel;
+    LvLabel mDisplayStatusLabel;
+    LvLabel mTemperatureStateLabel;
+    LvLabel mTemperatureSampleLabel;
+    LvLabel mHeapSpaceLabel;
+    LvLabel mAppInfoLabel;
+    LvLabel mFermentationStatusLabel;
+
     bool mLastDispatchedCount = 0;
     bool mFirstUpdate = true;
-    LvglObjects& mObjects;
     SoftwareTimer mHeapTimer;
 
     void onInit() final;
@@ -37,6 +50,9 @@ private:
     void onApplyHeapSpace() final;
     void onApplyAppInfo() final;
     void onApplyFermentationStatus() final;
+
+    // helper to init a label with position and text
+    void initLabel(LvLabel& label, int16_t x, int16_t y, const char* text);
 
 };
 

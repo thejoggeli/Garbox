@@ -14,6 +14,7 @@ public:
     // event handlers (to be implmeneted by user)
     virtual void onHeartbeat(const HeartbeatEvent& event) = 0;
 
+    // component constructor
     DebugScreenAbs();
 
     // init override from component

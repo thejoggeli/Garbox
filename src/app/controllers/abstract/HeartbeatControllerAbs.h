@@ -10,6 +10,7 @@ namespace Garbox {
 class HeartbeatControllerAbs : public ControllerAbs {
 public:
 
+    // component constructor
     HeartbeatControllerAbs();
 
     // tick handlers (to be implmeneted by user)

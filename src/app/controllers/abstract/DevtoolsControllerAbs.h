@@ -10,6 +10,7 @@ namespace Garbox {
 class DevtoolsControllerAbs : public ControllerAbs {
 public:
 
+    // component constructor
     DevtoolsControllerAbs();
 
     // tick handlers (to be implmeneted by user)

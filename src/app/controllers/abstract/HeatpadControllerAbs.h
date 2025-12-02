@@ -10,6 +10,7 @@ namespace Garbox {
 class HeatpadControllerAbs : public ControllerAbs {
 public:
 
+    // component constructor
     HeatpadControllerAbs();
 
     // tick handlers (to be implmeneted by user)

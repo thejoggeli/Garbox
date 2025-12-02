@@ -10,6 +10,7 @@ namespace Garbox {
 class CalibrationBehaviourAbs : public BehaviourAbs {
 public:
 
+    // component constructor
     CalibrationBehaviourAbs();
 
     // tick handlers (to be implmeneted by user)

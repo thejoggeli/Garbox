@@ -7,7 +7,7 @@ namespace Garbox {
 
 class FermentationBehaviour : public FermentationBehaviourAbs {
 public:
-    
+
     FermentationBehaviour();
     
     void onLogicTick() final;

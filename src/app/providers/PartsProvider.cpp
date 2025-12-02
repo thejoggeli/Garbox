@@ -23,7 +23,6 @@
 #include "modules/parts/piezo/PiezoPlayer.h"
 #include "modules/parts/temperature/Sht31.h"
 
-
 namespace Garbox {
 
 void PartsProvider::Init(){
@@ -160,6 +159,10 @@ AnimatedLedGroup& PartsProvider::GetStatusLeds(){
 RgbLed& PartsProvider::GetRgbLed(){
     static RgbLed instance(GpioInstances::GetRgbLed());
     return instance;
+}
+
+LvglContext& PartsProvider::GetLvglContext(){
+    return GetDisplay().getLvglHandler().getContext();
 }
 
 } // namespace

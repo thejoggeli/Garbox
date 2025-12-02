@@ -27,6 +27,7 @@ protected:
 
 public:
 
+    // component constructor
     MainScreenAbs();
 
     // init override from component

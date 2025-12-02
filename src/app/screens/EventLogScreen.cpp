@@ -1,6 +1,7 @@
-// This stub always gets generated along, together with the remaining
-// code. It can be used as a starting or reference point. 
 #include "EventLogScreen.h"
+
+#define GarboxEventLogScreenToConsole 0
+#include "core/log/Log.h"
 
 namespace Garbox {
 
@@ -29,7 +30,9 @@ void EventLogScreen::onUpdateScreen(){
 }
 
 void EventLogScreen::onEvent(const EventHeader* header){
-    // nothing to do
+#if GarboxEventLogScreenToConsole
+    LogDebug("Event", "[%u] %s: %s", header->id, ComponentIdToString(header->sender.id), EventTypeToString(header->type));
+#endif
 }
 
 } // namespace Garbox

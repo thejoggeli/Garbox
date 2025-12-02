@@ -10,6 +10,7 @@ namespace Garbox {
 class FermentationBehaviourAbs : public BehaviourAbs {
 public:
 
+    // component constructor
     FermentationBehaviourAbs();
 
     // tick handlers (to be implmeneted by user)

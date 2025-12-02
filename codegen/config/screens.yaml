@@ -36,7 +36,8 @@ screens:
   EventLog:
     replay: false
     tick_phases: null
-    receives: RECEIVE_ALL
+    receives: null
+    receives_all: true
     sends: null
     
   Debug:

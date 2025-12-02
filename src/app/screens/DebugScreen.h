@@ -1,11 +1,10 @@
 #pragma once
-// This stub always gets generated along, together with the remaining
-// code. It can be used as a starting or reference point. 
+
 #include "app/screens/abstract/DebugScreenAbs.h"
 
 namespace Garbox {
 
-class LvglObjects;
+class LvglContext;
 
 class DebugScreen : public DebugScreenAbs {
 public:
@@ -16,7 +15,7 @@ public:
 
 private:
 
-    LvglObjects& mObjects;
+    LvglContext& mContext;
     bool mFirstUpdate = true;
 
     void onInit() final;

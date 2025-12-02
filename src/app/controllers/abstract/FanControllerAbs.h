@@ -10,6 +10,7 @@ namespace Garbox {
 class FanControllerAbs : public ControllerAbs {
 public:
 
+    // component constructor
     FanControllerAbs();
 
     // tick handlers (to be implmeneted by user)

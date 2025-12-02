@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <lvgl.h>
-#include "modules/parts/display/LvglObjects.h"
+#include "core/lvgl/LvglContext.h"
 #include "core/util/math/RectXXYY.h"
 
 namespace Garbox {
@@ -24,7 +24,7 @@ public:
     LvglHandler(const Config& config);
     ~LvglHandler();
 
-    LvglObjects& getObjects();
+    LvglContext& getContext();
 
     void init();
     void startRender();
@@ -34,12 +34,15 @@ public:
 
 private: 
 
-    FlushHandler mFlushHandler = nullptr;
-    FlushWaitHandler mFlushWaitHandler = nullptr;
+    bool mInitialized = false;
 
     // lvgl
     lv_display_t* mLvDisplay = nullptr;
-    LvglObjects mObjects;
+    LvglContext* mContext = nullptr;
+
+    // flush handling
+    FlushHandler mFlushHandler = nullptr;
+    FlushWaitHandler mFlushWaitHandler = nullptr;
 
     // drawing buffer
     lv_draw_buf_t mDrawBuffer1;

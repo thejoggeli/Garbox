@@ -322,8 +322,8 @@
     "replay": "<ref>",
     "tick_phases": [],
     "receives": [],
-    "sends": [],
     "receives_all": "<ref>",
+    "sends": [],
     "tick_phases_all": "<ref>",
     "name": "EventLogScreen",
     "model": {

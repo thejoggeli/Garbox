@@ -12,7 +12,6 @@
 namespace Garbox {
 
 class Display;
-class LvglObjects;
 
 class DisplayController : public DisplayControllerAbs {
 public:

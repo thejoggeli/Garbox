@@ -10,6 +10,7 @@ namespace Garbox {
 class I2cPartsControllerAbs : public ControllerAbs {
 public:
 
+    // component constructor
     I2cPartsControllerAbs();
 
     // tick handlers (to be implmeneted by user)

@@ -36,7 +36,7 @@ def process_components(config, key, suffix):
 
         # init 'receives' field
         component["receives"] = ensure_list(component["receives"])
-        component["receives_all"] = False
+        component["receives_all"] = component.get("receives_all", False)
         if len(component["receives"]) > 0:
             first_entry = component["receives"][0]
 
@@ -44,14 +44,9 @@ def process_components(config, key, suffix):
             if first_entry == "INSERT_ALL":
                 component["receives"] = list(config["event_types"].keys())
 
-            # insert all event types (1 event handler)
-            elif first_entry == "RECEIVE_ALL":
-                component["receives"] = []
-                component["receives_all"] = True
-
         # init 'tick_phases' field
         component["tick_phases"] = ensure_list(component["tick_phases"])
-        component["tick_phases_all"] = False
+        component["tick_phases_all"] = component.get("tick_phases_all", False)
         if len(component["tick_phases"]) > 0:
             first_entry = component["tick_phases"][0]
 
@@ -59,11 +54,6 @@ def process_components(config, key, suffix):
             if first_entry == "INSERT_ALL":
                 component["tick_phases"] = [phase["name"] for phase in config["application"]["tick_phases"]]
             
-            # insert single tick handler (1 tick handler)
-            elif first_entry == "RECEIVE_ALL":
-                component["tick_phases"] = []
-                component["tick_phases_all"] = True
-
         # tick phase entry must have suffix 'Tick'
         for idx, name in enumerate(component["tick_phases"]):
             component["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")  

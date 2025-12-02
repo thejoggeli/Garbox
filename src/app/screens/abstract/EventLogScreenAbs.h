@@ -14,6 +14,7 @@ public:
     // event handler (to be implmeneted by user)
     virtual void onEvent(const EventHeader* header) = 0;
 
+    // component constructor
     EventLogScreenAbs();
 
     // init override from component
