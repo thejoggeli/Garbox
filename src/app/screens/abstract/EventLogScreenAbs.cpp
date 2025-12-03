@@ -7,11 +7,10 @@
 
 namespace Garbox {
 
-EventLogScreenAbs::EventLogScreenAbs() : ScreenAbs(ComponentId::EventLogScreen, ScreenId::EventLog, 0){}
+EventLogScreenAbs::EventLogScreenAbs(LvglContext& lvgl): ScreenAbs(ComponentId::EventLogScreen, ScreenId::EventLog, 0, lvgl) {}
 
 void EventLogScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
-    // no model fields configured
 }
 
 } // namespace Garbox

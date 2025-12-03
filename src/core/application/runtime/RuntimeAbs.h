@@ -73,7 +73,6 @@ protected:
 
     // screens internal methods
     void setQueuedScreen(ScreenAbs* screen);
-    void applyQueuedScreen(); 
 
     // to be implemented by user
     virtual void onInit() = 0;
@@ -89,6 +88,9 @@ protected:
     virtual ScreenAbs* resolveScreen(ScreenId id) = 0;
 
 private:
+
+    // private because this is already called in requestUpdateScreenNow()
+    void applyQueuedScreen(); 
 
     // component descriptor
     ComponentDescriptor mComponentDescriptor {ComponentType::Runtime, ComponentId::Runtime};

@@ -84,7 +84,6 @@ void {{ RuntimeName}}::handleTickStart(){
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
-    applyQueuedScreen();
 }
 
 void {{ RuntimeName}}::handleTickEnd(){

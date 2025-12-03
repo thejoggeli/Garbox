@@ -14,8 +14,8 @@ public:
     // event handler (to be implmeneted by user)
     virtual void onEvent(const EventHeader* header) = 0;
 
-    // component constructor
-    EventLogScreenAbs();
+    // constructor requires lvgl context
+    EventLogScreenAbs(LvglContext& lvgl);
 
     // init override from component
     void init(ComponentHostIfc& host) final;

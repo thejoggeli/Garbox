@@ -54,6 +54,9 @@ void RuntimeAbs::run(){
 
 void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
     mQueuedBehaviour = behaviour;
+    if(mActiveBehaviour == nullptr){
+        applyQueuedBehaviour();
+    }
 }
 
 void RuntimeAbs::applyQueuedBehaviour() {
@@ -90,6 +93,9 @@ void RuntimeAbs::applyQueuedBehaviour() {
 
 void RuntimeAbs::setQueuedScreen(ScreenAbs* screen){
     mQueuedScreen = screen;
+    if(mActiveScreen == nullptr){
+        applyQueuedScreen();
+    }
 }
 
 void RuntimeAbs::applyQueuedScreen() {
@@ -188,9 +194,9 @@ void RuntimeAbs::requestChangeScreen(ScreenId id){
 }
 
 void RuntimeAbs::requestUpdateScreenNow(){
-    if(mActiveScreen){
-        mActiveScreen->updateScreen();
-    }
+    AssertExit(mActiveScreen != nullptr, "RuntimeAbs", "active screen is nullptr");
+    applyQueuedScreen();
+    mActiveScreen->updateScreen();
 }
 
 } // namespace

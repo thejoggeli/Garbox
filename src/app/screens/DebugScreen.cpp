@@ -2,16 +2,15 @@
 
 #include "app/providers/PartsProvider.h"
 #include "core/log/Log.h"
-#include "core/lvgl/LvglContext.h"
 
 namespace Garbox {
 
-DebugScreen::DebugScreen() : DebugScreenAbs(), mContext(PartsProvider::GetLvglContext()) {
+DebugScreen::DebugScreen() : DebugScreenAbs(PartsProvider::GetLvglContext()) {
     // nothing to do
 }
 
 void DebugScreen::onInit(){
-    // nothing to do
+    setBackgroundColor(0xFF7700);
 }
 
 void DebugScreen::onStart(){
@@ -19,7 +18,7 @@ void DebugScreen::onStart(){
 }
 
 void DebugScreen::onBecomeEnabled(){
-    mFirstUpdate = true;
+    // nothing to do
 }
 
 void DebugScreen::onBecomeDisabled(){
@@ -27,10 +26,7 @@ void DebugScreen::onBecomeDisabled(){
 }
 
 void DebugScreen::onUpdateScreen(){
-    if(mFirstUpdate){
-        mContext.setBackgroundColor(0xFF7700);
-    }
-    mFirstUpdate = false;
+    // nothing to do
 }
 
 void DebugScreen::onHeartbeat(const HeartbeatEvent& event){

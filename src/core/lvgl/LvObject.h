@@ -8,6 +8,11 @@ namespace Garbox {
 class LvObject {
 public:
 
+    struct Size {
+        int32_t width;
+        int32_t height;
+    };
+
     LvObject(lv_obj_t* raw);
     
     lv_obj_t* raw() const;
@@ -15,6 +20,13 @@ public:
     // geometry
     void setSize(int32_t widthPixels, int32_t heightPixels);
     void setPosition(int32_t xPixels, int32_t yPixels);
+    void getSize(int32_t& widthPixels, int32_t& heightPixels) const;
+    void getPosition(int32_t& xPixels, int32_t& yPixels) const;
+    void getArea(lv_area_t area) const;
+    int32_t getPositionX() const;
+    int32_t getPositionY() const;
+    int32_t getWidth() const;
+    int32_t getHeight() const;
 
     // content sizing helpers
     void setWidthContent();
@@ -33,6 +45,7 @@ public:
     void setFont(const lv_font_t* font);
     void setOpacity(uint8_t opacity);
     void setBgColor(lv_color_t color);
+    void setBgOpacity(uint8_t opacity);
     void setPad(int32_t leftPixels, int32_t rightPixels, int32_t topPixels, int32_t bottomPixels);
     void setBorder(int32_t widthPixels, lv_color_t color);
     void setRadius(int32_t radiusPixels);

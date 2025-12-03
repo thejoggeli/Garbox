@@ -15,11 +15,12 @@ public:
 
 private:
 
+    // safe to update lvgl objects in these methods
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
-    void onUpdateScreen() final; // safe to update ui elements in this method
+    void onUpdateScreen() final; 
 
 };
 

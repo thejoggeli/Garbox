@@ -1,13 +1,13 @@
 #include "LvObject.h"
+#include "core/assert/Assert.h"
 
 namespace Garbox {
 
 char LvObject::sBuffer[256];
 
 LvObject::LvObject(lv_obj_t* raw):
-    // initialize members
     mRaw(raw){
-    // constructor body
+    AssertExit(raw != nullptr, "LvObject", "got nullptr");
 }
 
 lv_obj_t* LvObject::raw() const {
@@ -20,6 +20,36 @@ void LvObject::setSize(int32_t widthPixels, int32_t heightPixels){
 
 void LvObject::setPosition(int32_t xPixels, int32_t yPixels){
     lv_obj_set_pos(mRaw, xPixels, yPixels);
+}
+
+void LvObject::getSize(int32_t& widthPixels, int32_t& heightPixels) const {
+    widthPixels = lv_obj_get_width(mRaw);
+    heightPixels = lv_obj_get_height(mRaw);
+}
+
+void LvObject::getPosition(int32_t& xPixels, int32_t& yPixels) const {
+    xPixels = lv_obj_get_x(mRaw);
+    yPixels = lv_obj_get_y(mRaw);
+}
+
+void LvObject::getArea(lv_area_t area) const {
+    lv_obj_get_coords(mRaw, &area);
+}
+
+int32_t LvObject::getPositionX() const {
+    return lv_obj_get_x(mRaw);
+}
+
+int32_t LvObject::getPositionY() const {
+    return lv_obj_get_y(mRaw);
+}
+
+int32_t LvObject::getWidth() const {
+    return lv_obj_get_width(mRaw);
+}
+
+int32_t LvObject::getHeight() const {
+    return lv_obj_get_height(mRaw);
 }
 
 void LvObject::setWidthContent(){
@@ -78,6 +108,10 @@ void LvObject::setOpacity(uint8_t opacity){
 
 void LvObject::setBgColor(lv_color_t color){
     lv_obj_set_style_bg_color(mRaw, color, LV_PART_MAIN);
+}
+
+void LvObject::setBgOpacity(uint8_t opacity) {
+    lv_obj_set_style_bg_opa(mRaw, opacity, LV_PART_MAIN);
 }
 
 void LvObject::setPad(int32_t leftPixels, int32_t rightPixels, int32_t topPixels, int32_t bottomPixels){

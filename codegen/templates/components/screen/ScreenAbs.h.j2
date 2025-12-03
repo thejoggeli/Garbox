@@ -29,8 +29,8 @@ public:
 {# onEvent() #}
 {{ on_events(screen) }}
 
-{# constructor #}
-{{ constructor(name) }}
+    // constructor requires lvgl context
+    {{name}}Abs(LvglContext& lvgl);
 
     // init override from component
     void init(ComponentHostIfc& host) final;
@@ -62,7 +62,7 @@ protected:
     // method to mark an model field index dirty (for manually updated values)
     void markDirty(Model::Index index);
     bool isMarkedDirty(Model::Index index) const;
-    
+
 {% endif %}
 
 

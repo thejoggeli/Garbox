@@ -24,6 +24,11 @@ public:
 
 private:
 
+    HeatpadCommandPayload mLastHeatpadCommand; 
+    FanCommandPayload mLastFanCommand;
+    FermentationStatusPayload mLastFermentationStatus;
+
+    bool mFirstTick = true;
     bool mHeartbeatReceived = false;
 
     HeaterEngine mHeaterEngine;

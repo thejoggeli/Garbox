@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/screens/abstract/MainScreenAbs.h"
+#include "core/lvgl/LvBox.h"
 #include "core/lvgl/LvLabel.h"
 #include "core/time/SoftwareTimer.h"
 
@@ -15,7 +16,7 @@ public:
 
 private:
 
-    LvglContext& mLvgl;
+    LvBox mProgressBox;
     LvLabel mFanStateLabel;
     LvLabel mFanMeasuredRpmLabel;
     LvLabel mHeatpadStateLabel;
@@ -29,14 +30,14 @@ private:
     LvLabel mFermentationStatusLabel;
 
     bool mLastDispatchedCount = 0;
-    bool mFirstUpdate = true;
     SoftwareTimer mHeapTimer;
 
+    // safe to update lvgl objects in these methods
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
-    void onUpdateScreen() final; // safe to update ui elements in this method
+    void onUpdateScreen() final;
 
     void onApplyFanState() final;
     void onApplyFanMeasuredRpm() final;

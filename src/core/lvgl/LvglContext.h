@@ -12,23 +12,19 @@ namespace Garbox {
 class LvglContext {
 public:
     
-    LvglContext(lv_obj_t* root);
+    LvglContext(lv_obj_t* root, uint32_t displayWidth, uint32_t displayHeight);
 
     void init();
 
-    LvObject& getRoot();
+    LvObject& root();
 
-    void setBoxPosition(float position);
-    void setBackgroundColor(uint32_t color);
+    void getDisplaySize(uint32_t& width, uint32_t& height) const;
 
 private:
 
-    LvObject mRoot = nullptr;
-
-    lv_obj_t* mBackground;
-    lv_obj_t* mBox;
-
-    void setFormatted(lv_obj_t* lbl, const char* fmt, ...);
+    LvObject mRoot;
+    uint32_t mDisplayWidth;
+    uint32_t mDisplayHeight;
 
 };
 

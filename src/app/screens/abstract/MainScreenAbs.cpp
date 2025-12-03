@@ -7,11 +7,12 @@
 
 namespace Garbox {
 
-MainScreenAbs::MainScreenAbs(): 
+MainScreenAbs::MainScreenAbs(LvglContext& lvgl): 
     ScreenAbs(
         ComponentId::MainScreen, 
         ScreenId::Main, 
-        static_cast<uint32_t>(Model::Index::Count)
+        static_cast<uint32_t>(Model::Index::Count),
+        lvgl
     ),
     mModel(*this){}
 

@@ -2,11 +2,12 @@
 
 #include "core/application/component/ComponentAbs.h"
 #include "core/assert/Assert.h"
+#include "core/log/Log.h"
 
 namespace Garbox {
 
 ComponentAbs::ComponentAbs(ComponentType type, ComponentId id) : mComponentDescriptor{type, id}{
-    // nothing to do
+    LogDebug("ComponentAbs", "ctor id=%s", ComponentIdToString(id));
 }
 
 ComponentAbs::~ComponentAbs(){

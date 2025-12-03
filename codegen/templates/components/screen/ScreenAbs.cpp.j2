@@ -6,18 +6,18 @@
 
 namespace Garbox {
 
-
 {# constructor #}
 {% if screen.model.fields %}
-{{ name }}Abs::{{ name }}Abs(): 
+{{ name }}Abs::{{ name }}Abs(LvglContext& lvgl): 
     ScreenAbs(
         ComponentId::{{ name }}, 
         ScreenId::{{ name.removesuffix("Screen") }}, 
-        static_cast<uint32_t>(Model::Index::Count)
+        static_cast<uint32_t>(Model::Index::Count),
+        lvgl
     ),
     mModel(*this){}
 {% else %}
-{{ name }}Abs::{{ name }}Abs() : ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}, 0){}
+{{ name }}Abs::{{ name }}Abs(LvglContext& lvgl): ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}, 0, lvgl) {}
 {% endif %}
 
 {# onInitScreen() #}
@@ -27,8 +27,6 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
 {% for group_name in screen.model.groups.keys() %}
     registerUpdateHandler(apply{{ group_name|upper_first }}Trampoline, this);
 {% endfor %}
-{% else %}
-    // no model fields configured
 {% endif %}
 }
 

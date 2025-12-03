@@ -121,7 +121,7 @@ public:
         }
 
         T* ptr = Storage::elementPtr(mSize);
-        new(ptr) T(args...);
+        new(ptr) T(std::forward<Args>(args)...);
         mSize++;
         return ptr;
     }

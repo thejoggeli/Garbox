@@ -65,7 +65,7 @@ void LvglHandler::init(){
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
 
     // init objects
-    mContext = new LvglContext(lv_scr_act());
+    mContext = new LvglContext(lv_scr_act(), mWidth, mHeight);
     mContext->init();
 
     mInitialized = true;

@@ -150,7 +150,7 @@ public:
     T* emplaceFront(Args... args){
         T* slot = allocateFront();
         if(slot != 0){
-            new(slot) T(args...);
+            new(slot) T(std::forward<Args>(args)...);
         }
         return slot;
     }
@@ -160,7 +160,7 @@ public:
     T* emplaceBack(Args... args){
         T* slot = allocateBack();
         if(slot != 0){
-            new(slot) T(args...);
+            new (slot) T(std::forward<Args>(args)...);
         }
         return slot;
     }

@@ -87,7 +87,7 @@ void GarboxRuntime::handleTickStart(){
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
-    applyQueuedScreen();
+    dispatchEvents();
 }
 
 void GarboxRuntime::handleTickEnd(){

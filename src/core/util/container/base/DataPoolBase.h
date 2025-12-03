@@ -83,7 +83,7 @@ public:
         if(rawPtr == 0){
             return 0;
         }
-        return new(rawPtr) T(args...);
+        return new(rawPtr) T(std::forward<Args>(args)...);
     }
 
     // Total capacity in bytes provided by the Storage

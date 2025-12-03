@@ -7,11 +7,10 @@
 
 namespace Garbox {
 
-DebugScreenAbs::DebugScreenAbs() : ScreenAbs(ComponentId::DebugScreen, ScreenId::Debug, 0){}
+DebugScreenAbs::DebugScreenAbs(LvglContext& lvgl): ScreenAbs(ComponentId::DebugScreen, ScreenId::Debug, 0, lvgl) {}
 
 void DebugScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
-    // no model fields configured
 }
 
 DisplayCommandEvent DebugScreenAbs::makeDisplayCommandEvent(){
