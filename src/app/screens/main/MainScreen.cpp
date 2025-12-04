@@ -85,6 +85,23 @@ void MainScreen::onHeatpadCommand(const HeatpadCommandEvent& event){
     // nothing to do
 }
 
+bool MainScreen::isSensorOk(){
+    return mModel.getShtPowerEnabled() && !mModel.getShtResetting() && mModel.getShtDriverEnabled() && mModel.getShtHasSample();
+}
+
+const char* MainScreen::resovleSensorText(){
+    if(mModel.getShtResetting()){
+        return "Reset";
+    }
+    else if(!mModel.getShtPowerEnabled() || !mModel.getShtDriverEnabled()){
+        return "Off";
+    }
+    else if(!mModel.getShtHasSample()){
+        return "Busy";
+    }
+    return "Ok";
+}
+
 void MainScreen::onApplyFanStatus(){
     FanState state = mModel.getFanState();
     if(state == FanState::Stalled){
@@ -114,35 +131,43 @@ void MainScreen::onApplyHeatpadStatus(){
 }
 
 void MainScreen::onApplyHeatpadMeasure(){
-    const float voltage = mModel.getHeatpadMeasuredVoltage();
-    const float current = mModel.getHeatpadCurrentDuty();
-    const float duty = mModel.getHeatpadCurrentDuty();
-    const float power = voltage * current * duty;
-    mPowerLabel.setTextFormatted("%.1f W", power);
+    HeatpadState state = mModel.getHeatpadState();
+    if(state == HeatpadState::Disabled){
+        mPowerLabel.setText("Off");
+    }
+    else {
+        const float voltage = mModel.getHeatpadMeasuredVoltage();
+        const float current = mModel.getHeatpadMeasuredCurrent();
+        const float duty = mModel.getHeatpadCurrentDuty();
+        const float power = voltage * current * duty;
+        mPowerLabel.setTextFormatted("%.1f W", power);
+    }
 }
 
 void MainScreen::onApplyDisplayBrightness(){
     // nothing to do
 }
 
-void MainScreen::onApplyShtDriverEnabled(){
-    // nothing to do
-}
-
-void MainScreen::onApplyShtPowerEnabled(){
-    // nothing to do
-}
-
-void MainScreen::onApplyShtResetting(){
+void MainScreen::onApplySensorStatus(){
     // nothing to do
 }
 
 void MainScreen::onApplyMeasuredTemperature(){
-    mTemperatureLabel.setTextFormatted("%.1f°C", mModel.getMeasuredTemperature());
+    if(isSensorOk()){
+        mTemperatureLabel.setTextFormatted("%.1f°C", mModel.getMeasuredTemperature());
+    }
+    else {
+        mTemperatureLabel.setText(resovleSensorText());
+    }
 }
 
 void MainScreen::onApplyMeasuredHumidity(){
-    mHumidityLabel.setTextFormatted("%.1f%%", mModel.getMeasuredHumidity());
+    if(isSensorOk()){
+        mHumidityLabel.setTextFormatted("%.1f%%", mModel.getMeasuredHumidity());
+    }
+    else {
+        mHumidityLabel.setText(resovleSensorText());
+    }
 }
 
 void MainScreen::onApplyTargetTemperature(){

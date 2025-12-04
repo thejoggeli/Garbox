@@ -83,7 +83,11 @@
           "name": "shtDriverEnabled",
           "type": "bool",
           "bind": "TemperatureStatus->driverEnabled",
-          "group": "ShtDriverEnabled",
+          "dirty": [
+            "MeasuredTemperature",
+            "MeasuredHumidity"
+          ],
+          "group": "SensorStatus",
           "event_type": "TemperatureStatus",
           "event_field": "driverEnabled"
         },
@@ -91,7 +95,11 @@
           "name": "shtPowerEnabled",
           "type": "bool",
           "bind": "TemperatureStatus->powerEnabled",
-          "group": "ShtPowerEnabled",
+          "dirty": [
+            "MeasuredTemperature",
+            "MeasuredHumidity"
+          ],
+          "group": "SensorStatus",
           "event_type": "TemperatureStatus",
           "event_field": "powerEnabled"
         },
@@ -99,9 +107,25 @@
           "name": "shtResetting",
           "type": "bool",
           "bind": "TemperatureStatus->resetting",
-          "group": "ShtResetting",
+          "dirty": [
+            "MeasuredTemperature",
+            "MeasuredHumidity"
+          ],
+          "group": "SensorStatus",
           "event_type": "TemperatureStatus",
           "event_field": "resetting"
+        },
+        "shtHasSample": {
+          "name": "shtHasSample",
+          "type": "bool",
+          "bind": "TemperatureStatus->hasFirstSample",
+          "dirty": [
+            "MeasuredTemperature",
+            "MeasuredHumidity"
+          ],
+          "group": "SensorStatus",
+          "event_type": "TemperatureStatus",
+          "event_field": "hasFirstSample"
         },
         "measuredTemperature": {
           "name": "measuredTemperature",
@@ -158,7 +182,8 @@
         "TemperatureStatus": {
           "shtDriverEnabled": "<ref>",
           "shtPowerEnabled": "<ref>",
-          "shtResetting": "<ref>"
+          "shtResetting": "<ref>",
+          "shtHasSample": "<ref>"
         },
         "TemperatureSample": {
           "measuredTemperature": "<ref>",
@@ -189,14 +214,11 @@
         "DisplayBrightness": {
           "displayBrightness": "<ref>"
         },
-        "ShtDriverEnabled": {
-          "shtDriverEnabled": "<ref>"
-        },
-        "ShtPowerEnabled": {
-          "shtPowerEnabled": "<ref>"
-        },
-        "ShtResetting": {
-          "shtResetting": "<ref>"
+        "SensorStatus": {
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>",
+          "shtHasSample": "<ref>"
         },
         "MeasuredTemperature": {
           "measuredTemperature": "<ref>"

@@ -60,15 +60,7 @@ void MainScreen::onApplyDisplayBrightness(){
     // nothing to do
 }
 
-void MainScreen::onApplyShtDriverEnabled(){
-    // nothing to do
-}
-
-void MainScreen::onApplyShtPowerEnabled(){
-    // nothing to do
-}
-
-void MainScreen::onApplyShtResetting(){
+void MainScreen::onApplySensorStatus(){
     // nothing to do
 }
 

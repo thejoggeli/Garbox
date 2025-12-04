@@ -190,6 +190,11 @@
         "name": "resetting",
         "type": "bool",
         "default": "<ref>"
+      },
+      "hasFirstSample": {
+        "name": "hasFirstSample",
+        "type": "bool",
+        "default": "<ref>"
       }
     }
   },

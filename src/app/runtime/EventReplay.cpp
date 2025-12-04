@@ -247,6 +247,7 @@ void EventReplay::sendTemperatureStatusToMainScreen(void* context){
     model.setShtDriverEnabled(payload.driverEnabled); 
     model.setShtPowerEnabled(payload.powerEnabled); 
     model.setShtResetting(payload.resetting); 
+    model.setShtHasSample(payload.hasFirstSample); 
 }
 
 void EventReplay::sendActiveBehaviourChangedToDebugScreen(void* context){ 

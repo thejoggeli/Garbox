@@ -9,19 +9,20 @@ screens:
     sends: null
     model:
       fields:
-        - { name: fanState,               bind: FanStatus->state, group: FanStatus }
+        - { name: fanState,               bind: FanStatus->state,       group: FanStatus }
         - { name: fanMeasuredRpm,         bind: FanSample->measuredRpm, group: FanStatus }
         - { name: fanTargetSpeed,         bind: FanStatus->targetSpeed }
-        - { name: heatpadState,           bind: HeatpadStatus->state, group: HeatpadStatus }
+        - { name: heatpadState,           bind: HeatpadStatus->state,            group: HeatpadStatus }
         - { name: heatpadCurrentDuty,     bind: HeatpadStatus->currentDutyCycle, group: HeatpadStatus, dirty: HeatpadMeasure }
-        - { name: heatpadMeasuredVoltage, bind: HeatpadSample->measuredVoltage, group: HeatpadMeasure }
-        - { name: heatpadMeasuredCurrent, bind: HeatpadSample->measuredCurrent, group: HeatpadMeasure }
+        - { name: heatpadMeasuredVoltage, bind: HeatpadSample->measuredVoltage,  group: HeatpadMeasure }
+        - { name: heatpadMeasuredCurrent, bind: HeatpadSample->measuredCurrent,  group: HeatpadMeasure }
         - { name: displayBrightness,      bind: DisplayStatus->brightness }
-        - { name: shtDriverEnabled,       bind: TemperatureStatus->driverEnabled }
-        - { name: shtPowerEnabled,        bind: TemperatureStatus->powerEnabled }
-        - { name: shtResetting,           bind: TemperatureStatus->resetting }
-        - { name: measuredTemperature,    bind: TemperatureSample->temperatureCelcius }
-        - { name: measuredHumidity,       bind: TemperatureSample->humidityRelative }
+        - { name: shtDriverEnabled,       bind: TemperatureStatus->driverEnabled,  group: SensorStatus, dirty: [MeasuredTemperature, MeasuredHumidity] }
+        - { name: shtPowerEnabled,        bind: TemperatureStatus->powerEnabled,   group: SensorStatus, dirty: [MeasuredTemperature, MeasuredHumidity] }
+        - { name: shtResetting,           bind: TemperatureStatus->resetting,      group: SensorStatus, dirty: [MeasuredTemperature, MeasuredHumidity] }
+        - { name: shtHasSample,           bind: TemperatureStatus->hasFirstSample, group: SensorStatus, dirty: [MeasuredTemperature, MeasuredHumidity] }
+        - { name: measuredTemperature,    bind: TemperatureSample->temperatureCelcius, group: MeasuredTemperature }
+        - { name: measuredHumidity,       bind: TemperatureSample->humidityRelative,   group: MeasuredHumidity }
         - { name: targetTemperature,      bind: FermentationStatus->targetTemperature }
         - { name: engineState,            bind: FermentationStatus->heaterEngineState }
 

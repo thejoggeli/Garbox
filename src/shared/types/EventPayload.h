@@ -75,6 +75,7 @@ struct TemperatureStatusPayload {
     bool driverEnabled;
     bool powerEnabled;
     bool resetting;
+    bool hasFirstSample;
 };
 
 struct TemperatureSamplePayload {

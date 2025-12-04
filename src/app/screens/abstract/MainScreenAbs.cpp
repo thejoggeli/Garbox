@@ -35,9 +35,7 @@ void MainScreenAbs::init(ComponentHostIfc& host){
     mDirtyDispatcher.registerHandler(applyHeatpadStatusTrampoline, this);
     mDirtyDispatcher.registerHandler(applyHeatpadMeasureTrampoline, this);
     mDirtyDispatcher.registerHandler(applyDisplayBrightnessTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyShtDriverEnabledTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyShtPowerEnabledTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyShtResettingTrampoline, this);
+    mDirtyDispatcher.registerHandler(applySensorStatusTrampoline, this);
     mDirtyDispatcher.registerHandler(applyMeasuredTemperatureTrampoline, this);
     mDirtyDispatcher.registerHandler(applyMeasuredHumidityTrampoline, this);
     mDirtyDispatcher.registerHandler(applyTargetTemperatureTrampoline, this);
@@ -110,6 +108,10 @@ bool MainScreenAbs::Model::getShtPowerEnabled() const {
 
 bool MainScreenAbs::Model::getShtResetting() const { 
     return mShtResetting; 
+}
+
+bool MainScreenAbs::Model::getShtHasSample() const { 
+    return mShtHasSample; 
 }
 
 float MainScreenAbs::Model::getMeasuredTemperature() const { 
@@ -188,21 +190,36 @@ void MainScreenAbs::Model::setDisplayBrightness(float value){
 void MainScreenAbs::Model::setShtDriverEnabled(bool value){ 
     if(mShtDriverEnabled != value) { 
         mShtDriverEnabled = value; 
-        mScreen.markDirty(Model::Index::ShtDriverEnabled);
+        mScreen.markDirty(Model::Index::SensorStatus);
+        mScreen.markDirty(Model::Index::MeasuredTemperature);
+        mScreen.markDirty(Model::Index::MeasuredHumidity);
     } 
 }
 
 void MainScreenAbs::Model::setShtPowerEnabled(bool value){ 
     if(mShtPowerEnabled != value) { 
         mShtPowerEnabled = value; 
-        mScreen.markDirty(Model::Index::ShtPowerEnabled);
+        mScreen.markDirty(Model::Index::SensorStatus);
+        mScreen.markDirty(Model::Index::MeasuredTemperature);
+        mScreen.markDirty(Model::Index::MeasuredHumidity);
     } 
 }
 
 void MainScreenAbs::Model::setShtResetting(bool value){ 
     if(mShtResetting != value) { 
         mShtResetting = value; 
-        mScreen.markDirty(Model::Index::ShtResetting);
+        mScreen.markDirty(Model::Index::SensorStatus);
+        mScreen.markDirty(Model::Index::MeasuredTemperature);
+        mScreen.markDirty(Model::Index::MeasuredHumidity);
+    } 
+}
+
+void MainScreenAbs::Model::setShtHasSample(bool value){ 
+    if(mShtHasSample != value) { 
+        mShtHasSample = value; 
+        mScreen.markDirty(Model::Index::SensorStatus);
+        mScreen.markDirty(Model::Index::MeasuredTemperature);
+        mScreen.markDirty(Model::Index::MeasuredHumidity);
     } 
 }
 
@@ -270,16 +287,8 @@ void MainScreenAbs::applyDisplayBrightnessTrampoline(void* context){
     static_cast<MainScreenAbs*>(context)->onApplyDisplayBrightness();
 }
 
-void MainScreenAbs::applyShtDriverEnabledTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyShtDriverEnabled();
-}
-
-void MainScreenAbs::applyShtPowerEnabledTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyShtPowerEnabled();
-}
-
-void MainScreenAbs::applyShtResettingTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyShtResetting();
+void MainScreenAbs::applySensorStatusTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplySensorStatus();
 }
 
 void MainScreenAbs::applyMeasuredTemperatureTrampoline(void* context){

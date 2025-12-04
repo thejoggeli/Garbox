@@ -51,16 +51,16 @@ void I2cPartsController::onInputTick(){
         TriggerDebug("I2cPartsController", "unhandled state");
     }
 
-    // send if status event changed flag is set
-    if(mStateChanged){
-        sendTemperatureStatusEvent();
-        mStateChanged = false;
-    }
-
     // set new sample
     if(mNewSample){
         sendTemperatureSampleEvent();
         mNewSample = false;
+    }
+
+    // send if status event changed flag is set
+    if(mStateChanged){
+        sendTemperatureStatusEvent();
+        mStateChanged = false;
     }
 }
 
@@ -77,6 +77,10 @@ void I2cPartsController::handleRunningState(){
     }
     else {
         mFsm.cancelPendingTransition();
+        if(!mHasFirstSample){
+            mHasFirstSample = true;
+            mStateChanged = true;
+        }
     }
 }
 
@@ -87,6 +91,7 @@ void I2cPartsController::handleStateChanged(FsmState oldState, FsmState newState
         if(mTemperatureSensor.isStarted()){
             mTemperatureSensor.reset();
         }
+        mHasFirstSample = false;
         mResetting = true;
         mEnablePowerGpio.writeLevel(false);
         break;
@@ -94,6 +99,7 @@ void I2cPartsController::handleStateChanged(FsmState oldState, FsmState newState
         if(mTemperatureSensor.isStarted()){
             mTemperatureSensor.reset();
         }
+        mHasFirstSample = false;
         mResetting = true;
         mEnablePowerGpio.writeLevel(true);
         break;
@@ -111,6 +117,7 @@ void I2cPartsController::sendTemperatureStatusEvent(){
     event->powerEnabled = mEnablePowerGpio.readLevel();
     event->driverEnabled = mTemperatureSensor.isStarted();
     event->resetting = mResetting;
+    event->hasFirstSample = mHasFirstSample;
     sendEvent(event);
 }
 

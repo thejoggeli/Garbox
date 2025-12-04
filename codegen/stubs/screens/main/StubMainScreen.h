@@ -23,9 +23,7 @@ private:
     void onApplyHeatpadStatus() final;
     void onApplyHeatpadMeasure() final;
     void onApplyDisplayBrightness() final;
-    void onApplyShtDriverEnabled() final;
-    void onApplyShtPowerEnabled() final;
-    void onApplyShtResetting() final;
+    void onApplySensorStatus() final;
     void onApplyMeasuredTemperature() final;
     void onApplyMeasuredHumidity() final;
     void onApplyTargetTemperature() final;

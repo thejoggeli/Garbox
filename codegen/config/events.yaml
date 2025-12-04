@@ -46,6 +46,7 @@ event_types:
     - { name: driverEnabled, type: bool }
     - { name: powerEnabled, type: bool }
     - { name: resetting, type: bool }
+    - { name: hasFirstSample, type: bool }
   TemperatureSample:
     - { name: temperatureCelcius, type: float }
     - { name: humidityRelative, type: float }

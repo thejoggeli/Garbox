@@ -33,9 +33,7 @@ protected:
     virtual void onApplyHeatpadStatus() = 0;
     virtual void onApplyHeatpadMeasure() = 0;
     virtual void onApplyDisplayBrightness() = 0;
-    virtual void onApplyShtDriverEnabled() = 0;
-    virtual void onApplyShtPowerEnabled() = 0;
-    virtual void onApplyShtResetting() = 0;
+    virtual void onApplySensorStatus() = 0;
     virtual void onApplyMeasuredTemperature() = 0;
     virtual void onApplyMeasuredHumidity() = 0;
     virtual void onApplyTargetTemperature() = 0;
@@ -75,9 +73,7 @@ public:
             HeatpadStatus,
             HeatpadMeasure,
             DisplayBrightness,
-            ShtDriverEnabled,
-            ShtPowerEnabled,
-            ShtResetting,
+            SensorStatus,
             MeasuredTemperature,
             MeasuredHumidity,
             TargetTemperature,
@@ -105,6 +101,7 @@ public:
         bool getShtDriverEnabled() const;
         bool getShtPowerEnabled() const;
         bool getShtResetting() const;
+        bool getShtHasSample() const;
         float getMeasuredTemperature() const;
         float getMeasuredHumidity() const;
         float getTargetTemperature() const;
@@ -122,6 +119,7 @@ public:
         void setShtDriverEnabled(bool value);
         void setShtPowerEnabled(bool value);
         void setShtResetting(bool value);
+        void setShtHasSample(bool value);
         void setMeasuredTemperature(float value);
         void setMeasuredHumidity(float value);
         void setTargetTemperature(float value);
@@ -143,6 +141,7 @@ public:
         bool mShtDriverEnabled;
         bool mShtPowerEnabled;
         bool mShtResetting;
+        bool mShtHasSample;
         float mMeasuredTemperature;
         float mMeasuredHumidity;
         float mTargetTemperature;
@@ -174,9 +173,7 @@ private:
     static void applyHeatpadStatusTrampoline(void* context);
     static void applyHeatpadMeasureTrampoline(void* context);
     static void applyDisplayBrightnessTrampoline(void* context);
-    static void applyShtDriverEnabledTrampoline(void* context);
-    static void applyShtPowerEnabledTrampoline(void* context);
-    static void applyShtResettingTrampoline(void* context);
+    static void applySensorStatusTrampoline(void* context);
     static void applyMeasuredTemperatureTrampoline(void* context);
     static void applyMeasuredHumidityTrampoline(void* context);
     static void applyTargetTemperatureTrampoline(void* context);

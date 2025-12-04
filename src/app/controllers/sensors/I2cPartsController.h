@@ -33,6 +33,7 @@ private:
     Gpio& mEnablePowerGpio;
     Sht31& mTemperatureSensor;
 
+    bool mHasFirstSample = false;
     bool mNewSample = false;
     bool mStateChanged = true;
     bool mResetting = false;

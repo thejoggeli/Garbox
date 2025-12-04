@@ -384,6 +384,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 model.setShtDriverEnabled(event->driverEnabled);
                 model.setShtPowerEnabled(event->powerEnabled);
                 model.setShtResetting(event->resetting);
+                model.setShtHasSample(event->hasFirstSample);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'TemperatureStatus' event

@@ -23,9 +23,7 @@ public:
     void onApplyHeatpadStatus() final;
     void onApplyHeatpadMeasure() final;
     void onApplyDisplayBrightness() final;
-    void onApplyShtDriverEnabled() final;
-    void onApplyShtPowerEnabled() final;
-    void onApplyShtResetting() final;
+    void onApplySensorStatus() final;
     void onApplyMeasuredTemperature() final;
     void onApplyMeasuredHumidity() final;
     void onApplyTargetTemperature() final;
@@ -44,6 +42,9 @@ private:
     LvLabel mTemperatureLabel;
     LvLabel mHumidityLabel;
     LvLabel mPowerLabel;
+
+    bool isSensorOk();
+    const char* resovleSensorText();
 
     // safe to update lvgl objects in these methods
     void onInit() final;
