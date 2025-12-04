@@ -5,7 +5,9 @@ from pathlib import Path
 from loader.parse_application import parse_application
 from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
+from loader.parse_guis import parse_guis
 from common.util import decycle
+from lxml import etree
 
 class Loader:
 
@@ -17,7 +19,7 @@ class Loader:
         pass
 
     def preload_all(self):
-        paths = [p for p in self.config_dir.rglob("*") if p.is_file()]
+        paths = [p for p in self.config_dir.rglob("*.yaml") if p.is_file()]
         self.config = load_yaml_multi(paths)
 
         # parse hardware config
@@ -33,6 +35,18 @@ class Loader:
         # - screens
         # requires events to already be parsed)
         parse_application(self.config)
+
+        # load xml files
+        gui_dir = self.config_dir / "gui" 
+        gui_paths = [p for p in gui_dir.glob("*.xml") if p.is_file()]
+        gui_configs = {}
+        for path in gui_paths:
+            config_data = load_xml(path)
+            config_name = path.stem
+            gui_configs[config_name] = config_data 
+            
+
+        self.config["guis"] = parse_guis(gui_configs)
 
 
     def save_json(self, path: Path, config):
@@ -84,3 +98,7 @@ def load_yaml_multi(paths: list[Path]):
         merged = merge_yaml(merged, data)
     return merged
 
+
+def load_xml(path: Path):
+    print(f"{path}")
+    return etree.parse(path)

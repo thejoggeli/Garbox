@@ -1,0 +1,340 @@
+{
+  "MainScreen": {
+    "components": {
+      "SettingRow": {
+        "params": {
+          "label": {
+            "default": null
+          },
+          "value": {
+            "default": ""
+          }
+        },
+        "objects": {
+          "label": {
+            "type": "label",
+            "name": "label",
+            "attrs": {
+              "text": "$label",
+              "grow": "1"
+            },
+            "parent_name": "body",
+            "is_component": false
+          },
+          "left": {
+            "type": "image",
+            "name": "left",
+            "attrs": {
+              "src": "icons/arrow_left.png",
+              "visible": "false"
+            },
+            "parent_name": "body",
+            "is_component": "<ref>"
+          },
+          "value": {
+            "type": "label",
+            "name": "value",
+            "attrs": {
+              "text": "$value",
+              "width": "40",
+              "align": "right"
+            },
+            "parent_name": "body",
+            "is_component": "<ref>"
+          },
+          "right": {
+            "type": "image",
+            "name": "right",
+            "attrs": {
+              "src": "icons/arrow_right.png",
+              "visible": "false"
+            },
+            "parent_name": "body",
+            "is_component": "<ref>"
+          }
+        }
+      },
+      "InfoRow": {
+        "params": {
+          "icon": {
+            "default": "<ref>"
+          },
+          "value": {
+            "default": "<ref>"
+          },
+          "unit": {
+            "default": "<ref>"
+          },
+          "showUnit": {
+            "default": "false"
+          }
+        },
+        "objects": {
+          "icon": {
+            "type": "image",
+            "name": "icon",
+            "attrs": {
+              "src": "$icon",
+              "width": "16",
+              "height": "16"
+            },
+            "parent_name": "body",
+            "is_component": "<ref>"
+          },
+          "value": {
+            "type": "label",
+            "name": "value",
+            "attrs": {
+              "text": "$value"
+            },
+            "parent_name": "body",
+            "is_component": "<ref>"
+          },
+          "unit": {
+            "type": "label",
+            "name": "unit",
+            "attrs": {
+              "text": "$unit",
+              "visible": "$showUnit"
+            },
+            "parent_name": "body",
+            "is_component": "<ref>"
+          }
+        }
+      }
+    },
+    "objects": {
+      "root": {
+        "type": "container",
+        "name": "root",
+        "attrs": {
+          "layout": "grid",
+          "grid-columns": "1fr 120px 120px",
+          "grid-rows": "1fr",
+          "width": "100%",
+          "height": "100%"
+        },
+        "parent_name": "body",
+        "is_component": "<ref>"
+      },
+      "leftPane": {
+        "type": "container",
+        "name": "leftPane",
+        "attrs": {
+          "grid-column": "<ref>",
+          "layout": "flex-col",
+          "scroll-y": "true",
+          "padding": "8"
+        },
+        "parent_name": "root",
+        "is_component": "<ref>"
+      },
+      "settingPower": {
+        "type": "SettingRow",
+        "name": "settingPower",
+        "attrs": {
+          "label": "Power",
+          "value": "On"
+        },
+        "parent_name": "leftPane",
+        "is_component": true
+      },
+      "settingTarget": {
+        "type": "SettingRow",
+        "name": "settingTarget",
+        "attrs": {
+          "label": "Target",
+          "value": "30.0 \u00b0C"
+        },
+        "parent_name": "leftPane",
+        "is_component": "<ref>"
+      },
+      "settingFan": {
+        "type": "SettingRow",
+        "name": "settingFan",
+        "attrs": {
+          "label": "Fan",
+          "value": "Auto"
+        },
+        "parent_name": "leftPane",
+        "is_component": "<ref>"
+      },
+      "settingHeater": {
+        "type": "SettingRow",
+        "name": "settingHeater",
+        "attrs": {
+          "label": "Heater",
+          "value": "Auto"
+        },
+        "parent_name": "leftPane",
+        "is_component": "<ref>"
+      },
+      "settingCalibrate": {
+        "type": "SettingRow",
+        "name": "settingCalibrate",
+        "attrs": {
+          "label": "Calibrate"
+        },
+        "parent_name": "leftPane",
+        "is_component": "<ref>"
+      },
+      "settingAdvanced": {
+        "type": "SettingRow",
+        "name": "settingAdvanced",
+        "attrs": {
+          "label": "Advanced"
+        },
+        "parent_name": "leftPane",
+        "is_component": "<ref>"
+      },
+      "middlePane": {
+        "type": "container",
+        "name": "middlePane",
+        "attrs": {
+          "grid-column": "2",
+          "layout": "flex-col",
+          "width": "120px",
+          "padding": "<ref>"
+        },
+        "parent_name": "root",
+        "is_component": "<ref>"
+      },
+      "namelessLabel0": {
+        "type": "label",
+        "name": "namelessLabel0",
+        "attrs": {
+          "text": "Status",
+          "bold": "true",
+          "height": "30"
+        },
+        "parent_name": "middlePane",
+        "is_component": "<ref>"
+      },
+      "namelessContainer0": {
+        "type": "container",
+        "name": "namelessContainer0",
+        "attrs": {
+          "layout": "flex-col",
+          "grow": "<ref>"
+        },
+        "parent_name": "middlePane",
+        "is_component": "<ref>"
+      },
+      "status": {
+        "type": "InfoRow",
+        "name": "status",
+        "attrs": {
+          "icon": "icons/power16.png",
+          "value": "Active"
+        },
+        "parent_name": "namelessContainer0",
+        "is_component": "<ref>"
+      },
+      "fanPct": {
+        "type": "InfoRow",
+        "name": "fanPct",
+        "attrs": {
+          "icon": "icons/fan16.png",
+          "value": "40.0",
+          "unit": "%",
+          "showUnit": "true"
+        },
+        "parent_name": "namelessContainer0",
+        "is_component": "<ref>"
+      },
+      "heatPct": {
+        "type": "InfoRow",
+        "name": "heatPct",
+        "attrs": {
+          "icon": "icons/heat16.png",
+          "value": "23.0",
+          "unit": "<ref>",
+          "showUnit": "true"
+        },
+        "parent_name": "namelessContainer0",
+        "is_component": "<ref>"
+      },
+      "rightPane": {
+        "type": "container",
+        "name": "rightPane",
+        "attrs": {
+          "grid-column": "3",
+          "layout": "flex-col",
+          "width": "120px",
+          "padding": "<ref>"
+        },
+        "parent_name": "root",
+        "is_component": "<ref>"
+      },
+      "namelessLabel1": {
+        "type": "label",
+        "name": "namelessLabel1",
+        "attrs": {
+          "text": "Sensors",
+          "bold": "true",
+          "height": "30"
+        },
+        "parent_name": "rightPane",
+        "is_component": "<ref>"
+      },
+      "namelessContainer1": {
+        "type": "container",
+        "name": "namelessContainer1",
+        "attrs": {
+          "layout": "flex-col",
+          "grow": "<ref>"
+        },
+        "parent_name": "rightPane",
+        "is_component": "<ref>"
+      },
+      "fanRpm": {
+        "type": "InfoRow",
+        "name": "fanRpm",
+        "attrs": {
+          "icon": "icons/fan16.png",
+          "value": "2000",
+          "unit": "RPM",
+          "showUnit": "true"
+        },
+        "parent_name": "namelessContainer1",
+        "is_component": "<ref>"
+      },
+      "temperature": {
+        "type": "InfoRow",
+        "name": "temperature",
+        "attrs": {
+          "icon": "icons/temperature16.png",
+          "value": "28.2",
+          "unit": "\u00b0C",
+          "showUnit": "true"
+        },
+        "parent_name": "namelessContainer1",
+        "is_component": "<ref>"
+      },
+      "humidity": {
+        "type": "InfoRow",
+        "name": "humidity",
+        "attrs": {
+          "icon": "icons/humidity16.png",
+          "value": "56.3",
+          "unit": "<ref>",
+          "showUnit": "true"
+        },
+        "parent_name": "namelessContainer1",
+        "is_component": "<ref>"
+      },
+      "power": {
+        "type": "InfoRow",
+        "name": "power",
+        "attrs": {
+          "icon": "icons/power16.png",
+          "value": "15.3",
+          "unit": "W",
+          "showUnit": "true"
+        },
+        "parent_name": "namelessContainer1",
+        "is_component": "<ref>"
+      }
+    }
+  }
+}

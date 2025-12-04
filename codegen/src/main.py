@@ -33,6 +33,8 @@ def main():
 
     # safe parsed config to json
     loader.save_config(codegen_dir / "config_parsed")
+
+    quit()
     
     # hardware generation
     print("generating hardware files")

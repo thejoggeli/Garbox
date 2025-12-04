@@ -1,18 +1,7 @@
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
+from common.str_filters import lower_first, upper_first
 import re
-
-
-def upper_first(s):
-    if not isinstance(s, str) or not s:
-        return s
-    return s[0].upper() + s[1:]
-
-
-def lower_first(s):
-    if not isinstance(s, str) or not s:
-        return s
-    return s[0].lower() + s[1:]
 
 
 def create_jinja_env(template_dir: Path):
