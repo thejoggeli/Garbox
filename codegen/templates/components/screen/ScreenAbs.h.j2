@@ -2,6 +2,9 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
 #include "core/application/screen/ScreenAbs.h"
+{% if screen.use_lvgl %}
+#include "core/lvgl/objects/LvContainer.h"
+{% endif %}
 {% if screen.model.get("debounce") %}
 #include "core/time/SoftwareTimer.h"
 {% endif %}
@@ -10,18 +13,16 @@
 namespace Garbox {
 
 class {{ name }}Abs : public ScreenAbs {
-
-{# update user handlers #}
-{% if screen.model.fields %}
-protected:
-
-    // model field callbacks to update specific parts of the screen (to be implmeneted by user)
-{% for group_name, fields in screen.model.groups.items() %}
-    virtual void onApply{{ group_name|upper_first }}() = 0;
-{% endfor %}
-{% endif %}
-
 public:
+
+    // constructor 
+    {{name}}Abs();
+
+    // init override from component
+    void init(ComponentHostIfc& host) final;
+    void updateScreen() final;
+    void becomeEnabled() final;
+    void becomeDisabled() final;
 
 {# onTick() #}
 {{ on_ticks(screen) }}
@@ -29,42 +30,15 @@ public:
 {# onEvent() #}
 {{ on_events(screen) }}
 
-    // constructor requires lvgl context
-    {{name}}Abs(LvglContext& lvgl);
-
-    // init override from component
-    void init(ComponentHostIfc& host) final;
-
-{% if screen.model.get("debounce") %}
-    void updateScreen() final;
-    void becomeEnabled() final;
-    void becomeDisabled() final;
-{% endif %}
-
-{% if screen.model.fields %}
-{% set block %}
-    {% include "components/screen/ScreenModel.h.j2" %}
-{% endset %}
-{{ block | indent(4, true) }}
-{% endif %}
-
-{% if screen.model.fields %}
-    Model& getModel();
-    const Model& getModel() const;
-{% endif %}
-
 protected:
 
-{% if screen.model.fields %}
-    Model mModel;
-
-{# markDirty() #}
-    // method to mark an model field index dirty (for manually updated values)
-    void markDirty(Model::Index index);
-    bool isMarkedDirty(Model::Index index) const;
-
+{# onApplyX() handlers for model #}
+{% if screen.use_model %}
+    // model field callbacks to update specific parts of the screen (to be implmeneted by user)
+{% for group_name, fields in screen.model.groups.items() %}
+    virtual void onApply{{ group_name|upper_first }}() = 0;
+{% endfor %}
 {% endif %}
-
 
 {# make and send events #}
 {{ make_events(screen) }}
@@ -72,21 +46,68 @@ protected:
 
 private:
 
+{# hide events #}
+{{ hide_events("Screen") }}
+
+{####################}
+{### LVGL Section ###}
+{####################}
+{% if screen.use_lvgl %}
+
+/********************/
+/*** LVGL Section ***/
+/********************/
+
+protected:
+
+    LvContainer mContainer;
+    const uint32_t mDisplayWidth = 0;
+    const uint32_t mDisplayHeight = 0;
+
+    void setBackgroundColor(uint32_t color);
+{% endif %}
+
+{#####################}
+{### Model Section ###}
+{#####################}
+{% if screen.use_model %}
+
+/*********************/
+/*** Model Section ***/
+/*********************/
+
+public: 
+
+{% set block %}
+    {% include "components/screen/ScreenModel.h.j2" %}
+{% endset %}
+{{ block | indent(4, true) }}
+
+    // model instance
+    Model mModel;
+    Model& getModel();
+    const Model& getModel() const;
+
+protected: 
+
+    // dispatcher (calls apply methods)
+    DirtyDispatcher mDirtyDispatcher;
+    uint32_t mDispatchedCount = 0;
+    uint32_t getDispatchedCount() const { return mDispatchedCount; }
+
+    // method to mark an model field index dirty (for manually updated values)
+    void markDirty(Model::Index index);
+    bool isMarkedDirty(Model::Index index) const;
+
+private: 
+
 {# model field apply trampolines #}
-{% if screen.model.fields %}
     // model field apply trampolines
 {% for name in screen.model.groups.keys() %}
     static void apply{{ name|upper_first }}Trampoline(void* context);
 {% endfor %}
+
 {% endif %}
-
-{# hide events #}
-{{ hide_events("Screen") }}
-
-    // hide dangerous raw access
-    using ScreenAbs::registerUpdateHandler;
-    using ScreenAbs::markDirtyRaw;
-    using ScreenAbs::isMarkedDirtyRaw;
 
 };
 

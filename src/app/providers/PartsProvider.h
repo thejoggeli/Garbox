@@ -15,8 +15,6 @@ class AnimatedLed;
 class AnimatedLedGroup;
 class RgbLed;
 
-class LvglContext;
-
 class PartsProvider {
 public:
 
@@ -32,8 +30,6 @@ public:
     static AnimatedLed& GetStatusLed(StatusLedId id);
     static AnimatedLedGroup& GetStatusLeds();
     static RgbLed& GetRgbLed();
-
-    static LvglContext& GetLvglContext();
 
 };
 

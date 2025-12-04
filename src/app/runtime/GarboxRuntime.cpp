@@ -25,7 +25,7 @@ GarboxRuntime::GarboxRuntime():
         .eventQueueLength = 128,
     }),
     mTickRunner(TickHandlersCount, TickPeriodMillis),
-    mEventReplay(mMainScreen){
+    mEventReplay(mMainScreen, mDebugScreen){
 
     // register components
     registerComponent(&mCalibrationBehaviour);
@@ -38,8 +38,8 @@ GarboxRuntime::GarboxRuntime():
     registerComponent(&mInputController);
     registerComponent(&mI2cPartsController);
     registerComponent(&mMainScreen);
-    registerComponent(&mEventLogScreen);
     registerComponent(&mDebugScreen);
+    registerComponent(&mEventLogScreen);
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -87,7 +87,6 @@ void GarboxRuntime::handleTickStart(){
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
     applyQueuedBehaviour();
-    dispatchEvents();
 }
 
 void GarboxRuntime::handleTickEnd(){
@@ -158,7 +157,6 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         if(header->sendToInactiveComponents){
             mCalibrationBehaviour.onHeartbeat(event);
             mFermentationBehaviour.onHeartbeat(event);
-            mDebugScreen.onHeartbeat(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
@@ -166,22 +164,24 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
                 default: break; // active behaviour does not receive 'Heartbeat' event
             }
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeartbeat(event); break;
-                default: break; // active screen does not receive 'Heartbeat' event
-            }
         }
         break;
     }
     case EventType::FermentationStatus: {
         const FermentationStatusEvent event(header);
         switch(mActiveScreen->getScreenId()){
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
                 model.setEngineState(event->heaterEngineState);
                 model.setEngineTargetTemperature(event->targetTemperature);
                 model.setEngineMeasuredTemperature(event->measuredTemperature);
                 model.setEngineMeasuredHumidity(event->measuredHumidity);
+                break;
+            }
+            case ScreenId::Main: {
+                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+                model.setTargetTemperature(event->targetTemperature);
+                model.setEngineState(event->heaterEngineState);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'FermentationStatus' event
@@ -191,15 +191,30 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::DisplayCommand: {
         const DisplayCommandEvent event(header);
         mDisplayController.onDisplayCommand(event);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onDisplayCommand(event);
+        }
+        else {
+            // no active receivers for this event type
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayCommand(event); break;
+                default: break; // active screen does not receive 'DisplayCommand' event
+            }
+        }
         break;
     }
     case EventType::DisplayStatus: {
         const DisplayStatusEvent event(header);
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
+                model.setDisplayBrightness(event->brightness);
+                model.setDisplaySkipped(event->skipped);
+                break;
+            }
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
                 model.setDisplayBrightness(event->brightness);
-                model.setDisplaySkipped(event->skipped);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'DisplayStatus' event
@@ -220,6 +235,12 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             }
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
+                model.setFanState(event->state);
+                model.setFanTargetSpeed(event->targetSpeed);
+                break;
+            }
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
                 model.setFanState(event->state);
@@ -244,6 +265,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             }
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
+                model.setFanMeasuredRpm(event->measuredRpm);
+                break;
+            }
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
                 model.setFanMeasuredRpm(event->measuredRpm);
@@ -256,6 +282,16 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::FanCommand: {
         const FanCommandEvent event(header);
         mFanController.onFanCommand(event);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onFanCommand(event);
+        }
+        else {
+            // no active receivers for this event type
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanCommand(event); break;
+                default: break; // active screen does not receive 'FanCommand' event
+            }
+        }
         break;
     }
     case EventType::HeatpadStatus: {
@@ -270,13 +306,19 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             }
         }
         switch(mActiveScreen->getScreenId()){
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
                 model.setHeatpadState(event->state);
                 model.setHeatpadCurrentDuty(event->currentDutyCycle);
                 model.setHeatpadCurrentPeriod(event->currentPeriodMicros);
                 model.setHeatpadNextDuty(event->nextDutyCycle);
                 model.setHeatpadNextPeriod(event->nextPeriodMicros);
+                break;
+            }
+            case ScreenId::Main: {
+                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+                model.setHeatpadState(event->state);
+                model.setHeatpadCurrentDuty(event->currentDutyCycle);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'HeatpadStatus' event
@@ -286,9 +328,15 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::HeatpadSample: {
         const HeatpadSampleEvent event(header);
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
+                model.setHeatpadPwmProgress(event->pwmProgressMicros);
+                model.setHeatpadMeasuredVoltage(event->measuredVoltage);
+                model.setHeatpadMeasuredCurrent(event->measuredCurrent);
+                break;
+            }
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
-                model.setHeatpadPwmProgress(event->pwmProgressMicros);
                 model.setHeatpadMeasuredVoltage(event->measuredVoltage);
                 model.setHeatpadMeasuredCurrent(event->measuredCurrent);
                 break;
@@ -300,6 +348,16 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::HeatpadCommand: {
         const HeatpadCommandEvent event(header);
         mHeatpadController.onHeatpadCommand(event);
+        if(header->sendToInactiveComponents){
+            mMainScreen.onHeatpadCommand(event);
+        }
+        else {
+            // no active receivers for this event type
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadCommand(event); break;
+                default: break; // active screen does not receive 'HeatpadCommand' event
+            }
+        }
         break;
     }
     case EventType::TemperatureStatus: {
@@ -314,6 +372,13 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             }
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
+                model.setShtDriverEnabled(event->driverEnabled);
+                model.setShtPowerEnabled(event->powerEnabled);
+                model.setShtResetting(event->resetting);
+                break;
+            }
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
                 model.setShtDriverEnabled(event->driverEnabled);
@@ -337,10 +402,16 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             }
         }
         switch(mActiveScreen->getScreenId()){
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
                 model.setSensorTemperatureCelcius(event->temperatureCelcius);
                 model.setSensorHumidityRelative(event->humidityRelative);
+                break;
+            }
+            case ScreenId::Main: {
+                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+                model.setMeasuredTemperature(event->temperatureCelcius);
+                model.setMeasuredHumidity(event->humidityRelative);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'TemperatureSample' event
@@ -390,8 +461,8 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::ActiveBehaviourChanged: {
         const ActiveBehaviourChangedEvent event(header);
         switch(mActiveScreen->getScreenId()){
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->getModel();
+            case ScreenId::Debug: {
+                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->getModel();
                 model.setBehaviour(event->newBehaviour);
                 break;
             }
@@ -435,8 +506,8 @@ ControllerAbs* GarboxRuntime::resolveController(ControllerId id){
 ScreenAbs* GarboxRuntime::resolveScreen(ScreenId id){
     switch(id){
         case ScreenId::Main: return &mMainScreen;
-        case ScreenId::EventLog: return &mEventLogScreen;
         case ScreenId::Debug: return &mDebugScreen;
+        case ScreenId::EventLog: return &mEventLogScreen;
         default: TriggerExit("GarboxRuntime", "screen with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;

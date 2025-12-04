@@ -3,53 +3,85 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
+#include "core/lvgl/objects/LvContainer.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
 
 class MainScreenAbs : public ScreenAbs {
+public:
+
+    // constructor 
+    MainScreenAbs();
+
+    // init override from component
+    void init(ComponentHostIfc& host) final;
+    void updateScreen() final;
+    void becomeEnabled() final;
+    void becomeDisabled() final;
+
+    // event handlers (to be implmeneted by user)
+    virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
+    virtual void onFanCommand(const FanCommandEvent& event) = 0;
+    virtual void onHeatpadCommand(const HeatpadCommandEvent& event) = 0;
 
 protected:
 
     // model field callbacks to update specific parts of the screen (to be implmeneted by user)
-    virtual void onApplyFanState() = 0;
-    virtual void onApplyFanMeasuredRpm() = 0;
-    virtual void onApplyHeatpadState() = 0;
-    virtual void onApplyHeatpadDuty() = 0;
-    virtual void onApplyBoxPosition() = 0;
-    virtual void onApplyHeatpadSense() = 0;
-    virtual void onApplyDisplayStatus() = 0;
-    virtual void onApplyTemperatureState() = 0;
-    virtual void onApplyTemperatureSample() = 0;
-    virtual void onApplyAppInfo() = 0;
-    virtual void onApplyFermentationStatus() = 0;
-    virtual void onApplyHeapSpace() = 0;
+    virtual void onApplyFanStatus() = 0;
+    virtual void onApplyFanTargetSpeed() = 0;
+    virtual void onApplyHeatpadStatus() = 0;
+    virtual void onApplyHeatpadMeasure() = 0;
+    virtual void onApplyDisplayBrightness() = 0;
+    virtual void onApplyShtDriverEnabled() = 0;
+    virtual void onApplyShtPowerEnabled() = 0;
+    virtual void onApplyShtResetting() = 0;
+    virtual void onApplyMeasuredTemperature() = 0;
+    virtual void onApplyMeasuredHumidity() = 0;
+    virtual void onApplyTargetTemperature() = 0;
+    virtual void onApplyEngineState() = 0;
 
-public:
+private:
 
-    // constructor requires lvgl context
-    MainScreenAbs(LvglContext& lvgl);
+    // hide event methods
+    using ScreenAbs::makeEvent;
+    using ScreenAbs::publishEvent;
 
-    // init override from component
-    void init(ComponentHostIfc& host) final;
+/********************/
+/*** LVGL Section ***/
+/********************/
+
+protected:
+
+    LvContainer mContainer;
+    const uint32_t mDisplayWidth = 0;
+    const uint32_t mDisplayHeight = 0;
+
+    void setBackgroundColor(uint32_t color);
+
+/*********************/
+/*** Model Section ***/
+/*********************/
+
+public: 
 
     class Model { 
     public: 
 
         // dirty-flag indices (one per group) 
         enum class Index : uint8_t { 
-            FanState = 0,
-            FanMeasuredRpm,
-            HeatpadState,
-            HeatpadDuty,
-            BoxPosition,
-            HeatpadSense,
-            DisplayStatus,
-            TemperatureState,
-            TemperatureSample,
-            AppInfo,
-            FermentationStatus,
-            HeapSpace,
+            FanStatus = 0,
+            FanTargetSpeed,
+            HeatpadStatus,
+            HeatpadMeasure,
+            DisplayBrightness,
+            ShtDriverEnabled,
+            ShtPowerEnabled,
+            ShtResetting,
+            MeasuredTemperature,
+            MeasuredHumidity,
+            TargetTemperature,
+            EngineState,
             Count 
         }; 
 
@@ -63,57 +95,37 @@ public:
 
         // getters
         FanState getFanState() const;
-        float getFanTargetSpeed() const;
         float getFanMeasuredRpm() const;
+        float getFanTargetSpeed() const;
         HeatpadState getHeatpadState() const;
         float getHeatpadCurrentDuty() const;
-        uint32_t getHeatpadCurrentPeriod() const;
-        float getHeatpadNextDuty() const;
-        uint32_t getHeatpadNextPeriod() const;
-        float getHeatpadPwmProgress() const;
         float getHeatpadMeasuredVoltage() const;
         float getHeatpadMeasuredCurrent() const;
         float getDisplayBrightness() const;
-        uint32_t getDisplaySkipped() const;
         bool getShtDriverEnabled() const;
         bool getShtPowerEnabled() const;
         bool getShtResetting() const;
-        float getSensorTemperatureCelcius() const;
-        float getSensorHumidityRelative() const;
-        uint32_t getEventCount() const;
-        BehaviourId getBehaviour() const;
+        float getMeasuredTemperature() const;
+        float getMeasuredHumidity() const;
+        float getTargetTemperature() const;
         HeaterEngineState getEngineState() const;
-        float getEngineTargetTemperature() const;
-        float getEngineMeasuredTemperature() const;
-        float getEngineMeasuredHumidity() const;
-        uint32_t getHeapSpace() const;
 
         // setters 
         void setFanState(FanState value);
-        void setFanTargetSpeed(float value);
         void setFanMeasuredRpm(float value);
+        void setFanTargetSpeed(float value);
         void setHeatpadState(HeatpadState value);
         void setHeatpadCurrentDuty(float value);
-        void setHeatpadCurrentPeriod(uint32_t value);
-        void setHeatpadNextDuty(float value);
-        void setHeatpadNextPeriod(uint32_t value);
-        void setHeatpadPwmProgress(float value);
         void setHeatpadMeasuredVoltage(float value);
         void setHeatpadMeasuredCurrent(float value);
         void setDisplayBrightness(float value);
-        void setDisplaySkipped(uint32_t value);
         void setShtDriverEnabled(bool value);
         void setShtPowerEnabled(bool value);
         void setShtResetting(bool value);
-        void setSensorTemperatureCelcius(float value);
-        void setSensorHumidityRelative(float value);
-        void setEventCount(uint32_t value);
-        void setBehaviour(BehaviourId value);
+        void setMeasuredTemperature(float value);
+        void setMeasuredHumidity(float value);
+        void setTargetTemperature(float value);
         void setEngineState(HeaterEngineState value);
-        void setEngineTargetTemperature(float value);
-        void setEngineMeasuredTemperature(float value);
-        void setEngineMeasuredHumidity(float value);
-        void setHeapSpace(uint32_t value);
 
     private: 
 
@@ -121,74 +133,54 @@ public:
 
         // all model fields
         FanState mFanState;
-        float mFanTargetSpeed;
         float mFanMeasuredRpm;
+        float mFanTargetSpeed;
         HeatpadState mHeatpadState;
         float mHeatpadCurrentDuty;
-        uint32_t mHeatpadCurrentPeriod;
-        float mHeatpadNextDuty;
-        uint32_t mHeatpadNextPeriod;
-        float mHeatpadPwmProgress;
         float mHeatpadMeasuredVoltage;
         float mHeatpadMeasuredCurrent;
         float mDisplayBrightness;
-        uint32_t mDisplaySkipped;
         bool mShtDriverEnabled;
         bool mShtPowerEnabled;
         bool mShtResetting;
-        float mSensorTemperatureCelcius;
-        float mSensorHumidityRelative;
-        uint32_t mEventCount;
-        BehaviourId mBehaviour;
+        float mMeasuredTemperature;
+        float mMeasuredHumidity;
+        float mTargetTemperature;
         HeaterEngineState mEngineState;
-        float mEngineTargetTemperature;
-        float mEngineMeasuredTemperature;
-        float mEngineMeasuredHumidity;
-        uint32_t mHeapSpace;
 
     };
 
+    // model instance
+    Model mModel;
     Model& getModel();
     const Model& getModel() const;
 
-protected:
+protected: 
 
-    Model mModel;
+    // dispatcher (calls apply methods)
+    DirtyDispatcher mDirtyDispatcher;
+    uint32_t mDispatchedCount = 0;
+    uint32_t getDispatchedCount() const { return mDispatchedCount; }
 
     // method to mark an model field index dirty (for manually updated values)
     void markDirty(Model::Index index);
     bool isMarkedDirty(Model::Index index) const;
 
-    // make typed events 
-    DisplayCommandEvent makeDisplayCommandEvent();
-
-    // send typed events
-    void sendEvent(const DisplayCommandEvent& event);
-
-private:
+private: 
 
     // model field apply trampolines
-    static void applyFanStateTrampoline(void* context);
-    static void applyFanMeasuredRpmTrampoline(void* context);
-    static void applyHeatpadStateTrampoline(void* context);
-    static void applyHeatpadDutyTrampoline(void* context);
-    static void applyBoxPositionTrampoline(void* context);
-    static void applyHeatpadSenseTrampoline(void* context);
-    static void applyDisplayStatusTrampoline(void* context);
-    static void applyTemperatureStateTrampoline(void* context);
-    static void applyTemperatureSampleTrampoline(void* context);
-    static void applyAppInfoTrampoline(void* context);
-    static void applyFermentationStatusTrampoline(void* context);
-    static void applyHeapSpaceTrampoline(void* context);
-
-    // hide event methods
-    using ScreenAbs::makeEvent;
-    using ScreenAbs::publishEvent;
-
-    // hide dangerous raw access
-    using ScreenAbs::registerUpdateHandler;
-    using ScreenAbs::markDirtyRaw;
-    using ScreenAbs::isMarkedDirtyRaw;
+    static void applyFanStatusTrampoline(void* context);
+    static void applyFanTargetSpeedTrampoline(void* context);
+    static void applyHeatpadStatusTrampoline(void* context);
+    static void applyHeatpadMeasureTrampoline(void* context);
+    static void applyDisplayBrightnessTrampoline(void* context);
+    static void applyShtDriverEnabledTrampoline(void* context);
+    static void applyShtPowerEnabledTrampoline(void* context);
+    static void applyShtResettingTrampoline(void* context);
+    static void applyMeasuredTemperatureTrampoline(void* context);
+    static void applyMeasuredHumidityTrampoline(void* context);
+    static void applyTargetTemperatureTrampoline(void* context);
+    static void applyEngineStateTrampoline(void* context);
 
 };
 

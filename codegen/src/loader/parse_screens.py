@@ -11,12 +11,18 @@ def parse_screens(config: dict):
             screen_data["model"] = {
                 "fields": []
             }
+
+
+        use_model = len(screen_data["model"]["fields"]) > 0
+        screen_data["use_model"] = use_model 
+
         parse_model(screen_data["model"], config["event_types"])
         parse_model_helpers(screen_data["model"])
         collect_replay_events(screen_data)
 
         # replace
-        screen_data = screen_data.get("replay", False)
+        screen_data["replay"] = screen_data.get("replay", False)
+        screen_data["use_lvgl"] = screen_data.get("use_lvgl", False)
 
 
 def keys_difference(all_keys: list, keys_to_remove: list):

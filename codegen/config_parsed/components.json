@@ -145,7 +145,241 @@
     "name": "Input"
   },
   "MainScreen": {
+    "subdir": "main",
     "replay": true,
+    "use_lvgl": "<ref>",
+    "tick_phases": [],
+    "receives": [
+      "DisplayCommand",
+      "FanCommand",
+      "HeatpadCommand"
+    ],
+    "sends": [],
+    "model": {
+      "fields": {
+        "fanState": {
+          "name": "fanState",
+          "type": "FanState",
+          "bind": "FanStatus->state",
+          "group": "FanStatus",
+          "event_type": "FanStatus",
+          "event_field": "state"
+        },
+        "fanMeasuredRpm": {
+          "name": "fanMeasuredRpm",
+          "type": "float",
+          "bind": "FanSample->measuredRpm",
+          "group": "FanStatus",
+          "event_type": "FanSample",
+          "event_field": "measuredRpm"
+        },
+        "fanTargetSpeed": {
+          "name": "fanTargetSpeed",
+          "type": "float",
+          "bind": "FanStatus->targetSpeed",
+          "group": "FanTargetSpeed",
+          "event_type": "FanStatus",
+          "event_field": "targetSpeed"
+        },
+        "heatpadState": {
+          "name": "heatpadState",
+          "type": "HeatpadState",
+          "bind": "HeatpadStatus->state",
+          "group": "HeatpadStatus",
+          "event_type": "HeatpadStatus",
+          "event_field": "state"
+        },
+        "heatpadCurrentDuty": {
+          "name": "heatpadCurrentDuty",
+          "type": "float",
+          "bind": "HeatpadStatus->currentDutyCycle",
+          "dirty": [
+            "HeatpadMeasure"
+          ],
+          "group": "HeatpadStatus",
+          "event_type": "HeatpadStatus",
+          "event_field": "currentDutyCycle"
+        },
+        "heatpadMeasuredVoltage": {
+          "name": "heatpadMeasuredVoltage",
+          "type": "float",
+          "bind": "HeatpadSample->measuredVoltage",
+          "group": "HeatpadMeasure",
+          "event_type": "HeatpadSample",
+          "event_field": "measuredVoltage"
+        },
+        "heatpadMeasuredCurrent": {
+          "name": "heatpadMeasuredCurrent",
+          "type": "float",
+          "bind": "HeatpadSample->measuredCurrent",
+          "group": "HeatpadMeasure",
+          "event_type": "HeatpadSample",
+          "event_field": "measuredCurrent"
+        },
+        "displayBrightness": {
+          "name": "displayBrightness",
+          "type": "float",
+          "bind": "DisplayStatus->brightness",
+          "group": "DisplayBrightness",
+          "event_type": "DisplayStatus",
+          "event_field": "brightness"
+        },
+        "shtDriverEnabled": {
+          "name": "shtDriverEnabled",
+          "type": "bool",
+          "bind": "TemperatureStatus->driverEnabled",
+          "group": "ShtDriverEnabled",
+          "event_type": "TemperatureStatus",
+          "event_field": "driverEnabled"
+        },
+        "shtPowerEnabled": {
+          "name": "shtPowerEnabled",
+          "type": "bool",
+          "bind": "TemperatureStatus->powerEnabled",
+          "group": "ShtPowerEnabled",
+          "event_type": "TemperatureStatus",
+          "event_field": "powerEnabled"
+        },
+        "shtResetting": {
+          "name": "shtResetting",
+          "type": "bool",
+          "bind": "TemperatureStatus->resetting",
+          "group": "ShtResetting",
+          "event_type": "TemperatureStatus",
+          "event_field": "resetting"
+        },
+        "measuredTemperature": {
+          "name": "measuredTemperature",
+          "type": "float",
+          "bind": "TemperatureSample->temperatureCelcius",
+          "group": "MeasuredTemperature",
+          "event_type": "TemperatureSample",
+          "event_field": "temperatureCelcius"
+        },
+        "measuredHumidity": {
+          "name": "measuredHumidity",
+          "type": "float",
+          "bind": "TemperatureSample->humidityRelative",
+          "group": "MeasuredHumidity",
+          "event_type": "TemperatureSample",
+          "event_field": "humidityRelative"
+        },
+        "targetTemperature": {
+          "name": "targetTemperature",
+          "type": "float",
+          "bind": "FermentationStatus->targetTemperature",
+          "group": "TargetTemperature",
+          "event_type": "FermentationStatus",
+          "event_field": "targetTemperature"
+        },
+        "engineState": {
+          "name": "engineState",
+          "type": "HeaterEngineState",
+          "bind": "FermentationStatus->heaterEngineState",
+          "group": "EngineState",
+          "event_type": "FermentationStatus",
+          "event_field": "heaterEngineState"
+        }
+      },
+      "events": {
+        "FanStatus": {
+          "fanState": "<ref>",
+          "fanTargetSpeed": "<ref>"
+        },
+        "FanSample": {
+          "fanMeasuredRpm": "<ref>"
+        },
+        "HeatpadStatus": {
+          "heatpadState": "<ref>",
+          "heatpadCurrentDuty": "<ref>"
+        },
+        "HeatpadSample": {
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
+        },
+        "DisplayStatus": {
+          "displayBrightness": "<ref>"
+        },
+        "TemperatureStatus": {
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>"
+        },
+        "TemperatureSample": {
+          "measuredTemperature": "<ref>",
+          "measuredHumidity": "<ref>"
+        },
+        "FermentationStatus": {
+          "targetTemperature": "<ref>",
+          "engineState": "<ref>"
+        }
+      },
+      "manual": {},
+      "groups": {
+        "FanStatus": {
+          "fanState": "<ref>",
+          "fanMeasuredRpm": "<ref>"
+        },
+        "FanTargetSpeed": {
+          "fanTargetSpeed": "<ref>"
+        },
+        "HeatpadStatus": {
+          "heatpadState": "<ref>",
+          "heatpadCurrentDuty": "<ref>"
+        },
+        "HeatpadMeasure": {
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
+        },
+        "DisplayBrightness": {
+          "displayBrightness": "<ref>"
+        },
+        "ShtDriverEnabled": {
+          "shtDriverEnabled": "<ref>"
+        },
+        "ShtPowerEnabled": {
+          "shtPowerEnabled": "<ref>"
+        },
+        "ShtResetting": {
+          "shtResetting": "<ref>"
+        },
+        "MeasuredTemperature": {
+          "measuredTemperature": "<ref>"
+        },
+        "MeasuredHumidity": {
+          "measuredHumidity": "<ref>"
+        },
+        "TargetTemperature": {
+          "targetTemperature": "<ref>"
+        },
+        "EngineState": {
+          "engineState": "<ref>"
+        }
+      },
+      "debounce": {}
+    },
+    "receives_all": "<ref>",
+    "tick_phases_all": "<ref>",
+    "name": "MainScreen",
+    "use_model": "<ref>",
+    "replay_events": [
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>",
+      "<ref>"
+    ]
+  },
+  "DebugScreen": {
+    "subdir": "debug",
+    "replay": "<ref>",
+    "use_lvgl": "<ref>",
     "tick_phases": [],
     "receives": [],
     "sends": [
@@ -155,7 +389,7 @@
       "fields": {
         "fanState": {
           "name": "fanState",
-          "type": "FanState",
+          "type": "<ref>",
           "bind": "FanStatus->state",
           "group": "FanState",
           "event_type": "FanStatus",
@@ -163,7 +397,7 @@
         },
         "fanTargetSpeed": {
           "name": "fanTargetSpeed",
-          "type": "float",
+          "type": "<ref>",
           "bind": "FanStatus->targetSpeed",
           "group": "FanState",
           "event_type": "FanStatus",
@@ -171,7 +405,7 @@
         },
         "fanMeasuredRpm": {
           "name": "fanMeasuredRpm",
-          "type": "float",
+          "type": "<ref>",
           "bind": "FanSample->measuredRpm",
           "group": "FanMeasuredRpm",
           "event_type": "FanSample",
@@ -179,7 +413,7 @@
         },
         "heatpadState": {
           "name": "heatpadState",
-          "type": "HeatpadState",
+          "type": "<ref>",
           "bind": "HeatpadStatus->state",
           "group": "HeatpadState",
           "event_type": "HeatpadStatus",
@@ -187,7 +421,7 @@
         },
         "heatpadCurrentDuty": {
           "name": "heatpadCurrentDuty",
-          "type": "float",
+          "type": "<ref>",
           "bind": "HeatpadStatus->currentDutyCycle",
           "group": "HeatpadDuty",
           "event_type": "HeatpadStatus",
@@ -227,7 +461,7 @@
         },
         "heatpadMeasuredVoltage": {
           "name": "heatpadMeasuredVoltage",
-          "type": "float",
+          "type": "<ref>",
           "bind": "HeatpadSample->measuredVoltage",
           "group": "HeatpadSense",
           "event_type": "HeatpadSample",
@@ -235,7 +469,7 @@
         },
         "heatpadMeasuredCurrent": {
           "name": "heatpadMeasuredCurrent",
-          "type": "float",
+          "type": "<ref>",
           "bind": "HeatpadSample->measuredCurrent",
           "group": "HeatpadSense",
           "event_type": "HeatpadSample",
@@ -243,7 +477,7 @@
         },
         "displayBrightness": {
           "name": "displayBrightness",
-          "type": "float",
+          "type": "<ref>",
           "bind": "DisplayStatus->brightness",
           "group": "DisplayStatus",
           "event_type": "DisplayStatus",
@@ -259,7 +493,7 @@
         },
         "shtDriverEnabled": {
           "name": "shtDriverEnabled",
-          "type": "bool",
+          "type": "<ref>",
           "bind": "TemperatureStatus->driverEnabled",
           "group": "TemperatureState",
           "event_type": "TemperatureStatus",
@@ -267,7 +501,7 @@
         },
         "shtPowerEnabled": {
           "name": "shtPowerEnabled",
-          "type": "bool",
+          "type": "<ref>",
           "bind": "TemperatureStatus->powerEnabled",
           "group": "TemperatureState",
           "event_type": "TemperatureStatus",
@@ -275,7 +509,7 @@
         },
         "shtResetting": {
           "name": "shtResetting",
-          "type": "bool",
+          "type": "<ref>",
           "bind": "TemperatureStatus->resetting",
           "group": "TemperatureState",
           "event_type": "TemperatureStatus",
@@ -283,7 +517,7 @@
         },
         "sensorTemperatureCelcius": {
           "name": "sensorTemperatureCelcius",
-          "type": "float",
+          "type": "<ref>",
           "bind": "TemperatureSample->temperatureCelcius",
           "group": "TemperatureSample",
           "event_type": "TemperatureSample",
@@ -291,7 +525,7 @@
         },
         "sensorHumidityRelative": {
           "name": "sensorHumidityRelative",
-          "type": "float",
+          "type": "<ref>",
           "bind": "TemperatureSample->humidityRelative",
           "group": "TemperatureSample",
           "event_type": "TemperatureSample",
@@ -312,7 +546,7 @@
         },
         "engineState": {
           "name": "engineState",
-          "type": "HeaterEngineState",
+          "type": "<ref>",
           "bind": "FermentationStatus->heaterEngineState",
           "group": "FermentationStatus",
           "event_type": "FermentationStatus",
@@ -320,7 +554,7 @@
         },
         "engineTargetTemperature": {
           "name": "engineTargetTemperature",
-          "type": "float",
+          "type": "<ref>",
           "bind": "FermentationStatus->targetTemperature",
           "group": "FermentationStatus",
           "event_type": "FermentationStatus",
@@ -450,7 +684,8 @@
     },
     "receives_all": "<ref>",
     "tick_phases_all": "<ref>",
-    "name": "MainScreen",
+    "name": "DebugScreen",
+    "use_model": "<ref>",
     "replay_events": [
       "<ref>",
       "<ref>",
@@ -464,7 +699,9 @@
     ]
   },
   "EventLogScreen": {
+    "subdir": "eventlog",
     "replay": "<ref>",
+    "use_lvgl": "<ref>",
     "tick_phases": [],
     "receives": [],
     "receives_all": "<ref>",
@@ -478,29 +715,7 @@
       "groups": {},
       "debounce": {}
     },
+    "use_model": "<ref>",
     "replay_events": []
-  },
-  "DebugScreen": {
-    "replay": "<ref>",
-    "tick_phases": [],
-    "receives": [
-      "Heartbeat"
-    ],
-    "sends": [
-      "DisplayCommand"
-    ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
-    "name": "DebugScreen",
-    "model": {
-      "fields": {},
-      "events": {},
-      "manual": {},
-      "groups": {},
-      "debounce": {}
-    },
-    "replay_events": [
-      "<ref>"
-    ]
   }
 }

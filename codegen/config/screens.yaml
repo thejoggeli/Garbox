@@ -1,6 +1,34 @@
 screens:
+
   Main:
+    subdir: main
     replay: true
+    use_lvgl: true
+    tick_phases: null
+    receives: [DisplayCommand, FanCommand, HeatpadCommand]
+    sends: null
+    model:
+      fields:
+        - { name: fanState,               bind: FanStatus->state, group: FanStatus }
+        - { name: fanMeasuredRpm,         bind: FanSample->measuredRpm, group: FanStatus }
+        - { name: fanTargetSpeed,         bind: FanStatus->targetSpeed }
+        - { name: heatpadState,           bind: HeatpadStatus->state, group: HeatpadStatus }
+        - { name: heatpadCurrentDuty,     bind: HeatpadStatus->currentDutyCycle, group: HeatpadStatus, dirty: HeatpadMeasure }
+        - { name: heatpadMeasuredVoltage, bind: HeatpadSample->measuredVoltage, group: HeatpadMeasure }
+        - { name: heatpadMeasuredCurrent, bind: HeatpadSample->measuredCurrent, group: HeatpadMeasure }
+        - { name: displayBrightness,      bind: DisplayStatus->brightness }
+        - { name: shtDriverEnabled,       bind: TemperatureStatus->driverEnabled }
+        - { name: shtPowerEnabled,        bind: TemperatureStatus->powerEnabled }
+        - { name: shtResetting,           bind: TemperatureStatus->resetting }
+        - { name: measuredTemperature,    bind: TemperatureSample->temperatureCelcius }
+        - { name: measuredHumidity,       bind: TemperatureSample->humidityRelative }
+        - { name: targetTemperature,      bind: FermentationStatus->targetTemperature }
+        - { name: engineState,            bind: FermentationStatus->heaterEngineState }
+
+  Debug:
+    subdir: debug
+    replay: true
+    use_lvgl: true
     tick_phases: null
     receives: null
     sends: 
@@ -34,14 +62,10 @@ screens:
         - { name: heapSpace,                  type: uint32_t,                                 group: null}
 
   EventLog:
+    subdir: eventlog
     replay: false
+    use_lvgl: true
     tick_phases: null
     receives: null
     receives_all: true
     sends: null
-    
-  Debug:
-    replay: false
-    tick_phases: null
-    receives: [Heartbeat]
-    sends: [DisplayCommand]

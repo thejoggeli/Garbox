@@ -1,13 +1,12 @@
-#include "MainScreen.h"
+#include "DebugScreen.h"
 
 #include <esp_heap_caps.h>
-#include "app/providers/PartsProvider.h"
 #include "core/log/Log.h"
 
 namespace Garbox {
 
-MainScreen::MainScreen():
-    MainScreenAbs(PartsProvider::GetLvglContext()),
+DebugScreen::DebugScreen():
+    DebugScreenAbs(),
     mProgressBox(mContainer),
     mFanStateLabel(mContainer),
     mFanMeasuredRpmLabel(mContainer),
@@ -23,13 +22,13 @@ MainScreen::MainScreen():
     // nothing to do
 }
 
-void MainScreen::initLabel(LvLabel& label, int16_t x, int16_t y, const char* text) {
+void DebugScreen::initLabel(LvLabel& label, int16_t x, int16_t y, const char* text) {
     label.setText(text);
     label.setPosition(x, y);
     label.setTextColor(lv_color_hex(0xFFFFFF));
 }
 
-void MainScreen::onInit(){
+void DebugScreen::onInit(){
     const int16_t startXPx = 10;
     const int16_t startYPx = 10;
     const int16_t deltaYPx = 20;
@@ -53,19 +52,19 @@ void MainScreen::onInit(){
     setBackgroundColor(0x0);
 }
 
-void MainScreen::onStart(){
+void DebugScreen::onStart(){
     mHeapTimer.start(1000_ms);
 }
 
-void MainScreen::onBecomeEnabled(){
+void DebugScreen::onBecomeEnabled(){
     // nothing to do
 }
 
-void MainScreen::onBecomeDisabled(){
+void DebugScreen::onBecomeDisabled(){
     // nothing to do
 }
 
-void MainScreen::onUpdateScreen(){
+void DebugScreen::onUpdateScreen(){
 
     // update heap space
     if(mHeapTimer.isExpired()){
@@ -86,7 +85,7 @@ void MainScreen::onUpdateScreen(){
     }
 }
 
-void MainScreen::onApplyFanState(){
+void DebugScreen::onApplyFanState(){
     mFanStateLabel.setTextFormatted(
         "Fan state=%s, speed=%.1f%%", 
         FanStateToString(mModel.getFanState()),
@@ -94,18 +93,18 @@ void MainScreen::onApplyFanState(){
     );
 }
 
-void MainScreen::onApplyFanMeasuredRpm(){
+void DebugScreen::onApplyFanMeasuredRpm(){
     mFanMeasuredRpmLabel.setTextFormatted("Fan rpm=%.0f", mModel.getFanMeasuredRpm());
 }
 
-void MainScreen::onApplyHeatpadState(){
+void DebugScreen::onApplyHeatpadState(){
     mHeatpadStateLabel.setTextFormatted(
         "Heatpad state=%s", 
         HeatpadStateToString(mModel.getHeatpadState())
     );
 }
 
-void MainScreen::onApplyHeatpadDuty(){
+void DebugScreen::onApplyHeatpadDuty(){
     mHeatpadDutyLabel.setTextFormatted(
         "Duty%: %.0f%% => %.0f%%, ms: %u => %u",
         mModel.getHeatpadCurrentDuty()*100.0f,
@@ -115,7 +114,7 @@ void MainScreen::onApplyHeatpadDuty(){
     );
 }
 
-void MainScreen::onApplyBoxPosition(){
+void DebugScreen::onApplyBoxPosition(){
     float position = static_cast<float>(mModel.getHeatpadPwmProgress()) / static_cast<float>(mModel.getHeatpadCurrentPeriod());
     static constexpr uint32_t y = 240-8;
     static constexpr float wDisplay = 320.0f; 
@@ -126,7 +125,7 @@ void MainScreen::onApplyBoxPosition(){
     mProgressBox.setPosition(x, y);
 }
 
-void MainScreen::onApplyHeatpadSense(){
+void DebugScreen::onApplyHeatpadSense(){
     mHeatpadSenseLabel.setTextFormatted(
         "Heatpad U=%4.1fV, I=%3.1fA", 
         mModel.getHeatpadMeasuredVoltage(), 
@@ -134,7 +133,7 @@ void MainScreen::onApplyHeatpadSense(){
     );
 }
 
-void MainScreen::onApplyDisplayStatus(){
+void DebugScreen::onApplyDisplayStatus(){
     mDisplayStatusLabel.setTextFormatted(
         "Display: b=%.1f%%, skip=%u, dirty=%u",
         mModel.getDisplayBrightness()*100.0f, 
@@ -143,7 +142,7 @@ void MainScreen::onApplyDisplayStatus(){
     );
 }
 
-void MainScreen::onApplyTemperatureState(){
+void DebugScreen::onApplyTemperatureState(){
     mTemperatureStateLabel.setTextFormatted(
         "Sht31 power=%u, driver=%u, reset=%u",
         mModel.getShtPowerEnabled(),
@@ -152,7 +151,7 @@ void MainScreen::onApplyTemperatureState(){
     );
 }
 
-void MainScreen::onApplyTemperatureSample(){
+void DebugScreen::onApplyTemperatureSample(){
     mTemperatureSampleLabel.setTextFormatted(
         "Sht31 t=%.2f°C, rh=%.2f%%",
         mModel.getSensorTemperatureCelcius(),
@@ -160,13 +159,13 @@ void MainScreen::onApplyTemperatureSample(){
     );
 }
 
-void MainScreen::onApplyHeapSpace(){
+void DebugScreen::onApplyHeapSpace(){
     const uint32_t integer = mModel.getHeapSpace()/1000;
     const uint32_t fraction = mModel.getHeapSpace()%1000;
     mHeapSpaceLabel.setTextFormatted("Heap space: %u.%03u kB", integer, fraction);
 }
 
-void MainScreen::onApplyAppInfo(){
+void DebugScreen::onApplyAppInfo(){
     mAppInfoLabel.setTextFormatted(
         "App: %s, events=%u",
         BehaviourIdToString(mModel.getBehaviour()), 
@@ -174,7 +173,7 @@ void MainScreen::onApplyAppInfo(){
     );
 }
 
-void MainScreen::onApplyFermentationStatus(){
+void DebugScreen::onApplyFermentationStatus(){
     mFermentationStatusLabel.setTextFormatted(
         "Eng: s=%s, m=%.1f°C, t=%0.1f°C",
         HeaterEngineStateToString(mModel.getEngineState()),

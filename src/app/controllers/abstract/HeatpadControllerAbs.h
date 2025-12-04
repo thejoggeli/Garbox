@@ -15,7 +15,6 @@ public:
 
     // tick handlers (to be implmeneted by user)
     virtual void onInputTick() = 0;
-
     virtual void onOutputTick() = 0;
 
     // event handlers (to be implmeneted by user)

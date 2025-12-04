@@ -151,12 +151,15 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
     if(event->newState == ButtonState::Released){
 
         static uint32_t s = 0;
-        s = MathUtils::Wrap(s+1u, 2u);
+        s = MathUtils::Wrap(s+1u, 3u);
         switch(s){
             case 0:
                 getHost()->requestChangeScreen(ScreenId::Main);
                 break;
             case 1:
+                getHost()->requestChangeScreen(ScreenId::Debug);
+                break;
+            case 2:
                 getHost()->requestChangeScreen(ScreenId::EventLog);
                 break;
             default: break;

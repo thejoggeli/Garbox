@@ -3,7 +3,6 @@
 #define GarboxEventLogScreenToConsole 0
 
 #include <array>
-#include "app/providers/PartsProvider.h"
 #include "core/log/Log.h"
 #include "core/util/math/MathUtils.h"
 
@@ -12,7 +11,7 @@ namespace Garbox {
 static const lv_color_t DefaultTextColor = lv_color_hex(0xFFFFFF);
 
 EventLogScreen::EventLogScreen():
-    EventLogScreenAbs(PartsProvider::GetLvglContext()),
+    EventLogScreenAbs(),
     mLabels(mContainer),
     mMarker(mContainer){
     // nothing to do

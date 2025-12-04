@@ -3,105 +3,65 @@
 // *****************************************
 #include "MainScreenAbs.h"
 #include <math.h>
+#include "core/lvgl/LvglProvider.h"
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
-MainScreenAbs::MainScreenAbs(LvglContext& lvgl): 
-    ScreenAbs(
-        ComponentId::MainScreen, 
-        ScreenId::Main, 
-        static_cast<uint32_t>(Model::Index::Count),
-        lvgl
-    ),
-    mModel(*this){}
+MainScreenAbs::MainScreenAbs(): 
+    ScreenAbs(ComponentId::MainScreen, ScreenId::Main),
+    mContainer(LvglProvider::Root()),
+    mDisplayWidth(LvglProvider::GetDisplayWidth()),
+    mDisplayHeight(LvglProvider::GetDisplayHeight()),
+    mModel(*this),
+    mDirtyDispatcher(static_cast<uint32_t>(Model::Index::Count)){}
 
 void MainScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
-    registerUpdateHandler(applyFanStateTrampoline, this);
-    registerUpdateHandler(applyFanMeasuredRpmTrampoline, this);
-    registerUpdateHandler(applyHeatpadStateTrampoline, this);
-    registerUpdateHandler(applyHeatpadDutyTrampoline, this);
-    registerUpdateHandler(applyBoxPositionTrampoline, this);
-    registerUpdateHandler(applyHeatpadSenseTrampoline, this);
-    registerUpdateHandler(applyDisplayStatusTrampoline, this);
-    registerUpdateHandler(applyTemperatureStateTrampoline, this);
-    registerUpdateHandler(applyTemperatureSampleTrampoline, this);
-    registerUpdateHandler(applyAppInfoTrampoline, this);
-    registerUpdateHandler(applyFermentationStatusTrampoline, this);
-    registerUpdateHandler(applyHeapSpaceTrampoline, this);
+
+    // init lvgl container
+    mContainer.setHidden(true);
+    mContainer.setSize(mDisplayWidth, mDisplayHeight);
+    mContainer.setBorder(0, lv_color_hex(0x000000));
+    mContainer.setRadius(0);
+    mContainer.setPad(0, 0, 0, 0);
+    mContainer.setBgOpacity(LV_OPA_COVER);
+    mContainer.setScrollable(false);
+    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_CHAIN);
+    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+
+    mDirtyDispatcher.registerHandler(applyFanStatusTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyFanTargetSpeedTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyHeatpadStatusTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyHeatpadMeasureTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyDisplayBrightnessTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyShtDriverEnabledTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyShtPowerEnabledTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyShtResettingTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyMeasuredTemperatureTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyMeasuredHumidityTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyTargetTemperatureTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyEngineStateTrampoline, this);
 }
 
-MainScreenAbs::Model& MainScreenAbs::getModel(){
-    return mModel;
+void MainScreenAbs::updateScreen(){
+    ScreenAbs::updateScreen();
+    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
+    mDirtyDispatcher.dispatch();
 }
 
-const MainScreenAbs::Model& MainScreenAbs::getModel() const {
-    return mModel;
+void MainScreenAbs::becomeEnabled(){
+    mContainer.setHidden(false);
+    ScreenAbs::becomeEnabled();
 }
 
-void MainScreenAbs::markDirty(Model::Index index){
-    markDirtyRaw(static_cast<size_t>(index));
+void MainScreenAbs::becomeDisabled(){
+    mContainer.setHidden(true);
+    ScreenAbs::becomeDisabled();
 }
 
-bool MainScreenAbs::isMarkedDirty(Model::Index index) const {
-    return isMarkedDirtyRaw(static_cast<size_t>(index));
-}
-
-DisplayCommandEvent MainScreenAbs::makeDisplayCommandEvent(){
-    return ComponentAbs::makeEvent<EventType::DisplayCommand>();
-}
-
-void MainScreenAbs::sendEvent(const DisplayCommandEvent& event){
-    publishEvent(event.header());
-}
-
-void MainScreenAbs::applyFanStateTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyFanState();
-}
-
-void MainScreenAbs::applyFanMeasuredRpmTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyFanMeasuredRpm();
-}
-
-void MainScreenAbs::applyHeatpadStateTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyHeatpadState();
-}
-
-void MainScreenAbs::applyHeatpadDutyTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyHeatpadDuty();
-}
-
-void MainScreenAbs::applyBoxPositionTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyBoxPosition();
-}
-
-void MainScreenAbs::applyHeatpadSenseTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyHeatpadSense();
-}
-
-void MainScreenAbs::applyDisplayStatusTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyDisplayStatus();
-}
-
-void MainScreenAbs::applyTemperatureStateTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyTemperatureState();
-}
-
-void MainScreenAbs::applyTemperatureSampleTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyTemperatureSample();
-}
-
-void MainScreenAbs::applyAppInfoTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyAppInfo();
-}
-
-void MainScreenAbs::applyFermentationStatusTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyFermentationStatus();
-}
-
-void MainScreenAbs::applyHeapSpaceTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onApplyHeapSpace();
+void MainScreenAbs::setBackgroundColor(uint32_t color){
+    mContainer.setBgColor(lv_color_hex(color));
 }
 
 MainScreenAbs::Model::Model(MainScreenAbs& screen) : mScreen(screen){ 
@@ -112,12 +72,12 @@ FanState MainScreenAbs::Model::getFanState() const {
     return mFanState; 
 }
 
-float MainScreenAbs::Model::getFanTargetSpeed() const { 
-    return mFanTargetSpeed; 
-}
-
 float MainScreenAbs::Model::getFanMeasuredRpm() const { 
     return mFanMeasuredRpm; 
+}
+
+float MainScreenAbs::Model::getFanTargetSpeed() const { 
+    return mFanTargetSpeed; 
 }
 
 HeatpadState MainScreenAbs::Model::getHeatpadState() const { 
@@ -126,22 +86,6 @@ HeatpadState MainScreenAbs::Model::getHeatpadState() const {
 
 float MainScreenAbs::Model::getHeatpadCurrentDuty() const { 
     return mHeatpadCurrentDuty; 
-}
-
-uint32_t MainScreenAbs::Model::getHeatpadCurrentPeriod() const { 
-    return mHeatpadCurrentPeriod; 
-}
-
-float MainScreenAbs::Model::getHeatpadNextDuty() const { 
-    return mHeatpadNextDuty; 
-}
-
-uint32_t MainScreenAbs::Model::getHeatpadNextPeriod() const { 
-    return mHeatpadNextPeriod; 
-}
-
-float MainScreenAbs::Model::getHeatpadPwmProgress() const { 
-    return mHeatpadPwmProgress; 
 }
 
 float MainScreenAbs::Model::getHeatpadMeasuredVoltage() const { 
@@ -156,10 +100,6 @@ float MainScreenAbs::Model::getDisplayBrightness() const {
     return mDisplayBrightness; 
 }
 
-uint32_t MainScreenAbs::Model::getDisplaySkipped() const { 
-    return mDisplaySkipped; 
-}
-
 bool MainScreenAbs::Model::getShtDriverEnabled() const { 
     return mShtDriverEnabled; 
 }
@@ -172,215 +112,190 @@ bool MainScreenAbs::Model::getShtResetting() const {
     return mShtResetting; 
 }
 
-float MainScreenAbs::Model::getSensorTemperatureCelcius() const { 
-    return mSensorTemperatureCelcius; 
+float MainScreenAbs::Model::getMeasuredTemperature() const { 
+    return mMeasuredTemperature; 
 }
 
-float MainScreenAbs::Model::getSensorHumidityRelative() const { 
-    return mSensorHumidityRelative; 
+float MainScreenAbs::Model::getMeasuredHumidity() const { 
+    return mMeasuredHumidity; 
 }
 
-uint32_t MainScreenAbs::Model::getEventCount() const { 
-    return mEventCount; 
-}
-
-BehaviourId MainScreenAbs::Model::getBehaviour() const { 
-    return mBehaviour; 
+float MainScreenAbs::Model::getTargetTemperature() const { 
+    return mTargetTemperature; 
 }
 
 HeaterEngineState MainScreenAbs::Model::getEngineState() const { 
     return mEngineState; 
 }
 
-float MainScreenAbs::Model::getEngineTargetTemperature() const { 
-    return mEngineTargetTemperature; 
-}
-
-float MainScreenAbs::Model::getEngineMeasuredTemperature() const { 
-    return mEngineMeasuredTemperature; 
-}
-
-float MainScreenAbs::Model::getEngineMeasuredHumidity() const { 
-    return mEngineMeasuredHumidity; 
-}
-
-uint32_t MainScreenAbs::Model::getHeapSpace() const { 
-    return mHeapSpace; 
-}
-
 void MainScreenAbs::Model::setFanState(FanState value){ 
     if(mFanState != value) { 
         mFanState = value; 
-        mScreen.markDirty(Model::Index::FanState);
-    } 
-}
-
-void MainScreenAbs::Model::setFanTargetSpeed(float value){ 
-    if(mFanTargetSpeed != value) { 
-        mFanTargetSpeed = value; 
-        mScreen.markDirty(Model::Index::FanState);
+        mScreen.markDirty(Model::Index::FanStatus);
     } 
 }
 
 void MainScreenAbs::Model::setFanMeasuredRpm(float value){ 
     if(mFanMeasuredRpm != value) { 
         mFanMeasuredRpm = value; 
-        mScreen.markDirty(Model::Index::FanMeasuredRpm);
+        mScreen.markDirty(Model::Index::FanStatus);
+    } 
+}
+
+void MainScreenAbs::Model::setFanTargetSpeed(float value){ 
+    if(mFanTargetSpeed != value) { 
+        mFanTargetSpeed = value; 
+        mScreen.markDirty(Model::Index::FanTargetSpeed);
     } 
 }
 
 void MainScreenAbs::Model::setHeatpadState(HeatpadState value){ 
     if(mHeatpadState != value) { 
         mHeatpadState = value; 
-        mScreen.markDirty(Model::Index::HeatpadState);
+        mScreen.markDirty(Model::Index::HeatpadStatus);
     } 
 }
 
 void MainScreenAbs::Model::setHeatpadCurrentDuty(float value){ 
     if(mHeatpadCurrentDuty != value) { 
         mHeatpadCurrentDuty = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void MainScreenAbs::Model::setHeatpadCurrentPeriod(uint32_t value){ 
-    if(mHeatpadCurrentPeriod != value) { 
-        mHeatpadCurrentPeriod = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void MainScreenAbs::Model::setHeatpadNextDuty(float value){ 
-    if(mHeatpadNextDuty != value) { 
-        mHeatpadNextDuty = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void MainScreenAbs::Model::setHeatpadNextPeriod(uint32_t value){ 
-    if(mHeatpadNextPeriod != value) { 
-        mHeatpadNextPeriod = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void MainScreenAbs::Model::setHeatpadPwmProgress(float value){ 
-    if(mHeatpadPwmProgress != value) { 
-        mHeatpadPwmProgress = value; 
-        mScreen.markDirty(Model::Index::BoxPosition);
+        mScreen.markDirty(Model::Index::HeatpadStatus);
+        mScreen.markDirty(Model::Index::HeatpadMeasure);
     } 
 }
 
 void MainScreenAbs::Model::setHeatpadMeasuredVoltage(float value){ 
     if(mHeatpadMeasuredVoltage != value) { 
         mHeatpadMeasuredVoltage = value; 
-        mScreen.markDirty(Model::Index::HeatpadSense);
+        mScreen.markDirty(Model::Index::HeatpadMeasure);
     } 
 }
 
 void MainScreenAbs::Model::setHeatpadMeasuredCurrent(float value){ 
     if(mHeatpadMeasuredCurrent != value) { 
         mHeatpadMeasuredCurrent = value; 
-        mScreen.markDirty(Model::Index::HeatpadSense);
+        mScreen.markDirty(Model::Index::HeatpadMeasure);
     } 
 }
 
 void MainScreenAbs::Model::setDisplayBrightness(float value){ 
     if(mDisplayBrightness != value) { 
         mDisplayBrightness = value; 
-        mScreen.markDirty(Model::Index::DisplayStatus);
-    } 
-}
-
-void MainScreenAbs::Model::setDisplaySkipped(uint32_t value){ 
-    if(mDisplaySkipped != value) { 
-        mDisplaySkipped = value; 
-        mScreen.markDirty(Model::Index::DisplayStatus);
+        mScreen.markDirty(Model::Index::DisplayBrightness);
     } 
 }
 
 void MainScreenAbs::Model::setShtDriverEnabled(bool value){ 
     if(mShtDriverEnabled != value) { 
         mShtDriverEnabled = value; 
-        mScreen.markDirty(Model::Index::TemperatureState);
+        mScreen.markDirty(Model::Index::ShtDriverEnabled);
     } 
 }
 
 void MainScreenAbs::Model::setShtPowerEnabled(bool value){ 
     if(mShtPowerEnabled != value) { 
         mShtPowerEnabled = value; 
-        mScreen.markDirty(Model::Index::TemperatureState);
+        mScreen.markDirty(Model::Index::ShtPowerEnabled);
     } 
 }
 
 void MainScreenAbs::Model::setShtResetting(bool value){ 
     if(mShtResetting != value) { 
         mShtResetting = value; 
-        mScreen.markDirty(Model::Index::TemperatureState);
+        mScreen.markDirty(Model::Index::ShtResetting);
     } 
 }
 
-void MainScreenAbs::Model::setSensorTemperatureCelcius(float value){ 
-    if(mSensorTemperatureCelcius != value) { 
-        mSensorTemperatureCelcius = value; 
-        mScreen.markDirty(Model::Index::TemperatureSample);
+void MainScreenAbs::Model::setMeasuredTemperature(float value){ 
+    if(mMeasuredTemperature != value) { 
+        mMeasuredTemperature = value; 
+        mScreen.markDirty(Model::Index::MeasuredTemperature);
     } 
 }
 
-void MainScreenAbs::Model::setSensorHumidityRelative(float value){ 
-    if(mSensorHumidityRelative != value) { 
-        mSensorHumidityRelative = value; 
-        mScreen.markDirty(Model::Index::TemperatureSample);
+void MainScreenAbs::Model::setMeasuredHumidity(float value){ 
+    if(mMeasuredHumidity != value) { 
+        mMeasuredHumidity = value; 
+        mScreen.markDirty(Model::Index::MeasuredHumidity);
     } 
 }
 
-void MainScreenAbs::Model::setEventCount(uint32_t value){ 
-    if(mEventCount != value) { 
-        mEventCount = value; 
-        mScreen.markDirty(Model::Index::AppInfo);
-    } 
-}
-
-void MainScreenAbs::Model::setBehaviour(BehaviourId value){ 
-    if(mBehaviour != value) { 
-        mBehaviour = value; 
-        mScreen.markDirty(Model::Index::AppInfo);
+void MainScreenAbs::Model::setTargetTemperature(float value){ 
+    if(mTargetTemperature != value) { 
+        mTargetTemperature = value; 
+        mScreen.markDirty(Model::Index::TargetTemperature);
     } 
 }
 
 void MainScreenAbs::Model::setEngineState(HeaterEngineState value){ 
     if(mEngineState != value) { 
         mEngineState = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
+        mScreen.markDirty(Model::Index::EngineState);
     } 
 }
 
-void MainScreenAbs::Model::setEngineTargetTemperature(float value){ 
-    if(mEngineTargetTemperature != value) { 
-        mEngineTargetTemperature = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
+MainScreenAbs::Model& MainScreenAbs::getModel(){
+    return mModel;
 }
 
-void MainScreenAbs::Model::setEngineMeasuredTemperature(float value){ 
-    if(mEngineMeasuredTemperature != value) { 
-        mEngineMeasuredTemperature = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
+const MainScreenAbs::Model& MainScreenAbs::getModel() const {
+    return mModel;
 }
 
-void MainScreenAbs::Model::setEngineMeasuredHumidity(float value){ 
-    if(mEngineMeasuredHumidity != value) { 
-        mEngineMeasuredHumidity = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
+void MainScreenAbs::markDirty(Model::Index index){
+    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
 }
 
-void MainScreenAbs::Model::setHeapSpace(uint32_t value){ 
-    if(mHeapSpace != value) { 
-        mHeapSpace = value; 
-        mScreen.markDirty(Model::Index::HeapSpace);
-    } 
+bool MainScreenAbs::isMarkedDirty(Model::Index index) const {
+    return mDirtyDispatcher.isMarkedDirty(static_cast<size_t>(index));
+}
+
+void MainScreenAbs::applyFanStatusTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyFanStatus();
+}
+
+void MainScreenAbs::applyFanTargetSpeedTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyFanTargetSpeed();
+}
+
+void MainScreenAbs::applyHeatpadStatusTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyHeatpadStatus();
+}
+
+void MainScreenAbs::applyHeatpadMeasureTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyHeatpadMeasure();
+}
+
+void MainScreenAbs::applyDisplayBrightnessTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyDisplayBrightness();
+}
+
+void MainScreenAbs::applyShtDriverEnabledTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyShtDriverEnabled();
+}
+
+void MainScreenAbs::applyShtPowerEnabledTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyShtPowerEnabled();
+}
+
+void MainScreenAbs::applyShtResettingTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyShtResetting();
+}
+
+void MainScreenAbs::applyMeasuredTemperatureTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyMeasuredTemperature();
+}
+
+void MainScreenAbs::applyMeasuredHumidityTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyMeasuredHumidity();
+}
+
+void MainScreenAbs::applyTargetTemperatureTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyTargetTemperature();
+}
+
+void MainScreenAbs::applyEngineStateTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onApplyEngineState();
 }
 
 } // namespace Garbox

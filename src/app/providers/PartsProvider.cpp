@@ -161,8 +161,4 @@ RgbLed& PartsProvider::GetRgbLed(){
     return instance;
 }
 
-LvglContext& PartsProvider::GetLvglContext(){
-    return GetDisplay().getLvglHandler().getContext();
-}
-
 } // namespace

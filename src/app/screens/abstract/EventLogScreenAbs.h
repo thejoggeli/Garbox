@@ -3,22 +3,25 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
+#include "core/lvgl/objects/LvContainer.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
 
 class EventLogScreenAbs : public ScreenAbs {
-
 public:
 
-    // event handler (to be implmeneted by user)
-    virtual void onEvent(const EventHeader* header) = 0;
-
-    // constructor requires lvgl context
-    EventLogScreenAbs(LvglContext& lvgl);
+    // constructor 
+    EventLogScreenAbs();
 
     // init override from component
     void init(ComponentHostIfc& host) final;
+    void updateScreen() final;
+    void becomeEnabled() final;
+    void becomeDisabled() final;
+
+    // event handler (to be implmeneted by user)
+    virtual void onEvent(const EventHeader* header) = 0;
 
 protected:
 
@@ -28,10 +31,17 @@ private:
     using ScreenAbs::makeEvent;
     using ScreenAbs::publishEvent;
 
-    // hide dangerous raw access
-    using ScreenAbs::registerUpdateHandler;
-    using ScreenAbs::markDirtyRaw;
-    using ScreenAbs::isMarkedDirtyRaw;
+/********************/
+/*** LVGL Section ***/
+/********************/
+
+protected:
+
+    LvContainer mContainer;
+    const uint32_t mDisplayWidth = 0;
+    const uint32_t mDisplayHeight = 0;
+
+    void setBackgroundColor(uint32_t color);
 
 };
 

@@ -52,6 +52,10 @@ int32_t LvObject::getHeight() const {
     return lv_obj_get_height(mRaw);
 }
 
+void LvObject::center() {
+    lv_obj_center(mRaw);
+}
+
 void LvObject::setWidthContent(){
     lv_obj_set_width(mRaw, LV_SIZE_CONTENT);
 }

@@ -1,0 +1,5 @@
+<lvgl>
+    <screen id="test">
+        <label id="title" text="Hello ESP32-S3" align="center"/>
+    </screen>
+</lvgl>

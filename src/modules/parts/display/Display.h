@@ -50,6 +50,9 @@ public:
     void setBrightness(float brightness);
     float getBrightness() const;
 
+    uint32_t getWidth() const { return mWidth; }
+    uint32_t getHeight () const { return mHeight; }
+
     // disallow copy and move 
     Display(const Display&) = delete;
     Display& operator=(const Display&) = delete;

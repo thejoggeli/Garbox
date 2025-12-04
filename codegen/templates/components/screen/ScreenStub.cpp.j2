@@ -31,4 +31,14 @@ void {{ name }}::onUpdateScreen(){
 {{ on_ticks(screen) }}
 {{ on_events(screen) }}
 
+{# onApplyX() handlers for model #}
+{% if screen.use_model %}
+{% for group_name, fields in screen.model.groups.items() %}
+void {{ name }}::onApply{{ group_name|upper_first }}(){
+    // nothing to do
+}
+
+{% endfor %}
+{% endif %}
+
 } // namespace Garbox

@@ -1,14 +1,12 @@
 #pragma once
 
 #include "app/screens/abstract/EventLogScreenAbs.h"
-#include "core/lvgl/LvContainer.h"
-#include "core/lvgl/LvLabel.h"
+#include "core/lvgl/objects/LvContainer.h"
+#include "core/lvgl/objects/LvLabel.h"
 #include "core/util/container/static/ArrayStatic.h"
 #include "core/util/container/static/RingBufferStatic.h"
 
 namespace Garbox {
-
-class LvglContext;
 
 class EventLogScreen : public EventLogScreenAbs {
 public:

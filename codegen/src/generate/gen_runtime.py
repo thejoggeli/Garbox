@@ -40,7 +40,7 @@ def _collect_paths(loader: Loader, type: str):
         if("subdir" in data): 
             path = path / data["subdir"]
         paths.append(path / key)
-    return paths
+    return sorted(paths)
 
 
 def _generate_runtime(ctx: Context, loader: Loader):
@@ -88,7 +88,8 @@ def _generate_event_replay(ctx: Context, loader: Loader):
 
     replay_dict = {
         "events": {},
-        "screens": screens
+        "screens": screens,
+        "include_paths": _collect_paths(loader, 'screens'),
     }
 
     # collect all event types used by any screen

@@ -1,18 +1,16 @@
 #pragma once
 
-#include "app/screens/abstract/MainScreenAbs.h"
-#include "core/lvgl/LvBox.h"
-#include "core/lvgl/LvLabel.h"
+#include "app/screens/abstract/DebugScreenAbs.h"
+#include "core/lvgl/objects/LvBox.h"
+#include "core/lvgl/objects/LvLabel.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
-class LvglContext;
-
-class MainScreen : public MainScreenAbs {
+class DebugScreen : public DebugScreenAbs {
 public:
 
-    MainScreen();
+    DebugScreen();
 
 private:
 

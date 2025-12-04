@@ -26,7 +26,10 @@ public:
     int32_t getPositionX() const;
     int32_t getPositionY() const;
     int32_t getWidth() const;
-    int32_t getHeight() const;
+    int32_t getHeight() const; 
+    
+    // alignment helpers
+    void center();
 
     // content sizing helpers
     void setWidthContent();
@@ -53,7 +56,7 @@ public:
     void setTextLineSpace(int32_t spacePixels);
 
     // generic style setter
-    void setStyleProp(uint32_t prop, lv_style_value_t value);
+    void setStyleProp(uint32_t prop, lv_style_value_t value);   
 
 protected:
     

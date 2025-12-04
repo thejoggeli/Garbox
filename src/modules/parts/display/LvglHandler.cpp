@@ -28,11 +28,6 @@ LvglHandler::~LvglHandler(){
     TriggerExit("LvglHandler", "std::function can use heap");
 }
 
-LvglContext& LvglHandler::getContext(){
-    AssertExit(mContext != nullptr, "LvglHandler", "context is nullptr");
-    return *mContext;
-}
-
 void LvglHandler::init(){
     AssertExit(!mInitialized, "LvglHandler", "already initialized");
 
@@ -63,10 +58,6 @@ void LvglHandler::init(){
     // flush callbacks
     lv_display_set_flush_cb(mLvDisplay, handleFlush);
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
-
-    // init objects
-    mContext = new LvglContext(lv_scr_act(), mWidth, mHeight);
-    mContext->init();
 
     mInitialized = true;
 }
@@ -111,12 +102,10 @@ void LvglHandler::handleLog(lv_log_level_t level, const char* str){
         LogInfo0("LVGL/Info", "%s", str);
         break;
     case LV_LOG_LEVEL_WARN:
-        LogWarning0("LVGL/Warn", "%s", str);
-        TriggerDebug("LvglHandler", "LVGL Warning");
+        TriggerDebug("LvglHandler", str);
         break;
     case LV_LOG_LEVEL_ERROR:
-        LogError0("LVGL/Error", "%s", str);
-        TriggerExit("LvglHandler", "LVGL Error");
+        TriggerExit("LvglHandler", str);
         break;
     case LV_LOG_LEVEL_USER:        
     default:

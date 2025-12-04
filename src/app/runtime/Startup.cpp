@@ -1,4 +1,3 @@
-
 #include "app/runtime/StartupSequence.h"
 #include "app/runtime/TaskManager.h"
 #include "app/config/AppConfig.h"
@@ -7,6 +6,7 @@
 #include "app/runtime/GarboxRuntime.h"
 #include "core/assert/AssertHandler.h"
 #include "core/log/Log.h"
+#include "core/lvgl/LvglProvider.h"
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
 #include "modules/parts/led/AnimatedLedGroup.h"
@@ -15,7 +15,6 @@
 using namespace Garbox;
 
 void handleMainTask();
-void logProfiler();
 
 GarboxRuntime& getRuntime(){
     static GarboxRuntime instance;
@@ -98,6 +97,9 @@ void setup(){
 
     // init all parts
     PartsProvider::Init();
+
+    // init lvgl
+    LvglProvider::Init(AppConfig::DisplayWidth, AppConfig::DisplayHeight);
 
     // start system tasks
     TaskManager::StartAll();

@@ -28,4 +28,76 @@ void MainScreen::onUpdateScreen(){
     // nothing to do   
 }
 
+void MainScreen::onDisplayCommand(const DisplayCommandEvent& event){
+    // nothing to do
+}
+
+void MainScreen::onFanCommand(const FanCommandEvent& event){
+    // nothing to do
+}
+
+void MainScreen::onHeatpadCommand(const HeatpadCommandEvent& event){
+    // nothing to do
+}
+
+void MainScreen::onApplyFanState(){
+    // nothing to do
+}
+
+void MainScreen::onApplyFanTargetSpeed(){
+    // nothing to do
+}
+
+void MainScreen::onApplyFanMeasuredRpm(){
+    // nothing to do
+}
+
+void MainScreen::onApplyHeatpadState(){
+    // nothing to do
+}
+
+void MainScreen::onApplyHeatpadCurrentDuty(){
+    // nothing to do
+}
+
+void MainScreen::onApplyHeatpadMeasuredVoltage(){
+    // nothing to do
+}
+
+void MainScreen::onApplyHeatpadMeasuredCurrent(){
+    // nothing to do
+}
+
+void MainScreen::onApplyDisplayBrightness(){
+    // nothing to do
+}
+
+void MainScreen::onApplyShtDriverEnabled(){
+    // nothing to do
+}
+
+void MainScreen::onApplyShtPowerEnabled(){
+    // nothing to do
+}
+
+void MainScreen::onApplyShtResetting(){
+    // nothing to do
+}
+
+void MainScreen::onApplyMeasuredTemperature(){
+    // nothing to do
+}
+
+void MainScreen::onApplyMeasuredHumidity(){
+    // nothing to do
+}
+
+void MainScreen::onApplyTargetTemperature(){
+    // nothing to do
+}
+
+void MainScreen::onApplyEngineState(){
+    // nothing to do
+}
+
 } // namespace Garbox

@@ -2,52 +2,103 @@
 {% from "_common/component_cpp.j2" import constructor, make_events, send_events %}
 #include "{{ name }}Abs.h"
 #include <math.h>
+{% if screen.use_lvgl %}
+#include "core/lvgl/LvglProvider.h"
+{% endif %}
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
 {# constructor #}
-{% if screen.model.fields %}
-{{ name }}Abs::{{ name }}Abs(LvglContext& lvgl): 
-    ScreenAbs(
-        ComponentId::{{ name }}, 
-        ScreenId::{{ name.removesuffix("Screen") }}, 
-        static_cast<uint32_t>(Model::Index::Count),
-        lvgl
-    ),
-    mModel(*this){}
-{% else %}
-{{ name }}Abs::{{ name }}Abs(LvglContext& lvgl): ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }}, 0, lvgl) {}
-{% endif %}
+{{ name }}Abs::{{ name }}Abs(): 
+    ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }})
+{%- if screen.use_lvgl -%},
+    mContainer(LvglProvider::Root()),
+    mDisplayWidth(LvglProvider::GetDisplayWidth()),
+    mDisplayHeight(LvglProvider::GetDisplayHeight())
+{%- endif -%}
+{%- if screen.model.fields -%},
+    mModel(*this),
+    mDirtyDispatcher(static_cast<uint32_t>(Model::Index::Count))
+{%- endif -%}{}
 
 {# onInitScreen() #}
 void {{ name }}Abs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
-{% if screen.model.fields %}
+
+{% if screen.use_lvgl %}
+    // init lvgl container
+    mContainer.setHidden(true);
+    mContainer.setSize(mDisplayWidth, mDisplayHeight);
+    mContainer.setBorder(0, lv_color_hex(0x000000));
+    mContainer.setRadius(0);
+    mContainer.setPad(0, 0, 0, 0);
+    mContainer.setBgOpacity(LV_OPA_COVER);
+    mContainer.setScrollable(false);
+    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_CHAIN);
+    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+{% endif %}
+
+{% if screen.use_model %}
 {% for group_name in screen.model.groups.keys() %}
-    registerUpdateHandler(apply{{ group_name|upper_first }}Trampoline, this);
+    mDirtyDispatcher.registerHandler(apply{{ group_name|upper_first }}Trampoline, this);
 {% endfor %}
 {% endif %}
 }
 
-{% if screen.model.get("debounce") %}
 void {{ name }}Abs::updateScreen(){
+{% if screen.model.fields and screen.model.get("debounce") %}
     mModel.updateTimers();
+{% endif %}
     ScreenAbs::updateScreen();
+{% if screen.use_model %}
+    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
+    mDirtyDispatcher.dispatch();
+{% endif %}
 }
 
 void {{ name }}Abs::becomeEnabled(){
+{% if screen.use_lvgl %}
+    mContainer.setHidden(false);
+{% endif %}
+{% if screen.model.get("debounce") %}
     mModel.resetTimers();
+{% endif %}
     ScreenAbs::becomeEnabled();
 }
 
 void {{ name }}Abs::becomeDisabled(){
+{% if screen.use_lvgl %}
+    mContainer.setHidden(true);
+{% endif %}
+{% if screen.model.get("debounce") %}
     mModel.resetTimers();
+{% endif %}
     ScreenAbs::becomeDisabled();
+}
+
+{# make and send events #}
+{{ make_events(name, screen) }}
+{{ send_events(name, screen) }}
+
+{####################}
+{### LVGL Section ###}
+{####################}
+{% if screen.use_lvgl %}
+void {{ name }}Abs::setBackgroundColor(uint32_t color){
+    mContainer.setBgColor(lv_color_hex(color));
 }
 {% endif %}
 
-{% if screen.model.fields %}
+{#####################}
+{### Model Section ###}
+{#####################}
+{% if screen.use_model %}
+
+{# model groups trampolines #}
+
+{% include "components/screen/ScreenModel.cpp.j2" %}
+
 {{ name }}Abs::Model& {{ name }}Abs::getModel(){
     return mModel;
 }
@@ -58,20 +109,13 @@ const {{ name }}Abs::Model& {{ name }}Abs::getModel() const {
 
 {# dirty dispatch #}
 void {{ name }}Abs::markDirty(Model::Index index){
-    markDirtyRaw(static_cast<size_t>(index));
+    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
 }
 
 bool {{ name }}Abs::isMarkedDirty(Model::Index index) const {
-    return isMarkedDirtyRaw(static_cast<size_t>(index));
+    return mDirtyDispatcher.isMarkedDirty(static_cast<size_t>(index));
 }
-{% endif %}
 
-{# make and send events #}
-{{ make_events(name, screen) }}
-{{ send_events(name, screen) }}
-
-{# model groups trampolines #}
-{% if screen.model.fields %}
 {% for group_name, fields in screen.model.groups.items() %}
 void {{ name }}Abs::apply{{ group_name|upper_first }}Trampoline(void* context){
     static_cast<{{ name }}Abs*>(context)->onApply{{ group_name|upper_first }}();
@@ -80,8 +124,5 @@ void {{ name }}Abs::apply{{ group_name|upper_first }}Trampoline(void* context){
 {% endfor %}
 {% endif %}
 
-{% if screen.model.fields %}
-{% include "components/screen/ScreenModel.cpp.j2" %}
-{% endif %}
 
 } // namespace Garbox
