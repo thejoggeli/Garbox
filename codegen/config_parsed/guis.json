@@ -4,10 +4,14 @@
       "SettingRow": {
         "params": {
           "label": {
-            "default": null
+            "name": "label",
+            "default": null,
+            "required": true
           },
           "value": {
-            "default": ""
+            "name": "value",
+            "default": null,
+            "required": true
           }
         },
         "objects": {
@@ -15,58 +19,89 @@
             "type": "label",
             "name": "label",
             "attrs": {
-              "text": "$label",
-              "grow": "1"
+              "text": {
+                "type": "v-attr",
+                "value": "label"
+              },
+              "grow": {
+                "type": "normal",
+                "value": "1"
+              }
             },
-            "parent_name": "body",
-            "is_component": false
+            "parent_name": "body"
           },
           "left": {
             "type": "image",
             "name": "left",
             "attrs": {
-              "src": "icons/arrow_left.png",
-              "visible": "false"
+              "src": {
+                "type": "normal",
+                "value": "icons/arrow_left.png"
+              },
+              "visible": {
+                "type": "normal",
+                "value": "false"
+              }
             },
-            "parent_name": "body",
-            "is_component": "<ref>"
+            "parent_name": "body"
           },
           "value": {
             "type": "label",
             "name": "value",
             "attrs": {
-              "text": "$value",
-              "width": "40",
-              "align": "right"
+              "text": {
+                "type": "v-attr",
+                "value": "value"
+              },
+              "width": {
+                "type": "normal",
+                "value": "40"
+              },
+              "align": {
+                "type": "normal",
+                "value": "right"
+              }
             },
-            "parent_name": "body",
-            "is_component": "<ref>"
+            "parent_name": "body"
           },
           "right": {
             "type": "image",
             "name": "right",
             "attrs": {
-              "src": "icons/arrow_right.png",
-              "visible": "false"
+              "src": {
+                "type": "normal",
+                "value": "icons/arrow_right.png"
+              },
+              "visible": {
+                "type": "normal",
+                "value": "false"
+              }
             },
-            "parent_name": "body",
-            "is_component": "<ref>"
+            "parent_name": "body"
           }
         }
       },
       "InfoRow": {
         "params": {
           "icon": {
-            "default": "<ref>"
+            "name": "icon",
+            "default": null,
+            "required": true
           },
           "value": {
-            "default": "<ref>"
+            "name": "value",
+            "default": null,
+            "required": true
           },
           "unit": {
-            "default": "<ref>"
+            "name": "unit",
+            "default": "unit",
+            "required": false
           },
           "showUnit": {
-            "default": "false"
+            "name": "showUnit",
+            "default": "false",
+            "required": false
           }
         },
         "objects": {
@@ -74,31 +109,46 @@
             "type": "image",
             "name": "icon",
             "attrs": {
-              "src": "$icon",
-              "width": "16",
-              "height": "16"
+              "src": {
+                "type": "v-attr",
+                "value": "icon"
+              },
+              "width": {
+                "type": "normal",
+                "value": "16"
+              },
+              "height": {
+                "type": "normal",
+                "value": "16"
+              }
             },
-            "parent_name": "body",
-            "is_component": "<ref>"
+            "parent_name": "body"
           },
           "value": {
             "type": "label",
             "name": "value",
             "attrs": {
-              "text": "$value"
+              "text": {
+                "type": "v-attr",
+                "value": "value"
+              }
             },
-            "parent_name": "body",
-            "is_component": "<ref>"
+            "parent_name": "body"
           },
           "unit": {
             "type": "label",
             "name": "unit",
             "attrs": {
-              "text": "$unit",
-              "visible": "$showUnit"
+              "text": {
+                "type": "v-attr",
+                "value": "unit"
+              },
+              "visible": {
+                "type": "v-attr",
+                "value": "showUnit"
+              }
             },
-            "parent_name": "body",
-            "is_component": "<ref>"
+            "parent_name": "body"
           }
         }
       }
@@ -108,232 +158,412 @@
         "type": "container",
         "name": "root",
         "attrs": {
-          "layout": "grid",
-          "grid-columns": "1fr 120px 120px",
-          "grid-rows": "1fr",
-          "width": "100%",
-          "height": "100%"
+          "layout": {
+            "type": "normal",
+            "value": "grid"
+          },
+          "grid-columns": {
+            "type": "normal",
+            "value": "1fr 120px 120px"
+          },
+          "grid-rows": {
+            "type": "normal",
+            "value": "1fr"
+          },
+          "width": {
+            "type": "normal",
+            "value": "100%"
+          },
+          "height": {
+            "type": "normal",
+            "value": "100%"
+          }
         },
-        "parent_name": "body",
-        "is_component": "<ref>"
+        "parent_name": "root"
       },
       "leftPane": {
         "type": "container",
         "name": "leftPane",
         "attrs": {
-          "grid-column": "<ref>",
-          "layout": "flex-col",
-          "scroll-y": "true",
-          "padding": "8"
+          "grid-column": {
+            "type": "normal",
+            "value": "1"
+          },
+          "layout": {
+            "type": "normal",
+            "value": "flex-col"
+          },
+          "scroll-y": {
+            "type": "normal",
+            "value": "true"
+          },
+          "padding": {
+            "type": "normal",
+            "value": "8"
+          }
         },
-        "parent_name": "root",
-        "is_component": "<ref>"
+        "parent_name": "root"
       },
       "settingPower": {
         "type": "SettingRow",
         "name": "settingPower",
         "attrs": {
-          "label": "Power",
-          "value": "On"
+          "label": {
+            "type": "p-attr",
+            "value": "Power"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "On"
+          }
         },
-        "parent_name": "leftPane",
-        "is_component": true
+        "parent_name": "leftPane"
       },
       "settingTarget": {
         "type": "SettingRow",
         "name": "settingTarget",
         "attrs": {
-          "label": "Target",
-          "value": "30.0 \u00b0C"
+          "label": {
+            "type": "p-attr",
+            "value": "Target"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "30.0 \u00b0C"
+          }
         },
-        "parent_name": "leftPane",
-        "is_component": "<ref>"
+        "parent_name": "leftPane"
       },
       "settingFan": {
         "type": "SettingRow",
         "name": "settingFan",
         "attrs": {
-          "label": "Fan",
-          "value": "Auto"
+          "label": {
+            "type": "p-attr",
+            "value": "Fan"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "Auto"
+          }
         },
-        "parent_name": "leftPane",
-        "is_component": "<ref>"
+        "parent_name": "leftPane"
       },
       "settingHeater": {
         "type": "SettingRow",
         "name": "settingHeater",
         "attrs": {
-          "label": "Heater",
-          "value": "Auto"
+          "label": {
+            "type": "p-attr",
+            "value": "Heater"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "Auto"
+          }
         },
-        "parent_name": "leftPane",
-        "is_component": "<ref>"
+        "parent_name": "leftPane"
       },
       "settingCalibrate": {
         "type": "SettingRow",
         "name": "settingCalibrate",
         "attrs": {
-          "label": "Calibrate"
+          "label": {
+            "type": "p-attr",
+            "value": "Calibrate"
+          }
         },
-        "parent_name": "leftPane",
-        "is_component": "<ref>"
+        "parent_name": "leftPane"
       },
       "settingAdvanced": {
         "type": "SettingRow",
         "name": "settingAdvanced",
         "attrs": {
-          "label": "Advanced"
+          "label": {
+            "type": "p-attr",
+            "value": "Advanced"
+          }
         },
-        "parent_name": "leftPane",
-        "is_component": "<ref>"
+        "parent_name": "leftPane"
       },
       "middlePane": {
         "type": "container",
         "name": "middlePane",
         "attrs": {
-          "grid-column": "2",
-          "layout": "flex-col",
-          "width": "120px",
-          "padding": "<ref>"
+          "grid-column": {
+            "type": "normal",
+            "value": "2"
+          },
+          "layout": {
+            "type": "normal",
+            "value": "flex-col"
+          },
+          "width": {
+            "type": "normal",
+            "value": "120px"
+          },
+          "padding": {
+            "type": "normal",
+            "value": "8"
+          }
         },
-        "parent_name": "root",
-        "is_component": "<ref>"
+        "parent_name": "root"
       },
-      "namelessLabel0": {
+      "_namelessLabel_0": {
         "type": "label",
-        "name": "namelessLabel0",
+        "name": "_namelessLabel_0",
         "attrs": {
-          "text": "Status",
-          "bold": "true",
-          "height": "30"
+          "text": {
+            "type": "normal",
+            "value": "Status"
+          },
+          "bold": {
+            "type": "normal",
+            "value": "true"
+          },
+          "height": {
+            "type": "normal",
+            "value": "30"
+          }
         },
-        "parent_name": "middlePane",
-        "is_component": "<ref>"
+        "parent_name": "middlePane"
       },
-      "namelessContainer0": {
+      "_namelessContainer_0": {
         "type": "container",
-        "name": "namelessContainer0",
+        "name": "_namelessContainer_0",
         "attrs": {
-          "layout": "flex-col",
-          "grow": "<ref>"
+          "layout": {
+            "type": "normal",
+            "value": "flex-col"
+          },
+          "grow": {
+            "type": "normal",
+            "value": "1"
+          }
         },
-        "parent_name": "middlePane",
-        "is_component": "<ref>"
+        "parent_name": "middlePane"
       },
-      "status": {
+      "_namelessInfoRow_0": {
         "type": "InfoRow",
-        "name": "status",
+        "name": "_namelessInfoRow_0",
         "attrs": {
-          "icon": "icons/power16.png",
-          "value": "Active"
+          "name": {
+            "type": "p-attr",
+            "value": "status"
+          },
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/power16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "Active"
+          }
         },
-        "parent_name": "namelessContainer0",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_0"
       },
-      "fanPct": {
+      "_namelessInfoRow_1": {
         "type": "InfoRow",
-        "name": "fanPct",
+        "name": "_namelessInfoRow_1",
         "attrs": {
-          "icon": "icons/fan16.png",
-          "value": "40.0",
-          "unit": "%",
-          "showUnit": "true"
+          "name": {
+            "type": "p-attr",
+            "value": "fanPct"
+          },
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/fan16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "40.0"
+          },
+          "unit": {
+            "type": "p-attr",
+            "value": "%"
+          },
+          "showUnit": {
+            "type": "p-attr",
+            "value": "true"
+          }
         },
-        "parent_name": "namelessContainer0",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_0"
       },
-      "heatPct": {
+      "_namelessInfoRow_2": {
         "type": "InfoRow",
-        "name": "heatPct",
+        "name": "_namelessInfoRow_2",
         "attrs": {
-          "icon": "icons/heat16.png",
-          "value": "23.0",
-          "unit": "<ref>",
-          "showUnit": "true"
+          "name": {
+            "type": "p-attr",
+            "value": "heatPct"
+          },
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/heat16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "23.0"
+          },
+          "unit": {
+            "type": "p-attr",
+            "value": "%"
+          },
+          "showUnit": {
+            "type": "p-attr",
+            "value": "true"
+          }
         },
-        "parent_name": "namelessContainer0",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_0"
       },
       "rightPane": {
         "type": "container",
         "name": "rightPane",
         "attrs": {
-          "grid-column": "3",
-          "layout": "flex-col",
-          "width": "120px",
-          "padding": "<ref>"
+          "grid-column": {
+            "type": "normal",
+            "value": "3"
+          },
+          "layout": {
+            "type": "normal",
+            "value": "flex-col"
+          },
+          "width": {
+            "type": "normal",
+            "value": "120px"
+          },
+          "padding": {
+            "type": "normal",
+            "value": "8"
+          }
         },
-        "parent_name": "root",
-        "is_component": "<ref>"
+        "parent_name": "root"
       },
-      "namelessLabel1": {
+      "_namelessLabel_1": {
         "type": "label",
-        "name": "namelessLabel1",
+        "name": "_namelessLabel_1",
         "attrs": {
-          "text": "Sensors",
-          "bold": "true",
-          "height": "30"
+          "text": {
+            "type": "normal",
+            "value": "Sensors"
+          },
+          "bold": {
+            "type": "normal",
+            "value": "true"
+          },
+          "height": {
+            "type": "normal",
+            "value": "30"
+          }
         },
-        "parent_name": "rightPane",
-        "is_component": "<ref>"
+        "parent_name": "rightPane"
       },
-      "namelessContainer1": {
+      "_namelessContainer_1": {
         "type": "container",
-        "name": "namelessContainer1",
+        "name": "_namelessContainer_1",
         "attrs": {
-          "layout": "flex-col",
-          "grow": "<ref>"
+          "layout": {
+            "type": "normal",
+            "value": "flex-col"
+          },
+          "grow": {
+            "type": "normal",
+            "value": "1"
+          }
         },
-        "parent_name": "rightPane",
-        "is_component": "<ref>"
+        "parent_name": "rightPane"
       },
       "fanRpm": {
         "type": "InfoRow",
         "name": "fanRpm",
         "attrs": {
-          "icon": "icons/fan16.png",
-          "value": "2000",
-          "unit": "RPM",
-          "showUnit": "true"
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/fan16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "2000"
+          },
+          "unit": {
+            "type": "p-attr",
+            "value": "RPM"
+          },
+          "showUnit": {
+            "type": "p-attr",
+            "value": "true"
+          }
         },
-        "parent_name": "namelessContainer1",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_1"
       },
       "temperature": {
         "type": "InfoRow",
         "name": "temperature",
         "attrs": {
-          "icon": "icons/temperature16.png",
-          "value": "28.2",
-          "unit": "\u00b0C",
-          "showUnit": "true"
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/temperature16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "28.2"
+          },
+          "unit": {
+            "type": "p-attr",
+            "value": "\u00b0C"
+          },
+          "showUnit": {
+            "type": "p-attr",
+            "value": "true"
+          }
         },
-        "parent_name": "namelessContainer1",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_1"
       },
       "humidity": {
         "type": "InfoRow",
         "name": "humidity",
         "attrs": {
-          "icon": "icons/humidity16.png",
-          "value": "56.3",
-          "unit": "<ref>",
-          "showUnit": "true"
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/humidity16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "56.3"
+          },
+          "unit": {
+            "type": "p-attr",
+            "value": "%"
+          },
+          "showUnit": {
+            "type": "p-attr",
+            "value": "true"
+          }
         },
-        "parent_name": "namelessContainer1",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_1"
       },
       "power": {
         "type": "InfoRow",
         "name": "power",
         "attrs": {
-          "icon": "icons/power16.png",
-          "value": "15.3",
-          "unit": "W",
-          "showUnit": "true"
+          "icon": {
+            "type": "p-attr",
+            "value": "icons/power16.png"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "15.3"
+          },
+          "unit": {
+            "type": "p-attr",
+            "value": "W"
+          },
+          "showUnit": {
+            "type": "p-attr",
+            "value": "true"
+          }
         },
-        "parent_name": "namelessContainer1",
-        "is_component": "<ref>"
+        "parent_name": "_namelessContainer_1"
       }
     }
   }

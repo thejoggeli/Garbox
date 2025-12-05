@@ -3,15 +3,25 @@ import json
 def decycle(obj, seen=None):
     if seen is None:
         seen = set()
-    if id(obj) in seen:
-        return "<ref>"
-    seen.add(id(obj))
+
+    # immutable primitives: leave untouched
+    if isinstance(obj, (int, float, bool, str, bytes, type(None))):
+        return obj
+
+    oid = id(obj)
+    if oid in seen:
+        return f"<ref:{oid}>"
+    seen.add(oid)
 
     if isinstance(obj, dict):
         return {k: decycle(v, seen) for k, v in obj.items()}
+
     if isinstance(obj, list):
         return [decycle(i, seen) for i in obj]
+
+    # optionally handle other containers, or fall back:
     return obj
+
 
 def extract_dict(config: dict, keys: str | list[str]):
     """

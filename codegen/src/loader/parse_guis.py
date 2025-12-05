@@ -1,5 +1,8 @@
 from common.util import print_json
 from common.str_filters import to_camel_case
+from lxml import etree
+from pathlib import Path
+from loader.preprocess_guis import preprocess_xml_text
 
 class Counters:
 
@@ -13,33 +16,42 @@ class Counters:
             self.counters[name] += 1
         return self.counters[name]
 
-
-def parse_guis(xml_config):
+def parse_guis(xml_texts: str, save_preprocessed_to_dir: Path):
 
     guis_config_out = {}
 
-    for xml_name, xml_data in xml_config.items():
-        guis_config_out[xml_name] = parse_gui(xml_name, xml_data)
+    for xml_name, xml_text in xml_texts.items():
+
+        # preprocess XML
+        xml_text_preprocessed = preprocess_xml_text(xml_text)
+
+        # save preprocessed XML for inspection
+        save_preprocessed_to_dir.mkdir(parents=True, exist_ok=True)
+        out_path = save_preprocessed_to_dir / f"{xml_name}.xml"
+        with open(out_path, "w") as file:
+            file.write(xml_text_preprocessed)
+
+        # parse XML
+        gui_node = etree.fromstring(xml_text_preprocessed)
+        guis_config_out[xml_name] = parse_gui(gui_node)
 
     return guis_config_out
 
-def parse_gui(xml_name, xml_data):
-
-    gui_node = xml_data.getroot()
+def parse_gui(gui_node):
 
     components_node = gui_node.find("components")
     components = parse_components(components_node)
     
-    body_node = gui_node.find("body")
-    if body_node is None:
-        raise ValueError("main 'gui' > 'body' not found")
+    root_node = gui_node.find("root")
+    if root_node is None:
+        raise ValueError("required node not found: gui > root")
     
-    body_node.set("name", "body")
-    body_objects = parse_object_tree(body_node, components)
+    root_node.set("name", "root")
+    root_objects = parse_object_tree(root_node, is_component=False)
 
     return {
         "components": components,
-        "objects": body_objects,
+        "objects": root_objects,
     }
 
 
@@ -51,6 +63,8 @@ def parse_components(comps_node):
         return components
 
     for comp_node in comps_node.findall("*"):
+
+        print(comp_node.tag, dict(comp_node.attrib))
         components[comp_node.tag] = parse_component(comp_node)
 
     return components
@@ -64,17 +78,59 @@ def parse_component(comp_node):
     if body_node is None:
         raise ValueError("body element is missing in component")
     
+    print(dict(comp_node.attrib))
+    
     params = {}
+    body_attrs = {}
+
+    # scan param attributes ($attr => o-attr / r-attr)
+    for param_name, param_value in dict(comp_node.attrib).items():
+
+        # o-attr => optional
+        if(param_name.startswith("r-")):
+            name = param_name[2:]
+            required = True
+            default = None
+        # r-attr => required
+        elif(param_name.startswith("o-")):
+            name = param_name[2:]
+            required = False
+            default = param_value
+        # invalid prefix
+        else:
+            raise ValueError(f"invalid param prefix: {param_name}")
+
+        # param names must be unique
+        if name in params:
+            raise KeyError(f"duplicated param name '{name}'")
+
+        # add param config
+        params[name] = {
+            "name": name,
+            "default": default,
+            "required": required,
+        }
+
+    # scan <param> tags
     for param_node in comp_node.findall("param"):
         param_attrs = dict(param_node.attrib)
         if "name" not in param_attrs:
             raise ValueError("param is missing attribute 'name'")
-        params[param_attrs.get("name")] = {
-            "default": param_attrs.get("default", None)
+        
+        # param names must be unique
+        name = param_attrs.get("name")
+        if name in params:
+            raise KeyError(f"duplicated param name '{name}'")
+
+        # add param config
+        params[name] = {
+            "name": name,
+            "default": param_attrs.get("default", None),
+            "required": "default" not in param_attrs,
         }
 
     body_node.set("name", "body")
-    objects = parse_object_tree(body_node, components={})
+    objects = parse_object_tree(body_node, is_component=True)
 
     return {
         "params": params,
@@ -82,7 +138,7 @@ def parse_component(comp_node):
     }
 
 
-def parse_object_tree(root_node, components):
+def parse_object_tree(root_node, is_component):
 
     counters = Counters()
     objects = {}
@@ -96,7 +152,7 @@ def parse_object_tree(root_node, components):
         # get name
         name = attrs.get("name", None)
         if name is None:
-            name = f"nameless-{node.tag}-{counters.get_next(node.tag)}"
+            name = f"_nameless-{node.tag}_{counters.get_next(node.tag)}"
         elif name in objects:
             raise ValueError(f"duplicate name '{name}'")
         
@@ -117,9 +173,6 @@ def parse_object_tree(root_node, components):
             parent_name = parent.attrib.get("name", None)
             if parent_name is None:
                 raise RuntimeError("parent name must not be None")
-            
-        # check if node is component
-        is_component = node.tag in components
     
         # create final object
         obj_data = {
@@ -127,17 +180,34 @@ def parse_object_tree(root_node, components):
             "name": name,
             "attrs": {},
             "parent_name": parent_name,
-            "is_component": is_component,
         }
 
         # remove name from attrs
         if "name" in attrs:
             del attrs["name"]
         
-        # parse attrs
+        # parse component attrs => 
         for key, value in attrs.items():
             value = value.strip()
-            obj_data["attrs"][key] = value
+
+            # handle v-attrs
+            if key.startswith("v-"):
+                obj_data["attrs"][key[2:]] = {
+                    "type": "v-attr",
+                    "value": value,
+                }
+            # handle p-attrs
+            elif key.startswith("p-"):
+                obj_data["attrs"][key[2:]] = {
+                    "type": "p-attr",
+                    "value": value,
+                }
+            # handle regular attribute
+            else:
+                obj_data["attrs"][key] = {
+                    "type": "normal",
+                    "value": value,
+                }
 
         # add object to objects
         objects[name] = obj_data

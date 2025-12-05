@@ -14,17 +14,17 @@
       "targetTemperature": {
         "name": "targetTemperature",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "measuredTemperature": {
         "name": "measuredTemperature",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "measuredHumidity": {
         "name": "measuredHumidity",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -34,7 +34,7 @@
       "brightness": {
         "name": "brightness",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -44,12 +44,12 @@
       "brightness": {
         "name": "brightness",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "skipped": {
         "name": "skipped",
         "type": "uint32_t",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -59,17 +59,17 @@
       "state": {
         "name": "state",
         "type": "FanState",
-        "default": "<ref>"
+        "default": null
       },
       "targetSpeed": {
         "name": "targetSpeed",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "rpmControlEnabled": {
         "name": "rpmControlEnabled",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -79,7 +79,7 @@
       "measuredRpm": {
         "name": "measuredRpm",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -89,17 +89,17 @@
       "enabled": {
         "name": "enabled",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       },
       "targetSpeed": {
         "name": "targetSpeed",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "enableRpmControl": {
         "name": "enableRpmControl",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -109,27 +109,27 @@
       "state": {
         "name": "state",
         "type": "HeatpadState",
-        "default": "<ref>"
+        "default": null
       },
       "currentDutyCycle": {
         "name": "currentDutyCycle",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "currentPeriodMicros": {
         "name": "currentPeriodMicros",
         "type": "uint32_t",
-        "default": "<ref>"
+        "default": null
       },
       "nextDutyCycle": {
         "name": "nextDutyCycle",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "nextPeriodMicros": {
         "name": "nextPeriodMicros",
         "type": "uint32_t",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -139,17 +139,17 @@
       "measuredVoltage": {
         "name": "measuredVoltage",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "measuredCurrent": {
         "name": "measuredCurrent",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "pwmProgressMicros": {
         "name": "pwmProgressMicros",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -159,17 +159,17 @@
       "enabled": {
         "name": "enabled",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       },
       "dutyCycle": {
         "name": "dutyCycle",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "periodMicros": {
         "name": "periodMicros",
         "type": "uint32_t",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -179,22 +179,22 @@
       "driverEnabled": {
         "name": "driverEnabled",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       },
       "powerEnabled": {
         "name": "powerEnabled",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       },
       "resetting": {
         "name": "resetting",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       },
       "hasFirstSample": {
         "name": "hasFirstSample",
         "type": "bool",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -204,12 +204,12 @@
       "temperatureCelcius": {
         "name": "temperatureCelcius",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       },
       "humidityRelative": {
         "name": "humidityRelative",
         "type": "float",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -219,12 +219,12 @@
       "oldState": {
         "name": "oldState",
         "type": "ButtonState",
-        "default": "<ref>"
+        "default": null
       },
       "newState": {
         "name": "newState",
         "type": "ButtonState",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -234,12 +234,12 @@
       "count": {
         "name": "count",
         "type": "uint32_t",
-        "default": "<ref>"
+        "default": null
       },
       "holdTimeMicros": {
         "name": "holdTimeMicros",
         "type": "uint32_t",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -249,7 +249,7 @@
       "steps": {
         "name": "steps",
         "type": "int32_t",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -259,12 +259,12 @@
       "oldBehaviour": {
         "name": "oldBehaviour",
         "type": "BehaviourId",
-        "default": "<ref>"
+        "default": null
       },
       "newBehaviour": {
         "name": "newBehaviour",
         "type": "BehaviourId",
-        "default": "<ref>"
+        "default": null
       }
     }
   },
@@ -274,12 +274,12 @@
       "oldScreen": {
         "name": "oldScreen",
         "type": "ScreenId",
-        "default": "<ref>"
+        "default": null
       },
       "newScreen": {
         "name": "newScreen",
         "type": "ScreenId",
-        "default": "<ref>"
+        "default": null
       }
     }
   }

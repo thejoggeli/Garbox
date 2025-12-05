@@ -12,7 +12,7 @@
       "FanCommand"
     ],
     "receives_all": false,
-    "tick_phases_all": "<ref>",
+    "tick_phases_all": false,
     "name": "Logic"
   },
   "FermentationBehaviour": {
@@ -36,8 +36,8 @@
       "HeatpadCommand",
       "FermentationStatus"
     ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Logic"
   }
 }

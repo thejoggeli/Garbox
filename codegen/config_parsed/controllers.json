@@ -11,7 +11,7 @@
       "DisplayStatus"
     ],
     "receives_all": false,
-    "tick_phases_all": "<ref>",
+    "tick_phases_all": false,
     "name": "Render"
   },
   "DevtoolsController": {
@@ -21,8 +21,8 @@
     ],
     "receives": [],
     "sends": [],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Logging"
   },
   "FanController": {
@@ -38,8 +38,8 @@
       "FanStatus",
       "FanSample"
     ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Output"
   },
   "HeartbeatController": {
@@ -51,8 +51,8 @@
     "sends": [
       "Heartbeat"
     ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Heartbeat"
   },
   "HeatpadController": {
@@ -68,8 +68,8 @@
       "HeatpadStatus",
       "HeatpadSample"
     ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Output"
   },
   "InputController": {
@@ -83,8 +83,8 @@
       "ButtonRepeat",
       "EncoderStep"
     ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Input"
   },
   "I2cPartsController": {
@@ -99,8 +99,8 @@
       "TemperatureStatus",
       "TemperatureSample"
     ],
-    "receives_all": "<ref>",
-    "tick_phases_all": "<ref>",
+    "receives_all": false,
+    "tick_phases_all": false,
     "name": "Input"
   }
 }

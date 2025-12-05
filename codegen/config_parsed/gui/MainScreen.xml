@@ -4,11 +4,11 @@
     <!-- SETTINGS ROW COMPONENT -->
     <!-- Row layout: Label | (hidden left arrow) | Value | (hidden right arrow) -->
     <!-- Always hidden arrows; user can choose to show them later in C++ -->
-    <SettingRow $label $value>
+    <SettingRow r-label="" r-value="">
       <body layout="flex-row" height="40">
-        <label  name="label" text=$label grow="1" />
+        <label  name="label" v-text="label" grow="1" />
         <image  name="left"  src="icons/arrow_left.png"  visible="false" />
-        <label  name="value" text=$value width="40" align="right" />
+        <label  name="value" v-text="value" width="40" align="right" />
         <image  name="right" src="icons/arrow_right.png" visible="false" />
       </body>
     </SettingRow>
@@ -16,11 +16,11 @@
     <!-- INFO ROW COMPONENT -->
     <!-- Row layout: Icon | Value | Unit -->
     <!-- Evenly distributed vertically by parent container -->
-    <InfoRow $icon $value $unit="unit" $showUnit="false">
+    <InfoRow r-icon="" r-value="" o-unit="unit" o-showUnit="false">
       <body layout="flex-row" height="auto">
-        <image name="icon" src=$icon width="16" height="16" />
-        <label name="value" text=$value />
-        <label name="unit"  text=$unit visible=$showUnit />
+        <image name="icon" v-src="icon" width="16" height="16" />
+        <label name="value" v-text="value" />
+        <label name="unit"  v-text="unit" v-visible="showUnit" />
       </body>
     </InfoRow>
 
@@ -33,12 +33,12 @@
 
       <!-- LEFT PANE: fills horizontally, scrollable vertically -->
       <container name="leftPane" grid-column="1" layout="flex-col" scroll-y="true" padding="8">
-        <SettingRow name="setting-power"     $label="Power"     $value="On" />
-        <SettingRow name="setting-target"    $label="Target"    $value="30.0 °C" />
-        <SettingRow name="setting-fan"       $label="Fan"       $value="Auto" />
-        <SettingRow name="setting-heater"    $label="Heater"    $value="Auto" />
-        <SettingRow name="setting-calibrate" $label="Calibrate" />
-        <SettingRow name="setting-advanced"  $label="Advanced"  />
+        <SettingRow name="setting-power"     p-label="Power"     p-value="On" />
+        <SettingRow name="setting-target"    p-label="Target"    p-value="30.0 °C" />
+        <SettingRow name="setting-fan"       p-label="Fan"       p-value="Auto" />
+        <SettingRow name="setting-heater"    p-label="Heater"    p-value="Auto" />
+        <SettingRow name="setting-calibrate" p-label="Calibrate" />
+        <SettingRow name="setting-advanced"  p-label="Advanced"  />
       </container>
       <!-- LEFT PANE END -->
 
@@ -46,9 +46,9 @@
       <container name="middlePane" grid-column="2" layout="flex-col" width="120px" padding="8">
         <label text="Status" bold="true" height="30" />
         <container layout="flex-col" grow="1">
-          <InfoRow $name="status"  $icon="icons/power16.png"  $value="Active" />
-          <InfoRow $name="fanPct"  $icon="icons/fan16.png"    $value="40.0" $unit="%" $showUnit="true" />
-          <InfoRow $name="heatPct" $icon="icons/heat16.png"   $value="23.0" $unit="%" $showUnit="true" />
+          <InfoRow p-name="status"  p-icon="icons/power16.png"  p-value="Active" />
+          <InfoRow p-name="fanPct"  p-icon="icons/fan16.png"    p-value="40.0" p-unit="%" p-showUnit="true" />
+          <InfoRow p-name="heatPct" p-icon="icons/heat16.png"   p-value="23.0" p-unit="%" p-showUnit="true" />
         </container>
       </container>
       <!-- MIDDLE PANE END -->
@@ -57,10 +57,10 @@
       <container name="rightPane" grid-column="3" layout="flex-col" width="120px" padding="8">
         <label text="Sensors" bold="true" height="30" />
         <container layout="flex-col" grow="1">
-          <InfoRow name="fanRpm"      $icon="icons/fan16.png"          $value="2000" $unit="RPM" $showUnit="true" />
-          <InfoRow name="temperature" $icon="icons/temperature16.png"  $value="28.2" $unit="°C"  $showUnit="true" />
-          <InfoRow name="humidity"    $icon="icons/humidity16.png"     $value="56.3" $unit="%"   $showUnit="true" />
-          <InfoRow name="power"       $icon="icons/power16.png"        $value="15.3" $unit="W"   $showUnit="true" />
+          <InfoRow name="fanRpm"      p-icon="icons/fan16.png"          p-value="2000" p-unit="RPM" p-showUnit="true" />
+          <InfoRow name="temperature" p-icon="icons/temperature16.png"  p-value="28.2" p-unit="°C"  p-showUnit="true" />
+          <InfoRow name="humidity"    p-icon="icons/humidity16.png"     p-value="56.3" p-unit="%"   p-showUnit="true" />
+          <InfoRow name="power"       p-icon="icons/power16.png"        p-value="15.3" p-unit="W"   p-showUnit="true" />
         </container>
       </container>
       <!-- RIGHT PANE END -->

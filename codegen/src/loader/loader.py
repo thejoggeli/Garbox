@@ -7,7 +7,6 @@ from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
 from loader.parse_guis import parse_guis
 from common.util import decycle
-from lxml import etree
 
 class Loader:
 
@@ -39,14 +38,14 @@ class Loader:
         # load xml files
         gui_dir = self.config_dir / "gui" 
         gui_paths = [p for p in gui_dir.glob("*.xml") if p.is_file()]
-        gui_configs = {}
+        gui_configs_text = {}
         for path in gui_paths:
-            config_data = load_xml(path)
+            config_text = load_text(path)
             config_name = path.stem
-            gui_configs[config_name] = config_data 
+            gui_configs_text[config_name] = config_text 
             
 
-        self.config["guis"] = parse_guis(gui_configs)
+        self.config["guis"] = parse_guis(gui_configs_text, self.config_dir/"../config_parsed/gui")
 
 
     def save_json(self, path: Path, config):
@@ -99,6 +98,8 @@ def load_yaml_multi(paths: list[Path]):
     return merged
 
 
-def load_xml(path: Path):
+def load_text(path: Path):
     print(f"{path}")
-    return etree.parse(path)
+    with open(path, "r") as file:
+        return file.read()
+    return None

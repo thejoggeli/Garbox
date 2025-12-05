@@ -20,7 +20,7 @@
             "Heartbeat"
           ],
           "receives_all": false,
-          "tick_phases_all": "<ref>",
+          "tick_phases_all": false,
           "name": "Heartbeat"
         }
       },
@@ -44,8 +44,8 @@
             "FanStatus",
             "FanSample"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Output"
         },
         "HeatpadController": {
@@ -61,8 +61,8 @@
             "HeatpadStatus",
             "HeatpadSample"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Output"
         },
         "InputController": {
@@ -76,8 +76,8 @@
             "ButtonRepeat",
             "EncoderStep"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Input"
         },
         "I2cPartsController": {
@@ -92,8 +92,8 @@
             "TemperatureStatus",
             "TemperatureSample"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Input"
         }
       },
@@ -115,8 +115,8 @@
           "sends": [
             "FanCommand"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Logic"
         },
         "FermentationBehaviour": {
@@ -140,8 +140,8 @@
             "HeatpadCommand",
             "FermentationStatus"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Logic"
         }
       },
@@ -153,8 +153,8 @@
       "name": "OutputTick",
       "behaviours": {},
       "controllers": {
-        "FanController": "<ref>",
-        "HeatpadController": "<ref>"
+        "FanController": "<ref:130072544846656>",
+        "HeatpadController": "<ref:130072544853696>"
       },
       "screens": {},
       "order": 3
@@ -170,8 +170,8 @@
           ],
           "receives": [],
           "sends": [],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Logging"
         }
       },
@@ -194,8 +194,8 @@
           "sends": [
             "DisplayStatus"
           ],
-          "receives_all": "<ref>",
-          "tick_phases_all": "<ref>",
+          "receives_all": false,
+          "tick_phases_all": false,
           "name": "Render"
         }
       },
