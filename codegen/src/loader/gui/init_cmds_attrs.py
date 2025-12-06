@@ -8,8 +8,6 @@ def process_attrs(attrs):
 
     for attr_type, attr_data in attrs.items():
 
-        attr_data["value_raw"] = attr_data["value"]
-
         # attribute 'pad'
         if attr_type == "pad":
             split = split_attr(attr_data["value"])

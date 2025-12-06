@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/screens/abstract/EventLogScreenAbs.h"
-#include "core/lvgl/objects/LvContainer.h"
+#include "core/lvgl/objects/LvObject.h"
 #include "core/lvgl/objects/LvLabel.h"
 #include "core/util/container/static/ArrayStatic.h"
 #include "core/util/container/static/RingBufferStatic.h"

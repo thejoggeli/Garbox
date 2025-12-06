@@ -43,14 +43,18 @@ def eval_initializer(obj_type, attr_name, value):
 
     return None
 
+def fn_size(v, prefix, dim):
+    if prep_val(v) in {"auto", "content"}:
+        return f"set{prefix}{dim}Content()"
+    return f"set{prefix}{dim}({render_style_value(v)})"
 
 INITIALIZER_MAP = {
 
     "object": {
-        "raw-width":            lambda v: f"setRawWidth({render_ex(v,'int')})",
-        "raw-height":           lambda v: f"setRawHeight({render_ex(v,'int')})",
-        "width":                lambda v: f"setWidth({render_style_value(v)})",
-        "height":               lambda v: f"setHeight({render_style_value(v)})",
+        "raw-width":            lambda v: fn_size(v, prefix="Raw", dim="Width"),
+        "raw-height":           lambda v: fn_size(v, prefix="Raw", dim="Height"),
+        "width":                lambda v: fn_size(v, prefix="", dim="Width"),
+        "height":               lambda v: fn_size(v, prefix="", dim="Height"),
         "x":                    lambda v: f"setPositionX({render_ex(v,'int')})",
         "y":                    lambda v: f"setPositionY({render_ex(v,'int')})",
         "hidden":               lambda v: f"setHidden({render_ex(v,'bool')})",
@@ -87,7 +91,7 @@ INITIALIZER_MAP = {
     },
 
     "image": {
-        "src":                  lambda v: f"setSource({v})",
+        "src":                  lambda v: f"setSource(&{v})",
     },
 
     # "container": {

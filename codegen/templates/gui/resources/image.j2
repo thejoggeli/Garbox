@@ -1,0 +1,41 @@
+{% include "_common/header.j2" %}
+#ifdef __has_include
+    #if __has_include("lvgl.h")
+        #ifndef LV_LVGL_H_INCLUDE_SIMPLE
+            #define LV_LVGL_H_INCLUDE_SIMPLE
+        #endif
+    #endif
+#endif
+
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+    #include "lvgl.h"
+#else
+    #include "lvgl/lvgl.h"
+#endif
+
+
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
+#ifndef {{ attribute_macro }}
+#define {{ attribute_macro }}
+#endif
+
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST {{ attribute_macro }} uint8_t {{ resource.name }}_map[] = {
+{% for b in image.data_hex %}
+{% if loop.index0 % 64 == 0 %}    {% endif %}{{ b }}{% if not loop.last %}, {% endif %}
+{% if loop.index % 64 == 0 %}
+
+{% endif %}
+{% endfor %}
+};
+
+const lv_image_dsc_t {{ resource.name }} = {
+    .header.cf = {{ image.color_format }},
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = {{ image.width }},
+    .header.h = {{ image.height }},
+    .data_size = {{ image.data_size }},
+    .data = {{ resource.name }}_map,
+};

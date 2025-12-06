@@ -23,3 +23,9 @@ def lower_first(s):
     if not isinstance(s, str) or not s:
         return s
     return s[0].lower() + s[1:]
+
+def ljust(s:str, width:int, fillchar:str=" "):
+    return s.ljust(width, fillchar)
+
+def rjust(s:str, width:int, fillchar:str=" "):
+    return s.rjust(width, fillchar)

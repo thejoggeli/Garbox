@@ -7,6 +7,7 @@ from generate.gen_hardware import generate_hardware
 from generate.gen_types import generate_types
 from generate.gen_components import generate_components
 from generate.gen_config import generate_config
+from generate.gen_guis import generate_guis
 
 
 def main():
@@ -19,24 +20,25 @@ def main():
     ctx = Context(
         root_dir      = root_dir,
         config_dir    = (codegen_dir / "config"),
+        output_dir    = (codegen_dir / "output"),
+        stubs_dir     = (codegen_dir / "output/stubs"),
         templates_dir = (codegen_dir / "templates"),
-        stubs_dir     = (codegen_dir / "stubs"),
-        app_dir       = (codegen_dir / "../src/app"),
-        shared_dir    = (codegen_dir / "../src/shared")
+        res_dir       = (root_dir    / "res"),
+        app_dir       = (root_dir    / "src/app"),
+        bin_dir       = (root_dir    / "src/bin"),
+        shared_dir    = (root_dir    / "src/shared")
     )
     print_section("generator will use the following directory paths")
     ctx.print()
 
     # create loader
     print_section("loading all config files")
-    loader = Loader(ctx.config_dir)
+    loader = Loader(ctx)
     loader.preload_all()
 
     # safe parsed config to json
     print_section("saving all processed files")
-    loader.save_config((codegen_dir / "config_parsed"))
-
-    quit()
+    loader.save_config(ctx.output_dir / "parsed")
     
     # hardware generation
     print_section("generating hardware files")
@@ -58,9 +60,12 @@ def main():
     print_section("generating config files")
     generate_config(ctx, loader)
 
+    # guis
+    print_section("generating gui files")
+    generate_guis(ctx, loader)
+
     # generation finished
-    print_sep()
-    print("all files generated successfully!")
+    print_section("all files generated successfully!")
 
 if __name__ == "__main__":
     main()

@@ -3,7 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
-#include "core/lvgl/objects/LvContainer.h"
+#include "core/lvgl/objects/LvObject.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
@@ -51,7 +51,7 @@ private:
 
 protected:
 
-    LvContainer mContainer;
+    LvObject mContainer;
     const uint32_t mDisplayWidth = 0;
     const uint32_t mDisplayHeight = 0;
 

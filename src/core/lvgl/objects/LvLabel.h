@@ -15,7 +15,6 @@ public:
     void setText(const char* text);
     void setTextFormatted(const char* fmt, ...);
     void setLongMode(lv_label_long_mode_t mode);
-    void setAlign(lv_text_align_t align);
     
 };
 

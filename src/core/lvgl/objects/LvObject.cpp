@@ -125,16 +125,28 @@ void LvObject::setAlign(lv_align_t alignment, int32_t xOffset, int32_t yOffset){
 // content sizing helpers
 // ==============================================================================
 
-void LvObject::setWidthContent(){
+void LvObject::setRawWidthContent(){
     lv_obj_set_width(mRaw, LV_SIZE_CONTENT);
 }
 
-void LvObject::setHeightContent(){
+void LvObject::setRawHeightContent(){
     lv_obj_set_height(mRaw, LV_SIZE_CONTENT);
 }
 
-void LvObject::setSizeContent(){
+void LvObject::setRawSizeContent(){
     lv_obj_set_size(mRaw, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+}
+
+void LvObject::setWidthContent(){
+    lv_obj_set_style_width(mRaw, LV_SIZE_CONTENT, LV_PART_MAIN);
+}
+
+void LvObject::setHeightContent(){
+    lv_obj_set_style_height(mRaw, LV_SIZE_CONTENT, LV_PART_MAIN);
+}
+
+void LvObject::setSizeContent(){
+    lv_obj_set_style_size(mRaw, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_PART_MAIN);
 }
 
 // ==============================================================================

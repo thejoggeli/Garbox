@@ -1,4 +1,18 @@
 <gui>
+
+  <resources>
+
+      <!-- fonts are not implemented yet -->
+    <font name="my-very-special-font" />
+
+    <image name="power-16px"       path="icons/power.png"        resize="16x16" format="RGB565A8" />
+    <image name="fan-16px"         path="icons/fan.png"          resize="16x16" format="RGB565A8" />
+    <image name="heat-16px"        path="icons/heat.png"         resize="16x16" format="RGB565A8" />
+    <image name="humidity-16px"    path="icons/humidity.png"     resize="16x16" format="RGB565A8" />
+    <image name="temperature-16px" path="icons/temperature.png"  resize="16x16" format="RGB565A8" />
+
+  </resources>
+
   <components>
 
     <!-- SETTINGS ROW COMPONENT -->
@@ -7,9 +21,9 @@
     <SettingRow $label $value>
       <body layout="flex" flex-flow="row" height="40">
         <label name="label" text=$label flex-grow="1" />
-        <image name="left"  src="icons/arrow_left.png" hidden="true"/>
-        <label name="value" text=$value width="40" align="right" />
-        <image name="right" src="icons/arrow_right.png" hidden="true" />
+        <label name="left" text="&lt;" width="10px" hidden="true" />
+        <label name="value" text=$value width="40px" align="right" />
+        <label name="right" text="&gt;" width="10px" hidden="true" />
       </body>
     </SettingRow>
 
@@ -29,7 +43,7 @@
   <root>
 
     <!-- SCREEN ROOT LAYOUT: 3 columns -->
-    <container name="root" layout="flex" flex-flow="col" width="100%" height="100%">
+    <container name="wrapper" >
 
       <!-- LEFT PANE: fills horizontally, scrollable vertically -->
       <container 
@@ -40,8 +54,8 @@
       >
         <SettingRow name="setting-power"     $label="Power"     $value="On" />
         <SettingRow name="setting-target"    $label="Target"    $value="30.0 °C" />
-        <SettingRow name="setting-fan"       $label="Fan"       $value="Auto" />
-        <SettingRow name="setting-heater"    $label="Heater"    $value="Auto" />
+        <SettingRow name="setting-fan"       $label="Fan"       $value="auto" />
+        <SettingRow name="setting-heater"    $label="Heater"    $value="auto" />
         <SettingRow name="setting-calibrate" $label="Calibrate" $value="-" />
         <SettingRow name="setting-advanced"  $label="Advanced"  $value="-" />
       </container>
@@ -55,9 +69,9 @@
       >
         <label text="Status" height="30" text-color="#cc88ff" />
         <container layout="flex" flex-flow="col" flex-grow="1">
-          <InfoRow $name="status"  $icon="icons/power16.png"  $value="Active" />
-          <InfoRow $name="fanPct"  $icon="icons/fan16.png"    $value="40.0" $unit="%" />
-          <InfoRow $name="heatPct" $icon="icons/heat16.png"   $value="23.0" $unit="%" />
+          <InfoRow $name="status"  $icon="power-16px"  $value="Active" />
+          <InfoRow $name="fanPct"  $icon="fan-16px"    $value="40.0" $unit="%" />
+          <InfoRow $name="heatPct" $icon="heat-16px"   $value="23.0" $unit="%" />
         </container>
       </container>
       <!-- MIDDLE PANE END -->
@@ -70,10 +84,10 @@
       >
         <label text="Sensors" height="30" text-color="#88ccff"/>
         <container layout="flex" flex-flow="col" flex-grow="1">
-          <InfoRow name="fanRpm"      $icon="icons/fan16.png"          $value="2000" $unit="RPM" />
-          <InfoRow name="temperature" $icon="icons/temperature16.png"  $value="28.2" $unit="°C"  />
-          <InfoRow name="humidity"    $icon="icons/humidity16.png"     $value="56.3" $unit="%"   />
-          <InfoRow name="power"       $icon="icons/power16.png"        $value="15.3" $unit="W"   />
+          <InfoRow name="fanRpm"      $icon="fan-16px"          $value="2000" $unit="RPM" />
+          <InfoRow name="temperature" $icon="temperature-16px"  $value="28.2" $unit="°C"  />
+          <InfoRow name="humidity"    $icon="humidity-16px"     $value="56.3" $unit="%"   />
+          <InfoRow name="power"       $icon="power-16px"        $value="15.3" $unit="W"   />
         </container>
       </container>
       <!-- RIGHT PANE END -->

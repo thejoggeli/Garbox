@@ -1,6 +1,6 @@
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
-from common.str_filters import lower_first, upper_first
+from common.str_filters import lower_first, upper_first, ljust, rjust
 import re
 
 
@@ -13,6 +13,8 @@ def create_jinja_env(template_dir: Path):
     )
     env.filters["upper_first"] = upper_first
     env.filters["lower_first"] = lower_first
+    env.filters["ljust"] = ljust
+    env.filters["rjust"] = rjust
     return env
 
 

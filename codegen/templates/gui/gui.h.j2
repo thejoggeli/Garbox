@@ -1,0 +1,86 @@
+{% include "_common/header.j2" %}
+#pragma once
+
+{% for type_data in used_object_types.values() %}
+#include "core/lvgl/objects/{{ type_data.class_name }}.h"
+{% endfor %}
+
+{% set class_name = name ~ "Gui" %}
+
+namespace Garbox {
+
+{% for decl in gui.resources.declare.images %}
+{{ decl }};
+{% endfor %}
+
+{% if gui.resources.declare.fonts is defined %}
+{% for decl in gui.resources.declare.fonts %}
+{{ decl }};
+{% endfor %}
+{% endif %}
+
+class {{ class_name }} {
+public:
+
+    // ============================================================
+    // === Component Structs ======================================
+    // ============================================================
+
+{% for comp_name, comp in gui.components.items() %}
+    struct {{ comp_name }} {
+        {{ comp_name }}(LvObject& parent);
+    {% for obj_name, obj in comp.objects.items() %}
+        {{ type_to_class_name[obj.type].class_name }} {{ obj_name }};
+    {% endfor %}
+
+        {{ comp_name }}(const {{ comp_name }}&) = delete;
+        {{ comp_name }}& operator=(const {{ comp_name }}&) = delete;
+        {{ comp_name }}({{ comp_name }}&&) = delete;
+        {{ comp_name }}& operator=({{ comp_name }}&&) = delete;
+        ~{{ comp_name }}() = default;
+    };
+
+{% endfor %}
+
+    // ============================================================
+    // === Objects Struct =========================================
+    // ============================================================
+
+    struct Objects {
+        Objects();
+{% for obj_name, obj in gui.objects_raw.items() %}
+    {% if obj.is_component %}
+        {{ obj.type }} {{ obj_name }};
+    {% else %}
+        {{ type_to_class_name[obj.type].class_name }} {{ obj_name }};
+    {% endif %}
+{% endfor %}
+
+        Objects(const Objects&) = delete;
+        Objects& operator=(const Objects&) = delete;
+        Objects(Objects&&) = delete;
+        Objects& operator=(Objects&&) = delete;
+        ~Objects() = default;
+    };
+
+    // ============================================================
+    // === Gui Class ==============================================
+    // ============================================================
+
+    {{ class_name }}();
+
+    void init();
+    void show();
+    Objects& objects();
+
+    {{ class_name }}(const {{ class_name }}&) = delete;
+    {{ class_name }}& operator=(const {{ class_name }}&) = delete;
+    {{ class_name }}({{ class_name }}&&) = delete;
+    {{ class_name }}& operator=({{ class_name }}&&) = delete;
+    ~{{ class_name }}() = default;
+
+private:
+    Objects mObjects;
+};
+
+} // namespace

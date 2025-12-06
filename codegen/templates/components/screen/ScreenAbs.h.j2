@@ -3,7 +3,7 @@
 {% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
 #include "core/application/screen/ScreenAbs.h"
 {% if screen.use_lvgl %}
-#include "core/lvgl/objects/LvContainer.h"
+#include "core/lvgl/objects/LvObject.h"
 {% endif %}
 {% if screen.model.get("debounce") %}
 #include "core/time/SoftwareTimer.h"
@@ -60,7 +60,7 @@ private:
 
 protected:
 
-    LvContainer mContainer;
+    LvObject mContainer;
     const uint32_t mDisplayWidth = 0;
     const uint32_t mDisplayHeight = 0;
 

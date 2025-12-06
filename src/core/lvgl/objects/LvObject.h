@@ -49,6 +49,9 @@ public:
     void setAlign(lv_align_t alignment, int32_t xOffset = 0, int32_t yOffset = 0);
 
     // content sizing helpers
+    void setRawWidthContent();
+    void setRawHeightContent();
+    void setRawSizeContent();
     void setWidthContent();
     void setHeightContent();
     void setSizeContent();

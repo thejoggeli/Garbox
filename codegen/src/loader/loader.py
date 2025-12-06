@@ -6,15 +6,19 @@ from loader.parse_application import parse_application
 from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
 from loader.gui.parse_guis import parse_guis
+from common.context import Context
 from common.util import decycle, print_section
 
 class Loader:
 
     config_dir : Path
+    output_dir : Path
+
     config: dict = None
 
-    def __init__(self, config_dir: Path):
-        self.config_dir = config_dir
+    def __init__(self, ctx: Context):
+        self.config_dir = ctx.config_dir
+        self.output_dir = ctx.output_dir
         pass
 
     def preload_all(self):
@@ -45,7 +49,7 @@ class Loader:
             gui_configs_text[config_name] = config_text 
         
         print_section("parsing gui xml files")    
-        self.config["guis"] = parse_guis(gui_configs_text, self.config_dir/"../config_parsed/gui")
+        self.config["guis"] = parse_guis(gui_configs_text, self.output_dir / "gui")
 
 
     def save_json(self, path: Path, config):

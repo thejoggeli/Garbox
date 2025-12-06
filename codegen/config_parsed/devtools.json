@@ -1,9 +1,0 @@
-{
-  "profiler": {
-    "custom_ids": [
-      "LedAnimation",
-      "PiezoPlayer",
-      "DisplayRender"
-    ]
-  }
-}

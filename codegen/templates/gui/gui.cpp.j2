@@ -1,0 +1,59 @@
+{% include "_common/header.j2" %}
+{% set class_name = name ~ "Gui" %}
+
+#include "{{class_name}}.h"
+
+namespace Garbox {
+
+{{class_name}}::{{class_name}}() : mObjects(){
+    // nothing to do
+}
+
+void {{class_name}}::init(){
+{% for cmd in gui.init_cmds %}
+{% for call in cmd.calls %}
+    {% set call_str = "mObjects." ~ cmd.instance ~ "." ~ call ~ ";" %}
+    {{ call_str | ljust(75) }} // {{ cmd.comment }}
+{% endfor %}
+{% endfor %}
+}
+
+void {{class_name}}::show(){
+    lv_screen_load(mObjects.root.raw());
+}
+
+{{class_name}}::Objects& {{class_name}}::objects(){
+    return mObjects;
+}
+
+// ============================================================
+// === Component Structs ======================================
+// ============================================================
+
+{% for comp_name, comp in gui.components.items() %}
+{{class_name}}::{{ comp_name }}::{{ comp_name }}(LvObject& parent):
+{% for obj_name, obj in comp.objects.items() %}
+    {% set parent_name = "nullptr" if not obj.parent_name else obj.parent_name %}
+    {{ obj_name }}({{ parent_name }})
+    {%- if loop.last %}{}{%else%},{%endif%}
+
+{% endfor %}
+
+{% endfor %}
+
+// ============================================================
+// === Objects Struct =========================================
+// ============================================================
+
+{{class_name}}::Objects::Objects():
+{% for obj_name, obj in gui.objects_raw.items() %}
+    {% set parent_name = "nullptr" if not obj.parent_name else obj.parent_name %}
+    {{ obj_name }}({{ parent_name }})
+    {%- if loop.last %}{}{%else%},{%endif%}
+
+{% endfor %}
+
+} // namespace
+
+
+
