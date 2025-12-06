@@ -1,5 +1,5 @@
 
-from loader.gui.parse_color_string import parse_color_to_hex
+from common.parse_color_string import parse_color_to_hex
 from common.util import print_json, nested_get, ensure_list
 from common.parse_type import render_value
 

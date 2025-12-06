@@ -3,7 +3,7 @@ from common.str_filters import to_camel_case
 from pathlib import Path
 from loader.gui.preprocess_xmls import preprocess_xml_text
 from loader.gui.convert_xml_to_dict import xml_to_dict
-from loader.gui.postprocess_dict import postprocess_dict
+from loader.gui.init_cmds import build_initializer_commands
 
 def parse_guis(xml_texts: str, save_preprocessed_to_dir: Path):
 
@@ -22,16 +22,15 @@ def parse_guis(xml_texts: str, save_preprocessed_to_dir: Path):
             file.write(xml_text_preprocessed)
 
     # convert XMLs to dicts
-    converted_dicts = {}
+    gui_dicts = {}
     for name, xml_text in preprocessed_texts.items():
         # convert XML to dict
-        converted_dicts[name] = xml_to_dict(xml_text)
+        gui_dicts[name] = xml_to_dict(xml_text)
 
-    # postprocessing dicts
-    postprocessed_dicts = {}
-    for name, converted_dict in converted_dicts.items():
+    # build initializer commands
+    for name, gui_data in gui_dicts.items():
         # convert XML to dict
-        postprocessed_dicts[name] = postprocess_dict(converted_dict)
+        gui_data["init_cmds"] = build_initializer_commands(gui_data)
 
-    return postprocessed_dicts
+    return gui_dicts
 

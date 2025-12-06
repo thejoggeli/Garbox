@@ -1,14 +1,11 @@
 from common.util import print_json
-from loader.gui.postprocess_fns import eval_initializer
-from loader.gui.postprocess_attrs import process_attrs
-
-def postprocess_dict(gui_data):
-    gui_data["initializer_commands"] = build_initializer_commands(gui_data)
-    return gui_data
+from loader.gui.init_cmds_fns import eval_initializer
+from loader.gui.init_cmds_attrs import process_attrs
 
 
 def build_initializer_commands(gui_data):
 
+    fn_calls = []
     for obj_name, obj_data in gui_data["objects"].items():
 
         is_component = obj_data["is_component"]
@@ -18,25 +15,34 @@ def build_initializer_commands(gui_data):
 
         # handle component object
         if is_component:
-            build_from_component(obj_data)
+            result = build_from_component(obj_data)
 
         # handle regular lvgl object
         else:
-            build_from_object(obj_data)
+            result = build_from_object(obj_data)
 
+        fn_calls.extend(result)
+
+    # assemble calls
+    assembled_calls = []
+    for fn_call in fn_calls:
+        instance = fn_call["instance"]
+        for call_str in fn_call["calls"]:
+            assembled_call = f"{instance}.{call_str}; // {fn_call['comment']};"
+            # print(assembled_call)
+            assembled_calls.append(assembled_call)
+
+    return assembled_calls
 
 def build_from_object(obj_data):
-    obj_type = obj_data["type"]
-    print(f"{obj_type}")
-    build_function_calls(obj_data["name"], obj_data["type"], obj_data["attrs"])
+    fn_calls = build_function_calls(obj_data["name"], obj_data["type"], obj_data["attrs"])
+    return fn_calls
 
 
 def build_from_component(obj_data):
 
     obj_type = obj_data["type"]
     comp_def = obj_data["component"]
-
-    print(f"{obj_type}")
 
     body_attrs      = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "attr"}
     param_attrs     = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "p-attr"}
@@ -120,11 +126,6 @@ def build_function_calls(instance_name: str, obj_type: str, attrs: dict):
                 "calls": [f"<{attr_name}>"],
                 "comment": f"function def not found",
             })
-
-    for fn_call in fn_calls:
-        instance = fn_call["instance"]
-        for call_str in fn_call["calls"]:
-            print(f"- {instance}.{call_str}; // {fn_call['comment']}")
     
     return fn_calls
 
