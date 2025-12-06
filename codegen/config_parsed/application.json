@@ -153,8 +153,8 @@
       "name": "OutputTick",
       "behaviours": {},
       "controllers": {
-        "FanController": "<ref:130072544846656>",
-        "HeatpadController": "<ref:130072544853696>"
+        "FanController": "<ref:133789146298752>",
+        "HeatpadController": "<ref:133789146299456>"
       },
       "screens": {},
       "order": 3

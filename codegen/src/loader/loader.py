@@ -5,8 +5,8 @@ from pathlib import Path
 from loader.parse_application import parse_application
 from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
-from loader.parse_guis import parse_guis
-from common.util import decycle
+from loader.gui.parse_guis import parse_guis
+from common.util import decycle, print_section
 
 class Loader:
 
@@ -43,13 +43,13 @@ class Loader:
             config_text = load_text(path)
             config_name = path.stem
             gui_configs_text[config_name] = config_text 
-            
-
+        
+        print_section("parsing gui xml files")    
         self.config["guis"] = parse_guis(gui_configs_text, self.config_dir/"../config_parsed/gui")
 
 
     def save_json(self, path: Path, config):
-        print(f"saving: {path}")
+        print(f"{path}")
         os.makedirs(path.parent, exist_ok=True)
         with open(path, "w") as file:
             json.dump(decycle(config), file, indent=2)

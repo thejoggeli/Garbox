@@ -45,7 +45,7 @@ void DebugScreen::onInit(){
     initLabel(mHeatpadSenseLabel,       startXPx, currentYPx, "Heatpad");currentYPx += deltaYPx;
     initLabel(mHeatpadDutyLabel,        startXPx, currentYPx, "Duty%:"); currentYPx += deltaYPx;
 
-    mProgressBox.setSize(48, 8);
+    mProgressBox.setRawSize(48, 8);
     mProgressBox.setBgColor(lv_color_hex(0xFFFFFF));
     mProgressBox.setBgOpacity(LV_OPA_COVER);
 

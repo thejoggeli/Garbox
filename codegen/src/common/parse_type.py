@@ -13,8 +13,8 @@ INT_TYPES = {
     "unsigned long long",
 }
 
-TRUE_SET  = {"1", "yes" "true",  "on",  "enable",  "enabled"}
-FALSE_SET = {"0", "no", "false", "off", "disable", "disabled", "none", "null", "undefined"}
+TRUE_SET  = {"1", "yes", "true",  "on",  "enable",  "enabled"}
+FALSE_SET = {"0", "no",  "false", "off", "disable", "disabled", "none", "null", "undefined"}
 
 
 def preprocess_type(type_name: str):
@@ -97,8 +97,6 @@ def parse_int_for_type(value, type_name):
 
     if isinstance(value, str):
         value = value.replace("'", "")
-
-    print("VALUE", value)
 
     # Try converting to int
     try:

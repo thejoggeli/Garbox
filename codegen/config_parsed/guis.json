@@ -23,12 +23,13 @@
                 "type": "v-attr",
                 "value": "label"
               },
-              "grow": {
+              "flex-grow": {
                 "type": "normal",
                 "value": "1"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           },
           "left": {
             "type": "image",
@@ -38,12 +39,13 @@
                 "type": "normal",
                 "value": "icons/arrow_left.png"
               },
-              "visible": {
+              "hidden": {
                 "type": "normal",
-                "value": "false"
+                "value": "true"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           },
           "value": {
             "type": "label",
@@ -62,7 +64,8 @@
                 "value": "right"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           },
           "right": {
             "type": "image",
@@ -72,12 +75,13 @@
                 "type": "normal",
                 "value": "icons/arrow_right.png"
               },
-              "visible": {
+              "hidden": {
                 "type": "normal",
-                "value": "false"
+                "value": "true"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           }
         }
       },
@@ -98,8 +102,8 @@
             "default": "unit",
             "required": false
           },
-          "showUnit": {
-            "name": "showUnit",
+          "hideUnit": {
+            "name": "hideUnit",
             "default": "false",
             "required": false
           }
@@ -122,7 +126,8 @@
                 "value": "16"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           },
           "value": {
             "type": "label",
@@ -133,7 +138,8 @@
                 "value": "value"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           },
           "unit": {
             "type": "label",
@@ -143,12 +149,13 @@
                 "type": "v-attr",
                 "value": "unit"
               },
-              "visible": {
+              "hidden": {
                 "type": "v-attr",
-                "value": "showUnit"
+                "value": "hideUnit"
               }
             },
-            "parent_name": "body"
+            "parent_name": "body",
+            "is_component": false
           }
         }
       }
@@ -160,15 +167,11 @@
         "attrs": {
           "layout": {
             "type": "normal",
-            "value": "grid"
+            "value": "flex"
           },
-          "grid-columns": {
+          "flex-flow": {
             "type": "normal",
-            "value": "1fr 120px 120px"
-          },
-          "grid-rows": {
-            "type": "normal",
-            "value": "1fr"
+            "value": "col"
           },
           "width": {
             "type": "normal",
@@ -179,30 +182,45 @@
             "value": "100%"
           }
         },
-        "parent_name": "root"
+        "parent_name": "root",
+        "is_component": false
       },
       "leftPane": {
         "type": "container",
         "name": "leftPane",
         "attrs": {
-          "grid-column": {
+          "pad": {
+            "type": "normal",
+            "value": [
+              "8",
+              "8",
+              "8",
+              "8"
+            ]
+          },
+          "flex-grow": {
             "type": "normal",
             "value": "1"
           },
           "layout": {
             "type": "normal",
-            "value": "flex-col"
+            "value": "flex"
           },
-          "scroll-y": {
+          "flex-flow": {
+            "type": "normal",
+            "value": "col"
+          },
+          "scrollable": {
             "type": "normal",
             "value": "true"
           },
-          "padding": {
+          "scroll-dir": {
             "type": "normal",
-            "value": "8"
+            "value": "x"
           }
         },
-        "parent_name": "root"
+        "parent_name": "root",
+        "is_component": false
       },
       "settingPower": {
         "type": "SettingRow",
@@ -217,7 +235,8 @@
             "value": "On"
           }
         },
-        "parent_name": "leftPane"
+        "parent_name": "leftPane",
+        "is_component": true
       },
       "settingTarget": {
         "type": "SettingRow",
@@ -232,7 +251,8 @@
             "value": "30.0 \u00b0C"
           }
         },
-        "parent_name": "leftPane"
+        "parent_name": "leftPane",
+        "is_component": true
       },
       "settingFan": {
         "type": "SettingRow",
@@ -247,7 +267,8 @@
             "value": "Auto"
           }
         },
-        "parent_name": "leftPane"
+        "parent_name": "leftPane",
+        "is_component": true
       },
       "settingHeater": {
         "type": "SettingRow",
@@ -262,7 +283,8 @@
             "value": "Auto"
           }
         },
-        "parent_name": "leftPane"
+        "parent_name": "leftPane",
+        "is_component": true
       },
       "settingCalibrate": {
         "type": "SettingRow",
@@ -273,7 +295,8 @@
             "value": "Calibrate"
           }
         },
-        "parent_name": "leftPane"
+        "parent_name": "leftPane",
+        "is_component": true
       },
       "settingAdvanced": {
         "type": "SettingRow",
@@ -284,30 +307,37 @@
             "value": "Advanced"
           }
         },
-        "parent_name": "leftPane"
+        "parent_name": "leftPane",
+        "is_component": true
       },
       "middlePane": {
         "type": "container",
         "name": "middlePane",
         "attrs": {
-          "grid-column": {
+          "pad": {
             "type": "normal",
-            "value": "2"
-          },
-          "layout": {
-            "type": "normal",
-            "value": "flex-col"
+            "value": [
+              "8",
+              "8",
+              "8",
+              "8"
+            ]
           },
           "width": {
             "type": "normal",
-            "value": "120px"
+            "value": "100px"
           },
-          "padding": {
+          "layout": {
             "type": "normal",
-            "value": "8"
+            "value": "flex"
+          },
+          "flex-flow": {
+            "type": "normal",
+            "value": "col"
           }
         },
-        "parent_name": "root"
+        "parent_name": "root",
+        "is_component": false
       },
       "_namelessLabel_0": {
         "type": "label",
@@ -317,16 +347,13 @@
             "type": "normal",
             "value": "Status"
           },
-          "bold": {
-            "type": "normal",
-            "value": "true"
-          },
           "height": {
             "type": "normal",
             "value": "30"
           }
         },
-        "parent_name": "middlePane"
+        "parent_name": "middlePane",
+        "is_component": false
       },
       "_namelessContainer_0": {
         "type": "container",
@@ -334,14 +361,19 @@
         "attrs": {
           "layout": {
             "type": "normal",
-            "value": "flex-col"
+            "value": "flex"
           },
-          "grow": {
+          "flex-flow": {
+            "type": "normal",
+            "value": "col"
+          },
+          "flex-grow": {
             "type": "normal",
             "value": "1"
           }
         },
-        "parent_name": "middlePane"
+        "parent_name": "middlePane",
+        "is_component": false
       },
       "_namelessInfoRow_0": {
         "type": "InfoRow",
@@ -360,7 +392,8 @@
             "value": "Active"
           }
         },
-        "parent_name": "_namelessContainer_0"
+        "parent_name": "_namelessContainer_0",
+        "is_component": true
       },
       "_namelessInfoRow_1": {
         "type": "InfoRow",
@@ -381,13 +414,10 @@
           "unit": {
             "type": "p-attr",
             "value": "%"
-          },
-          "showUnit": {
-            "type": "p-attr",
-            "value": "true"
           }
         },
-        "parent_name": "_namelessContainer_0"
+        "parent_name": "_namelessContainer_0",
+        "is_component": true
       },
       "_namelessInfoRow_2": {
         "type": "InfoRow",
@@ -408,36 +438,39 @@
           "unit": {
             "type": "p-attr",
             "value": "%"
-          },
-          "showUnit": {
-            "type": "p-attr",
-            "value": "true"
           }
         },
-        "parent_name": "_namelessContainer_0"
+        "parent_name": "_namelessContainer_0",
+        "is_component": true
       },
       "rightPane": {
         "type": "container",
         "name": "rightPane",
         "attrs": {
-          "grid-column": {
+          "pad": {
             "type": "normal",
-            "value": "3"
-          },
-          "layout": {
-            "type": "normal",
-            "value": "flex-col"
+            "value": [
+              "8",
+              "8",
+              "8",
+              "8"
+            ]
           },
           "width": {
             "type": "normal",
-            "value": "120px"
+            "value": "100px"
           },
-          "padding": {
+          "layout": {
             "type": "normal",
-            "value": "8"
+            "value": "flex"
+          },
+          "flex-flow": {
+            "type": "normal",
+            "value": "col"
           }
         },
-        "parent_name": "root"
+        "parent_name": "root",
+        "is_component": false
       },
       "_namelessLabel_1": {
         "type": "label",
@@ -447,16 +480,13 @@
             "type": "normal",
             "value": "Sensors"
           },
-          "bold": {
-            "type": "normal",
-            "value": "true"
-          },
           "height": {
             "type": "normal",
             "value": "30"
           }
         },
-        "parent_name": "rightPane"
+        "parent_name": "rightPane",
+        "is_component": false
       },
       "_namelessContainer_1": {
         "type": "container",
@@ -464,14 +494,19 @@
         "attrs": {
           "layout": {
             "type": "normal",
-            "value": "flex-col"
+            "value": "flex"
           },
-          "grow": {
+          "flex-flow": {
+            "type": "normal",
+            "value": "col"
+          },
+          "flex-grow": {
             "type": "normal",
             "value": "1"
           }
         },
-        "parent_name": "rightPane"
+        "parent_name": "rightPane",
+        "is_component": false
       },
       "fanRpm": {
         "type": "InfoRow",
@@ -488,13 +523,10 @@
           "unit": {
             "type": "p-attr",
             "value": "RPM"
-          },
-          "showUnit": {
-            "type": "p-attr",
-            "value": "true"
           }
         },
-        "parent_name": "_namelessContainer_1"
+        "parent_name": "_namelessContainer_1",
+        "is_component": true
       },
       "temperature": {
         "type": "InfoRow",
@@ -511,13 +543,10 @@
           "unit": {
             "type": "p-attr",
             "value": "\u00b0C"
-          },
-          "showUnit": {
-            "type": "p-attr",
-            "value": "true"
           }
         },
-        "parent_name": "_namelessContainer_1"
+        "parent_name": "_namelessContainer_1",
+        "is_component": true
       },
       "humidity": {
         "type": "InfoRow",
@@ -534,13 +563,10 @@
           "unit": {
             "type": "p-attr",
             "value": "%"
-          },
-          "showUnit": {
-            "type": "p-attr",
-            "value": "true"
           }
         },
-        "parent_name": "_namelessContainer_1"
+        "parent_name": "_namelessContainer_1",
+        "is_component": true
       },
       "power": {
         "type": "InfoRow",
@@ -557,14 +583,12 @@
           "unit": {
             "type": "p-attr",
             "value": "W"
-          },
-          "showUnit": {
-            "type": "p-attr",
-            "value": "true"
           }
         },
-        "parent_name": "_namelessContainer_1"
+        "parent_name": "_namelessContainer_1",
+        "is_component": true
       }
-    }
+    },
+    "initializer_commands": null
   }
 }

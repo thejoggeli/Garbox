@@ -1,5 +1,24 @@
 import json
 
+def print_section(text: str, total_length: int = 60):
+    core = f" {text.strip()} "
+    core_len = len(core)
+
+    if core_len > total_length:
+        return core  # or raise an error
+
+    pad = total_length - core_len
+    left = pad // 2
+    right = pad - left
+
+    print("\n" + "=" * left + core + "=" * right + "\n")
+
+
+def print_sep(char:str = "=", total_length: int = 60):
+    print("")
+    print(char*total_length)
+    print("")
+
 def decycle(obj, seen=None):
     if seen is None:
         seen = set()
@@ -40,7 +59,7 @@ def extract_dict(config: dict, keys: str | list[str]):
     return ex_config
 
 
-def nested_get(d, *keys, default=None):
+def nested_get(d, keys, default=None):
     cur = d
     for k in keys:
         if isinstance(cur, dict) and k in cur:

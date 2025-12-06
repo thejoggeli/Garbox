@@ -21,7 +21,7 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
 
     // init lvgl container
     mContainer.setHidden(true);
-    mContainer.setSize(mDisplayWidth, mDisplayHeight);
+    mContainer.setRawSize(mDisplayWidth, mDisplayHeight);
     mContainer.setBorder(0, lv_color_hex(0x000000));
     mContainer.setRadius(0);
     mContainer.setPad(0, 0, 0, 0);

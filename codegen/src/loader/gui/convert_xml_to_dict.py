@@ -1,8 +1,9 @@
-from common.util import print_json
 from common.str_filters import to_camel_case
 from lxml import etree
 from pathlib import Path
-from loader.preprocess_guis import preprocess_xml_text
+from loader.gui.preprocess_xmls import preprocess_xml_text
+from lxml import etree
+
 
 class Counters:
 
@@ -15,29 +16,11 @@ class Counters:
         else:
             self.counters[name] += 1
         return self.counters[name]
+    
 
-def parse_guis(xml_texts: str, save_preprocessed_to_dir: Path):
+def xml_to_dict(xml_text):
 
-    guis_config_out = {}
-
-    for xml_name, xml_text in xml_texts.items():
-
-        # preprocess XML
-        xml_text_preprocessed = preprocess_xml_text(xml_text)
-
-        # save preprocessed XML for inspection
-        save_preprocessed_to_dir.mkdir(parents=True, exist_ok=True)
-        out_path = save_preprocessed_to_dir / f"{xml_name}.xml"
-        with open(out_path, "w") as file:
-            file.write(xml_text_preprocessed)
-
-        # parse XML
-        gui_node = etree.fromstring(xml_text_preprocessed)
-        guis_config_out[xml_name] = parse_gui(gui_node)
-
-    return guis_config_out
-
-def parse_gui(gui_node):
+    gui_node = etree.fromstring(xml_text)
 
     components_node = gui_node.find("components")
     components = parse_components(components_node)
@@ -47,7 +30,7 @@ def parse_gui(gui_node):
         raise ValueError("required node not found: gui > root")
     
     root_node.set("name", "root")
-    root_objects = parse_object_tree(root_node, is_component=False)
+    root_objects = parse_object_tree(root_node, components=components)
 
     return {
         "components": components,
@@ -63,25 +46,18 @@ def parse_components(comps_node):
         return components
 
     for comp_node in comps_node.findall("*"):
-
-        print(comp_node.tag, dict(comp_node.attrib))
         components[comp_node.tag] = parse_component(comp_node)
 
     return components
 
 
 def parse_component(comp_node):
-    name = comp_node.get("name")
-    print("Parsing component:", name)
 
     body_node = comp_node.find("body")
     if body_node is None:
         raise ValueError("body element is missing in component")
     
-    print(dict(comp_node.attrib))
-    
     params = {}
-    body_attrs = {}
 
     # scan param attributes ($attr => o-attr / r-attr)
     for param_name, param_value in dict(comp_node.attrib).items():
@@ -130,7 +106,7 @@ def parse_component(comp_node):
         }
 
     body_node.set("name", "body")
-    objects = parse_object_tree(body_node, is_component=True)
+    objects = parse_object_tree(body_node)
 
     return {
         "params": params,
@@ -138,7 +114,7 @@ def parse_component(comp_node):
     }
 
 
-def parse_object_tree(root_node, is_component):
+def parse_object_tree(root_node, components={}):
 
     counters = Counters()
     objects = {}
@@ -180,6 +156,7 @@ def parse_object_tree(root_node, is_component):
             "name": name,
             "attrs": {},
             "parent_name": parent_name,
+            "is_component": node.tag in components
         }
 
         # remove name from attrs
@@ -214,3 +191,5 @@ def parse_object_tree(root_node, is_component):
 
 
     return objects
+
+
