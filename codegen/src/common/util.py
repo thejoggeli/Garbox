@@ -29,7 +29,7 @@ def decycle(obj, seen=None):
 
     oid = id(obj)
     if oid in seen:
-        return f"<ref:{oid}>"
+        return f"<ref>"
     seen.add(oid)
 
     if isinstance(obj, dict):

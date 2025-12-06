@@ -162,75 +162,75 @@
       },
       "events": {
         "FanStatus": {
-          "fanState": "<ref:131439823916992>",
-          "fanTargetSpeed": "<ref:131439823916480>"
+          "fanState": "<ref>",
+          "fanTargetSpeed": "<ref>"
         },
         "FanSample": {
-          "fanMeasuredRpm": "<ref:131439823914304>"
+          "fanMeasuredRpm": "<ref>"
         },
         "HeatpadStatus": {
-          "heatpadState": "<ref:131439823917952>",
-          "heatpadCurrentDuty": "<ref:131439823922112>"
+          "heatpadState": "<ref>",
+          "heatpadCurrentDuty": "<ref>"
         },
         "HeatpadSample": {
-          "heatpadMeasuredVoltage": "<ref:131439823921216>",
-          "heatpadMeasuredCurrent": "<ref:131439823916416>"
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
         },
         "DisplayStatus": {
-          "displayBrightness": "<ref:131439824031680>"
+          "displayBrightness": "<ref>"
         },
         "TemperatureStatus": {
-          "shtDriverEnabled": "<ref:131439823985536>",
-          "shtPowerEnabled": "<ref:131439823991424>",
-          "shtResetting": "<ref:131439823992320>",
-          "shtHasSample": "<ref:131439823986304>"
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>",
+          "shtHasSample": "<ref>"
         },
         "TemperatureSample": {
-          "measuredTemperature": "<ref:131439823994048>",
-          "measuredHumidity": "<ref:131439823987712>"
+          "measuredTemperature": "<ref>",
+          "measuredHumidity": "<ref>"
         },
         "FermentationStatus": {
-          "targetTemperature": "<ref:131439823985984>",
-          "engineState": "<ref:131439823993408>"
+          "targetTemperature": "<ref>",
+          "engineState": "<ref>"
         }
       },
       "manual": {},
       "groups": {
         "FanStatus": {
-          "fanState": "<ref:131439823916992>",
-          "fanMeasuredRpm": "<ref:131439823914304>"
+          "fanState": "<ref>",
+          "fanMeasuredRpm": "<ref>"
         },
         "FanTargetSpeed": {
-          "fanTargetSpeed": "<ref:131439823916480>"
+          "fanTargetSpeed": "<ref>"
         },
         "HeatpadStatus": {
-          "heatpadState": "<ref:131439823917952>",
-          "heatpadCurrentDuty": "<ref:131439823922112>"
+          "heatpadState": "<ref>",
+          "heatpadCurrentDuty": "<ref>"
         },
         "HeatpadMeasure": {
-          "heatpadMeasuredVoltage": "<ref:131439823921216>",
-          "heatpadMeasuredCurrent": "<ref:131439823916416>"
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
         },
         "DisplayBrightness": {
-          "displayBrightness": "<ref:131439824031680>"
+          "displayBrightness": "<ref>"
         },
         "SensorStatus": {
-          "shtDriverEnabled": "<ref:131439823985536>",
-          "shtPowerEnabled": "<ref:131439823991424>",
-          "shtResetting": "<ref:131439823992320>",
-          "shtHasSample": "<ref:131439823986304>"
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>",
+          "shtHasSample": "<ref>"
         },
         "MeasuredTemperature": {
-          "measuredTemperature": "<ref:131439823994048>"
+          "measuredTemperature": "<ref>"
         },
         "MeasuredHumidity": {
-          "measuredHumidity": "<ref:131439823987712>"
+          "measuredHumidity": "<ref>"
         },
         "TargetTemperature": {
-          "targetTemperature": "<ref:131439823985984>"
+          "targetTemperature": "<ref>"
         },
         "EngineState": {
-          "engineState": "<ref:131439823993408>"
+          "engineState": "<ref>"
         }
       },
       "debounce": {}
@@ -461,100 +461,100 @@
       },
       "events": {
         "FanStatus": {
-          "fanState": "<ref:131439823982336>",
-          "fanTargetSpeed": "<ref:131439823985856>"
+          "fanState": "<ref>",
+          "fanTargetSpeed": "<ref>"
         },
         "FanSample": {
-          "fanMeasuredRpm": "<ref:131439823989312>"
+          "fanMeasuredRpm": "<ref>"
         },
         "HeatpadStatus": {
-          "heatpadState": "<ref:131439823992128>",
-          "heatpadCurrentDuty": "<ref:131439823985728>",
-          "heatpadCurrentPeriod": "<ref:131439823921408>",
-          "heatpadNextDuty": "<ref:131439823923520>",
-          "heatpadNextPeriod": "<ref:131439823925632>"
+          "heatpadState": "<ref>",
+          "heatpadCurrentDuty": "<ref>",
+          "heatpadCurrentPeriod": "<ref>",
+          "heatpadNextDuty": "<ref>",
+          "heatpadNextPeriod": "<ref>"
         },
         "HeatpadSample": {
-          "heatpadPwmProgress": "<ref:131439823927296>",
-          "heatpadMeasuredVoltage": "<ref:131439823929152>",
-          "heatpadMeasuredCurrent": "<ref:131439823926144>"
+          "heatpadPwmProgress": "<ref>",
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
         },
         "DisplayStatus": {
-          "displayBrightness": "<ref:131439823922176>",
-          "displaySkipped": "<ref:131439823913856>"
+          "displayBrightness": "<ref>",
+          "displaySkipped": "<ref>"
         },
         "TemperatureStatus": {
-          "shtDriverEnabled": "<ref:131439823919552>",
-          "shtPowerEnabled": "<ref:131439823921792>",
-          "shtResetting": "<ref:131439823926976>"
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>"
         },
         "TemperatureSample": {
-          "sensorTemperatureCelcius": "<ref:131439823921664>",
-          "sensorHumidityRelative": "<ref:131439823918976>"
+          "sensorTemperatureCelcius": "<ref>",
+          "sensorHumidityRelative": "<ref>"
         },
         "ActiveBehaviourChanged": {
-          "behaviour": "<ref:131439823914176>"
+          "behaviour": "<ref>"
         },
         "FermentationStatus": {
-          "engineState": "<ref:131439823914560>",
-          "engineTargetTemperature": "<ref:131439823919168>",
-          "engineMeasuredTemperature": "<ref:131439823920768>",
-          "engineMeasuredHumidity": "<ref:131439823916928>"
+          "engineState": "<ref>",
+          "engineTargetTemperature": "<ref>",
+          "engineMeasuredTemperature": "<ref>",
+          "engineMeasuredHumidity": "<ref>"
         }
       },
       "manual": {
-        "eventCount": "<ref:131439823924864>",
-        "heapSpace": "<ref:131439823928640>"
+        "eventCount": "<ref>",
+        "heapSpace": "<ref>"
       },
       "groups": {
         "FanState": {
-          "fanState": "<ref:131439823982336>",
-          "fanTargetSpeed": "<ref:131439823985856>"
+          "fanState": "<ref>",
+          "fanTargetSpeed": "<ref>"
         },
         "FanMeasuredRpm": {
-          "fanMeasuredRpm": "<ref:131439823989312>"
+          "fanMeasuredRpm": "<ref>"
         },
         "HeatpadState": {
-          "heatpadState": "<ref:131439823992128>"
+          "heatpadState": "<ref>"
         },
         "HeatpadDuty": {
-          "heatpadCurrentDuty": "<ref:131439823985728>",
-          "heatpadCurrentPeriod": "<ref:131439823921408>",
-          "heatpadNextDuty": "<ref:131439823923520>",
-          "heatpadNextPeriod": "<ref:131439823925632>"
+          "heatpadCurrentDuty": "<ref>",
+          "heatpadCurrentPeriod": "<ref>",
+          "heatpadNextDuty": "<ref>",
+          "heatpadNextPeriod": "<ref>"
         },
         "BoxPosition": {
-          "heatpadPwmProgress": "<ref:131439823927296>"
+          "heatpadPwmProgress": "<ref>"
         },
         "HeatpadSense": {
-          "heatpadMeasuredVoltage": "<ref:131439823929152>",
-          "heatpadMeasuredCurrent": "<ref:131439823926144>"
+          "heatpadMeasuredVoltage": "<ref>",
+          "heatpadMeasuredCurrent": "<ref>"
         },
         "DisplayStatus": {
-          "displayBrightness": "<ref:131439823922176>",
-          "displaySkipped": "<ref:131439823913856>"
+          "displayBrightness": "<ref>",
+          "displaySkipped": "<ref>"
         },
         "TemperatureState": {
-          "shtDriverEnabled": "<ref:131439823919552>",
-          "shtPowerEnabled": "<ref:131439823921792>",
-          "shtResetting": "<ref:131439823926976>"
+          "shtDriverEnabled": "<ref>",
+          "shtPowerEnabled": "<ref>",
+          "shtResetting": "<ref>"
         },
         "TemperatureSample": {
-          "sensorTemperatureCelcius": "<ref:131439823921664>",
-          "sensorHumidityRelative": "<ref:131439823918976>"
+          "sensorTemperatureCelcius": "<ref>",
+          "sensorHumidityRelative": "<ref>"
         },
         "AppInfo": {
-          "eventCount": "<ref:131439823924864>",
-          "behaviour": "<ref:131439823914176>"
+          "eventCount": "<ref>",
+          "behaviour": "<ref>"
         },
         "FermentationStatus": {
-          "engineState": "<ref:131439823914560>",
-          "engineTargetTemperature": "<ref:131439823919168>",
-          "engineMeasuredTemperature": "<ref:131439823920768>",
-          "engineMeasuredHumidity": "<ref:131439823916928>"
+          "engineState": "<ref>",
+          "engineTargetTemperature": "<ref>",
+          "engineMeasuredTemperature": "<ref>",
+          "engineMeasuredHumidity": "<ref>"
         },
         "HeapSpace": {
-          "heapSpace": "<ref:131439823928640>"
+          "heapSpace": "<ref>"
         }
       },
       "debounce": {}

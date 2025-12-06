@@ -258,7 +258,7 @@
         },
         "parent_name": "leftPane",
         "is_component": true,
-        "component": "<ref:131439824035136>"
+        "component": "<ref>"
       },
       "settingTarget": {
         "type": "SettingRow",
@@ -277,7 +277,7 @@
         },
         "parent_name": "leftPane",
         "is_component": true,
-        "component": "<ref:131439824035136>"
+        "component": "<ref>"
       },
       "settingFan": {
         "type": "SettingRow",
@@ -296,7 +296,7 @@
         },
         "parent_name": "leftPane",
         "is_component": true,
-        "component": "<ref:131439824035136>"
+        "component": "<ref>"
       },
       "settingHeater": {
         "type": "SettingRow",
@@ -315,7 +315,7 @@
         },
         "parent_name": "leftPane",
         "is_component": true,
-        "component": "<ref:131439824035136>"
+        "component": "<ref>"
       },
       "settingCalibrate": {
         "type": "SettingRow",
@@ -334,7 +334,7 @@
         },
         "parent_name": "leftPane",
         "is_component": true,
-        "component": "<ref:131439824035136>"
+        "component": "<ref>"
       },
       "settingAdvanced": {
         "type": "SettingRow",
@@ -353,7 +353,7 @@
         },
         "parent_name": "leftPane",
         "is_component": true,
-        "component": "<ref:131439824035136>"
+        "component": "<ref>"
       },
       "middlePane": {
         "type": "container",
@@ -459,7 +459,7 @@
         },
         "parent_name": "_namelessContainer_0",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       },
       "_namelessInfoRow_1": {
         "type": "InfoRow",
@@ -488,7 +488,7 @@
         },
         "parent_name": "_namelessContainer_0",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       },
       "_namelessInfoRow_2": {
         "type": "InfoRow",
@@ -517,7 +517,7 @@
         },
         "parent_name": "_namelessContainer_0",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       },
       "rightPane": {
         "type": "container",
@@ -623,7 +623,7 @@
         },
         "parent_name": "_namelessContainer_1",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       },
       "temperature": {
         "type": "InfoRow",
@@ -647,7 +647,7 @@
         },
         "parent_name": "_namelessContainer_1",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       },
       "humidity": {
         "type": "InfoRow",
@@ -671,7 +671,7 @@
         },
         "parent_name": "_namelessContainer_1",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       },
       "power": {
         "type": "InfoRow",
@@ -695,7 +695,7 @@
         },
         "parent_name": "_namelessContainer_1",
         "is_component": true,
-        "component": "<ref:131439824034368>"
+        "component": "<ref>"
       }
     },
     "initializer_commands": null
