@@ -3,6 +3,7 @@ from common.item import Item, generate_items
 from common.str_filters import upper_first
 from loader.gui.image_load import load_lvgl_image
 from loader.loader import Loader
+from sortedcontainers import SortedSet
 
 def generate_guis(ctx: Context, loader: Loader):
 
@@ -25,12 +26,26 @@ def get_class_name(obj_type):
     return "Lv" + upper_first(obj_type)
 
 
-def _type_to_class_name_map(gui_data):
+def _extract_used_object_types(gui_data):
 
-    map = {}
+    obj_types = SortedSet()
+
+    for comp_data in gui_data["components"].values():
+        for obj_data in comp_data["objects"].values():
+            obj_types.add(obj_data["type"])
 
     for obj_data in gui_data["objects_flat"].values():
-        obj_type = obj_data["type"]
+        obj_types.add(obj_data["type"])
+
+    return list(obj_types)
+
+
+def _type_to_class_name_map(gui_data):
+
+    obj_types = _extract_used_object_types(gui_data)
+    map = {}
+
+    for obj_type in obj_types:
 
         if obj_type not in map:
             map[obj_type] = {
@@ -40,15 +55,13 @@ def _type_to_class_name_map(gui_data):
 
     return map
 
-def _extract_used_object_types(gui_data):
+def _extract_include_types(gui_data):
 
+    obj_types = _extract_used_object_types(gui_data)
     map = {}
 
-    for obj_data in gui_data["objects_flat"].values():
-        obj_type = obj_data["type"]
-
+    for obj_type in obj_types:
         class_name = get_class_name(obj_type)
-
         if class_name not in map:
             map[class_name] = {
                 "type": obj_type,
@@ -56,6 +69,8 @@ def _extract_used_object_types(gui_data):
             }
 
     return map
+
+
 
 def _generate_classes(ctx: Context, loader: Loader):
 
@@ -66,7 +81,7 @@ def _generate_classes(ctx: Context, loader: Loader):
         config = {
             "name": gui_name,
             "gui": gui_data,
-            "used_object_types": _extract_used_object_types(gui_data),
+            "include_types": _extract_include_types(gui_data),
             "type_to_class_name": _type_to_class_name_map(gui_data),
         }
 

@@ -10,6 +10,16 @@ namespace Garbox {
 }
 
 void {{class_name}}::init(){
+    
+    // initialize root
+    mObjects.root.setHidden(true);
+    mObjects.root.setBorder(0, lv_color_hex(0x000000));
+    mObjects.root.setRadius(0);
+    mObjects.root.setPad(0, 0, 0, 0);
+    mObjects.root.setBgOpacity(LV_OPA_COVER);
+    mObjects.root.setScrollable(false);
+
+    // generated from xml
 {% for cmd in gui.init_cmds %}
 {% for call in cmd.calls %}
     {% set call_str = "mObjects." ~ cmd.instance ~ "." ~ call ~ ";" %}
@@ -19,7 +29,12 @@ void {{class_name}}::init(){
 }
 
 void {{class_name}}::show(){
-    lv_screen_load(mObjects.root.raw());
+    mObjects.root.setHidden(false);
+    mObjects.root.setScreen();
+}
+
+void {{class_name}}::hide(){
+    mObjects.root.setHidden(true);
 }
 
 {{class_name}}::Objects& {{class_name}}::objects(){
@@ -33,7 +48,7 @@ void {{class_name}}::show(){
 {% for comp_name, comp in gui.components.items() %}
 {{class_name}}::{{ comp_name }}::{{ comp_name }}(LvObject& parent):
 {% for obj_name, obj in comp.objects.items() %}
-    {% set parent_name = "nullptr" if not obj.parent_name else obj.parent_name %}
+    {% set parent_name = "parent" if not obj.parent_name else obj.parent_name %}
     {{ obj_name }}({{ parent_name }})
     {%- if loop.last %}{}{%else%},{%endif%}
 
@@ -47,7 +62,7 @@ void {{class_name}}::show(){
 
 {{class_name}}::Objects::Objects():
 {% for obj_name, obj in gui.objects_raw.items() %}
-    {% set parent_name = "nullptr" if not obj.parent_name else obj.parent_name %}
+    {% set parent_name = "" if not obj.parent_name else obj.parent_name %}
     {{ obj_name }}({{ parent_name }})
     {%- if loop.last %}{}{%else%},{%endif%}
 

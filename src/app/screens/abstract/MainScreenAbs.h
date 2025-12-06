@@ -2,8 +2,8 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+#include "app/guis/MainScreenGui.h"
 #include "core/application/screen/ScreenAbs.h"
-#include "core/lvgl/objects/LvObject.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
@@ -45,15 +45,19 @@ private:
     using ScreenAbs::makeEvent;
     using ScreenAbs::publishEvent;
 
-/********************/
-/*** LVGL Section ***/
-/********************/
+/*******************/
+/*** GUI Section ***/
+/*******************/
+
+private:
+
+    MainScreenGui mGui;
 
 protected:
 
-    LvObject mContainer;
-    const uint32_t mDisplayWidth = 0;
-    const uint32_t mDisplayHeight = 0;
+    MainScreenGui::Objects& gui(); 
+    const uint32_t mScreenWidth = 0;
+    const uint32_t mScreenHeight = 0;
 
     void setBackgroundColor(uint32_t color);
 
@@ -149,10 +153,15 @@ public:
 
     };
 
+private:
+
     // model instance
     Model mModel;
-    Model& getModel();
-    const Model& getModel() const;
+
+public:
+
+    Model& model();
+    const Model& model() const;
 
 protected: 
 

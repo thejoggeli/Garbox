@@ -31,18 +31,6 @@ public:
 
 private:
 
-    LvImage mHeatImage;
-    LvImage mFanImage;
-    LvImage mTemperatureImage;
-    LvImage mHumidityImage;
-    LvImage mPowerImage;
-
-    LvLabel mHeatLabel;
-    LvLabel mFanLabel;
-    LvLabel mTemperatureLabel;
-    LvLabel mHumidityLabel;
-    LvLabel mPowerLabel;
-
     bool isSensorOk();
     const char* resovleSensorText();
 

@@ -1,17 +1,17 @@
 {% include "_common/header.j2" %}
 #pragma once
 
-{% for type_data in used_object_types.values() %}
+{% for type_data in include_types.values() %}
 #include "core/lvgl/objects/{{ type_data.class_name }}.h"
 {% endfor %}
 
 {% set class_name = name ~ "Gui" %}
 
-namespace Garbox {
-
 {% for decl in gui.resources.declare.images %}
 {{ decl }};
 {% endfor %}
+
+namespace Garbox {
 
 {% if gui.resources.declare.fonts is defined %}
 {% for decl in gui.resources.declare.fonts %}
@@ -71,6 +71,7 @@ public:
 
     void init();
     void show();
+    void hide();
     Objects& objects();
 
     {{ class_name }}(const {{ class_name }}&) = delete;

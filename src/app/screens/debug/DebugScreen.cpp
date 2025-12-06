@@ -7,18 +7,18 @@ namespace Garbox {
 
 DebugScreen::DebugScreen():
     DebugScreenAbs(),
-    mProgressBox(mContainer),
-    mFanStateLabel(mContainer),
-    mFanMeasuredRpmLabel(mContainer),
-    mHeatpadStateLabel(mContainer),
-    mHeatpadDutyLabel(mContainer),
-    mHeatpadSenseLabel(mContainer),
-    mDisplayStatusLabel(mContainer),
-    mTemperatureStateLabel(mContainer),
-    mTemperatureSampleLabel(mContainer),
-    mHeapSpaceLabel(mContainer),
-    mAppInfoLabel(mContainer),
-    mFermentationStatusLabel(mContainer){
+    mProgressBox(mRoot),
+    mFanStateLabel(mRoot),
+    mFanMeasuredRpmLabel(mRoot),
+    mHeatpadStateLabel(mRoot),
+    mHeatpadDutyLabel(mRoot),
+    mHeatpadSenseLabel(mRoot),
+    mDisplayStatusLabel(mRoot),
+    mTemperatureStateLabel(mRoot),
+    mTemperatureSampleLabel(mRoot),
+    mHeapSpaceLabel(mRoot),
+    mAppInfoLabel(mRoot),
+    mFermentationStatusLabel(mRoot){
     // nothing to do
 }
 
@@ -68,12 +68,12 @@ void DebugScreen::onUpdateScreen(){
 
     // update heap space
     if(mHeapTimer.isExpired()){
-        mModel.setHeapSpace(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+        model().setHeapSpace(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
         mHeapTimer.restart();
     }
 
     // update event count
-    mModel.setEventCount(getContext()->eventCount);
+    model().setEventCount(getContext()->eventCount);
 
     // last dispatched count must be updated manually, otherwise a dispatch is
     // triggered by itself on each tick
@@ -88,34 +88,34 @@ void DebugScreen::onUpdateScreen(){
 void DebugScreen::onApplyFanState(){
     mFanStateLabel.setTextFormatted(
         "Fan state=%s, speed=%.1f%%", 
-        FanStateToString(mModel.getFanState()),
-        mModel.getFanTargetSpeed()*100.0f
+        FanStateToString(model().getFanState()),
+        model().getFanTargetSpeed()*100.0f
     );
 }
 
 void DebugScreen::onApplyFanMeasuredRpm(){
-    mFanMeasuredRpmLabel.setTextFormatted("Fan rpm=%.0f", mModel.getFanMeasuredRpm());
+    mFanMeasuredRpmLabel.setTextFormatted("Fan rpm=%.0f", model().getFanMeasuredRpm());
 }
 
 void DebugScreen::onApplyHeatpadState(){
     mHeatpadStateLabel.setTextFormatted(
         "Heatpad state=%s", 
-        HeatpadStateToString(mModel.getHeatpadState())
+        HeatpadStateToString(model().getHeatpadState())
     );
 }
 
 void DebugScreen::onApplyHeatpadDuty(){
     mHeatpadDutyLabel.setTextFormatted(
         "Duty%: %.0f%% => %.0f%%, ms: %u => %u",
-        mModel.getHeatpadCurrentDuty()*100.0f,
-        mModel.getHeatpadNextDuty()*100.0f,
-        mModel.getHeatpadCurrentPeriod()/1000,
-        mModel.getHeatpadNextPeriod()/1000
+        model().getHeatpadCurrentDuty()*100.0f,
+        model().getHeatpadNextDuty()*100.0f,
+        model().getHeatpadCurrentPeriod()/1000,
+        model().getHeatpadNextPeriod()/1000
     );
 }
 
 void DebugScreen::onApplyBoxPosition(){
-    float position = static_cast<float>(mModel.getHeatpadPwmProgress()) / static_cast<float>(mModel.getHeatpadCurrentPeriod());
+    float position = static_cast<float>(model().getHeatpadPwmProgress()) / static_cast<float>(model().getHeatpadCurrentPeriod());
     static constexpr uint32_t y = 240-8;
     static constexpr float wDisplay = 320.0f; 
     static constexpr float wBox = 48.0f;
@@ -128,16 +128,16 @@ void DebugScreen::onApplyBoxPosition(){
 void DebugScreen::onApplyHeatpadSense(){
     mHeatpadSenseLabel.setTextFormatted(
         "Heatpad U=%4.1fV, I=%3.1fA", 
-        mModel.getHeatpadMeasuredVoltage(), 
-        mModel.getHeatpadMeasuredCurrent()
+        model().getHeatpadMeasuredVoltage(), 
+        model().getHeatpadMeasuredCurrent()
     );
 }
 
 void DebugScreen::onApplyDisplayStatus(){
     mDisplayStatusLabel.setTextFormatted(
         "Display: b=%.1f%%, skip=%u, dirty=%u",
-        mModel.getDisplayBrightness()*100.0f, 
-        mModel.getDisplaySkipped(), 
+        model().getDisplayBrightness()*100.0f, 
+        model().getDisplaySkipped(), 
         getDispatchedCount()
     );
 }
@@ -145,40 +145,40 @@ void DebugScreen::onApplyDisplayStatus(){
 void DebugScreen::onApplyTemperatureState(){
     mTemperatureStateLabel.setTextFormatted(
         "Sht31 power=%u, driver=%u, reset=%u",
-        mModel.getShtPowerEnabled(),
-        mModel.getShtDriverEnabled(),
-        mModel.getShtResetting()
+        model().getShtPowerEnabled(),
+        model().getShtDriverEnabled(),
+        model().getShtResetting()
     );
 }
 
 void DebugScreen::onApplyTemperatureSample(){
     mTemperatureSampleLabel.setTextFormatted(
         "Sht31 t=%.2f°C, rh=%.2f%%",
-        mModel.getSensorTemperatureCelcius(),
-        mModel.getSensorHumidityRelative()
+        model().getSensorTemperatureCelcius(),
+        model().getSensorHumidityRelative()
     );
 }
 
 void DebugScreen::onApplyHeapSpace(){
-    const uint32_t integer = mModel.getHeapSpace()/1000;
-    const uint32_t fraction = mModel.getHeapSpace()%1000;
+    const uint32_t integer = model().getHeapSpace()/1000;
+    const uint32_t fraction = model().getHeapSpace()%1000;
     mHeapSpaceLabel.setTextFormatted("Heap space: %u.%03u kB", integer, fraction);
 }
 
 void DebugScreen::onApplyAppInfo(){
     mAppInfoLabel.setTextFormatted(
         "App: %s, events=%u",
-        BehaviourIdToString(mModel.getBehaviour()), 
-        mModel.getEventCount()
+        BehaviourIdToString(model().getBehaviour()), 
+        model().getEventCount()
     );
 }
 
 void DebugScreen::onApplyFermentationStatus(){
     mFermentationStatusLabel.setTextFormatted(
         "Eng: s=%s, m=%.1f°C, t=%0.1f°C",
-        HeaterEngineStateToString(mModel.getEngineState()),
-        mModel.getEngineMeasuredTemperature(),
-        mModel.getEngineTargetTemperature()
+        HeaterEngineStateToString(model().getEngineState()),
+        model().getEngineMeasuredTemperature(),
+        model().getEngineTargetTemperature()
     );
 }
 

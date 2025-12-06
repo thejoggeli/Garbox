@@ -209,7 +209,7 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
         switch(mActiveScreen->getScreenId()){
         {% for screen_name in routes["screens_with_fields"] %}
             case ScreenId::{{ screen_name.removesuffix("Screen") }}: {
-                {{ screen_name }}::Model& model = static_cast<{{ screen_name }}*>(mActiveScreen)->getModel();
+                {{ screen_name }}::Model& model = static_cast<{{ screen_name }}*>(mActiveScreen)->model();
             {% for field in screens[screen_name]["model"]["events"][event].values() %}
                 model.set{{ field.name|upper_first }}(event->{{ field.event_field }});
             {% endfor %}

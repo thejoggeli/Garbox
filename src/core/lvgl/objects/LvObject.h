@@ -6,6 +6,10 @@
 namespace Garbox {
 
 class LvObject {
+protected:
+
+    LvObject(lv_obj_t* raw);
+
 public:
 
     struct Size {
@@ -13,7 +17,8 @@ public:
         int32_t height;
     };
 
-    LvObject(lv_obj_t* raw);
+    LvObject();
+    LvObject(LvObject& parent);
     
     lv_obj_t* raw() const;
 
@@ -62,6 +67,7 @@ public:
     // flex
     void setFlexFlow(lv_flex_flow_t flow);
     void setFlexGrow(uint8_t grow);
+    void setFlexAlign(lv_flex_align_t main_place, lv_flex_align_t cross_place, lv_flex_align_t track_place);
 
     // grid
     void setGridColumns(const lv_coord_t* columns);
@@ -81,9 +87,19 @@ public:
     void setScrollElastic(bool enabled);
     void setScrollDirection(lv_dir_t dir);
 
-    // style helpers
-    void setTextColor(lv_color_t color);
+    // text helpers
     void setFont(const lv_font_t* font);
+    void setTextColor(lv_color_t color);
+    void setTextLetterSpace(int32_t spacePixels);
+    void setTextLineSpace(int32_t spacePixels);
+    void setTextAlign(lv_text_align_t align);
+    void setTextDecor(lv_text_decor_t decor);
+    void setTextOpa(lv_opa_t opa);
+    void setTextOutlineColor(lv_color_t color);
+    void setTextOutlineOpa(lv_opa_t opa);
+    void setTextOutlineWidth(uint16_t width);
+
+    // style helpers    
     void setOpacity(uint8_t opacity);
     void setBgColor(lv_color_t color);
     void setBgOpacity(uint8_t opacity);
@@ -91,8 +107,6 @@ public:
     void setBorderWidth(int32_t widthPixels);
     void setBorderColor(lv_color_t color);
     void setRadius(int32_t radiusPixels);
-    void setTextLetterSpace(int32_t spacePixels);
-    void setTextLineSpace(int32_t spacePixels);
 
     // padding
     void setPad(int32_t leftPixels, int32_t rightPixels, int32_t topPixels, int32_t bottomPixels);
@@ -105,7 +119,9 @@ public:
 
     // style helper
     void setStyleProp(uint32_t prop, lv_style_value_t value);   
-    void setTextAlign(lv_text_align_t align);
+
+    // set this object as the main screen
+    void setScreen();
 
 protected:
     

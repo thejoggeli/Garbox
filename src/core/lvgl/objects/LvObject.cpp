@@ -5,9 +5,16 @@ namespace Garbox {
 
 char LvObject::sBuffer[256];
 
-LvObject::LvObject(lv_obj_t* raw):
-    mRaw(raw){
-    AssertExit(raw != nullptr, "LvObject", "got nullptr");
+LvObject::LvObject(lv_obj_t* raw) : mRaw(raw){
+    AssertExit(mRaw != nullptr, "LvObject", "got nullptr");
+}
+
+LvObject::LvObject() : LvObject(lv_obj_create(nullptr)){
+    AssertExit(mRaw != nullptr, "LvObject", "got nullptr");
+}
+
+LvObject::LvObject(LvObject& parent) : LvObject(lv_obj_create(parent.raw())) {
+    AssertExit(mRaw != nullptr, "LvObject", "got nullptr");
 }
 
 lv_obj_t* LvObject::raw() const {
@@ -23,11 +30,11 @@ void LvObject::setPosition(int32_t xPixels, int32_t yPixels){
 }
 
 void LvObject::setPositionX(int32_t xPixels){
-    lv_obj_set_pos(mRaw, xPixels, getPositionY());
+    lv_obj_set_x(mRaw, xPixels);
 }
 
 void LvObject::setPositionY(int32_t yPixels){
-    lv_obj_set_pos(mRaw, getPositionX(), yPixels);
+    lv_obj_set_y(mRaw, yPixels);
 }
 
 void LvObject::getPosition(int32_t& xPixels, int32_t& yPixels) const {
@@ -169,6 +176,10 @@ void LvObject::setFlexGrow(uint8_t grow){
     lv_obj_set_flex_grow(mRaw, grow);
 }
 
+void LvObject::setFlexAlign(lv_flex_align_t main_place, lv_flex_align_t cross_place, lv_flex_align_t track_place){
+    lv_obj_set_flex_align(mRaw, main_place, cross_place, track_place);
+}
+
 // ==============================================================================
 // grid
 // ==============================================================================
@@ -198,6 +209,7 @@ void LvObject::clearFlag(lv_obj_flag_t flag){
 }
 
 void LvObject::setHidden(bool hidden){
+    return;
     if(hidden){
         lv_obj_add_flag(mRaw, LV_OBJ_FLAG_HIDDEN);
     }
@@ -260,16 +272,52 @@ void LvObject::setScrollDirection(lv_dir_t dir){
 }
 
 // ==============================================================================
-// style helpers
+// text helpers
 // ==============================================================================
+
+void LvObject::setFont(const lv_font_t* font){
+    lv_obj_set_style_text_font(mRaw, font, LV_PART_MAIN);
+}
 
 void LvObject::setTextColor(lv_color_t color){
     lv_obj_set_style_text_color(mRaw, color, LV_PART_MAIN);
 }
 
-void LvObject::setFont(const lv_font_t* font){
-    lv_obj_set_style_text_font(mRaw, font, LV_PART_MAIN);
+void LvObject::setTextLetterSpace(int32_t spacePixels){
+    lv_obj_set_style_text_letter_space(mRaw, spacePixels, LV_PART_MAIN);
 }
+
+void LvObject::setTextLineSpace(int32_t spacePixels){
+    lv_obj_set_style_text_line_space(mRaw, spacePixels, LV_PART_MAIN);
+}
+
+void LvObject::setTextAlign(lv_text_align_t align) {
+    lv_obj_set_style_text_align(mRaw, align, LV_PART_MAIN);
+}
+
+void LvObject::setTextDecor(lv_text_decor_t decor) {
+    lv_obj_set_style_text_decor(mRaw, decor, LV_PART_MAIN);
+}
+
+void LvObject::setTextOpa(lv_opa_t opa) {
+    lv_obj_set_style_text_opa(mRaw, opa, LV_PART_MAIN);
+}
+
+void LvObject::setTextOutlineColor(lv_color_t color) {
+    lv_obj_set_style_text_outline_stroke_color(mRaw, color, LV_PART_MAIN);
+}
+
+void LvObject::setTextOutlineOpa(lv_opa_t opa) {
+    lv_obj_set_style_text_outline_stroke_opa(mRaw, opa, LV_PART_MAIN);
+}
+
+void LvObject::setTextOutlineWidth(uint16_t width) {
+    lv_obj_set_style_text_outline_stroke_width(mRaw, width, LV_PART_MAIN);
+}
+
+// ==============================================================================
+// style helpers
+// ==============================================================================
 
 void LvObject::setOpacity(uint8_t opacity){
     lv_obj_set_style_opa(mRaw, opacity, LV_PART_MAIN);
@@ -298,14 +346,6 @@ void LvObject::setBorderColor(lv_color_t color){
 
 void LvObject::setRadius(int32_t radiusPixels){
     lv_obj_set_style_radius(mRaw, radiusPixels, LV_PART_MAIN);
-}
-
-void LvObject::setTextLetterSpace(int32_t spacePixels){
-    lv_obj_set_style_text_letter_space(mRaw, spacePixels, LV_PART_MAIN);
-}
-
-void LvObject::setTextLineSpace(int32_t spacePixels){
-    lv_obj_set_style_text_line_space(mRaw, spacePixels, LV_PART_MAIN);
 }
 
 // ==============================================================================
@@ -353,8 +393,8 @@ void LvObject::setStyleProp(uint32_t prop, lv_style_value_t value){
     lv_obj_set_local_style_prop(mRaw, prop, value, LV_PART_MAIN);
 }
 
-void LvObject::setTextAlign(lv_text_align_t align){
-    lv_obj_set_style_text_align(mRaw, align, LV_PART_MAIN);
+void LvObject::setScreen(){
+    lv_disp_load_scr(mRaw);
 }
 
 } // namespace Garbox

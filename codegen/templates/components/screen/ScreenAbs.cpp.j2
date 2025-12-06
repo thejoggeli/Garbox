@@ -5,6 +5,9 @@
 {% if screen.use_lvgl %}
 #include "core/lvgl/LvglProvider.h"
 {% endif %}
+{% if screen.use_gui %}
+#include "core/lvgl/LvglProvider.h"
+{% endif %}
 #include "shared/types/ComponentId.h"
 
 namespace Garbox {
@@ -13,9 +16,14 @@ namespace Garbox {
 {{ name }}Abs::{{ name }}Abs(): 
     ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }})
 {%- if screen.use_lvgl -%},
-    mContainer(LvglProvider::Root()),
-    mDisplayWidth(LvglProvider::GetDisplayWidth()),
-    mDisplayHeight(LvglProvider::GetDisplayHeight())
+    mRoot(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight())
+{%- endif -%}
+{%- if screen.use_gui -%},
+    mGui(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight())
 {%- endif -%}
 {%- if screen.model.fields -%},
     mModel(*this),
@@ -24,19 +32,22 @@ namespace Garbox {
 
 {# onInitScreen() #}
 void {{ name }}Abs::init(ComponentHostIfc& host){
-    ScreenAbs::init(host);
 
 {% if screen.use_lvgl %}
     // init lvgl container
-    mContainer.setHidden(true);
-    mContainer.setRawSize(mDisplayWidth, mDisplayHeight);
-    mContainer.setBorder(0, lv_color_hex(0x000000));
-    mContainer.setRadius(0);
-    mContainer.setPad(0, 0, 0, 0);
-    mContainer.setBgOpacity(LV_OPA_COVER);
-    mContainer.setScrollable(false);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_CHAIN);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    mRoot.setHidden(true);
+    mRoot.setRawSize(mScreenWidth, mScreenHeight);
+    mRoot.setBorder(0, lv_color_hex(0x000000));
+    mRoot.setRadius(0);
+    mRoot.setPad(0, 0, 0, 0);
+    mRoot.setBgOpacity(LV_OPA_COVER);
+    mRoot.setScrollable(false);
+{% endif %}
+
+{% if screen.use_gui %}
+    // init gui
+    mGui.init();
+    mGui.hide();
 {% endif %}
 
 {% if screen.use_model %}
@@ -44,6 +55,9 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
     mDirtyDispatcher.registerHandler(apply{{ group_name|upper_first }}Trampoline, this);
 {% endfor %}
 {% endif %}
+
+    // calls onInit()
+    ScreenAbs::init(host);
 }
 
 void {{ name }}Abs::updateScreen(){
@@ -59,7 +73,11 @@ void {{ name }}Abs::updateScreen(){
 
 void {{ name }}Abs::becomeEnabled(){
 {% if screen.use_lvgl %}
-    mContainer.setHidden(false);
+    mRoot.setHidden(false);
+    mRoot.setScreen();
+{% endif %}
+{% if screen.use_gui %}
+    mGui.show();
 {% endif %}
 {% if screen.model.get("debounce") %}
     mModel.resetTimers();
@@ -69,7 +87,10 @@ void {{ name }}Abs::becomeEnabled(){
 
 void {{ name }}Abs::becomeDisabled(){
 {% if screen.use_lvgl %}
-    mContainer.setHidden(true);
+    mRoot.setHidden(true);
+{% endif %}
+{% if screen.use_gui %}
+    mGui.hide();
 {% endif %}
 {% if screen.model.get("debounce") %}
     mModel.resetTimers();
@@ -81,29 +102,44 @@ void {{ name }}Abs::becomeDisabled(){
 {{ make_events(name, screen) }}
 {{ send_events(name, screen) }}
 
+{% if screen.use_lvgl %}
 {####################}
 {### LVGL Section ###}
 {####################}
-{% if screen.use_lvgl %}
+
 void {{ name }}Abs::setBackgroundColor(uint32_t color){
-    mContainer.setBgColor(lv_color_hex(color));
+    mRoot.setBgColor(lv_color_hex(color));
 }
 {% endif %}
 
+{% if screen.use_gui %}
+{###################}
+{### GUI Section ###}
+{###################}
+
+{{ screen.gui["name"] }}Gui::Objects& {{ name }}Abs::gui(){
+    return mGui.objects();
+}
+
+void {{ name }}Abs::setBackgroundColor(uint32_t color){
+    mGui.objects().root.setBgColor(lv_color_hex(color));
+}
+{% endif %}
+
+{% if screen.use_model %}
 {#####################}
 {### Model Section ###}
 {#####################}
-{% if screen.use_model %}
 
 {# model groups trampolines #}
 
 {% include "components/screen/ScreenModel.cpp.j2" %}
 
-{{ name }}Abs::Model& {{ name }}Abs::getModel(){
+{{ name }}Abs::Model& {{ name }}Abs::model(){
     return mModel;
 }
 
-const {{ name }}Abs::Model& {{ name }}Abs::getModel() const {
+const {{ name }}Abs::Model& {{ name }}Abs::model() const {
     return mModel;
 }
 

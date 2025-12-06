@@ -22,22 +22,10 @@ class Loader:
         pass
 
     def preload_all(self):
+
+        # load yaml files
         paths = [p for p in self.config_dir.rglob("*.yaml") if p.is_file()]
         self.config = load_yaml_multi(paths)
-
-        # parse hardware config
-        parse_hardware_config(self.config)
-
-        # parse events (render default values)
-        parse_events(self.config)
-
-        # parse application and components including:
-        # - application
-        # - controllers
-        # - behaviours
-        # - screens
-        # requires events to already be parsed)
-        parse_application(self.config)
 
         # load xml files
         gui_dir = self.config_dir / "gui" 
@@ -47,9 +35,25 @@ class Loader:
             config_text = load_text(path)
             config_name = path.stem
             gui_configs_text[config_name] = config_text 
-        
-        print_section("parsing gui xml files")    
+
+        print_section("parsing configs")
+
+        # parse hardware config
+        parse_hardware_config(self.config)
+
+        # parse events (render default values)
+        parse_events(self.config)
+
+        # parse gui xml configs  
         self.config["guis"] = parse_guis(gui_configs_text, self.output_dir / "gui")
+
+        # parse application and components including:
+        # - application
+        # - controllers
+        # - behaviours
+        # - screens
+        # requires events to already be parsed)
+        parse_application(self.config)       
 
 
     def save_json(self, path: Path, config):

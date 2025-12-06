@@ -38,6 +38,7 @@ def xml_to_dict(gui_name: str, xml_text: str):
     root_objects = parse_object_tree(screen_node, components=components)
 
     return {
+        "name": gui_name,
         "resources": resources,
         "components": components,
         "objects_raw": root_objects,

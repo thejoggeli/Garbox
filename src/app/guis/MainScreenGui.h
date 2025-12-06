@@ -5,15 +5,8 @@
 
 #include "core/lvgl/objects/LvObject.h"
 #include "core/lvgl/objects/LvLabel.h"
-#include "core/lvgl/objects/LvImage.h"
 
 namespace Garbox {
-
-LV_IMAGE_DECLARE(MainScreen_image_power_16px);
-LV_IMAGE_DECLARE(MainScreen_image_fan_16px);
-LV_IMAGE_DECLARE(MainScreen_image_heat_16px);
-LV_IMAGE_DECLARE(MainScreen_image_temperature_16px);
-LV_IMAGE_DECLARE(MainScreen_image_humidity_16px);
 
 class MainScreenGui {
 public:
@@ -37,20 +30,6 @@ public:
         ~SettingRow() = default;
     };
 
-    struct InfoRow {
-        InfoRow(LvObject& parent);
-        LvObject body;
-        LvImage icon;
-        LvLabel value;
-        LvLabel unit;
-
-        InfoRow(const InfoRow&) = delete;
-        InfoRow& operator=(const InfoRow&) = delete;
-        InfoRow(InfoRow&&) = delete;
-        InfoRow& operator=(InfoRow&&) = delete;
-        ~InfoRow() = default;
-    };
-
     // ============================================================
     // === Objects Struct =========================================
     // ============================================================
@@ -58,27 +37,8 @@ public:
     struct Objects {
         Objects();
         LvObject root;
-        LvObject wrapper;
-        LvObject leftPane;
         SettingRow settingPower;
         SettingRow settingTarget;
-        SettingRow settingFan;
-        SettingRow settingHeater;
-        SettingRow settingCalibrate;
-        SettingRow settingAdvanced;
-        LvObject middlePane;
-        LvLabel _namelessLabel_0;
-        LvObject _namelessContainer_0;
-        InfoRow _namelessInfoRow_0;
-        InfoRow _namelessInfoRow_1;
-        InfoRow _namelessInfoRow_2;
-        LvObject rightPane;
-        LvLabel _namelessLabel_1;
-        LvObject _namelessContainer_1;
-        InfoRow fanRpm;
-        InfoRow temperature;
-        InfoRow humidity;
-        InfoRow power;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;
@@ -95,6 +55,7 @@ public:
 
     void init();
     void show();
+    void hide();
     Objects& objects();
 
     MainScreenGui(const MainScreenGui&) = delete;

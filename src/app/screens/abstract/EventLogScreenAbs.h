@@ -37,9 +37,9 @@ private:
 
 protected:
 
-    LvObject mContainer;
-    const uint32_t mDisplayWidth = 0;
-    const uint32_t mDisplayHeight = 0;
+    LvObject mRoot;
+    const uint32_t mScreenWidth = 0;
+    const uint32_t mScreenHeight = 0;
 
     void setBackgroundColor(uint32_t color);
 

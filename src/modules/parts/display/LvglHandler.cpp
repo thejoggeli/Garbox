@@ -59,6 +59,9 @@ void LvglHandler::init(){
     lv_display_set_flush_cb(mLvDisplay, handleFlush);
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
 
+    // no theme
+    lv_disp_set_theme(NULL, nullptr);
+
     mInitialized = true;
 }
 

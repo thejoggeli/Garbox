@@ -12,8 +12,8 @@ static const lv_color_t DefaultTextColor = lv_color_hex(0xFFFFFF);
 
 EventLogScreen::EventLogScreen():
     EventLogScreenAbs(),
-    mLabels(mContainer),
-    mMarker(mContainer){
+    mLabels(mRoot),
+    mMarker(mRoot){
     // nothing to do
 }
 

@@ -19,81 +19,25 @@
     <!-- Row layout: Label | (hidden left arrow) | Value | (hidden right arrow) -->
     <!-- Always hidden arrows; user can choose to show them later in C++ -->
     <SettingRow $label $value>
-      <body layout="flex" flex-flow="row" height="40">
-        <label name="label" text=$label flex-grow="1" />
-        <label name="left" text="&lt;" width="10px" hidden="true" />
-        <label name="value" text=$value width="40px" align="right" />
-        <label name="right" text="&gt;" width="10px" hidden="true" />
+      <body layout="flex" flex-flow="row">
+        <label name="label" text=$label text-align="left" pad-right="8px" />
+        <label name="left"  text="&lt;" text-align="center" width="16px" hidden="true" />
+        <label name="value" text=$value text-align="center" width="80px" />
+        <label name="right" text="&gt;" text-align="center" width="16px" hidden="true" />
       </body>
     </SettingRow>
 
-    <!-- INFO ROW COMPONENT -->
-    <!-- Row layout: Icon | Value | Unit -->
-    <!-- Evenly distributed vertically by parent container -->
-    <InfoRow $icon $value $unit="unit" $hideUnit="false">
-      <body layout="flex" flex-flow="row" height="auto">
-        <image name="icon" src=$icon width="16" height="16" />
-        <label name="value" text=$value />
-        <label name="unit"  text=$unit hidden=$hideUnit />
-      </body>
-    </InfoRow>
-
   </components>
 
-  <root>
+  <root bg-color="#000000" text-color="#ffffff" layout="flex" flex-flow="column">
 
-    <!-- SCREEN ROOT LAYOUT: 3 columns -->
-    <container name="wrapper" >
-
-      <!-- LEFT PANE: fills horizontally, scrollable vertically -->
-      <container 
-        name="leftPane" 
-        pad="8" flex-grow="1"
-        layout="flex" flex-flow="col" 
-        scrollable="true" scroll-dir="x" 
-      >
-        <SettingRow name="setting-power"     $label="Power"     $value="On" />
-        <SettingRow name="setting-target"    $label="Target"    $value="30.0 °C" />
-        <SettingRow name="setting-fan"       $label="Fan"       $value="auto" />
-        <SettingRow name="setting-heater"    $label="Heater"    $value="auto" />
-        <SettingRow name="setting-calibrate" $label="Calibrate" $value="-" />
-        <SettingRow name="setting-advanced"  $label="Advanced"  $value="-" />
-      </container>
-      <!-- LEFT PANE END -->
-
-      <!-- MIDDLE PANE: fixed width, rows distributed evenly -->
-      <container 
-        name="middlePane" 
-        pad="8" width="100px"
-        layout="flex" flex-flow="col"  
-      >
-        <label text="Status" height="30" text-color="#cc88ff" />
-        <container layout="flex" flex-flow="col" flex-grow="1">
-          <InfoRow $name="status"  $icon="power-16px"  $value="Active" />
-          <InfoRow $name="fanPct"  $icon="fan-16px"    $value="40.0" $unit="%" />
-          <InfoRow $name="heatPct" $icon="heat-16px"   $value="23.0" $unit="%" />
-        </container>
-      </container>
-      <!-- MIDDLE PANE END -->
-
-      <!-- RIGHT PANE -->
-      <container 
-        name="rightPane"
-        pad="8" width="100px" 
-        layout="flex" flex-flow="col"
-      >
-        <label text="Sensors" height="30" text-color="#88ccff"/>
-        <container layout="flex" flex-flow="col" flex-grow="1">
-          <InfoRow name="fanRpm"      $icon="fan-16px"          $value="2000" $unit="RPM" />
-          <InfoRow name="temperature" $icon="temperature-16px"  $value="28.2" $unit="°C"  />
-          <InfoRow name="humidity"    $icon="humidity-16px"     $value="56.3" $unit="%"   />
-          <InfoRow name="power"       $icon="power-16px"        $value="15.3" $unit="W"   />
-        </container>
-      </container>
-      <!-- RIGHT PANE END -->
-
-    </container>
-    <!-- SCREEN ROOT LAYOUT END -->
+    <SettingRow name="settingPower"  $label="Power"  $value="On"     bg-color="#ff00ff" bg-opacity="100%" />
+    <SettingRow name="settingTarget" $label="Target" $value="30.0°C" bg-color="#00ffff" bg-opacity="100%" />
+    <!-- <SettingRow name="settingFan"         $label="Fan"        $value="auto" /> -->
+    <!-- <SettingRow name="settingHeater"      $label="Heater"     $value="auto" /> -->
+    <!-- <SettingRow name="settingBrightness"  $label="Brightness" $value="-" /> -->
+    <!-- <SettingRow name="settingCalibrate"   $label="Calibrate"  $value="-" /> -->
+    <!-- <SettingRow name="settingAdvanced"    $label="Advanced"   $value="-" /> -->
 
   </root>
 

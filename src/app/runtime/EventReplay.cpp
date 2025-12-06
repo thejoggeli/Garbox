@@ -178,7 +178,7 @@ void EventReplay::sendDisplayCommandToMainScreen(void* context){
 
 void EventReplay::sendDisplayStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     DisplayStatusPayload& payload = self->mDisplayStatusBlock.payload; 
     model.setDisplayBrightness(payload.brightness); 
 }
@@ -190,14 +190,14 @@ void EventReplay::sendFanCommandToMainScreen(void* context){
 
 void EventReplay::sendFanSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     FanSamplePayload& payload = self->mFanSampleBlock.payload; 
     model.setFanMeasuredRpm(payload.measuredRpm); 
 }
 
 void EventReplay::sendFanStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     FanStatusPayload& payload = self->mFanStatusBlock.payload; 
     model.setFanState(payload.state); 
     model.setFanTargetSpeed(payload.targetSpeed); 
@@ -205,7 +205,7 @@ void EventReplay::sendFanStatusToMainScreen(void* context){
 
 void EventReplay::sendFermentationStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     FermentationStatusPayload& payload = self->mFermentationStatusBlock.payload; 
     model.setTargetTemperature(payload.targetTemperature); 
     model.setEngineState(payload.heaterEngineState); 
@@ -218,7 +218,7 @@ void EventReplay::sendHeatpadCommandToMainScreen(void* context){
 
 void EventReplay::sendHeatpadSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     HeatpadSamplePayload& payload = self->mHeatpadSampleBlock.payload; 
     model.setHeatpadMeasuredVoltage(payload.measuredVoltage); 
     model.setHeatpadMeasuredCurrent(payload.measuredCurrent); 
@@ -226,7 +226,7 @@ void EventReplay::sendHeatpadSampleToMainScreen(void* context){
 
 void EventReplay::sendHeatpadStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     HeatpadStatusPayload& payload = self->mHeatpadStatusBlock.payload; 
     model.setHeatpadState(payload.state); 
     model.setHeatpadCurrentDuty(payload.currentDutyCycle); 
@@ -234,7 +234,7 @@ void EventReplay::sendHeatpadStatusToMainScreen(void* context){
 
 void EventReplay::sendTemperatureSampleToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     TemperatureSamplePayload& payload = self->mTemperatureSampleBlock.payload; 
     model.setMeasuredTemperature(payload.temperatureCelcius); 
     model.setMeasuredHumidity(payload.humidityRelative); 
@@ -242,7 +242,7 @@ void EventReplay::sendTemperatureSampleToMainScreen(void* context){
 
 void EventReplay::sendTemperatureStatusToMainScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    MainScreen::Model& model = self->mMainScreen.getModel();
+    MainScreen::Model& model = self->mMainScreen.model();
     TemperatureStatusPayload& payload = self->mTemperatureStatusBlock.payload; 
     model.setShtDriverEnabled(payload.driverEnabled); 
     model.setShtPowerEnabled(payload.powerEnabled); 
@@ -252,14 +252,14 @@ void EventReplay::sendTemperatureStatusToMainScreen(void* context){
 
 void EventReplay::sendActiveBehaviourChangedToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     ActiveBehaviourChangedPayload& payload = self->mActiveBehaviourChangedBlock.payload; 
     model.setBehaviour(payload.newBehaviour); 
 }
 
 void EventReplay::sendDisplayStatusToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     DisplayStatusPayload& payload = self->mDisplayStatusBlock.payload; 
     model.setDisplayBrightness(payload.brightness); 
     model.setDisplaySkipped(payload.skipped); 
@@ -267,14 +267,14 @@ void EventReplay::sendDisplayStatusToDebugScreen(void* context){
 
 void EventReplay::sendFanSampleToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     FanSamplePayload& payload = self->mFanSampleBlock.payload; 
     model.setFanMeasuredRpm(payload.measuredRpm); 
 }
 
 void EventReplay::sendFanStatusToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     FanStatusPayload& payload = self->mFanStatusBlock.payload; 
     model.setFanState(payload.state); 
     model.setFanTargetSpeed(payload.targetSpeed); 
@@ -282,7 +282,7 @@ void EventReplay::sendFanStatusToDebugScreen(void* context){
 
 void EventReplay::sendFermentationStatusToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     FermentationStatusPayload& payload = self->mFermentationStatusBlock.payload; 
     model.setEngineState(payload.heaterEngineState); 
     model.setEngineTargetTemperature(payload.targetTemperature); 
@@ -292,7 +292,7 @@ void EventReplay::sendFermentationStatusToDebugScreen(void* context){
 
 void EventReplay::sendHeatpadSampleToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     HeatpadSamplePayload& payload = self->mHeatpadSampleBlock.payload; 
     model.setHeatpadPwmProgress(payload.pwmProgressMicros); 
     model.setHeatpadMeasuredVoltage(payload.measuredVoltage); 
@@ -301,7 +301,7 @@ void EventReplay::sendHeatpadSampleToDebugScreen(void* context){
 
 void EventReplay::sendHeatpadStatusToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     HeatpadStatusPayload& payload = self->mHeatpadStatusBlock.payload; 
     model.setHeatpadState(payload.state); 
     model.setHeatpadCurrentDuty(payload.currentDutyCycle); 
@@ -312,7 +312,7 @@ void EventReplay::sendHeatpadStatusToDebugScreen(void* context){
 
 void EventReplay::sendTemperatureSampleToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     TemperatureSamplePayload& payload = self->mTemperatureSampleBlock.payload; 
     model.setSensorTemperatureCelcius(payload.temperatureCelcius); 
     model.setSensorHumidityRelative(payload.humidityRelative); 
@@ -320,7 +320,7 @@ void EventReplay::sendTemperatureSampleToDebugScreen(void* context){
 
 void EventReplay::sendTemperatureStatusToDebugScreen(void* context){ 
     EventReplay* self = static_cast<EventReplay*>(context);
-    DebugScreen::Model& model = self->mDebugScreen.getModel();
+    DebugScreen::Model& model = self->mDebugScreen.model();
     TemperatureStatusPayload& payload = self->mTemperatureStatusBlock.payload; 
     model.setShtDriverEnabled(payload.driverEnabled); 
     model.setShtPowerEnabled(payload.powerEnabled); 

@@ -10,25 +10,22 @@ namespace Garbox {
 
 DebugScreenAbs::DebugScreenAbs(): 
     ScreenAbs(ComponentId::DebugScreen, ScreenId::Debug),
-    mContainer(LvglProvider::Root()),
-    mDisplayWidth(LvglProvider::GetDisplayWidth()),
-    mDisplayHeight(LvglProvider::GetDisplayHeight()),
+    mRoot(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight()),
     mModel(*this),
     mDirtyDispatcher(static_cast<uint32_t>(Model::Index::Count)){}
 
 void DebugScreenAbs::init(ComponentHostIfc& host){
-    ScreenAbs::init(host);
 
     // init lvgl container
-    mContainer.setHidden(true);
-    mContainer.setRawSize(mDisplayWidth, mDisplayHeight);
-    mContainer.setBorder(0, lv_color_hex(0x000000));
-    mContainer.setRadius(0);
-    mContainer.setPad(0, 0, 0, 0);
-    mContainer.setBgOpacity(LV_OPA_COVER);
-    mContainer.setScrollable(false);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_CHAIN);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    mRoot.setHidden(true);
+    mRoot.setRawSize(mScreenWidth, mScreenHeight);
+    mRoot.setBorder(0, lv_color_hex(0x000000));
+    mRoot.setRadius(0);
+    mRoot.setPad(0, 0, 0, 0);
+    mRoot.setBgOpacity(LV_OPA_COVER);
+    mRoot.setScrollable(false);
 
     mDirtyDispatcher.registerHandler(applyFanStateTrampoline, this);
     mDirtyDispatcher.registerHandler(applyFanMeasuredRpmTrampoline, this);
@@ -42,6 +39,9 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
     mDirtyDispatcher.registerHandler(applyAppInfoTrampoline, this);
     mDirtyDispatcher.registerHandler(applyFermentationStatusTrampoline, this);
     mDirtyDispatcher.registerHandler(applyHeapSpaceTrampoline, this);
+
+    // calls onInit()
+    ScreenAbs::init(host);
 }
 
 void DebugScreenAbs::updateScreen(){
@@ -51,12 +51,13 @@ void DebugScreenAbs::updateScreen(){
 }
 
 void DebugScreenAbs::becomeEnabled(){
-    mContainer.setHidden(false);
+    mRoot.setHidden(false);
+    mRoot.setScreen();
     ScreenAbs::becomeEnabled();
 }
 
 void DebugScreenAbs::becomeDisabled(){
-    mContainer.setHidden(true);
+    mRoot.setHidden(true);
     ScreenAbs::becomeDisabled();
 }
 
@@ -69,7 +70,7 @@ void DebugScreenAbs::sendEvent(const DisplayCommandEvent& event){
 }
 
 void DebugScreenAbs::setBackgroundColor(uint32_t color){
-    mContainer.setBgColor(lv_color_hex(color));
+    mRoot.setBgColor(lv_color_hex(color));
 }
 
 DebugScreenAbs::Model::Model(DebugScreenAbs& screen) : mScreen(screen){ 
@@ -351,11 +352,11 @@ void DebugScreenAbs::Model::setHeapSpace(uint32_t value){
     } 
 }
 
-DebugScreenAbs::Model& DebugScreenAbs::getModel(){
+DebugScreenAbs::Model& DebugScreenAbs::model(){
     return mModel;
 }
 
-const DebugScreenAbs::Model& DebugScreenAbs::getModel() const {
+const DebugScreenAbs::Model& DebugScreenAbs::model() const {
     return mModel;
 }
 

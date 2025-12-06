@@ -10,24 +10,23 @@ namespace Garbox {
 
 EventLogScreenAbs::EventLogScreenAbs(): 
     ScreenAbs(ComponentId::EventLogScreen, ScreenId::EventLog),
-    mContainer(LvglProvider::Root()),
-    mDisplayWidth(LvglProvider::GetDisplayWidth()),
-    mDisplayHeight(LvglProvider::GetDisplayHeight()){}
+    mRoot(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight()){}
 
 void EventLogScreenAbs::init(ComponentHostIfc& host){
-    ScreenAbs::init(host);
 
     // init lvgl container
-    mContainer.setHidden(true);
-    mContainer.setRawSize(mDisplayWidth, mDisplayHeight);
-    mContainer.setBorder(0, lv_color_hex(0x000000));
-    mContainer.setRadius(0);
-    mContainer.setPad(0, 0, 0, 0);
-    mContainer.setBgOpacity(LV_OPA_COVER);
-    mContainer.setScrollable(false);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_CHAIN);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    mRoot.setHidden(true);
+    mRoot.setRawSize(mScreenWidth, mScreenHeight);
+    mRoot.setBorder(0, lv_color_hex(0x000000));
+    mRoot.setRadius(0);
+    mRoot.setPad(0, 0, 0, 0);
+    mRoot.setBgOpacity(LV_OPA_COVER);
+    mRoot.setScrollable(false);
 
+    // calls onInit()
+    ScreenAbs::init(host);
 }
 
 void EventLogScreenAbs::updateScreen(){
@@ -35,17 +34,18 @@ void EventLogScreenAbs::updateScreen(){
 }
 
 void EventLogScreenAbs::becomeEnabled(){
-    mContainer.setHidden(false);
+    mRoot.setHidden(false);
+    mRoot.setScreen();
     ScreenAbs::becomeEnabled();
 }
 
 void EventLogScreenAbs::becomeDisabled(){
-    mContainer.setHidden(true);
+    mRoot.setHidden(true);
     ScreenAbs::becomeDisabled();
 }
 
 void EventLogScreenAbs::setBackgroundColor(uint32_t color){
-    mContainer.setBgColor(lv_color_hex(color));
+    mRoot.setBgColor(lv_color_hex(color));
 }
 
 } // namespace Garbox

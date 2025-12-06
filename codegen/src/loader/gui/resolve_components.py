@@ -28,7 +28,7 @@ def resolve_component(obj_data):
     obj_type = obj_data["type"]
     comp_def = obj_data["component"]
 
-    body_attrs      = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "attr"}
+    attrs_for_body  = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "attr"}
     param_attrs     = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "p-attr"}
     optional_params = {k: v for k, v in comp_def["params"].items()   if v["required"] == False}
 
@@ -82,11 +82,13 @@ def resolve_component(obj_data):
         }
 
     # override default component body attrs with passed component instance attrs
-    body_idx = 0
-    for attr_name, attr_data in body_attrs.items():
-        objects["body"]["attrs"][attr_name] = {
+    body_idx = f"{obj_data['name']}.body"
+    body_attrs = objects[body_idx]["attrs"]
+    for attr_name, attr_data in attrs_for_body.items():
+        body_attrs[attr_name] = {
             "type": attr_data["type"],
             "value": attr_data["value"],
+            "value_raw": attr_data["value_raw"],
         }
 
     return objects

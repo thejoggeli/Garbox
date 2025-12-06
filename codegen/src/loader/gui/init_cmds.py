@@ -33,11 +33,7 @@ def build_function_calls(instance_name: str, obj_type: str, attrs: dict):
                 "comment": f"{attr_name}=\"{attr_data['value_raw']}\"",
             })
         else:
-            fn_calls.append({
-                "instance": instance_name,
-                "calls": [f"<{attr_name}>"],
-                "comment": f"function def not found",
-            })
+            raise ValueError(f"invalid attribute '{attr_name}' in tag <{obj_type}>")
     
     return fn_calls
 

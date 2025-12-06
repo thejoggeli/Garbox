@@ -10,25 +10,17 @@ namespace Garbox {
 
 MainScreenAbs::MainScreenAbs(): 
     ScreenAbs(ComponentId::MainScreen, ScreenId::Main),
-    mContainer(LvglProvider::Root()),
-    mDisplayWidth(LvglProvider::GetDisplayWidth()),
-    mDisplayHeight(LvglProvider::GetDisplayHeight()),
+    mGui(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight()),
     mModel(*this),
     mDirtyDispatcher(static_cast<uint32_t>(Model::Index::Count)){}
 
 void MainScreenAbs::init(ComponentHostIfc& host){
-    ScreenAbs::init(host);
 
-    // init lvgl container
-    mContainer.setHidden(true);
-    mContainer.setRawSize(mDisplayWidth, mDisplayHeight);
-    mContainer.setBorder(0, lv_color_hex(0x000000));
-    mContainer.setRadius(0);
-    mContainer.setPad(0, 0, 0, 0);
-    mContainer.setBgOpacity(LV_OPA_COVER);
-    mContainer.setScrollable(false);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_CHAIN);
-    mContainer.clearFlag(LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    // init gui
+    mGui.init();
+    mGui.hide();
 
     mDirtyDispatcher.registerHandler(applyFanStatusTrampoline, this);
     mDirtyDispatcher.registerHandler(applyFanTargetSpeedTrampoline, this);
@@ -40,6 +32,9 @@ void MainScreenAbs::init(ComponentHostIfc& host){
     mDirtyDispatcher.registerHandler(applyMeasuredHumidityTrampoline, this);
     mDirtyDispatcher.registerHandler(applyTargetTemperatureTrampoline, this);
     mDirtyDispatcher.registerHandler(applyEngineStateTrampoline, this);
+
+    // calls onInit()
+    ScreenAbs::init(host);
 }
 
 void MainScreenAbs::updateScreen(){
@@ -49,17 +44,21 @@ void MainScreenAbs::updateScreen(){
 }
 
 void MainScreenAbs::becomeEnabled(){
-    mContainer.setHidden(false);
+    mGui.show();
     ScreenAbs::becomeEnabled();
 }
 
 void MainScreenAbs::becomeDisabled(){
-    mContainer.setHidden(true);
+    mGui.hide();
     ScreenAbs::becomeDisabled();
 }
 
+MainScreenGui::Objects& MainScreenAbs::gui(){
+    return mGui.objects();
+}
+
 void MainScreenAbs::setBackgroundColor(uint32_t color){
-    mContainer.setBgColor(lv_color_hex(color));
+    mGui.objects().root.setBgColor(lv_color_hex(color));
 }
 
 MainScreenAbs::Model::Model(MainScreenAbs& screen) : mScreen(screen){ 
@@ -134,6 +133,7 @@ void MainScreenAbs::Model::setFanState(FanState value){
     if(mFanState != value) { 
         mFanState = value; 
         mScreen.markDirty(Model::Index::FanStatus);
+        mScreen.markDirty(Model::Index::FanTargetSpeed);
     } 
 }
 
@@ -248,14 +248,15 @@ void MainScreenAbs::Model::setEngineState(HeaterEngineState value){
     if(mEngineState != value) { 
         mEngineState = value; 
         mScreen.markDirty(Model::Index::EngineState);
+        mScreen.markDirty(Model::Index::TargetTemperature);
     } 
 }
 
-MainScreenAbs::Model& MainScreenAbs::getModel(){
+MainScreenAbs::Model& MainScreenAbs::model(){
     return mModel;
 }
 
-const MainScreenAbs::Model& MainScreenAbs::getModel() const {
+const MainScreenAbs::Model& MainScreenAbs::model() const {
     return mModel;
 }
 

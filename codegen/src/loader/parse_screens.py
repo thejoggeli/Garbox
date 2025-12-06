@@ -20,9 +20,18 @@ def parse_screens(config: dict):
         parse_model_helpers(screen_data["model"])
         collect_replay_events(screen_data)
 
+        gui_filename = screen_data.get("gui_filename", None)
+
         # replace
         screen_data["replay"] = screen_data.get("replay", False)
         screen_data["use_lvgl"] = screen_data.get("use_lvgl", False)
+        screen_data["use_gui"] = gui_filename is not None
+        screen_data["gui_filename"] = gui_filename
+
+        if gui_filename is not None:
+            gui_name = gui_filename.replace(".xml", "").strip()
+            screen_data["use_lvgl"] = False
+            screen_data["gui"] = config["guis"][gui_name]
 
 
 def keys_difference(all_keys: list, keys_to_remove: list):
