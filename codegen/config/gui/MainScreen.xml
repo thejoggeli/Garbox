@@ -19,25 +19,54 @@
     <!-- Row layout: Label | (hidden left arrow) | Value | (hidden right arrow) -->
     <!-- Always hidden arrows; user can choose to show them later in C++ -->
     <SettingRow $label $value>
-      <body layout="flex" flex-flow="row">
-        <label name="label" text=$label text-align="left" pad-right="8px" />
-        <label name="left"  text="&lt;" text-align="center" width="16px" hidden="true" />
-        <label name="value" text=$value text-align="center" width="80px" />
-        <label name="right" text="&gt;" text-align="center" width="16px" hidden="true" />
+      <body layout="flex" flex-flow="row" width="content" height="content">
+        <label name="label" text=$label text-align="left"   width="content" />
+        <label name="value" text=$value text-align="center" width="content" />
       </body>
     </SettingRow>
 
+    <!-- INFO ROW COMPONENT -->
+    <!-- Row layout: Icon | Value | Unit -->
+    <!-- Evenly distributed vertically by parent container -->
+    <InfoRow $icon $value $unit="unit" $hideUnit="false">
+      <body layout="flex" flex-flow="row" height="content">
+        <image name="icon"  src=$icon width="16" height="16" />
+        <label name="value" text=$value pad-left="4px" pad-right="4px" />
+        <label name="unit"  text=$unit hidden=$hideUnit text-align="right" flex-grow="1" />
+      </body>
+    </InfoRow>
+
   </components>
 
-  <root bg-color="#000000" text-color="#ffffff" layout="flex" flex-flow="column">
+  <root bg-color="#000000" text-color="#ffffff">
 
-    <SettingRow name="settingPower"  $label="Power"  $value="On"     bg-color="#ff00ff" bg-opacity="100%" />
-    <SettingRow name="settingTarget" $label="Target" $value="30.0°C" bg-color="#00ffff" bg-opacity="100%" />
-    <!-- <SettingRow name="settingFan"         $label="Fan"        $value="auto" /> -->
-    <!-- <SettingRow name="settingHeater"      $label="Heater"     $value="auto" /> -->
-    <!-- <SettingRow name="settingBrightness"  $label="Brightness" $value="-" /> -->
-    <!-- <SettingRow name="settingCalibrate"   $label="Calibrate"  $value="-" /> -->
-    <!-- <SettingRow name="settingAdvanced"    $label="Advanced"   $value="-" /> -->
+    <container layout="flex" flex-flow="row" width="100%" height="100%" bg-color="#cccccc" bg-opacity="100%">
+
+      <container layout="flex" flex-flow="column" flex-align="start start start" flex-grow="1" height="100%" pad="4px" pad-gap="4px">
+        <SettingRow name="settingPower"       $label="Power"      bg-color="#880088" bg-opacity="100%" $value="On" />
+        <SettingRow name="settingTarget"      $label="Target"     bg-color="#008888" bg-opacity="100%" $value="30.0°C" />
+        <SettingRow name="settingFan"         $label="Fan"        bg-color="#880000" bg-opacity="100%" $value="auto" />
+        <SettingRow name="settingHeater"      $label="Heater"     bg-color="#000088" bg-opacity="100%" $value="auto" />
+        <SettingRow name="settingBrightness"  $label="Brightness" bg-color="#008800" bg-opacity="100%" $value="-" />
+        <SettingRow name="settingCalibrate"   $label="Calibrate"  bg-color="#888800" bg-opacity="100%" $value="-" />
+        <SettingRow name="settingAdvanced"    $label="Advanced"   bg-color="#880088" bg-opacity="100%" $value="-" />
+      </container>
+
+      <container layout="flex" flex-flow="column" flex-align="start start start" width="100px" height="100%" bg-color="#444444" bg-opacity="100%" pad="4px" pad-gap="8px">
+        <InfoRow name="statusEngine"      $icon="power-16px"        $value="" $hideUnit="true" />
+        <InfoRow name="statusTemperature" $icon="temperature-16px"  $value="" $unit="°C" />
+        <InfoRow name="statusFan"         $icon="fan-16px"          $value="" $unit="%" />
+        <InfoRow name="statusHeat"        $icon="heat-16px"         $value="" $unit="%" />
+      </container>
+
+      <container layout="flex" flex-flow="column" flex-align="start start start" width="100px" height="100%" bg-color="#440000" bg-opacity="100%" pad="4px" pad-gap="8px">
+          <InfoRow name="sensorPower"       $icon="power-16px"        $value="" $unit="W"   />
+          <InfoRow name="sensorTemperature" $icon="temperature-16px"  $value="" $unit="°C"  />
+          <InfoRow name="sensorFan"         $icon="fan-16px"          $value="" $unit="RPM" />
+          <InfoRow name="sensorHumidity"    $icon="humidity-16px"     $value="" $unit="%"   />
+      </container>
+
+    </container>
 
   </root>
 

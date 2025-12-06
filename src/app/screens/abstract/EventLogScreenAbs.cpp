@@ -17,7 +17,6 @@ EventLogScreenAbs::EventLogScreenAbs():
 void EventLogScreenAbs::init(ComponentHostIfc& host){
 
     // init lvgl container
-    mRoot.setHidden(true);
     mRoot.setRawSize(mScreenWidth, mScreenHeight);
     mRoot.setBorder(0, lv_color_hex(0x000000));
     mRoot.setRadius(0);
@@ -34,13 +33,11 @@ void EventLogScreenAbs::updateScreen(){
 }
 
 void EventLogScreenAbs::becomeEnabled(){
-    mRoot.setHidden(false);
     mRoot.setScreen();
     ScreenAbs::becomeEnabled();
 }
 
 void EventLogScreenAbs::becomeDisabled(){
-    mRoot.setHidden(true);
     ScreenAbs::becomeDisabled();
 }
 

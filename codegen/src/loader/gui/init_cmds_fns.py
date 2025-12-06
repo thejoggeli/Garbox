@@ -63,8 +63,6 @@ def fn_size(v, prefix, dim):
     v = prep_val(v)
     if v == "content": 
         return f"set{prefix}{dim}Content()"
-    if v == "auto": 
-        return f"set{prefix}{dim}Auto()"
     return f"set{prefix}{dim}({render_style_value(v)})"
 
 INITIALIZER_MAP = {
@@ -96,13 +94,28 @@ INITIALIZER_MAP = {
         "opacity":      lambda v: f"setOpacity({render_value(v,'int')})",
 
         # padding
-        "pad":          lambda v: f"setPad({render_px_pct(v[0],'int')}, {render_px_pct(v[1],'int')}, {render_px_pct(v[2],'int')}, {render_px_pct(v[3],'int')})",
+        "pad":          lambda v: f"setPad({render_px_pct(v[0])}, {render_px_pct(v[1])}, {render_px_pct(v[2])}, {render_px_pct(v[3])})",
         "pad-left":     lambda v: f"setPadLeft({render_px_pct(v)})",
         "pad-right":    lambda v: f"setPadRight({render_px_pct(v)})",
         "pad-top":      lambda v: f"setPadTop({render_px_pct(v)})",
         "pad-bottom":   lambda v: f"setPadBottom({render_px_pct(v)})",
-        "pad-x":        lambda v: f"setPadX({render_px_pct(v[0],'int')}, {render_px_pct(v[1],'int')})",
-        "pad-y":        lambda v: f"setPadY({render_px_pct(v[0],'int')}, {render_px_pct(v[1],'int')})",
+        "pad-all":      lambda v: f"setPadAll({render_px_pct(v)})",
+        "pad-hor":      lambda v: f"setPadHor({render_px_pct(v)})",
+        "pad-ver":      lambda v: f"setPadVer({render_px_pct(v)})",
+        "pad-gap":      lambda v: f"setPadGap({render_px_pct(v)})",
+        "pad-row":      lambda v: f"setPadRow({render_px_pct(v)})",
+        "pad-column":   lambda v: f"setPadColumn({render_px_pct(v)})",
+        "pad-radial":   lambda v: f"setPadRadial({render_px_pct(v)})",
+
+        # margin
+        "margin":        lambda v: f"setMargin({render_px_pct(v[0])}, {render_px_pct(v[1])}, {render_px_pct(v[2])}, {render_px_pct(v[3])})",
+        "margin-left":   lambda v: f"setMarginLeft({render_px_pct(v)})",
+        "margin-right":  lambda v: f"setMarginRight({render_px_pct(v)})",
+        "margin-top":    lambda v: f"setMarginTop({render_px_pct(v)})",
+        "margin-bottom": lambda v: f"setMarginBottom({render_px_pct(v)})",
+        "margin-all":    lambda v: f"setMarginAll({render_px_pct(v)})",
+        "margin-hor":    lambda v: f"setMarginHor({render_px_pct(v)})",
+        "margin-ver":    lambda v: f"setMarginVer({render_px_pct(v)})",
 
         # border
         "border-width": lambda v: f"setBorderWidth({render_px_pct(v)})",

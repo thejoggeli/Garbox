@@ -19,7 +19,6 @@ DebugScreenAbs::DebugScreenAbs():
 void DebugScreenAbs::init(ComponentHostIfc& host){
 
     // init lvgl container
-    mRoot.setHidden(true);
     mRoot.setRawSize(mScreenWidth, mScreenHeight);
     mRoot.setBorder(0, lv_color_hex(0x000000));
     mRoot.setRadius(0);
@@ -51,13 +50,11 @@ void DebugScreenAbs::updateScreen(){
 }
 
 void DebugScreenAbs::becomeEnabled(){
-    mRoot.setHidden(false);
     mRoot.setScreen();
     ScreenAbs::becomeEnabled();
 }
 
 void DebugScreenAbs::becomeDisabled(){
-    mRoot.setHidden(true);
     ScreenAbs::becomeDisabled();
 }
 

@@ -6,7 +6,7 @@ def split_attr(val):
     if isinstance(v, str) and v.lower() == "cover":
         return 255
 
-def parse_bg_opacity(v):
+def parse_opacity(v):
     
     # case: literal string "cover"
     if isinstance(v, str) and v.strip().lower() == "cover":
@@ -35,11 +35,12 @@ def process_attrs(attrs):
 
     for attr_type, attr_data in attrs.items():
 
+        # opacity attributes
         if attr_type in {"bg-opacity", "text-outline-opa", "text-opa"}:
-            attr_data["value"] = parse_bg_opacity(attr_data["value"])
+            attr_data["value"] = parse_opacity(attr_data["value"])
 
-        # attribute 'pad'
-        if attr_type == "pad":
+        # attributes 'pad' and 'margin'
+        if attr_type == "pad" or attr_type == "margin":
             split = split_attr(attr_data["value"])
             if len(split) == 1 or isinstance(split, str):
                 attr_data["value"] = attr_data = [split[0], split[0], split[0], split[0]]
@@ -49,17 +50,7 @@ def process_attrs(attrs):
                 attr_data["value"] = [split[0], split[1], split[2], split[3]]
             else:
                 raise ValueError(f"invalid '{attr_type}' value. expected 1 or 2 or 4 integers, got '{attr_data['value']}'")
-        
-        # attribute 'pad-x'
-        elif attr_type == "pad-x" or attr_type == "pad-y":
-            split = split_attr(attr_data["value"])
-            if len(split) == 1 or isinstance(split, str):
-                attr_data["value"] = [split[0], split[0]]
-            elif len(split) == 2:
-                attr_data["value"] = [split[0], split[1]]
-            else:
-                raise ValueError(f"invalid '{attr_type}' value. expected 1 or 2 integers, got '{attr_data['value']}'")
-
+            
         # align
         elif attr_type == "align":
             split = split_attr(attr_data["value"])

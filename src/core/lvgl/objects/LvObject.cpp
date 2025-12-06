@@ -209,7 +209,6 @@ void LvObject::clearFlag(lv_obj_flag_t flag){
 }
 
 void LvObject::setHidden(bool hidden){
-    return;
     if(hidden){
         lv_obj_add_flag(mRaw, LV_OBJ_FLAG_HIDDEN);
     }
@@ -375,14 +374,71 @@ void LvObject::setPadBottom(int32_t bottomPixels){
     lv_obj_set_style_pad_bottom(mRaw, bottomPixels, LV_PART_MAIN);
 }
 
-void LvObject::setPadX(int32_t xPixels){
-    lv_obj_set_style_pad_left(mRaw, xPixels, LV_PART_MAIN);
-    lv_obj_set_style_pad_right(mRaw, xPixels, LV_PART_MAIN);
+void LvObject::setPadAll(int32_t px) {
+    lv_obj_set_style_pad_all(mRaw, px, LV_PART_MAIN);
 }
 
-void LvObject::setPadY(int32_t yPixels){
-    lv_obj_set_style_pad_top(mRaw, yPixels, LV_PART_MAIN);
-    lv_obj_set_style_pad_bottom(mRaw, yPixels, LV_PART_MAIN);
+void LvObject::setPadHor(int32_t px) {
+    lv_obj_set_style_pad_hor(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setPadVer(int32_t px) {
+    lv_obj_set_style_pad_ver(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setPadGap(int32_t px) {
+    lv_obj_set_style_pad_gap(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setPadRow(int32_t px) {
+    lv_obj_set_style_pad_row(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setPadColumn(int32_t px) {
+    lv_obj_set_style_pad_column(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setPadRadial(int32_t px) {
+    lv_obj_set_style_pad_radial(mRaw, px, LV_PART_MAIN);
+}
+
+// ==============================================================================
+// margin
+// ==============================================================================
+
+void LvObject::setMargin(int32_t leftPixels, int32_t rightPixels, int32_t topPixels, int32_t bottomPixels) {
+    lv_obj_set_style_margin_left(mRaw, leftPixels, LV_PART_MAIN);
+    lv_obj_set_style_margin_right(mRaw, rightPixels, LV_PART_MAIN);
+    lv_obj_set_style_margin_top(mRaw, topPixels, LV_PART_MAIN);
+    lv_obj_set_style_margin_bottom(mRaw, bottomPixels, LV_PART_MAIN);
+}
+
+void LvObject::setMarginLeft(int32_t px) {
+    lv_obj_set_style_margin_left(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setMarginRight(int32_t px) {
+    lv_obj_set_style_margin_right(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setMarginTop(int32_t px) {
+    lv_obj_set_style_margin_top(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setMarginBottom(int32_t px) {
+    lv_obj_set_style_margin_bottom(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setMarginAll(int32_t px) {
+    lv_obj_set_style_margin_all(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setMarginHor(int32_t px) {
+    lv_obj_set_style_margin_hor(mRaw, px, LV_PART_MAIN);
+}
+
+void LvObject::setMarginVer(int32_t px) {
+    lv_obj_set_style_margin_ver(mRaw, px, LV_PART_MAIN);
 }
 
 // ==============================================================================

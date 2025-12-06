@@ -12,7 +12,6 @@ namespace Garbox {
 void {{class_name}}::init(){
     
     // initialize root
-    mObjects.root.setHidden(true);
     mObjects.root.setBorder(0, lv_color_hex(0x000000));
     mObjects.root.setRadius(0);
     mObjects.root.setPad(0, 0, 0, 0);
@@ -29,12 +28,7 @@ void {{class_name}}::init(){
 }
 
 void {{class_name}}::show(){
-    mObjects.root.setHidden(false);
     mObjects.root.setScreen();
-}
-
-void {{class_name}}::hide(){
-    mObjects.root.setHidden(true);
 }
 
 {{class_name}}::Objects& {{class_name}}::objects(){

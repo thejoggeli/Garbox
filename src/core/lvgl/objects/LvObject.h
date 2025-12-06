@@ -114,8 +114,23 @@ public:
     void setPadRight(int32_t rightPixels);
     void setPadTop(int32_t topPixels);
     void setPadBottom(int32_t bottomPixels);
-    void setPadX(int32_t xPixels);
-    void setPadY(int32_t yPixels);
+    void setPadAll(int32_t px);
+    void setPadHor(int32_t px);
+    void setPadVer(int32_t px);
+    void setPadGap(int32_t px);
+    void setPadRow(int32_t px);
+    void setPadColumn(int32_t px);
+    void setPadRadial(int32_t px);
+
+    // margin
+    void setMargin(int32_t leftPixels, int32_t rightPixels, int32_t topPixels, int32_t bottomPixels);
+    void setMarginLeft(int32_t px);
+    void setMarginRight(int32_t px);
+    void setMarginTop(int32_t px);
+    void setMarginBottom(int32_t px);
+    void setMarginAll(int32_t px);
+    void setMarginHor(int32_t px);
+    void setMarginVer(int32_t px);
 
     // style helper
     void setStyleProp(uint32_t prop, lv_style_value_t value);   

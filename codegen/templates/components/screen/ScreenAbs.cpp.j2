@@ -35,7 +35,6 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
 
 {% if screen.use_lvgl %}
     // init lvgl container
-    mRoot.setHidden(true);
     mRoot.setRawSize(mScreenWidth, mScreenHeight);
     mRoot.setBorder(0, lv_color_hex(0x000000));
     mRoot.setRadius(0);
@@ -47,7 +46,6 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
 {% if screen.use_gui %}
     // init gui
     mGui.init();
-    mGui.hide();
 {% endif %}
 
 {% if screen.use_model %}
@@ -73,7 +71,6 @@ void {{ name }}Abs::updateScreen(){
 
 void {{ name }}Abs::becomeEnabled(){
 {% if screen.use_lvgl %}
-    mRoot.setHidden(false);
     mRoot.setScreen();
 {% endif %}
 {% if screen.use_gui %}
@@ -86,12 +83,6 @@ void {{ name }}Abs::becomeEnabled(){
 }
 
 void {{ name }}Abs::becomeDisabled(){
-{% if screen.use_lvgl %}
-    mRoot.setHidden(true);
-{% endif %}
-{% if screen.use_gui %}
-    mGui.hide();
-{% endif %}
 {% if screen.model.get("debounce") %}
     mModel.resetTimers();
 {% endif %}

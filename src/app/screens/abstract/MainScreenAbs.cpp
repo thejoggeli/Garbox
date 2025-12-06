@@ -20,7 +20,6 @@ void MainScreenAbs::init(ComponentHostIfc& host){
 
     // init gui
     mGui.init();
-    mGui.hide();
 
     mDirtyDispatcher.registerHandler(applyFanStatusTrampoline, this);
     mDirtyDispatcher.registerHandler(applyFanTargetSpeedTrampoline, this);
@@ -49,7 +48,6 @@ void MainScreenAbs::becomeEnabled(){
 }
 
 void MainScreenAbs::becomeDisabled(){
-    mGui.hide();
     ScreenAbs::becomeDisabled();
 }
 
