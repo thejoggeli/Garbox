@@ -6,10 +6,10 @@
     <!-- Always hidden arrows; user can choose to show them later in C++ -->
     <SettingRow $label $value>
       <body layout="flex" flex-flow="row" height="40">
-        <label  name="label" text=$label flex-grow="1" />
-        <image  name="left"  src="icons/arrow_left.png" hidden="true"/>
-        <label  name="value" text=$value width="40" align="right" />
-        <image  name="right" src="icons/arrow_right.png" hidden="true" />
+        <label name="label" text=$label flex-grow="1" />
+        <image name="left"  src="icons/arrow_left.png" hidden="true"/>
+        <label name="value" text=$value width="40" align="right" />
+        <image name="right" src="icons/arrow_right.png" hidden="true" />
       </body>
     </SettingRow>
 
@@ -42,8 +42,8 @@
         <SettingRow name="setting-target"    $label="Target"    $value="30.0 °C" />
         <SettingRow name="setting-fan"       $label="Fan"       $value="Auto" />
         <SettingRow name="setting-heater"    $label="Heater"    $value="Auto" />
-        <SettingRow name="setting-calibrate" $label="Calibrate" />
-        <SettingRow name="setting-advanced"  $label="Advanced"  />
+        <SettingRow name="setting-calibrate" $label="Calibrate" $value="-" />
+        <SettingRow name="setting-advanced"  $label="Advanced"  $value="-" />
       </container>
       <!-- LEFT PANE END -->
 
@@ -53,7 +53,7 @@
         pad="8" width="100px"
         layout="flex" flex-flow="col"  
       >
-        <label text="Status" height="30" />
+        <label text="Status" height="30" text-color="#cc88ff" />
         <container layout="flex" flex-flow="col" flex-grow="1">
           <InfoRow $name="status"  $icon="icons/power16.png"  $value="Active" />
           <InfoRow $name="fanPct"  $icon="icons/fan16.png"    $value="40.0" $unit="%" />
@@ -68,7 +68,7 @@
         pad="8" width="100px" 
         layout="flex" flex-flow="col"
       >
-        <label text="Sensors" height="30" />
+        <label text="Sensors" height="30" text-color="#88ccff"/>
         <container layout="flex" flex-flow="col" flex-grow="1">
           <InfoRow name="fanRpm"      $icon="icons/fan16.png"          $value="2000" $unit="RPM" />
           <InfoRow name="temperature" $icon="icons/temperature16.png"  $value="28.2" $unit="°C"  />

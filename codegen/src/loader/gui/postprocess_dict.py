@@ -33,7 +33,6 @@ def prep_val(val):
 def split_attr(val):
     split = val.replace(",", " ")
     split = val.split(" ")
-    split = [x.strip() for x in val]
     return split
 
 def postprocess_dict(gui_data):
@@ -62,8 +61,83 @@ def build_initializer_commands(gui_data):
 def build_from_object(obj_data):
     obj_type = obj_data["type"]
     print(f"{obj_type}")
+    build_function_calls(obj_data["name"], obj_data["type"], obj_data["attrs"])
 
-    for attr_name, attr_data in obj_data["attrs"].items():
+
+def build_from_component(obj_data):
+
+    obj_type = obj_data["type"]
+    comp_def = obj_data["component"]
+
+    print(f"{obj_type}")
+
+    body_attrs      = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "attr"}
+    param_attrs     = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "p-attr"}
+    optional_params = {k: v for k, v in comp_def["params"].items()   if v["required"] == False}
+
+    build_list = []
+
+    for objdef_name, objdef_data in comp_def["objects"].items():
+
+        attrs = {}
+
+        for attr_name, attr_data in objdef_data["attrs"].items():
+            out_value = None
+            raw_value = attr_data["value"] 
+
+            # resolve v-attr (insert value either from passed params or from default)
+            if attr_data["type"] == "v-attr":
+                
+                # get value from passed param
+                if raw_value in param_attrs:
+                    out_value = param_attrs[raw_value]["value"]
+
+                # fall back to default value
+                elif raw_value in optional_params: 
+                    out_value = optional_params[raw_value]["default"]
+
+                # handle param not found
+                else:
+                    raise ValueError(f"parameter attribute missing: {obj_type}.{objdef_name}.{attr_name}")
+            
+            # handle regular attr 
+            else:
+                out_value = attr_data["value"]
+
+            attrs[attr_name] = {
+                "type": attr_data["type"],
+                "value": out_value,
+            }
+        
+        build_list.append({
+            "instance_name": f"{obj_data['name']}.{objdef_data['name']}",
+            "obj_type": objdef_data["type"],
+            "attrs": attrs,
+        })
+
+    # override default component body attrs with passed component instance attrs
+    body_idx = 0
+    for attr_name, attr_data in body_attrs.items():
+        build_list[body_idx]["attrs"][attr_name] = {
+            "type": attr_data["type"],
+            "value": attr_data["value"],
+        }
+
+    # build function calls
+    fn_calls = []
+    for build_entry in build_list:
+        process_attrs(build_entry["attrs"])
+        result = build_function_calls(build_entry["instance_name"], build_entry["obj_type"], build_entry["attrs"])
+        fn_calls.extend(result)
+
+    return fn_calls
+
+
+def build_function_calls(instance_name: str, obj_type: str, attrs: dict):
+
+    fn_calls = []
+
+    for attr_name, attr_data in attrs.items():
 
         initializer_fn = nested_get(INITIALIZER_MAP, keys=(obj_type, attr_name), default=None)
 
@@ -71,24 +145,40 @@ def build_from_object(obj_data):
             initializer_fn = nested_get(INITIALIZER_MAP, keys=("object", attr_name), default=None)
 
         if initializer_fn is not None:
-            result = initializer_fn(attr_data["value"])
-            print(f"- {attr_name}: {result}")
+            fn_calls.append({
+                "instance": instance_name,
+                "calls": ensure_list(initializer_fn(attr_data["value"])),
+                "comment": f"{attr_name}=\"{attr_data['value_raw']}\"",
+            })
         else:
-            print(f"- {attr_name}: <missing>")
+            fn_calls.append({
+                "instance": instance_name,
+                "calls": [f"<{attr_name}>"],
+                "comment": f"function def not found",
+            })
 
-
-def build_from_component(obj_data):
-    obj_type = obj_data["type"]
-    # print(f"handle compoment: {obj_type}")
+    for fn_call in fn_calls:
+        instance = fn_call["instance"]
+        for call_str in fn_call["calls"]:
+            print(f"- {instance}.{call_str}; // {fn_call['comment']}")
+    
+    return fn_calls
 
 
 def process_attrs(attrs):
+
+    align = None
+    align_x = None
+    align_y = None
+
     for attr_type, attr_data in attrs.items():
+
+        attr_data["value_raw"] = attr_data["value"]
 
         # attribute 'pad'
         if attr_type == "pad":
             split = split_attr(attr_data["value"])
-            if len(split) == 1:
+            if len(split) == 1 or isinstance(split, str):
                 attr_data["value"] = attr_data = [split[0], split[0], split[0], split[0]]
             elif len(split) == 2:
                 attr_data["value"] = [split[0], split[0], split[1], split[1]]
@@ -100,12 +190,28 @@ def process_attrs(attrs):
         # attribute 'pad-x'
         elif attr_type == "pad-x" or attr_type == "pad-y":
             split = split_attr(attr_data["value"])
-            if len(split) == 1:
+            if len(split) == 1 or isinstance(split, str):
                 attr_data["value"] = [split[0], split[0]]
             elif len(split) == 2:
                 attr_data["value"] = [split[0], split[1]]
             else:
                 raise ValueError(f"invalid '{attr_type}' value. expected 1 or 2 integers, got '{attr_data['value']}'")
+
+        # align
+        elif attr_type == "align":
+            split = split_attr(attr_data["value"])
+            if len(split) == 1 or isinstance(split, str):
+                attr_data["value"] = [split[0], 0, 0]
+            elif len(split) == 2:
+                attr_data["value"] = [split[0], split[1], split[1]]
+            elif len(split) == 3:
+                attr_data["value"] = [split[0], split[1], split[2]]
+            else:
+                raise ValueError(f"invalid '{attr_type}' value. expected str and up to 2 integers, got '{attr_data['value']}'")
+
+
+
+
 
 TEXT_ALIGN = {
     "auto": "LV_TEXT_ALIGN_AUTO",
@@ -138,6 +244,30 @@ FLEX_FLOW = {
     "col-wrap-reverse": "LV_FLEX_FLOW_COLUMN_WRAP_REVERSE",
 }
 
+ALIGN = {
+    "default":          "LV_ALIGN_DEFAULT",
+    "top-left":         "LV_ALIGN_TOP_LEFT",
+    "top":              "LV_ALIGN_TOP_MID",
+    "top-right":        "LV_ALIGN_TOP_RIGHT",
+    "bottom-left":      "LV_ALIGN_BOTTOM_LEFT",
+    "bottom":           "LV_ALIGN_BOTTOM_MID",
+    "bottom-right":     "LV_ALIGN_BOTTOM_RIGHT",
+    "left":             "LV_ALIGN_LEFT_MID",
+    "right":            "LV_ALIGN_RIGHT_MID",
+    "center":           "LV_ALIGN_CENTER",
+    "out-top-left":     "LV_ALIGN_OUT_TOP_LEFT",
+    "out-top":          "LV_ALIGN_OUT_TOP_MID",
+    "out-top-right":    "LV_ALIGN_OUT_TOP_RIGHT",
+    "out-bottom-left":  "LV_ALIGN_OUT_BOTTOM_LEFT",
+    "out-bottom":       "LV_ALIGN_OUT_BOTTOM_MID",
+    "out-bottom-right": "LV_ALIGN_OUT_BOTTOM_RIGHT",
+    "out-left-top":     "LV_ALIGN_OUT_LEFT_TOP",
+    "out-left":         "LV_ALIGN_OUT_LEFT_MID",
+    "out-left-bottom":  "LV_ALIGN_OUT_LEFT_BOTTOM",
+    "out-right-top":    "LV_ALIGN_OUT_RIGHT_TOP",
+    "out-right":        "LV_ALIGN_OUT_RIGHT_MID",
+    "out-right-bottom": "LV_ALIGN_OUT_RIGHT_BOTTOM",
+}
 
 INITIALIZER_MAP = {
 
@@ -172,18 +302,18 @@ INITIALIZER_MAP = {
         "text-line-space":      lambda v: f"setTextLineSpace({render_ex(v,'int')})",
         "layout":               lambda v: f"setLayout({LAYOUT[prep_val(v)]})",
         "flex-flow":            lambda v: f"setFlexFlow({FLEX_FLOW[prep_val(v)]})",
-        "flex-grow":                 lambda v: f"setFlexGrow({render_ex(v,'int')})",
+        "flex-grow":            lambda v: f"setFlexGrow({render_ex(v,'int')})",
+        "align":                lambda v: f"setAlign({ALIGN[v[0]]}, {v[1]}, {v[2]})",
     },
 
     "label": {
         "text":                 lambda v: f"setText({render_ex(v,'string')})",
-        "color":                lambda v: f"setTextColor(lv_color_hex(0x{parse_color_to_hex(v)}))",
-        "align":                lambda v: f"setAlign({render_ex(v,'enum_text_align')})",
+        "text-color":           lambda v: f"setTextColor(lv_color_hex(0x{parse_color_to_hex(v)}))",
     },
 
-    # "image": {
-    #     "src":       lambda obj, v: f"{obj}.setSource({render_ex(v,'string')})",
-    # },
+    "image": {
+        "src":                  lambda v: f"setSource({v})",
+    },
 
     # "container": {
     #     # intentionally empty — all container behavior is inherited from LvObject

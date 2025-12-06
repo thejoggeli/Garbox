@@ -46,6 +46,7 @@ public:
     
     // alignment helpers
     void center();
+    void setAlign(lv_align_t alignment, int32_t xOffset = 0, int32_t yOffset = 0);
 
     // content sizing helpers
     void setWidthContent();
@@ -101,6 +102,7 @@ public:
 
     // style helper
     void setStyleProp(uint32_t prop, lv_style_value_t value);   
+    void setTextAlign(lv_text_align_t align);
 
 protected:
     

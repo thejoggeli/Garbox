@@ -150,13 +150,18 @@ def parse_object_tree(root_node, components={}):
             if parent_name is None:
                 raise RuntimeError("parent name must not be None")
     
+        # get component
+        isComponent = node.tag in components
+        component = components[node.tag] if isComponent else None
+
         # create final object
         obj_data = {
             "type": node.tag, # either LvObject or component name
             "name": name,
             "attrs": {},
             "parent_name": parent_name,
-            "is_component": node.tag in components
+            "is_component": isComponent,
+            "component": component, 
         }
 
         # remove name from attrs
@@ -182,7 +187,7 @@ def parse_object_tree(root_node, components={}):
             # handle regular attribute
             else:
                 obj_data["attrs"][key] = {
-                    "type": "normal",
+                    "type": "attr",
                     "value": value,
                 }
 

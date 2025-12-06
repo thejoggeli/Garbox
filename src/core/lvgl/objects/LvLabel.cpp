@@ -23,9 +23,4 @@ void LvLabel::setLongMode(lv_label_long_mode_t mode){
     lv_label_set_long_mode(raw(), mode);
 }
 
-void LvLabel::setAlign(lv_text_align_t align){
-    // align label text via style
-    lv_obj_set_style_text_align(raw(), align, LV_PART_MAIN);
-}
-
 } // namespace Garbox

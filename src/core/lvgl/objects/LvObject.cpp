@@ -117,6 +117,10 @@ void LvObject::center() {
     lv_obj_center(mRaw);
 }
 
+void LvObject::setAlign(lv_align_t alignment, int32_t xOffset, int32_t yOffset){
+    lv_obj_align(mRaw, alignment, xOffset, yOffset);
+}
+
 // ==============================================================================
 // content sizing helpers
 // ==============================================================================
@@ -335,6 +339,10 @@ void LvObject::setPadY(int32_t yPixels){
 
 void LvObject::setStyleProp(uint32_t prop, lv_style_value_t value){
     lv_obj_set_local_style_prop(mRaw, prop, value, LV_PART_MAIN);
+}
+
+void LvObject::setTextAlign(lv_text_align_t align){
+    lv_obj_set_style_text_align(mRaw, align, LV_PART_MAIN);
 }
 
 } // namespace Garbox

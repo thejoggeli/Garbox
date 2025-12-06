@@ -24,28 +24,30 @@
                 "value": "label"
               },
               "flex-grow": {
-                "type": "normal",
+                "type": "attr",
                 "value": "1"
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           },
           "left": {
             "type": "image",
             "name": "left",
             "attrs": {
               "src": {
-                "type": "normal",
+                "type": "attr",
                 "value": "icons/arrow_left.png"
               },
               "hidden": {
-                "type": "normal",
+                "type": "attr",
                 "value": "true"
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           },
           "value": {
             "type": "label",
@@ -56,32 +58,34 @@
                 "value": "value"
               },
               "width": {
-                "type": "normal",
+                "type": "attr",
                 "value": "40"
               },
               "align": {
-                "type": "normal",
+                "type": "attr",
                 "value": "right"
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           },
           "right": {
             "type": "image",
             "name": "right",
             "attrs": {
               "src": {
-                "type": "normal",
+                "type": "attr",
                 "value": "icons/arrow_right.png"
               },
               "hidden": {
-                "type": "normal",
+                "type": "attr",
                 "value": "true"
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           }
         }
       },
@@ -118,16 +122,17 @@
                 "value": "icon"
               },
               "width": {
-                "type": "normal",
+                "type": "attr",
                 "value": "16"
               },
               "height": {
-                "type": "normal",
+                "type": "attr",
                 "value": "16"
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           },
           "value": {
             "type": "label",
@@ -139,7 +144,8 @@
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           },
           "unit": {
             "type": "label",
@@ -155,7 +161,8 @@
               }
             },
             "parent_name": "body",
-            "is_component": false
+            "is_component": false,
+            "component": null
           }
         }
       }
@@ -166,61 +173,73 @@
         "name": "root",
         "attrs": {
           "layout": {
-            "type": "normal",
-            "value": "flex"
+            "type": "attr",
+            "value": "flex",
+            "value_raw": "flex"
           },
           "flex-flow": {
-            "type": "normal",
-            "value": "col"
+            "type": "attr",
+            "value": "col",
+            "value_raw": "col"
           },
           "width": {
-            "type": "normal",
-            "value": "100%"
+            "type": "attr",
+            "value": "100%",
+            "value_raw": "100%"
           },
           "height": {
-            "type": "normal",
-            "value": "100%"
+            "type": "attr",
+            "value": "100%",
+            "value_raw": "100%"
           }
         },
         "parent_name": "root",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "leftPane": {
         "type": "container",
         "name": "leftPane",
         "attrs": {
           "pad": {
-            "type": "normal",
+            "type": "attr",
             "value": [
               "8",
               "8",
               "8",
               "8"
-            ]
+            ],
+            "value_raw": "8"
           },
           "flex-grow": {
-            "type": "normal",
-            "value": "1"
+            "type": "attr",
+            "value": "1",
+            "value_raw": "1"
           },
           "layout": {
-            "type": "normal",
-            "value": "flex"
+            "type": "attr",
+            "value": "flex",
+            "value_raw": "flex"
           },
           "flex-flow": {
-            "type": "normal",
-            "value": "col"
+            "type": "attr",
+            "value": "col",
+            "value_raw": "col"
           },
           "scrollable": {
-            "type": "normal",
-            "value": "true"
+            "type": "attr",
+            "value": "true",
+            "value_raw": "true"
           },
           "scroll-dir": {
-            "type": "normal",
-            "value": "x"
+            "type": "attr",
+            "value": "x",
+            "value_raw": "x"
           }
         },
         "parent_name": "root",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "settingPower": {
         "type": "SettingRow",
@@ -228,15 +247,18 @@
         "attrs": {
           "label": {
             "type": "p-attr",
-            "value": "Power"
+            "value": "Power",
+            "value_raw": "Power"
           },
           "value": {
             "type": "p-attr",
-            "value": "On"
+            "value": "On",
+            "value_raw": "On"
           }
         },
         "parent_name": "leftPane",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824035136>"
       },
       "settingTarget": {
         "type": "SettingRow",
@@ -244,15 +266,18 @@
         "attrs": {
           "label": {
             "type": "p-attr",
-            "value": "Target"
+            "value": "Target",
+            "value_raw": "Target"
           },
           "value": {
             "type": "p-attr",
-            "value": "30.0 \u00b0C"
+            "value": "30.0 \u00b0C",
+            "value_raw": "30.0 \u00b0C"
           }
         },
         "parent_name": "leftPane",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824035136>"
       },
       "settingFan": {
         "type": "SettingRow",
@@ -260,15 +285,18 @@
         "attrs": {
           "label": {
             "type": "p-attr",
-            "value": "Fan"
+            "value": "Fan",
+            "value_raw": "Fan"
           },
           "value": {
             "type": "p-attr",
-            "value": "Auto"
+            "value": "Auto",
+            "value_raw": "Auto"
           }
         },
         "parent_name": "leftPane",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824035136>"
       },
       "settingHeater": {
         "type": "SettingRow",
@@ -276,15 +304,18 @@
         "attrs": {
           "label": {
             "type": "p-attr",
-            "value": "Heater"
+            "value": "Heater",
+            "value_raw": "Heater"
           },
           "value": {
             "type": "p-attr",
-            "value": "Auto"
+            "value": "Auto",
+            "value_raw": "Auto"
           }
         },
         "parent_name": "leftPane",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824035136>"
       },
       "settingCalibrate": {
         "type": "SettingRow",
@@ -292,11 +323,18 @@
         "attrs": {
           "label": {
             "type": "p-attr",
-            "value": "Calibrate"
+            "value": "Calibrate",
+            "value_raw": "Calibrate"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "-",
+            "value_raw": "-"
           }
         },
         "parent_name": "leftPane",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824035136>"
       },
       "settingAdvanced": {
         "type": "SettingRow",
@@ -304,76 +342,100 @@
         "attrs": {
           "label": {
             "type": "p-attr",
-            "value": "Advanced"
+            "value": "Advanced",
+            "value_raw": "Advanced"
+          },
+          "value": {
+            "type": "p-attr",
+            "value": "-",
+            "value_raw": "-"
           }
         },
         "parent_name": "leftPane",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824035136>"
       },
       "middlePane": {
         "type": "container",
         "name": "middlePane",
         "attrs": {
           "pad": {
-            "type": "normal",
+            "type": "attr",
             "value": [
               "8",
               "8",
               "8",
               "8"
-            ]
+            ],
+            "value_raw": "8"
           },
           "width": {
-            "type": "normal",
-            "value": "100px"
+            "type": "attr",
+            "value": "100px",
+            "value_raw": "100px"
           },
           "layout": {
-            "type": "normal",
-            "value": "flex"
+            "type": "attr",
+            "value": "flex",
+            "value_raw": "flex"
           },
           "flex-flow": {
-            "type": "normal",
-            "value": "col"
+            "type": "attr",
+            "value": "col",
+            "value_raw": "col"
           }
         },
         "parent_name": "root",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "_namelessLabel_0": {
         "type": "label",
         "name": "_namelessLabel_0",
         "attrs": {
           "text": {
-            "type": "normal",
-            "value": "Status"
+            "type": "attr",
+            "value": "Status",
+            "value_raw": "Status"
           },
           "height": {
-            "type": "normal",
-            "value": "30"
+            "type": "attr",
+            "value": "30",
+            "value_raw": "30"
+          },
+          "text-color": {
+            "type": "attr",
+            "value": "#cc88ff",
+            "value_raw": "#cc88ff"
           }
         },
         "parent_name": "middlePane",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "_namelessContainer_0": {
         "type": "container",
         "name": "_namelessContainer_0",
         "attrs": {
           "layout": {
-            "type": "normal",
-            "value": "flex"
+            "type": "attr",
+            "value": "flex",
+            "value_raw": "flex"
           },
           "flex-flow": {
-            "type": "normal",
-            "value": "col"
+            "type": "attr",
+            "value": "col",
+            "value_raw": "col"
           },
           "flex-grow": {
-            "type": "normal",
-            "value": "1"
+            "type": "attr",
+            "value": "1",
+            "value_raw": "1"
           }
         },
         "parent_name": "middlePane",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "_namelessInfoRow_0": {
         "type": "InfoRow",
@@ -381,19 +443,23 @@
         "attrs": {
           "name": {
             "type": "p-attr",
-            "value": "status"
+            "value": "status",
+            "value_raw": "status"
           },
           "icon": {
             "type": "p-attr",
-            "value": "icons/power16.png"
+            "value": "icons/power16.png",
+            "value_raw": "icons/power16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "Active"
+            "value": "Active",
+            "value_raw": "Active"
           }
         },
         "parent_name": "_namelessContainer_0",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       },
       "_namelessInfoRow_1": {
         "type": "InfoRow",
@@ -401,23 +467,28 @@
         "attrs": {
           "name": {
             "type": "p-attr",
-            "value": "fanPct"
+            "value": "fanPct",
+            "value_raw": "fanPct"
           },
           "icon": {
             "type": "p-attr",
-            "value": "icons/fan16.png"
+            "value": "icons/fan16.png",
+            "value_raw": "icons/fan16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "40.0"
+            "value": "40.0",
+            "value_raw": "40.0"
           },
           "unit": {
             "type": "p-attr",
-            "value": "%"
+            "value": "%",
+            "value_raw": "%"
           }
         },
         "parent_name": "_namelessContainer_0",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       },
       "_namelessInfoRow_2": {
         "type": "InfoRow",
@@ -425,88 +496,110 @@
         "attrs": {
           "name": {
             "type": "p-attr",
-            "value": "heatPct"
+            "value": "heatPct",
+            "value_raw": "heatPct"
           },
           "icon": {
             "type": "p-attr",
-            "value": "icons/heat16.png"
+            "value": "icons/heat16.png",
+            "value_raw": "icons/heat16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "23.0"
+            "value": "23.0",
+            "value_raw": "23.0"
           },
           "unit": {
             "type": "p-attr",
-            "value": "%"
+            "value": "%",
+            "value_raw": "%"
           }
         },
         "parent_name": "_namelessContainer_0",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       },
       "rightPane": {
         "type": "container",
         "name": "rightPane",
         "attrs": {
           "pad": {
-            "type": "normal",
+            "type": "attr",
             "value": [
               "8",
               "8",
               "8",
               "8"
-            ]
+            ],
+            "value_raw": "8"
           },
           "width": {
-            "type": "normal",
-            "value": "100px"
+            "type": "attr",
+            "value": "100px",
+            "value_raw": "100px"
           },
           "layout": {
-            "type": "normal",
-            "value": "flex"
+            "type": "attr",
+            "value": "flex",
+            "value_raw": "flex"
           },
           "flex-flow": {
-            "type": "normal",
-            "value": "col"
+            "type": "attr",
+            "value": "col",
+            "value_raw": "col"
           }
         },
         "parent_name": "root",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "_namelessLabel_1": {
         "type": "label",
         "name": "_namelessLabel_1",
         "attrs": {
           "text": {
-            "type": "normal",
-            "value": "Sensors"
+            "type": "attr",
+            "value": "Sensors",
+            "value_raw": "Sensors"
           },
           "height": {
-            "type": "normal",
-            "value": "30"
+            "type": "attr",
+            "value": "30",
+            "value_raw": "30"
+          },
+          "text-color": {
+            "type": "attr",
+            "value": "#88ccff",
+            "value_raw": "#88ccff"
           }
         },
         "parent_name": "rightPane",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "_namelessContainer_1": {
         "type": "container",
         "name": "_namelessContainer_1",
         "attrs": {
           "layout": {
-            "type": "normal",
-            "value": "flex"
+            "type": "attr",
+            "value": "flex",
+            "value_raw": "flex"
           },
           "flex-flow": {
-            "type": "normal",
-            "value": "col"
+            "type": "attr",
+            "value": "col",
+            "value_raw": "col"
           },
           "flex-grow": {
-            "type": "normal",
-            "value": "1"
+            "type": "attr",
+            "value": "1",
+            "value_raw": "1"
           }
         },
         "parent_name": "rightPane",
-        "is_component": false
+        "is_component": false,
+        "component": null
       },
       "fanRpm": {
         "type": "InfoRow",
@@ -514,19 +607,23 @@
         "attrs": {
           "icon": {
             "type": "p-attr",
-            "value": "icons/fan16.png"
+            "value": "icons/fan16.png",
+            "value_raw": "icons/fan16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "2000"
+            "value": "2000",
+            "value_raw": "2000"
           },
           "unit": {
             "type": "p-attr",
-            "value": "RPM"
+            "value": "RPM",
+            "value_raw": "RPM"
           }
         },
         "parent_name": "_namelessContainer_1",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       },
       "temperature": {
         "type": "InfoRow",
@@ -534,19 +631,23 @@
         "attrs": {
           "icon": {
             "type": "p-attr",
-            "value": "icons/temperature16.png"
+            "value": "icons/temperature16.png",
+            "value_raw": "icons/temperature16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "28.2"
+            "value": "28.2",
+            "value_raw": "28.2"
           },
           "unit": {
             "type": "p-attr",
-            "value": "\u00b0C"
+            "value": "\u00b0C",
+            "value_raw": "\u00b0C"
           }
         },
         "parent_name": "_namelessContainer_1",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       },
       "humidity": {
         "type": "InfoRow",
@@ -554,19 +655,23 @@
         "attrs": {
           "icon": {
             "type": "p-attr",
-            "value": "icons/humidity16.png"
+            "value": "icons/humidity16.png",
+            "value_raw": "icons/humidity16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "56.3"
+            "value": "56.3",
+            "value_raw": "56.3"
           },
           "unit": {
             "type": "p-attr",
-            "value": "%"
+            "value": "%",
+            "value_raw": "%"
           }
         },
         "parent_name": "_namelessContainer_1",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       },
       "power": {
         "type": "InfoRow",
@@ -574,19 +679,23 @@
         "attrs": {
           "icon": {
             "type": "p-attr",
-            "value": "icons/power16.png"
+            "value": "icons/power16.png",
+            "value_raw": "icons/power16.png"
           },
           "value": {
             "type": "p-attr",
-            "value": "15.3"
+            "value": "15.3",
+            "value_raw": "15.3"
           },
           "unit": {
             "type": "p-attr",
-            "value": "W"
+            "value": "W",
+            "value_raw": "W"
           }
         },
         "parent_name": "_namelessContainer_1",
-        "is_component": true
+        "is_component": true,
+        "component": "<ref:131439824034368>"
       }
     },
     "initializer_commands": null
