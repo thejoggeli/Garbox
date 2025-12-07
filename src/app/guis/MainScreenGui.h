@@ -9,9 +9,10 @@
 
 LV_IMAGE_DECLARE(MainScreen_image_power_16px);
 LV_IMAGE_DECLARE(MainScreen_image_temperature_16px);
-LV_IMAGE_DECLARE(MainScreen_image_fan_16px);
 LV_IMAGE_DECLARE(MainScreen_image_heat_16px);
+LV_IMAGE_DECLARE(MainScreen_image_fan_16px);
 LV_IMAGE_DECLARE(MainScreen_image_humidity_16px);
+LV_IMAGE_DECLARE(MainScreen_image_rpm_16px);
 
 namespace Garbox {
 
@@ -35,18 +36,32 @@ public:
         ~SettingRow() = default;
     };
 
-    struct InfoRow {
-        InfoRow(LvObject& parent);
+    struct InfoRowUnitText {
+        InfoRowUnitText(LvObject& parent);
         LvObject body;
         LvImage icon;
         LvLabel value;
         LvLabel unit;
 
-        InfoRow(const InfoRow&) = delete;
-        InfoRow& operator=(const InfoRow&) = delete;
-        InfoRow(InfoRow&&) = delete;
-        InfoRow& operator=(InfoRow&&) = delete;
-        ~InfoRow() = default;
+        InfoRowUnitText(const InfoRowUnitText&) = delete;
+        InfoRowUnitText& operator=(const InfoRowUnitText&) = delete;
+        InfoRowUnitText(InfoRowUnitText&&) = delete;
+        InfoRowUnitText& operator=(InfoRowUnitText&&) = delete;
+        ~InfoRowUnitText() = default;
+    };
+
+    struct InfoRowUnitIcon {
+        InfoRowUnitIcon(LvObject& parent);
+        LvObject body;
+        LvImage icon;
+        LvLabel value;
+        LvImage unit;
+
+        InfoRowUnitIcon(const InfoRowUnitIcon&) = delete;
+        InfoRowUnitIcon& operator=(const InfoRowUnitIcon&) = delete;
+        InfoRowUnitIcon(InfoRowUnitIcon&&) = delete;
+        InfoRowUnitIcon& operator=(InfoRowUnitIcon&&) = delete;
+        ~InfoRowUnitIcon() = default;
     };
 
     // ============================================================
@@ -66,15 +81,17 @@ public:
         SettingRow settingCalibrate;
         SettingRow settingAdvanced;
         LvObject _namelessContainer_2;
-        InfoRow statusEngine;
-        InfoRow statusTemperature;
-        InfoRow statusFan;
-        InfoRow statusHeat;
+        LvLabel _namelessLabel_0;
+        InfoRowUnitText statusEngine;
+        InfoRowUnitText statusTemperature;
+        InfoRowUnitText statusHeat;
+        InfoRowUnitText statusFan;
         LvObject _namelessContainer_3;
-        InfoRow sensorPower;
-        InfoRow sensorTemperature;
-        InfoRow sensorFan;
-        InfoRow sensorHumidity;
+        LvLabel _namelessLabel_1;
+        InfoRowUnitText sensorPower;
+        InfoRowUnitText sensorTemperature;
+        InfoRowUnitText sensorHumidity;
+        InfoRowUnitIcon sensorFan;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

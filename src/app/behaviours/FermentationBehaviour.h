@@ -34,7 +34,6 @@ private:
     HeaterEngine mHeaterEngine;
 
     void doFanTestStep();
-    void sendDisableActuatorsCommands();
     
     void onInit() final;
     void onStart() final;

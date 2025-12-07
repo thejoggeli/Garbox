@@ -32,6 +32,7 @@ public:
 private:
 
     bool isSensorOk();
+    const char* resovleEngineStateText();
     const char* resovleSensorText();
 
     // safe to update lvgl objects in these methods

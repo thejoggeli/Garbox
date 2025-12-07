@@ -1,7 +1,7 @@
 from common.context import Context
 from common.item import Item, generate_items
 from common.str_filters import upper_first
-from loader.gui.image_load import load_lvgl_image
+from lvgl.LVGLImage import LVGLImage, ColorFormat
 from loader.loader import Loader
 from sortedcontainers import SortedSet
 
@@ -96,30 +96,18 @@ def _generate_classes(ctx: Context, loader: Loader):
 
 def _generate_resources(ctx: Context, loader: Loader):
 
-    items = []
-
     for gui_data in loader.config["guis"].values():
 
         all_used = gui_data["resources"]["used"]
 
         for image_name, image_resource in all_used["images"].items():
 
-            image = load_lvgl_image(
-                path = ctx.res_dir / image_resource["path"],
-                name = image_name,
-                color_format = image_resource["format"],
-            )
 
-            config = {
-                "attribute_macro": make_attribute_macro(image_name),
-                "image": image,
-                "resource": image_resource,
-            }
+            image_path_in = ctx.res_dir/image_resource["path"]
+            image_path_out = ctx.bin_dir/"images"/f"{image_name}.c"
+            image_format = image_resource["format"]
 
-            items.append(Item(
-                config, keys = "*", 
-                out_path = ctx.bin_dir/"images"/f"{image_name}.c", 
-                template_path="gui/resources/image.j2"
-            ))
+            img = LVGLImage().from_png(str(image_path_in), cf=ColorFormat[image_format])
+            img.adjust_stride(align=1)
+            img.to_c_array(str(image_path_out))
 
-    generate_items(ctx, items)

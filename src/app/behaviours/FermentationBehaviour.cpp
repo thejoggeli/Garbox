@@ -30,7 +30,9 @@ void FermentationBehaviour::onBecomeEnabled(){
 
 void FermentationBehaviour::onBecomeDisabled(){
     mHeaterEngine.reset();
-    sendDisableActuatorsCommands();
+    sendFanCommand(false, 0.0f);
+    sendHeatpadCommand(false, 0.0f, 5000_ms);
+    sendFermentationStatus();
 }
 
 void FermentationBehaviour::onLogicTick(){
@@ -55,11 +57,6 @@ void FermentationBehaviour::onLogicTick(){
     }
     
     mFirstTick = false;
-}
-
-void FermentationBehaviour::sendDisableActuatorsCommands(){
-    sendFanCommand(false, 0.0f);
-    sendHeatpadCommand(false, 0.0f, 5000_ms);
 }
 
 void FermentationBehaviour::sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros){

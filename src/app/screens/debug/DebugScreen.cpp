@@ -47,7 +47,7 @@ void DebugScreen::onInit(){
 
     mProgressBox.setRawSize(48, 8);
     mProgressBox.setBgColor(lv_color_hex(0xFFFFFF));
-    mProgressBox.setBgOpacity(LV_OPA_COVER);
+    mProgressBox.setBgOpa(LV_OPA_COVER);
 
     setBackgroundColor(0x0);
 }

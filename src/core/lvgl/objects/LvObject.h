@@ -94,19 +94,25 @@ public:
     void setTextLineSpace(int32_t spacePixels);
     void setTextAlign(lv_text_align_t align);
     void setTextDecor(lv_text_decor_t decor);
-    void setTextOpa(lv_opa_t opa);
+    void setTextOpa(lv_opa_t opacity);
     void setTextOutlineColor(lv_color_t color);
-    void setTextOutlineOpa(lv_opa_t opa);
+    void setTextOutlineOpa(lv_opa_t opacity);
     void setTextOutlineWidth(uint16_t width);
 
     // style helpers    
-    void setOpacity(uint8_t opacity);
+    void setOpa(uint8_t opacity);
     void setBgColor(lv_color_t color);
-    void setBgOpacity(uint8_t opacity);
+    void setBgOpa(uint8_t opacity);
+    void setRadius(int32_t radiusPixels);
+
+    // border
     void setBorder(int32_t widthPixels, lv_color_t color);
     void setBorderWidth(int32_t widthPixels);
     void setBorderColor(lv_color_t color);
-    void setRadius(int32_t radiusPixels);
+    void setBorderOpa(lv_opa_t opacity);
+    void setBorderSide(lv_border_side_t side);
+    void setBorderSide(int side);
+    void setBorderPost(bool enabled);
 
     // padding
     void setPad(int32_t leftPixels, int32_t rightPixels, int32_t topPixels, int32_t bottomPixels);

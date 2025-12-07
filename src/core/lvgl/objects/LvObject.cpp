@@ -298,16 +298,16 @@ void LvObject::setTextDecor(lv_text_decor_t decor) {
     lv_obj_set_style_text_decor(mRaw, decor, LV_PART_MAIN);
 }
 
-void LvObject::setTextOpa(lv_opa_t opa) {
-    lv_obj_set_style_text_opa(mRaw, opa, LV_PART_MAIN);
+void LvObject::setTextOpa(lv_opa_t opacity) {
+    lv_obj_set_style_text_opa(mRaw, opacity, LV_PART_MAIN);
 }
 
 void LvObject::setTextOutlineColor(lv_color_t color) {
     lv_obj_set_style_text_outline_stroke_color(mRaw, color, LV_PART_MAIN);
 }
 
-void LvObject::setTextOutlineOpa(lv_opa_t opa) {
-    lv_obj_set_style_text_outline_stroke_opa(mRaw, opa, LV_PART_MAIN);
+void LvObject::setTextOutlineOpa(lv_opa_t opacity) {
+    lv_obj_set_style_text_outline_stroke_opa(mRaw, opacity, LV_PART_MAIN);
 }
 
 void LvObject::setTextOutlineWidth(uint16_t width) {
@@ -318,7 +318,7 @@ void LvObject::setTextOutlineWidth(uint16_t width) {
 // style helpers
 // ==============================================================================
 
-void LvObject::setOpacity(uint8_t opacity){
+void LvObject::setOpa(uint8_t opacity){
     lv_obj_set_style_opa(mRaw, opacity, LV_PART_MAIN);
 }
 
@@ -326,9 +326,17 @@ void LvObject::setBgColor(lv_color_t color){
     lv_obj_set_style_bg_color(mRaw, color, LV_PART_MAIN);
 }
 
-void LvObject::setBgOpacity(uint8_t opacity) {
+void LvObject::setBgOpa(uint8_t opacity) {
     lv_obj_set_style_bg_opa(mRaw, opacity, LV_PART_MAIN);
 }
+
+void LvObject::setRadius(int32_t radiusPixels){
+    lv_obj_set_style_radius(mRaw, radiusPixels, LV_PART_MAIN);
+}
+
+// ==============================================================================
+// border
+// ==============================================================================
 
 void LvObject::setBorder(int32_t widthPixels, lv_color_t color){
     lv_obj_set_style_border_width(mRaw, widthPixels, LV_PART_MAIN);
@@ -343,8 +351,20 @@ void LvObject::setBorderColor(lv_color_t color){
     lv_obj_set_style_border_color(mRaw, color, LV_PART_MAIN);
 }
 
-void LvObject::setRadius(int32_t radiusPixels){
-    lv_obj_set_style_radius(mRaw, radiusPixels, LV_PART_MAIN);
+void LvObject::setBorderOpa(lv_opa_t opacity){
+    lv_obj_set_style_border_opa(mRaw, opacity, LV_PART_MAIN);
+}
+
+void LvObject::setBorderSide(lv_border_side_t side){
+    lv_obj_set_style_border_side(mRaw, side, LV_PART_MAIN);
+}
+
+void LvObject::setBorderSide(int side){
+    lv_obj_set_style_border_side(mRaw, static_cast<lv_border_side_t>(side), LV_PART_MAIN);
+}
+
+void LvObject::setBorderPost(bool enabled){
+    lv_obj_set_style_border_post(mRaw, enabled, LV_PART_MAIN);
 }
 
 // ==============================================================================

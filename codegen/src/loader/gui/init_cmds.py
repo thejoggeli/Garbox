@@ -1,15 +1,11 @@
 from common.util import print_json
 from loader.gui.init_cmds_fns import eval_initializer
-from loader.gui.init_cmds_attrs import process_attrs
 
 
 def build_initializer_commands(gui_data):
 
     fn_calls = []
     for obj_name, obj_data in gui_data["objects_flat"].items():
-
-        # process attrs
-        process_attrs(obj_data["attrs"])
         
         result = build_function_calls(obj_data["name"], obj_data["type"], obj_data["attrs"])
 
