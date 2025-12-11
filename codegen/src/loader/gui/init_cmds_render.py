@@ -1,7 +1,7 @@
 from loader.gui.init_cmds_types import *
 from common.parse_type import render_value
 from common.parse_color_string import parse_color_to_hex
-
+import math
 
 def prep_val(val):
     return val.lower().strip()
@@ -93,6 +93,78 @@ def render_px(val):
     raise ValueError(f"invalid val in render_px: {val}")
 
 
+def render_zoom(v):
+    # numeric literal => return unchanged
+    if isinstance(v, int):
+        return v
+
+    if isinstance(v, float):
+        return int(v)
+
+    if isinstance(v, str):
+        s = v.strip().lower()
+
+        # percent format: "125%" or "25.7%"
+        if s.endswith("%"):
+            num_str = s[:-1].strip()
+            try:
+                pct = float(num_str)
+            except ValueError:
+                raise ValueError(f"Invalid zoom percentage '{v}'")
+
+            # LVGL zoom unit: 256 = 100%
+            return int(round((pct / 100.0) * 256))
+
+        # raw integer in string form
+        try:
+            return int(s)
+        except ValueError:
+            raise ValueError(f"Invalid zoom value '{v}'")
+
+    raise ValueError(f"Invalid zoom type '{v}'")
+
+
+
+def render_angle(v):
+    # raw numeric value
+    if isinstance(v, int):
+        return v
+
+    if isinstance(v, float):
+        # treat this as raw LVGL value
+        return int(round(v))
+
+    if isinstance(v, str):
+        s = v.strip().lower()
+
+        # degree formats
+        if s.endswith(("deg", "degs")):
+            num = s.replace("degs", "").replace("deg", "").strip()
+            try:
+                deg = float(num)
+            except ValueError:
+                raise ValueError(f"Invalid degree angle '{v}'")
+            return int(round(deg * 10))
+
+        # radian formats
+        if s.endswith(("rad", "rads")):
+            num = s.replace("rads", "").replace("rad", "").strip()
+            try:
+                rad = float(num)
+            except ValueError:
+                raise ValueError(f"Invalid radian angle '{v}'")
+            deg = rad * (180.0 / math.pi)
+            return int(round(deg * 10))
+
+        # raw integer (string)
+        try:
+            return int(s)
+        except ValueError:
+            raise ValueError(f"Invalid angle value '{v}'")
+
+    raise ValueError(f"Invalid angle type '{v}'")
+
+
 def render_border_side(val):
 
     split = split_attr(val)
@@ -142,12 +214,41 @@ def render_flex_align(val):
     split = split_attr(val)
 
     if len(split) == 1 or isinstance(split, str):
-        v = [split[0], "start", "start"]
-    elif len(split) == 2:
-        v = [split[0], split[1], "start"]
+        v = [split[0], split[0], split[0]]
     elif len(split) == 3:
         v = [split[0], split[1], split[2]]
     else:
-        raise ValueError(f"invalid flex-align value. expected 1 or 2 or 3 values, got '{v}'")
+        raise ValueError(f"invalid flex-align value. expected 1 or 3 values, got '{v}'")
     
     return f"{FLEX_ALIGN[v[0]]}, {FLEX_ALIGN[v[1]]}, {FLEX_ALIGN[v[2]]}"
+
+
+def render_transform_size(val):
+    split = split_attr(val)
+    if len(split) == 2:
+        return f"{render_px(split[0])}, {render_px(split[1])}"
+    raise ValueError(f"invalid transform-size value. expected 2 values, got '{val}'")
+    
+
+def render_transform_pivot(val):
+    split = split_attr(val)
+    if len(split) == 2:
+        return f"{render_px(split[0])}, {render_px(split[1])}"
+    raise ValueError(f"invalid transform-pivot value. expected 2 values, got '{val}'")
+    
+
+def render_transform_zoom(val):
+    split = split_attr(val)
+    if len(split) == 1:
+        return f"{render_zoom(split[0])}, {render_zoom(split[0])}"
+    if len(split) == 2:
+        return f"{render_zoom(split[0])}, {render_zoom(split[1])}"
+    raise ValueError(f"invalid transform-zoom value. expected 1 or 2 values, got '{val}'")
+    
+
+def render_transform_skew(val):
+    split = split_attr(val)
+    if len(split) == 2:
+        return f"{render_angle(split[0])}, {render_angle(split[1])}"
+    raise ValueError(f"invalid transform-skew value. expected 2 values, got '{val}'")
+    

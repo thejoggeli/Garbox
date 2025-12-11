@@ -31,7 +31,7 @@ void Fan::init(){
     // init rpm conditioner
     mTachoConditioner.setFixedPointScaling(1000.0f); // gives theoretical 0.001 RPM resolution
     mTachoConditioner.setInputScaling(mHzToRpmFactor);
-    mTachoConditioner.setOutputSnapping(10.0f, 0.5f); // snap to 10 RPM
+    mTachoConditioner.setOutputSnapping(1.0f, 0.5f); // snap to 10 RPM
 
     // init frequency sensor
     mFrequencySensor.init(config);

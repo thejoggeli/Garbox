@@ -36,7 +36,7 @@ def preprocess_components(xml_text):
     # Must trigger only in attribute values, not strings
     # Example: foo=$bar => v-foo="bar"
     inner = re.sub(
-        r'(\s)(\w+)\s*=\s*\$(\w+)',          # foo=$bar
+        r'(\s)([\w-]+)\s*=\s*\$(\w+)',
         lambda m: f'{m.group(1)}v-{m.group(2)}="{m.group(3)}"',
         inner
     )

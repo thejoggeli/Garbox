@@ -8,7 +8,8 @@ namespace Garbox {
 
 class LvImage : public LvObject {
 public:
-    explicit LvImage(LvObject& parent);
+    LvImage(LvObject& parent);
+    LvImage(lv_obj_t* raw);
 
     void setSource(const void* src);
     void setPivot(lv_coord_t x, lv_coord_t y);

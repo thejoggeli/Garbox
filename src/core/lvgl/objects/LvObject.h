@@ -5,10 +5,11 @@
 
 namespace Garbox {
 
+/**
+ * This is a non-owning wrapper around a LVGL object. LVGL owns it.
+ */
 class LvObject {
 protected:
-
-    LvObject(lv_obj_t* raw);
 
 public:
 
@@ -19,8 +20,17 @@ public:
 
     LvObject();
     LvObject(LvObject& parent);
+    LvObject(lv_obj_t* raw);
+    ~LvObject();
+
+    LvObject(const LvObject& other); // copy constructor
+    LvObject& operator=(const LvObject& other); // assignment operator
     
+    LvObject(LvObject&& other) noexcept; // move constructor
+    LvObject& operator=(LvObject&& other) noexcept; // move assignment operator
+
     lv_obj_t* raw() const;
+    void free();
 
     // raw positioning
     void setPosition(int32_t xPixels, int32_t yPixels);
@@ -86,6 +96,21 @@ public:
     void setScrollMomentum(bool enabled);
     void setScrollElastic(bool enabled);
     void setScrollDirection(lv_dir_t dir);
+
+    // transform
+    void setTransformWidth(int32_t width);
+    void setTransformHeight(int32_t height);
+    void setTransformPivot(int32_t x, int32_t y);
+    void setTransformPivotX(int32_t pivot);
+    void setTransformPivotY(int32_t pivot);
+    void setTransformRotation(int32_t rotation);
+    void setTransformScale(int32_t scale);
+    void setTransformScale(int32_t scaleX, int32_t scaleY);
+    void setTransformScaleX(int32_t scaleX);
+    void setTransformScaleY(int32_t scaleY);
+    void setTransformSkew(int32_t skewX, int32_t skewY);
+    void setTransformSkewX(int32_t skewX);
+    void setTransformSkewY(int32_t skewY);
 
     // text helpers
     void setFont(const lv_font_t* font);

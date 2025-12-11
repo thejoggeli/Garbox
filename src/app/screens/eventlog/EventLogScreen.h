@@ -24,11 +24,19 @@ private:
         EventType type;
     };
 
-    static constexpr size_t NumLabels = 21;
-    ArrayStatic<LvLabel, NumLabels> mLabels;
+    struct LogRow {
+        LvObject container;
+        LvLabel marker;
+        LvLabel id;
+        LvLabel text;
+        LogRow(LvObject& parent);
+    };
+
+    static constexpr size_t NumRows = 22;
+    ArrayStatic<LogRow, NumRows> mRows;
     size_t mNextLabelIndex = 0;
-    RingBufferStatic<EventEntry, NumLabels> mBuffer;
-    LvLabel mMarker;
+    size_t mCurrentLabelIndex = static_cast<size_t>(-1);
+    RingBufferStatic<EventEntry, NumRows> mBuffer;
 
     // safe to update lvgl objects in these methods
     void onInit() final;

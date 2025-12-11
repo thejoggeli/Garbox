@@ -84,6 +84,21 @@ INITIALIZER_MAP = {
         "flex-grow":        lambda v: f"setFlexGrow({render_int(v)})",
         "flex-align":       lambda v: f"setFlexAlign({render_flex_align(v)})",
 
+        # transforms
+        "transform-size":       lambda v: f"setTransformSize({render_transform_size(v)})",
+        "transform-width":      lambda v: f"setTransformWidth({render_px(v)})",
+        "transform-height":     lambda v: f"setTransformHeight({render_px(v)})",
+        "transform-pivot":      lambda v: f"setTransformPivot({render_transform_pivot(v)})",
+        "transform-pivot-x":    lambda v: f"setTransformPivotX({render_px(v)})",
+        "transform-pivot-y":    lambda v: f"setTransformPivotY({render_px(v)})",
+        "transform-rotation":   lambda v: f"setTransformRotation({render_angle(v)})",
+        "transform-scale":      lambda v: f"setTransformScale({render_transform_zoom(v)})",
+        "transform-scale-x":    lambda v: f"setTransformScaleX({render_zoom(v)})",
+        "transform-scale-y":    lambda v: f"setTransformScaleY({render_zoom(v)})",
+        "transform-skew":       lambda v: f"setTransformSkewX({render_transform_skew(v)})",
+        "transform-skew-x":     lambda v: f"setTransformSkewX({render_angle(v)})",
+        "transform-skew-y":     lambda v: f"setTransformSkewY({render_angle(v)})",
+
         # text helpers
         "text-letter-space":    lambda v: f"setTextLetterSpace({render_style_val(v)})",
         "text-line-space":      lambda v: f"setTextLineSpace({render_style_val(v)})",
@@ -99,12 +114,12 @@ INITIALIZER_MAP = {
 
     # label specific functions
     "label": {
-        "text":                 lambda v: f"setText({render_string(v)})",
+        "text": lambda v: f"setText({render_string(v)})",
     },
 
     # image specific functions
     "image": {
-        "src":                  lambda v: f"setSource(&{v})",
+        "src": lambda v: f"setSource(&{v})",
     },
 
 }

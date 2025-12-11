@@ -17,8 +17,40 @@ LvObject::LvObject(LvObject& parent) : LvObject(lv_obj_create(parent.raw())) {
     AssertExit(mRaw != nullptr, "LvObject", "got nullptr");
 }
 
+LvObject::~LvObject(){
+    // no deletion here, as this is just a wrappery
+}
+
+LvObject::LvObject(const LvObject& other) : mRaw(other.mRaw) {
+    // copy constructor
+}
+
+LvObject& LvObject::operator=(const LvObject& other){
+    if (this != &other) {
+        mRaw = other.mRaw;
+    }
+    return *this;
+}
+
+LvObject::LvObject(LvObject&& other) noexcept : mRaw(other.mRaw){
+    other.mRaw = nullptr;
+}
+
+LvObject& LvObject::operator=(LvObject&& other) noexcept {
+    if (this != &other) {
+        mRaw = other.mRaw;
+        other.mRaw = nullptr;
+    }
+    return *this;
+}
+
+
 lv_obj_t* LvObject::raw() const {
     return mRaw;
+}
+
+void LvObject::free(){
+    lv_obj_del(mRaw);
 }
 
 // ==============================================================================
@@ -268,6 +300,65 @@ void LvObject::setScrollElastic(bool enabled){
 
 void LvObject::setScrollDirection(lv_dir_t dir){
     lv_obj_set_scroll_dir(mRaw, dir);
+}
+
+// ==============================================================================
+// transform
+// ==============================================================================
+
+void LvObject::setTransformWidth(int32_t width) {
+    lv_obj_set_style_transform_width(mRaw, width, LV_PART_MAIN);
+}
+
+void LvObject::setTransformHeight(int32_t height) {
+    lv_obj_set_style_transform_height(mRaw, height, LV_PART_MAIN);
+}
+
+void LvObject::setTransformPivot(int32_t x, int32_t y) {
+    lv_obj_set_style_transform_pivot_x(mRaw, x, LV_PART_MAIN);
+    lv_obj_set_style_transform_pivot_y(mRaw, y, LV_PART_MAIN);
+}
+
+void LvObject::setTransformPivotX(int32_t pivot) {
+    lv_obj_set_style_transform_pivot_x(mRaw, pivot, LV_PART_MAIN);
+}
+
+void LvObject::setTransformPivotY(int32_t pivot) {
+    lv_obj_set_style_transform_pivot_y(mRaw, pivot, LV_PART_MAIN);
+}
+
+void LvObject::setTransformRotation(int32_t rotation) {
+    lv_obj_set_style_transform_rotation(mRaw, rotation, LV_PART_MAIN);
+}
+
+void LvObject::setTransformScale(int32_t scale) {
+    lv_obj_set_style_transform_scale(mRaw, scale, LV_PART_MAIN);
+}
+
+void LvObject::setTransformScale(int32_t x, int32_t y) {
+    lv_obj_set_style_transform_scale_x(mRaw, x, LV_PART_MAIN);
+    lv_obj_set_style_transform_scale_y(mRaw, y, LV_PART_MAIN);
+}
+
+void LvObject::setTransformScaleX(int32_t scaleX) {
+    lv_obj_set_style_transform_scale_x(mRaw, scaleX, LV_PART_MAIN);
+}
+
+void LvObject::setTransformScaleY(int32_t scaleY) {
+    lv_obj_set_style_transform_scale_y(mRaw, scaleY, LV_PART_MAIN);
+}
+
+void LvObject::setTransformSkew(int32_t x, int32_t y) {
+    lv_obj_set_style_transform_skew_x(mRaw, x, LV_PART_MAIN);
+    lv_obj_set_style_transform_skew_y(mRaw, y, LV_PART_MAIN);
+}
+
+void LvObject::setTransformSkewX(int32_t skewX) {
+    lv_obj_set_style_transform_skew_x(mRaw, skewX, LV_PART_MAIN);
+}
+
+void LvObject::setTransformSkewY(int32_t skewY) {
+    lv_obj_set_style_transform_skew_y(mRaw, skewY, LV_PART_MAIN);
 }
 
 // ==============================================================================

@@ -31,8 +31,12 @@ public:
 
 private:
 
+    LvImage mTemperatureLabel;
+    LvImage mPowerLabel;
+
     bool isSensorOk();
     const char* resovleEngineStateText();
+    uint32_t resovleEngineStateColor();
     const char* resovleSensorText();
 
     // safe to update lvgl objects in these methods

@@ -7,12 +7,12 @@
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
 
-LV_IMAGE_DECLARE(MainScreen_image_power_16px);
-LV_IMAGE_DECLARE(MainScreen_image_temperature_16px);
-LV_IMAGE_DECLARE(MainScreen_image_heat_16px);
-LV_IMAGE_DECLARE(MainScreen_image_fan_16px);
-LV_IMAGE_DECLARE(MainScreen_image_humidity_16px);
-LV_IMAGE_DECLARE(MainScreen_image_rpm_16px);
+LV_IMAGE_DECLARE(MainScreen_image_arrow_up);
+LV_IMAGE_DECLARE(MainScreen_image_arrow_down);
+LV_IMAGE_DECLARE(MainScreen_image_fan16);
+LV_IMAGE_DECLARE(MainScreen_image_humidity16);
+LV_IMAGE_DECLARE(MainScreen_image_power16);
+LV_IMAGE_DECLARE(MainScreen_image_heat16);
 
 namespace Garbox {
 
@@ -23,45 +23,43 @@ public:
     // === Component Structs ======================================
     // ============================================================
 
-    struct SettingRow {
-        SettingRow(LvObject& parent);
+    struct GraphComponent {
+        GraphComponent(LvObject& parent);
+        LvObject body;
+        LvObject labelContainer;
+        LvObject _namelessContainer_0;
+
+        GraphComponent(const GraphComponent&) = delete;
+        GraphComponent& operator=(const GraphComponent&) = delete;
+        GraphComponent(GraphComponent&&) = delete;
+        GraphComponent& operator=(GraphComponent&&) = delete;
+        ~GraphComponent() = default;
+    };
+
+    struct MenuRow {
+        MenuRow(LvObject& parent);
         LvObject body;
         LvLabel label;
         LvLabel value;
 
-        SettingRow(const SettingRow&) = delete;
-        SettingRow& operator=(const SettingRow&) = delete;
-        SettingRow(SettingRow&&) = delete;
-        SettingRow& operator=(SettingRow&&) = delete;
-        ~SettingRow() = default;
+        MenuRow(const MenuRow&) = delete;
+        MenuRow& operator=(const MenuRow&) = delete;
+        MenuRow(MenuRow&&) = delete;
+        MenuRow& operator=(MenuRow&&) = delete;
+        ~MenuRow() = default;
     };
 
-    struct InfoRowUnitText {
-        InfoRowUnitText(LvObject& parent);
+    struct InfoTile {
+        InfoTile(LvObject& parent);
         LvObject body;
         LvImage icon;
         LvLabel value;
-        LvLabel unit;
 
-        InfoRowUnitText(const InfoRowUnitText&) = delete;
-        InfoRowUnitText& operator=(const InfoRowUnitText&) = delete;
-        InfoRowUnitText(InfoRowUnitText&&) = delete;
-        InfoRowUnitText& operator=(InfoRowUnitText&&) = delete;
-        ~InfoRowUnitText() = default;
-    };
-
-    struct InfoRowUnitIcon {
-        InfoRowUnitIcon(LvObject& parent);
-        LvObject body;
-        LvImage icon;
-        LvLabel value;
-        LvImage unit;
-
-        InfoRowUnitIcon(const InfoRowUnitIcon&) = delete;
-        InfoRowUnitIcon& operator=(const InfoRowUnitIcon&) = delete;
-        InfoRowUnitIcon(InfoRowUnitIcon&&) = delete;
-        InfoRowUnitIcon& operator=(InfoRowUnitIcon&&) = delete;
-        ~InfoRowUnitIcon() = default;
+        InfoTile(const InfoTile&) = delete;
+        InfoTile& operator=(const InfoTile&) = delete;
+        InfoTile(InfoTile&&) = delete;
+        InfoTile& operator=(InfoTile&&) = delete;
+        ~InfoTile() = default;
     };
 
     // ============================================================
@@ -71,27 +69,35 @@ public:
     struct Objects {
         Objects();
         LvObject root;
+        LvObject wrapper;
         LvObject _namelessContainer_0;
+        GraphComponent tempGraph;
+        GraphComponent powerGraph;
         LvObject _namelessContainer_1;
-        SettingRow settingPower;
-        SettingRow settingTarget;
-        SettingRow settingFan;
-        SettingRow settingHeater;
-        SettingRow settingBrightness;
-        SettingRow settingCalibrate;
-        SettingRow settingAdvanced;
+        LvLabel t4;
+        LvLabel t3;
+        LvLabel t2;
+        LvLabel t1;
+        LvLabel t0;
         LvObject _namelessContainer_2;
-        LvLabel _namelessLabel_0;
-        InfoRowUnitText statusEngine;
-        InfoRowUnitText statusTemperature;
-        InfoRowUnitText statusHeat;
-        InfoRowUnitText statusFan;
+        LvObject systemStateBg;
+        LvLabel systemState;
         LvObject _namelessContainer_3;
-        LvLabel _namelessLabel_1;
-        InfoRowUnitText sensorPower;
-        InfoRowUnitText sensorTemperature;
-        InfoRowUnitText sensorHumidity;
-        InfoRowUnitIcon sensorFan;
+        LvImage menuArrUp;
+        LvObject _namelessContainer_4;
+        LvObject _namelessContainer_5;
+        MenuRow _namelessMenuRow_0;
+        MenuRow _namelessMenuRow_1;
+        MenuRow _namelessMenuRow_2;
+        MenuRow _namelessMenuRow_3;
+        MenuRow _namelessMenuRow_4;
+        LvObject _namelessContainer_6;
+        LvImage menuArrDown;
+        LvObject _namelessContainer_7;
+        InfoTile fanInfo;
+        InfoTile humidInfo;
+        InfoTile powerInfo;
+        InfoTile timeInfo;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

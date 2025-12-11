@@ -4,6 +4,8 @@ namespace Garbox {
 
 LvImage::LvImage(LvObject& parent): LvObject(lv_image_create(parent.raw())) {}
 
+LvImage::LvImage(lv_obj_t* raw): LvObject(raw) {}
+
 void LvImage::setSource(const void* src){
     lv_image_set_src(mRaw, src);
 }
