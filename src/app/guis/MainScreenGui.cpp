@@ -47,6 +47,8 @@ void MainScreenGui::init(){
     mObjects.tempGraph._namelessContainer_0.setBorderWidth(1);                  // border-width="1px"
     mObjects.tempGraph._namelessContainer_0.setBorderSide(LV_BORDER_SIDE_FULL); // border-side="full"
     mObjects.tempGraph._namelessContainer_0.setRadius(8);                       // radius="8px"
+    mObjects.tempGraph.chart.setWidth(LV_PCT(100));                             // width="100%"
+    mObjects.tempGraph.chart.setHeight(LV_PCT(100));                            // height="100%"
     mObjects.powerGraph.body.setLayout(LV_LAYOUT_FLEX);                         // layout="flex"
     mObjects.powerGraph.body.setFlexFlow(LV_FLEX_FLOW_ROW);                     // flex-flow="row"
     mObjects.powerGraph.body.setWidth(LV_PCT(100));                             // width="100%"
@@ -63,6 +65,8 @@ void MainScreenGui::init(){
     mObjects.powerGraph._namelessContainer_0.setBorderWidth(1);                 // border-width="1px"
     mObjects.powerGraph._namelessContainer_0.setBorderSide(LV_BORDER_SIDE_FULL); // border-side="full"
     mObjects.powerGraph._namelessContainer_0.setRadius(8);                      // radius="8px"
+    mObjects.powerGraph.chart.setWidth(LV_PCT(100));                            // width="100%"
+    mObjects.powerGraph.chart.setHeight(LV_PCT(100));                           // height="100%"
     mObjects._namelessContainer_1.setWidth(LV_PCT(100));                        // width="100%"
     mObjects._namelessContainer_1.setFlexGrow(1);                               // flex-grow="1"
     mObjects._namelessContainer_1.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
@@ -254,7 +258,8 @@ MainScreenGui::Objects& MainScreenGui::objects(){
 MainScreenGui::GraphComponent::GraphComponent(LvObject& parent):
     body(parent),
     labelContainer(body),
-    _namelessContainer_0(body){}
+    _namelessContainer_0(body),
+    chart(_namelessContainer_0){}
 
 MainScreenGui::MenuRow::MenuRow(LvObject& parent):
     body(parent),

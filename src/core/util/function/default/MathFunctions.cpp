@@ -70,7 +70,6 @@ const MathFunctionIfc& MathFunctions::GetSinAnim(){
     return GetSinNorm270();
 }
 
-
 const MathFunctionIfc& MathFunctions::GetGamma22(){
     return GetSampled([](float x){ return powf(x, 2.2f); }, Samples::Gamma);
 }

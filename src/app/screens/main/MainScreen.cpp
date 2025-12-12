@@ -2,6 +2,8 @@
 
 #include "core/log/Log.h"
 #include "core/lvgl/LvglHelpers.h"
+#include "core/util/function/default/MathFunctions.h"
+#include <math.h>
 
 namespace Garbox {
 
@@ -27,7 +29,36 @@ MainScreen::MainScreen() :
     })){}
 
 void MainScreen::onInit(){
-    // setBackgroundColor(0x0);
+
+    const uint32_t pointCount = 8*8+1;
+
+    // setup chart
+    LvChart& chart = gui().tempGraph.chart;
+    chart.setType(LV_CHART_TYPE_LINE);
+    chart.setPointCount(pointCount);
+    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, 0, 100);
+    chart.setDivLineCount(5, 5);
+    chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
+
+    // create series
+    mTempSeries = chart.addSeries(lv_color_hex(ColorBlue)); 
+    chart.hideSeries(mTempSeries, false);
+
+    // fill values
+    const MathFunctionIfc& sinFn = MathFunctions::GetSinAnim(); 
+    for (int i = 0; i < pointCount; i++) {
+        const float step = 1.0f/(8*8);
+        const float x = fmodf(static_cast<float>(i) * step, 1.0f);
+        const float value = sinFn.evaluate(x) * 75.0f + 12.5f;
+        chart.setNextValue(mTempSeries, value);
+    }
+
+    // set point size
+    lv_obj_set_style_size(chart.raw(), 0, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_line_width(chart.raw(), 3, LV_PART_ITEMS);
+
+    // update the chart
+    chart.refresh();
 }
 
 void MainScreen::onStart(){
@@ -43,7 +74,17 @@ void MainScreen::onBecomeDisabled(){
 }
 
 void MainScreen::onUpdateScreen(){
-    // nothing to do
+    const MathFunctionIfc& sinFn = MathFunctions::GetSinAnim(); 
+    const float step = 1.0f/(8*8);
+    static float t = step;
+    LvChart& chart = gui().tempGraph.chart;
+    const float x = fmodf(t, 1.0f);
+    const float value = sinFn.evaluate(x) * 75.0f + 12.5f;
+    chart.setNextValue(mTempSeries, value);
+    t += step;
+    if(t >= 0.99f){
+        t = 0.0f;
+    }
 }
 
 void MainScreen::onDisplayCommand(const DisplayCommandEvent& event){

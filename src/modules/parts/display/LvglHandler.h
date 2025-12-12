@@ -68,6 +68,9 @@ private:
     static uint8_t* allocDrawBufferData(uint32_t size);
     static void initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t size, uint32_t width, uint32_t height);
 
+    // theme helpers
+    static void myThemeCallback(lv_theme_t * th, lv_obj_t * obj);
+
 };
 
 } // namespace

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "core/lvgl/objects/LvObject.h"
+#include "core/lvgl/objects/LvChart.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
 
@@ -28,6 +29,7 @@ public:
         LvObject body;
         LvObject labelContainer;
         LvObject _namelessContainer_0;
+        LvChart chart;
 
         GraphComponent(const GraphComponent&) = delete;
         GraphComponent& operator=(const GraphComponent&) = delete;

@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <esp_heap_caps.h>
+#include <themes/lv_theme_private.h>
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
@@ -59,8 +60,14 @@ void LvglHandler::init(){
     lv_display_set_flush_cb(mLvDisplay, handleFlush);
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
 
-    // no theme
-    lv_disp_set_theme(NULL, nullptr);
+    // apply my theme
+    lv_theme_t* base = lv_display_get_theme(mLvDisplay);
+    static lv_theme_t myTheme; 
+    myTheme = *base; // inherit all default theme behavior
+    lv_theme_set_parent(&myTheme, base);
+    lv_theme_set_apply_cb(&myTheme, myThemeCallback);
+    lv_display_set_theme(mLvDisplay, &myTheme);
+
 
     mInitialized = true;
 }
@@ -146,6 +153,22 @@ void LvglHandler::initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t 
     buffer.data_size = size;
     buffer.unaligned_data = data;
     buffer.handlers = nullptr;
+}
+
+void LvglHandler::myThemeCallback(lv_theme_t* th, lv_obj_t * obj){
+    LV_UNUSED(th);
+
+    /* Remove/override unwanted visuals */
+    lv_obj_set_style_radius(obj, 0, 0);
+    lv_obj_set_style_border_width(obj, 0, 0);
+    lv_obj_set_style_pad_all(obj, 0, 0);
+    lv_obj_set_style_margin_all(obj, 0, 0);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_pad_row(obj, 0, 0);
+    lv_obj_set_style_pad_column(obj, 0, 0);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+
+    /* If specific widgets need exceptions, check their class here */
 }
 
 } // namespace

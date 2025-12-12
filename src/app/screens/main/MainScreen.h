@@ -4,6 +4,7 @@
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
+#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
@@ -33,6 +34,9 @@ private:
 
     LvImage mTemperatureLabel;
     LvImage mPowerLabel;
+    
+    lv_chart_series_t* mTempSeries;
+    lv_chart_series_t* mPowerSeries;
 
     bool isSensorOk();
     const char* resovleEngineStateText();

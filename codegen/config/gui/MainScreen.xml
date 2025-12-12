@@ -18,14 +18,13 @@
   <components>
 
     <!-- GRAPH COMPONENT -->
-      
     <GraphComponent $label $color>
       <body layout="flex" flex-flow="row">
         <container name="labelContainer" width="22px" height="100%" layout="flex" flex-flow="column" flex-align="center">
           <!-- Rotate label will be inserted in cpp -->
         </container>
         <container flex-grow="1" height="100%" border-color="#fff" border-width="1px" border-side="full" radius="8px">
-          <!-- Graph goes here -->
+          <chart name="chart" width="100%" height="100%" />
         </container>
       </body>
     </GraphComponent>
@@ -71,7 +70,7 @@
       </container>
 
       <!-- Right side of screen (SystemState, Menu, InfoTiles) -->
-      <container layout="flex" flex-flow="column" flex-grow="1" height="100%" bg-color="#088" pad="8px 8px 8px 0px">
+      <container layout="flex" flex-flow="column" flex-grow="1" height="100%" pad="8px 8px 8px 0px">
 
         <!-- Status box -->
         <container name="system-state-bg" width="100%" height="22px" bg-color="#70bc47" bg-opa="100%" radius="8px">
