@@ -13,7 +13,7 @@ public:
 
     template<typename... Args>
     ArrayHeap(std::size_t elementCount, Args&&... args) : ArrayBase<T, HeapStorage<T>>(
-        ArrayBase<T, HeapStorage<T>>::without_count,
+        ArrayBase<T, HeapStorage<T>>::with_count,
         elementCount, 
         std::forward<Args>(args)...) {}
 

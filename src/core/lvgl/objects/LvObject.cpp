@@ -53,21 +53,13 @@ void LvObject::free(){
     lv_obj_del(mRaw);
 }
 
+void LvObject::setScreen(){
+    lv_disp_load_scr(mRaw);
+}
+
 // ==============================================================================
-// raw positioning
+// position getters
 // ==============================================================================
-
-void LvObject::setPosition(int32_t xPixels, int32_t yPixels){
-    lv_obj_set_pos(mRaw, xPixels, yPixels);
-}
-
-void LvObject::setPositionX(int32_t xPixels){
-    lv_obj_set_x(mRaw, xPixels);
-}
-
-void LvObject::setPositionY(int32_t yPixels){
-    lv_obj_set_y(mRaw, yPixels);
-}
 
 void LvObject::getPosition(int32_t& xPixels, int32_t& yPixels) const {
     xPixels = lv_obj_get_x(mRaw);
@@ -83,11 +75,73 @@ int32_t LvObject::getPositionY() const {
 }
 
 // ==============================================================================
-// area
+// width and height getters
 // ==============================================================================
 
-void LvObject::getArea(lv_area_t& area) const {
+int32_t LvObject::getRawWidth() const {
+    return lv_obj_get_width(mRaw);
+}
+
+int32_t LvObject::getRawHeight() const {
+    return lv_obj_get_height(mRaw);
+}
+
+int32_t LvObject::getWidth() const {
+    return lv_obj_get_style_width(mRaw, LV_PART_MAIN);
+}
+
+int32_t LvObject::getHeight() const {
+    return lv_obj_get_style_height(mRaw, LV_PART_MAIN);
+}
+
+int32_t LvObject::getContentWidth() const {
+    return lv_obj_get_content_width(mRaw);
+}
+
+int32_t LvObject::getContentHeight() const {
+    return lv_obj_get_content_height(mRaw);
+}
+
+// ==============================================================================
+// size getters
+// ==============================================================================
+
+void LvObject::getRawSize(int32_t& widthPixels, int32_t& heightPixels) const {
+    widthPixels = lv_obj_get_width(mRaw);
+    heightPixels = lv_obj_get_height(mRaw);
+}
+
+void LvObject::getSize(int32_t& widthPixels, int32_t& heightPixels) const {
+    widthPixels = lv_obj_get_style_width(mRaw, LV_PART_MAIN);
+    heightPixels = lv_obj_get_style_height(mRaw, LV_PART_MAIN);
+}
+
+// ==============================================================================
+// coords getters
+// ==============================================================================
+
+void LvObject::getCoords(lv_area_t& area) const {
     lv_obj_get_coords(mRaw, &area);
+}
+
+void LvObject::getContentCoords(lv_area_t& area) const {
+    lv_obj_get_content_coords(mRaw, &area);
+}
+
+// ==============================================================================
+// raw positioning
+// ==============================================================================
+
+void LvObject::setPosition(int32_t xPixels, int32_t yPixels){
+    lv_obj_set_pos(mRaw, xPixels, yPixels);
+}
+
+void LvObject::setPositionX(int32_t xPixels){
+    lv_obj_set_x(mRaw, xPixels);
+}
+
+void LvObject::setPositionY(int32_t yPixels){
+    lv_obj_set_y(mRaw, yPixels);
 }
 
 // ==============================================================================
@@ -106,19 +160,6 @@ void LvObject::setRawHeight(int32_t heightPixels){
     lv_obj_set_height(mRaw, heightPixels);
 }
 
-void LvObject::getRawSize(int32_t& widthPixels, int32_t& heightPixels) const {
-    widthPixels = lv_obj_get_width(mRaw);
-    heightPixels = lv_obj_get_height(mRaw);
-}
-
-int32_t LvObject::getRawWidth() const {
-    return lv_obj_get_width(mRaw);
-}
-
-int32_t LvObject::getRawHeight() const {
-    return lv_obj_get_height(mRaw);
-}
-
 // ==============================================================================
 // style based sizing
 // ==============================================================================
@@ -133,19 +174,6 @@ void LvObject::setWidth(lv_coord_t value){
 
 void LvObject::setHeight(lv_coord_t value){
     lv_obj_set_style_height(mRaw, value, LV_PART_MAIN);
-}
-
-void LvObject::getSize(int32_t& widthPixels, int32_t& heightPixels) const {
-    widthPixels = lv_obj_get_style_width(mRaw, LV_PART_MAIN);
-    heightPixels = lv_obj_get_style_height(mRaw, LV_PART_MAIN);
-}
-
-int32_t LvObject::getWidth() const {
-    return lv_obj_get_style_width(mRaw, LV_PART_MAIN);
-}
-
-int32_t LvObject::getHeight() const {
-    return lv_obj_get_style_height(mRaw, LV_PART_MAIN);
 }
 
 // ==============================================================================
@@ -553,15 +581,506 @@ void LvObject::setMarginVer(int32_t px) {
 }
 
 // ==============================================================================
-// style helper
+// generic style setters
 // ==============================================================================
 
 void LvObject::setStyleProp(uint32_t prop, lv_style_value_t value){
     lv_obj_set_local_style_prop(mRaw, prop, value, LV_PART_MAIN);
 }
 
-void LvObject::setScreen(){
-    lv_disp_load_scr(mRaw);
+// size / position
+
+void LvObject::setStyleSize(int32_t width, int32_t height, lv_part_t part) {
+    lv_obj_set_style_width(mRaw, width, part);
+    lv_obj_set_style_height(mRaw, height, part);
+}
+
+void LvObject::setStyleWidth(int32_t width, lv_part_t part) {
+    lv_obj_set_style_width(mRaw, width, part);
+}
+
+void LvObject::setStyleMinWidth(int32_t width, lv_part_t part) {
+    lv_obj_set_style_min_width(mRaw, width, part);
+}
+
+void LvObject::setStyleMaxWidth(int32_t width, lv_part_t part) {
+    lv_obj_set_style_max_width(mRaw, width, part);
+}
+
+void LvObject::setStyleHeight(int32_t height, lv_part_t part) {
+    lv_obj_set_style_height(mRaw, height, part);
+}
+
+void LvObject::setStyleMinHeight(int32_t height, lv_part_t part) {
+    lv_obj_set_style_min_height(mRaw, height, part);
+}
+
+void LvObject::setStyleMaxHeight(int32_t height, lv_part_t part) {
+    lv_obj_set_style_max_height(mRaw, height, part);
+}
+
+void LvObject::setStyleX(int32_t x, lv_part_t part) {
+    lv_obj_set_style_x(mRaw, x, part);
+}
+
+void LvObject::setStyleY(int32_t y, lv_part_t part) {
+    lv_obj_set_style_y(mRaw, y, part);
+}
+
+void LvObject::setStyleAlign(lv_align_t align, lv_part_t part) {
+    lv_obj_set_style_align(mRaw, align, part);
+}
+
+// transforms / translate
+
+void LvObject::setStyleTransformWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_transform_width(mRaw, value, part);
+}
+
+void LvObject::setStyleTransformHeight(int32_t value, lv_part_t part) {
+    lv_obj_set_style_transform_height(mRaw, value, part);
+}
+
+void LvObject::setStyleTranslateX(int32_t value, lv_part_t part) {
+    lv_obj_set_style_translate_x(mRaw, value, part);
+}
+
+void LvObject::setStyleTranslateY(int32_t value, lv_part_t part) {
+    lv_obj_set_style_translate_y(mRaw, value, part);
+}
+
+void LvObject::setStyleTranslateRadial(int32_t value, lv_part_t part) {
+    lv_obj_set_style_translate_radial(mRaw, value, part);
+}
+
+void LvObject::setStyleTransformScaleX(int32_t value, lv_part_t part) {
+    lv_obj_set_style_transform_scale_x(mRaw, value, part);
+}
+
+void LvObject::setStyleTransformScaleY(int32_t value, lv_part_t part) {
+    lv_obj_set_style_transform_scale_y(mRaw, value, part);
+}
+
+void LvObject::setStyleTransformRotation(int32_t angle10deg, lv_part_t part) {
+    lv_obj_set_style_transform_rotation(mRaw, angle10deg, part);
+}
+
+void LvObject::setStyleTransformPivotX(int32_t value, lv_part_t part) {
+    lv_obj_set_style_transform_pivot_x(mRaw, value, part);
+}
+
+void LvObject::setStyleTransformPivotY(int32_t value, lv_part_t part) {
+    lv_obj_set_style_transform_pivot_y(mRaw, value, part);
+}
+
+void LvObject::setStyleTransformSkewX(int32_t angle10deg, lv_part_t part) {
+    lv_obj_set_style_transform_skew_x(mRaw, angle10deg, part);
+}
+
+void LvObject::setStyleTransformSkewY(int32_t angle10deg, lv_part_t part) {
+    lv_obj_set_style_transform_skew_y(mRaw, angle10deg, part);
+}
+
+// padding / margin
+
+void LvObject::setStylePadTop(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_top(mRaw, value, part);
+}
+
+void LvObject::setStylePadBottom(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_bottom(mRaw, value, part);
+}
+
+void LvObject::setStylePadLeft(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_left(mRaw, value, part);
+}
+
+void LvObject::setStylePadRight(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_right(mRaw, value, part);
+}
+
+void LvObject::setStylePadRow(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_row(mRaw, value, part);
+}
+
+void LvObject::setStylePadColumn(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_column(mRaw, value, part);
+}
+
+void LvObject::setStylePadRadial(int32_t value, lv_part_t part) {
+    lv_obj_set_style_pad_radial(mRaw, value, part);
+}
+
+void LvObject::setStyleMarginTop(int32_t value, lv_part_t part) {
+    lv_obj_set_style_margin_top(mRaw, value, part);
+}
+
+void LvObject::setStyleMarginBottom(int32_t value, lv_part_t part) {
+    lv_obj_set_style_margin_bottom(mRaw, value, part);
+}
+
+void LvObject::setStyleMarginLeft(int32_t value, lv_part_t part) {
+    lv_obj_set_style_margin_left(mRaw, value, part);
+}
+
+void LvObject::setStyleMarginRight(int32_t value, lv_part_t part) {
+    lv_obj_set_style_margin_right(mRaw, value, part);
+}
+
+// background
+
+void LvObject::setStyleBgColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_bg_color(mRaw, value, part);
+}
+
+void LvObject::setStyleBgOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_bg_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBgGradColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_bg_grad_color(mRaw, value, part);
+}
+
+void LvObject::setStyleBgGradDir(lv_grad_dir_t dir, lv_part_t part) {
+    lv_obj_set_style_bg_grad_dir(mRaw, dir, part);
+}
+
+void LvObject::setStyleBgMainStop(int32_t value, lv_part_t part) {
+    lv_obj_set_style_bg_main_stop(mRaw, value, part);
+}
+
+void LvObject::setStyleBgGradStop(int32_t value, lv_part_t part) {
+    lv_obj_set_style_bg_grad_stop(mRaw, value, part);
+}
+
+void LvObject::setStyleBgMainOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_bg_main_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBgGradOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_bg_grad_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBgGrad(const lv_grad_dsc_t* grad, lv_part_t part) {
+    lv_obj_set_style_bg_grad(mRaw, grad, part);
+}
+
+void LvObject::setStyleBgImageSrc(const void* src, lv_part_t part) {
+    lv_obj_set_style_bg_image_src(mRaw, src, part);
+}
+
+void LvObject::setStyleBgImageOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_bg_image_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBgImageRecolor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_bg_image_recolor(mRaw, value, part);
+}
+
+void LvObject::setStyleBgImageRecolorOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_bg_image_recolor_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBgImageTiled(bool tiled, lv_part_t part) {
+    lv_obj_set_style_bg_image_tiled(mRaw, tiled, part);
+}
+
+// border / outline
+
+void LvObject::setStyleBorderColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_border_color(mRaw, value, part);
+}
+
+void LvObject::setStyleBorderOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_border_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBorderWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_border_width(mRaw, value, part);
+}
+
+void LvObject::setStyleBorderSide(lv_border_side_t value, lv_part_t part) {
+    lv_obj_set_style_border_side(mRaw, value, part);
+}
+
+void LvObject::setStyleBorderPost(bool value, lv_part_t part) {
+    lv_obj_set_style_border_post(mRaw, value, part);
+}
+
+void LvObject::setStyleOutlineWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_outline_width(mRaw, value, part);
+}
+
+void LvObject::setStyleOutlineColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_outline_color(mRaw, value, part);
+}
+
+void LvObject::setStyleOutlineOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_outline_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleOutlinePad(int32_t value, lv_part_t part) {
+    lv_obj_set_style_outline_pad(mRaw, value, part);
+}
+
+// shadow
+
+void LvObject::setStyleShadowWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_shadow_width(mRaw, value, part);
+}
+
+void LvObject::setStyleShadowOffsetX(int32_t value, lv_part_t part) {
+    lv_obj_set_style_shadow_offset_x(mRaw, value, part);
+}
+
+void LvObject::setStyleShadowOffsetY(int32_t value, lv_part_t part) {
+    lv_obj_set_style_shadow_offset_y(mRaw, value, part);
+}
+
+void LvObject::setStyleShadowSpread(int32_t value, lv_part_t part) {
+    lv_obj_set_style_shadow_spread(mRaw, value, part);
+}
+
+void LvObject::setStyleShadowColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_shadow_color(mRaw, value, part);
+}
+
+void LvObject::setStyleShadowOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_shadow_opa(mRaw, value, part);
+}
+
+// image style
+
+void LvObject::setStyleImageOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_image_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleImageRecolor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_image_recolor(mRaw, value, part);
+}
+
+void LvObject::setStyleImageRecolorOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_image_recolor_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleImageColorkey(const lv_image_colorkey_t* key, lv_part_t part) {
+    lv_obj_set_style_image_colorkey(mRaw, key, part);
+}
+
+// line / arc
+
+void LvObject::setStyleLineWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_line_width(mRaw, value, part);
+}
+
+void LvObject::setStyleLineDashWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_line_dash_width(mRaw, value, part);
+}
+
+void LvObject::setStyleLineDashGap(int32_t value, lv_part_t part) {
+    lv_obj_set_style_line_dash_gap(mRaw, value, part);
+}
+
+void LvObject::setStyleLineRounded(bool value, lv_part_t part) {
+    lv_obj_set_style_line_rounded(mRaw, value, part);
+}
+
+void LvObject::setStyleLineColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_line_color(mRaw, value, part);
+}
+
+void LvObject::setStyleLineOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_line_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleArcWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_arc_width(mRaw, value, part);
+}
+
+void LvObject::setStyleArcRounded(bool value, lv_part_t part) {
+    lv_obj_set_style_arc_rounded(mRaw, value, part);
+}
+
+void LvObject::setStyleArcColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_arc_color(mRaw, value, part);
+}
+
+void LvObject::setStyleArcOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_arc_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleArcImageSrc(const void* src, lv_part_t part) {
+    lv_obj_set_style_arc_image_src(mRaw, src, part);
+}
+
+// text
+
+void LvObject::setStyleTextColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_text_color(mRaw, value, part);
+}
+
+void LvObject::setStyleTextOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_text_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleTextFont(const lv_font_t* font, lv_part_t part) {
+    lv_obj_set_style_text_font(mRaw, font, part);
+}
+
+void LvObject::setStyleTextLetterSpace(int32_t value, lv_part_t part) {
+    lv_obj_set_style_text_letter_space(mRaw, value, part);
+}
+
+void LvObject::setStyleTextLineSpace(int32_t value, lv_part_t part) {
+    lv_obj_set_style_text_line_space(mRaw, value, part);
+}
+
+void LvObject::setStyleTextDecor(lv_text_decor_t value, lv_part_t part) {
+    lv_obj_set_style_text_decor(mRaw, value, part);
+}
+
+void LvObject::setStyleTextAlign(lv_text_align_t value, lv_part_t part) {
+    lv_obj_set_style_text_align(mRaw, value, part);
+}
+
+void LvObject::setStyleTextOutlineColor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_text_outline_stroke_color(mRaw, value, part);
+}
+
+void LvObject::setStyleTextOutlineWidth(int32_t value, lv_part_t part) {
+    lv_obj_set_style_text_outline_stroke_width(mRaw, value, part);
+}
+
+void LvObject::setStyleTextOutlineOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_text_outline_stroke_opa(mRaw, value, part);
+}
+
+// misc
+
+void LvObject::setStyleRadius(int32_t value, lv_part_t part) {
+    lv_obj_set_style_radius(mRaw, value, part);
+}
+
+void LvObject::setStyleRadialOffset(int32_t value, lv_part_t part) {
+    lv_obj_set_style_radial_offset(mRaw, value, part);
+}
+
+void LvObject::setStyleClipCorner(bool value, lv_part_t part) {
+    lv_obj_set_style_clip_corner(mRaw, value, part);
+}
+
+void LvObject::setStyleOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleOpaLayered(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_opa_layered(mRaw, value, part);
+}
+
+void LvObject::setStyleColorFilterDsc(const lv_color_filter_dsc_t* dsc, lv_part_t part) {
+    lv_obj_set_style_color_filter_dsc(mRaw, dsc, part);
+}
+
+void LvObject::setStyleColorFilterOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_color_filter_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleRecolor(lv_color_t value, lv_part_t part) {
+    lv_obj_set_style_recolor(mRaw, value, part);
+}
+
+void LvObject::setStyleRecolorOpa(lv_opa_t value, lv_part_t part) {
+    lv_obj_set_style_recolor_opa(mRaw, value, part);
+}
+
+void LvObject::setStyleBlendMode(lv_blend_mode_t mode, lv_part_t part) {
+    lv_obj_set_style_blend_mode(mRaw, mode, part);
+}
+
+void LvObject::setStyleLayout(uint16_t layout, lv_part_t part) {
+    lv_obj_set_style_layout(mRaw, layout, part);
+}
+
+void LvObject::setStyleBaseDir(lv_base_dir_t dir, lv_part_t part) {
+    lv_obj_set_style_base_dir(mRaw, dir, part);
+}
+
+void LvObject::setStyleBitmapMaskSrc(const void* src, lv_part_t part) {
+    lv_obj_set_style_bitmap_mask_src(mRaw, src, part);
+}
+
+void LvObject::setStyleRotarySensitivity(uint32_t value, lv_part_t part) {
+    lv_obj_set_style_rotary_sensitivity(mRaw, value, part);
+}
+
+// flex / grid
+
+void LvObject::setStyleFlexFlow(lv_flex_flow_t flow, lv_part_t part) {
+    lv_obj_set_style_flex_flow(mRaw, flow, part);
+}
+
+void LvObject::setStyleFlexMainPlace(lv_flex_align_t value, lv_part_t part) {
+    lv_obj_set_style_flex_main_place(mRaw, value, part);
+}
+
+void LvObject::setStyleFlexCrossPlace(lv_flex_align_t value, lv_part_t part) {
+    lv_obj_set_style_flex_cross_place(mRaw, value, part);
+}
+
+void LvObject::setStyleFlexTrackPlace(lv_flex_align_t value, lv_part_t part) {
+    lv_obj_set_style_flex_track_place(mRaw, value, part);
+}
+
+void LvObject::setStyleFlexGrow(uint8_t value, lv_part_t part) {
+    lv_obj_set_style_flex_grow(mRaw, value, part);
+}
+
+void LvObject::setStyleGridColumnDscArray(const int32_t* value, lv_part_t part) {
+    lv_obj_set_style_grid_column_dsc_array(mRaw, value, part);
+}
+
+void LvObject::setStyleGridColumnAlign(lv_grid_align_t value, lv_part_t part) {
+    lv_obj_set_style_grid_column_align(mRaw, value, part);
+}
+
+void LvObject::setStyleGridRowDscArray(const int32_t* value, lv_part_t part) {
+    lv_obj_set_style_grid_row_dsc_array(mRaw, value, part);
+}
+
+void LvObject::setStyleGridRowAlign(lv_grid_align_t value, lv_part_t part) {
+    lv_obj_set_style_grid_row_align(mRaw, value, part);
+}
+
+void LvObject::setStyleGridCellColumnPos(int32_t value, lv_part_t part) {
+    lv_obj_set_style_grid_cell_column_pos(mRaw, value, part);
+}
+
+void LvObject::setStyleGridCellXAlign(lv_grid_align_t value, lv_part_t part) {
+    lv_obj_set_style_grid_cell_x_align(mRaw, value, part);
+}
+
+void LvObject::setStyleGridCellColumnSpan(int32_t value, lv_part_t part) {
+    lv_obj_set_style_grid_cell_column_span(mRaw, value, part);
+}
+
+void LvObject::setStyleGridCellRowPos(int32_t value, lv_part_t part) {
+    lv_obj_set_style_grid_cell_row_pos(mRaw, value, part);
+}
+
+void LvObject::setStyleGridCellYAlign(lv_grid_align_t value, lv_part_t part) {
+    lv_obj_set_style_grid_cell_y_align(mRaw, value, part);
+}
+
+void LvObject::setStyleGridCellRowSpan(int32_t value, lv_part_t part) {
+    lv_obj_set_style_grid_cell_row_span(mRaw, value, part);
+}
+
+// ==============================================================================
+// generic style setters
+// ==============================================================================
+
+void LvObject::addEventCallback(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data){
+    lv_obj_add_event_cb(mRaw, event_cb, filter, user_data);
 }
 
 } // namespace Garbox

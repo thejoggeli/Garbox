@@ -63,13 +63,13 @@ public:
         constructAll();
     }
 
-    ArrayBase(std::size_t elementCount) : Storage(elementCount){
-        constructAll();
-    }
-
     template<typename... Args>
     ArrayBase(without_count_t, Args&&... args) : Storage(){
         constructAllWith(std::forward<Args>(args)...);
+    }
+
+    ArrayBase(std::size_t elementCount) : Storage(elementCount){
+        constructAll();
     }
 
     template<typename... Args>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/screens/abstract/MainScreenAbs.h"
+#include "core/lvgl/helpers/ChartGridRenderer.h"
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
@@ -32,11 +33,17 @@ public:
 
 private:
 
-    LvImage mTemperatureLabel;
+    LvImage mTempLabel;
     LvImage mPowerLabel;
+
+    ChartGridRenderer mTempGrid;
+    ChartGridRenderer mPowerGrid;
     
-    lv_chart_series_t* mTempSeries;
-    lv_chart_series_t* mPowerSeries;
+    LvChartSeries* mTempSeries;
+    LvChartSeries* mPowerSeries;
+
+    void initTemperatureChart();
+    void initPowerChart();
 
     bool isSensorOk();
     const char* resovleEngineStateText();

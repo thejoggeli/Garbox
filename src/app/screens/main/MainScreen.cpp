@@ -7,13 +7,29 @@
 
 namespace Garbox {
 
-static const uint32_t ColorRed = 0xB85450;
-static const uint32_t ColorBlue = 0x8AB4F4;
-static const uint32_t ColorGreen = 0x7BBF56;
+
+static constexpr uint32_t ColorRed = 0xB85450;
+static constexpr uint32_t ColorBlue = 0x8AB4F4;
+static constexpr uint32_t ColorGreen = 0x7BBF56;
+
+static constexpr uint32_t GridHorizontalCount = 3;
+static constexpr uint32_t GridVerticalCount = 5;
+static constexpr uint32_t GridLineColor = 0x333333;
+static constexpr uint32_t GridLineWidth = 2;
+
+static constexpr uint32_t ChartsPointCount = 8*8+1;
+
+static constexpr int32_t TempChartYMin = 15;
+static constexpr int32_t TempChartYMax = 45;
+static constexpr int32_t TempChartYRange = TempChartYMax - TempChartYMin;
+
+static constexpr int32_t PowerChartYMin = -10;
+static constexpr int32_t PowerChartYMax = 110;
+static constexpr int32_t PowerChartYRange = PowerChartYMax - PowerChartYMin;
 
 MainScreen::MainScreen() : 
     MainScreenAbs(),
-    mTemperatureLabel(LvglHelpers::createRotatedLabelRgb565(gui().tempGraph.labelContainer, {
+    mTempLabel(LvglHelpers::createRotatedLabelRgb565(gui().tempGraph.labelContainer, {
         .text = "Temperature",
         .font = &lv_font_montserrat_14,
         .color = ColorBlue,
@@ -26,39 +42,105 @@ MainScreen::MainScreen() :
         .color = ColorRed,
         .bgColor = 0x0,
         .angle = LvglHelpers::Angle::Deg270,
-    })){}
+    })),
+    mTempGrid(
+        gui().tempGraph.chart,
+        GridHorizontalCount,
+        GridVerticalCount,
+        lv_color_hex(GridLineColor),
+        GridLineWidth
+    ),
+    mPowerGrid(
+        gui().tempGraph.chart,
+        GridHorizontalCount,
+        GridVerticalCount,
+        lv_color_hex(GridLineColor),
+        GridLineWidth
+    ){}
 
 void MainScreen::onInit(){
+    initTemperatureChart();
+    initPowerChart();
 
-    const uint32_t pointCount = 8*8+1;
+    const int32_t xMin = 5;
+    const int32_t xMax = ChartsPointCount - 5;
+    const int32_t xRange = xMax - xMin;
 
-    // setup chart
+    // temperature horizontal grid
+    mTempGrid.setHorizontalPosition(0, (1000 * (20 - TempChartYMin)) / TempChartYRange);
+    mTempGrid.setHorizontalPosition(0, (1000 * (30 - TempChartYMin)) / TempChartYRange);
+    mTempGrid.setHorizontalPosition(0, (1000 * (40 - TempChartYMin)) / TempChartYRange);
+
+    // power horizontal grid
+    mPowerGrid.setHorizontalPosition(0, (1000 * (20 - PowerChartYMin)) / PowerChartYRange);
+    mPowerGrid.setHorizontalPosition(0, (1000 * (30 - PowerChartYMin)) / PowerChartYRange);
+    mPowerGrid.setHorizontalPosition(0, (1000 * (40 - PowerChartYMin)) / PowerChartYRange);
+
+    // charts vertical grid
+    for(int32_t i = 0; i < GridVerticalCount; i++){
+        int32_t tVal = (xRange*i)/(GridVerticalCount-1);
+        int32_t permille = (1000 * xMin + tVal) / ChartsPointCount;
+        mTempGrid.setVerticalPosition(0, permille);
+        mPowerGrid.setVerticalPosition(0, permille);
+    }
+}
+
+void MainScreen::initTemperatureChart(){
+
+    // setup temperature chart
     LvChart& chart = gui().tempGraph.chart;
     chart.setType(LV_CHART_TYPE_LINE);
-    chart.setPointCount(pointCount);
+    chart.setPointCount(ChartsPointCount);
     chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, 0, 100);
     chart.setDivLineCount(5, 5);
     chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
+    chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
+    chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
 
-    // create series
-    mTempSeries = chart.addSeries(lv_color_hex(ColorBlue)); 
-    chart.hideSeries(mTempSeries, false);
+    // create temperature series
+    LvChartSeries* series = chart.addSeries(lv_color_hex(ColorBlue)); 
+    chart.hideSeries(series, false);
 
-    // fill values
-    const MathFunctionIfc& sinFn = MathFunctions::GetSinAnim(); 
-    for (int i = 0; i < pointCount; i++) {
+    // fill temperature values
+    const MathFunctionIfc& mathFn = MathFunctions::GetSinAnim(); 
+    for (int i = 0; i < ChartsPointCount; i++) {
         const float step = 1.0f/(8*8);
         const float x = fmodf(static_cast<float>(i) * step, 1.0f);
-        const float value = sinFn.evaluate(x) * 75.0f + 12.5f;
-        chart.setNextValue(mTempSeries, value);
+        const float value = mathFn.evaluate(x) * 75.0f + 12.5f;
+        chart.setNextValue(series, value);
     }
 
-    // set point size
-    lv_obj_set_style_size(chart.raw(), 0, 0, LV_PART_INDICATOR);
-    lv_obj_set_style_line_width(chart.raw(), 3, LV_PART_ITEMS);
-
-    // update the chart
     chart.refresh();
+    mTempSeries = series;
+}
+
+void MainScreen::initPowerChart(){
+
+    // setup temperature chart
+    LvChart& chart = gui().tempGraph.chart;
+    chart.setType(LV_CHART_TYPE_LINE);
+    chart.setPointCount(ChartsPointCount);
+    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, 0, 100);
+    chart.setDivLineCount(5, 5);
+    chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
+    chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
+    chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
+
+    // create temperature series
+    LvChartSeries* series = chart.addSeries(lv_color_hex(ColorBlue)); 
+    chart.hideSeries(series, false);
+
+    // fill temperature values
+    const MathFunctionIfc& mathFn = MathFunctions::GetGamma22(); 
+    for (int i = 0; i < ChartsPointCount; i++) {
+        const float step = 1.0f/(8*8);
+        const float x = fmodf(static_cast<float>(i) * step, 1.0f);
+        const float value = mathFn.evaluate(x) * 75.0f + 12.5f;
+        chart.setNextValue(series, value);
+    }
+
+    chart.refresh();
+    mPowerSeries = series;
 }
 
 void MainScreen::onStart(){
@@ -74,12 +156,12 @@ void MainScreen::onBecomeDisabled(){
 }
 
 void MainScreen::onUpdateScreen(){
-    const MathFunctionIfc& sinFn = MathFunctions::GetSinAnim(); 
+    const MathFunctionIfc& mathFn = MathFunctions::GetSinAnim(); 
     const float step = 1.0f/(8*8);
     static float t = step;
     LvChart& chart = gui().tempGraph.chart;
     const float x = fmodf(t, 1.0f);
-    const float value = sinFn.evaluate(x) * 75.0f + 12.5f;
+    const float value = mathFn.evaluate(x) * 75.0f + 12.5f;
     chart.setNextValue(mTempSeries, value);
     t += step;
     if(t >= 0.99f){

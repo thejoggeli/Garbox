@@ -5,6 +5,8 @@
 
 namespace Garbox {
 
+using LvChartSeries = lv_chart_series_t;
+
 class LvChart : public LvObject {
 public:
     LvChart(LvObject& parent);
@@ -92,6 +94,7 @@ public:
     // refresh
     // ==============================================================================
     void refresh();
+
 };
 
 } // namespace Garbox
