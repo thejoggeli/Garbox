@@ -7,37 +7,75 @@ namespace Garbox {
 
 ChartGridRenderer::ChartGridRenderer(
     // parameters
-    LvChart& chart,
+    LvObject& renderTarget,
     uint32_t horizontalLineCount,
     uint32_t verticalLineCount,
     lv_color_t lineColor,
     lv_coord_t lineThicknessPixels):
     // initialize members
-    mChart(chart),
-    mHorizontalLines(horizontalLineCount, chart),
-    mVerticalLines(verticalLineCount, chart),
+    mRenderTarget(renderTarget),
     mHorizontalPermilles(horizontalLineCount),
     mVerticalPermilles(verticalLineCount),
     mLineColor(lineColor),
     mLineThicknessPixels(lineThicknessPixels){
 
-    // init horizontal lines
-    for(LvObject& line : mHorizontalLines){
-        line.setScrollable(false);
-        line.setBgColor(mLineColor);
-        line.setBgOpa(LV_OPA_COVER);
+    // configure overlay
+    mRenderTarget.setSize(LV_PCT(100), LV_PCT(100));
+    mRenderTarget.setAlign(LV_ALIGN_TOP_LEFT);
+    mRenderTarget.setScrollable(false);
+    mRenderTarget.setBgOpa(LV_OPA_TRANSP);
+
+    // ensure it is drawn below the chart
+    mRenderTarget.moveBackground();
+
+    // register draw callback
+    mRenderTarget.addEventCallback(drawEventTrampoline, LV_EVENT_DRAW_MAIN, this);
+}
+
+void ChartGridRenderer::drawEventTrampoline(lv_event_t* event){
+    ChartGridRenderer* self = static_cast<ChartGridRenderer*>(lv_event_get_user_data(event));
+
+    if(self != nullptr){
+        self->onDraw(event);
+    }
+}
+
+void ChartGridRenderer::onDraw(lv_event_t* event){
+    lv_layer_t* layer = lv_event_get_layer(event);
+    if(layer == nullptr){
+        return;
     }
 
-    // init vertical lines
-    for(LvObject& line : mVerticalLines){
-        line.setScrollable(false);
-        line.setBgColor(mLineColor);
-        line.setBgOpa(LV_OPA_COVER);
+    lv_area_t contentArea;
+    mRenderTarget.getContentCoords(contentArea);
+
+    lv_draw_line_dsc_t lineDsc;
+    lv_draw_line_dsc_init(&lineDsc);
+    lineDsc.color = mLineColor;
+    lineDsc.width = mLineThicknessPixels;
+    lineDsc.opa   = LV_OPA_COVER;
+    lineDsc.round_start = 1;
+    lineDsc.round_end = 1;
+
+    // horizontal lines
+    for(uint32_t i = 0; i < mHorizontalPermilles.size(); i++){
+        const lv_coord_t y = permilleToPixelY(mHorizontalPermilles[i]);
+
+        lineDsc.p1 = { contentArea.x1, y };
+        lineDsc.p2 = { contentArea.x2, y };
+
+        lv_draw_line(layer, &lineDsc);
     }
 
-    // resize callbacks
-    mChart.addEventCallback(chartEventTrampoline, LV_EVENT_SIZE_CHANGED, this);
-    mChart.addEventCallback(chartEventTrampoline, LV_EVENT_STYLE_CHANGED, this);
+    // vertical lines
+    for(uint32_t i = 0; i < mVerticalPermilles.size(); i++){
+        const lv_coord_t x = permilleToPixelX(mVerticalPermilles[i]);
+
+        lineDsc.p1 = { x, contentArea.y1 };
+        lineDsc.p2 = { x, contentArea.y2 };
+
+        lv_draw_line(layer, &lineDsc);
+    }
 }
 
 void ChartGridRenderer::setHorizontalPosition(uint32_t index, int32_t permille){
@@ -47,7 +85,7 @@ void ChartGridRenderer::setHorizontalPosition(uint32_t index, int32_t permille){
     }
 
     mHorizontalPermilles[index] = permille;
-    updateHorizontalPosition(index);
+    lv_obj_invalidate(mRenderTarget.raw());
 }
 
 void ChartGridRenderer::setVerticalPosition(uint32_t index, int32_t permille){
@@ -57,66 +95,21 @@ void ChartGridRenderer::setVerticalPosition(uint32_t index, int32_t permille){
     }
 
     mVerticalPermilles[index] = permille;
-    updateVerticalPosition(index);
+    lv_obj_invalidate(mRenderTarget.raw());
 }
 
-void ChartGridRenderer::updateHorizontalPosition(uint32_t index){
-    LvObject& line = mHorizontalLines[index];
-    const lv_coord_t yPixel = permilleToPositionY(mHorizontalPermilles[index]);
-
-    lv_area_t contentCoords;
-    mChart.getContentCoords(contentCoords);
-    
-    line.setSize(mChart.getContentWidth(), mLineThicknessPixels);
-    line.setPosition(contentCoords.x1, yPixel - (mLineThicknessPixels / 2));
-}
-
-void ChartGridRenderer::updateVerticalPosition(uint32_t index){
-    LvObject& line = mVerticalLines[index];
-    const lv_coord_t xPixel = permilleToPositionX(mVerticalPermilles[index]);
-
-    lv_area_t contentCoords;
-    mChart.getContentCoords(contentCoords);
-    
-    line.setSize(mLineThicknessPixels, mChart.getContentHeight());
-    line.setPosition(xPixel - (mLineThicknessPixels / 2), contentCoords.y1);
-}
-
-void ChartGridRenderer::updateAllPositions(){
-    for(uint32_t i = 0; i < mHorizontalLines.size(); i++){
-        updateHorizontalPosition(i);
-    }
-    for(uint32_t i = 0; i < mVerticalLines.size(); i++){
-        updateVerticalPosition(i);
-    }
-}
-
-lv_coord_t ChartGridRenderer::permilleToPositionY(int32_t permille) const {
+lv_coord_t ChartGridRenderer::permilleToPixelY(int32_t permille) const {
     permille = std::clamp<int32_t>(permille, 0, 1000);
-    const lv_coord_t heightPixels = mChart.getContentHeight();
+    const lv_coord_t heightPixels = mRenderTarget.getContentHeight();
     const lv_coord_t offsetPixels = (heightPixels * permille) / 1000;
     return heightPixels - offsetPixels;
 }
 
-lv_coord_t ChartGridRenderer::permilleToPositionX(int32_t permille) const {    
+lv_coord_t ChartGridRenderer::permilleToPixelX(int32_t permille) const {    
     permille = std::clamp<int32_t>(permille, 0, 1000);
-    const lv_coord_t widthPixels = mChart.getContentWidth();
+    const lv_coord_t widthPixels = mRenderTarget.getContentWidth();
     const lv_coord_t offsetPixels = (widthPixels * permille) / 1000;
     return offsetPixels;
-}
-
-void ChartGridRenderer::chartEventTrampoline(lv_event_t* event){
-    ChartGridRenderer* self = static_cast<ChartGridRenderer*>(lv_event_get_user_data(event));
-    if(self != nullptr){
-        self->onChartEvent(event);
-    }
-}
-
-void ChartGridRenderer::onChartEvent(lv_event_t* event){
-    const lv_event_code_t code = lv_event_get_code(event);
-    if((code == LV_EVENT_SIZE_CHANGED) || (code == LV_EVENT_STYLE_CHANGED)){
-        updateAllPositions();
-    }
 }
 
 } // namespace Garbox

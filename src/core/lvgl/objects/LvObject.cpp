@@ -18,18 +18,10 @@ LvObject::LvObject(LvObject& parent) : LvObject(lv_obj_create(parent.raw())) {
 }
 
 LvObject::~LvObject(){
-    // no deletion here, as this is just a wrappery
-}
-
-LvObject::LvObject(const LvObject& other) : mRaw(other.mRaw) {
-    // copy constructor
-}
-
-LvObject& LvObject::operator=(const LvObject& other){
-    if (this != &other) {
-        mRaw = other.mRaw;
+    if(mRaw != nullptr){
+        lv_obj_del(mRaw);
+        mRaw = nullptr;
     }
-    return *this;
 }
 
 LvObject::LvObject(LvObject&& other) noexcept : mRaw(other.mRaw){
@@ -37,24 +29,49 @@ LvObject::LvObject(LvObject&& other) noexcept : mRaw(other.mRaw){
 }
 
 LvObject& LvObject::operator=(LvObject&& other) noexcept {
-    if (this != &other) {
+    if(this != &other){
+        if(mRaw != nullptr){
+            lv_obj_del(mRaw);
+        }
+
         mRaw = other.mRaw;
         other.mRaw = nullptr;
     }
     return *this;
 }
 
-
 lv_obj_t* LvObject::raw() const {
     return mRaw;
 }
 
 void LvObject::free(){
+    AssertExit(mRaw != nullptr, "LvObject", "free nullptr");
     lv_obj_del(mRaw);
+    mRaw = nullptr;
 }
 
 void LvObject::setScreen(){
     lv_disp_load_scr(mRaw);
+}
+
+// ==============================================================================
+// ordering
+// ==============================================================================
+
+void LvObject::moveBackground(){
+    lv_obj_move_background(mRaw);
+}
+
+void LvObject::moveForeground(){
+    lv_obj_move_foreground(mRaw);
+}
+
+void LvObject::moveToIndex(int32_t index){
+    lv_obj_move_to_index(mRaw, index);
+}
+
+int32_t LvObject::getIndex(){
+    return lv_obj_get_index(mRaw);
 }
 
 // ==============================================================================

@@ -59,30 +59,32 @@ MainScreen::MainScreen() :
     ){}
 
 void MainScreen::onInit(){
+
+
     initTemperatureChart();
     initPowerChart();
 
-    const int32_t xMin = 5;
-    const int32_t xMax = ChartsPointCount - 5;
-    const int32_t xRange = xMax - xMin;
+    // const int32_t xMin = 5;
+    // const int32_t xMax = ChartsPointCount - 5;
+    // const int32_t xRange = xMax - xMin;
 
-    // temperature horizontal grid
-    mTempGrid.setHorizontalPosition(0, (1000 * (20 - TempChartYMin)) / TempChartYRange);
-    mTempGrid.setHorizontalPosition(0, (1000 * (30 - TempChartYMin)) / TempChartYRange);
-    mTempGrid.setHorizontalPosition(0, (1000 * (40 - TempChartYMin)) / TempChartYRange);
+    // // temperature horizontal grid
+    // mTempGrid.setHorizontalPosition(0, (1000 * (20 - TempChartYMin)) / TempChartYRange);
+    // mTempGrid.setHorizontalPosition(0, (1000 * (30 - TempChartYMin)) / TempChartYRange);
+    // mTempGrid.setHorizontalPosition(0, (1000 * (40 - TempChartYMin)) / TempChartYRange);
 
-    // power horizontal grid
-    mPowerGrid.setHorizontalPosition(0, (1000 * (20 - PowerChartYMin)) / PowerChartYRange);
-    mPowerGrid.setHorizontalPosition(0, (1000 * (30 - PowerChartYMin)) / PowerChartYRange);
-    mPowerGrid.setHorizontalPosition(0, (1000 * (40 - PowerChartYMin)) / PowerChartYRange);
+    // // power horizontal grid
+    // mPowerGrid.setHorizontalPosition(0, (1000 * (20 - PowerChartYMin)) / PowerChartYRange);
+    // mPowerGrid.setHorizontalPosition(0, (1000 * (30 - PowerChartYMin)) / PowerChartYRange);
+    // mPowerGrid.setHorizontalPosition(0, (1000 * (40 - PowerChartYMin)) / PowerChartYRange);
 
-    // charts vertical grid
-    for(int32_t i = 0; i < GridVerticalCount; i++){
-        int32_t tVal = (xRange*i)/(GridVerticalCount-1);
-        int32_t permille = (1000 * xMin + tVal) / ChartsPointCount;
-        mTempGrid.setVerticalPosition(0, permille);
-        mPowerGrid.setVerticalPosition(0, permille);
-    }
+    // // charts vertical grid
+    // for(int32_t i = 0; i < GridVerticalCount; i++){
+    //     int32_t tVal = (xRange*i)/(GridVerticalCount-1);
+    //     int32_t permille = (1000 * xMin + tVal) / ChartsPointCount;
+    //     mTempGrid.setVerticalPosition(0, permille);
+    //     mPowerGrid.setVerticalPosition(0, permille);
+    // }
 }
 
 void MainScreen::initTemperatureChart(){
@@ -117,7 +119,7 @@ void MainScreen::initTemperatureChart(){
 void MainScreen::initPowerChart(){
 
     // setup temperature chart
-    LvChart& chart = gui().tempGraph.chart;
+    LvChart& chart = gui().powerGraph.chart;
     chart.setType(LV_CHART_TYPE_LINE);
     chart.setPointCount(ChartsPointCount);
     chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, 0, 100);
@@ -127,7 +129,7 @@ void MainScreen::initPowerChart(){
     chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
 
     // create temperature series
-    LvChartSeries* series = chart.addSeries(lv_color_hex(ColorBlue)); 
+    LvChartSeries* series = chart.addSeries(lv_color_hex(ColorRed)); 
     chart.hideSeries(series, false);
 
     // fill temperature values

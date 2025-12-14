@@ -24,6 +24,7 @@
           <!-- Rotate label will be inserted in cpp -->
         </container>
         <container flex-grow="1" height="100%" border-color="#fff" border-width="1px" border-side="full" radius="8px">
+          <container name="grid" width="100%" height="100%"></container>
           <chart name="chart" width="100%" height="100%" />
         </container>
       </body>

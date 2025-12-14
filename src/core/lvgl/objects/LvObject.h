@@ -6,7 +6,9 @@
 namespace Garbox {
 
 /**
- * This is a non-owning wrapper around a LVGL object. LVGL owns it.
+ * Wrapper around a LVGL object.
+ * 
+ * Owns the reference to the underlying LVGL object.
  */
 class LvObject {
 protected:
@@ -18,22 +20,38 @@ public:
         int32_t height;
     };
 
+    // create a 
     LvObject();
+
+    // create an object with parent
     LvObject(LvObject& parent);
     LvObject(lv_obj_t* raw);
+
+    // does not free the lvgl object
     ~LvObject();
 
-    LvObject(const LvObject& other); // copy constructor
-    LvObject& operator=(const LvObject& other); // assignment operator
+    // wrapper can not be copied
+    LvObject(const LvObject& other) = delete; // copy constructor
+    LvObject& operator=(const LvObject& other) = delete; // assignment operator
     
+    // wrapper can be moved
     LvObject(LvObject&& other) noexcept; // move constructor
     LvObject& operator=(LvObject&& other) noexcept; // move assignment operator
 
+    // raw lvgl object access
     lv_obj_t* raw() const;
+
+    // deletes the lvgl object
     void free();
 
     // set this object as the main screen
     void setScreen();
+
+    // ordering
+    void moveBackground();
+    void moveForeground();
+    void moveToIndex(int32_t index);
+    int32_t getIndex();
 
     // raw positioning
     void setPosition(int32_t xPixels, int32_t yPixels);
