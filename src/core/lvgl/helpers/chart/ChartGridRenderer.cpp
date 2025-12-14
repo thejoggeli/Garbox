@@ -158,7 +158,7 @@ void ChartGridRenderer::onDrawLabels(lv_event_t* event){
         // compute coordinate of label
         const int32_t x1 = contentArea.x1 + LabelPaddingLeft; 
         const int32_t y1 = contentArea.y2 - ((contentHeight * mYTicks[i].relativePosition) / RelativePositionMax) - (labelDsc.text_size.y / 2);
-        const int32_t x2 = x1 + labelDsc.text_size.x; 
+        const int32_t x2 = x1 + labelDsc.text_size.x;
         const int32_t y2 = y1 + labelDsc.text_size.y;
 
         // compute label area

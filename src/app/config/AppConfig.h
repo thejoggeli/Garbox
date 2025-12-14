@@ -37,7 +37,7 @@ static constexpr uint32_t StatusLedsTaskCore = 1;
 static constexpr const char* DisplayRenderTaskName = "DisplayRenderTask";
 static constexpr uint32_t DisplayRenderTaskPriority = 1; // rendering is low priority
 static constexpr uint32_t DisplayRenderTaskStackSize = 1024*8;
-static constexpr uint32_t DisplayRenderTaskCore = 0;
+static constexpr uint32_t DisplayRenderTaskCore = 1;
 
 // SPI DMA Task
 static constexpr const char* SpiDmaTaskName = "SpiDmaTask";
