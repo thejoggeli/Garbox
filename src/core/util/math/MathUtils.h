@@ -11,6 +11,9 @@ public:
     // Prevent instantiation
     MathUtils() = delete;
 
+    /// maps val from range [min, max] to [0.0f, 1.0f]
+    static float Normalize(float val, float min, float max);
+
     /// clamps val to given range [minVal, maxVal]
     template <typename T>
     static T Clamp(T val, T minVal, T maxVal){

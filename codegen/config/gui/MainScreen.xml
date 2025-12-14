@@ -24,7 +24,6 @@
           <!-- Rotate label will be inserted in cpp -->
         </container>
         <container flex-grow="1" height="100%" border-color="#fff" border-width="1px" border-side="full" radius="8px">
-          <container name="grid" width="100%" height="100%"></container>
           <chart name="chart" width="100%" height="100%" />
         </container>
       </body>
@@ -42,7 +41,7 @@
     <InfoTile $icon $value>
       <body layout="flex" flex-flow="column" flex-align="center" margin="0 0 4px 4px">
         <image name="icon" src=$icon width="16" height="16" />
-        <label name="value" text=$value />
+        <label name="value" text=$value width="100%" />
       </body>
     </InfoTile>
 

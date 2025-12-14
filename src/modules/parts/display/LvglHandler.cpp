@@ -157,8 +157,6 @@ void LvglHandler::initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t 
 
 void LvglHandler::myThemeCallback(lv_theme_t* th, lv_obj_t * obj){
     LV_UNUSED(th);
-
-    /* Remove/override unwanted visuals */
     lv_obj_set_style_radius(obj, 0, 0);
     lv_obj_set_style_border_width(obj, 0, 0);
     lv_obj_set_style_pad_all(obj, 0, 0);
@@ -166,9 +164,8 @@ void LvglHandler::myThemeCallback(lv_theme_t* th, lv_obj_t * obj){
     lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, 0);
     lv_obj_set_style_pad_row(obj, 0, 0);
     lv_obj_set_style_pad_column(obj, 0, 0);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-
-    /* If specific widgets need exceptions, check their class here */
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    // lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
 }
 
 } // namespace

@@ -1,11 +1,11 @@
-#include "LvglHelpers.h"
+#include "RotationRenderer.h"
 #include "core/assert/Assert.h"
-#include "core/lvgl/BufferRotate.h"
+#include "core/lvgl/helpers/BufferRotate.h"
 #include <cstring>
 
 namespace Garbox {
 
-LvImage LvglHelpers::createRotatedLabelRgb565(LvObject& parent, const RotatedLabelConfig& config){
+LvImage RotationRenderer::createRotatedLabelRgb565(LvObject& parent, const RotatedLabelConfig& config){
 
     // measure text size
     lv_point_t textSize;
@@ -19,8 +19,8 @@ LvImage LvglHelpers::createRotatedLabelRgb565(LvObject& parent, const RotatedLab
         LV_TEXT_FLAG_NONE
     );
 
-    AssertExit(textSize.x > 0, "LvglHelpers", "x must be >= 0");
-    AssertExit(textSize.y > 0, "LvglHelpers", "y must be >= 0");
+    AssertExit(textSize.x > 0, "RotationRenderer", "x must be >= 0");
+    AssertExit(textSize.y > 0, "RotationRenderer", "y must be >= 0");
 
     const int32_t w = textSize.x;
     const int32_t h = textSize.y;
@@ -34,7 +34,7 @@ LvImage LvglHelpers::createRotatedLabelRgb565(LvObject& parent, const RotatedLab
     // this minimizes fragmentation because if we created non-rotated buffer first
     // it would leave a "hole" in the memory after its free'd
     lv_draw_buf_t* drawBufRot = lv_draw_buf_create(rotW, rotH, LV_COLOR_FORMAT_RGB565, 0);
-    AssertExit(drawBufRot != nullptr, "LvglHelpers", "draw buf create failed");
+    AssertExit(drawBufRot != nullptr, "RotationRenderer", "draw buf create failed");
     
     // create rotated canvas
     lv_obj_t* rotCanvas = lv_canvas_create(parent.raw());
@@ -42,7 +42,7 @@ LvImage LvglHelpers::createRotatedLabelRgb565(LvObject& parent, const RotatedLab
 
     // create draw buffer (memory will be freed after this function)
     lv_draw_buf_t* drawBuf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_RGB565, 0);
-    AssertExit(drawBuf != nullptr, "LvglHelpers", "buffer allocation failed");
+    AssertExit(drawBuf != nullptr, "RotationRenderer", "buffer allocation failed");
 
     // create canvas with this draw buffer (memory will be freed after this function)
     lv_obj_t* canvas = lv_canvas_create(lv_screen_active());

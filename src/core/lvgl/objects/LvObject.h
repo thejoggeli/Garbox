@@ -6,7 +6,7 @@
 namespace Garbox {
 
 /**
- * Wrapper around a LVGL object.
+ * Non-owning wrapper around a LVGL object.
  * 
  * Owns the reference to the underlying LVGL object.
  */
@@ -348,9 +348,6 @@ protected:
     
     // raw pointer to lvgl object 
     lv_obj_t* mRaw = nullptr;
-    
-    // buffer for string formatting
-    static char sBuffer[256];
 
 };
 

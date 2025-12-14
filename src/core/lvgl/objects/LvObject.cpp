@@ -3,8 +3,6 @@
 
 namespace Garbox {
 
-char LvObject::sBuffer[256];
-
 LvObject::LvObject(lv_obj_t* raw) : mRaw(raw){
     AssertExit(mRaw != nullptr, "LvObject", "got nullptr");
 }
@@ -18,10 +16,7 @@ LvObject::LvObject(LvObject& parent) : LvObject(lv_obj_create(parent.raw())) {
 }
 
 LvObject::~LvObject(){
-    if(mRaw != nullptr){
-        lv_obj_del(mRaw);
-        mRaw = nullptr;
-    }
+    // non-owning wrapper, nothing to do
 }
 
 LvObject::LvObject(LvObject&& other) noexcept : mRaw(other.mRaw){
@@ -29,11 +24,7 @@ LvObject::LvObject(LvObject&& other) noexcept : mRaw(other.mRaw){
 }
 
 LvObject& LvObject::operator=(LvObject&& other) noexcept {
-    if(this != &other){
-        if(mRaw != nullptr){
-            lv_obj_del(mRaw);
-        }
-
+    if (this != &other) {
         mRaw = other.mRaw;
         other.mRaw = nullptr;
     }

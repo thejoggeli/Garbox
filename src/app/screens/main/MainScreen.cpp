@@ -1,8 +1,9 @@
 #include "MainScreen.h"
 
 #include "core/log/Log.h"
-#include "core/lvgl/LvglHelpers.h"
+#include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"
+#include "core/util/math/MathUtils.h"
 #include <math.h>
 
 namespace Garbox {
@@ -12,79 +13,92 @@ static constexpr uint32_t ColorRed = 0xB85450;
 static constexpr uint32_t ColorBlue = 0x8AB4F4;
 static constexpr uint32_t ColorGreen = 0x7BBF56;
 
-static constexpr uint32_t GridHorizontalCount = 3;
-static constexpr uint32_t GridVerticalCount = 5;
+static constexpr uint32_t GridTicksCountX = 5;
+static constexpr uint32_t GridTicksCountY = 3;
 static constexpr uint32_t GridLineColor = 0x333333;
 static constexpr uint32_t GridLineWidth = 2;
 
 static constexpr uint32_t ChartsPointCount = 8*8+1;
 
-static constexpr int32_t TempChartYMin = 15;
-static constexpr int32_t TempChartYMax = 45;
-static constexpr int32_t TempChartYRange = TempChartYMax - TempChartYMin;
-
-static constexpr int32_t PowerChartYMin = -10;
-static constexpr int32_t PowerChartYMax = 110;
-static constexpr int32_t PowerChartYRange = PowerChartYMax - PowerChartYMin;
+static constexpr int32_t TempChartYScale = 1024*8; // scale y-values by factor to prevent staircase effect (LVGL chart uses ints internally)
+static constexpr int32_t TempChartYMin = TempChartYScale * 15;
+static constexpr int32_t TempChartYMax = TempChartYScale * 45;
+ 
+static constexpr int32_t PowerChartYScale = 1024*8; // scale y-values factor to prevent staircase effect (LVGL chart uses ints internally)
+static constexpr int32_t PowerChartYMin = PowerChartYScale * (0 - 20);
+static constexpr int32_t PowerChartYMax = PowerChartYScale * (100 + 20);
 
 MainScreen::MainScreen() : 
     MainScreenAbs(),
-    mTempLabel(LvglHelpers::createRotatedLabelRgb565(gui().tempGraph.labelContainer, {
+    mTempLabel(RotationRenderer::createRotatedLabelRgb565(gui().tempGraph.labelContainer, {
         .text = "Temperature",
         .font = &lv_font_montserrat_14,
         .color = ColorBlue,
         .bgColor = 0x0,
-        .angle = LvglHelpers::Angle::Deg270,
+        .angle = RotationRenderer::Angle::Deg270,
     })),
-    mPowerLabel(LvglHelpers::createRotatedLabelRgb565(gui().powerGraph.labelContainer, {
+    mPowerLabel(RotationRenderer::createRotatedLabelRgb565(gui().powerGraph.labelContainer, {
         .text = "Power",
         .font = &lv_font_montserrat_14,
         .color = ColorRed,
         .bgColor = 0x0,
-        .angle = LvglHelpers::Angle::Deg270,
+        .angle = RotationRenderer::Angle::Deg270,
     })),
     mTempGrid(
         gui().tempGraph.chart,
-        GridHorizontalCount,
-        GridVerticalCount,
+        GridTicksCountX,
+        GridTicksCountY,
         lv_color_hex(GridLineColor),
         GridLineWidth
     ),
     mPowerGrid(
-        gui().tempGraph.chart,
-        GridHorizontalCount,
-        GridVerticalCount,
+        gui().powerGraph.chart,
+        GridTicksCountX,
+        GridTicksCountY,
         lv_color_hex(GridLineColor),
         GridLineWidth
-    ){}
+    ){
+
+    // setup time axis labels
+    const lv_font_t* timeAxisFont = &lv_font_montserrat_12; 
+    gui().t0.setFont(timeAxisFont);
+    gui().t1.setFont(timeAxisFont);
+    gui().t2.setFont(timeAxisFont);
+    gui().t3.setFont(timeAxisFont);
+    gui().t4.setFont(timeAxisFont);
+}
 
 void MainScreen::onInit(){
-
 
     initTemperatureChart();
     initPowerChart();
 
-    // const int32_t xMin = 5;
-    // const int32_t xMax = ChartsPointCount - 5;
-    // const int32_t xRange = xMax - xMin;
+    const int32_t pointIndexLeft = ChartsPointCount * 0.1f;
+    const int32_t pointIndexRight = ChartsPointCount * 0.9f;
 
-    // // temperature horizontal grid
-    // mTempGrid.setHorizontalPosition(0, (1000 * (20 - TempChartYMin)) / TempChartYRange);
-    // mTempGrid.setHorizontalPosition(0, (1000 * (30 - TempChartYMin)) / TempChartYRange);
-    // mTempGrid.setHorizontalPosition(0, (1000 * (40 - TempChartYMin)) / TempChartYRange);
+    // temperature horizontal grid
+    mTempGrid.setYTickPosition(0, MathUtils::Normalize(20 * TempChartYScale, TempChartYMin, TempChartYMax));
+    mTempGrid.setYTickPosition(1, MathUtils::Normalize(30 * TempChartYScale, TempChartYMin, TempChartYMax));
+    mTempGrid.setYTickPosition(2, MathUtils::Normalize(40 * TempChartYScale, TempChartYMin, TempChartYMax));
+    mTempGrid.setYTickLabel(0, "20°C");
+    mTempGrid.setYTickLabel(1, "30°C");
+    mTempGrid.setYTickLabel(2, "40°C");
 
-    // // power horizontal grid
-    // mPowerGrid.setHorizontalPosition(0, (1000 * (20 - PowerChartYMin)) / PowerChartYRange);
-    // mPowerGrid.setHorizontalPosition(0, (1000 * (30 - PowerChartYMin)) / PowerChartYRange);
-    // mPowerGrid.setHorizontalPosition(0, (1000 * (40 - PowerChartYMin)) / PowerChartYRange);
+    // power horizontal grid
+    mPowerGrid.setYTickPosition(0, MathUtils::Normalize(0   * TempChartYScale, PowerChartYMin, PowerChartYMax));
+    mPowerGrid.setYTickPosition(1, MathUtils::Normalize(50  * TempChartYScale, PowerChartYMin, PowerChartYMax));
+    mPowerGrid.setYTickPosition(2, MathUtils::Normalize(100 * TempChartYScale, PowerChartYMin, PowerChartYMax));
+    mPowerGrid.setYTickLabel(0, "0%");
+    mPowerGrid.setYTickLabel(1, "50%");
+    mPowerGrid.setYTickLabel(2, "100%");
 
-    // // charts vertical grid
-    // for(int32_t i = 0; i < GridVerticalCount; i++){
-    //     int32_t tVal = (xRange*i)/(GridVerticalCount-1);
-    //     int32_t permille = (1000 * xMin + tVal) / ChartsPointCount;
-    //     mTempGrid.setVerticalPosition(0, permille);
-    //     mPowerGrid.setVerticalPosition(0, permille);
-    // }
+    // charts vertical grid
+    for(int32_t i = 0; i < GridTicksCountX; i++){
+        float pointIndex = MathUtils::Map<float>(i, 0, GridTicksCountX-1, pointIndexLeft, pointIndexRight);
+        float relativePos = MathUtils::Normalize(pointIndex, 0, ChartsPointCount);
+        mTempGrid.setXTickPosition(i, relativePos);
+        mPowerGrid.setXTickPosition(i, relativePos);
+    }
 }
 
 void MainScreen::initTemperatureChart(){
@@ -93,8 +107,8 @@ void MainScreen::initTemperatureChart(){
     LvChart& chart = gui().tempGraph.chart;
     chart.setType(LV_CHART_TYPE_LINE);
     chart.setPointCount(ChartsPointCount);
-    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, 0, 100);
-    chart.setDivLineCount(5, 5);
+    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, TempChartYMin, TempChartYMax);
+    chart.setDivLineCount(0, 0);
     chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
     chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
     chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
@@ -108,8 +122,8 @@ void MainScreen::initTemperatureChart(){
     for (int i = 0; i < ChartsPointCount; i++) {
         const float step = 1.0f/(8*8);
         const float x = fmodf(static_cast<float>(i) * step, 1.0f);
-        const float value = mathFn.evaluate(x) * 75.0f + 12.5f;
-        chart.setNextValue(series, value);
+        const float value = mathFn.evaluate(x) * 20.0f + 20.0f;
+        chart.setNextValue(series, value * TempChartYScale);
     }
 
     chart.refresh();
@@ -122,8 +136,8 @@ void MainScreen::initPowerChart(){
     LvChart& chart = gui().powerGraph.chart;
     chart.setType(LV_CHART_TYPE_LINE);
     chart.setPointCount(ChartsPointCount);
-    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, 0, 100);
-    chart.setDivLineCount(5, 5);
+    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, PowerChartYMin, PowerChartYMax);
+    chart.setDivLineCount(0, 0);
     chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
     chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
     chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
@@ -135,10 +149,10 @@ void MainScreen::initPowerChart(){
     // fill temperature values
     const MathFunctionIfc& mathFn = MathFunctions::GetGamma22(); 
     for (int i = 0; i < ChartsPointCount; i++) {
-        const float step = 1.0f/(8*8);
+        const float step = 1.0f/(8*8) * 2.0f;
         const float x = fmodf(static_cast<float>(i) * step, 1.0f);
-        const float value = mathFn.evaluate(x) * 75.0f + 12.5f;
-        chart.setNextValue(series, value);
+        const float value = mathFn.evaluate(x) * 100.0f;
+        chart.setNextValue(series, value * PowerChartYScale);
     }
 
     chart.refresh();
@@ -158,17 +172,34 @@ void MainScreen::onBecomeDisabled(){
 }
 
 void MainScreen::onUpdateScreen(){
-    const MathFunctionIfc& mathFn = MathFunctions::GetSinAnim(); 
-    const float step = 1.0f/(8*8);
-    static float t = step;
-    LvChart& chart = gui().tempGraph.chart;
-    const float x = fmodf(t, 1.0f);
-    const float value = mathFn.evaluate(x) * 75.0f + 12.5f;
-    chart.setNextValue(mTempSeries, value);
-    t += step;
-    if(t >= 0.99f){
-        t = 0.0f;
+
+    // update temp chart
+    {
+        const MathFunctionIfc& mathFn = MathFunctions::GetSinAnim(); 
+        const float step = 1.0f/(8*8);
+        static float t = step;
+        const float value = mathFn.evaluate(t) * 20.0f + 20.0f;
+        gui().tempGraph.chart.setNextValue(mTempSeries, value * TempChartYScale);
+        t += step;
+        if(t >= 0.99f){
+            t = 0.0f;
+        }
     }
+
+    // update power chart
+    static uint32_t count = 0;
+    if(count%2 == 0){
+        const MathFunctionIfc& mathFn = MathFunctions::GetGamma22(); 
+        const float step = 1.0f/(8*8) * 2.0f;
+        static float t = step;
+        const float value = mathFn.evaluate(t) * 100.0f;
+        gui().powerGraph.chart.setNextValue(mPowerSeries, value * PowerChartYScale);
+        t += step;
+        if(t >= 0.99f){
+            t = 0.0f;
+        }        
+    }
+    count++;
 }
 
 void MainScreen::onDisplayCommand(const DisplayCommandEvent& event){

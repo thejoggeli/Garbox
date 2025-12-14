@@ -6,7 +6,7 @@
 
 namespace Garbox {
 
-class LvglHelpers {
+class RotationRenderer {
 public:
 
     enum class Angle : uint16_t {

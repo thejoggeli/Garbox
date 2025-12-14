@@ -12,11 +12,12 @@ void LvLabel::setText(const char* text){
 }
 
 void LvLabel::setTextFormatted(const char* fmt, ...){
+    char buffer[128];
     va_list args;
     va_start(args, fmt);
-    vsnprintf(sBuffer, sizeof(sBuffer), fmt, args);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
     va_end(args);
-    lv_label_set_text(mRaw, sBuffer);
+    lv_label_set_text(mRaw, buffer);
 }
 
 void LvLabel::setLongMode(lv_label_long_mode_t mode){

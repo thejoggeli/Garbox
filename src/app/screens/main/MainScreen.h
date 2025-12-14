@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/screens/abstract/MainScreenAbs.h"
-#include "core/lvgl/helpers/ChartGridRenderer.h"
+#include "core/lvgl/helpers/chart/ChartGridRenderer.h"
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
