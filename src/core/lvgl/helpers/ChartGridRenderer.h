@@ -5,6 +5,7 @@
 
 #include "core/lvgl/objects/LvChart.h"
 #include "core/lvgl/objects/LvObject.h"
+#include "core/util/container/heap/ArrayHeap.h"
 
 namespace Garbox {
 
