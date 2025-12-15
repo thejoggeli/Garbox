@@ -12,6 +12,7 @@ namespace Garbox {
 static constexpr uint32_t ColorRed = 0xB85450;
 static constexpr uint32_t ColorBlue = 0x8AB4F4;
 static constexpr uint32_t ColorGreen = 0x7BBF56;
+static constexpr uint32_t ColorTarget = 0xD1B254;
 
 static constexpr uint32_t ChartSeriesLineWidth = 2;
 static constexpr uint32_t GridTicksCountX = 5;
@@ -22,8 +23,8 @@ static constexpr uint32_t GridLineWidth = 1;
 static constexpr uint32_t ChartsPointCount = 8*8+1;
 
 static constexpr int32_t TempChartYScale = 1024*8; // scale y-values by factor to prevent staircase effect (LVGL chart uses ints internally)
-static constexpr int32_t TempChartYMin = TempChartYScale * 15;
-static constexpr int32_t TempChartYMax = TempChartYScale * 45;
+static constexpr int32_t TempChartYMin = TempChartYScale * 16;
+static constexpr int32_t TempChartYMax = TempChartYScale * 44;
  
 static constexpr int32_t PowerChartYScale = 1024*8; // scale y-values factor to prevent staircase effect (LVGL chart uses ints internally)
 static constexpr int32_t PowerChartYMin = PowerChartYScale * (0 - 20);
@@ -58,7 +59,9 @@ MainScreen::MainScreen() :
         GridTicksCountY,
         lv_color_hex(GridLineColor),
         GridLineWidth
-    ){
+    ){}
+
+void MainScreen::onInit(){
 
     // setup time axis labels
     const lv_font_t* timeAxisFont = &lv_font_montserrat_10; 
@@ -71,6 +74,7 @@ MainScreen::MainScreen() :
     // setup graph values
     gui().tempGraph.value.setTextColor(lv_color_hex(ColorBlue));
     gui().powerGraph.value.setTextColor(lv_color_hex(ColorRed));
+    gui().powerGraph.value.setAlign(LV_ALIGN_BOTTOM_RIGHT, -4, -4);
 
     // setup info labels
     const lv_font_t* infoLabelFont = &lv_font_montserrat_12; 
@@ -83,10 +87,7 @@ MainScreen::MainScreen() :
     const lv_font_t* menuFont = &lv_font_montserrat_12;
     gui().menuContainer.setFont(menuFont);
 
-}
-
-void MainScreen::onInit(){
-
+    // init charts
     initTemperatureChart();
     initPowerChart();
 
@@ -134,7 +135,7 @@ void MainScreen::initTemperatureChart(){
     mTempSeries = chart.addSeries(lv_color_hex(ColorBlue)); 
 
     // create temperature target series
-    mTempTargetSeries = chart.addSeries(lv_color_hex(0xD1B254)); 
+    mTempTargetSeries = chart.addSeries(lv_color_hex(ColorTarget)); 
 
     // refresh chart
     chart.refresh();
@@ -178,12 +179,6 @@ void MainScreen::onUpdateScreen(){
         mPowerTimer.restart();
         const float power = model().getHeatpadNextDuty() * 100.0f;
         gui().powerGraph.chart.setNextValue(mPowerSeries, power * PowerChartYScale);
-        if(power > 75.0f){
-            gui().powerGraph.value.setAlign(LV_ALIGN_BOTTOM_RIGHT, -4, -4);
-        }
-        else if(power < 25.0f){
-            gui().powerGraph.value.setAlign(LV_ALIGN_TOP_RIGHT, -4, 4);
-        }
     }
 }
 
@@ -316,19 +311,13 @@ void MainScreen::onApplySensorStatus(){
 void MainScreen::onApplyMeasuredTemperature(){
 
     if(!isSensorOk()){
-        gui().tempGraph.value.setTextFormatted("SENSOR ERROR");
+        gui().tempGraph.value.setTextFormatted(resovleSensorText());
         return;
     }
 
     // set chart temperature
     float temperature = model().getMeasuredTemperature();
     gui().tempGraph.chart.setNextValue(mTempSeries, temperature * TempChartYScale);
-    if(temperature > 35.0f){
-        gui().tempGraph.value.setAlign(LV_ALIGN_BOTTOM_RIGHT, -4, -4);
-    }
-    else if(temperature < 25.0f){
-        gui().tempGraph.value.setAlign(LV_ALIGN_TOP_RIGHT, -4, 4);
-    }
     gui().tempGraph.value.setTextFormatted("%.1f°C", temperature);
 
     // set chart target temperature
