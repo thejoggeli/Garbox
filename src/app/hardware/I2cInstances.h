@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "core/hardware/i2c/I2c.h"
+    
 
 namespace Garbox {
 

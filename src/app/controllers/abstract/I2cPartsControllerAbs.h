@@ -21,14 +21,6 @@ public:
 
 protected:
 
-    // make typed events 
-    TemperatureStatusEvent makeTemperatureStatusEvent();
-    TemperatureSampleEvent makeTemperatureSampleEvent();
-
-    // send typed events
-    void sendEvent(const TemperatureStatusEvent& event);
-    void sendEvent(const TemperatureSampleEvent& event);
-
 private:
 
     // hide event methods

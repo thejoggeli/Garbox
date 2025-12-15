@@ -1,0 +1,22 @@
+#pragma once
+{% include "_common/header.j2" %}
+{# compute max name length for white space alignment #}
+{% set ns = namespace(maxlen=0) %}
+{% for alias_name in type_aliases.keys() %}
+    {% set length = alias_name|length %}
+    {% if length > ns.maxlen %}
+        {% set ns.maxlen = length %}
+    {% endif %}
+{% endfor %}
+{# include header #}
+#include "core/application/datastore/StoredValue.h"
+{% from "_common/includes.j2" import emit_includes %}
+{{ emit_includes(include_h) }}
+
+namespace Garbox {
+
+{% for alias_name, alias_data in type_aliases.items() %}
+using {{ alias_name.ljust(ns.maxlen) }} = StoredValue<{{ alias_data["type"] }}>;
+{% endfor %}
+
+} // namespace Garbox

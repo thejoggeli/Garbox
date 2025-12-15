@@ -13,16 +13,9 @@ enum class EventType : uint16_t {
 
     // generated from config
     Heartbeat,
-    FermentationStatus,
     DisplayCommand,
-    DisplayStatus,
-    FanStatus,
-    FanSample,
     FanCommand,
-    HeatpadStatus,
-    HeatpadSample,
     HeatpadCommand,
-    TemperatureStatus,
     TemperatureSample,
     ButtonStateChanged,
     ButtonRepeat,

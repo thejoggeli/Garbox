@@ -1,0 +1,45 @@
+datastore:
+    include_h: 
+        - "app/engine/HeaterEngineState.h"
+        - "app/types/TempsenseState.h"
+        - "modules/parts/fan/FanState.h"
+        - "modules/parts/heatpad/HeatpadState.h"
+    fields:
+
+        # Temperature Sensor
+        - { name: TempsenseState, type: TempsenseState }
+        - { name: TempsenseDriverEnabled, type: bool }
+        - { name: TempsensePowerEnabled, type: bool }
+        - { name: TempsenseResetting, type: bool }
+        - { name: TempsenseHasFirstSample, type: bool }
+        - { name: MeasuredTemperature, type: float }
+        - { name: MeasuredHumidity, type: float }
+
+        # Display
+        - { name: DisplayBrightness, type: float }
+        - { name: FramesSkipped, type: uint32_t }
+
+        # Fermentation Engine
+        - { name: HeaterEngineState, type: HeaterEngineState }
+        - { name: TargetTemperature, type: float }
+
+        # Fan 
+        - { name: FanState, type: FanState }
+        - { name: FanTargetSpeed, type: float }
+        - { name: FanRpmControl, type: bool } # Open loop (0-100%) or closed loop (RPM) control
+        - { name: FanMeasuredRpm, type: float }
+
+        # Heatpad
+        - { name: HeatpadState, type: HeatpadState }
+        - { name: HeatpadDuty, type: float }
+        - { name: HeatpadPeriod, type: uint32_t }
+        - { name: HeatpadNextDuty, type: float }
+        - { name: HeatpadNextPeriod, type: uint32_t }
+        - { name: HeatpadMeasuredVoltage, type: float }
+        - { name: HeatpadMeasuredCurrent, type: float }
+        - { name: HeatpadPwmProgress, type: uint32_t }
+
+
+
+
+

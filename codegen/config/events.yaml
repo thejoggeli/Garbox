@@ -1,52 +1,20 @@
 event_payloads:
   include_h: [
-    "app/engine/HeaterEngineState.h",
-    "modules/parts/button/ButtonState.h",
-    "modules/parts/fan/FanState.h",
-    "modules/parts/heatpad/HeatpadState.h"
+    "modules/parts/button/ButtonState.h"
   ]
 
 event_types:
   Heartbeat: null
-  FermentationStatus:
-    - { name: heaterEngineState, type: HeaterEngineState }
-    - { name: targetTemperature, type: float }
-    - { name: measuredTemperature, type: float }
-    - { name: measuredHumidity, type: float }
   DisplayCommand:
     - { name: brightness, type: float }
-  DisplayStatus:
-    - { name: brightness, type: float }
-    - { name: skipped, type: uint32_t }
-  FanStatus:
-    - { name: state, type: FanState }
-    - { name: targetSpeed, type: float }
-    - { name: rpmControlEnabled, type: bool } # DutyCycle or RPM (depending on rpmControlEnabled)
-  FanSample:
-    - { name: measuredRpm, type: float }
   FanCommand:
     - { name: enabled, type: bool }
     - { name: targetSpeed, type: float }
     - { name: enableRpmControl, type: bool } # DutyCycle or RPM (depending on enableRpmControl)
-  HeatpadStatus:
-    - { name: state, type: HeatpadState }
-    - { name: currentDutyCycle, type: float }
-    - { name: currentPeriodMicros, type: uint32_t }
-    - { name: nextDutyCycle, type: float }
-    - { name: nextPeriodMicros, type: uint32_t }
-  HeatpadSample:
-    - { name: measuredVoltage, type: float }
-    - { name: measuredCurrent, type: float }
-    - { name: pwmProgressMicros, type: float }
   HeatpadCommand:
     - { name: enabled, type: bool }
     - { name: dutyCycle, type: float }
     - { name: periodMicros, type: uint32_t }
-  TemperatureStatus:
-    - { name: driverEnabled, type: bool }
-    - { name: powerEnabled, type: bool }
-    - { name: resetting, type: bool }
-    - { name: hasFirstSample, type: bool }
   TemperatureSample:
     - { name: temperatureCelcius, type: float }
     - { name: humidityRelative, type: float }

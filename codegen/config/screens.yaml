@@ -8,24 +8,6 @@ screens:
     tick_phases: null
     receives: [DisplayCommand, FanCommand, HeatpadCommand]
     sends: null
-    model:
-      fields:
-        - { name: fanState,               bind: FanStatus->state,       group: FanStatus, dirty: fanTargetSpeed }
-        - { name: fanMeasuredRpm,         bind: FanSample->measuredRpm, group: FanStatus }
-        - { name: fanTargetSpeed,         bind: FanStatus->targetSpeed }
-        - { name: heatpadState,           bind: HeatpadStatus->state,            group: HeatpadStatus }
-        - { name: heatpadNextDuty,        bind: HeatpadStatus->nextDutyCycle,    group: HeatpadStatus, dirty: HeatpadMeasure }
-        - { name: heatpadMeasuredVoltage, bind: HeatpadSample->measuredVoltage,  group: HeatpadMeasure }
-        - { name: heatpadMeasuredCurrent, bind: HeatpadSample->measuredCurrent,  group: HeatpadMeasure }
-        - { name: displayBrightness,      bind: DisplayStatus->brightness }
-        - { name: shtDriverEnabled,       bind: TemperatureStatus->driverEnabled,  group: SensorStatus, dirty: [measuredTemperature, measuredHumidity] }
-        - { name: shtPowerEnabled,        bind: TemperatureStatus->powerEnabled,   group: SensorStatus, dirty: [measuredTemperature, measuredHumidity] }
-        - { name: shtResetting,           bind: TemperatureStatus->resetting,      group: SensorStatus, dirty: [measuredTemperature, measuredHumidity] }
-        - { name: shtHasSample,           bind: TemperatureStatus->hasFirstSample, group: SensorStatus, dirty: [measuredTemperature, measuredHumidity] }
-        - { name: measuredTemperature,    bind: TemperatureSample->temperatureCelcius }
-        - { name: measuredHumidity,       bind: TemperatureSample->humidityRelative }
-        - { name: targetTemperature,      bind: FermentationStatus->targetTemperature }
-        - { name: engineState,            bind: FermentationStatus->heaterEngineState, dirty: targetTemperature}
 
   Debug:
     subdir: debug
@@ -33,45 +15,7 @@ screens:
     use_lvgl: true
     tick_phases: null
     receives: null
-    sends: 
-      - DisplayCommand
-    model:
-      fields:
-        - { name: fanState,                   bind: FanStatus->state,                         group: FanState }
-        - { name: fanTargetSpeed,             bind: FanStatus->targetSpeed,                   group: FanState }
-        - { name: fanMeasuredRpm,             bind: FanSample->measuredRpm,                   group: null }
-        - { name: heatpadState,               bind: HeatpadStatus->state,                     group: HeatpadState }
-        - { name: heatpadCurrentDuty,         bind: HeatpadStatus->currentDutyCycle,          group: HeatpadDuty }
-        - { name: heatpadCurrentPeriod,       bind: HeatpadStatus->currentPeriodMicros,       group: HeatpadDuty }
-        - { name: heatpadNextDuty,            bind: HeatpadStatus->nextDutyCycle,             group: HeatpadDuty }
-        - { name: heatpadNextPeriod,          bind: HeatpadStatus->nextPeriodMicros,          group: HeatpadDuty }
-        - { name: heatpadPwmProgress,         bind: HeatpadSample->pwmProgressMicros,         group: BoxPosition }
-        - { name: heatpadMeasuredVoltage,     bind: HeatpadSample->measuredVoltage,           group: HeatpadSense }
-        - { name: heatpadMeasuredCurrent,     bind: HeatpadSample->measuredCurrent,           group: HeatpadSense }
-        - { name: displayBrightness,          bind: DisplayStatus->brightness,                group: DisplayStatus }
-        - { name: displaySkipped,             bind: DisplayStatus->skipped,                   group: DisplayStatus }
-        - { name: shtDriverEnabled,           bind: TemperatureStatus->driverEnabled,         group: TemperatureState }
-        - { name: shtPowerEnabled,            bind: TemperatureStatus->powerEnabled,          group: TemperatureState }
-        - { name: shtResetting,               bind: TemperatureStatus->resetting,             group: TemperatureState }
-        - { name: sensorTemperatureCelcius,   bind: TemperatureSample->temperatureCelcius,    group: TemperatureSample }
-        - { name: sensorHumidityRelative,     bind: TemperatureSample->humidityRelative,      group: TemperatureSample }
-        - { name: timeSeconds,                type: uint32_t,                                 group: Time }
-        - { name: eventCount,                 type: uint32_t,                                 group: AppInfo }
-        - { name: behaviour,                  bind: ActiveBehaviourChanged->newBehaviour,     group: AppInfo }
-        - { name: engineState,                bind: FermentationStatus->heaterEngineState,    group: FermentationStatus }
-        - { name: engineTargetTemperature,    bind: FermentationStatus->targetTemperature,    group: FermentationStatus }
-        - { name: engineMeasuredTemperature,  bind: FermentationStatus->measuredTemperature,  group: FermentationStatus }
-        - { name: engineMeasuredHumidity,     bind: FermentationStatus->measuredHumidity,     group: FermentationStatus }
-
-        - { name: heapAllocatedBlocks,        type: uint32_t,                                 group: HeapBlocks}
-        - { name: heapFreeBlocks,             type: uint32_t,                                 group: HeapBlocks}
-        - { name: heapLargestFreeBlock,       type: uint32_t,                                 group: HeapBlocks}
-
-        - { name: heapAllocatedBytes,         type: uint32_t,                                 group: HeapBytes}
-        - { name: heapMinimumFreeBytes,       type: uint32_t,                                 group: HeapBytes}
-
-        - { name: heapTotalFreeBytes,         type: uint32_t,                                 group: HeapMinimum}
-        - { name: heapMinimumTime,            type: uint32_t,                                 group: HeapMinimum}
+    sends: [DisplayCommand]
 
   EventLog:
     subdir: eventlog

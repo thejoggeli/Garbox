@@ -10,20 +10,5 @@ FanControllerAbs::FanControllerAbs() : ControllerAbs(ComponentId::FanController,
     // nothing to do
 }
 
-FanStatusEvent FanControllerAbs::makeFanStatusEvent(){
-    return ComponentAbs::makeEvent<EventType::FanStatus>();
-}
-
-FanSampleEvent FanControllerAbs::makeFanSampleEvent(){
-    return ComponentAbs::makeEvent<EventType::FanSample>();
-}
-
-void FanControllerAbs::sendEvent(const FanStatusEvent& event){
-    publishEvent(event.header());
-}
-
-void FanControllerAbs::sendEvent(const FanSampleEvent& event){
-    publishEvent(event.header());
-}
  
 } // namespace Garbox

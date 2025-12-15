@@ -10,16 +10,9 @@ namespace Garbox {
 
 // event view aliases
 using HeartbeatEvent              = EventView<EventType::Heartbeat>;
-using FermentationStatusEvent     = EventView<EventType::FermentationStatus>;
 using DisplayCommandEvent         = EventView<EventType::DisplayCommand>;
-using DisplayStatusEvent          = EventView<EventType::DisplayStatus>;
-using FanStatusEvent              = EventView<EventType::FanStatus>;
-using FanSampleEvent              = EventView<EventType::FanSample>;
 using FanCommandEvent             = EventView<EventType::FanCommand>;
-using HeatpadStatusEvent          = EventView<EventType::HeatpadStatus>;
-using HeatpadSampleEvent          = EventView<EventType::HeatpadSample>;
 using HeatpadCommandEvent         = EventView<EventType::HeatpadCommand>;
-using TemperatureStatusEvent      = EventView<EventType::TemperatureStatus>;
 using TemperatureSampleEvent      = EventView<EventType::TemperatureSample>;
 using ButtonStateChangedEvent     = EventView<EventType::ButtonStateChanged>;
 using ButtonRepeatEvent           = EventView<EventType::ButtonRepeat>;
@@ -29,16 +22,9 @@ using ActiveScreenChangedEvent    = EventView<EventType::ActiveScreenChanged>;
 
 // event payload aliases
 using HeartbeatPayload              = EventPayload<EventType::Heartbeat>;
-using FermentationStatusPayload     = EventPayload<EventType::FermentationStatus>;
 using DisplayCommandPayload         = EventPayload<EventType::DisplayCommand>;
-using DisplayStatusPayload          = EventPayload<EventType::DisplayStatus>;
-using FanStatusPayload              = EventPayload<EventType::FanStatus>;
-using FanSamplePayload              = EventPayload<EventType::FanSample>;
 using FanCommandPayload             = EventPayload<EventType::FanCommand>;
-using HeatpadStatusPayload          = EventPayload<EventType::HeatpadStatus>;
-using HeatpadSamplePayload          = EventPayload<EventType::HeatpadSample>;
 using HeatpadCommandPayload         = EventPayload<EventType::HeatpadCommand>;
-using TemperatureStatusPayload      = EventPayload<EventType::TemperatureStatus>;
 using TemperatureSamplePayload      = EventPayload<EventType::TemperatureSample>;
 using ButtonStateChangedPayload     = EventPayload<EventType::ButtonStateChanged>;
 using ButtonRepeatPayload           = EventPayload<EventType::ButtonRepeat>;

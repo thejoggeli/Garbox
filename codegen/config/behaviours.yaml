@@ -2,10 +2,19 @@ behaviours:
 
   CalibrationBehaviour:
     tick_phases: [Logic]
-    receives: [Heartbeat, FanStatus, FanSample]
+    receives: [Heartbeat]
     sends: [FanCommand]
 
   FermentationBehaviour:
+    include: 
+      - "app/engine/HeaterEngineState.h"
+    state:
+      - { name: HeaterEngineState, type: HeaterEngineState }
+      - { name: TargetTemperature, type: float }
     tick_phases: [Logic]
-    receives: [Heartbeat, FanStatus, FanSample, HeatpadStatus, TemperatureStatus, TemperatureSample, ButtonStateChanged, ButtonRepeat, EncoderStep]
+    receives: 
+      - Heartbeat
+      - ButtonStateChanged
+      - ButtonRepeat
+      - EncoderStep
     sends: [FanCommand, DisplayCommand, HeatpadCommand, FermentationStatus]

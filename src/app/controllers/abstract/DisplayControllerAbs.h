@@ -21,12 +21,6 @@ public:
 
 protected:
 
-    // make typed events 
-    DisplayStatusEvent makeDisplayStatusEvent();
-
-    // send typed events
-    void sendEvent(const DisplayStatusEvent& event);
-
 private:
 
     // hide event methods

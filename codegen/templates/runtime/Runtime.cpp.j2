@@ -20,15 +20,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
         .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
         .eventQueueLength = {{ application.event_queue_length }},
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis),
-    mEventReplay(
-{%- set ns = namespace(delim="") -%}
-{%- for name, screen_data in screens.items() -%} 
-    {%- if screen_data.replay -%}
-        {{- ns.delim }}m{{- name -}}{%- if not loop.last -%}{%- endif -%}
-        {%- set ns.delim = ", " -%}
-    {%- endif -%}
-{%- endfor -%}){
+    mTickRunner(TickHandlersCount, TickPeriodMillis){
 
     // register components
 {% for beh in behaviours %}
@@ -74,9 +66,7 @@ void {{ RuntimeName}}::onActiveBehaviourChanged(){
 }
 
 void {{ RuntimeName}}::onActiveScreenChanged(){
-    if(mActiveScreen){
-        mEventReplay.replay(mActiveScreen->getScreenId());
-    }
+    // nothing to do
 }
 
 void {{ RuntimeName}}::handleTickStart(){
@@ -141,9 +131,6 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
 
 {% endfor %}
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
-
-    // store event for replay
-    mEventReplay.storeEvent(header);
 
 {% set ns = namespace(printed=0) %}
 {% for component in components.values() %}

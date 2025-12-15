@@ -13,7 +13,6 @@ enum class ComponentId : uint16_t {
 
     // default component ids
     Runtime,
-    Replay,
 
     // generated from config
     DisplayController,

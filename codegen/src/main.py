@@ -8,6 +8,7 @@ from generate.gen_types import generate_types
 from generate.gen_components import generate_components
 from generate.gen_config import generate_config
 from generate.gen_guis import generate_guis
+from generate.gen_datastore import generate_datastore
 
 
 def main():
@@ -55,6 +56,10 @@ def main():
     # runtime generation
     print_section("generating runtime files")
     generate_runtime(ctx, loader)
+
+    # datastore generation
+    print_section("generating datastore files")
+    generate_datastore(ctx, loader)
 
     # config generation
     print_section("generating config files")

@@ -1,0 +1,42 @@
+{% include "_common/header.j2" %}
+#include "DataStore.h"
+
+namespace Garbox {
+
+DataStore::DataStore():
+    DataStoreAbs(),
+{% for field in fields %}
+    {% set endl = "{}" if loop.last else "," %}
+    m{{ field["name"] | upper_first }}(){{ endl }}
+{% endfor %}
+
+DataStore::~DataStore(){
+    // nothing to do
+}
+
+void DataStore::Init(){
+    instance();
+}
+
+DataStore& DataStore::instance(){
+    static DataStore instance;
+    return instance;
+}
+
+{% for field in fields %}
+
+const {{ field["type_alias"] }}& DataStore::Get{{ field["name"] | upper_first }}(){
+    return instance().m{{ field["name"] | upper_first }};
+}
+
+bool DataStore::Reset{{ field["name"] | upper_first }}(){
+    return instance().m{{ field["name"] | upper_first }}.reset();
+}
+
+bool DataStore::Update{{ field["name"] | upper_first }}({{ field["type_name"] }} value){
+    return instance().m{{ field["name"] | upper_first }}.update(value);
+}
+
+{% endfor %}
+
+} // namespace

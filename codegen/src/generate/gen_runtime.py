@@ -7,7 +7,6 @@ from loader.loader import Loader
 
 def generate_runtime(ctx: Context, loader: Loader):
     _generate_runtime(ctx, loader)
-    _generate_event_replay(ctx, loader)
 
 
 def _collect_event_routes(loader: Loader):
@@ -71,41 +70,6 @@ def _generate_runtime(ctx: Context, loader: Loader):
     items = [
         Item(runtime_dict, "*", out_base.with_suffix(".h"),   "runtime/Runtime.h.j2"),
         Item(runtime_dict, "*", out_base.with_suffix(".cpp"), "runtime/Runtime.cpp.j2"),
-    ]
-
-    generate_items(ctx, items)
-
-
-def _generate_event_replay(ctx: Context, loader: Loader):
-    """
-    Generates 
-    - app/runtime/EventReplay.h
-    - app/runtime/EventReplay.cpp
-    """
-
-    # filter only screens with 'replay=true'
-    screens = {name: screen for name, screen in loader.config["screens"].items() if screen["replay"] == True}
-
-    replay_dict = {
-        "events": {},
-        "screens": screens,
-        "include_paths": _collect_paths(loader, 'screens'),
-    }
-
-    # collect all event types used by any screen
-    all_replay_events = SortedSet()
-    for screen_data in screens.values():
-        for event_name in screen_data["replay_events"]:
-            all_replay_events.add(event_name)
-
-    # add all used event to dict
-    for event_name, event in loader.config["event_types"].items():
-        if(event_name in all_replay_events):
-            replay_dict["events"][event_name] = event
-        
-    items = [
-        Item(replay_dict, "*", ctx.app_dir/"runtime/EventReplay.h",   "runtime/EventReplay.h.j2"),
-        Item(replay_dict, "*", ctx.app_dir/"runtime/EventReplay.cpp", "runtime/EventReplay.cpp.j2"),
     ]
 
     generate_items(ctx, items)

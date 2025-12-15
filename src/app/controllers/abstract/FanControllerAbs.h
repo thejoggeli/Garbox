@@ -22,14 +22,6 @@ public:
 
 protected:
 
-    // make typed events 
-    FanStatusEvent makeFanStatusEvent();
-    FanSampleEvent makeFanSampleEvent();
-
-    // send typed events
-    void sendEvent(const FanStatusEvent& event);
-    void sendEvent(const FanSampleEvent& event);
-
 private:
 
     // hide event methods

@@ -7,7 +7,6 @@ const char* ComponentTypeToString(ComponentType type){
 
         // component types
         case ComponentType::Runtime: return "Runtime";
-        case ComponentType::Replay: return "Replay";
         case ComponentType::Controller: return "Controller";
         case ComponentType::Behaviour: return "Behaviour";
         case ComponentType::Screen: return "Screen";

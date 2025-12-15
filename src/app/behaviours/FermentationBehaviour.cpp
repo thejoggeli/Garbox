@@ -1,5 +1,6 @@
 #include "FermentationBehaviour.h"
 
+#include "app/datastore/DataStore.h"
 #include "core/log/Log.h"
 #include "core/time/TimeLiterals.h"
 #include "core/util/math/MathUtils.h"
@@ -32,23 +33,29 @@ void FermentationBehaviour::onBecomeDisabled(){
     mHeaterEngine.reset();
     sendFanCommand(false, 0.0f);
     sendHeatpadCommand(false, 0.0f, 5000_ms);
-    sendFermentationStatus();
+    DataStore::UpdateHeaterEngineState(mHeaterEngine.getState());
 }
 
 void FermentationBehaviour::onLogicTick(){
 
     // set control engine input
     HeaterEngine::Input& input = mHeaterEngine.getInput();
-    input.targetTemperature = 30.0f;
+    input.targetTemperature = DataStore::GetTargetTemperature();
+    input.fanMeasuredRpm = DataStore::GetFanMeasuredRpm();
+    input.fanStalled = DataStore::GetFanState() == FanState::Stalled;
+    input.measuredHumidity = DataStore::GetMeasuredHumidity();
+    input.measuredHumidityValid = DataStore::GetMeasuredHumidity().hasValue();
+    input.measuredTemperature = DataStore::GetMeasuredTemperature();
+    input.measuredTemperatureValid = DataStore::GetMeasuredTemperature().hasValue();
 
     // perform control engine step
     mHeaterEngine.step();
     
     // send actuator commands
     const HeaterEngine::Output& output = mHeaterEngine.getOutput();
-    sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
     sendFanCommand(output.fanEnabled, output.fanTargetSpeed);
-    sendFermentationStatus();
+    sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
+    DataStore::UpdateHeaterEngineState(mHeaterEngine.getState());
 
     // handle heartbeat received
     if(mHeartbeatReceived){
@@ -88,60 +95,9 @@ void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
     mLastFanCommand.targetSpeed = speed;
 }
 
-void FermentationBehaviour::sendFermentationStatus(){
-    const HeaterEngine::Input& input = mHeaterEngine.getInput();
-    if (!mFirstTick &&
-        mLastFermentationStatus.heaterEngineState == mHeaterEngine.getState() &&
-        mLastFermentationStatus.targetTemperature == input.targetTemperature &&
-        mLastFermentationStatus.measuredTemperature == input.measuredTemperature &&
-        mLastFermentationStatus.measuredHumidity == input.measuredHumidity){
-        return;
-    }
-    FermentationStatusEvent event = makeFermentationStatusEvent();
-    event->heaterEngineState = mHeaterEngine.getState();
-    event->targetTemperature = input.targetTemperature;
-    event->measuredTemperature = input.measuredTemperature;
-    event->measuredHumidity = input.measuredHumidity;
-    sendEvent(event);
-    mLastFermentationStatus.heaterEngineState = event->heaterEngineState;
-    mLastFermentationStatus.targetTemperature = event->targetTemperature;
-    mLastFermentationStatus.measuredTemperature = event->measuredTemperature;
-    mLastFermentationStatus.measuredHumidity = event->measuredHumidity;
-}
 
 void FermentationBehaviour::onHeartbeat(const HeartbeatEvent& event){
     mHeartbeatReceived = true;
-}
-
-void FermentationBehaviour::onFanStatus(const FanStatusEvent& event){
-    HeaterEngine::Input& input = mHeaterEngine.getInput();
-    input.fanStalled = (event->state == FanState::Stalled);
-}
-
-void FermentationBehaviour::onFanSample(const FanSampleEvent& event){
-    HeaterEngine::Input& input = mHeaterEngine.getInput();
-    input.fanMeasuredRpm = event->measuredRpm;
-}
-
-void FermentationBehaviour::onHeatpadStatus(const HeatpadStatusEvent& event){
-    // nothing to do
-}
-
-void FermentationBehaviour::onTemperatureStatus(const TemperatureStatusEvent& event){
-    HeaterEngine::Input& input = mHeaterEngine.getInput();
-    const bool enabled = event->powerEnabled && event->driverEnabled && !event->resetting;
-    if(!enabled){
-        input.measuredTemperatureValid = false;
-        input.measuredHumidityValid = false;
-    }
-}
-
-void FermentationBehaviour::onTemperatureSample(const TemperatureSampleEvent& event){
-    HeaterEngine::Input& input = mHeaterEngine.getInput();
-    input.measuredTemperature = event->temperatureCelcius;
-    input.measuredHumidity = event->humidityRelative;
-    input.measuredTemperatureValid = true;
-    input.measuredHumidityValid = true;
 }
 
 void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& event){

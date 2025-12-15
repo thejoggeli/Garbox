@@ -5,6 +5,7 @@ from pathlib import Path
 from loader.parse_application import parse_application
 from loader.parse_events import parse_events
 from loader.parse_hardware import parse_hardware_config
+from loader.parse_datastore import parse_datastore
 from loader.gui.parse_guis import parse_guis
 from common.context import Context
 from common.util import decycle, print_section
@@ -40,6 +41,9 @@ class Loader:
 
         # parse hardware config
         parse_hardware_config(self.config)
+
+        # parse datastore
+        parse_datastore(self.config)
 
         # parse events (render default values)
         parse_events(self.config)

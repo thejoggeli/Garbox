@@ -1,14 +1,17 @@
-#include "app/runtime/StartupSequence.h"
-#include "app/runtime/TaskManager.h"
 #include "app/config/AppConfig.h"
+#include "app/datastore/DataStore.h"
 #include "app/hardware/HardwareInit.h"
 #include "app/providers/PartsProvider.h"
 #include "app/runtime/GarboxRuntime.h"
+#include "app/runtime/StartupSequence.h"
+#include "app/runtime/TaskManager.h"
+
 #include "core/assert/AssertHandler.h"
 #include "core/log/Log.h"
 #include "core/lvgl/LvglProvider.h"
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
+
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
@@ -97,6 +100,9 @@ void setup(){
 
     // init all parts
     PartsProvider::Init();
+
+    // init data store
+    DataStore::Init();
 
     // init lvgl
     LvglProvider::Init(AppConfig::DisplayWidth, AppConfig::DisplayHeight);

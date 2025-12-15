@@ -37,8 +37,6 @@ public:
     void run();
 
     // ComponentHostIfc
-    void requestEnableController(ControllerId id) final;
-    void requestDisableController(ControllerId id) final;
     void requestChangeBehaviour(BehaviourId id) final;
     void requestChangeScreen(ScreenId id) final;
     void requestUpdateScreenNow() final;

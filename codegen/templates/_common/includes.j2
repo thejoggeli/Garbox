@@ -1,25 +1,27 @@
-{# include_h #}
-{% macro include_h(data_dict) %}
-    {% if data_dict is defined and "include_h" in data_dict %}
-        {% if value is string %}
-#include "{{ data_dict["include_h"] }}"
-        {% else %}
-            {% for path in data_dict["include_h"] %}
+{# emit_includes #}
+{% macro emit_includes(arg) %}
+    {% if arg is string %}
+#include "{{ arg }}"
+    {% else %}
+        {% for path in arg %}
 #include "{{ path }}"
-            {% endfor %}
-        {% endif %}
+        {% endfor %}
     {% endif %}
 {% endmacro %}
 
-{# include_cpp #}
-{% macro include_cpp(data_dict) %}
-    {% if data_dict is defined and "include_cpp" in data_dict %}
-        {% if value is string %}
-#include "{{ data_dict["include_cpp"] }}"
-        {% else %}
-            {% for path in data_dict["include_cpp"] %}
-#include "{{ path }}"
-            {% endfor %}
-        {% endif %}
+{# include_dict #}
+{% macro include_dict(includes, key) %}
+    {% if data_dict is defined and key in data_dict %}
+        {{ emit_includes(data_dict[key]) }}
     {% endif %}
+{% endmacro %}
+
+{# include_h #}
+{% macro include_h(data) %}
+    {{ include_dict(data, "include_h") }}
+{% endmacro %}
+
+{# include_cpp #}
+{% macro include_cpp(data) %}
+    {{ include_dict(data, "include_cpp") }}
 {% endmacro %}

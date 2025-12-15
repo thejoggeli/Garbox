@@ -3,6 +3,7 @@
 // *****************************************
 #include "I2cInstances.h"
 #include "core/assert/Assert.h"
+    
 
 namespace Garbox {
 

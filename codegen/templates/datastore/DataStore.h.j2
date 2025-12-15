@@ -1,0 +1,33 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include "app/datastore/DataStoreAlias.h"
+#include "core/application/datastore/DataStoreAbs.h"
+
+namespace Garbox {
+
+struct DataStore : public DataStoreAbs {
+public:
+
+    static void Init();
+
+{% for field in fields %}
+    static const {{ field["type_alias"] }}& Get{{ field["name"] | upper_first }}();
+    static bool Reset{{ field["name"] | upper_first }}();
+    static bool Update{{ field["name"] | upper_first }}({{ field["type_name"] }} value);
+
+{% endfor %}
+
+private:
+
+    DataStore();
+    ~DataStore();
+
+    static DataStore& instance();
+
+{% for field in fields %}
+    {{ field["type_alias"] }} m{{ field["name"] | upper_first }};
+{% endfor %}
+
+};
+
+} // namespace

@@ -2,9 +2,12 @@ controllers:
 
   DisplayController:
     subdir: "hmi"
+    state: 
+      - { name: Brightness, type: float }
+      - { name: FramesSkipped, type: uint32_t }
     tick_phases: Render
     receives: [DisplayCommand]
-    sends: [DisplayStatus]
+    sends: null
 
   DevtoolsController:
     subdir: "devtools"
@@ -14,9 +17,14 @@ controllers:
 
   FanController:
     subdir: "actuators"
+    state:
+      - { name: FanState, type: FanState }
+      - { name: TargetSpeed, type: float }
+      - { name: RpmControl, type: bool } # Open loop (0-100%) or closed loop (RPM) control
+      - { name: MeasuredRpm, type: float }
     tick_phases: [Input, Output]
     receives: [FanCommand]
-    sends: [FanStatus, FanSample]
+    sends: null
 
   HeartbeatController:
     subdir: "heartbeat"
@@ -26,9 +34,18 @@ controllers:
 
   HeatpadController:
     subdir: "actuators"
+    state:
+      - { name: HeatpadState, type: HeatpadState }
+      - { name: CurrentDuty, type: float }
+      - { name: CurrentPeriod, type: uint32_t }
+      - { name: NextDuty, type: float }
+      - { name: NextPeriod, type: uint32_t }
+      - { name: MeasuredVoltage, type: float }
+      - { name: MeasuredCurrent, type: float }
+      - { name: PwmProgressMicros, type: uint32_t }
     tick_phases: [Input, Output]
     receives: [HeatpadCommand]
-    sends: [HeatpadStatus, HeatpadSample]
+    sends: null
 
   InputController:
     subdir: "hmi"
@@ -38,7 +55,14 @@ controllers:
 
   I2cPartsController:
     subdir: "sensors"
+    state: 
+      - { name: DriverEnabled, type: bool }
+      - { name: PowerEnabled, type: bool }
+      - { name: Resetting, type: bool }
+      - { name: HasFirstSample, type: bool }
+      - { name: MeasuredTemperature, type: float }
+      - { name: MeasuredHumidity, type: float }
     tick_phases: [Input]
     receives: [ButtonStateChanged]
-    sends: [TemperatureStatus, TemperatureSample]
+    sends: null
 

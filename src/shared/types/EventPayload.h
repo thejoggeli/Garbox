@@ -5,12 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
-#include "app/engine/HeaterEngineState.h"
-#include "modules/parts/button/ButtonState.h"
-#include "modules/parts/fan/FanState.h"
-#include "modules/parts/heatpad/HeatpadState.h"
-#include "shared/types/BehaviourId.h"
-#include "shared/types/ScreenId.h"
+    
 
 namespace Garbox {
 
@@ -19,30 +14,8 @@ struct HeartbeatPayload {
     // no fields
 };
 
-struct FermentationStatusPayload {
-    HeaterEngineState heaterEngineState;
-    float targetTemperature;
-    float measuredTemperature;
-    float measuredHumidity;
-};
-
 struct DisplayCommandPayload {
     float brightness;
-};
-
-struct DisplayStatusPayload {
-    float brightness;
-    uint32_t skipped;
-};
-
-struct FanStatusPayload {
-    FanState state;
-    float targetSpeed;
-    bool rpmControlEnabled;
-};
-
-struct FanSamplePayload {
-    float measuredRpm;
 };
 
 struct FanCommandPayload {
@@ -51,31 +24,10 @@ struct FanCommandPayload {
     bool enableRpmControl;
 };
 
-struct HeatpadStatusPayload {
-    HeatpadState state;
-    float currentDutyCycle;
-    uint32_t currentPeriodMicros;
-    float nextDutyCycle;
-    uint32_t nextPeriodMicros;
-};
-
-struct HeatpadSamplePayload {
-    float measuredVoltage;
-    float measuredCurrent;
-    float pwmProgressMicros;
-};
-
 struct HeatpadCommandPayload {
     bool enabled;
     float dutyCycle;
     uint32_t periodMicros;
-};
-
-struct TemperatureStatusPayload {
-    bool driverEnabled;
-    bool powerEnabled;
-    bool resetting;
-    bool hasFirstSample;
 };
 
 struct TemperatureSamplePayload {
@@ -117,28 +69,8 @@ struct ResolveEventPayload<EventType::Heartbeat> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::FermentationStatus> {
-    using type = FermentationStatusPayload;
-};
-
-template<>
 struct ResolveEventPayload<EventType::DisplayCommand> {
     using type = DisplayCommandPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::DisplayStatus> {
-    using type = DisplayStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::FanStatus> {
-    using type = FanStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::FanSample> {
-    using type = FanSamplePayload;
 };
 
 template<>
@@ -147,23 +79,8 @@ struct ResolveEventPayload<EventType::FanCommand> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::HeatpadStatus> {
-    using type = HeatpadStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::HeatpadSample> {
-    using type = HeatpadSamplePayload;
-};
-
-template<>
 struct ResolveEventPayload<EventType::HeatpadCommand> {
     using type = HeatpadCommandPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::TemperatureStatus> {
-    using type = TemperatureStatusPayload;
 };
 
 template<>

@@ -175,16 +175,6 @@ const RuntimeContext& RuntimeAbs::getContext() const {
     return mContext;
 }
 
-void RuntimeAbs::requestEnableController(ControllerId id){
-    // TODO implement
-    // question: should be let the current tick finish before enabling?
-}
-
-void RuntimeAbs::requestDisableController(ControllerId id){
-    // TODO implement
-    // question: should be let the current tick finish before disabling?
-}
-
 void RuntimeAbs::requestChangeBehaviour(BehaviourId id){
     setQueuedBehaviour(resolveBehaviour(id));
 }
