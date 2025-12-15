@@ -15,6 +15,7 @@ public:
 private:
 
     LvBox mProgressBox;
+    LvLabel mTimeLabel;
     LvLabel mFanStateLabel;
     LvLabel mFanMeasuredRpmLabel;
     LvLabel mHeatpadStateLabel;
@@ -23,7 +24,9 @@ private:
     LvLabel mDisplayStatusLabel;
     LvLabel mTemperatureStateLabel;
     LvLabel mTemperatureSampleLabel;
-    LvLabel mHeapSpaceLabel;
+    LvLabel mHeapBlocksLabel;
+    LvLabel mHeapBytesLabel;
+    LvLabel mHeapMinimumLabel;
     LvLabel mAppInfoLabel;
     LvLabel mFermentationStatusLabel;
 
@@ -46,7 +49,10 @@ private:
     void onApplyDisplayStatus() final;
     void onApplyTemperatureState() final;
     void onApplyTemperatureSample() final;
-    void onApplyHeapSpace() final;
+    void onApplyTime() final;
+    void onApplyHeapBlocks() final;
+    void onApplyHeapBytes() final;
+    void onApplyHeapMinimum() final;
     void onApplyAppInfo() final;
     void onApplyFermentationStatus() final;
 

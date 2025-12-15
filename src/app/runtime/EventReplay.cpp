@@ -229,7 +229,7 @@ void EventReplay::sendHeatpadStatusToMainScreen(void* context){
     MainScreen::Model& model = self->mMainScreen.model();
     HeatpadStatusPayload& payload = self->mHeatpadStatusBlock.payload; 
     model.setHeatpadState(payload.state); 
-    model.setHeatpadCurrentDuty(payload.currentDutyCycle); 
+    model.setHeatpadNextDuty(payload.nextDutyCycle); 
 }
 
 void EventReplay::sendTemperatureSampleToMainScreen(void* context){ 

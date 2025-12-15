@@ -318,7 +318,7 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
                 model.setHeatpadState(event->state);
-                model.setHeatpadCurrentDuty(event->currentDutyCycle);
+                model.setHeatpadNextDuty(event->nextDutyCycle);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'HeatpadStatus' event

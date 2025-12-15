@@ -32,9 +32,12 @@ protected:
     virtual void onApplyDisplayStatus() = 0;
     virtual void onApplyTemperatureState() = 0;
     virtual void onApplyTemperatureSample() = 0;
+    virtual void onApplyTime() = 0;
     virtual void onApplyAppInfo() = 0;
     virtual void onApplyFermentationStatus() = 0;
-    virtual void onApplyHeapSpace() = 0;
+    virtual void onApplyHeapBlocks() = 0;
+    virtual void onApplyHeapBytes() = 0;
+    virtual void onApplyHeapMinimum() = 0;
 
     // make typed events 
     DisplayCommandEvent makeDisplayCommandEvent();
@@ -80,9 +83,12 @@ public:
             DisplayStatus,
             TemperatureState,
             TemperatureSample,
+            Time,
             AppInfo,
             FermentationStatus,
-            HeapSpace,
+            HeapBlocks,
+            HeapBytes,
+            HeapMinimum,
             Count 
         }; 
 
@@ -113,13 +119,20 @@ public:
         bool getShtResetting() const;
         float getSensorTemperatureCelcius() const;
         float getSensorHumidityRelative() const;
+        uint32_t getTimeSeconds() const;
         uint32_t getEventCount() const;
         BehaviourId getBehaviour() const;
         HeaterEngineState getEngineState() const;
         float getEngineTargetTemperature() const;
         float getEngineMeasuredTemperature() const;
         float getEngineMeasuredHumidity() const;
-        uint32_t getHeapSpace() const;
+        uint32_t getHeapAllocatedBlocks() const;
+        uint32_t getHeapFreeBlocks() const;
+        uint32_t getHeapLargestFreeBlock() const;
+        uint32_t getHeapAllocatedBytes() const;
+        uint32_t getHeapMinimumFreeBytes() const;
+        uint32_t getHeapTotalFreeBytes() const;
+        uint32_t getHeapMinimumTime() const;
 
         // setters 
         void setFanState(FanState value);
@@ -140,13 +153,20 @@ public:
         void setShtResetting(bool value);
         void setSensorTemperatureCelcius(float value);
         void setSensorHumidityRelative(float value);
+        void setTimeSeconds(uint32_t value);
         void setEventCount(uint32_t value);
         void setBehaviour(BehaviourId value);
         void setEngineState(HeaterEngineState value);
         void setEngineTargetTemperature(float value);
         void setEngineMeasuredTemperature(float value);
         void setEngineMeasuredHumidity(float value);
-        void setHeapSpace(uint32_t value);
+        void setHeapAllocatedBlocks(uint32_t value);
+        void setHeapFreeBlocks(uint32_t value);
+        void setHeapLargestFreeBlock(uint32_t value);
+        void setHeapAllocatedBytes(uint32_t value);
+        void setHeapMinimumFreeBytes(uint32_t value);
+        void setHeapTotalFreeBytes(uint32_t value);
+        void setHeapMinimumTime(uint32_t value);
 
     private: 
 
@@ -171,13 +191,20 @@ public:
         bool mShtResetting;
         float mSensorTemperatureCelcius;
         float mSensorHumidityRelative;
+        uint32_t mTimeSeconds;
         uint32_t mEventCount;
         BehaviourId mBehaviour;
         HeaterEngineState mEngineState;
         float mEngineTargetTemperature;
         float mEngineMeasuredTemperature;
         float mEngineMeasuredHumidity;
-        uint32_t mHeapSpace;
+        uint32_t mHeapAllocatedBlocks;
+        uint32_t mHeapFreeBlocks;
+        uint32_t mHeapLargestFreeBlock;
+        uint32_t mHeapAllocatedBytes;
+        uint32_t mHeapMinimumFreeBytes;
+        uint32_t mHeapTotalFreeBytes;
+        uint32_t mHeapMinimumTime;
 
     };
 
@@ -214,9 +241,12 @@ private:
     static void applyDisplayStatusTrampoline(void* context);
     static void applyTemperatureStateTrampoline(void* context);
     static void applyTemperatureSampleTrampoline(void* context);
+    static void applyTimeTrampoline(void* context);
     static void applyAppInfoTrampoline(void* context);
     static void applyFermentationStatusTrampoline(void* context);
-    static void applyHeapSpaceTrampoline(void* context);
+    static void applyHeapBlocksTrampoline(void* context);
+    static void applyHeapBytesTrampoline(void* context);
+    static void applyHeapMinimumTrampoline(void* context);
 
 };
 

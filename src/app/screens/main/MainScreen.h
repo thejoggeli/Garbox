@@ -33,14 +33,17 @@ public:
 
 private:
 
+    SoftwareTimer mPowerTimer;
+
     LvImage mTempLabel;
     LvImage mPowerLabel;
 
     ChartGridRenderer mTempGrid;
     ChartGridRenderer mPowerGrid;
     
-    LvChartSeries* mTempSeries;
-    LvChartSeries* mPowerSeries;
+    LvChartSeries* mTempSeries = nullptr;
+    LvChartSeries* mTempTargetSeries = nullptr;
+    LvChartSeries* mPowerSeries = nullptr;
 
     void initTemperatureChart();
     void initPowerChart();

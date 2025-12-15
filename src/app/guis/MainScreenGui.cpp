@@ -49,10 +49,18 @@ void MainScreenGui::init(){
     mObjects.tempGraph._namelessContainer_0.setRadius(8);                       // radius="8px"
     mObjects.tempGraph.chart.setWidth(LV_PCT(100));                             // width="100%"
     mObjects.tempGraph.chart.setHeight(LV_PCT(100));                            // height="100%"
+    mObjects.tempGraph.value.setText("label");                                  // text="label"
+    mObjects.tempGraph.value.setWidthContent();                                 // width="content"
+    mObjects.tempGraph.value.setHeightContent();                                // height="content"
+    mObjects.tempGraph.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);                 // text-align="right"
+    mObjects.tempGraph.value.setAlign(LV_ALIGN_TOP_RIGHT, -4, 4);               // align="top-right -4px 4px"
+    mObjects.tempGraph.value.setBgColor(lv_color_hex(0x000000));                // bg-color="#000"
+    mObjects.tempGraph.value.setBgOpa(102);                                     // bg-opa="40%"
+    mObjects.tempGraph.value.setRadius(4);                                      // radius="4px"
     mObjects.powerGraph.body.setLayout(LV_LAYOUT_FLEX);                         // layout="flex"
     mObjects.powerGraph.body.setFlexFlow(LV_FLEX_FLOW_ROW);                     // flex-flow="row"
     mObjects.powerGraph.body.setWidth(LV_PCT(100));                             // width="100%"
-    mObjects.powerGraph.body.setHeight(92);                                     // height="92px"
+    mObjects.powerGraph.body.setHeight(96);                                     // height="96px"
     mObjects.powerGraph.body.setPadTop(4);                                      // pad-top="4px"
     mObjects.powerGraph.labelContainer.setWidth(22);                            // width="22px"
     mObjects.powerGraph.labelContainer.setHeight(LV_PCT(100));                  // height="100%"
@@ -67,6 +75,14 @@ void MainScreenGui::init(){
     mObjects.powerGraph._namelessContainer_0.setRadius(8);                      // radius="8px"
     mObjects.powerGraph.chart.setWidth(LV_PCT(100));                            // width="100%"
     mObjects.powerGraph.chart.setHeight(LV_PCT(100));                           // height="100%"
+    mObjects.powerGraph.value.setText("label");                                 // text="label"
+    mObjects.powerGraph.value.setWidthContent();                                // width="content"
+    mObjects.powerGraph.value.setHeightContent();                               // height="content"
+    mObjects.powerGraph.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);                // text-align="right"
+    mObjects.powerGraph.value.setAlign(LV_ALIGN_TOP_RIGHT, -4, 4);              // align="top-right -4px 4px"
+    mObjects.powerGraph.value.setBgColor(lv_color_hex(0x000000));               // bg-color="#000"
+    mObjects.powerGraph.value.setBgOpa(102);                                    // bg-opa="40%"
+    mObjects.powerGraph.value.setRadius(4);                                     // radius="4px"
     mObjects._namelessContainer_1.setWidth(LV_PCT(100));                        // width="100%"
     mObjects._namelessContainer_1.setFlexGrow(1);                               // flex-grow="1"
     mObjects._namelessContainer_1.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
@@ -75,24 +91,24 @@ void MainScreenGui::init(){
     mObjects._namelessContainer_1.setPadLeft(22);                               // pad-left="22px"
     mObjects.t4.setWidth(LV_PCT(20));                                           // width="20%"
     mObjects.t4.setTextAlign(LV_TEXT_ALIGN_CENTER);                             // text-align="center"
-    mObjects.t4.setTextColor(lv_color_hex(0xa6a6a6));                           // text-color="rgb(166, 166, 166)"
+    mObjects.t4.setTextColor(lv_color_hex(0x808080));                           // text-color="#808080"
     mObjects.t4.setText("12h");                                                 // text="12h"
     mObjects.t4.setPadLeft(1);                                                  // pad-left="1px"
     mObjects.t3.setWidth(LV_PCT(20));                                           // width="20%"
     mObjects.t3.setTextAlign(LV_TEXT_ALIGN_CENTER);                             // text-align="center"
-    mObjects.t3.setTextColor(lv_color_hex(0xa6a6a6));                           // text-color="rgb(166, 166, 166)"
+    mObjects.t3.setTextColor(lv_color_hex(0x808080));                           // text-color="#808080"
     mObjects.t3.setText("9h");                                                  // text="9h"
     mObjects.t2.setWidth(LV_PCT(20));                                           // width="20%"
     mObjects.t2.setTextAlign(LV_TEXT_ALIGN_CENTER);                             // text-align="center"
-    mObjects.t2.setTextColor(lv_color_hex(0xa6a6a6));                           // text-color="rgb(166, 166, 166)"
+    mObjects.t2.setTextColor(lv_color_hex(0x808080));                           // text-color="#808080"
     mObjects.t2.setText("6h");                                                  // text="6h"
     mObjects.t1.setWidth(LV_PCT(20));                                           // width="20%"
     mObjects.t1.setTextAlign(LV_TEXT_ALIGN_CENTER);                             // text-align="center"
-    mObjects.t1.setTextColor(lv_color_hex(0xa6a6a6));                           // text-color="rgb(166, 166, 166)"
+    mObjects.t1.setTextColor(lv_color_hex(0x808080));                           // text-color="#808080"
     mObjects.t1.setText("3h");                                                  // text="3h"
     mObjects.t0.setWidth(LV_PCT(20));                                           // width="20%"
     mObjects.t0.setTextAlign(LV_TEXT_ALIGN_CENTER);                             // text-align="center"
-    mObjects.t0.setTextColor(lv_color_hex(0xa6a6a6));                           // text-color="rgb(166, 166, 166)"
+    mObjects.t0.setTextColor(lv_color_hex(0x808080));                           // text-color="#808080"
     mObjects.t0.setText("now");                                                 // text="now"
     mObjects.t0.setPadRight(1);                                                 // pad-right="1px"
     mObjects._namelessContainer_2.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
@@ -108,24 +124,25 @@ void MainScreenGui::init(){
     mObjects.systemState.setAlign(LV_ALIGN_CENTER, 0, 0);                       // align="center"
     mObjects.systemState.setText("Regulating");                                 // text="Regulating"
     mObjects.systemState.setTextColor(lv_color_hex(0x000000));                  // text-color="#000"
-    mObjects._namelessContainer_3.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_3.setFlexGrow(1);                               // flex-grow="1"
-    mObjects._namelessContainer_3.setPadTop(8);                                 // pad-top="8px"
-    mObjects._namelessContainer_3.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
-    mObjects._namelessContainer_3.setFlexFlow(LV_FLEX_FLOW_COLUMN);             // flex-flow="column"
-    mObjects._namelessContainer_3.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
+    mObjects.menuContainer.setWidth(LV_PCT(100));                               // width="100%"
+    mObjects.menuContainer.setFlexGrow(1);                                      // flex-grow="1"
+    mObjects.menuContainer.setPadTop(16);                                       // pad-top="16px"
+    mObjects.menuContainer.setPadBottom(8);                                     // pad-bottom="8px"
+    mObjects.menuContainer.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
+    mObjects.menuContainer.setFlexFlow(LV_FLEX_FLOW_COLUMN);                    // flex-flow="column"
+    mObjects.menuContainer.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
     mObjects.menuArrUp.setSource(&MainScreen_image_arrow_up);                   // src="arrow-up"
     mObjects.menuArrUp.setOpa(102);                                             // opa="40%"
+    mObjects._namelessContainer_3.setWidth(LV_PCT(100));                        // width="100%"
+    mObjects._namelessContainer_3.setHeight(4);                                 // height="4px"
     mObjects._namelessContainer_4.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_4.setHeight(4);                                 // height="4px"
-    mObjects._namelessContainer_5.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_5.setFlexGrow(1);                               // flex-grow="1"
-    mObjects._namelessContainer_5.setBorderColor(lv_color_hex(0xffffff));       // border-color="#fff"
-    mObjects._namelessContainer_5.setBorderWidth(1);                            // border-width="1px"
-    mObjects._namelessContainer_5.setBorderSide(LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM); // border-side="top bottom"
-    mObjects._namelessContainer_5.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
-    mObjects._namelessContainer_5.setFlexFlow(LV_FLEX_FLOW_COLUMN);             // flex-flow="column"
-    mObjects._namelessContainer_5.setFlexAlign(LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="space-evenly center center"
+    mObjects._namelessContainer_4.setFlexGrow(1);                               // flex-grow="1"
+    mObjects._namelessContainer_4.setBorderColor(lv_color_hex(0xffffff));       // border-color="#fff"
+    mObjects._namelessContainer_4.setBorderWidth(1);                            // border-width="1px"
+    mObjects._namelessContainer_4.setBorderSide(LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM); // border-side="top bottom"
+    mObjects._namelessContainer_4.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
+    mObjects._namelessContainer_4.setFlexFlow(LV_FLEX_FLOW_COLUMN);             // flex-flow="column"
+    mObjects._namelessContainer_4.setFlexAlign(LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="space-evenly center center"
     mObjects._namelessMenuRow_0.body.setLayout(LV_LAYOUT_FLEX);                 // layout="flex"
     mObjects._namelessMenuRow_0.body.setFlexFlow(LV_FLEX_FLOW_ROW);             // flex-flow="row"
     mObjects._namelessMenuRow_0.body.setWidth(LV_PCT(100));                     // width="100%"
@@ -186,16 +203,16 @@ void MainScreenGui::init(){
     mObjects._namelessMenuRow_4.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);        // text-align="right"
     mObjects._namelessMenuRow_4.value.setWidthContent();                        // width="content"
     mObjects._namelessMenuRow_4.value.setHeightContent();                       // height="content"
-    mObjects._namelessContainer_6.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_6.setHeight(4);                                 // height="4px"
+    mObjects._namelessContainer_5.setWidth(LV_PCT(100));                        // width="100%"
+    mObjects._namelessContainer_5.setHeight(4);                                 // height="4px"
     mObjects.menuArrDown.setSource(&MainScreen_image_arrow_down);               // src="arrow-down"
-    mObjects._namelessContainer_7.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_7.setHeightContent();                           // height="content"
-    mObjects._namelessContainer_7.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
-    mObjects._namelessContainer_7.setFlexFlow(LV_FLEX_FLOW_ROW_WRAP);           // flex-flow="row-wrap"
-    mObjects._namelessContainer_7.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_SPACE_AROUND); // flex-align="center space-around space-around"
-    mObjects._namelessContainer_7.setPadTop(4);                                 // pad-top="4px"
-    mObjects._namelessContainer_7.setPadBottom(4);                              // pad-bottom="4px"
+    mObjects._namelessContainer_6.setWidth(LV_PCT(100));                        // width="100%"
+    mObjects._namelessContainer_6.setHeightContent();                           // height="content"
+    mObjects._namelessContainer_6.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
+    mObjects._namelessContainer_6.setFlexFlow(LV_FLEX_FLOW_ROW_WRAP);           // flex-flow="row-wrap"
+    mObjects._namelessContainer_6.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_SPACE_AROUND); // flex-align="center space-around space-around"
+    mObjects._namelessContainer_6.setPadTop(4);                                 // pad-top="4px"
+    mObjects._namelessContainer_6.setPadBottom(4);                              // pad-bottom="4px"
     mObjects.fanInfo.body.setLayout(LV_LAYOUT_FLEX);                            // layout="flex"
     mObjects.fanInfo.body.setFlexFlow(LV_FLEX_FLOW_COLUMN);                     // flex-flow="column"
     mObjects.fanInfo.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
@@ -208,6 +225,7 @@ void MainScreenGui::init(){
     mObjects.fanInfo.icon.setHeight(16);                                        // height="16"
     mObjects.fanInfo.value.setText("0%");                                       // text="0%"
     mObjects.fanInfo.value.setWidth(LV_PCT(100));                               // width="100%"
+    mObjects.fanInfo.value.setTextAlign(LV_TEXT_ALIGN_CENTER);                  // text-align="center"
     mObjects.humidInfo.body.setLayout(LV_LAYOUT_FLEX);                          // layout="flex"
     mObjects.humidInfo.body.setFlexFlow(LV_FLEX_FLOW_COLUMN);                   // flex-flow="column"
     mObjects.humidInfo.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
@@ -220,6 +238,7 @@ void MainScreenGui::init(){
     mObjects.humidInfo.icon.setHeight(16);                                      // height="16"
     mObjects.humidInfo.value.setText("0.0%");                                   // text="0.0%"
     mObjects.humidInfo.value.setWidth(LV_PCT(100));                             // width="100%"
+    mObjects.humidInfo.value.setTextAlign(LV_TEXT_ALIGN_CENTER);                // text-align="center"
     mObjects.powerInfo.body.setLayout(LV_LAYOUT_FLEX);                          // layout="flex"
     mObjects.powerInfo.body.setFlexFlow(LV_FLEX_FLOW_COLUMN);                   // flex-flow="column"
     mObjects.powerInfo.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
@@ -232,6 +251,7 @@ void MainScreenGui::init(){
     mObjects.powerInfo.icon.setHeight(16);                                      // height="16"
     mObjects.powerInfo.value.setText("0.0W");                                   // text="0.0W"
     mObjects.powerInfo.value.setWidth(LV_PCT(100));                             // width="100%"
+    mObjects.powerInfo.value.setTextAlign(LV_TEXT_ALIGN_CENTER);                // text-align="center"
     mObjects.timeInfo.body.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.timeInfo.body.setFlexFlow(LV_FLEX_FLOW_COLUMN);                    // flex-flow="column"
     mObjects.timeInfo.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
@@ -244,6 +264,7 @@ void MainScreenGui::init(){
     mObjects.timeInfo.icon.setHeight(16);                                       // height="16"
     mObjects.timeInfo.value.setText("1d 5h");                                   // text="1d 5h"
     mObjects.timeInfo.value.setWidth(LV_PCT(100));                              // width="100%"
+    mObjects.timeInfo.value.setTextAlign(LV_TEXT_ALIGN_CENTER);                 // text-align="center"
 }
 
 void MainScreenGui::show(){
@@ -262,7 +283,8 @@ MainScreenGui::GraphComponent::GraphComponent(LvObject& parent):
     body(parent),
     labelContainer(body),
     _namelessContainer_0(body),
-    chart(_namelessContainer_0){}
+    chart(_namelessContainer_0),
+    value(_namelessContainer_0){}
 
 MainScreenGui::MenuRow::MenuRow(LvObject& parent):
     body(parent),
@@ -293,22 +315,22 @@ MainScreenGui::Objects::Objects():
     _namelessContainer_2(wrapper),
     systemStateBg(_namelessContainer_2),
     systemState(systemStateBg),
-    _namelessContainer_3(_namelessContainer_2),
-    menuArrUp(_namelessContainer_3),
-    _namelessContainer_4(_namelessContainer_3),
-    _namelessContainer_5(_namelessContainer_3),
-    _namelessMenuRow_0(_namelessContainer_5),
-    _namelessMenuRow_1(_namelessContainer_5),
-    _namelessMenuRow_2(_namelessContainer_5),
-    _namelessMenuRow_3(_namelessContainer_5),
-    _namelessMenuRow_4(_namelessContainer_5),
-    _namelessContainer_6(_namelessContainer_3),
-    menuArrDown(_namelessContainer_3),
-    _namelessContainer_7(_namelessContainer_2),
-    fanInfo(_namelessContainer_7),
-    humidInfo(_namelessContainer_7),
-    powerInfo(_namelessContainer_7),
-    timeInfo(_namelessContainer_7){}
+    menuContainer(_namelessContainer_2),
+    menuArrUp(menuContainer),
+    _namelessContainer_3(menuContainer),
+    _namelessContainer_4(menuContainer),
+    _namelessMenuRow_0(_namelessContainer_4),
+    _namelessMenuRow_1(_namelessContainer_4),
+    _namelessMenuRow_2(_namelessContainer_4),
+    _namelessMenuRow_3(_namelessContainer_4),
+    _namelessMenuRow_4(_namelessContainer_4),
+    _namelessContainer_5(menuContainer),
+    menuArrDown(menuContainer),
+    _namelessContainer_6(_namelessContainer_2),
+    fanInfo(_namelessContainer_6),
+    humidInfo(_namelessContainer_6),
+    powerInfo(_namelessContainer_6),
+    timeInfo(_namelessContainer_6){}
 
 } // namespace
 

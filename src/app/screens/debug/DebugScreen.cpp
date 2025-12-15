@@ -1,13 +1,16 @@
 #include "DebugScreen.h"
 
 #include <esp_heap_caps.h>
+#include <esp_system.h>
 #include "core/log/Log.h"
+#include "core/util/helpers/StringUtils.h"
 
 namespace Garbox {
 
 DebugScreen::DebugScreen():
     DebugScreenAbs(),
     mProgressBox(mRoot),
+    mTimeLabel(mRoot),
     mFanStateLabel(mRoot),
     mFanMeasuredRpmLabel(mRoot),
     mHeatpadStateLabel(mRoot),
@@ -16,7 +19,9 @@ DebugScreen::DebugScreen():
     mDisplayStatusLabel(mRoot),
     mTemperatureStateLabel(mRoot),
     mTemperatureSampleLabel(mRoot),
-    mHeapSpaceLabel(mRoot),
+    mHeapBlocksLabel(mRoot),
+    mHeapBytesLabel(mRoot),
+    mHeapMinimumLabel(mRoot),
     mAppInfoLabel(mRoot),
     mFermentationStatusLabel(mRoot){
     // nothing to do
@@ -26,15 +31,19 @@ void DebugScreen::initLabel(LvLabel& label, int16_t x, int16_t y, const char* te
     label.setText(text);
     label.setPosition(x, y);
     label.setTextColor(lv_color_hex(0xFFFFFF));
+    label.setFont(&lv_font_montserrat_12);
 }
 
 void DebugScreen::onInit(){
     const int16_t startXPx = 10;
     const int16_t startYPx = 10;
-    const int16_t deltaYPx = 20;
+    const int16_t deltaYPx = 15;
     int16_t currentYPx = startYPx;
+    initLabel(mTimeLabel,               startXPx, currentYPx, "Time:"); currentYPx += deltaYPx;
     initLabel(mAppInfoLabel,            startXPx, currentYPx, "App:"); currentYPx += deltaYPx;
-    initLabel(mHeapSpaceLabel,          startXPx, currentYPx, "Heap space:"); currentYPx += deltaYPx;
+    initLabel(mHeapBytesLabel,          startXPx, currentYPx, "Heap:"); currentYPx += deltaYPx;
+    initLabel(mHeapMinimumLabel,        startXPx, currentYPx, "Heap:"); currentYPx += deltaYPx;
+    initLabel(mHeapBlocksLabel,         startXPx, currentYPx, "Blocks:"); currentYPx += deltaYPx;
     initLabel(mDisplayStatusLabel,      startXPx, currentYPx, "Render skipped count:"); currentYPx += deltaYPx;
     initLabel(mFermentationStatusLabel, startXPx, currentYPx, "Eng:"); currentYPx += deltaYPx;
     initLabel(mTemperatureStateLabel,   startXPx, currentYPx, "Sht31"); currentYPx += deltaYPx;
@@ -66,9 +75,22 @@ void DebugScreen::onBecomeDisabled(){
 
 void DebugScreen::onUpdateScreen(){
 
+    // update time
+    model().setTimeSeconds(Time::GetTickSeconds());
+
     // update heap space
     if(mHeapTimer.isExpired()){
-        model().setHeapSpace(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+        multi_heap_info_t info;
+        heap_caps_get_info(&info, MALLOC_CAP_DEFAULT);
+        model().setHeapAllocatedBlocks(info.allocated_blocks);
+        model().setHeapFreeBlocks(info.free_blocks);
+        model().setHeapLargestFreeBlock(info.largest_free_block);
+        if(info.minimum_free_bytes != model().getHeapMinimumFreeBytes()){
+            model().setHeapMinimumTime(Time::GetTickSeconds());
+            model().setHeapMinimumFreeBytes(info.minimum_free_bytes);
+        }
+        model().setHeapTotalFreeBytes(info.total_free_bytes);
+        model().setHeapAllocatedBytes(info.total_allocated_bytes);
         mHeapTimer.restart();
     }
 
@@ -116,7 +138,7 @@ void DebugScreen::onApplyHeatpadDuty(){
 
 void DebugScreen::onApplyBoxPosition(){
     float position = static_cast<float>(model().getHeatpadPwmProgress()) / static_cast<float>(model().getHeatpadCurrentPeriod());
-    static constexpr uint32_t y = 240-8;
+    static constexpr uint32_t y = 240-4;
     static constexpr float wDisplay = 320.0f; 
     static constexpr float wBox = 48.0f;
     static constexpr float left = -wBox;
@@ -159,10 +181,41 @@ void DebugScreen::onApplyTemperatureSample(){
     );
 }
 
-void DebugScreen::onApplyHeapSpace(){
-    const uint32_t integer = model().getHeapSpace()/1000;
-    const uint32_t fraction = model().getHeapSpace()%1000;
-    mHeapSpaceLabel.setTextFormatted("Heap space: %u.%03u kB", integer, fraction);
+void DebugScreen::onApplyTime(){
+    static char buffer[32];
+    StringUtils::FormatDurationDHMS(model().getTimeSeconds(), buffer, 32);
+    mTimeLabel.setTextFormatted("Time: %s", buffer);
+}
+
+void DebugScreen::onApplyHeapBlocks(){
+    const uint32_t integer = model().getHeapLargestFreeBlock()/1000;
+    const uint32_t fraction = model().getHeapLargestFreeBlock()%1000;
+    mHeapBlocksLabel.setTextFormatted("Blocks: free=%u, alloc=%u, largest=%u.%03u kB", 
+        model().getHeapFreeBlocks(),
+        model().getHeapAllocatedBlocks(),
+        integer, fraction
+    );
+}
+
+void DebugScreen::onApplyHeapBytes(){
+    const uint32_t int1 = model().getHeapTotalFreeBytes()/1000;
+    const uint32_t frac1 = model().getHeapTotalFreeBytes()%1000;
+    const uint32_t int2 = model().getHeapAllocatedBytes()/1000;
+    const uint32_t frac2 = model().getHeapAllocatedBytes()%1000;
+    mHeapBytesLabel.setTextFormatted("Heap: free=%u.%03u kB, alloc=%u.%03u kB", 
+        int1, frac1,
+        int2, frac2
+    );
+}
+
+void DebugScreen::onApplyHeapMinimum(){
+    const uint32_t int1 = model().getHeapMinimumFreeBytes()/1000;
+    const uint32_t frac1 = model().getHeapMinimumFreeBytes()%1000;
+    static char buffer[32];
+    StringUtils::FormatDurationDHMS(model().getHeapMinimumTime(), buffer, 32);
+    mHeapMinimumLabel.setTextFormatted("Heap: min=%u.%03u kB, time=%s", 
+        int1, frac1, buffer
+    );
 }
 
 void DebugScreen::onApplyAppInfo(){

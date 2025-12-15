@@ -48,7 +48,7 @@ static constexpr uint32_t SpiDmaTaskCore = DisplayRenderTaskCore;
 // Display Sender Task
 static constexpr const char* DisplaySenderTaskName = "DisplaySenderTask";
 static constexpr uint32_t DisplaySenderTaskPriority = SpiDmaTaskPriority + 1 ; // this piority order is important !! visual glitches otherwise
-static constexpr uint32_t DisplaySenderTaskStackSize = 1024*4;
+static constexpr uint32_t DisplaySenderTaskStackSize = 1024*8;
 static constexpr uint32_t DisplaySenderTaskCore = DisplayRenderTaskCore;
 
 // Display

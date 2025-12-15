@@ -25,6 +25,7 @@
         </container>
         <container flex-grow="1" height="100%" border-color="#fff" border-width="1px" border-side="full" radius="8px">
           <chart name="chart" width="100%" height="100%" />
+          <label text="label" name="value" width="content" height="content" text-align="right" align="top-right -4px 4px" bg-color="#000" bg-opa="40%" radius="4px" />
         </container>
       </body>
     </GraphComponent>
@@ -41,7 +42,7 @@
     <InfoTile $icon $value>
       <body layout="flex" flex-flow="column" flex-align="center" margin="0 0 4px 4px">
         <image name="icon" src=$icon width="16" height="16" />
-        <label name="value" text=$value width="100%" />
+        <label name="value" text=$value width="100%" text-align="center" />
       </body>
     </InfoTile>
 
@@ -57,14 +58,14 @@
 
         <GraphComponent name="tempGraph"  width="100%" height="126px" pad-top="8px" pad-bottom="4px" />
 
-        <GraphComponent name="powerGraph" width="100%" height="92px" pad-top="4px" />
+        <GraphComponent name="powerGraph" width="100%" height="96px" pad-top="4px" />
 
         <container width="100%" flex-grow="1" layout="flex" flex-flow="row" flex-align="space-around center center" pad-left="22px" >
-          <label name="t4" width="20%" text-align="center" text-color="rgb(166, 166, 166)" text="12h" pad-left="1px" /> <!-- 1px padding to compensate border of graph -->
-          <label name="t3" width="20%" text-align="center" text-color="rgb(166, 166, 166)" text="9h" />
-          <label name="t2" width="20%" text-align="center" text-color="rgb(166, 166, 166)" text="6h" />
-          <label name="t1" width="20%" text-align="center" text-color="rgb(166, 166, 166)" text="3h" />
-          <label name="t0" width="20%" text-align="center" text-color="rgb(166, 166, 166)" text="now" pad-right="1px" /> <!-- 1px padding to compensate border of graph -->
+          <label name="t4" width="20%" text-align="center" text-color="#808080" text="12h" pad-left="1px" /> <!-- 1px padding to compensate border of graph -->
+          <label name="t3" width="20%" text-align="center" text-color="#808080" text="9h" />
+          <label name="t2" width="20%" text-align="center" text-color="#808080" text="6h" />
+          <label name="t1" width="20%" text-align="center" text-color="#808080" text="3h" />
+          <label name="t0" width="20%" text-align="center" text-color="#808080" text="now" pad-right="1px" /> <!-- 1px padding to compensate border of graph -->
         </container>
 
       </container>
@@ -79,7 +80,8 @@
 
         <!-- Menu -->
         <container 
-          width="100%" flex-grow="1" pad-top="8px"
+          name="menu-container"
+          width="100%" flex-grow="1" pad-top="16px" pad-bottom="8px"
           layout="flex" flex-flow="column" flex-align="center">
            
           <!-- arrow up + horizontal line -->

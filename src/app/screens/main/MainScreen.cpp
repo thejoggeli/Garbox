@@ -13,10 +13,11 @@ static constexpr uint32_t ColorRed = 0xB85450;
 static constexpr uint32_t ColorBlue = 0x8AB4F4;
 static constexpr uint32_t ColorGreen = 0x7BBF56;
 
+static constexpr uint32_t ChartSeriesLineWidth = 2;
 static constexpr uint32_t GridTicksCountX = 5;
 static constexpr uint32_t GridTicksCountY = 3;
-static constexpr uint32_t GridLineColor = 0x333333;
-static constexpr uint32_t GridLineWidth = 2;
+static constexpr uint32_t GridLineColor = 0x101010;
+static constexpr uint32_t GridLineWidth = 1;
 
 static constexpr uint32_t ChartsPointCount = 8*8+1;
 
@@ -60,12 +61,28 @@ MainScreen::MainScreen() :
     ){
 
     // setup time axis labels
-    const lv_font_t* timeAxisFont = &lv_font_montserrat_12; 
+    const lv_font_t* timeAxisFont = &lv_font_montserrat_10; 
     gui().t0.setFont(timeAxisFont);
     gui().t1.setFont(timeAxisFont);
     gui().t2.setFont(timeAxisFont);
     gui().t3.setFont(timeAxisFont);
     gui().t4.setFont(timeAxisFont);
+
+    // setup graph values
+    gui().tempGraph.value.setTextColor(lv_color_hex(ColorBlue));
+    gui().powerGraph.value.setTextColor(lv_color_hex(ColorRed));
+
+    // setup info labels
+    const lv_font_t* infoLabelFont = &lv_font_montserrat_12; 
+    gui().fanInfo.value.setFont(infoLabelFont);
+    gui().timeInfo.value.setFont(infoLabelFont);
+    gui().humidInfo.value.setFont(infoLabelFont);
+    gui().powerInfo.value.setFont(infoLabelFont);
+
+    // setup menu
+    const lv_font_t* menuFont = &lv_font_montserrat_12;
+    gui().menuContainer.setFont(menuFont);
+
 }
 
 void MainScreen::onInit(){
@@ -111,23 +128,16 @@ void MainScreen::initTemperatureChart(){
     chart.setDivLineCount(0, 0);
     chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
     chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
-    chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
+    chart.setStyleLineWidth(ChartSeriesLineWidth, LV_PART_ITEMS); // series line width
 
     // create temperature series
-    LvChartSeries* series = chart.addSeries(lv_color_hex(ColorBlue)); 
-    chart.hideSeries(series, false);
+    mTempSeries = chart.addSeries(lv_color_hex(ColorBlue)); 
 
-    // fill temperature values
-    const MathFunctionIfc& mathFn = MathFunctions::GetSinAnim(); 
-    for (int i = 0; i < ChartsPointCount; i++) {
-        const float step = 1.0f/(8*8);
-        const float x = fmodf(static_cast<float>(i) * step, 1.0f);
-        const float value = mathFn.evaluate(x) * 20.0f + 20.0f;
-        chart.setNextValue(series, value * TempChartYScale);
-    }
+    // create temperature target series
+    mTempTargetSeries = chart.addSeries(lv_color_hex(0xD1B254)); 
 
+    // refresh chart
     chart.refresh();
-    mTempSeries = series;
 }
 
 void MainScreen::initPowerChart(){
@@ -140,27 +150,17 @@ void MainScreen::initPowerChart(){
     chart.setDivLineCount(0, 0);
     chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
     chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
-    chart.setStyleLineWidth(3, LV_PART_ITEMS); // series line width
+    chart.setStyleLineWidth(ChartSeriesLineWidth, LV_PART_ITEMS); // series line width
 
     // create temperature series
-    LvChartSeries* series = chart.addSeries(lv_color_hex(ColorRed)); 
-    chart.hideSeries(series, false);
+    mPowerSeries = chart.addSeries(lv_color_hex(ColorRed)); 
 
-    // fill temperature values
-    const MathFunctionIfc& mathFn = MathFunctions::GetGamma22(); 
-    for (int i = 0; i < ChartsPointCount; i++) {
-        const float step = 1.0f/(8*8) * 2.0f;
-        const float x = fmodf(static_cast<float>(i) * step, 1.0f);
-        const float value = mathFn.evaluate(x) * 100.0f;
-        chart.setNextValue(series, value * PowerChartYScale);
-    }
-
+    // refresh chart
     chart.refresh();
-    mPowerSeries = series;
 }
 
 void MainScreen::onStart(){
-    // nothing to do
+    mPowerTimer.start(250_ms);
 }
 
 void MainScreen::onBecomeEnabled(){
@@ -173,33 +173,18 @@ void MainScreen::onBecomeDisabled(){
 
 void MainScreen::onUpdateScreen(){
 
-    // update temp chart
-    {
-        const MathFunctionIfc& mathFn = MathFunctions::GetSinAnim(); 
-        const float step = 1.0f/(8*8);
-        static float t = step;
-        const float value = mathFn.evaluate(t) * 20.0f + 20.0f;
-        gui().tempGraph.chart.setNextValue(mTempSeries, value * TempChartYScale);
-        t += step;
-        if(t >= 0.99f){
-            t = 0.0f;
+    // update power chart
+    if(mPowerTimer.isExpired()){
+        mPowerTimer.restart();
+        const float power = model().getHeatpadNextDuty() * 100.0f;
+        gui().powerGraph.chart.setNextValue(mPowerSeries, power * PowerChartYScale);
+        if(power > 75.0f){
+            gui().powerGraph.value.setAlign(LV_ALIGN_BOTTOM_RIGHT, -4, -4);
+        }
+        else if(power < 25.0f){
+            gui().powerGraph.value.setAlign(LV_ALIGN_TOP_RIGHT, -4, 4);
         }
     }
-
-    // update power chart
-    static uint32_t count = 0;
-    if(count%2 == 0){
-        const MathFunctionIfc& mathFn = MathFunctions::GetGamma22(); 
-        const float step = 1.0f/(8*8) * 2.0f;
-        static float t = step;
-        const float value = mathFn.evaluate(t) * 100.0f;
-        gui().powerGraph.chart.setNextValue(mPowerSeries, value * PowerChartYScale);
-        t += step;
-        if(t >= 0.99f){
-            t = 0.0f;
-        }        
-    }
-    count++;
 }
 
 void MainScreen::onDisplayCommand(const DisplayCommandEvent& event){
@@ -302,21 +287,19 @@ void MainScreen::onApplyFanTargetSpeed(){
 }
 
 void MainScreen::onApplyHeatpadStatus(){
-    // HeatpadState state = model().getHeatpadState();
-    // if(state == HeatpadState::Disabled){
-    //     gui().statusHeat.value.setText("Off");
-    //     // gui().statusHeat.unit.setHidden(true);
-    // }
-    // else {
-    //     gui().statusHeat.value.setTextFormatted("%.1f", model().getHeatpadCurrentDuty()*100.0f);
-    //     // gui().statusHeat.unit.setHidden(false);
-    // }
+    HeatpadState state = model().getHeatpadState();
+    if(state == HeatpadState::Disabled){
+        gui().powerGraph.value.setText("Off");
+        return;
+    }
+    const float power = model().getHeatpadNextDuty() * 100.0f;
+    gui().powerGraph.value.setTextFormatted("%.1f%%", power);
 }
 
 void MainScreen::onApplyHeatpadMeasure(){
     const float voltage = model().getHeatpadMeasuredVoltage();
     const float current = model().getHeatpadMeasuredCurrent();
-    const float duty = model().getHeatpadCurrentDuty();
+    const float duty = model().getHeatpadNextDuty();
     const float power = voltage * current * duty;
     gui().powerInfo.value.setTextFormatted("%.1fW", power);
 }
@@ -331,14 +314,26 @@ void MainScreen::onApplySensorStatus(){
 }
 
 void MainScreen::onApplyMeasuredTemperature(){
-    // if(isSensorOk()){
-    //     gui().sensorTemperature.value.setTextFormatted("%.1f", model().getMeasuredTemperature());
-    //     // gui().sensorTemperature.unit.setHidden(false);
-    // }
-    // else {
-    //     gui().sensorTemperature.value.setText(resovleSensorText());
-    //     // gui().sensorTemperature.unit.setHidden(true);
-    // }
+
+    if(!isSensorOk()){
+        gui().tempGraph.value.setTextFormatted("SENSOR ERROR");
+        return;
+    }
+
+    // set chart temperature
+    float temperature = model().getMeasuredTemperature();
+    gui().tempGraph.chart.setNextValue(mTempSeries, temperature * TempChartYScale);
+    if(temperature > 35.0f){
+        gui().tempGraph.value.setAlign(LV_ALIGN_BOTTOM_RIGHT, -4, -4);
+    }
+    else if(temperature < 25.0f){
+        gui().tempGraph.value.setAlign(LV_ALIGN_TOP_RIGHT, -4, 4);
+    }
+    gui().tempGraph.value.setTextFormatted("%.1f°C", temperature);
+
+    // set chart target temperature
+    float temperatureTarget = model().getTargetTemperature();
+    gui().tempGraph.chart.setNextValue(mTempTargetSeries, temperatureTarget * TempChartYScale);
 }
 
 void MainScreen::onApplyMeasuredHumidity(){

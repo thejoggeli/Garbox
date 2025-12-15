@@ -79,8 +79,8 @@ HeatpadState MainScreenAbs::Model::getHeatpadState() const {
     return mHeatpadState; 
 }
 
-float MainScreenAbs::Model::getHeatpadCurrentDuty() const { 
-    return mHeatpadCurrentDuty; 
+float MainScreenAbs::Model::getHeatpadNextDuty() const { 
+    return mHeatpadNextDuty; 
 }
 
 float MainScreenAbs::Model::getHeatpadMeasuredVoltage() const { 
@@ -156,9 +156,9 @@ void MainScreenAbs::Model::setHeatpadState(HeatpadState value){
     } 
 }
 
-void MainScreenAbs::Model::setHeatpadCurrentDuty(float value){ 
-    if(mHeatpadCurrentDuty != value) { 
-        mHeatpadCurrentDuty = value; 
+void MainScreenAbs::Model::setHeatpadNextDuty(float value){ 
+    if(mHeatpadNextDuty != value) { 
+        mHeatpadNextDuty = value; 
         mScreen.markDirty(Model::Index::HeatpadStatus);
         mScreen.markDirty(Model::Index::HeatpadMeasure);
     } 

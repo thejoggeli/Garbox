@@ -58,3 +58,4 @@ event_types:
     - { name: holdTimeMicros, type: uint32_t }
   EncoderStep:
     - { name: steps, type: int32_t }
+    

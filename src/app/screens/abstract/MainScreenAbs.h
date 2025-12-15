@@ -98,7 +98,7 @@ public:
         float getFanMeasuredRpm() const;
         float getFanTargetSpeed() const;
         HeatpadState getHeatpadState() const;
-        float getHeatpadCurrentDuty() const;
+        float getHeatpadNextDuty() const;
         float getHeatpadMeasuredVoltage() const;
         float getHeatpadMeasuredCurrent() const;
         float getDisplayBrightness() const;
@@ -116,7 +116,7 @@ public:
         void setFanMeasuredRpm(float value);
         void setFanTargetSpeed(float value);
         void setHeatpadState(HeatpadState value);
-        void setHeatpadCurrentDuty(float value);
+        void setHeatpadNextDuty(float value);
         void setHeatpadMeasuredVoltage(float value);
         void setHeatpadMeasuredCurrent(float value);
         void setDisplayBrightness(float value);
@@ -138,7 +138,7 @@ public:
         float mFanMeasuredRpm;
         float mFanTargetSpeed;
         HeatpadState mHeatpadState;
-        float mHeatpadCurrentDuty;
+        float mHeatpadNextDuty;
         float mHeatpadMeasuredVoltage;
         float mHeatpadMeasuredCurrent;
         float mDisplayBrightness;

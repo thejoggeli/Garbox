@@ -201,9 +201,9 @@ def render_align(val):
     if len(split) == 1 or isinstance(split, str):
         v = [split[0], 0, 0]
     elif len(split) == 2:
-        v = [split[0], split[1], split[1]]
+        v = [split[0], render_px(split[1]), render_px(split[1])]
     elif len(split) == 3:
-        v = [split[0], split[1], split[2]]
+        v = [split[0], render_px(split[1]), render_px(split[2])]
     else:
         raise ValueError(f"invalid align value. expected str and up to 2 integers, got '{val}'")
     

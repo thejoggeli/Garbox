@@ -8,9 +8,9 @@
 namespace Garbox {
 
 // label text
-static const lv_font_t* LabelFont  = &lv_font_montserrat_12;
+static const lv_font_t* LabelFont  = &lv_font_montserrat_10;
 static const lv_color_t LabelColor = lv_color_hex(0xFFFFFF);
-static const lv_opa_t   LabelOpa   = LV_OPA_60;
+static const lv_opa_t   LabelOpa   = 255*0.5f;
 
 // label padding
 static const int32_t LabelPaddingLeft   = 4;
@@ -18,7 +18,7 @@ static const int32_t LabelPaddingBottom = 4;
 
 // label background
 static const lv_color_t LabelBgColor  = lv_color_hex(0x0);
-static const lv_opa_t   LabelBgOpa    = LV_OPA_30;
+static const lv_opa_t   LabelBgOpa    = 255*0.4f;
 static const int32_t    LabelBgRadius = 2;
 static const int32_t    LabelBgPadX   = 1;
 static const int32_t    LabelBgPadY   = 0;
@@ -139,7 +139,7 @@ void ChartGridRenderer::onDrawLabels(lv_event_t* event){
         lv_area_t rectArea = {x1-LabelBgPadX, y1-LabelBgPadY, x2+LabelBgPadX, y2+LabelBgPadY};
 
         // draw 
-        // lv_draw_rect(layer, &rectDsc, &rectArea);
+        lv_draw_rect(layer, &rectDsc, &rectArea);
         lv_draw_label(layer, &labelDsc, &labelArea);
     }
 
@@ -168,7 +168,7 @@ void ChartGridRenderer::onDrawLabels(lv_event_t* event){
         lv_area_t rectArea = {x1-LabelBgPadX, y1-LabelBgPadY, x2+LabelBgPadX, y2+LabelBgPadY};
 
         // draw 
-        // lv_draw_rect(layer, &rectDsc, &rectArea);
+        lv_draw_rect(layer, &rectDsc, &rectArea);
         lv_draw_label(layer, &labelDsc, &labelArea);
     }
 }

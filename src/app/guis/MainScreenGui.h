@@ -30,6 +30,7 @@ public:
         LvObject labelContainer;
         LvObject _namelessContainer_0;
         LvChart chart;
+        LvLabel value;
 
         GraphComponent(const GraphComponent&) = delete;
         GraphComponent& operator=(const GraphComponent&) = delete;
@@ -84,18 +85,18 @@ public:
         LvObject _namelessContainer_2;
         LvObject systemStateBg;
         LvLabel systemState;
-        LvObject _namelessContainer_3;
+        LvObject menuContainer;
         LvImage menuArrUp;
+        LvObject _namelessContainer_3;
         LvObject _namelessContainer_4;
-        LvObject _namelessContainer_5;
         MenuRow _namelessMenuRow_0;
         MenuRow _namelessMenuRow_1;
         MenuRow _namelessMenuRow_2;
         MenuRow _namelessMenuRow_3;
         MenuRow _namelessMenuRow_4;
-        LvObject _namelessContainer_6;
+        LvObject _namelessContainer_5;
         LvImage menuArrDown;
-        LvObject _namelessContainer_7;
+        LvObject _namelessContainer_6;
         InfoTile fanInfo;
         InfoTile humidInfo;
         InfoTile powerInfo;

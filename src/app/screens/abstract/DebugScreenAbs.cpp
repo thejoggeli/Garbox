@@ -35,9 +35,12 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
     mDirtyDispatcher.registerHandler(applyDisplayStatusTrampoline, this);
     mDirtyDispatcher.registerHandler(applyTemperatureStateTrampoline, this);
     mDirtyDispatcher.registerHandler(applyTemperatureSampleTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyTimeTrampoline, this);
     mDirtyDispatcher.registerHandler(applyAppInfoTrampoline, this);
     mDirtyDispatcher.registerHandler(applyFermentationStatusTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeapSpaceTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyHeapBlocksTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyHeapBytesTrampoline, this);
+    mDirtyDispatcher.registerHandler(applyHeapMinimumTrampoline, this);
 
     // calls onInit()
     ScreenAbs::init(host);
@@ -146,6 +149,10 @@ float DebugScreenAbs::Model::getSensorHumidityRelative() const {
     return mSensorHumidityRelative; 
 }
 
+uint32_t DebugScreenAbs::Model::getTimeSeconds() const { 
+    return mTimeSeconds; 
+}
+
 uint32_t DebugScreenAbs::Model::getEventCount() const { 
     return mEventCount; 
 }
@@ -170,8 +177,32 @@ float DebugScreenAbs::Model::getEngineMeasuredHumidity() const {
     return mEngineMeasuredHumidity; 
 }
 
-uint32_t DebugScreenAbs::Model::getHeapSpace() const { 
-    return mHeapSpace; 
+uint32_t DebugScreenAbs::Model::getHeapAllocatedBlocks() const { 
+    return mHeapAllocatedBlocks; 
+}
+
+uint32_t DebugScreenAbs::Model::getHeapFreeBlocks() const { 
+    return mHeapFreeBlocks; 
+}
+
+uint32_t DebugScreenAbs::Model::getHeapLargestFreeBlock() const { 
+    return mHeapLargestFreeBlock; 
+}
+
+uint32_t DebugScreenAbs::Model::getHeapAllocatedBytes() const { 
+    return mHeapAllocatedBytes; 
+}
+
+uint32_t DebugScreenAbs::Model::getHeapMinimumFreeBytes() const { 
+    return mHeapMinimumFreeBytes; 
+}
+
+uint32_t DebugScreenAbs::Model::getHeapTotalFreeBytes() const { 
+    return mHeapTotalFreeBytes; 
+}
+
+uint32_t DebugScreenAbs::Model::getHeapMinimumTime() const { 
+    return mHeapMinimumTime; 
 }
 
 void DebugScreenAbs::Model::setFanState(FanState value){ 
@@ -300,6 +331,13 @@ void DebugScreenAbs::Model::setSensorHumidityRelative(float value){
     } 
 }
 
+void DebugScreenAbs::Model::setTimeSeconds(uint32_t value){ 
+    if(mTimeSeconds != value) { 
+        mTimeSeconds = value; 
+        mScreen.markDirty(Model::Index::Time);
+    } 
+}
+
 void DebugScreenAbs::Model::setEventCount(uint32_t value){ 
     if(mEventCount != value) { 
         mEventCount = value; 
@@ -342,10 +380,52 @@ void DebugScreenAbs::Model::setEngineMeasuredHumidity(float value){
     } 
 }
 
-void DebugScreenAbs::Model::setHeapSpace(uint32_t value){ 
-    if(mHeapSpace != value) { 
-        mHeapSpace = value; 
-        mScreen.markDirty(Model::Index::HeapSpace);
+void DebugScreenAbs::Model::setHeapAllocatedBlocks(uint32_t value){ 
+    if(mHeapAllocatedBlocks != value) { 
+        mHeapAllocatedBlocks = value; 
+        mScreen.markDirty(Model::Index::HeapBlocks);
+    } 
+}
+
+void DebugScreenAbs::Model::setHeapFreeBlocks(uint32_t value){ 
+    if(mHeapFreeBlocks != value) { 
+        mHeapFreeBlocks = value; 
+        mScreen.markDirty(Model::Index::HeapBlocks);
+    } 
+}
+
+void DebugScreenAbs::Model::setHeapLargestFreeBlock(uint32_t value){ 
+    if(mHeapLargestFreeBlock != value) { 
+        mHeapLargestFreeBlock = value; 
+        mScreen.markDirty(Model::Index::HeapBlocks);
+    } 
+}
+
+void DebugScreenAbs::Model::setHeapAllocatedBytes(uint32_t value){ 
+    if(mHeapAllocatedBytes != value) { 
+        mHeapAllocatedBytes = value; 
+        mScreen.markDirty(Model::Index::HeapBytes);
+    } 
+}
+
+void DebugScreenAbs::Model::setHeapMinimumFreeBytes(uint32_t value){ 
+    if(mHeapMinimumFreeBytes != value) { 
+        mHeapMinimumFreeBytes = value; 
+        mScreen.markDirty(Model::Index::HeapBytes);
+    } 
+}
+
+void DebugScreenAbs::Model::setHeapTotalFreeBytes(uint32_t value){ 
+    if(mHeapTotalFreeBytes != value) { 
+        mHeapTotalFreeBytes = value; 
+        mScreen.markDirty(Model::Index::HeapMinimum);
+    } 
+}
+
+void DebugScreenAbs::Model::setHeapMinimumTime(uint32_t value){ 
+    if(mHeapMinimumTime != value) { 
+        mHeapMinimumTime = value; 
+        mScreen.markDirty(Model::Index::HeapMinimum);
     } 
 }
 
@@ -401,6 +481,10 @@ void DebugScreenAbs::applyTemperatureSampleTrampoline(void* context){
     static_cast<DebugScreenAbs*>(context)->onApplyTemperatureSample();
 }
 
+void DebugScreenAbs::applyTimeTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onApplyTime();
+}
+
 void DebugScreenAbs::applyAppInfoTrampoline(void* context){
     static_cast<DebugScreenAbs*>(context)->onApplyAppInfo();
 }
@@ -409,8 +493,16 @@ void DebugScreenAbs::applyFermentationStatusTrampoline(void* context){
     static_cast<DebugScreenAbs*>(context)->onApplyFermentationStatus();
 }
 
-void DebugScreenAbs::applyHeapSpaceTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeapSpace();
+void DebugScreenAbs::applyHeapBlocksTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onApplyHeapBlocks();
+}
+
+void DebugScreenAbs::applyHeapBytesTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onApplyHeapBytes();
+}
+
+void DebugScreenAbs::applyHeapMinimumTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onApplyHeapMinimum();
 }
 
 } // namespace Garbox

@@ -61,8 +61,8 @@ private:
     // force off if temperature too far above target temperature
     static constexpr float OverTemperatureDelta = 2.0f; 
 
-    // temperature must be below over-temperature threshold for at least 30s before going back to regulating state
-    static constexpr uint32_t OverTemperatureExitTimeMicros = 30_s; 
+    // temperature must be below over-temperature threshold for at least 10s before going back to regulating state
+    static constexpr uint32_t OverTemperatureExitTimeMicros = 10_s; 
 
     // control
     bool mRegulationEnabled = false;
