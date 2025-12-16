@@ -2,6 +2,9 @@
 {% from "_common/component_cpp.j2" import constructor, make_events, send_events %}
 #include "{{ name }}Abs.h"
 #include <math.h>
+{% if screen.use_model %}
+#include "app/runtime/SnapshotRegistry.h"
+{% endif %}
 {% if screen.use_lvgl %}
 #include "core/lvgl/LvglProvider.h"
 {% endif %}
@@ -79,6 +82,11 @@ void {{ name }}Abs::becomeEnabled(){
 {% if screen.model.get("debounce") %}
     mModel.resetTimers();
 {% endif %}
+{% if screen.use_model %}
+{% for event_type, event_data in screen.model.events.items() %}
+    setSnapshot{{ event_type }}();
+{% endfor %}
+{% endif %}
     ScreenAbs::becomeEnabled();
 }
 
@@ -121,6 +129,16 @@ void {{ name }}Abs::setBackgroundColor(uint32_t color){
 {#####################}
 {### Model Section ###}
 {#####################}
+
+{% for event_type, event_data in screen.model.events.items() %}
+void {{ name }}Abs::setSnapshot{{ event_type }}(){
+    const {{ event_type }}Payload& payload = SnapshotRegistry::Get{{ event_type }}();
+    {% for field_data in event_data.values() %}
+    mModel.set{{ field_data.name|upper_first }}(payload.{{ field_data.event_field }});
+    {% endfor %}
+}
+
+{% endfor %}
 
 {# model groups trampolines #}
 

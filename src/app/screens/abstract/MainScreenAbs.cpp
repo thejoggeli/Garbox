@@ -3,6 +3,7 @@
 // *****************************************
 #include "MainScreenAbs.h"
 #include <math.h>
+#include "app/runtime/SnapshotRegistry.h"
 #include "core/lvgl/LvglProvider.h"
 #include "shared/types/ComponentId.h"
 
@@ -44,6 +45,14 @@ void MainScreenAbs::updateScreen(){
 
 void MainScreenAbs::becomeEnabled(){
     mGui.show();
+    setSnapshotFanStatus();
+    setSnapshotFanSample();
+    setSnapshotHeatpadStatus();
+    setSnapshotHeatpadSample();
+    setSnapshotDisplayStatus();
+    setSnapshotTemperatureStatus();
+    setSnapshotTemperatureSample();
+    setSnapshotFermentationStatus();
     ScreenAbs::becomeEnabled();
 }
 
@@ -57,6 +66,54 @@ MainScreenGui::Objects& MainScreenAbs::gui(){
 
 void MainScreenAbs::setBackgroundColor(uint32_t color){
     mGui.objects().root.setBgColor(lv_color_hex(color));
+}
+
+void MainScreenAbs::setSnapshotFanStatus(){
+    const FanStatusPayload& payload = SnapshotRegistry::GetFanStatus();
+    mModel.setFanState(payload.state);
+    mModel.setFanTargetSpeed(payload.targetSpeed);
+}
+
+void MainScreenAbs::setSnapshotFanSample(){
+    const FanSamplePayload& payload = SnapshotRegistry::GetFanSample();
+    mModel.setFanMeasuredRpm(payload.measuredRpm);
+}
+
+void MainScreenAbs::setSnapshotHeatpadStatus(){
+    const HeatpadStatusPayload& payload = SnapshotRegistry::GetHeatpadStatus();
+    mModel.setHeatpadState(payload.state);
+    mModel.setHeatpadNextDuty(payload.nextDutyCycle);
+}
+
+void MainScreenAbs::setSnapshotHeatpadSample(){
+    const HeatpadSamplePayload& payload = SnapshotRegistry::GetHeatpadSample();
+    mModel.setHeatpadMeasuredVoltage(payload.measuredVoltage);
+    mModel.setHeatpadMeasuredCurrent(payload.measuredCurrent);
+}
+
+void MainScreenAbs::setSnapshotDisplayStatus(){
+    const DisplayStatusPayload& payload = SnapshotRegistry::GetDisplayStatus();
+    mModel.setDisplayBrightness(payload.brightness);
+}
+
+void MainScreenAbs::setSnapshotTemperatureStatus(){
+    const TemperatureStatusPayload& payload = SnapshotRegistry::GetTemperatureStatus();
+    mModel.setShtDriverEnabled(payload.driverEnabled);
+    mModel.setShtPowerEnabled(payload.powerEnabled);
+    mModel.setShtResetting(payload.resetting);
+    mModel.setShtHasSample(payload.hasFirstSample);
+}
+
+void MainScreenAbs::setSnapshotTemperatureSample(){
+    const TemperatureSamplePayload& payload = SnapshotRegistry::GetTemperatureSample();
+    mModel.setMeasuredTemperature(payload.temperatureCelcius);
+    mModel.setMeasuredHumidity(payload.humidityRelative);
+}
+
+void MainScreenAbs::setSnapshotFermentationStatus(){
+    const FermentationStatusPayload& payload = SnapshotRegistry::GetFermentationStatus();
+    mModel.setTargetTemperature(payload.targetTemperature);
+    mModel.setEngineState(payload.heaterEngineState);
 }
 
 MainScreenAbs::Model::Model(MainScreenAbs& screen) : mScreen(screen){ 

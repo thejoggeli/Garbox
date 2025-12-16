@@ -9,16 +9,19 @@ def parse_events(config: dict):
         if(event_data is None):
             event_types[event_name] = {"meta": {}, "fields": {}}
             continue
+    
+        event_meta = event_data.get("meta", {})
+        event_fields = event_data.get("fields", [])
+        if event_fields is None:
+            event_fields = []
 
-        if isinstance(event_data, list):
-            event_meta = {}
-            event_fields = event_data
-        elif isinstance(event_data, dict):
-            event_meta = event_data.get("meta", {})
-            event_fields = event_data.get("fields", [])
-        else:
-            raise ValueError("invalid event value. expected list of fields or meta(dict) and fields(array)")
+        event_kind = event_data.get("kind", None)
+        if event_kind is None:
+            raise ValueError(f"event 'kind' is missing: {event_name}")
         
+        if event_kind == "snapshot" and len(event_fields) == 0:
+            raise ValueError(f"event of kind 'snapshot' must have at least 1 field: {event_name}")
+
         parsed_fields = {}
 
         for event_field in event_fields:
@@ -35,6 +38,7 @@ def parse_events(config: dict):
 
         event_types[event_name] = {
             "meta": event_meta,
+            "kind": event_kind,
             "fields": parsed_fields,
         }
 

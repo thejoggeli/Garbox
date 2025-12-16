@@ -1,7 +1,6 @@
 #pragma once
 {% include "_common/header.j2" %}
 {% set RuntimeName = application.app_name ~ 'Runtime' %}
-#include "app/runtime/EventReplay.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 // include all components
@@ -28,7 +27,6 @@ public:
 private:
 
     TickRunner mTickRunner;
-    EventReplay mEventReplay;
 
     {# behaviour instances #}
     {% for beh in behaviours %}

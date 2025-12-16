@@ -60,16 +60,11 @@ screens:
         - { name: behaviour,                  bind: ActiveBehaviourChanged->newBehaviour,     group: AppInfo }
         - { name: engineState,                bind: FermentationStatus->heaterEngineState,    group: FermentationStatus }
         - { name: engineTargetTemperature,    bind: FermentationStatus->targetTemperature,    group: FermentationStatus }
-        - { name: engineMeasuredTemperature,  bind: FermentationStatus->measuredTemperature,  group: FermentationStatus }
-        - { name: engineMeasuredHumidity,     bind: FermentationStatus->measuredHumidity,     group: FermentationStatus }
-
         - { name: heapAllocatedBlocks,        type: uint32_t,                                 group: HeapBlocks}
         - { name: heapFreeBlocks,             type: uint32_t,                                 group: HeapBlocks}
         - { name: heapLargestFreeBlock,       type: uint32_t,                                 group: HeapBlocks}
-
         - { name: heapAllocatedBytes,         type: uint32_t,                                 group: HeapBytes}
         - { name: heapMinimumFreeBytes,       type: uint32_t,                                 group: HeapBytes}
-
         - { name: heapTotalFreeBytes,         type: uint32_t,                                 group: HeapMinimum}
         - { name: heapMinimumTime,            type: uint32_t,                                 group: HeapMinimum}
 

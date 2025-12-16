@@ -124,8 +124,6 @@ public:
         BehaviourId getBehaviour() const;
         HeaterEngineState getEngineState() const;
         float getEngineTargetTemperature() const;
-        float getEngineMeasuredTemperature() const;
-        float getEngineMeasuredHumidity() const;
         uint32_t getHeapAllocatedBlocks() const;
         uint32_t getHeapFreeBlocks() const;
         uint32_t getHeapLargestFreeBlock() const;
@@ -158,8 +156,6 @@ public:
         void setBehaviour(BehaviourId value);
         void setEngineState(HeaterEngineState value);
         void setEngineTargetTemperature(float value);
-        void setEngineMeasuredTemperature(float value);
-        void setEngineMeasuredHumidity(float value);
         void setHeapAllocatedBlocks(uint32_t value);
         void setHeapFreeBlocks(uint32_t value);
         void setHeapLargestFreeBlock(uint32_t value);
@@ -196,8 +192,6 @@ public:
         BehaviourId mBehaviour;
         HeaterEngineState mEngineState;
         float mEngineTargetTemperature;
-        float mEngineMeasuredTemperature;
-        float mEngineMeasuredHumidity;
         uint32_t mHeapAllocatedBlocks;
         uint32_t mHeapFreeBlocks;
         uint32_t mHeapLargestFreeBlock;
@@ -230,6 +224,16 @@ protected:
     bool isMarkedDirty(Model::Index index) const;
 
 private: 
+
+    void setSnapshotFanStatus();
+    void setSnapshotFanSample();
+    void setSnapshotHeatpadStatus();
+    void setSnapshotHeatpadSample();
+    void setSnapshotDisplayStatus();
+    void setSnapshotTemperatureStatus();
+    void setSnapshotTemperatureSample();
+    void setSnapshotActiveBehaviourChanged();
+    void setSnapshotFermentationStatus();
 
     // model field apply trampolines
     static void applyFanStateTrampoline(void* context);

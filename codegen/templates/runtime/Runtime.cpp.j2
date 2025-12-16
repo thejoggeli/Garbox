@@ -1,6 +1,8 @@
 {% include "_common/header.j2" %}
 {% set RuntimeName = application.app_name ~ 'Runtime' %}
 #include "{{ RuntimeName }}.h"
+
+#include "app/runtime/SnapshotRegistry.h"
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/time/Time.h"
@@ -20,15 +22,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
         .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
         .eventQueueLength = {{ application.event_queue_length }},
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis),
-    mEventReplay(
-{%- set ns = namespace(delim="") -%}
-{%- for name, screen_data in screens.items() -%} 
-    {%- if screen_data.replay -%}
-        {{- ns.delim }}m{{- name -}}{%- if not loop.last -%}{%- endif -%}
-        {%- set ns.delim = ", " -%}
-    {%- endif -%}
-{%- endfor -%}){
+    mTickRunner(TickHandlersCount, TickPeriodMillis){
 
     // register components
 {% for beh in behaviours %}
@@ -74,9 +68,7 @@ void {{ RuntimeName}}::onActiveBehaviourChanged(){
 }
 
 void {{ RuntimeName}}::onActiveScreenChanged(){
-    if(mActiveScreen){
-        mEventReplay.replay(mActiveScreen->getScreenId());
-    }
+    // nothing to do
 }
 
 void {{ RuntimeName}}::handleTickStart(){
@@ -142,9 +134,6 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
 {% endfor %}
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 
-    // store event for replay
-    mEventReplay.storeEvent(header);
-
 {% set ns = namespace(printed=0) %}
 {% for component in components.values() %}
     {% if component["receives_all"]: %}
@@ -159,36 +148,39 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     // route event to components
     switch(header->type){
 {# ---- Route events ---- #}
-{% for event, routes in event_routes.items() %}
-    case EventType::{{ event }}: {
-    {% if routes["count"] > 0 %}
-        const {{ event }}Event event(header);
+{% for event_name, routes in event_routes.items() %}
+    case EventType::{{ event_name }}: {
+    {% if routes["count"] > 0 or routes["event"]["kind"] == "snapshot" %}
+        const {{ event_name }}Event event(header);
+    {% endif %}
+    {% if routes["event"]["kind"] == "snapshot" %}
+        SnapshotRegistry::Update{{ event_name }}(*event.payload());
     {% endif %}
     {# send event to controllers supporting this event #}
     {% for ctrl in routes["controllers"] %}
-        m{{ ctrl }}.on{{ event }}(event);
+        m{{ ctrl }}.on{{ event_name }}(event);
     {% endfor %}
     {# send event to active behaviour + screen (if  event supported) #}
     {% if routes["behaviours"] | length > 0 or routes["screens"] | length > 0 %}
         if(header->sendToInactiveComponents){
         {% if routes["behaviours"] | length > 0 or routes["screens"] %}
             {% for beha in routes["behaviours"] %}
-            m{{ beha }}.on{{ event }}(event);
+            m{{ beha }}.on{{ event_name }}(event);
           {% endfor %}
             {% for screen in routes["screens"] %}
-            m{{ screen }}.on{{ event }}(event);
+            m{{ screen }}.on{{ event_name }}(event);
             {% endfor %}
         {% else %}
-            // no inactive receivers for '{{ event }}' event
+            // no inactive receivers for '{{ event_name }}' event
         {% endif %}
         }
         else {
         {% if routes["behaviours"] | length > 0 %}
             switch(mActiveBehaviour->getBehaviourId()){
             {% for beha in routes["behaviours"] %}
-                case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event }}(event); break;
+                case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->on{{ event_name }}(event); break;
             {% endfor %}
-                default: break; // active behaviour does not receive '{{ event }}' event
+                default: break; // active behaviour does not receive '{{ event_name }}' event
             }
         {% else %}
             // no active receivers for this event type
@@ -197,9 +189,9 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
         {% if routes["screens"] | length > 0 %}
             switch(mActiveScreen->getScreenId()){
             {% for screen_name in routes["screens"] %}
-                case ScreenId::{{ screen_name.removesuffix("Screen") }}: static_cast<{{ screen_name }}*>(mActiveScreen)->on{{ event }}(event); break;
+                case ScreenId::{{ screen_name.removesuffix("Screen") }}: static_cast<{{ screen_name }}*>(mActiveScreen)->on{{ event_name }}(event); break;
             {% endfor %}
-                default: break; // active screen does not receive '{{ event }}' event
+                default: break; // active screen does not receive '{{ event_name }}' event
             }
         {% endif %}
         }
@@ -210,13 +202,13 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
         {% for screen_name in routes["screens_with_fields"] %}
             case ScreenId::{{ screen_name.removesuffix("Screen") }}: {
                 {{ screen_name }}::Model& model = static_cast<{{ screen_name }}*>(mActiveScreen)->model();
-            {% for field in screens[screen_name]["model"]["events"][event].values() %}
+            {% for field in screens[screen_name]["model"]["events"][event_name].values() %}
                 model.set{{ field.name|upper_first }}(event->{{ field.event_field }});
             {% endfor %}
                 break;
             }
         {% endfor %}
-            default: break; // active screen has no model binding to any field of '{{ event }}' event
+            default: break; // active screen has no model binding to any field of '{{ event_name }}' event
         }
     {% endif %}
         break;

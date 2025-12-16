@@ -1,5 +1,6 @@
 #include "MainScreen.h"
 
+#include "app/runtime/SnapshotRegistry.h"
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"
@@ -177,7 +178,8 @@ void MainScreen::onUpdateScreen(){
     // update power chart
     if(mPowerTimer.isExpired()){
         mPowerTimer.restart();
-        const float power = model().getHeatpadNextDuty() * 100.0f;
+        const float nextDuty = SnapshotRegistry::GetHeatpadStatus().nextDutyCycle;
+        const float power = nextDuty * 100.0f;
         gui().powerGraph.chart.setNextValue(mPowerSeries, power * PowerChartYScale);
     }
 }

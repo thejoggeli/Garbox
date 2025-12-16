@@ -7,17 +7,18 @@ from loader.loader import Loader
 
 def generate_runtime(ctx: Context, loader: Loader):
     _generate_runtime(ctx, loader)
-    _generate_event_replay(ctx, loader)
+    _generate_snapshot_registry(ctx, loader)
 
 
 def _collect_event_routes(loader: Loader):
     event_routes = {}
-    for event_key in loader.config["event_types"].keys():
+    for event_key, event_data, in loader.config["event_types"].items():
         event_routes[event_key] = {
             "controllers": SortedSet(),
             "behaviours":  SortedSet(),
             "screens":  SortedSet(),
             "screens_with_fields": SortedSet(),
+            "event": event_data,
             "count": 0
         }
     for section in ("controllers", "behaviours", "screens"):
@@ -76,37 +77,24 @@ def _generate_runtime(ctx: Context, loader: Loader):
     generate_items(ctx, items)
 
 
-def _generate_event_replay(ctx: Context, loader: Loader):
+def _generate_snapshot_registry(ctx: Context, loader: Loader):
     """
     Generates 
-    - app/runtime/EventReplay.h
-    - app/runtime/EventReplay.cpp
+    - app/runtime/SnapshotRegistry.h
+    - app/runtime/SnapshotRegistry.cpp
     """
 
-    # filter only screens with 'replay=true'
-    screens = {name: screen for name, screen in loader.config["screens"].items() if screen["replay"] == True}
+    # filter only events with kind='snapshot'
+    event_types = loader.config["event_types"]
+    events = {name: ev for name, ev in event_types.items() if ev["kind"] == "snapshot"}
 
-    replay_dict = {
-        "events": {},
-        "screens": screens,
-        "include_paths": _collect_paths(loader, 'screens'),
+    registry_dict = {
+        "events": events,
     }
-
-    # collect all event types used by any screen
-    all_replay_events = SortedSet()
-    for screen_data in screens.values():
-        for event_name in screen_data["replay_events"]:
-            all_replay_events.add(event_name)
-
-    # add all used event to dict
-    for event_name, event in loader.config["event_types"].items():
-        if(event_name in all_replay_events):
-            replay_dict["events"][event_name] = event
         
     items = [
-        Item(replay_dict, "*", ctx.app_dir/"runtime/EventReplay.h",   "runtime/EventReplay.h.j2"),
-        Item(replay_dict, "*", ctx.app_dir/"runtime/EventReplay.cpp", "runtime/EventReplay.cpp.j2"),
+        Item(registry_dict, "*", ctx.app_dir/"runtime/SnapshotRegistry.h",   "runtime/SnapshotRegistry.h.j2"),
+        Item(registry_dict, "*", ctx.app_dir/"runtime/SnapshotRegistry.cpp", "runtime/SnapshotRegistry.cpp.j2"),
     ]
 
     generate_items(ctx, items)
-

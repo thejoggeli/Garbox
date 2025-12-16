@@ -13,11 +13,6 @@ public:
     void onLogicTick() final;
 
     void onHeartbeat(const HeartbeatEvent& event) final;
-    void onFanStatus(const FanStatusEvent& event) final;
-    void onFanSample(const FanSampleEvent& event) final;
-    void onHeatpadStatus(const HeatpadStatusEvent& event) final;
-    void onTemperatureStatus(const TemperatureStatusEvent& event) final;
-    void onTemperatureSample(const TemperatureSampleEvent& event) final;
     void onButtonStateChanged(const ButtonStateChangedEvent& event) final;
     void onButtonRepeat(const ButtonRepeatEvent& event) final;
     void onEncoderStep(const EncoderStepEvent& event) final;
@@ -32,6 +27,8 @@ private:
     bool mHeartbeatReceived = false;
 
     HeaterEngine mHeaterEngine;
+
+    static bool checkTemperatureStatus(const TemperatureStatusPayload& payload);
 
     void doFanTestStep();
     

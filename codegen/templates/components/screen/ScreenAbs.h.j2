@@ -131,6 +131,10 @@ protected:
 
 private: 
 
+{% for event_type, event_data in screen.model.events.items() %}
+    void setSnapshot{{ event_type }}();
+{% endfor %}
+
 {# model field apply trampolines #}
     // model field apply trampolines
 {% for name in screen.model.groups.keys() %}

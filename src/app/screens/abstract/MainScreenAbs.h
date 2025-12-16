@@ -176,6 +176,15 @@ protected:
 
 private: 
 
+    void setSnapshotFanStatus();
+    void setSnapshotFanSample();
+    void setSnapshotHeatpadStatus();
+    void setSnapshotHeatpadSample();
+    void setSnapshotDisplayStatus();
+    void setSnapshotTemperatureStatus();
+    void setSnapshotTemperatureSample();
+    void setSnapshotFermentationStatus();
+
     // model field apply trampolines
     static void applyFanStatusTrampoline(void* context);
     static void applyFanTargetSpeedTrampoline(void* context);

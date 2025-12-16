@@ -2,7 +2,6 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app/runtime/EventReplay.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 // include all components
@@ -29,7 +28,6 @@ public:
 private:
 
     TickRunner mTickRunner;
-    EventReplay mEventReplay;
 
     CalibrationBehaviour mCalibrationBehaviour;
     FermentationBehaviour mFermentationBehaviour;

@@ -19,15 +19,39 @@ struct HeartbeatPayload {
     // no fields
 };
 
+struct DisplayCommandPayload {
+    float brightness;
+};
+
+struct FanCommandPayload {
+    bool enabled;
+    float targetSpeed;
+    bool enableRpmControl;
+};
+
+struct HeatpadCommandPayload {
+    bool enabled;
+    float dutyCycle;
+    uint32_t periodMicros;
+};
+
+struct ButtonStateChangedPayload {
+    ButtonState oldState;
+    ButtonState newState;
+};
+
+struct ButtonRepeatPayload {
+    uint32_t count;
+    uint32_t holdTimeMicros;
+};
+
+struct EncoderStepPayload {
+    int32_t steps;
+};
+
 struct FermentationStatusPayload {
     HeaterEngineState heaterEngineState;
     float targetTemperature;
-    float measuredTemperature;
-    float measuredHumidity;
-};
-
-struct DisplayCommandPayload {
-    float brightness;
 };
 
 struct DisplayStatusPayload {
@@ -45,12 +69,6 @@ struct FanSamplePayload {
     float measuredRpm;
 };
 
-struct FanCommandPayload {
-    bool enabled;
-    float targetSpeed;
-    bool enableRpmControl;
-};
-
 struct HeatpadStatusPayload {
     HeatpadState state;
     float currentDutyCycle;
@@ -65,12 +83,6 @@ struct HeatpadSamplePayload {
     float pwmProgressMicros;
 };
 
-struct HeatpadCommandPayload {
-    bool enabled;
-    float dutyCycle;
-    uint32_t periodMicros;
-};
-
 struct TemperatureStatusPayload {
     bool driverEnabled;
     bool powerEnabled;
@@ -81,20 +93,6 @@ struct TemperatureStatusPayload {
 struct TemperatureSamplePayload {
     float temperatureCelcius;
     float humidityRelative;
-};
-
-struct ButtonStateChangedPayload {
-    ButtonState oldState;
-    ButtonState newState;
-};
-
-struct ButtonRepeatPayload {
-    uint32_t count;
-    uint32_t holdTimeMicros;
-};
-
-struct EncoderStepPayload {
-    int32_t steps;
 };
 
 struct ActiveBehaviourChangedPayload {
@@ -117,13 +115,38 @@ struct ResolveEventPayload<EventType::Heartbeat> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::FermentationStatus> {
-    using type = FermentationStatusPayload;
+struct ResolveEventPayload<EventType::DisplayCommand> {
+    using type = DisplayCommandPayload;
 };
 
 template<>
-struct ResolveEventPayload<EventType::DisplayCommand> {
-    using type = DisplayCommandPayload;
+struct ResolveEventPayload<EventType::FanCommand> {
+    using type = FanCommandPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::HeatpadCommand> {
+    using type = HeatpadCommandPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::ButtonStateChanged> {
+    using type = ButtonStateChangedPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::ButtonRepeat> {
+    using type = ButtonRepeatPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::EncoderStep> {
+    using type = EncoderStepPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::FermentationStatus> {
+    using type = FermentationStatusPayload;
 };
 
 template<>
@@ -142,11 +165,6 @@ struct ResolveEventPayload<EventType::FanSample> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::FanCommand> {
-    using type = FanCommandPayload;
-};
-
-template<>
 struct ResolveEventPayload<EventType::HeatpadStatus> {
     using type = HeatpadStatusPayload;
 };
@@ -157,11 +175,6 @@ struct ResolveEventPayload<EventType::HeatpadSample> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::HeatpadCommand> {
-    using type = HeatpadCommandPayload;
-};
-
-template<>
 struct ResolveEventPayload<EventType::TemperatureStatus> {
     using type = TemperatureStatusPayload;
 };
@@ -169,21 +182,6 @@ struct ResolveEventPayload<EventType::TemperatureStatus> {
 template<>
 struct ResolveEventPayload<EventType::TemperatureSample> {
     using type = TemperatureSamplePayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::ButtonStateChanged> {
-    using type = ButtonStateChangedPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::ButtonRepeat> {
-    using type = ButtonRepeatPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::EncoderStep> {
-    using type = EncoderStepPayload;
 };
 
 template<>

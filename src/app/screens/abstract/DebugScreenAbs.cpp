@@ -3,6 +3,7 @@
 // *****************************************
 #include "DebugScreenAbs.h"
 #include <math.h>
+#include "app/runtime/SnapshotRegistry.h"
 #include "core/lvgl/LvglProvider.h"
 #include "shared/types/ComponentId.h"
 
@@ -54,6 +55,15 @@ void DebugScreenAbs::updateScreen(){
 
 void DebugScreenAbs::becomeEnabled(){
     mRoot.setScreen();
+    setSnapshotFanStatus();
+    setSnapshotFanSample();
+    setSnapshotHeatpadStatus();
+    setSnapshotHeatpadSample();
+    setSnapshotDisplayStatus();
+    setSnapshotTemperatureStatus();
+    setSnapshotTemperatureSample();
+    setSnapshotActiveBehaviourChanged();
+    setSnapshotFermentationStatus();
     ScreenAbs::becomeEnabled();
 }
 
@@ -71,6 +81,63 @@ void DebugScreenAbs::sendEvent(const DisplayCommandEvent& event){
 
 void DebugScreenAbs::setBackgroundColor(uint32_t color){
     mRoot.setBgColor(lv_color_hex(color));
+}
+
+void DebugScreenAbs::setSnapshotFanStatus(){
+    const FanStatusPayload& payload = SnapshotRegistry::GetFanStatus();
+    mModel.setFanState(payload.state);
+    mModel.setFanTargetSpeed(payload.targetSpeed);
+}
+
+void DebugScreenAbs::setSnapshotFanSample(){
+    const FanSamplePayload& payload = SnapshotRegistry::GetFanSample();
+    mModel.setFanMeasuredRpm(payload.measuredRpm);
+}
+
+void DebugScreenAbs::setSnapshotHeatpadStatus(){
+    const HeatpadStatusPayload& payload = SnapshotRegistry::GetHeatpadStatus();
+    mModel.setHeatpadState(payload.state);
+    mModel.setHeatpadCurrentDuty(payload.currentDutyCycle);
+    mModel.setHeatpadCurrentPeriod(payload.currentPeriodMicros);
+    mModel.setHeatpadNextDuty(payload.nextDutyCycle);
+    mModel.setHeatpadNextPeriod(payload.nextPeriodMicros);
+}
+
+void DebugScreenAbs::setSnapshotHeatpadSample(){
+    const HeatpadSamplePayload& payload = SnapshotRegistry::GetHeatpadSample();
+    mModel.setHeatpadPwmProgress(payload.pwmProgressMicros);
+    mModel.setHeatpadMeasuredVoltage(payload.measuredVoltage);
+    mModel.setHeatpadMeasuredCurrent(payload.measuredCurrent);
+}
+
+void DebugScreenAbs::setSnapshotDisplayStatus(){
+    const DisplayStatusPayload& payload = SnapshotRegistry::GetDisplayStatus();
+    mModel.setDisplayBrightness(payload.brightness);
+    mModel.setDisplaySkipped(payload.skipped);
+}
+
+void DebugScreenAbs::setSnapshotTemperatureStatus(){
+    const TemperatureStatusPayload& payload = SnapshotRegistry::GetTemperatureStatus();
+    mModel.setShtDriverEnabled(payload.driverEnabled);
+    mModel.setShtPowerEnabled(payload.powerEnabled);
+    mModel.setShtResetting(payload.resetting);
+}
+
+void DebugScreenAbs::setSnapshotTemperatureSample(){
+    const TemperatureSamplePayload& payload = SnapshotRegistry::GetTemperatureSample();
+    mModel.setSensorTemperatureCelcius(payload.temperatureCelcius);
+    mModel.setSensorHumidityRelative(payload.humidityRelative);
+}
+
+void DebugScreenAbs::setSnapshotActiveBehaviourChanged(){
+    const ActiveBehaviourChangedPayload& payload = SnapshotRegistry::GetActiveBehaviourChanged();
+    mModel.setBehaviour(payload.newBehaviour);
+}
+
+void DebugScreenAbs::setSnapshotFermentationStatus(){
+    const FermentationStatusPayload& payload = SnapshotRegistry::GetFermentationStatus();
+    mModel.setEngineState(payload.heaterEngineState);
+    mModel.setEngineTargetTemperature(payload.targetTemperature);
 }
 
 DebugScreenAbs::Model::Model(DebugScreenAbs& screen) : mScreen(screen){ 
@@ -167,14 +234,6 @@ HeaterEngineState DebugScreenAbs::Model::getEngineState() const {
 
 float DebugScreenAbs::Model::getEngineTargetTemperature() const { 
     return mEngineTargetTemperature; 
-}
-
-float DebugScreenAbs::Model::getEngineMeasuredTemperature() const { 
-    return mEngineMeasuredTemperature; 
-}
-
-float DebugScreenAbs::Model::getEngineMeasuredHumidity() const { 
-    return mEngineMeasuredHumidity; 
 }
 
 uint32_t DebugScreenAbs::Model::getHeapAllocatedBlocks() const { 
@@ -362,20 +421,6 @@ void DebugScreenAbs::Model::setEngineState(HeaterEngineState value){
 void DebugScreenAbs::Model::setEngineTargetTemperature(float value){ 
     if(mEngineTargetTemperature != value) { 
         mEngineTargetTemperature = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
-}
-
-void DebugScreenAbs::Model::setEngineMeasuredTemperature(float value){ 
-    if(mEngineMeasuredTemperature != value) { 
-        mEngineMeasuredTemperature = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
-}
-
-void DebugScreenAbs::Model::setEngineMeasuredHumidity(float value){ 
-    if(mEngineMeasuredHumidity != value) { 
-        mEngineMeasuredHumidity = value; 
         mScreen.markDirty(Model::Index::FermentationStatus);
     } 
 }

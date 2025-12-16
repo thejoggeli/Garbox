@@ -1,0 +1,35 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include "shared/types/EventAlias.h"
+
+namespace Garbox {
+
+class SnapshotRegistry {
+public:
+
+{% for event_name in events.keys() %}
+    static void Update{{ event_name }}(const {{ event_name }}Payload& payload);
+{% endfor %}
+
+{% for event_name in events.keys() %}
+    static const {{ event_name }}Payload& Get{{ event_name }}();
+{% endfor %}
+
+private:
+
+    SnapshotRegistry();
+    ~SnapshotRegistry();
+    SnapshotRegistry(const SnapshotRegistry&) = delete;
+    SnapshotRegistry& operator=(const SnapshotRegistry&) = delete;
+    SnapshotRegistry(SnapshotRegistry&&) = delete;
+    SnapshotRegistry& operator=(SnapshotRegistry&&) = delete;
+
+    static SnapshotRegistry& instance();
+
+{% for event_name in events.keys() %}
+    {{ event_name }}Payload m{{ event_name }}Payload;
+{% endfor %}
+
+};
+
+} // namespace
