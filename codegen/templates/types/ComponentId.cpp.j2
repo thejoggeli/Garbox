@@ -7,7 +7,6 @@ const char* ComponentIdToString(ComponentId id){
     switch(id){
         case ComponentId::Null: return "Null";
         case ComponentId::Runtime: return "Runtime";
-        case ComponentId::Replay: return "Replay";
 {% for name in names %}
         case ComponentId::{{ name }}: return "{{ name }}";
 {% endfor %}

@@ -2,7 +2,6 @@ screens:
 
   Main:
     subdir: main
-    replay: true
     use_lvgl: true
     gui_filename: MainScreen.xml
     tick_phases: null
@@ -29,7 +28,6 @@ screens:
 
   Debug:
     subdir: debug
-    replay: true
     use_lvgl: true
     tick_phases: null
     receives: null
@@ -70,7 +68,6 @@ screens:
 
   EventLog:
     subdir: eventlog
-    replay: false
     use_lvgl: true
     tick_phases: null
     receives: null

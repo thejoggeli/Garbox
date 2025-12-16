@@ -18,12 +18,10 @@ def parse_screens(config: dict):
 
         parse_model(screen_data["model"], config["event_types"])
         parse_model_helpers(screen_data["model"])
-        collect_replay_events(screen_data)
 
         gui_filename = screen_data.get("gui_filename", None)
 
         # replace
-        screen_data["replay"] = screen_data.get("replay", False)
         screen_data["use_lvgl"] = screen_data.get("use_lvgl", False)
         screen_data["use_gui"] = gui_filename is not None
         screen_data["gui_filename"] = gui_filename
@@ -154,9 +152,3 @@ def parse_model_helpers(model: dict):
     model["groups"] = groups
     model["debounce"] = debounce
     
-
-def collect_replay_events(screen: dict):
-    events_set = SortedSet()
-    events_set.update(screen["model"]["events"].keys())
-    events_set.update(screen["receives"])
-    screen["replay_events"] = list(events_set)
