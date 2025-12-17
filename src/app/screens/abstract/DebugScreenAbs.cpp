@@ -136,7 +136,7 @@ void DebugScreenAbs::setSnapshotActiveBehaviourChanged(){
 
 void DebugScreenAbs::setSnapshotFermentationStatus(){
     const FermentationStatusPayload& payload = SnapshotRegistry::GetFermentationStatus();
-    mModel.setEngineState(payload.heaterEngineState);
+    mModel.setEngineState(payload.fermentationState);
     mModel.setEngineTargetTemperature(payload.targetTemperature);
 }
 
@@ -228,7 +228,7 @@ BehaviourId DebugScreenAbs::Model::getBehaviour() const {
     return mBehaviour; 
 }
 
-HeaterEngineState DebugScreenAbs::Model::getEngineState() const { 
+FermentationState DebugScreenAbs::Model::getEngineState() const { 
     return mEngineState; 
 }
 
@@ -411,7 +411,7 @@ void DebugScreenAbs::Model::setBehaviour(BehaviourId value){
     } 
 }
 
-void DebugScreenAbs::Model::setEngineState(HeaterEngineState value){ 
+void DebugScreenAbs::Model::setEngineState(FermentationState value){ 
     if(mEngineState != value) { 
         mEngineState = value; 
         mScreen.markDirty(Model::Index::FermentationStatus);

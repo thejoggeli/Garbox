@@ -34,15 +34,15 @@ def process_components(config, key, suffix):
 
     for name, component in config[key].items():
 
-        # init 'receives' field
-        component["receives"] = ensure_list(component["receives"])
-        component["receives_all"] = component.get("receives_all", False)
-        if len(component["receives"]) > 0:
-            first_entry = component["receives"][0]
+        # init 'receive_events' field
+        component["receive_events"] = ensure_list(component.get("receive_events", []))
+        component["receive_events_all"] = component.get("receive_events_all", False)
+        if len(component["receive_events"]) > 0:
+            first_entry = component["receive_events"][0]
 
             # insert all event types (N event handlers)
             if first_entry == "INSERT_ALL":
-                component["receives"] = list(config["event_types"].keys())
+                component["receive_events"] = list(config["event_types"].keys())
 
         # init 'tick_phases' field
         component["tick_phases"] = ensure_list(component["tick_phases"])
@@ -58,8 +58,8 @@ def process_components(config, key, suffix):
         for idx, name in enumerate(component["tick_phases"]):
             component["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")  
         
-        # init 'sends' field
-        component["sends"] = ensure_list(component["sends"])
+        # init 'send_events' field
+        component["send_events"] = ensure_list(component.get("send_events", []))
 
         # component name
         component["name"] = name

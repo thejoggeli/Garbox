@@ -23,7 +23,7 @@ def _collect_event_routes(loader: Loader):
         }
     for section in ("controllers", "behaviours", "screens"):
         for key, data in loader.config[section].items():
-            for event in data.get("receives", []):
+            for event in data.get("receive_events", []):
                 event_routes[event][section].add(key)
                 event_routes[event]["count"] += 1
 

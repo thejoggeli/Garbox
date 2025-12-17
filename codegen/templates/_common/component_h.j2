@@ -28,16 +28,16 @@
 
 {# receive events #}
 {% macro on_events(component) %}
-{% if component.receives_all %}
+{% if component.receive_events_all %}
 
     // event handler (to be implmeneted by user)
     virtual void onEvent(const EventHeader* header) = 0;
 
 {% endif %}
-{% if component.receives %}
+{% if component.receive_events %}
 
     // event handlers (to be implmeneted by user)
-{% for ev in component.receives %}
+{% for ev in component.receive_events %}
     virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
 {% endfor %}
 {% endif %}
@@ -46,10 +46,10 @@
 
 {# make events #}
 {% macro make_events(component) %}
-{% if component.sends %}
+{% if component.send_events %}
 
     // make typed events 
-{% for ev in component.sends %}
+{% for ev in component.send_events %}
     {{ ev }}Event make{{ ev }}Event();
 {% endfor %}
 
@@ -59,10 +59,10 @@
 
 {# send events #}
 {% macro send_events(component) %}
-{% if component.sends %}
+{% if component.send_events %}
 
     // send typed events
-{% for ev in component.sends %}
+{% for ev in component.send_events %}
     void sendEvent(const {{ ev }}Event& event);
 {% endfor %}
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/behaviours/abstract/FermentationBehaviourAbs.h"
-#include "app/engine/HeaterEngine.h"
+#include "app/engine/FermentationEngine.h"
 
 namespace Garbox {
 
@@ -26,7 +26,7 @@ private:
     bool mFirstTick = true;
     bool mHeartbeatReceived = false;
 
-    HeaterEngine mHeaterEngine;
+    FermentationEngine mFermentationEngine;
 
     static bool checkTemperatureStatus(const TemperatureStatusPayload& payload);
 

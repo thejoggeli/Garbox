@@ -254,14 +254,14 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         switch(mActiveScreen->getScreenId()){
             case ScreenId::Debug: {
                 DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setEngineState(event->heaterEngineState);
+                model.setEngineState(event->fermentationState);
                 model.setEngineTargetTemperature(event->targetTemperature);
                 break;
             }
             case ScreenId::Main: {
                 MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
                 model.setTargetTemperature(event->targetTemperature);
-                model.setEngineState(event->heaterEngineState);
+                model.setEngineState(event->fermentationState);
                 break;
             }
             default: break; // active screen has no model binding to any field of 'FermentationStatus' event

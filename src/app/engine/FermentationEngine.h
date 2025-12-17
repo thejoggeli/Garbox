@@ -1,16 +1,16 @@
 #pragma once
 
 #include <cstdint>
-#include "app/engine/HeaterEngineState.h"
+#include "app/engine/FermentationState.h"
 #include "core/util/control/PidControl.h"
 #include "core/util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
 
-class HeaterEngine {
+class FermentationEngine {
 public:
 
-    using State = HeaterEngineState;
+    using State = FermentationState;
 
     struct Input {
 
@@ -42,7 +42,7 @@ public:
         float heaterPwmPeriodMicros;
     };
 
-    HeaterEngine();
+    FermentationEngine();
 
     void reset();
     void step();

@@ -1,4 +1,4 @@
-#include "HeaterEngine.h"
+#include "FermentationEngine.h"
 
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
@@ -12,7 +12,7 @@ static constexpr float PidOutputMax = 1.0f;
 
 namespace Garbox {
 
-HeaterEngine::HeaterEngine():
+FermentationEngine::FermentationEngine():
     // init members
     mPid(PidKp, PidKi, PidKd, PidOutputMin, PidOutputMax){
 
@@ -24,14 +24,14 @@ HeaterEngine::HeaterEngine():
     });
 }
 
-void HeaterEngine::reset(){
+void FermentationEngine::reset(){
     mRegulationEnabled = false;
     mTargetTemperatureChanged = false;
     mFsm.reset();
     mPid.reset();
 }
 
-void HeaterEngine::setRegulationEnabled(bool enabled){
+void FermentationEngine::setRegulationEnabled(bool enabled){
     if(enabled == mRegulationEnabled){
         return;
     }
@@ -49,7 +49,7 @@ void HeaterEngine::setRegulationEnabled(bool enabled){
     }
 }
 
-void HeaterEngine::step(){
+void FermentationEngine::step(){
 
     // input tracking
     if(mInput.targetTemperature != mLastTargetTemperature){
@@ -77,7 +77,7 @@ void HeaterEngine::step(){
         handleCooldownState();
         break;
     default:
-        TriggerExit("HeaterEngine", "unhandled state");
+        TriggerExit("FermentationEngine", "unhandled state");
     }
     mFsm.tick();
 
@@ -114,7 +114,7 @@ void HeaterEngine::step(){
         mOutput.fanTargetSpeed = 1.0f;
         break;
     default:
-        TriggerExit("HeaterEngine", "unhandled state");
+        TriggerExit("FermentationEngine", "unhandled state");
     }
 
     // these outputs are the same for all states
@@ -125,13 +125,13 @@ void HeaterEngine::step(){
     mTargetTemperatureChanged = false;
 }
 
-void HeaterEngine::handleResetState(){
+void FermentationEngine::handleResetState(){
     if(mRegulationEnabled){
         mFsm.forceTransition(State::Ready);
     }
 }
 
-void HeaterEngine::handleReadyState(){
+void FermentationEngine::handleReadyState(){
     if(!isInputInvalid()){
         if(isInOverTemperatureZone()){
             mFsm.forceTransition(State::OverTemperature);
@@ -142,7 +142,7 @@ void HeaterEngine::handleReadyState(){
     }
 }
 
-void HeaterEngine::handleRegulatingState(){
+void FermentationEngine::handleRegulatingState(){
     if(isInOverTemperatureZone()){
         mFsm.forceTransition(State::OverTemperature); // turn heatpad off if measured temperature over safety threshold
     }
@@ -156,7 +156,7 @@ void HeaterEngine::handleRegulatingState(){
     }
 }
 
-void HeaterEngine::handleInvalidInputState(){
+void FermentationEngine::handleInvalidInputState(){
     if(isInOverTemperatureZone()){
         mFsm.forceTransition(State::OverTemperature); // turn heatpad off if measured temperature over safety threshold
     }
@@ -168,7 +168,7 @@ void HeaterEngine::handleInvalidInputState(){
     }
 }
 
-void HeaterEngine::handleOverTemperatureState(){
+void FermentationEngine::handleOverTemperatureState(){
     if(!isInOverTemperatureZone()){
         if(mTargetTemperatureChanged){
             mFsm.forceTransition(State::Regulating); // transition immediately if user changed target temperature (and no longer in over-temperature zone) 
@@ -182,13 +182,13 @@ void HeaterEngine::handleOverTemperatureState(){
     }
 }
 
-void HeaterEngine::handleCooldownState(){
+void FermentationEngine::handleCooldownState(){
     if(!isInputInvalid() && (mInput.measuredTemperature < CooldownStateThresholdTemperature)){
         mFsm.forceTransition(State::Reset);
     }
 }
 
-void HeaterEngine::handleFsmStateChanged(State oldState, State newState){
+void FermentationEngine::handleFsmStateChanged(State oldState, State newState){
     switch(newState){
     case State::Reset:
     case State::Ready:
@@ -199,16 +199,16 @@ void HeaterEngine::handleFsmStateChanged(State oldState, State newState){
         mPid.reset();
         break;
     default:
-        TriggerExit("HeaterEngine", "unhandled state");
+        TriggerExit("FermentationEngine", "unhandled state");
     }
 }
 
-bool HeaterEngine::isInOverTemperatureZone() const {
+bool FermentationEngine::isInOverTemperatureZone() const {
     const float overTemperatureThreshold = mInput.targetTemperature + OverTemperatureDelta;
     return (mInput.measuredTemperature > overTemperatureThreshold) && mInput.measuredTemperatureValid;
 }
 
-bool HeaterEngine::isInputInvalid() const {
+bool FermentationEngine::isInputInvalid() const {
     return !mInput.measuredTemperatureValid || !mInput.measuredHumidityValid || mInput.fanStalled; 
 }
 

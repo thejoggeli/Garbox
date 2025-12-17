@@ -136,7 +136,7 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 
 {% set ns = namespace(printed=0) %}
 {% for component in components.values() %}
-    {% if component["receives_all"]: %}
+    {% if component["receive_events_all"]: %}
         {% if ns.printed == 0 %}
     // receive all events
         {% endif %}

@@ -229,7 +229,7 @@ void DebugScreen::onApplyAppInfo(){
 void DebugScreen::onApplyFermentationStatus(){
     mFermentationStatusLabel.setTextFormatted(
         "Eng: s=%s, t=%0.1f°C",
-        HeaterEngineStateToString(model().getEngineState()),
+        FermentationStateToString(model().getEngineState()),
         model().getEngineTargetTemperature()
     );
 }

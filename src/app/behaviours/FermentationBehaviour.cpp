@@ -24,13 +24,13 @@ void FermentationBehaviour::onStart(){
 }
 
 void FermentationBehaviour::onBecomeEnabled(){
-    mHeaterEngine.reset();
-    mHeaterEngine.setRegulationEnabled(true);
+    mFermentationEngine.reset();
+    mFermentationEngine.setRegulationEnabled(true);
     mFirstTick = true;
 }
 
 void FermentationBehaviour::onBecomeDisabled(){
-    mHeaterEngine.reset();
+    mFermentationEngine.reset();
     sendFanCommand(false, 0.0f);
     sendHeatpadCommand(false, 0.0f, 5000_ms);
     sendFermentationStatus();
@@ -41,20 +41,20 @@ void FermentationBehaviour::onLogicTick(){
     const bool temperatureStatusValid = checkTemperatureStatus(SnapshotRegistry::GetTemperatureStatus());
 
     // set control engine input
-    HeaterEngine::Input& input = mHeaterEngine.getInput();
-    input.fanMeasuredRpm = SnapshotRegistry::GetFanSample().measuredRpm;
-    input.fanStalled = SnapshotRegistry::GetFanStatus().state == FanState::Stalled;
-    input.measuredHumidity = SnapshotRegistry::GetTemperatureSample().humidityRelative;
-    input.measuredTemperature = SnapshotRegistry::GetTemperatureSample().temperatureCelcius;
-    input.measuredHumidityValid = temperatureStatusValid;
-    input.measuredTemperatureValid = temperatureStatusValid;
-    input.targetTemperature = 30.0f;
+    FermentationEngine::Input& input      = mFermentationEngine.getInput();
+    input.fanMeasuredRpm            = SnapshotRegistry::GetFanSample().measuredRpm;
+    input.fanStalled                = SnapshotRegistry::GetFanStatus().state == FanState::Stalled;
+    input.measuredHumidity          = SnapshotRegistry::GetTemperatureSample().humidityRelative;
+    input.measuredTemperature       = SnapshotRegistry::GetTemperatureSample().temperatureCelcius;
+    input.measuredHumidityValid     = temperatureStatusValid;
+    input.measuredTemperatureValid  = temperatureStatusValid;
+    input.targetTemperature         = 30.0f;
 
     // perform control engine step
-    mHeaterEngine.step();
+    mFermentationEngine.step();
     
     // send actuator commands
-    const HeaterEngine::Output& output = mHeaterEngine.getOutput();
+    const FermentationEngine::Output& output = mFermentationEngine.getOutput();
     sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
     sendFanCommand(output.fanEnabled, output.fanTargetSpeed);
     sendFermentationStatus();
@@ -95,14 +95,14 @@ void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
 }
 
 void FermentationBehaviour::sendFermentationStatus(){
-    const HeaterEngine::Input& input = mHeaterEngine.getInput();
+    const FermentationEngine::Input& input = mFermentationEngine.getInput();
     if (!mFirstTick &&
-        mLastFermentationStatus.heaterEngineState == mHeaterEngine.getState() &&
+        mLastFermentationStatus.fermentationState == mFermentationEngine.getState() &&
         mLastFermentationStatus.targetTemperature == input.targetTemperature){
         return;
     }
     FermentationStatusEvent event = makeFermentationStatusEvent();
-    event->heaterEngineState = mHeaterEngine.getState();
+    event->fermentationState = mFermentationEngine.getState();
     event->targetTemperature = input.targetTemperature;
     sendEvent(event);
     mLastFermentationStatus = *event.payload();
@@ -137,7 +137,7 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
         // sendEvent(cmd);
     }
     else if(event->newState == ButtonState::PressedLong){
-        mHeaterEngine.setRegulationEnabled(!mHeaterEngine.isRegulationEnabled());
+        mFermentationEngine.setRegulationEnabled(!mFermentationEngine.isRegulationEnabled());
     }
 }
     

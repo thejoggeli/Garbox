@@ -21,15 +21,15 @@ void {{ component.name }}::on{{ tick }}(){
 
 {# receive events #}
 {% macro on_events(component) %}
-{% if component.receives_all %}
+{% if component.receive_events_all %}
 
 void {{ component.name }}::onEvent(const EventHeader* header){
     // nothing to do
 }
 
 {% endif %}
-{% if component.receives %}
-{% for ev in component.receives %}
+{% if component.receive_events %}
+{% for ev in component.receive_events %}
 
 void {{ component.name }}::on{{ ev }}(const {{ ev }}Event& event){
     // nothing to do

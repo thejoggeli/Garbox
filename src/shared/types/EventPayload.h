@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
-#include "app/engine/HeaterEngineState.h"
+#include "app/engine/FermentationState.h"
 #include "modules/parts/button/ButtonState.h"
 #include "modules/parts/fan/FanState.h"
 #include "modules/parts/heatpad/HeatpadState.h"
@@ -50,7 +50,7 @@ struct EncoderStepPayload {
 };
 
 struct FermentationStatusPayload {
-    HeaterEngineState heaterEngineState;
+    FermentationState fermentationState;
     float targetTemperature;
 };
 

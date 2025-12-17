@@ -201,43 +201,43 @@ bool MainScreen::isSensorOk(){
 }
 
 const char* MainScreen::resovleEngineStateText(){
-    const HeaterEngineState state = model().getEngineState();
+    const FermentationState state = model().getEngineState();
 
     switch(state){
-        case HeaterEngineState::Reset:
+        case FermentationState::Reset:
             return "Reset";
-        case HeaterEngineState::Cooldown:
+        case FermentationState::Cooldown:
             return "Off";
-        case HeaterEngineState::Ready:
+        case FermentationState::Ready:
             return "Ready";
-        case HeaterEngineState::Regulating:
+        case FermentationState::Regulating:
             return "Running";
-        case HeaterEngineState::OverTemperature:
+        case FermentationState::OverTemperature:
             return "Overheat";
-        case HeaterEngineState::InvalidInput:
+        case FermentationState::InvalidInput:
             return "Error #2";
-        case HeaterEngineState::Null:
+        case FermentationState::Null:
             return "Error #0";
-        case HeaterEngineState::Count:
+        case FermentationState::Count:
         default:
             return "Error #1";
     }
 }
 
 uint32_t MainScreen::resovleEngineStateColor(){
-    const HeaterEngineState state = model().getEngineState();
+    const FermentationState state = model().getEngineState();
 
     switch(state){
-        case HeaterEngineState::Cooldown:
+        case FermentationState::Cooldown:
             return ColorBlue; // blue
-        case HeaterEngineState::Reset:
-        case HeaterEngineState::Ready:
-        case HeaterEngineState::Regulating:
+        case FermentationState::Reset:
+        case FermentationState::Ready:
+        case FermentationState::Regulating:
             return ColorGreen; // green
-        case HeaterEngineState::OverTemperature:
-        case HeaterEngineState::InvalidInput:
-        case HeaterEngineState::Null:
-        case HeaterEngineState::Count:
+        case FermentationState::OverTemperature:
+        case FermentationState::InvalidInput:
+        case FermentationState::Null:
+        case FermentationState::Count:
         default:
             return ColorRed; // red
     }
@@ -339,11 +339,11 @@ void MainScreen::onApplyMeasuredHumidity(){
 }
 
 void MainScreen::onApplyTargetTemperature(){
-    // HeaterEngineState state = model().getEngineState();
+    // FermentationState state = model().getEngineState();
     // switch(state){
-    //     case HeaterEngineState::Ready:
-    //     case HeaterEngineState::Regulating:
-    //     case HeaterEngineState::OverTemperature: {
+    //     case FermentationState::Ready:
+    //     case FermentationState::Regulating:
+    //     case FermentationState::OverTemperature: {
     //         gui().statusTemperature.value.setTextFormatted("%.1f", model().getTargetTemperature());
     //         // gui().statusTemperature.unit.setHidden(false);            
     //         break;

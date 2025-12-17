@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-enum class HeaterEngineState : uint8_t {
+enum class FermentationState : uint8_t {
     Null = 0,
     Reset,
     Ready, // awainting input
@@ -15,6 +15,6 @@ enum class HeaterEngineState : uint8_t {
     Count 
 };
 
-const char* HeaterEngineStateToString(HeaterEngineState id);
+const char* FermentationStateToString(FermentationState id);
 
 } // namespace

@@ -1,0 +1,53 @@
+states:
+
+  DisplayStatus:
+    fields: 
+      - { name: Brightness, type: float }
+
+  DisplayDiagnostics:
+    fields: 
+      - { name: SkippedFrames, type: uint32_t }
+
+  FanStatus:
+    include: "modules/parts/fan/FanState.h"
+    fields:
+      - { name: State, type: FanState }
+      - { name: TargetSpeed, type: float }
+      - { name: RpmControl, type: bool } # DutyCycle or RPM
+
+  FanSample:
+    fields:
+      - { name: MeasuredRpm, type: float }
+
+  FermentationStatus:
+    include: "app/engine/FermentationState.h"
+    fields:
+      - { name: State, type: FermentationState }
+      - { name: TargetTemperature, type: float }
+
+  HeatpadStatus:
+    include: "modules/parts/heatpad/HeatpadState.h"
+    fields:
+      - { name: state, type: HeatpadState }
+      - { name: currentDutyCycle, type: float }
+      - { name: currentPeriodMicros, type: uint32_t }
+      - { name: nextDutyCycle, type: float }
+      - { name: nextPeriodMicros, type: uint32_t }
+
+  HeatpadSample:
+    fields:
+      - { name: measuredVoltage, type: float }
+      - { name: measuredCurrent, type: float }
+      - { name: pwmProgressMicros, type: float }
+
+  TemperatureStatus:
+    fields:
+      - { name: driverEnabled, type: bool }
+      - { name: powerEnabled, type: bool }
+      - { name: resetting, type: bool }
+      - { name: hasFirstSample, type: bool }
+
+  TemperatureSample:
+    fields:
+      - { name: temperatureCelcius, type: float }
+      - { name: humidityRelative, type: float }

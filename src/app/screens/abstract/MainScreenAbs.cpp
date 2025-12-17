@@ -113,7 +113,7 @@ void MainScreenAbs::setSnapshotTemperatureSample(){
 void MainScreenAbs::setSnapshotFermentationStatus(){
     const FermentationStatusPayload& payload = SnapshotRegistry::GetFermentationStatus();
     mModel.setTargetTemperature(payload.targetTemperature);
-    mModel.setEngineState(payload.heaterEngineState);
+    mModel.setEngineState(payload.fermentationState);
 }
 
 MainScreenAbs::Model::Model(MainScreenAbs& screen) : mScreen(screen){ 
@@ -180,7 +180,7 @@ float MainScreenAbs::Model::getTargetTemperature() const {
     return mTargetTemperature; 
 }
 
-HeaterEngineState MainScreenAbs::Model::getEngineState() const { 
+FermentationState MainScreenAbs::Model::getEngineState() const { 
     return mEngineState; 
 }
 
@@ -299,7 +299,7 @@ void MainScreenAbs::Model::setTargetTemperature(float value){
     } 
 }
 
-void MainScreenAbs::Model::setEngineState(HeaterEngineState value){ 
+void MainScreenAbs::Model::setEngineState(FermentationState value){ 
     if(mEngineState != value) { 
         mEngineState = value; 
         mScreen.markDirty(Model::Index::EngineState);

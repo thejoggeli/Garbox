@@ -1,6 +1,6 @@
 event_payloads:
   include_h: [
-    "app/engine/HeaterEngineState.h",
+    "app/engine/FermentationState.h",
     "modules/parts/button/ButtonState.h",
     "modules/parts/fan/FanState.h",
     "modules/parts/heatpad/HeatpadState.h"
@@ -51,7 +51,7 @@ event_types:
   FermentationStatus:
     kind: snapshot
     fields:
-      - { name: heaterEngineState, type: HeaterEngineState }
+      - { name: fermentationState, type: FermentationState }
       - { name: targetTemperature, type: float }
 
   DisplayStatus:

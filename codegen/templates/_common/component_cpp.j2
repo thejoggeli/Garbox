@@ -8,8 +8,8 @@
 
 {# make events #}
 {% macro make_events(name, component) %}
-{% if component.sends %}
-{% for ev in component.sends %}
+{% if component.send_events %}
+{% for ev in component.send_events %}
 
 {{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
     return ComponentAbs::makeEvent<EventType::{{ ev }}>();
@@ -21,8 +21,8 @@
 
 {# send events #}
 {% macro send_events(name, component) %}
-{% if component.sends %}
-{% for ev in component.sends %}
+{% if component.send_events %}
+{% for ev in component.send_events %}
 
 void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
     publishEvent(event.header());

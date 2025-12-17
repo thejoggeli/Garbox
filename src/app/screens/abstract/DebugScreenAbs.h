@@ -122,7 +122,7 @@ public:
         uint32_t getTimeSeconds() const;
         uint32_t getEventCount() const;
         BehaviourId getBehaviour() const;
-        HeaterEngineState getEngineState() const;
+        FermentationState getEngineState() const;
         float getEngineTargetTemperature() const;
         uint32_t getHeapAllocatedBlocks() const;
         uint32_t getHeapFreeBlocks() const;
@@ -154,7 +154,7 @@ public:
         void setTimeSeconds(uint32_t value);
         void setEventCount(uint32_t value);
         void setBehaviour(BehaviourId value);
-        void setEngineState(HeaterEngineState value);
+        void setEngineState(FermentationState value);
         void setEngineTargetTemperature(float value);
         void setHeapAllocatedBlocks(uint32_t value);
         void setHeapFreeBlocks(uint32_t value);
@@ -190,7 +190,7 @@ public:
         uint32_t mTimeSeconds;
         uint32_t mEventCount;
         BehaviourId mBehaviour;
-        HeaterEngineState mEngineState;
+        FermentationState mEngineState;
         float mEngineTargetTemperature;
         uint32_t mHeapAllocatedBlocks;
         uint32_t mHeapFreeBlocks;

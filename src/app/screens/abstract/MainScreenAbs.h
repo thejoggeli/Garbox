@@ -109,7 +109,7 @@ public:
         float getMeasuredTemperature() const;
         float getMeasuredHumidity() const;
         float getTargetTemperature() const;
-        HeaterEngineState getEngineState() const;
+        FermentationState getEngineState() const;
 
         // setters 
         void setFanState(FanState value);
@@ -127,7 +127,7 @@ public:
         void setMeasuredTemperature(float value);
         void setMeasuredHumidity(float value);
         void setTargetTemperature(float value);
-        void setEngineState(HeaterEngineState value);
+        void setEngineState(FermentationState value);
 
     private: 
 
@@ -149,7 +149,7 @@ public:
         float mMeasuredTemperature;
         float mMeasuredHumidity;
         float mTargetTemperature;
-        HeaterEngineState mEngineState;
+        FermentationState mEngineState;
 
     };
 

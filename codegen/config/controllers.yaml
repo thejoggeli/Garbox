@@ -3,42 +3,42 @@ controllers:
   DisplayController:
     subdir: "hmi"
     tick_phases: Render
-    receives: [DisplayCommand]
-    sends: [DisplayStatus]
+    receive_events: [DisplayCommand]
+    send_events: [DisplayStatus]
+    write_states: [DisplayStatus, DisplayDiagnostics]
 
   DevtoolsController:
     subdir: "devtools"
-    tick_phases: [Logging]
-    receives: null
-    sends: null
+    tick_phases: Logging
 
   FanController:
     subdir: "actuators"
     tick_phases: [Input, Output]
-    receives: [FanCommand]
-    sends: [FanStatus, FanSample]
+    receive_events: [FanCommand]
+    send_events: [FanStatus, FanSample]
+    write_states: [FanStatus, FanSample]
 
   HeartbeatController:
     subdir: "heartbeat"
-    tick_phases: [Heartbeat]
-    receives: null
-    sends: [Heartbeat]
+    tick_phases: Heartbeat
+    send_events: Heartbeat
 
   HeatpadController:
     subdir: "actuators"
     tick_phases: [Input, Output]
-    receives: [HeatpadCommand]
-    sends: [HeatpadStatus, HeatpadSample]
+    receive_events: [HeatpadCommand]
+    send_events: [HeatpadStatus, HeatpadSample]
+    write_states: [HeatpadStatus, HeatpadSample]
 
   InputController:
     subdir: "hmi"
     tick_phases: [Input]
-    receives: null
-    sends: [ButtonStateChanged, ButtonRepeat, EncoderStep]
+    send_events: [ButtonStateChanged, ButtonRepeat, EncoderStep]
 
   I2cPartsController:
     subdir: "sensors"
     tick_phases: [Input]
-    receives: [ButtonStateChanged]
-    sends: [TemperatureStatus, TemperatureSample]
+    receive_events: [ButtonStateChanged]
+    send_events: [TemperatureStatus, TemperatureSample]
+    write_states: [TemperatureStatus, TemperatureSample]
 

@@ -5,8 +5,8 @@ screens:
     use_lvgl: true
     gui_filename: MainScreen.xml
     tick_phases: null
-    receives: [DisplayCommand, FanCommand, HeatpadCommand]
-    sends: null
+    receive_events: [DisplayCommand, FanCommand, HeatpadCommand]
+    send_events: null
     model:
       fields:
         - { name: fanState,               bind: FanStatus->state,       group: FanStatus, dirty: fanTargetSpeed }
@@ -24,14 +24,14 @@ screens:
         - { name: measuredTemperature,    bind: TemperatureSample->temperatureCelcius }
         - { name: measuredHumidity,       bind: TemperatureSample->humidityRelative }
         - { name: targetTemperature,      bind: FermentationStatus->targetTemperature }
-        - { name: engineState,            bind: FermentationStatus->heaterEngineState, dirty: targetTemperature}
+        - { name: engineState,            bind: FermentationStatus->fermentationState, dirty: targetTemperature}
 
   Debug:
     subdir: debug
     use_lvgl: true
     tick_phases: null
-    receives: null
-    sends: 
+    receive_events: null
+    send_events: 
       - DisplayCommand
     model:
       fields:
@@ -56,7 +56,7 @@ screens:
         - { name: timeSeconds,                type: uint32_t,                                 group: Time }
         - { name: eventCount,                 type: uint32_t,                                 group: AppInfo }
         - { name: behaviour,                  bind: ActiveBehaviourChanged->newBehaviour,     group: AppInfo }
-        - { name: engineState,                bind: FermentationStatus->heaterEngineState,    group: FermentationStatus }
+        - { name: engineState,                bind: FermentationStatus->fermentationState,    group: FermentationStatus }
         - { name: engineTargetTemperature,    bind: FermentationStatus->targetTemperature,    group: FermentationStatus }
         - { name: heapAllocatedBlocks,        type: uint32_t,                                 group: HeapBlocks}
         - { name: heapFreeBlocks,             type: uint32_t,                                 group: HeapBlocks}
@@ -70,6 +70,6 @@ screens:
     subdir: eventlog
     use_lvgl: true
     tick_phases: null
-    receives: null
-    receives_all: true
-    sends: null
+    receive_events: null
+    receive_events_all: true
+    send_events: null
