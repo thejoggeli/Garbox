@@ -26,11 +26,11 @@ void HeatpadControllerAbs::sendEvent(const HeatpadSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-HeatpadStatusState& HeatpadControllerAbs::writeHeatpadStatusState(){
+HeatpadStatusState& HeatpadControllerAbs::stateHeatpadStatus(){
     return *mHeatpadStatusState;
 }
 
-HeatpadSampleState& HeatpadControllerAbs::writeHeatpadSampleState(){
+HeatpadSampleState& HeatpadControllerAbs::stateHeatpadSample(){
     return *mHeatpadSampleState;
 }
 

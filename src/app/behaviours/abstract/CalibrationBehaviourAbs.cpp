@@ -18,11 +18,11 @@ void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
     sendEventToHost(event.header());
 }
 
-const FanStatusState& CalibrationBehaviourAbs::readFanStatusState(){
+const FanStatusState& CalibrationBehaviourAbs::stateFanStatus(){
     return *mFanStatusState;
 }
 
-const FanSampleState& CalibrationBehaviourAbs::readFanSampleState(){
+const FanSampleState& CalibrationBehaviourAbs::stateFanSample(){
     return *mFanSampleState;
 }
 

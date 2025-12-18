@@ -18,11 +18,11 @@ void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
     sendEventToHost(event.header());
 }
 
-DisplayStatusState& DisplayControllerAbs::writeDisplayStatusState(){
+DisplayStatusState& DisplayControllerAbs::stateDisplayStatus(){
     return *mDisplayStatusState;
 }
 
-DisplayDiagnosticsState& DisplayControllerAbs::writeDisplayDiagnosticsState(){
+DisplayDiagnosticsState& DisplayControllerAbs::stateDisplayDiagnostics(){
     return *mDisplayDiagnosticsState;
 }
 

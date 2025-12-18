@@ -36,8 +36,8 @@ protected:
     void sendEvent(const HeatpadSampleEvent& event);
 
     // get writable states
-    HeatpadStatusState& writeHeatpadStatusState();
-    HeatpadSampleState& writeHeatpadSampleState();
+    HeatpadStatusState& stateHeatpadStatus();
+    HeatpadSampleState& stateHeatpadSample();
 
 private:
 

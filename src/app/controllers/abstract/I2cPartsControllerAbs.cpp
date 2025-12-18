@@ -26,11 +26,11 @@ void I2cPartsControllerAbs::sendEvent(const TemperatureSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-TemperatureStatusState& I2cPartsControllerAbs::writeTemperatureStatusState(){
+TemperatureStatusState& I2cPartsControllerAbs::stateTemperatureStatus(){
     return *mTemperatureStatusState;
 }
 
-TemperatureSampleState& I2cPartsControllerAbs::writeTemperatureSampleState(){
+TemperatureSampleState& I2cPartsControllerAbs::stateTemperatureSample(){
     return *mTemperatureSampleState;
 }
 

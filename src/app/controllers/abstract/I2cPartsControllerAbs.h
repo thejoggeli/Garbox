@@ -35,8 +35,8 @@ protected:
     void sendEvent(const TemperatureSampleEvent& event);
 
     // get writable states
-    TemperatureStatusState& writeTemperatureStatusState();
-    TemperatureSampleState& writeTemperatureSampleState();
+    TemperatureStatusState& stateTemperatureStatus();
+    TemperatureSampleState& stateTemperatureSample();
 
 private:
 

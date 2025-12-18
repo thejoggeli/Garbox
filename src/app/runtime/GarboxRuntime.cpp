@@ -175,6 +175,37 @@ void GarboxRuntime::handleRenderTick(){
 
 void GarboxRuntime::onRouteStateChanged(const StateAbs& state){
     
+    switch(state.type()){
+    case StateType::DisplayStatus: break;
+    case StateType::DisplayDiagnostics: break;
+    case StateType::FanStatus: {
+        const FanStatusState& fanStatus = static_cast<const FanStatusState&>(state);
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatusStateChanged(fanStatus); break;
+            default: break; // active behaviour does not read state
+        }
+        break;
+    }
+    case StateType::FanSample: {
+        const FanSampleState& fanSample = static_cast<const FanSampleState&>(state);
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSampleStateChanged(fanSample); break;
+            default: break; // active behaviour does not read state
+        }
+        break;
+    }
+    case StateType::FermentationStatus: break;
+    case StateType::HeatpadStatus: break;
+    case StateType::HeatpadSample: break;
+    case StateType::TemperatureStatus: break;
+    case StateType::TemperatureSample: break;
+    case StateType::ActiveBehaviour: break;
+    case StateType::ActiveScreen: break;
+    case StateType::Null:
+    case StateType::Count:
+        TriggerDebug("GarboxRuntime", "invalid state type");
+        break;
+    }
 }
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){

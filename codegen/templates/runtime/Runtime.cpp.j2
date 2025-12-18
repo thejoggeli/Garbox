@@ -158,6 +158,42 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
 
 void {{ RuntimeName }}::onRouteStateChanged(const StateAbs& state){
     
+    switch(state.type()){
+{% for state in states.values() %}
+    {% if state["readers"]["components"] %}
+    case StateType::{{ state["name"]}}: {
+        {% set fn_call = "on" ~ state["name"]|upper_first ~ "StateChanged(" ~ state["name"]|lower_first ~ ")" %}
+        const {{ state["name_with_suffix"]|upper_first }}& {{ state["name"]|lower_first }} = static_cast<const {{ state["name_with_suffix"]|upper_first }}&>(state);
+        {% for ctrl_name, ctrl_data in state["readers"]["controllers"].items() %}
+        m{{ ctrl_name }}.{{ fn_call }};
+        {% endfor %}
+        {% if state["readers"]["behaviours"] %}
+        switch(mActiveBehaviour->getBehaviourId()){
+            {% for beha in state["readers"]["behaviours"].keys() %}
+            case BehaviourId::{{ beha.removesuffix("Behaviour") }}: static_cast<{{ beha }}*>(mActiveBehaviour)->{{ fn_call }}; break;
+            {% endfor %}
+            default: break; // active behaviour does not read state
+        }
+        {% endif %}
+        {% if state["readers"]["screens"] %}
+        switch(mActiveScreen->getScreenId()){
+            {% for screen in readers["screens"]["screens"].keys() %}
+            case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ fn_call }}; break;
+            {% endfor %}
+            default: break; // active screen does not read state 
+        }
+        {% endif %}
+        break;
+    }
+    {% else %}
+    case StateType::{{ state["name"]}}: break;
+    {% endif %}
+{% endfor %}
+    case StateType::Null:
+    case StateType::Count:
+        TriggerDebug("{{ RuntimeName }}", "invalid state type");
+        break;
+    }
 }
 
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){

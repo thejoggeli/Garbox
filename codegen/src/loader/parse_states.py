@@ -40,4 +40,10 @@ def parse_states(config: dict):
             "meta": state_meta,
             "fields": parsed_fields,
             "writer": state_data.get("writer", None),
+            "readers": {
+                "components": {},
+                "controllers": {},
+                "behaviours": {},
+                "screens": {},
+            },
         }

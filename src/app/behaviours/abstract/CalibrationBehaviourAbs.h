@@ -39,8 +39,8 @@ protected:
     void sendEvent(const FanCommandEvent& event);
 
     // get readable states
-    const FanStatusState& readFanStatusState();
-    const FanSampleState& readFanSampleState();
+    const FanStatusState& stateFanStatus();
+    const FanSampleState& stateFanSample();
 
 private:
 

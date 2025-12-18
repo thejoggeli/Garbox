@@ -33,8 +33,8 @@ protected:
     void sendEvent(const DisplayStatusEvent& event);
 
     // get writable states
-    DisplayStatusState& writeDisplayStatusState();
-    DisplayDiagnosticsState& writeDisplayDiagnosticsState();
+    DisplayStatusState& stateDisplayStatus();
+    DisplayDiagnosticsState& stateDisplayDiagnostics();
 
 private:
 

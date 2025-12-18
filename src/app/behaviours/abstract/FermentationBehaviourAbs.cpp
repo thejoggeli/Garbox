@@ -42,7 +42,7 @@ void FermentationBehaviourAbs::sendEvent(const FermentationStatusEvent& event){
     sendEventToHost(event.header());
 }
 
-FermentationStatusState& FermentationBehaviourAbs::writeFermentationStatusState(){
+FermentationStatusState& FermentationBehaviourAbs::stateFermentationStatus(){
     return *mFermentationStatusState;
 }
 

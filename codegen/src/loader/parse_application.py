@@ -32,7 +32,9 @@ def process_components(config, key, suffix):
 
     config[key] = ensure_dict_keys_have_suffix(config[key], suffix)
 
-    for name, component in config[key].items():
+    for component_name, component in config[key].items():
+
+        print(component_name)
 
         # init 'receive_events' field
         component["receive_events"] = ensure_list(component.get("receive_events", []))
@@ -87,9 +89,11 @@ def process_components(config, key, suffix):
                 raise ValueError(f"a given state can only be either in read_states or write_states, not both:  '{state_name}'")
             component["read_states"][state_name] = states[state_name]
             component["all_states"][state_name] = states[state_name]
+            states[state_name]["readers"]["components"][component_name] = component
+            states[state_name]["readers"][key][component_name] = component
 
         # component name
-        component["name"] = name
+        component["name"] = component_name
         
 
 def process_tick_phases(config):

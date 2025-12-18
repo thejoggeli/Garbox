@@ -105,6 +105,50 @@ void FanController::onFanCommandEvent(const FanCommandEvent& event){
     }
 }
 
+/*
+void FanController::onFanCommandEvent(const FanCommandEvent& event){
+    
+    // apply enabled
+    if(mFan.isEnabled() != event->enabled){
+        mFan.setEnabled(event->enabled);
+        if(!event->enabled){
+            mPid.reset(); // reset pid when disabling fan
+            mTargetSpeed = 0.0f;
+        }
+        stateFanStatus().setState(mFan.getState());
+    }
+
+    // apply use pid
+    if(event->enableRpmControl != mUsePid){
+        mUsePid = event->enableRpmControl;
+        if(!mUsePid){
+            mPid.reset(); // reset pid when leaving pid mode 
+        }
+        stateFanStatus().setRpmControl(mUsePid);
+    }
+
+    // apply target speed only if fan enabled
+    if(event->enabled && (event->targetSpeed != mTargetSpeed)){
+        mTargetSpeed = event->targetSpeed;
+        if(!mUsePid){
+            mFan.setTargetSpeed(mTargetSpeed);
+        }
+        stateFanStatus().setTargetSpeed(mFan.getTargetSpeed());
+    }
+
+    // set status led
+    if(stateFanStatus().isDirty()){
+        if(mFan.isEnabled()){
+            float brightness = MathUtils::Map(mTargetSpeed, 0.4f, 1.0f, 0.25f, 1.0f);
+            mStatusLed.setBrightnessSmooth(brightness, 500_ms);
+        }
+        else {
+            mStatusLed.setBrightnessSmooth(0.0f, 500_ms);
+        }
+    }
+}
+*/
+
 void FanController::handleFanStateChanged(FanState oldState, FanState newState){
     mStateChanged = true;
 }

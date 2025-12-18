@@ -26,11 +26,11 @@ void FanControllerAbs::sendEvent(const FanSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-FanStatusState& FanControllerAbs::writeFanStatusState(){
+FanStatusState& FanControllerAbs::stateFanStatus(){
     return *mFanStatusState;
 }
 
-FanSampleState& FanControllerAbs::writeFanSampleState(){
+FanSampleState& FanControllerAbs::stateFanSample(){
     return *mFanSampleState;
 }
 

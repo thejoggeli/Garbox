@@ -41,7 +41,7 @@ protected:
     void sendEvent(const FermentationStatusEvent& event);
 
     // get writable states
-    FermentationStatusState& writeFermentationStatusState();
+    FermentationStatusState& stateFermentationStatus();
 
 private:
 

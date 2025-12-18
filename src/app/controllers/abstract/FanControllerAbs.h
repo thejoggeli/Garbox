@@ -36,8 +36,8 @@ protected:
     void sendEvent(const FanSampleEvent& event);
 
     // get writable states
-    FanStatusState& writeFanStatusState();
-    FanSampleState& writeFanSampleState();
+    FanStatusState& stateFanStatus();
+    FanSampleState& stateFanSample();
 
 private:
 
