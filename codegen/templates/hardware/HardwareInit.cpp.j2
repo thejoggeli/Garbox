@@ -2,7 +2,7 @@
 #include "HardwareInit.h"
 #include "core/assert/Assert.h"
 {% for name in init %}
-#include "app/hardware/{{ name }}.h"
+#include "app/generated/hardware/{{ name }}.h"
 {% endfor %}
 
 namespace Garbox {

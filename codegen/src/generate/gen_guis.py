@@ -85,8 +85,8 @@ def _generate_classes(ctx: Context, loader: Loader):
             "type_to_class_name": _type_to_class_name_map(gui_data),
         }
 
-        out_path_h   = ctx.app_dir/f"guis/{gui_name}Gui.h" 
-        out_path_cpp = ctx.app_dir/f"guis/{gui_name}Gui.cpp" 
+        out_path_h   = ctx.gen_dir/f"guis/{gui_name}Gui.h" 
+        out_path_cpp = ctx.gen_dir/f"guis/{gui_name}Gui.cpp" 
 
         items.append(Item(config, "*", out_path_h,   "gui/gui.h.j2"))
         items.append(Item(config, "*", out_path_cpp, "gui/gui.cpp.j2"))

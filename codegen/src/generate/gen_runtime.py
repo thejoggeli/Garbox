@@ -37,7 +37,7 @@ def _collect_event_routes(loader: Loader):
 def _collect_paths(loader: Loader, type: str):
     paths = []
     for key, data in loader.config[type].items():
-        path = Path(f"app/{type}")
+        path = Path(f"app/components/{type}")
         if("subdir" in data): 
             path = path / data["subdir"]
         paths.append(path / key)
@@ -52,8 +52,7 @@ def _generate_runtime(ctx: Context, loader: Loader):
     """
 
     # Output paths
-    app_name = loader.config["application"]["app_name"]
-    out_base = ctx.app_dir / f"runtime/{app_name}Runtime"
+    out_base = ctx.gen_dir / f"runtime/Runtime"
 
     # Aggregate runtime data
     runtime_dict = {
@@ -81,8 +80,8 @@ def _generate_runtime(ctx: Context, loader: Loader):
 def _generate_snapshot_registry(ctx: Context, loader: Loader):
     """
     Generates 
-    - app/runtime/SnapshotRegistry.h
-    - app/runtime/SnapshotRegistry.cpp
+    - app/generated/runtime/SnapshotRegistry.h
+    - app/generated/runtime/SnapshotRegistry.cpp
     """
 
     # filter only events with kind='snapshot'
@@ -94,8 +93,8 @@ def _generate_snapshot_registry(ctx: Context, loader: Loader):
     }
         
     items = [
-        Item(registry_dict, "*", ctx.app_dir/"runtime/SnapshotRegistry.h",   "runtime/SnapshotRegistry.h.j2"),
-        Item(registry_dict, "*", ctx.app_dir/"runtime/SnapshotRegistry.cpp", "runtime/SnapshotRegistry.cpp.j2"),
+        Item(registry_dict, "*", ctx.gen_dir/"runtime/SnapshotRegistry.h",   "runtime/SnapshotRegistry.h.j2"),
+        Item(registry_dict, "*", ctx.gen_dir/"runtime/SnapshotRegistry.cpp", "runtime/SnapshotRegistry.cpp.j2"),
     ]
 
     generate_items(ctx, items)

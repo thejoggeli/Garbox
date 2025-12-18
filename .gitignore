@@ -9,8 +9,8 @@ __pycache__
 codegen/output/
 
 src/app/controlers/abstract/
-src/app/behaviours/abstract/
-src/app/screens/abstract/
+src/app/generated/behaviours/
+src/app/generated/screens/
 
 res/
 src/bin/

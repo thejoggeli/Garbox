@@ -9,24 +9,22 @@ def generate_components(ctx: Context, loader: Loader):
     Generate all component files.
 
     # For each Behaviour:
-    - app/behaviour/abstract/<Name>BehaviourAbs.h
-    - app/behaviour/abstract/<Name>BehaviourAbs.cpp
-    - godecen/stubs/behaviour/<Name>Behaviour.h
-    - godecen/stubs/behaviour/<Name>Behaviour.cpp
+    - app/generated/behaviour/Name>BehaviourAbs.h
+    - app/generated/behaviour/Name>BehaviourAbs.cpp
+    - godecen/output/stubs/behaviour/<Name>Behaviour.h
+    - godecen/output/stubs/behaviour/<Name>Behaviour.cpp
     
     # For each Controller:
-    - app/controller/abstract/<Name>ControllerAbs.h
-    - app/controller/abstract/<Name>ControllerAbs.cpp
-    - godecen/stubs/controller/<Name>Controller.h
-    - godecen/stubs/controller/<Name>Controller.cpp
+    - app/generated/controller/<Name>ControllerAbs.h
+    - app/generated/controller/<Name>ControllerAbs.cpp
+    - godecen/output/stubs/controller/<Name>Controller.h
+    - godecen/output/stubs/controller/<Name>Controller.cpp
     
-    # Types:
-    - shared/types/ComponentId.h
-    - shared/types/ComponentId.cpp
-    - shared/types/BehaviourId.h
-    - shared/types/BehaviourId.cpp
-    - shared/types/ControllerId.h
-    - shared/types/ControllerId.cpp
+    # For each Screen:
+    - app/generated/screen/<Name>ScreenAbs.h
+    - app/generated/screen/<Name>ScreenAbs.cpp
+    - godecen/output/stubs/screen/<Name>Screen.h
+    - godecen/output/stubs/screen/<Name>Screen.cpp
 
     """
 
@@ -50,19 +48,19 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
     items = []
     stubs = []
     for comp_key, comp_dict in components.items():
-        out_path = ctx.app_dir /  f"{type_key}s/abstract/{comp_key}Abs"
+        out_path = ctx.gen_dir /  f"{type_key}s/{comp_key}Abs"
         template_path = f"components/{type_key}/{type_name}Abs"
         item_dict = {
             "name": comp_key,
-            "runtime_name": loader.config["application"]["app_name"] + "Runtime",
+            "runtime_name": "Runtime",
             f"{type_key}": comp_dict
         }
         comp_dict["name"] = comp_key
-        # generate abstract files, e.g. app/controller/abstract/FanControllerAbs.h
+        # generate abstract files, e.g. app/generated/controllers/FanControllerAbs.h
         items.append(Item(item_dict, "*", f"{out_path}.h", f"{template_path}.h.j2"))
         items.append(Item(item_dict, "*", f"{out_path}.cpp", f"{template_path}.cpp.j2"))
 
-        # generate stub files, e.g. codegen/stubs/controller/ExampleFanController.hy
+        # generate stub files, e.g. codegen/output/stubs/controllers/ExampleFanController.hy
         path_parts = [ctx.stubs_dir, f"{type_key}s/", comp_dict.get("subdir", ""), f"{stubs_prefix}{comp_key}{stubs_suffix}"]
         out_path = Path(*path_parts)
         template_path = f"components/{type_key}/{type_name}Stub"

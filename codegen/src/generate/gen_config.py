@@ -7,9 +7,9 @@ from loader.loader import Loader
 
 def generate_config(ctx: Context, loader: Loader):
 
-    filename = f"{loader.config['application']['app_name']}Config"
+    filename = f"GeneratedConfig"
 
     items = [
-        Item(loader.config, "application", ctx.app_dir/f"config/{filename}.h",  "config/Config.h.j2"),
+        Item(loader.config, "application", ctx.gen_dir/f"config/{filename}.h",  "config/Config.h.j2"),
     ]
     generate_items(ctx, items)

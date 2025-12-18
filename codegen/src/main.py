@@ -4,7 +4,7 @@ from common.context import Context
 from loader.loader import Loader
 from generate.gen_runtime import generate_runtime
 from generate.gen_hardware import generate_hardware
-from generate.gen_types import generate_types
+from generate.gen_shared import generate_shared
 from generate.gen_states import generate_states
 from generate.gen_components import generate_components
 from generate.gen_config import generate_config
@@ -26,6 +26,7 @@ def main():
         templates_dir = (codegen_dir / "templates"),
         res_dir       = (root_dir    / "res"),
         app_dir       = (root_dir    / "src/app"),
+        gen_dir       = (root_dir    / "src/app/generated"),
         bin_dir       = (root_dir    / "src/bin"),
         shared_dir    = (root_dir    / "src/shared")
     )
@@ -45,9 +46,9 @@ def main():
     print_section("generating hardware files")
     generate_hardware(ctx, loader)
 
-    # types generation
-    print_section("generating types files")
-    generate_types(ctx, loader)
+    # shared generation
+    print_section("generating shared files")
+    generate_shared(ctx, loader)
 
     # states generation
     print_section("generating state files")

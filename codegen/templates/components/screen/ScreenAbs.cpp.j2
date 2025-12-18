@@ -3,7 +3,7 @@
 #include "{{ name }}Abs.h"
 #include <math.h>
 {% if screen.use_model %}
-#include "app/runtime/SnapshotRegistry.h"
+#include "app/generated/runtime/SnapshotRegistry.h"
 {% endif %}
 {% if screen.use_lvgl %}
 #include "core/lvgl/LvglProvider.h"

@@ -8,9 +8,10 @@ class Context:
     config_dir:     Path
     output_dir:     Path
     templates_dir:  Path
-    res_dir:        Path
     app_dir:        Path
+    gen_dir:        Path
     bin_dir:        Path
+    res_dir:        Path
     shared_dir:     Path
     stubs_dir:      Path
 
@@ -24,6 +25,7 @@ class Context:
         templates_dir, 
         res_dir, 
         app_dir, 
+        gen_dir, 
         bin_dir, 
         shared_dir, 
         stubs_dir):
@@ -33,8 +35,9 @@ class Context:
         self.config_dir     = Path(config_dir).resolve().relative_to(root_dir)
         self.output_dir     = Path(output_dir).resolve().relative_to(root_dir)
         self.templates_dir  = Path(templates_dir).resolve().relative_to(root_dir)
-        self.bin_dir        = Path(bin_dir).resolve().relative_to(root_dir)
         self.app_dir        = Path(app_dir).resolve().relative_to(root_dir)
+        self.gen_dir        = Path(gen_dir).resolve().relative_to(root_dir)
+        self.bin_dir        = Path(bin_dir).resolve().relative_to(root_dir)
         self.res_dir        = Path(res_dir).resolve().relative_to(root_dir)
         self.shared_dir     = Path(shared_dir).resolve().relative_to(root_dir)
         self.stubs_dir      = Path(stubs_dir).resolve().relative_to(root_dir)
@@ -49,6 +52,7 @@ class Context:
         print(f"templates  => {self.templates_dir}")
         print(f"bin        => {self.bin_dir}")
         print(f"app        => {self.app_dir}")
+        print(f"gen        => {self.gen_dir}")
         print(f"res        => {self.res_dir}")
         print(f"shared_dir => {self.shared_dir}")
         print(f"stubs_dir  => {self.stubs_dir}")

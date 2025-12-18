@@ -1,8 +1,8 @@
 {% include "_common/header.j2" %}
-{% set RuntimeName = application.app_name ~ 'Runtime' %}
+{% set RuntimeName = 'Runtime' %}
 #include "{{ RuntimeName }}.h"
 
-#include "app/runtime/SnapshotRegistry.h"
+#include "app/generated/runtime/SnapshotRegistry.h"
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/time/Time.h"

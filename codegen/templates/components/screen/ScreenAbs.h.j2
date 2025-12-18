@@ -2,7 +2,7 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_h.j2" import constructor, on_ticks, on_events, on_states_changed, make_events, send_events, hide_events, states_include, states_protected, states_private %}
 {% if screen.use_gui %}
-#include "app/guis/{{ screen.gui["name"] }}Gui.h"
+#include "app/generated/guis/{{ screen.gui["name"] }}Gui.h"
 {% endif %}
 {{ states_include(screen) }}
 #include "core/application/screen/ScreenAbs.h"

@@ -11,18 +11,18 @@ def generate_hardware(ctx: Context, loader: Loader):
 
 def _generate_instances(ctx: Context, loader: Loader):
     """
-    - app/hardware/AdcInstances.h
-    - app/hardware/AdcInstances.cpp
-    - app/hardware/GpioInstances.h
-    - app/hardware/GpioInstances.cpp
-    - app/hardware/I2cInstances.h
-    - app/hardware/I2cInstances.cpp
-    - app/hardware/SpiInstances.h
-    - app/hardware/SpiInstances.cpp
-    - app/hardware/TimerInstances.h
-    - app/hardware/TimerInstances.cpp
-    - app/hardware/LedcInstances.h
-    - app/hardware/LedcInstances.cpp
+    - app/generated/hardware/AdcInstances.h
+    - app/generated/hardware/AdcInstances.cpp
+    - app/generated/hardware/GpioInstances.h
+    - app/generated/hardware/GpioInstances.cpp
+    - app/generated/hardware/I2cInstances.h
+    - app/generated/hardware/I2cInstances.cpp
+    - app/generated/hardware/SpiInstances.h
+    - app/generated/hardware/SpiInstances.cpp
+    - app/generated/hardware/TimerInstances.h
+    - app/generated/hardware/TimerInstances.cpp
+    - app/generated/hardware/LedcInstances.h
+    - app/generated/hardware/LedcInstances.cpp
     """
 
     init_mapping = {
@@ -34,7 +34,7 @@ def _generate_instances(ctx: Context, loader: Loader):
         "ledc":  "LedcInstances",
     }
 
-    hw_dir = ctx.app_dir / "hardware"
+    hw_dir = ctx.gen_dir / "hardware"
     config = loader.config["hardware"]
 
     init_config = {"init": []}
@@ -51,11 +51,11 @@ def _generate_instances(ctx: Context, loader: Loader):
 
 def _generate_hardware_init(ctx: Context, loader: Loader):
     """
-    - app/hardware/HardwareInit.h
-    - app/hardware/HardwareInit.cpp
+    - app/generated/hardware/HardwareInit.h
+    - app/generated/hardware/HardwareInit.cpp
     """
 
-    hw_dir = ctx.app_dir / "hardware"
+    hw_dir = ctx.gen_dir / "hardware"
     config = loader.config["hardware"]
 
     items = [
