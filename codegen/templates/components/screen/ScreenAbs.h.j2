@@ -1,9 +1,10 @@
 #pragma once
 {% include "_common/header.j2" %}
-{% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
+{% from "_common/component_h.j2" import constructor, on_ticks, on_events, on_states_changed, make_events, send_events, hide_events, states_include, states_protected, states_private %}
 {% if screen.use_gui %}
 #include "app/guis/{{ screen.gui["name"] }}Gui.h"
 {% endif %}
+{{ states_include(screen) }}
 #include "core/application/screen/ScreenAbs.h"
 {% if screen.use_lvgl %}
 #include "core/lvgl/objects/LvObject.h"
@@ -14,6 +15,8 @@
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class {{ runtime_name }};
 
 class {{ name }}Abs : public ScreenAbs {
 public:
@@ -33,6 +36,9 @@ public:
 {# onEvent() #}
 {{ on_events(screen) }}
 
+{# onStateChanged() #}
+{{ on_states_changed(screen) }}
+
 protected:
 
 {# onApplyX() handlers for model #}
@@ -46,10 +52,11 @@ protected:
 {# make and send events #}
 {{ make_events(screen) }}
 {{ send_events(screen) }}
+{{ states_protected(screen) }}
 
 private:
 
-{# hide events #}
+{{ states_private(screen) }}
 {{ hide_events("Screen") }}
 
 {% if screen.use_lvgl %}
@@ -143,6 +150,7 @@ private:
 
 {% endif %}
 
+    friend class {{ runtime_name }};
 };
 
 } // namespace Garbox

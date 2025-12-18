@@ -54,6 +54,7 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
         template_path = f"components/{type_key}/{type_name}Abs"
         item_dict = {
             "name": comp_key,
+            "runtime_name": loader.config["application"]["app_name"] + "Runtime",
             f"{type_key}": comp_dict
         }
         comp_dict["name"] = comp_key

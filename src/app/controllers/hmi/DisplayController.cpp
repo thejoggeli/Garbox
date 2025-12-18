@@ -55,7 +55,7 @@ void DisplayController::onRenderTick(){
     }
 }
 
-void DisplayController::onDisplayCommand(const DisplayCommandEvent& event){
+void DisplayController::onDisplayCommandEvent(const DisplayCommandEvent& event){
     setBrightnessSmooth(event->brightness, 1000_ms);
 };
 

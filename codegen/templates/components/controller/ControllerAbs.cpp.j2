@@ -1,5 +1,5 @@
 {% include "_common/header.j2" %}
-{% from "_common/component_cpp.j2" import constructor, make_events, send_events %}
+{% from "_common/component_cpp.j2" import constructor, make_events, send_events, states %}
 #include "{{ name }}Abs.h"
 #include "shared/types/ComponentId.h"
 
@@ -7,5 +7,6 @@ namespace Garbox {
 
 {{ constructor("Controller", name, controller) }}
 {{ make_events(name, controller) }}
-{{ send_events(name, controller) }} 
+{{ send_events(name, controller) }}
+{{ states(name, controller) }}
 } // namespace Garbox

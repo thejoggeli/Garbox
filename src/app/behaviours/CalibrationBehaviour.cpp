@@ -39,7 +39,7 @@ void CalibrationBehaviour::onLogicTick(){
     // nothing to do
 }
 
-void CalibrationBehaviour::onHeartbeat(const HeartbeatEvent& event){
+void CalibrationBehaviour::onHeartbeatEvent(const HeartbeatEvent& event){
     static PiezoPlayer& piezo = PartsProvider::GetPiezoPlayer();
     if(mCounter++ > 3){
         getHost()->requestChangeBehaviour(BehaviourId::Fermentation);
@@ -50,11 +50,19 @@ void CalibrationBehaviour::onHeartbeat(const HeartbeatEvent& event){
     }
 }
 
-void CalibrationBehaviour::onFanStatus(const FanStatusEvent& event){
+void CalibrationBehaviour::onFanStatusEvent(const FanStatusEvent& event){
     // nothing to do
 }
 
-void CalibrationBehaviour::onFanSample(const FanSampleEvent& event){
+void CalibrationBehaviour::onFanSampleEvent(const FanSampleEvent& event){
+    // nothing to do
+}
+
+void CalibrationBehaviour::onFanStatusStateChanged(const FanStatusState& state){
+    // nothing to do
+}
+
+void CalibrationBehaviour::onFanSampleStateChanged(const FanSampleState& state){
     // nothing to do
 }
 

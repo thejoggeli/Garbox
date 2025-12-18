@@ -64,7 +64,7 @@ void I2cPartsController::onInputTick(){
     }
 }
 
-void I2cPartsController::onButtonStateChanged(const ButtonStateChangedEvent& event){
+void I2cPartsController::onButtonStateChangedEvent(const ButtonStateChangedEvent& event){
     if(event->newState == ButtonState::Pressed){
         mFsm.forceTransition(FsmState::ResetPowerOffPhase);
     }

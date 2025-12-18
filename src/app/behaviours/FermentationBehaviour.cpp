@@ -108,11 +108,11 @@ void FermentationBehaviour::sendFermentationStatus(){
     mLastFermentationStatus = *event.payload();
 }
 
-void FermentationBehaviour::onHeartbeat(const HeartbeatEvent& event){
+void FermentationBehaviour::onHeartbeatEvent(const HeartbeatEvent& event){
     mHeartbeatReceived = true;
 }
 
-void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& event){
+void FermentationBehaviour::onButtonStateChangedEvent(const ButtonStateChangedEvent& event){
     if(event->newState == ButtonState::Released){
 
         static uint32_t s = 0;
@@ -141,13 +141,13 @@ void FermentationBehaviour::onButtonStateChanged(const ButtonStateChangedEvent& 
     }
 }
     
-void FermentationBehaviour::onButtonRepeat(const ButtonRepeatEvent& event){
+void FermentationBehaviour::onButtonRepeatEvent(const ButtonRepeatEvent& event){
     if(event->count == 5){
         getHost()->requestChangeBehaviour(BehaviourId::Calibration);
     }
 }
     
-void FermentationBehaviour::onEncoderStep(const EncoderStepEvent& event){
+void FermentationBehaviour::onEncoderStepEvent(const EncoderStepEvent& event){
     // nothing to do
 }
 

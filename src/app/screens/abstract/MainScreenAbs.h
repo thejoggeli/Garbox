@@ -3,10 +3,13 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "app/guis/MainScreenGui.h"
+
 #include "core/application/screen/ScreenAbs.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class GarboxRuntime;
 
 class MainScreenAbs : public ScreenAbs {
 public:
@@ -19,11 +22,6 @@ public:
     void updateScreen() final;
     void becomeEnabled() final;
     void becomeDisabled() final;
-
-    // event handlers (to be implmeneted by user)
-    virtual void onDisplayCommand(const DisplayCommandEvent& event) = 0;
-    virtual void onFanCommand(const FanCommandEvent& event) = 0;
-    virtual void onHeatpadCommand(const HeatpadCommandEvent& event) = 0;
 
 protected:
 
@@ -197,6 +195,7 @@ private:
     static void applyTargetTemperatureTrampoline(void* context);
     static void applyEngineStateTrampoline(void* context);
 
+    friend class GarboxRuntime;
 };
 
 } // namespace Garbox

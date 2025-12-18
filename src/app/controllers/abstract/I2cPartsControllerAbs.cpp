@@ -25,5 +25,21 @@ void I2cPartsControllerAbs::sendEvent(const TemperatureStatusEvent& event){
 void I2cPartsControllerAbs::sendEvent(const TemperatureSampleEvent& event){
     sendEventToHost(event.header());
 }
- 
+
+TemperatureStatusState& I2cPartsControllerAbs::writeState(TemperatureStatusType type){
+    return *mTemperatureStatusState;
+}
+
+TemperatureSampleState& I2cPartsControllerAbs::writeState(TemperatureSampleType type){
+    return *mTemperatureSampleState;
+}
+
+void I2cPartsControllerAbs::injectWritableState(TemperatureStatusState* state){
+    mTemperatureStatusState = state;
+}
+
+void I2cPartsControllerAbs::injectWritableState(TemperatureSampleState* state){
+    mTemperatureSampleState = state;
+}
+
 } // namespace Garbox

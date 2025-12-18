@@ -2,11 +2,14 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+
 #include "core/application/screen/ScreenAbs.h"
 #include "core/lvgl/objects/LvObject.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class GarboxRuntime;
 
 class EventLogScreenAbs : public ScreenAbs {
 public:
@@ -43,6 +46,7 @@ protected:
 
     void setBackgroundColor(uint32_t color);
 
+    friend class GarboxRuntime;
 };
 
 } // namespace Garbox

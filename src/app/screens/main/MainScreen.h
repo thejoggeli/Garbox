@@ -14,11 +14,6 @@ public:
 
     MainScreen();
 
-    // event handlers (to be implmeneted by user)
-    void onDisplayCommand(const DisplayCommandEvent& event) final;
-    void onFanCommand(const FanCommandEvent& event) final;
-    void onHeatpadCommand(const HeatpadCommandEvent& event) final;
-
     // model field callbacks to update specific parts of the screen
     void onApplyFanStatus() final;
     void onApplyFanTargetSpeed() final;

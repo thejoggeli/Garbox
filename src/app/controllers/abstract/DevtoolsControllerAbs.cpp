@@ -10,5 +10,4 @@ DevtoolsControllerAbs::DevtoolsControllerAbs() : ControllerAbs(ComponentId::Devt
     // nothing to do
 }
 
- 
 } // namespace Garbox

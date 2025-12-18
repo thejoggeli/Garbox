@@ -45,7 +45,7 @@ def process_components(config, key, suffix):
                 component["receive_events"] = list(config["event_types"].keys())
 
         # init 'tick_phases' field
-        component["tick_phases"] = ensure_list(component["tick_phases"])
+        component["tick_phases"] = ensure_list(component.get("tick_phases", []))
         component["tick_phases_all"] = component.get("tick_phases_all", False)
         if len(component["tick_phases"]) > 0:
             first_entry = component["tick_phases"][0]
@@ -60,6 +60,33 @@ def process_components(config, key, suffix):
         
         # init 'send_events' field
         component["send_events"] = ensure_list(component.get("send_events", []))
+
+        # get states from config
+        states = config["states"]
+        component["all_states"] = {}       
+
+        # convert 'write_states' field to dict
+        write_states = ensure_list(component.get("write_states", []))
+        component["write_states"] = {}        
+        for state_name in write_states:
+            if state_name not in states:
+                raise ValueError(f"write_state error: state '{state_name}' not found")
+            if states[state_name]["writer"] is not None:
+                raise ValueError(f"write_state error: state '{state_name}' has multiple writers")
+            component["write_states"][state_name] = states[state_name]
+            component["all_states"][state_name] = states[state_name]
+            states[state_name]["writer"] = component
+
+        # init 'read_states' field
+        read_states = ensure_list(component.get("read_states", []))
+        component["read_states"] = {}        
+        for state_name in read_states:
+            if state_name not in states:
+                raise ValueError(f"read_states error: state '{state_name}' not found")
+            if state_name in component["write_states"]:
+                raise ValueError(f"a given state can only be either in read_states or write_states, not both:  '{state_name}'")
+            component["read_states"][state_name] = states[state_name]
+            component["all_states"][state_name] = states[state_name]
 
         # component name
         component["name"] = name

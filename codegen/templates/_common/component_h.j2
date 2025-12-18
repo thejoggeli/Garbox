@@ -38,7 +38,19 @@
 
     // event handlers (to be implmeneted by user)
 {% for ev in component.receive_events %}
-    virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
+    virtual void on{{ ev }}Event(const {{ ev }}Event& event) = 0;
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# state change #}
+{% macro on_states_changed(component) %}
+{% if component.read_states %}
+
+    // state change handlers (to be implmeneted by user)
+{% for state in component.read_states.values() %}
+    virtual void on{{ state["name"]|upper_first }}StateChanged(const {{ state["name_with_suffix"] }}& state) = 0;
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -69,6 +81,76 @@
 {% endif %}
 {% endmacro %}
 
+{# states include #}
+{% macro states_include(component) %}
+{% if component.all_states %}
+{% for state_name, state_data in component.all_states.items() %}
+#include "app/states/types/{{ state_data["name_with_suffix"]|upper_first }}.h"
+{% endfor %}
+{% endif %}
+
+{% endmacro %}
+
+{# states protected #}
+{% macro states_protected(component) %}
+{% if component.all_states %}
+    // state type accessors for getters and setters
+{% for state_name, state_data in component.all_states.items() %}
+    struct {{ state_name }}Type {};
+{% endfor %}
+{% for state_name, state_data in component.all_states.items() %}
+    static constexpr {{ state_name }}Type {{ state_name }} {};
+{% endfor %}
+{% endif %}
+
+{% if component.write_states %}
+    // get writable states
+{% for state_name, state_data in component.write_states.items() %}
+    {{ state_data["name_with_suffix"]|upper_first }}& writeState({{ state_name }}Type type);
+{% endfor %}
+{% endif %}
+
+{% if component.read_states %}
+    // get readable states
+{% for state_name, state_data in component.read_states.items() %}
+    const {{ state_data["name_with_suffix"]|upper_first }}& readState({{ state_name }}Type type);
+{% endfor %}
+{% endif %}
+
+{% endmacro %}
+
+{# states private #}
+{% macro states_private(component) %}
+
+{% if component.write_states %}
+    // writable state pointers
+{% for state_name, state_data in component.write_states.items() %}
+    {{ state_data["name_with_suffix"]|upper_first }}* m{{ state_data["name_with_suffix"]|upper_first }} = nullptr;
+{% endfor %}
+{% endif %}
+
+{% if component.read_states %}
+    // readable state pointers
+{% for state_name, state_data in component.read_states.items() %}
+    const {{ state_data["name_with_suffix"]|upper_first }}* m{{ state_data["name_with_suffix"]|upper_first }} = nullptr;
+{% endfor %}
+{% endif %}
+
+{% if component.write_states %}
+    // dependency inject writable states
+{% for state_name, state_data in component.write_states.items() %}
+    void injectWritableState({{ state_data["name_with_suffix"]|upper_first }}* state);
+{% endfor %}
+{% endif %}
+
+{% if component.read_states %}
+    // dependency inject readable states
+{% for state_name, state_data in component.read_states.items() %}
+    void injectReadableState(const {{ state_data["name_with_suffix"]|upper_first }}* state);
+{% endfor %}
+{% endif %}
+
+{% endmacro %}
 
 {# hide #}
 {% macro hide_events(type) %}

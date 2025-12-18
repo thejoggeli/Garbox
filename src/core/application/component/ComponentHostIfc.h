@@ -13,8 +13,6 @@ class EventFactory;
 class ComponentHostIfc {
 public:
 
-    virtual void requestEnableController(ControllerId id) = 0;
-    virtual void requestDisableController(ControllerId id) = 0;
     virtual void requestChangeBehaviour(BehaviourId id) = 0;
     virtual void requestChangeScreen(ScreenId id) = 0;
     virtual void requestUpdateScreenNow() = 0;

@@ -66,7 +66,7 @@ void HeatpadController::onOutputTick(){
     mLed.setColor(hslColor.toLinearRgb());
 }
 
-void HeatpadController::onHeatpadCommand(const HeatpadCommandEvent& event){
+void HeatpadController::onHeatpadCommandEvent(const HeatpadCommandEvent& event){
     // apply enabled 
     if(mHeatpad.isEnabled() != event->enabled){
         mHeatpad.setEnabled(event->enabled);

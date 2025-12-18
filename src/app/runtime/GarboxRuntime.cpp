@@ -69,6 +69,22 @@ GarboxRuntime::GarboxRuntime():
     mTickRunner.registerTickPhase([this](){ handleOutputTick(); }, OutputTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
+
+    // dependency inject write states
+    mFermentationBehaviour.injectWritableState(&mStateRegistry.getFermentationStatus());
+    mDisplayController.injectWritableState(&mStateRegistry.getDisplayStatus());
+    mDisplayController.injectWritableState(&mStateRegistry.getDisplayDiagnostics());
+    mFanController.injectWritableState(&mStateRegistry.getFanStatus());
+    mFanController.injectWritableState(&mStateRegistry.getFanSample());
+    mHeatpadController.injectWritableState(&mStateRegistry.getHeatpadStatus());
+    mHeatpadController.injectWritableState(&mStateRegistry.getHeatpadSample());
+    mI2cPartsController.injectWritableState(&mStateRegistry.getTemperatureStatus());
+    mI2cPartsController.injectWritableState(&mStateRegistry.getTemperatureSample());
+
+    // dependency inject read states
+    mCalibrationBehaviour.injectReadableState(&mStateRegistry.getFanStatus());
+    mCalibrationBehaviour.injectReadableState(&mStateRegistry.getFanSample());
+
 }
 
 void GarboxRuntime::onInit(){
@@ -90,11 +106,11 @@ void GarboxRuntime::onRun(){
 }
 
 void GarboxRuntime::onActiveBehaviourChanged(){
-    // nothing to do
+    mStateRegistry.getActiveBehaviour().setBehaviour(mActiveBehaviour->getBehaviourId());
 }
 
 void GarboxRuntime::onActiveScreenChanged(){
-    // nothing to do
+    mStateRegistry.getActiveScreen().setScreen(mActiveScreen->getScreenId());
 }
 
 void GarboxRuntime::handleTickStart(){
@@ -171,13 +187,13 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::Heartbeat: {
         const HeartbeatEvent event(header);
         if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onHeartbeat(event);
-            mFermentationBehaviour.onHeartbeat(event);
+            mCalibrationBehaviour.onHeartbeatEvent(event);
+            mFermentationBehaviour.onHeartbeatEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeat(event); break;
+                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onHeartbeatEvent(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeartbeatEvent(event); break;
                 default: break; // active behaviour does not receive 'Heartbeat' event
             }
         }
@@ -185,58 +201,28 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     }
     case EventType::DisplayCommand: {
         const DisplayCommandEvent event(header);
-        mDisplayController.onDisplayCommand(event);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onDisplayCommand(event);
-        }
-        else {
-            // no active receivers for this event type
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayCommand(event); break;
-                default: break; // active screen does not receive 'DisplayCommand' event
-            }
-        }
+        mDisplayController.onDisplayCommandEvent(event);
         break;
     }
     case EventType::FanCommand: {
         const FanCommandEvent event(header);
-        mFanController.onFanCommand(event);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onFanCommand(event);
-        }
-        else {
-            // no active receivers for this event type
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanCommand(event); break;
-                default: break; // active screen does not receive 'FanCommand' event
-            }
-        }
+        mFanController.onFanCommandEvent(event);
         break;
     }
     case EventType::HeatpadCommand: {
         const HeatpadCommandEvent event(header);
-        mHeatpadController.onHeatpadCommand(event);
-        if(header->sendToInactiveComponents){
-            mMainScreen.onHeatpadCommand(event);
-        }
-        else {
-            // no active receivers for this event type
-            switch(mActiveScreen->getScreenId()){
-                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadCommand(event); break;
-                default: break; // active screen does not receive 'HeatpadCommand' event
-            }
-        }
+        mHeatpadController.onHeatpadCommandEvent(event);
         break;
     }
     case EventType::ButtonStateChanged: {
         const ButtonStateChangedEvent event(header);
-        mI2cPartsController.onButtonStateChanged(event);
+        mI2cPartsController.onButtonStateChangedEvent(event);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonStateChanged(event);
+            mFermentationBehaviour.onButtonStateChangedEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChanged(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChangedEvent(event); break;
                 default: break; // active behaviour does not receive 'ButtonStateChanged' event
             }
         }
@@ -245,11 +231,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::ButtonRepeat: {
         const ButtonRepeatEvent event(header);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonRepeat(event);
+            mFermentationBehaviour.onButtonRepeatEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeat(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeatEvent(event); break;
                 default: break; // active behaviour does not receive 'ButtonRepeat' event
             }
         }
@@ -258,11 +244,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
     case EventType::EncoderStep: {
         const EncoderStepEvent event(header);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onEncoderStep(event);
+            mFermentationBehaviour.onEncoderStepEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStep(event); break;
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStepEvent(event); break;
                 default: break; // active behaviour does not receive 'EncoderStep' event
             }
         }
@@ -311,11 +297,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         const FanStatusEvent event(header);
         SnapshotRegistry::UpdateFanStatus(*event.payload());
         if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onFanStatus(event);
+            mCalibrationBehaviour.onFanStatusEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatus(event); break;
+                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatusEvent(event); break;
                 default: break; // active behaviour does not receive 'FanStatus' event
             }
         }
@@ -340,11 +326,11 @@ void GarboxRuntime::onRouteEvent(const EventHeader* header){
         const FanSampleEvent event(header);
         SnapshotRegistry::UpdateFanSample(*event.payload());
         if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onFanSample(event);
+            mCalibrationBehaviour.onFanSampleEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSample(event); break;
+                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSampleEvent(event); break;
                 default: break; // active behaviour does not receive 'FanSample' event
             }
         }

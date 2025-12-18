@@ -1,5 +1,5 @@
 {% include "_common/header_stub.j2" %}
-{% from "_common/component_stub_cpp.j2" import on_ticks, on_events %}
+{% from "_common/component_stub_cpp.j2" import on_ticks, on_events, on_states_changed %}
 #include "{{ name }}.h"
 
 namespace Garbox {
@@ -30,6 +30,7 @@ void {{ name }}::onUpdateScreen(){
 
 {{ on_ticks(screen) }}
 {{ on_events(screen) }}
+{{ on_states_changed(screen) }}
 
 {# onApplyX() handlers for model #}
 {% if screen.use_model %}

@@ -10,10 +10,10 @@
 {% macro make_events(name, component) %}
 {% if component.send_events %}
 {% for ev in component.send_events %}
-
 {{ ev }}Event {{ name }}Abs::make{{ ev }}Event(){
     return ComponentAbs::makeEvent<EventType::{{ ev }}>();
 }
+
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -23,10 +23,51 @@
 {% macro send_events(name, component) %}
 {% if component.send_events %}
 {% for ev in component.send_events %}
-
 void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
     sendEventToHost(event.header());
 }
+
 {% endfor %}
 {% endif %}
+{% endmacro %}
+
+{# states #}
+{% macro states(name, component) %}
+
+{% if component.write_states %}
+{% for state_name, state_data in component.write_states.items() %}
+{{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::writeState({{ state_name }}Type type){
+    return *m{{ state_data["name_with_suffix"]|upper_first }};
+}
+
+{% endfor %}
+{% endif %}
+
+{% if component.read_states %}
+{% for state_name, state_data in component.read_states.items() %}
+const {{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::readState({{ state_name }}Type type){
+    return *m{{ state_data["name_with_suffix"]|upper_first }};
+}
+
+{% endfor %}
+{% endif %}
+
+{% if component.write_states %}
+{% for state_name, state_data in component.write_states.items() %}
+void {{ name }}Abs::injectWritableState({{ state_data["name_with_suffix"]|upper_first }}* state){
+    m{{ state_data["name_with_suffix"]|upper_first }} = state;
+}
+
+{% endfor %}
+{% endif %}
+
+{% if component.read_states %}
+{% for state_name, state_data in component.read_states.items() %}
+void {{ name }}Abs::injectReadableState(const {{ state_data["name_with_suffix"]|upper_first }}* state){
+    m{{ state_data["name_with_suffix"]|upper_first }} = state;
+}
+
+{% endfor %}
+{% endif %}
+
 {% endmacro %}

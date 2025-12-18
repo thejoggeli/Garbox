@@ -25,5 +25,21 @@ void HeatpadControllerAbs::sendEvent(const HeatpadStatusEvent& event){
 void HeatpadControllerAbs::sendEvent(const HeatpadSampleEvent& event){
     sendEventToHost(event.header());
 }
- 
+
+HeatpadStatusState& HeatpadControllerAbs::writeState(HeatpadStatusType type){
+    return *mHeatpadStatusState;
+}
+
+HeatpadSampleState& HeatpadControllerAbs::writeState(HeatpadSampleType type){
+    return *mHeatpadSampleState;
+}
+
+void HeatpadControllerAbs::injectWritableState(HeatpadStatusState* state){
+    mHeatpadStatusState = state;
+}
+
+void HeatpadControllerAbs::injectWritableState(HeatpadSampleState* state){
+    mHeatpadSampleState = state;
+}
+
 } // namespace Garbox

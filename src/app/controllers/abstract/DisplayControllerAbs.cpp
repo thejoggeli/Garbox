@@ -17,5 +17,21 @@ DisplayStatusEvent DisplayControllerAbs::makeDisplayStatusEvent(){
 void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
     sendEventToHost(event.header());
 }
- 
+
+DisplayStatusState& DisplayControllerAbs::writeState(DisplayStatusType type){
+    return *mDisplayStatusState;
+}
+
+DisplayDiagnosticsState& DisplayControllerAbs::writeState(DisplayDiagnosticsType type){
+    return *mDisplayDiagnosticsState;
+}
+
+void DisplayControllerAbs::injectWritableState(DisplayStatusState* state){
+    mDisplayStatusState = state;
+}
+
+void DisplayControllerAbs::injectWritableState(DisplayDiagnosticsState* state){
+    mDisplayDiagnosticsState = state;
+}
+
 } // namespace Garbox

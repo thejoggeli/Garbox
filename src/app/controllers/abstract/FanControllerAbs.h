@@ -2,10 +2,15 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+#include "app/states/types/FanStatusState.h"
+#include "app/states/types/FanSampleState.h"
+
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class GarboxRuntime;
 
 class FanControllerAbs : public ControllerAbs {
 public:
@@ -18,7 +23,7 @@ public:
     virtual void onOutputTick() = 0;
 
     // event handlers (to be implmeneted by user)
-    virtual void onFanCommand(const FanCommandEvent& event) = 0;
+    virtual void onFanCommandEvent(const FanCommandEvent& event) = 0;
 
 protected:
 
@@ -30,12 +35,31 @@ protected:
     void sendEvent(const FanStatusEvent& event);
     void sendEvent(const FanSampleEvent& event);
 
+    // state type accessors for getters and setters
+    struct FanStatusType {};
+    struct FanSampleType {};
+    static constexpr FanStatusType FanStatus {};
+    static constexpr FanSampleType FanSample {};
+
+    // get writable states
+    FanStatusState& writeState(FanStatusType type);
+    FanSampleState& writeState(FanSampleType type);
+
 private:
+
+    // writable state pointers
+    FanStatusState* mFanStatusState = nullptr;
+    FanSampleState* mFanSampleState = nullptr;
+
+    // dependency inject writable states
+    void injectWritableState(FanStatusState* state);
+    void injectWritableState(FanSampleState* state);
 
     // hide event methods
     using ControllerAbs::makeEvent;
     using ControllerAbs::sendEventToHost;
 
+    friend class GarboxRuntime;
 };
 
 } // namespace Garbox

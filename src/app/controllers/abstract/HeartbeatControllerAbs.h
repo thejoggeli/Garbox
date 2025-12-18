@@ -2,10 +2,13 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class GarboxRuntime;
 
 class HeartbeatControllerAbs : public ControllerAbs {
 public:
@@ -30,6 +33,7 @@ private:
     using ControllerAbs::makeEvent;
     using ControllerAbs::sendEventToHost;
 
+    friend class GarboxRuntime;
 };
 
 } // namespace Garbox

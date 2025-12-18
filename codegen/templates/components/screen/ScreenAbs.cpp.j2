@@ -1,5 +1,5 @@
 {% include "_common/header.j2" %}
-{% from "_common/component_cpp.j2" import constructor, make_events, send_events %}
+{% from "_common/component_cpp.j2" import constructor, make_events, send_events, states %}
 #include "{{ name }}Abs.h"
 #include <math.h>
 {% if screen.use_model %}
@@ -100,6 +100,7 @@ void {{ name }}Abs::becomeDisabled(){
 {# make and send events #}
 {{ make_events(name, screen) }}
 {{ send_events(name, screen) }}
+{{ states(name, screen) }}
 
 {% if screen.use_lvgl %}
 {####################}

@@ -17,5 +17,21 @@ FanCommandEvent CalibrationBehaviourAbs::makeFanCommandEvent(){
 void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
     sendEventToHost(event.header());
 }
- 
+
+const FanStatusState& CalibrationBehaviourAbs::readState(FanStatusType type){
+    return *mFanStatusState;
+}
+
+const FanSampleState& CalibrationBehaviourAbs::readState(FanSampleType type){
+    return *mFanSampleState;
+}
+
+void CalibrationBehaviourAbs::injectReadableState(const FanStatusState* state){
+    mFanStatusState = state;
+}
+
+void CalibrationBehaviourAbs::injectReadableState(const FanSampleState* state){
+    mFanSampleState = state;
+}
+
 } // namespace Garbox

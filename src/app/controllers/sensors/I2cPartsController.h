@@ -14,7 +14,7 @@ public:
     I2cPartsController();
 
     void onInputTick() final;
-    void onButtonStateChanged(const ButtonStateChangedEvent& event) final;
+    void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) final;
 
 private:
 

@@ -31,10 +31,25 @@ void {{ component.name }}::onEvent(const EventHeader* header){
 {% if component.receive_events %}
 {% for ev in component.receive_events %}
 
-void {{ component.name }}::on{{ ev }}(const {{ ev }}Event& event){
+void {{ component.name }}::on{{ ev }}Event(const {{ ev }}Event& event){
     // nothing to do
 }
 
 {% endfor %}
+{% endif %}
+{% endmacro %}
+
+
+{# receive state changed #}
+{% macro on_states_changed(component) %}
+{% if component.read_states %}
+    // state changed handlers
+{% for state in component.read_states.values() %}
+void {{ component.name }}::on{{ state["name"]|upper_first }}StateChanged(const {{ state["name_with_suffix"]|upper_first }}& state){
+    // nothing to do
+}
+
+{% endfor %}
+
 {% endif %}
 {% endmacro %}

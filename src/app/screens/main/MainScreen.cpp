@@ -184,18 +184,6 @@ void MainScreen::onUpdateScreen(){
     }
 }
 
-void MainScreen::onDisplayCommand(const DisplayCommandEvent& event){
-    // nothing to do
-}
-
-void MainScreen::onFanCommand(const FanCommandEvent& event){
-    // nothing to do
-}
-
-void MainScreen::onHeatpadCommand(const HeatpadCommandEvent& event){
-    // nothing to do
-}
-
 bool MainScreen::isSensorOk(){
     return model().getShtPowerEnabled() && !model().getShtResetting() && model().getShtDriverEnabled() && model().getShtHasSample();
 }

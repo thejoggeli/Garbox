@@ -1,21 +1,29 @@
 #pragma once
 {% include "_common/header.j2" %}
-{% from "_common/component_h.j2" import constructor, on_ticks, on_events, make_events, send_events, hide_events %}
+{% from "_common/component_h.j2" import constructor, on_ticks, on_events, on_states_changed, make_events, send_events, hide_events, states_include, states_protected, states_private  %}
+{{ states_include(controller) }}
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class {{ runtime_name }};
 
 class {{ name }}Abs : public ControllerAbs {
 public:
 {{ constructor(name) }}
 {{ on_ticks(controller) }}
 {{ on_events(controller) }}
+{{ on_states_changed(controller) }}
 protected:
 {{ make_events(controller) }}
 {{ send_events(controller) }}
+{{ states_protected(controller) }}
 private:
+{{ states_private(controller) }}
 {{ hide_events("Controller") }}
+
+    friend class {{ runtime_name }};
 };
 
 } // namespace Garbox

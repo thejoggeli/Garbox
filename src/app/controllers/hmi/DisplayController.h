@@ -19,7 +19,7 @@ public:
     DisplayController();
 
     void onRenderTick() final;
-    void onDisplayCommand(const DisplayCommandEvent& event) final;
+    void onDisplayCommandEvent(const DisplayCommandEvent& event) final;
 
 private:
 

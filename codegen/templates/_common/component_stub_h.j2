@@ -37,7 +37,20 @@
 
     // event handlers
 {% for ev in component.receive_events %}
-    virtual void on{{ ev }}(const {{ ev }}Event& event) = 0;
+    virtual void on{{ ev }}Event(const {{ ev }}Event& event) final;
+{% endfor %}
+
+{% endif %}
+{% endmacro %}
+
+
+{# receive state changed #}
+{% macro on_states_changed(component) %}
+{% if component.read_states %}
+
+    // state changed handlers
+{% for state in component.read_states.values() %}
+    virtual void on{{ state["name"]|upper_first }}StateChanged(const {{ state["name_with_suffix"]|upper_first }}& state) final;
 {% endfor %}
 
 {% endif %}

@@ -12,10 +12,10 @@ public:
     
     void onLogicTick() final;
 
-    void onHeartbeat(const HeartbeatEvent& event) final;
-    void onButtonStateChanged(const ButtonStateChangedEvent& event) final;
-    void onButtonRepeat(const ButtonRepeatEvent& event) final;
-    void onEncoderStep(const EncoderStepEvent& event) final;
+    void onHeartbeatEvent(const HeartbeatEvent& event) final;
+    void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) final;
+    void onButtonRepeatEvent(const ButtonRepeatEvent& event) final;
+    void onEncoderStepEvent(const EncoderStepEvent& event) final;
 
 private:
 

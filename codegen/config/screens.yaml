@@ -4,9 +4,6 @@ screens:
     subdir: main
     use_lvgl: true
     gui_filename: MainScreen.xml
-    tick_phases: null
-    receive_events: [DisplayCommand, FanCommand, HeatpadCommand]
-    send_events: null
     model:
       fields:
         - { name: fanState,               bind: FanStatus->state,       group: FanStatus, dirty: fanTargetSpeed }
@@ -29,8 +26,6 @@ screens:
   Debug:
     subdir: debug
     use_lvgl: true
-    tick_phases: null
-    receive_events: null
     send_events: 
       - DisplayCommand
     model:
@@ -69,7 +64,4 @@ screens:
   EventLog:
     subdir: eventlog
     use_lvgl: true
-    tick_phases: null
-    receive_events: null
     receive_events_all: true
-    send_events: null

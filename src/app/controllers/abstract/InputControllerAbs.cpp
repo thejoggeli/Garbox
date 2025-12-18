@@ -33,5 +33,5 @@ void InputControllerAbs::sendEvent(const ButtonRepeatEvent& event){
 void InputControllerAbs::sendEvent(const EncoderStepEvent& event){
     sendEventToHost(event.header());
 }
- 
+
 } // namespace Garbox

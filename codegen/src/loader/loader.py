@@ -56,7 +56,8 @@ class Loader:
         # - controllers
         # - behaviours
         # - screens
-        # requires events to already be parsed)
+        # requires events to already be parsed
+        # requires states to already be parsed
         parse_application(self.config)       
 
 

@@ -2,11 +2,14 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+
 #include "core/application/screen/ScreenAbs.h"
 #include "core/lvgl/objects/LvObject.h"
 #include "shared/types/EventType.h"
 
 namespace Garbox {
+
+class GarboxRuntime;
 
 class DebugScreenAbs : public ScreenAbs {
 public:
@@ -252,6 +255,7 @@ private:
     static void applyHeapBytesTrampoline(void* context);
     static void applyHeapMinimumTrampoline(void* context);
 
+    friend class GarboxRuntime;
 };
 
 } // namespace Garbox

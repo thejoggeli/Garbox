@@ -39,5 +39,5 @@ def parse_states(config: dict):
             "include": include,
             "meta": state_meta,
             "fields": parsed_fields,
+            "writer": state_data.get("writer", None),
         }
-
