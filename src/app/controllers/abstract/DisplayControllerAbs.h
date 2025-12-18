@@ -32,15 +32,9 @@ protected:
     // send typed events
     void sendEvent(const DisplayStatusEvent& event);
 
-    // state type accessors for getters and setters
-    struct DisplayStatusType {};
-    struct DisplayDiagnosticsType {};
-    static constexpr DisplayStatusType DisplayStatus {};
-    static constexpr DisplayDiagnosticsType DisplayDiagnostics {};
-
     // get writable states
-    DisplayStatusState& writeState(DisplayStatusType type);
-    DisplayDiagnosticsState& writeState(DisplayDiagnosticsType type);
+    DisplayStatusState& writeDisplayStatusState();
+    DisplayDiagnosticsState& writeDisplayDiagnosticsState();
 
 private:
 
@@ -49,8 +43,8 @@ private:
     DisplayDiagnosticsState* mDisplayDiagnosticsState = nullptr;
 
     // dependency inject writable states
-    void injectWritableState(DisplayStatusState* state);
-    void injectWritableState(DisplayDiagnosticsState* state);
+    void injectDisplayStatusState(DisplayStatusState* state);
+    void injectDisplayDiagnosticsState(DisplayDiagnosticsState* state);
 
     // hide event methods
     using ControllerAbs::makeEvent;

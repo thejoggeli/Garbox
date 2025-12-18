@@ -36,7 +36,7 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
 
 {% if component.write_states %}
 {% for state_name, state_data in component.write_states.items() %}
-{{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::writeState({{ state_name }}Type type){
+{{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::write{{ state_name }}State(){
     return *m{{ state_data["name_with_suffix"]|upper_first }};
 }
 
@@ -45,7 +45,7 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
 
 {% if component.read_states %}
 {% for state_name, state_data in component.read_states.items() %}
-const {{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::readState({{ state_name }}Type type){
+const {{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::read{{ state_name }}State(){
     return *m{{ state_data["name_with_suffix"]|upper_first }};
 }
 
@@ -54,7 +54,7 @@ const {{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::readState
 
 {% if component.write_states %}
 {% for state_name, state_data in component.write_states.items() %}
-void {{ name }}Abs::injectWritableState({{ state_data["name_with_suffix"]|upper_first }}* state){
+void {{ name }}Abs::inject{{ state_data["name_with_suffix"]|upper_first }}({{ state_data["name_with_suffix"]|upper_first }}* state){
     m{{ state_data["name_with_suffix"]|upper_first }} = state;
 }
 
@@ -63,7 +63,7 @@ void {{ name }}Abs::injectWritableState({{ state_data["name_with_suffix"]|upper_
 
 {% if component.read_states %}
 {% for state_name, state_data in component.read_states.items() %}
-void {{ name }}Abs::injectReadableState(const {{ state_data["name_with_suffix"]|upper_first }}* state){
+void {{ name }}Abs::inject{{ state_data["name_with_suffix"]|upper_first }}(const {{ state_data["name_with_suffix"]|upper_first }}* state){
     m{{ state_data["name_with_suffix"]|upper_first }} = state;
 }
 

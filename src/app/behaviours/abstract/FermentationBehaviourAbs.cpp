@@ -42,11 +42,11 @@ void FermentationBehaviourAbs::sendEvent(const FermentationStatusEvent& event){
     sendEventToHost(event.header());
 }
 
-FermentationStatusState& FermentationBehaviourAbs::writeState(FermentationStatusType type){
+FermentationStatusState& FermentationBehaviourAbs::writeFermentationStatusState(){
     return *mFermentationStatusState;
 }
 
-void FermentationBehaviourAbs::injectWritableState(FermentationStatusState* state){
+void FermentationBehaviourAbs::injectFermentationStatusState(FermentationStatusState* state){
     mFermentationStatusState = state;
 }
 

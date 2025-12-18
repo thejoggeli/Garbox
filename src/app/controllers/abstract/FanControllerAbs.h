@@ -35,15 +35,9 @@ protected:
     void sendEvent(const FanStatusEvent& event);
     void sendEvent(const FanSampleEvent& event);
 
-    // state type accessors for getters and setters
-    struct FanStatusType {};
-    struct FanSampleType {};
-    static constexpr FanStatusType FanStatus {};
-    static constexpr FanSampleType FanSample {};
-
     // get writable states
-    FanStatusState& writeState(FanStatusType type);
-    FanSampleState& writeState(FanSampleType type);
+    FanStatusState& writeFanStatusState();
+    FanSampleState& writeFanSampleState();
 
 private:
 
@@ -52,8 +46,8 @@ private:
     FanSampleState* mFanSampleState = nullptr;
 
     // dependency inject writable states
-    void injectWritableState(FanStatusState* state);
-    void injectWritableState(FanSampleState* state);
+    void injectFanStatusState(FanStatusState* state);
+    void injectFanSampleState(FanSampleState* state);
 
     // hide event methods
     using ControllerAbs::makeEvent;

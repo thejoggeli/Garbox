@@ -93,27 +93,18 @@
 
 {# states protected #}
 {% macro states_protected(component) %}
-{% if component.all_states %}
-    // state type accessors for getters and setters
-{% for state_name, state_data in component.all_states.items() %}
-    struct {{ state_name }}Type {};
-{% endfor %}
-{% for state_name, state_data in component.all_states.items() %}
-    static constexpr {{ state_name }}Type {{ state_name }} {};
-{% endfor %}
-{% endif %}
 
 {% if component.write_states %}
     // get writable states
 {% for state_name, state_data in component.write_states.items() %}
-    {{ state_data["name_with_suffix"]|upper_first }}& writeState({{ state_name }}Type type);
+    {{ state_data["name_with_suffix"]|upper_first }}& write{{ state_name }}State();
 {% endfor %}
 {% endif %}
 
 {% if component.read_states %}
     // get readable states
 {% for state_name, state_data in component.read_states.items() %}
-    const {{ state_data["name_with_suffix"]|upper_first }}& readState({{ state_name }}Type type);
+    const {{ state_data["name_with_suffix"]|upper_first }}& read{{ state_name }}State();
 {% endfor %}
 {% endif %}
 
@@ -139,14 +130,14 @@
 {% if component.write_states %}
     // dependency inject writable states
 {% for state_name, state_data in component.write_states.items() %}
-    void injectWritableState({{ state_data["name_with_suffix"]|upper_first }}* state);
+    void inject{{ state_data["name_with_suffix"]|upper_first }}({{ state_data["name_with_suffix"]|upper_first }}* state);
 {% endfor %}
 {% endif %}
 
 {% if component.read_states %}
     // dependency inject readable states
 {% for state_name, state_data in component.read_states.items() %}
-    void injectReadableState(const {{ state_data["name_with_suffix"]|upper_first }}* state);
+    void inject{{ state_data["name_with_suffix"]|upper_first }}(const {{ state_data["name_with_suffix"]|upper_first }}* state);
 {% endfor %}
 {% endif %}
 

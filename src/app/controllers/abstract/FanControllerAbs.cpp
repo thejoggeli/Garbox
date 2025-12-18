@@ -26,19 +26,19 @@ void FanControllerAbs::sendEvent(const FanSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-FanStatusState& FanControllerAbs::writeState(FanStatusType type){
+FanStatusState& FanControllerAbs::writeFanStatusState(){
     return *mFanStatusState;
 }
 
-FanSampleState& FanControllerAbs::writeState(FanSampleType type){
+FanSampleState& FanControllerAbs::writeFanSampleState(){
     return *mFanSampleState;
 }
 
-void FanControllerAbs::injectWritableState(FanStatusState* state){
+void FanControllerAbs::injectFanStatusState(FanStatusState* state){
     mFanStatusState = state;
 }
 
-void FanControllerAbs::injectWritableState(FanSampleState* state){
+void FanControllerAbs::injectFanSampleState(FanSampleState* state){
     mFanSampleState = state;
 }
 

@@ -26,19 +26,19 @@ void I2cPartsControllerAbs::sendEvent(const TemperatureSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-TemperatureStatusState& I2cPartsControllerAbs::writeState(TemperatureStatusType type){
+TemperatureStatusState& I2cPartsControllerAbs::writeTemperatureStatusState(){
     return *mTemperatureStatusState;
 }
 
-TemperatureSampleState& I2cPartsControllerAbs::writeState(TemperatureSampleType type){
+TemperatureSampleState& I2cPartsControllerAbs::writeTemperatureSampleState(){
     return *mTemperatureSampleState;
 }
 
-void I2cPartsControllerAbs::injectWritableState(TemperatureStatusState* state){
+void I2cPartsControllerAbs::injectTemperatureStatusState(TemperatureStatusState* state){
     mTemperatureStatusState = state;
 }
 
-void I2cPartsControllerAbs::injectWritableState(TemperatureSampleState* state){
+void I2cPartsControllerAbs::injectTemperatureSampleState(TemperatureSampleState* state){
     mTemperatureSampleState = state;
 }
 

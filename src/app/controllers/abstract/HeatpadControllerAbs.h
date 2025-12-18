@@ -35,15 +35,9 @@ protected:
     void sendEvent(const HeatpadStatusEvent& event);
     void sendEvent(const HeatpadSampleEvent& event);
 
-    // state type accessors for getters and setters
-    struct HeatpadStatusType {};
-    struct HeatpadSampleType {};
-    static constexpr HeatpadStatusType HeatpadStatus {};
-    static constexpr HeatpadSampleType HeatpadSample {};
-
     // get writable states
-    HeatpadStatusState& writeState(HeatpadStatusType type);
-    HeatpadSampleState& writeState(HeatpadSampleType type);
+    HeatpadStatusState& writeHeatpadStatusState();
+    HeatpadSampleState& writeHeatpadSampleState();
 
 private:
 
@@ -52,8 +46,8 @@ private:
     HeatpadSampleState* mHeatpadSampleState = nullptr;
 
     // dependency inject writable states
-    void injectWritableState(HeatpadStatusState* state);
-    void injectWritableState(HeatpadSampleState* state);
+    void injectHeatpadStatusState(HeatpadStatusState* state);
+    void injectHeatpadSampleState(HeatpadSampleState* state);
 
     // hide event methods
     using ControllerAbs::makeEvent;

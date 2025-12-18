@@ -38,15 +38,9 @@ protected:
     // send typed events
     void sendEvent(const FanCommandEvent& event);
 
-    // state type accessors for getters and setters
-    struct FanStatusType {};
-    struct FanSampleType {};
-    static constexpr FanStatusType FanStatus {};
-    static constexpr FanSampleType FanSample {};
-
     // get readable states
-    const FanStatusState& readState(FanStatusType type);
-    const FanSampleState& readState(FanSampleType type);
+    const FanStatusState& readFanStatusState();
+    const FanSampleState& readFanSampleState();
 
 private:
 
@@ -55,8 +49,8 @@ private:
     const FanSampleState* mFanSampleState = nullptr;
 
     // dependency inject readable states
-    void injectReadableState(const FanStatusState* state);
-    void injectReadableState(const FanSampleState* state);
+    void injectFanStatusState(const FanStatusState* state);
+    void injectFanSampleState(const FanSampleState* state);
 
     // hide event methods
     using BehaviourAbs::makeEvent;

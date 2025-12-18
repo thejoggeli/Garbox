@@ -55,7 +55,7 @@ void CalibrationBehaviour::onFanStatusEvent(const FanStatusEvent& event){
 }
 
 void CalibrationBehaviour::onFanSampleEvent(const FanSampleEvent& event){
-    // nothing to do
+    // nothing to do    
 }
 
 void CalibrationBehaviour::onFanStatusStateChanged(const FanStatusState& state){

@@ -18,19 +18,19 @@ void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
     sendEventToHost(event.header());
 }
 
-DisplayStatusState& DisplayControllerAbs::writeState(DisplayStatusType type){
+DisplayStatusState& DisplayControllerAbs::writeDisplayStatusState(){
     return *mDisplayStatusState;
 }
 
-DisplayDiagnosticsState& DisplayControllerAbs::writeState(DisplayDiagnosticsType type){
+DisplayDiagnosticsState& DisplayControllerAbs::writeDisplayDiagnosticsState(){
     return *mDisplayDiagnosticsState;
 }
 
-void DisplayControllerAbs::injectWritableState(DisplayStatusState* state){
+void DisplayControllerAbs::injectDisplayStatusState(DisplayStatusState* state){
     mDisplayStatusState = state;
 }
 
-void DisplayControllerAbs::injectWritableState(DisplayDiagnosticsState* state){
+void DisplayControllerAbs::injectDisplayDiagnosticsState(DisplayDiagnosticsState* state){
     mDisplayDiagnosticsState = state;
 }
 

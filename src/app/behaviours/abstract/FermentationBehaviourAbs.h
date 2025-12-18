@@ -40,12 +40,8 @@ protected:
     void sendEvent(const HeatpadCommandEvent& event);
     void sendEvent(const FermentationStatusEvent& event);
 
-    // state type accessors for getters and setters
-    struct FermentationStatusType {};
-    static constexpr FermentationStatusType FermentationStatus {};
-
     // get writable states
-    FermentationStatusState& writeState(FermentationStatusType type);
+    FermentationStatusState& writeFermentationStatusState();
 
 private:
 
@@ -53,7 +49,7 @@ private:
     FermentationStatusState* mFermentationStatusState = nullptr;
 
     // dependency inject writable states
-    void injectWritableState(FermentationStatusState* state);
+    void injectFermentationStatusState(FermentationStatusState* state);
 
     // hide event methods
     using BehaviourAbs::makeEvent;

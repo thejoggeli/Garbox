@@ -18,19 +18,19 @@ void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
     sendEventToHost(event.header());
 }
 
-const FanStatusState& CalibrationBehaviourAbs::readState(FanStatusType type){
+const FanStatusState& CalibrationBehaviourAbs::readFanStatusState(){
     return *mFanStatusState;
 }
 
-const FanSampleState& CalibrationBehaviourAbs::readState(FanSampleType type){
+const FanSampleState& CalibrationBehaviourAbs::readFanSampleState(){
     return *mFanSampleState;
 }
 
-void CalibrationBehaviourAbs::injectReadableState(const FanStatusState* state){
+void CalibrationBehaviourAbs::injectFanStatusState(const FanStatusState* state){
     mFanStatusState = state;
 }
 
-void CalibrationBehaviourAbs::injectReadableState(const FanSampleState* state){
+void CalibrationBehaviourAbs::injectFanSampleState(const FanSampleState* state){
     mFanSampleState = state;
 }
 

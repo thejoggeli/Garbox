@@ -34,15 +34,9 @@ protected:
     void sendEvent(const TemperatureStatusEvent& event);
     void sendEvent(const TemperatureSampleEvent& event);
 
-    // state type accessors for getters and setters
-    struct TemperatureStatusType {};
-    struct TemperatureSampleType {};
-    static constexpr TemperatureStatusType TemperatureStatus {};
-    static constexpr TemperatureSampleType TemperatureSample {};
-
     // get writable states
-    TemperatureStatusState& writeState(TemperatureStatusType type);
-    TemperatureSampleState& writeState(TemperatureSampleType type);
+    TemperatureStatusState& writeTemperatureStatusState();
+    TemperatureSampleState& writeTemperatureSampleState();
 
 private:
 
@@ -51,8 +45,8 @@ private:
     TemperatureSampleState* mTemperatureSampleState = nullptr;
 
     // dependency inject writable states
-    void injectWritableState(TemperatureStatusState* state);
-    void injectWritableState(TemperatureSampleState* state);
+    void injectTemperatureStatusState(TemperatureStatusState* state);
+    void injectTemperatureSampleState(TemperatureSampleState* state);
 
     // hide event methods
     using ControllerAbs::makeEvent;

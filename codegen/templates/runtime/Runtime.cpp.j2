@@ -55,14 +55,14 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
     // dependency inject write states
 {% for comp_name, comp_data in components.items() %}
     {% for state_name, state_data in comp_data.write_states.items() %}
-    m{{ comp_name }}.injectWritableState(&mStateRegistry.get{{ state_name|upper_first }}());
+    m{{ comp_name }}.inject{{ state_data["name_with_suffix"]|upper_first }}(&mStateRegistry.get{{ state_name|upper_first }}());
     {% endfor %}
 {% endfor %}
 
     // dependency inject read states
 {% for comp_name, comp_data in components.items() %}
     {% for state_name, state_data in comp_data.read_states.items() %}
-    m{{ comp_name }}.injectReadableState(&mStateRegistry.get{{ state_name|upper_first }}());
+    m{{ comp_name }}.inject{{ state_data["name_with_suffix"]|upper_first }}(&mStateRegistry.get{{ state_name|upper_first }}());
     {% endfor %}
 {% endfor %}
 

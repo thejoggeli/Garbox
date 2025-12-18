@@ -71,19 +71,19 @@ GarboxRuntime::GarboxRuntime():
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
 
     // dependency inject write states
-    mFermentationBehaviour.injectWritableState(&mStateRegistry.getFermentationStatus());
-    mDisplayController.injectWritableState(&mStateRegistry.getDisplayStatus());
-    mDisplayController.injectWritableState(&mStateRegistry.getDisplayDiagnostics());
-    mFanController.injectWritableState(&mStateRegistry.getFanStatus());
-    mFanController.injectWritableState(&mStateRegistry.getFanSample());
-    mHeatpadController.injectWritableState(&mStateRegistry.getHeatpadStatus());
-    mHeatpadController.injectWritableState(&mStateRegistry.getHeatpadSample());
-    mI2cPartsController.injectWritableState(&mStateRegistry.getTemperatureStatus());
-    mI2cPartsController.injectWritableState(&mStateRegistry.getTemperatureSample());
+    mFermentationBehaviour.injectFermentationStatusState(&mStateRegistry.getFermentationStatus());
+    mDisplayController.injectDisplayStatusState(&mStateRegistry.getDisplayStatus());
+    mDisplayController.injectDisplayDiagnosticsState(&mStateRegistry.getDisplayDiagnostics());
+    mFanController.injectFanStatusState(&mStateRegistry.getFanStatus());
+    mFanController.injectFanSampleState(&mStateRegistry.getFanSample());
+    mHeatpadController.injectHeatpadStatusState(&mStateRegistry.getHeatpadStatus());
+    mHeatpadController.injectHeatpadSampleState(&mStateRegistry.getHeatpadSample());
+    mI2cPartsController.injectTemperatureStatusState(&mStateRegistry.getTemperatureStatus());
+    mI2cPartsController.injectTemperatureSampleState(&mStateRegistry.getTemperatureSample());
 
     // dependency inject read states
-    mCalibrationBehaviour.injectReadableState(&mStateRegistry.getFanStatus());
-    mCalibrationBehaviour.injectReadableState(&mStateRegistry.getFanSample());
+    mCalibrationBehaviour.injectFanStatusState(&mStateRegistry.getFanStatus());
+    mCalibrationBehaviour.injectFanSampleState(&mStateRegistry.getFanSample());
 
 }
 
