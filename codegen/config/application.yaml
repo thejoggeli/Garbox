@@ -15,4 +15,5 @@ application:
     - { name: Render, delay_millis: 20 }
   stubs_prefix: "Stub"
   stubs_suffix: ""
+  max_dispatch_recursion_depth: 3
   

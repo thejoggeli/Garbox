@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from loader.parse_application import parse_application
 from loader.parse_events import parse_events
+from loader.parse_states import parse_states
 from loader.parse_hardware import parse_hardware_config
 from loader.gui.parse_guis import parse_guis
 from common.context import Context
@@ -41,8 +42,11 @@ class Loader:
         # parse hardware config
         parse_hardware_config(self.config)
 
-        # parse events (render default values)
+        # parse events
         parse_events(self.config)
+
+        # parse states
+        parse_states(self.config)
 
         # parse gui xml configs  
         self.config["guis"] = parse_guis(gui_configs_text, self.output_dir / "gui")

@@ -1,0 +1,21 @@
+{% include "_common/header.j2" %}
+#include "StateType.h"
+
+namespace Garbox {
+
+const char* StateTypeToString(StateType type){
+    switch(type){
+
+        case StateType::Null: return "Null";
+
+{% for name in states.keys() %}
+        case StateType::{{ name }}: return "{{ name }}";
+{% endfor %}
+
+        case StateType::Count: return "Count";
+    }
+
+    return "Invalid";
+}
+
+} // namespace Garbox

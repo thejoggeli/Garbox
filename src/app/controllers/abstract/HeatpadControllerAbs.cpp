@@ -19,11 +19,11 @@ HeatpadSampleEvent HeatpadControllerAbs::makeHeatpadSampleEvent(){
 }
 
 void HeatpadControllerAbs::sendEvent(const HeatpadStatusEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void HeatpadControllerAbs::sendEvent(const HeatpadSampleEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

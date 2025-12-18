@@ -1,3 +1,5 @@
+import re
+
 def to_camel_case(name: str, delim: str | None = None) -> str:
     # Case 1: delimiter-based conversion
     if delim and delim in name:
@@ -12,12 +14,24 @@ def to_camel_case(name: str, delim: str | None = None) -> str:
         return name[0].lower() + name[1:]
     return name
 
+def to_snake_case(name: str, delim: str | None = None) -> str:
+    # Case 1: delimiter-based conversion
+    if delim and delim in name:
+        parts = name.split(delim)
+        return "_".join(p.lower() for p in parts if p)
+
+    # Case 2: camelCase or PascalCase → snake_case
+    if not name:
+        return name
+
+    # Insert underscore before capitals (except at start), then lowercase
+    snake = re.sub(r'(?<!^)(?=[A-Z])', '_', name)
+    return snake.lower()
 
 def upper_first(s):
     if not isinstance(s, str) or not s:
         return s
     return s[0].upper() + s[1:]
-
 
 def lower_first(s):
     if not isinstance(s, str) or not s:
@@ -29,3 +43,8 @@ def ljust(s:str, width:int, fillchar:str=" "):
 
 def rjust(s:str, width:int, fillchar:str=" "):
     return s.rjust(width, fillchar)
+
+def ensure_suffix(value: str, suffix: str):
+    if not value.endswith(suffix):
+        return value + suffix
+    return value

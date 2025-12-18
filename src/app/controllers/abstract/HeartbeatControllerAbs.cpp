@@ -15,7 +15,7 @@ HeartbeatEvent HeartbeatControllerAbs::makeHeartbeatEvent(){
 }
 
 void HeartbeatControllerAbs::sendEvent(const HeartbeatEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

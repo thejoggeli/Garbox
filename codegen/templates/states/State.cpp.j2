@@ -1,0 +1,39 @@
+{% include "_common/header.j2" %}
+#include "{{ name_with_suffix }}.h"
+
+namespace Garbox {
+
+{{ name_with_suffix }}::{{ name_with_suffix }}(): StateAbs(StateType::{{ name }}){
+    // mCurrent and mNext default-initialized
+}
+
+{% for field in fields.values() %}
+{% if field.type == "bool" %}
+{{ field.type }} {{ name_with_suffix }}::is{{ field.name|upper_first }}() const {
+{% else %}
+{{ field.type }} {{ name_with_suffix }}::get{{ field.name|upper_first }}() const {
+{% endif %}
+    return mCurrent.{{ field.name|lower_first }};
+}
+
+{% endfor %}
+
+{% for field in fields.values() %}
+void {{ name_with_suffix }}::set{{ field.name|upper_first }}({{ field.type }} value){
+    if (mNext.{{ field.name|lower_first }} == value) {
+        return;
+    }
+    mNext.{{ field.name|lower_first }} = value;
+    setDirty();
+}
+
+{% endfor %}
+
+void {{ name_with_suffix }}::publish(){
+    if (!isDirty()) {
+        return;
+    }
+    mCurrent = mNext;
+}
+
+} // namespace Garbox

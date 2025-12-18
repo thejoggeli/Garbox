@@ -54,6 +54,12 @@ private:
         return mCurrentEventId;
     }
 
+    // disallow copy and move 
+    EventFactory(const EventFactory&) = delete;
+    EventFactory& operator=(const EventFactory&) = delete;
+    EventFactory(EventFactory&&) = delete;
+    EventFactory& operator=(EventFactory&&) = delete;
+
 };
 
 } // namespace

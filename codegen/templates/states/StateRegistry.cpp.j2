@@ -1,0 +1,18 @@
+#include "StateRegistry.h"
+#include "core/assert/Assert.h"
+
+namespace Garbox {
+
+StateRegistry::StateRegistry(){
+    // nothing to do
+}
+
+// states accessors
+{% for state in states.values() %}
+{{ state.name_with_suffix }}& StateRegistry::get{{ state.name }}(){
+    return m{{ state.name }};
+}
+
+{% endfor %}
+
+} // namespace Garbox

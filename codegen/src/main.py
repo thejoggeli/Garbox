@@ -5,6 +5,7 @@ from loader.loader import Loader
 from generate.gen_runtime import generate_runtime
 from generate.gen_hardware import generate_hardware
 from generate.gen_types import generate_types
+from generate.gen_states import generate_states
 from generate.gen_components import generate_components
 from generate.gen_config import generate_config
 from generate.gen_guis import generate_guis
@@ -44,9 +45,13 @@ def main():
     print_section("generating hardware files")
     generate_hardware(ctx, loader)
 
-    # events generation
+    # types generation
     print_section("generating types files")
     generate_types(ctx, loader)
+
+    # states generation
+    print_section("generating state files")
+    generate_states(ctx, loader)
 
     # components generation
     print_section("generating component files")

@@ -55,11 +55,11 @@ void ComponentAbs::becomeDisabled(){
     onBecomeDisabled();
 }
 
-void ComponentAbs::publishEvent(const EventHeader* header){
+void ComponentAbs::sendEventToHost(const EventHeader* header){
     if(!mInitialized){
         TriggerExit("ComponentAbs", "not initialized");
     }
-    mHost->publishEvent(header);
+    mHost->receiveEvent(header);
 }
 
 } // namespace

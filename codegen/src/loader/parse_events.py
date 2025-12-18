@@ -1,4 +1,5 @@
 from common.parse_type import render_value
+from common.str_filters import ensure_suffix
 
 def parse_events(config: dict):
 
@@ -37,6 +38,8 @@ def parse_events(config: dict):
             }
 
         event_types[event_name] = {
+            "name": event_name,
+            "name_with_suffix": ensure_suffix(event_name, "Event"),
             "meta": event_meta,
             "kind": event_kind,
             "fields": parsed_fields,

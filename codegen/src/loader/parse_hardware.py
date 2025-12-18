@@ -1,7 +1,5 @@
-from common.util import ( 
-    ensure_dict_keys_have_suffix, 
-    ensure_str_has_suffix,
-)
+from common.util import ensure_dict_keys_have_suffix
+from common.str_filters import ensure_suffix
 
 def parse_hardware_config(config):
 
@@ -12,4 +10,4 @@ def parse_hardware_config(config):
 
     # ensure timer bindings in ledc channels have 'Timer' suffix
     for channel in hardware["ledc"]["instances"]["channels"].values():
-        channel["timer"] = ensure_str_has_suffix(channel["timer"], "Timer")
+        channel["timer"] = ensure_suffix(channel["timer"], "Timer")

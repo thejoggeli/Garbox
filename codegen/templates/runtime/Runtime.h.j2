@@ -1,6 +1,7 @@
 #pragma once
 {% include "_common/header.j2" %}
 {% set RuntimeName = application.app_name ~ 'Runtime' %}
+#include "app/states/StateRegistry.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 // include all components
@@ -28,17 +29,23 @@ private:
 
     TickRunner mTickRunner;
 
+    // state registry instance
+    StateRegistry mStateRegistry;
+
     {# behaviour instances #}
+    // behaviours instances
     {% for beh in behaviours %}
     {{ beh }} m{{ beh }};
     {% endfor %}
 
     {# controller instances #}
+    // controllers instances
     {% for ctrl in controllers %}
     {{ ctrl }} m{{ ctrl }};
     {% endfor %}
 
     {# screen instances #}
+    // screens instances
     {% for screen in screens %}
     {{ screen }} m{{ screen }};
     {% endfor %}
@@ -54,6 +61,7 @@ private:
     void onInit() final;
     void onStart() final;
     void onRun() final;
+    void onRouteStateChanged(const StateAbs& state) final;
     void onRouteEvent(const EventHeader* header) final;
     void onActiveBehaviourChanged() final;
     void onActiveScreenChanged() final;

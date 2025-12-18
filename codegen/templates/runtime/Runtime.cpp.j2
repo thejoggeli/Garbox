@@ -19,10 +19,18 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 {{ RuntimeName }}::{{ RuntimeName }}():
     RuntimeAbs(RuntimeAbs::Config {
         .numComponents = {{ controllers | length + behaviours | length + screens | length }},
+        .numStates = {{ states | length }},
         .eventPoolSizeBytes = {{ application.event_pool_size_bytes }},
         .eventQueueLength = {{ application.event_queue_length }},
+        .maxDispatchRecursionDepth = {{ application.max_dispatch_recursion_depth }}
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis){
+    mTickRunner(TickHandlersCount, TickPeriodMillis),
+    mStateRegistry(){
+
+    // register states
+{% for state in states.values() %}
+    registerState(&mStateRegistry.get{{ state.name|upper_first }}());
+{% endfor %}
 
     // register components
 {% for beh in behaviours %}
@@ -128,10 +136,15 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
     }
 {% endif %}
     {# Call dispatch events #}
-    dispatchEvents();
+    dispatch();
 }
 
 {% endfor %}
+
+void {{ RuntimeName }}::onRouteStateChanged(const StateAbs& state){
+    
+}
+
 void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 
 {% set ns = namespace(printed=0) %}

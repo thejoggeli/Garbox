@@ -29,7 +29,7 @@ private:
 
     // hide event methods
     using ScreenAbs::makeEvent;
-    using ScreenAbs::publishEvent;
+    using ScreenAbs::sendEventToHost;
 
 /********************/
 /*** LVGL Section ***/

@@ -15,7 +15,7 @@ DisplayStatusEvent DisplayControllerAbs::makeDisplayStatusEvent(){
 }
 
 void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

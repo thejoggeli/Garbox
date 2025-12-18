@@ -1,6 +1,6 @@
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
-from common.str_filters import lower_first, upper_first, ljust, rjust
+from common.str_filters import lower_first, upper_first, ljust, rjust, ensure_suffix
 import re
 
 
@@ -15,6 +15,7 @@ def create_jinja_env(template_dir: Path):
     env.filters["lower_first"] = lower_first
     env.filters["ljust"] = ljust
     env.filters["rjust"] = rjust
+    env.filters["ensure_suffix"] = ensure_suffix
     return env
 
 

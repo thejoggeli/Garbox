@@ -59,7 +59,7 @@ protected:
     virtual void onBecomeDisabled() {}; 
 
     // send event
-    void publishEvent(const EventHeader* header);
+    void sendEventToHost(const EventHeader* header);
 
     // make event
     template<EventType E>

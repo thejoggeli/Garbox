@@ -1,0 +1,36 @@
+{% include "_common/header.j2" %}
+#pragma once
+
+{% for state in states.values() %}
+#include "app/states/types/{{ state.name_with_suffix }}.h"
+{% endfor %}
+
+namespace Garbox {
+
+class StateRegistry final {
+public:
+
+    StateRegistry();
+    ~StateRegistry() = default;
+
+    // states accessors
+{% for state in states.values() %}
+    {{ state.name_with_suffix }}& get{{ state.name }}();
+{% endfor %}
+
+private:
+
+    // states instances
+{% for state in states.values() %}
+    {{ state.name_with_suffix }} m{{ state.name }};
+{% endfor %}
+
+    // disallow copy and move
+    StateRegistry(const StateRegistry&) = delete;
+    StateRegistry& operator=(const StateRegistry&) = delete;
+    StateRegistry(StateRegistry&&) = delete;
+    StateRegistry& operator=(StateRegistry&&) = delete;
+
+};
+
+} // namespace Garbox

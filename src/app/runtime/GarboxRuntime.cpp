@@ -23,10 +23,26 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 GarboxRuntime::GarboxRuntime():
     RuntimeAbs(RuntimeAbs::Config {
         .numComponents = 12,
+        .numStates = 11,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
+        .maxDispatchRecursionDepth = 3
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis){
+    mTickRunner(TickHandlersCount, TickPeriodMillis),
+    mStateRegistry(){
+
+    // register states
+    registerState(&mStateRegistry.getDisplayStatus());
+    registerState(&mStateRegistry.getDisplayDiagnostics());
+    registerState(&mStateRegistry.getFanStatus());
+    registerState(&mStateRegistry.getFanSample());
+    registerState(&mStateRegistry.getFermentationStatus());
+    registerState(&mStateRegistry.getHeatpadStatus());
+    registerState(&mStateRegistry.getHeatpadSample());
+    registerState(&mStateRegistry.getTemperatureStatus());
+    registerState(&mStateRegistry.getTemperatureSample());
+    registerState(&mStateRegistry.getActiveBehaviour());
+    registerState(&mStateRegistry.getActiveScreen());
 
     // register components
     registerComponent(&mCalibrationBehaviour);
@@ -96,7 +112,7 @@ void GarboxRuntime::handleTickEnd(){
 void GarboxRuntime::handleHeartbeatTick(){
     Profiler::MeasureScoped profiler(ProfilerId::HeartbeatTick);
     mHeartbeatController.onHeartbeatTick();
-    dispatchEvents();
+    dispatch();
 }
 
 void GarboxRuntime::handleInputTick(){
@@ -105,7 +121,7 @@ void GarboxRuntime::handleInputTick(){
     mHeatpadController.onInputTick();
     mInputController.onInputTick();
     mI2cPartsController.onInputTick();
-    dispatchEvents();
+    dispatch();
 }
 
 void GarboxRuntime::handleLogicTick(){
@@ -119,26 +135,30 @@ void GarboxRuntime::handleLogicTick(){
             break;
         default: break; // active behaviour does not receive tick type
     }
-    dispatchEvents();
+    dispatch();
 }
 
 void GarboxRuntime::handleOutputTick(){
     Profiler::MeasureScoped profiler(ProfilerId::OutputTick);
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
-    dispatchEvents();
+    dispatch();
 }
 
 void GarboxRuntime::handleLoggingTick(){
     Profiler::MeasureScoped profiler(ProfilerId::LoggingTick);
     mDevtoolsController.onLoggingTick();
-    dispatchEvents();
+    dispatch();
 }
 
 void GarboxRuntime::handleRenderTick(){
     Profiler::MeasureScoped profiler(ProfilerId::RenderTick);
     mDisplayController.onRenderTick();
-    dispatchEvents();
+    dispatch();
+}
+
+void GarboxRuntime::onRouteStateChanged(const StateAbs& state){
+    
 }
 
 void GarboxRuntime::onRouteEvent(const EventHeader* header){

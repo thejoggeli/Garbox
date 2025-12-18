@@ -6,6 +6,7 @@ from loader.loader import Loader
 
 def generate_types(ctx: Context, loader: Loader):
     _generate_events(ctx, loader)
+    _generate_states(ctx, loader)
     _generate_component_ids(ctx, loader)
     _generate_profiler_ids(ctx, loader)
     _generate_tick_phases(ctx, loader)
@@ -30,6 +31,21 @@ def _generate_events(ctx: Context, loader: Loader):
         Item(loader.config, "event_types", ctx.shared_dir / "types/EventType.h",    "types/EventType.h.j2"),
         Item(loader.config, "event_types", ctx.shared_dir / "types/EventType.cpp",  "types/EventType.cpp.j2"),
         Item(payloads_dict, "*",           ctx.shared_dir / "types/EventPayload.h", "types/EventPayload.h.j2"),
+    ]
+
+    generate_items(ctx, items)
+
+
+def _generate_states(ctx: Context, loader: Loader):
+    """
+    Generates: 
+    - shared/types/StateType.h
+    - shared/types/StateType.cpp
+    """
+
+    items = [
+        Item(loader.config, "states", ctx.shared_dir / "types/StateType.h",   "types/StateType.h.j2"),
+        Item(loader.config, "states", ctx.shared_dir / "types/StateType.cpp", "types/StateType.cpp.j2"),
     ]
 
     generate_items(ctx, items)

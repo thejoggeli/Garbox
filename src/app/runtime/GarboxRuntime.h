@@ -2,6 +2,7 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
+#include "app/states/StateRegistry.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 // include all components
@@ -29,9 +30,14 @@ private:
 
     TickRunner mTickRunner;
 
+    // state registry instance
+    StateRegistry mStateRegistry;
+
+    // behaviours instances
     CalibrationBehaviour mCalibrationBehaviour;
     FermentationBehaviour mFermentationBehaviour;
 
+    // controllers instances
     DisplayController mDisplayController;
     DevtoolsController mDevtoolsController;
     FanController mFanController;
@@ -40,6 +46,7 @@ private:
     InputController mInputController;
     I2cPartsController mI2cPartsController;
 
+    // screens instances
     MainScreen mMainScreen;
     DebugScreen mDebugScreen;
     EventLogScreen mEventLogScreen;
@@ -57,6 +64,7 @@ private:
     void onInit() final;
     void onStart() final;
     void onRun() final;
+    void onRouteStateChanged(const StateAbs& state) final;
     void onRouteEvent(const EventHeader* header) final;
     void onActiveBehaviourChanged() final;
     void onActiveScreenChanged() final;

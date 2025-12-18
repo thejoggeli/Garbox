@@ -1,0 +1,23 @@
+#pragma once
+{% include "_common/header.j2" %}
+#include <cstdint>
+
+namespace Garbox {
+
+enum class StateType : uint16_t {
+
+    // null state
+    Null = 0,
+
+    // generated from config
+{% for name in states.keys() %}
+    {{ name }},
+{% endfor %}
+
+    // enum size marker
+    Count,
+};
+
+const char* StateTypeToString(StateType type);
+
+} // namespace Garbox

@@ -19,11 +19,11 @@ TemperatureSampleEvent I2cPartsControllerAbs::makeTemperatureSampleEvent(){
 }
 
 void I2cPartsControllerAbs::sendEvent(const TemperatureStatusEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void I2cPartsControllerAbs::sendEvent(const TemperatureSampleEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

@@ -1,8 +1,8 @@
 from common.util import ( 
     ensure_list,
-    ensure_dict_keys_have_suffix, 
-    ensure_str_has_suffix,
+    ensure_dict_keys_have_suffix
 )
+from common.str_filters import ensure_suffix
 from loader.parse_screens import parse_screens
 
 COMPONENT_TYPES = ["controllers", "behaviours", "screens"]
@@ -56,7 +56,7 @@ def process_components(config, key, suffix):
             
         # tick phase entry must have suffix 'Tick'
         for idx, name in enumerate(component["tick_phases"]):
-            component["tick_phases"][idx] = ensure_str_has_suffix(name, "Tick")  
+            component["tick_phases"][idx] = ensure_suffix(name, "Tick")  
         
         # init 'send_events' field
         component["send_events"] = ensure_list(component.get("send_events", []))
@@ -68,7 +68,7 @@ def process_components(config, key, suffix):
 def process_tick_phases(config):
 
     for tick_phase in config["application"]["tick_phases"]:
-        tick_phase["name"] = ensure_str_has_suffix(tick_phase["name"], "Tick")
+        tick_phase["name"] = ensure_suffix(tick_phase["name"], "Tick")
 
     # add list of which component uses each tick to application.tick_phases
     phases = config["application"]["tick_phases"]

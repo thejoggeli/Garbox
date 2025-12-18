@@ -31,7 +31,7 @@ private:
 
     // hide event methods
     using ControllerAbs::makeEvent;
-    using ControllerAbs::publishEvent;
+    using ControllerAbs::sendEventToHost;
 
 };
 

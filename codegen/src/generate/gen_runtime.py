@@ -67,6 +67,7 @@ def _generate_runtime(ctx: Context, loader: Loader):
         "behaviour_paths":  _collect_paths(loader, 'behaviours'),
         "controller_paths": _collect_paths(loader, 'controllers'),
         "screen_paths":     _collect_paths(loader, 'screens'),
+        "states":           loader.config["states"],
     }
 
     items = [

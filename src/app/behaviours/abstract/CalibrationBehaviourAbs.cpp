@@ -15,7 +15,7 @@ FanCommandEvent CalibrationBehaviourAbs::makeFanCommandEvent(){
 }
 
 void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

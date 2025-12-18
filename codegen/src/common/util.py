@@ -104,9 +104,3 @@ def ensure_dict_keys_have_suffix(in_dict: dict, suffix: str):
         out_dict[new_key] = value
 
     return out_dict
-
-
-def ensure_str_has_suffix(value: str, suffix: str):
-    if not value.endswith(suffix):
-        return value + suffix
-    return value

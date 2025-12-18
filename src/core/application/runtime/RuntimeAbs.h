@@ -6,6 +6,8 @@
 #include "core/application/event/EventFactory.h"
 #include "core/application/runtime/RuntimeContext.h"
 #include "core/application/screen/ScreenAbs.h"
+#include "core/application/state/StateAbs.h"
+#include "core/application/state/StateHostIfc.h"
 #include "core/util/container/heap/RingBufferHeap.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/heap/VectorHeap.h"
@@ -15,13 +17,15 @@ namespace Garbox {
 /**
  * Extend this class in the application
  */
-class RuntimeAbs : public ComponentHostIfc {
+class RuntimeAbs : public ComponentHostIfc, public StateHostIfc {
 public:
 
     struct Config {
         size_t numComponents;
+        size_t numStates;
         size_t eventPoolSizeBytes = 1024;
         size_t eventQueueLength = 64;
+        size_t maxDispatchRecursionDepth = 3;
     };
 
     RuntimeAbs(const Config& config);
@@ -42,9 +46,12 @@ public:
     void requestChangeBehaviour(BehaviourId id) final;
     void requestChangeScreen(ScreenId id) final;
     void requestUpdateScreenNow() final;
-    void publishEvent(const EventHeader* header) final;
+    void receiveEvent(const EventHeader* header) final;
     EventFactory& getEventFactory() final;
     const RuntimeContext& getContext() const final;
+
+    // StateHostIfc
+    void markStateDirty(StateAbs* state) final;
 
 protected:
 
@@ -63,9 +70,11 @@ protected:
     // components setup
     void registerComponent(ComponentAbs* component);
 
-    // event handling internal methods
-    void dispatchEvents();
-    void clearEventQueue();
+    // states setup
+    void registerState(StateAbs* state);
+
+    // dispatch states and events until a stable state is reached 
+    void dispatch();
 
     // behaviours internal methods
     void setQueuedBehaviour(BehaviourAbs* behaviour);
@@ -78,6 +87,7 @@ protected:
     virtual void onInit() = 0;
     virtual void onStart() = 0;
     virtual void onRun() = 0;
+    virtual void onRouteStateChanged(const StateAbs& state) = 0;
     virtual void onRouteEvent(const EventHeader* event) = 0;
     virtual void onActiveBehaviourChanged() = 0;
     virtual void onActiveScreenChanged() = 0;
@@ -89,6 +99,12 @@ protected:
 
 private:
 
+    const size_t mMaxDispatchRecursionDepth;
+
+    // state and event handling internal methods
+    void dispatchStates();
+    void dispatchEvents();
+
     // private because this is already called in requestUpdateScreenNow()
     void applyQueuedScreen(); 
 
@@ -99,7 +115,14 @@ private:
     EventFactory mEventFactory;
     RingBufferHeap<const EventHeader*> mEventQueue; // store only pointer, events are owned by event factory
 
+    // components
     VectorHeap<ComponentAbs*> mComponents;
+
+    // states
+    VectorHeap<StateAbs*> mStates;
+    VectorHeap<StateAbs*> mDirtyStates; 
+    // second state queue is required to allow issuing new state changes during dispatch
+    VectorHeap<StateAbs*> mStateUpdatesPending;  
 };
 
 } // namespace

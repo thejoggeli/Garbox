@@ -16,9 +16,13 @@ namespace Garbox {
 
 RuntimeAbs::RuntimeAbs(const Config& config):
     // init members
+    mMaxDispatchRecursionDepth(config.maxDispatchRecursionDepth),
     mEventFactory(config.eventPoolSizeBytes),
     mEventQueue(config.eventQueueLength),
-    mComponents(config.numComponents){
+    mComponents(config.numComponents),
+    mStates(config.numStates),
+    mDirtyStates(config.numStates),
+    mStateUpdatesPending(config.numStates){
     // constructor body
 }
 
@@ -88,7 +92,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
 
     // send event
     onActiveBehaviourChanged();
-    publishEvent(event.header());   
+    receiveEvent(event.header());   
 }
 
 void RuntimeAbs::setQueuedScreen(ScreenAbs* screen){
@@ -127,7 +131,7 @@ void RuntimeAbs::applyQueuedScreen() {
 
     // send event
     onActiveScreenChanged();
-    publishEvent(event.header());   
+    receiveEvent(event.header());   
 }
 
 void RuntimeAbs::registerComponent(ComponentAbs* component){
@@ -135,7 +139,17 @@ void RuntimeAbs::registerComponent(ComponentAbs* component){
     mComponents.push(component);
 }
 
-void RuntimeAbs::publishEvent(const EventHeader* header){
+void RuntimeAbs::registerState(StateAbs* state){
+    AssertExit(!mStates.full(), "RuntimeAbs", "max states count exceeded");
+    mStates.push(state);
+}
+
+void RuntimeAbs::markStateDirty(StateAbs* state){
+    AssertExit(!mDirtyStates.full(), "RuntimeAbs", "dirty states full");
+    mDirtyStates.push(state);
+}
+
+void RuntimeAbs::receiveEvent(const EventHeader* header){
 #if GarboxRuntimeAbsPrintEvents
     LogDebug("Event", "[%u] %s: %s", header->id, ComponentIdToString(header->sender.id), EventTypeToString(header->type));
 #endif
@@ -154,21 +168,49 @@ EventFactory& RuntimeAbs::getEventFactory(){
     return mEventFactory;
 }
 
-void RuntimeAbs::clearEventQueue(){
-    mEventQueue.releaseAll();
+void RuntimeAbs::dispatch(){
+    for(uint32_t i = 0; i < mMaxDispatchRecursionDepth; ++i){
+        dispatchStates();
+        dispatchEvents();
+        // stop if stable state reached
+        if(mDirtyStates.size() == 0 && mEventQueue.size() == 0){
+            break;
+        }
+    }
     mEventFactory.releaseDataPool();
 }
 
-void RuntimeAbs::dispatchEvents(){
-    const EventHeader* header;
-    while(mEventQueue.releaseFront(header)){
-        if(header == nullptr){
-            TriggerDebug("RuntimeAbs", "event header is nullptr");
-            continue;
+void RuntimeAbs::dispatchStates(){
+    
+    // swap dirty states
+    for(StateAbs* state : mDirtyStates){
+        state->publish();
+        state->clearDirty();
+        mStateUpdatesPending.push(state);
+    }
+    mDirtyStates.releaseAll();
+
+    // call state changed handlers
+    // the handlers can issue new state changes, which get added to 'mDirtyQueue'
+    // this is safe because a second queue 'mStateUpdatesPending' is used 
+    for(StateAbs* state : mStateUpdatesPending){
+        onRouteStateChanged(*state);
+    }
+    mStateUpdatesPending.releaseAll();
+}
+
+void RuntimeAbs::dispatchEvents(){    
+    // publish only events that were already queued at the start of this function
+    // events that are queued during routing are routed later
+    uint32_t numEventsToPublish = mEventQueue.size();
+    for(uint32_t i = 0; i < numEventsToPublish; i++){
+        const EventHeader* header;
+        if(!mEventQueue.releaseFront(header)){
+            TriggerExit("RuntimeAbs", "event header is nullptr");
+            break;
         }
         onRouteEvent(header);
     }
-    mEventFactory.releaseDataPool();
 }
 
 const RuntimeContext& RuntimeAbs::getContext() const {

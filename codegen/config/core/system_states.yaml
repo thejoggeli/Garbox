@@ -1,0 +1,11 @@
+states:
+
+  ActiveBehaviour:
+    include: "shared/types/BehaviourId.h"
+    fields:
+      - { name: behaviour, type: BehaviourId }
+
+  ActiveScreen: 
+    include: "shared/types/ScreenId.h"
+    fields:
+      - { name: screen, type: ScreenId }

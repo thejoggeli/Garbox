@@ -76,7 +76,7 @@ DisplayCommandEvent DebugScreenAbs::makeDisplayCommandEvent(){
 }
 
 void DebugScreenAbs::sendEvent(const DisplayCommandEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void DebugScreenAbs::setBackgroundColor(uint32_t color){

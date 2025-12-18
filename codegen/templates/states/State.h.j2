@@ -1,0 +1,42 @@
+{% include "_common/header.j2" %}
+#pragma once
+
+#include "core/application/state/StateAbs.h"
+{% from "_common/includes.j2" import emit_includes %}
+{{ emit_includes(include) }}
+
+namespace Garbox {
+
+class {{ name_with_suffix }} final : public StateAbs {
+public:
+    {{ name_with_suffix }}();
+
+    // read access (published state)
+{% for field in fields.values() %}
+{% if field.type == "bool" %}
+    {{ field.type }} is{{ field.name|upper_first }}() const;
+{% else %}
+    {{ field.type }} get{{ field.name|upper_first }}() const;
+{% endif %}
+{% endfor %}
+
+    // write access (next state)
+{% for field in fields.values() %}
+    void set{{ field.name|upper_first }}({{ field.type }} value);
+{% endfor %}
+
+private:
+
+    struct Data {
+{% for field in fields.values() %}
+        {{ field.type }} {{ field.name|lower_first }};
+{% endfor %}
+    };
+
+    Data mCurrent {};
+    Data mNext {};
+
+    void publish() final;
+};
+
+} // namespace Garbox

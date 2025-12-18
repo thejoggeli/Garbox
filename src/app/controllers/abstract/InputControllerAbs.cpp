@@ -23,15 +23,15 @@ EncoderStepEvent InputControllerAbs::makeEncoderStepEvent(){
 }
 
 void InputControllerAbs::sendEvent(const ButtonStateChangedEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void InputControllerAbs::sendEvent(const ButtonRepeatEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void InputControllerAbs::sendEvent(const EncoderStepEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

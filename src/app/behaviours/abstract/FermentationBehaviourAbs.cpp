@@ -27,19 +27,19 @@ FermentationStatusEvent FermentationBehaviourAbs::makeFermentationStatusEvent(){
 }
 
 void FermentationBehaviourAbs::sendEvent(const FanCommandEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void FermentationBehaviourAbs::sendEvent(const DisplayCommandEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void FermentationBehaviourAbs::sendEvent(const HeatpadCommandEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
 
 void FermentationBehaviourAbs::sendEvent(const FermentationStatusEvent& event){
-    publishEvent(event.header());
+    sendEventToHost(event.header());
 }
  
 } // namespace Garbox

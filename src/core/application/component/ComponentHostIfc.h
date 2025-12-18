@@ -19,7 +19,7 @@ public:
     virtual void requestChangeScreen(ScreenId id) = 0;
     virtual void requestUpdateScreenNow() = 0;
 
-    virtual void publishEvent(const EventHeader* header) = 0;
+    virtual void receiveEvent(const EventHeader* header) = 0;
     virtual EventFactory& getEventFactory() = 0;
     virtual const RuntimeContext& getContext() const = 0;
 
