@@ -14,6 +14,9 @@ public:
     // read access (published state)
     uint32_t getSkippedFrames() const;
 
+    // read access (next state)
+    uint32_t nextSkippedFrames() const;
+
     // write access (next state)
     void setSkippedFrames(uint32_t value);
 

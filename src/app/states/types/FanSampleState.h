@@ -14,6 +14,9 @@ public:
     // read access (published state)
     float getMeasuredRpm() const;
 
+    // read access (next state)
+    float nextMeasuredRpm() const;
+
     // write access (next state)
     void setMeasuredRpm(float value);
 

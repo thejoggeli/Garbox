@@ -17,12 +17,20 @@ float FermentationStatusState::getTargetTemperature() const {
     return mCurrent.targetTemperature;
 }
 
+FermentationState FermentationStatusState::nextState() const {
+    return mCurrent.state;
+}
+
+float FermentationStatusState::nextTargetTemperature() const {
+    return mCurrent.targetTemperature;
+}
+
 void FermentationStatusState::setState(FermentationState value){
     if (mNext.state == value) {
         return;
     }
     mNext.state = value;
-    setDirty();
+    markDirty();
 }
 
 void FermentationStatusState::setTargetTemperature(float value){
@@ -30,7 +38,7 @@ void FermentationStatusState::setTargetTemperature(float value){
         return;
     }
     mNext.targetTemperature = value;
-    setDirty();
+    markDirty();
 }
 
 void FermentationStatusState::publish(){
@@ -38,6 +46,7 @@ void FermentationStatusState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

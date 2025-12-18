@@ -17,12 +17,20 @@ float TemperatureSampleState::getHumidityRelative() const {
     return mCurrent.humidityRelative;
 }
 
+float TemperatureSampleState::nextTemperatureCelcius() const {
+    return mCurrent.temperatureCelcius;
+}
+
+float TemperatureSampleState::nextHumidityRelative() const {
+    return mCurrent.humidityRelative;
+}
+
 void TemperatureSampleState::setTemperatureCelcius(float value){
     if (mNext.temperatureCelcius == value) {
         return;
     }
     mNext.temperatureCelcius = value;
-    setDirty();
+    markDirty();
 }
 
 void TemperatureSampleState::setHumidityRelative(float value){
@@ -30,7 +38,7 @@ void TemperatureSampleState::setHumidityRelative(float value){
         return;
     }
     mNext.humidityRelative = value;
-    setDirty();
+    markDirty();
 }
 
 void TemperatureSampleState::publish(){
@@ -38,6 +46,7 @@ void TemperatureSampleState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

@@ -70,20 +70,44 @@ GarboxRuntime::GarboxRuntime():
     mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
 
-    // dependency inject write states
-    mFermentationBehaviour.injectFermentationStatusState(&mStateRegistry.getFermentationStatus());
-    mDisplayController.injectDisplayStatusState(&mStateRegistry.getDisplayStatus());
-    mDisplayController.injectDisplayDiagnosticsState(&mStateRegistry.getDisplayDiagnostics());
-    mFanController.injectFanStatusState(&mStateRegistry.getFanStatus());
-    mFanController.injectFanSampleState(&mStateRegistry.getFanSample());
-    mHeatpadController.injectHeatpadStatusState(&mStateRegistry.getHeatpadStatus());
-    mHeatpadController.injectHeatpadSampleState(&mStateRegistry.getHeatpadSample());
-    mI2cPartsController.injectTemperatureStatusState(&mStateRegistry.getTemperatureStatus());
-    mI2cPartsController.injectTemperatureSampleState(&mStateRegistry.getTemperatureSample());
+    // bind 'CalibrationBehaviour' states
+    mCalibrationBehaviour.bindStates(
+        mStateRegistry.getFanStatus(),
+        mStateRegistry.getFanSample()
+    );
 
-    // dependency inject read states
-    mCalibrationBehaviour.injectFanStatusState(&mStateRegistry.getFanStatus());
-    mCalibrationBehaviour.injectFanSampleState(&mStateRegistry.getFanSample());
+    // bind 'FermentationBehaviour' states
+    mFermentationBehaviour.bindStates(
+        mStateRegistry.getFermentationStatus(),
+        mStateRegistry.getFanSample(),
+        mStateRegistry.getFanStatus(),
+        mStateRegistry.getTemperatureSample(),
+        mStateRegistry.getTemperatureStatus()
+    );
+
+    // bind 'DisplayController' states
+    mDisplayController.bindStates(
+        mStateRegistry.getDisplayStatus(),
+        mStateRegistry.getDisplayDiagnostics()
+    );
+
+    // bind 'FanController' states
+    mFanController.bindStates(
+        mStateRegistry.getFanStatus(),
+        mStateRegistry.getFanSample()
+    );
+
+    // bind 'HeatpadController' states
+    mHeatpadController.bindStates(
+        mStateRegistry.getHeatpadStatus(),
+        mStateRegistry.getHeatpadSample()
+    );
+
+    // bind 'I2cPartsController' states
+    mI2cPartsController.bindStates(
+        mStateRegistry.getTemperatureStatus(),
+        mStateRegistry.getTemperatureSample()
+    );
 
 }
 
@@ -182,6 +206,7 @@ void GarboxRuntime::onRouteStateChanged(const StateAbs& state){
         const FanStatusState& fanStatus = static_cast<const FanStatusState&>(state);
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatusStateChanged(fanStatus); break;
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatusStateChanged(fanStatus); break;
             default: break; // active behaviour does not read state
         }
         break;
@@ -190,6 +215,7 @@ void GarboxRuntime::onRouteStateChanged(const StateAbs& state){
         const FanSampleState& fanSample = static_cast<const FanSampleState&>(state);
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSampleStateChanged(fanSample); break;
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSampleStateChanged(fanSample); break;
             default: break; // active behaviour does not read state
         }
         break;
@@ -197,8 +223,22 @@ void GarboxRuntime::onRouteStateChanged(const StateAbs& state){
     case StateType::FermentationStatus: break;
     case StateType::HeatpadStatus: break;
     case StateType::HeatpadSample: break;
-    case StateType::TemperatureStatus: break;
-    case StateType::TemperatureSample: break;
+    case StateType::TemperatureStatus: {
+        const TemperatureStatusState& temperatureStatus = static_cast<const TemperatureStatusState&>(state);
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatusStateChanged(temperatureStatus); break;
+            default: break; // active behaviour does not read state
+        }
+        break;
+    }
+    case StateType::TemperatureSample: {
+        const TemperatureSampleState& temperatureSample = static_cast<const TemperatureSampleState&>(state);
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSampleStateChanged(temperatureSample); break;
+            default: break; // active behaviour does not read state
+        }
+        break;
+    }
     case StateType::ActiveBehaviour: break;
     case StateType::ActiveScreen: break;
     case StateType::Null:

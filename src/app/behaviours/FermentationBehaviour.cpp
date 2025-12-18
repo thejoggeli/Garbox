@@ -1,6 +1,5 @@
 #include "FermentationBehaviour.h"
 
-#include "app/runtime/SnapshotRegistry.h"
 #include "core/log/Log.h"
 #include "core/time/TimeLiterals.h"
 #include "core/util/math/MathUtils.h"
@@ -38,17 +37,17 @@ void FermentationBehaviour::onBecomeDisabled(){
 
 void FermentationBehaviour::onLogicTick(){
 
-    const bool temperatureStatusValid = checkTemperatureStatus(SnapshotRegistry::GetTemperatureStatus());
+    const bool temperatureStatusValid = checkTemperatureStatus();
 
     // set control engine input
-    FermentationEngine::Input& input      = mFermentationEngine.getInput();
-    input.fanMeasuredRpm            = SnapshotRegistry::GetFanSample().measuredRpm;
-    input.fanStalled                = SnapshotRegistry::GetFanStatus().state == FanState::Stalled;
-    input.measuredHumidity          = SnapshotRegistry::GetTemperatureSample().humidityRelative;
-    input.measuredTemperature       = SnapshotRegistry::GetTemperatureSample().temperatureCelcius;
-    input.measuredHumidityValid     = temperatureStatusValid;
-    input.measuredTemperatureValid  = temperatureStatusValid;
-    input.targetTemperature         = 30.0f;
+    FermentationEngine::Input& input = mFermentationEngine.getInput();
+    input.fanMeasuredRpm             = states().fanSample.getMeasuredRpm();
+    input.fanStalled                 = states().fanStatus.getState() == FanState::Stalled;
+    input.measuredHumidity           = states().temperatureSample.getHumidityRelative();
+    input.measuredTemperature        = states().temperatureSample.getTemperatureCelcius();
+    input.measuredHumidityValid      = temperatureStatusValid;
+    input.measuredTemperatureValid   = temperatureStatusValid;
+    input.targetTemperature          = 30.0f;
 
     // perform control engine step
     mFermentationEngine.step();
@@ -151,8 +150,9 @@ void FermentationBehaviour::onEncoderStepEvent(const EncoderStepEvent& event){
     // nothing to do
 }
 
-bool FermentationBehaviour::checkTemperatureStatus(const TemperatureStatusPayload& payload){
-    return payload.powerEnabled && payload.driverEnabled && !payload.resetting;
+bool FermentationBehaviour::checkTemperatureStatus(){
+    const TemperatureStatusState& status = states().temperatureStatus;
+    return status.isPowerEnabled() && status.isDriverEnabled() && !status.isResetting();
 }
 
 } // namespace

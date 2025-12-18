@@ -34,40 +34,33 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
 {# states #}
 {% macro states(name, component) %}
 
-{% if component.write_states %}
+{% if component.all_states %}
+
+{{ name }}Abs::States& {{ name }}Abs::states(){
+    return mStates.value();
+}
+
+void {{ name }}Abs::bindStates(
 {% for state_name, state_data in component.write_states.items() %}
-{{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::state{{ state_name|upper_first }}(){
-    return *m{{ state_data["name_with_suffix"]|upper_first }};
-}
-
+    {% set delim = "" if loop.last and not component.read_states else ","%}
+    {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name"]|lower_first }}{{ delim }}
 {% endfor %}
-{% endif %}
-
-{% if component.read_states %}
 {% for state_name, state_data in component.read_states.items() %}
-const {{ state_data["name_with_suffix"]|upper_first }}& {{ name }}Abs::state{{ state_name|upper_first }}(){
-    return *m{{ state_data["name_with_suffix"]|upper_first }};
+    {% set delim = "" if loop.last else ","%}
+    const {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name"]|lower_first }}{{ delim }}
+{% endfor %}
+){
+    mStates.emplace(
+    {% for state_name, state_data in component.write_states.items() %}
+        {% set delim = "" if loop.last and not component.read_states else ","%}
+        {{ state_data["name"]|lower_first }}{{ delim }}
+    {% endfor %}
+    {% for state_name, state_data in component.read_states.items() %}
+        {% set delim = "" if loop.last else ","%}
+        {{ state_data["name"]|lower_first }}{{ delim }}
+    {% endfor %}
+    );
 }
 
-{% endfor %}
 {% endif %}
-
-{% if component.write_states %}
-{% for state_name, state_data in component.write_states.items() %}
-void {{ name }}Abs::inject{{ state_data["name_with_suffix"]|upper_first }}({{ state_data["name_with_suffix"]|upper_first }}* state){
-    m{{ state_data["name_with_suffix"]|upper_first }} = state;
-}
-
-{% endfor %}
-{% endif %}
-
-{% if component.read_states %}
-{% for state_name, state_data in component.read_states.items() %}
-void {{ name }}Abs::inject{{ state_data["name_with_suffix"]|upper_first }}(const {{ state_data["name_with_suffix"]|upper_first }}* state){
-    m{{ state_data["name_with_suffix"]|upper_first }} = state;
-}
-
-{% endfor %}
-{% endif %}
-
 {% endmacro %}

@@ -19,16 +19,16 @@ public:
     CalibrationBehaviourAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onLogicTick() = 0;
+    virtual void onLogicTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onHeartbeatEvent(const HeartbeatEvent& event) = 0;
-    virtual void onFanStatusEvent(const FanStatusEvent& event) = 0;
-    virtual void onFanSampleEvent(const FanSampleEvent& event) = 0;
+    virtual void onHeartbeatEvent(const HeartbeatEvent& event) {};
+    virtual void onFanStatusEvent(const FanStatusEvent& event) {};
+    virtual void onFanSampleEvent(const FanSampleEvent& event) {};
 
     // state change handlers (to be implmeneted by user)
-    virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
-    virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
+    virtual void onFanStatusStateChanged(const FanStatusState& state) {};
+    virtual void onFanSampleStateChanged(const FanSampleState& state) {};
 
 protected:
 
@@ -38,19 +38,39 @@ protected:
     // send typed events
     void sendEvent(const FanCommandEvent& event);
 
-    // get readable states
-    const FanStatusState& stateFanStatus();
-    const FanSampleState& stateFanSample();
+    // state access struct
+    class States final {
+    public:
+
+        States(
+            const FanStatusState& fanStatusState, // read
+            const FanSampleState& fanSampleState // read
+        ):
+            fanStatus(fanStatusState),
+            fanSample(fanSampleState){
+        }
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+        // readable states
+        const FanStatusState& fanStatus;
+        const FanSampleState& fanSample;
+    };
+
+    States& states();
 
 private:
 
-    // readable state pointers
-    const FanStatusState* mFanStatusState = nullptr;
-    const FanSampleState* mFanSampleState = nullptr;
+    std::optional<States> mStates;
 
-    // dependency inject readable states
-    void injectFanStatusState(const FanStatusState* state);
-    void injectFanSampleState(const FanSampleState* state);
+    void bindStates(
+        const FanStatusState& fanStatus,
+        const FanSampleState& fanSample
+    );
 
     // hide event methods
     using BehaviourAbs::makeEvent;

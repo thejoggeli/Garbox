@@ -11,3 +11,4 @@ behaviours:
     receive_events: [Heartbeat, ButtonStateChanged, ButtonRepeat, EncoderStep]
     send_events: [FanCommand, DisplayCommand, HeatpadCommand, FermentationStatus]
     write_states: [FermentationStatus]
+    read_states: [FanSample, FanStatus, TemperatureSample, TemperatureStatus]

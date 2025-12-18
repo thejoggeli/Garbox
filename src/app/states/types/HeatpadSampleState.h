@@ -16,6 +16,11 @@ public:
     float getMeasuredCurrent() const;
     float getPwmProgressMicros() const;
 
+    // read access (next state)
+    float nextMeasuredVoltage() const;
+    float nextMeasuredCurrent() const;
+    float nextPwmProgressMicros() const;
+
     // write access (next state)
     void setMeasuredVoltage(float value);
     void setMeasuredCurrent(float value);

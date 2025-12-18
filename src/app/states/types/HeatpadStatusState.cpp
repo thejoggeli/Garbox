@@ -29,12 +29,32 @@ uint32_t HeatpadStatusState::getNextPeriodMicros() const {
     return mCurrent.nextPeriodMicros;
 }
 
+HeatpadState HeatpadStatusState::nextState() const {
+    return mCurrent.state;
+}
+
+float HeatpadStatusState::nextCurrentDutyCycle() const {
+    return mCurrent.currentDutyCycle;
+}
+
+uint32_t HeatpadStatusState::nextCurrentPeriodMicros() const {
+    return mCurrent.currentPeriodMicros;
+}
+
+float HeatpadStatusState::nextNextDutyCycle() const {
+    return mCurrent.nextDutyCycle;
+}
+
+uint32_t HeatpadStatusState::nextNextPeriodMicros() const {
+    return mCurrent.nextPeriodMicros;
+}
+
 void HeatpadStatusState::setState(HeatpadState value){
     if (mNext.state == value) {
         return;
     }
     mNext.state = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadStatusState::setCurrentDutyCycle(float value){
@@ -42,7 +62,7 @@ void HeatpadStatusState::setCurrentDutyCycle(float value){
         return;
     }
     mNext.currentDutyCycle = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadStatusState::setCurrentPeriodMicros(uint32_t value){
@@ -50,7 +70,7 @@ void HeatpadStatusState::setCurrentPeriodMicros(uint32_t value){
         return;
     }
     mNext.currentPeriodMicros = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadStatusState::setNextDutyCycle(float value){
@@ -58,7 +78,7 @@ void HeatpadStatusState::setNextDutyCycle(float value){
         return;
     }
     mNext.nextDutyCycle = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadStatusState::setNextPeriodMicros(uint32_t value){
@@ -66,7 +86,7 @@ void HeatpadStatusState::setNextPeriodMicros(uint32_t value){
         return;
     }
     mNext.nextPeriodMicros = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadStatusState::publish(){
@@ -74,6 +94,7 @@ void HeatpadStatusState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

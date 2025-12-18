@@ -52,20 +52,22 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
     mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
 {% endfor %}
 
-    // dependency inject write states
 {% for comp_name, comp_data in components.items() %}
+    {% if comp_data.all_states %}
+    // bind '{{comp_name}}' states
+    m{{ comp_name }}.bindStates(
     {% for state_name, state_data in comp_data.write_states.items() %}
-    m{{ comp_name }}.inject{{ state_data["name_with_suffix"]|upper_first }}(&mStateRegistry.get{{ state_name|upper_first }}());
+        {% set delim = "" if loop.last and not comp_data.read_states else ","%}
+        mStateRegistry.get{{ state_data["name"]|upper_first }}(){{ delim }}
     {% endfor %}
-{% endfor %}
-
-    // dependency inject read states
-{% for comp_name, comp_data in components.items() %}
     {% for state_name, state_data in comp_data.read_states.items() %}
-    m{{ comp_name }}.inject{{ state_data["name_with_suffix"]|upper_first }}(&mStateRegistry.get{{ state_name|upper_first }}());
+        {% set delim = "" if loop.last else ","%}
+        mStateRegistry.get{{ state_data["name"]|upper_first }}(){{ delim }}
     {% endfor %}
-{% endfor %}
+    );
+    {% endif %}
 
+{% endfor %}
 }
 
 void {{ RuntimeName }}::onInit(){

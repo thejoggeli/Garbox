@@ -24,7 +24,7 @@ public:
     void becomeDisabled() final;
 
     // event handler (to be implmeneted by user)
-    virtual void onEvent(const EventHeader* header) = 0;
+    virtual void onEvent(const EventHeader* header) {};
 
 protected:
 

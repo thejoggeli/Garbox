@@ -13,12 +13,16 @@ ScreenId ActiveScreenState::getScreen() const {
     return mCurrent.screen;
 }
 
+ScreenId ActiveScreenState::nextScreen() const {
+    return mCurrent.screen;
+}
+
 void ActiveScreenState::setScreen(ScreenId value){
     if (mNext.screen == value) {
         return;
     }
     mNext.screen = value;
-    setDirty();
+    markDirty();
 }
 
 void ActiveScreenState::publish(){
@@ -26,6 +30,7 @@ void ActiveScreenState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

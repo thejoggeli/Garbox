@@ -20,6 +20,11 @@ public:
 {% endif %}
 {% endfor %}
 
+    // read access (next state)
+{% for field in fields.values() %}
+    {{ field.type }} next{{ field.name|upper_first }}() const;
+{% endfor %}
+
     // write access (next state)
 {% for field in fields.values() %}
     void set{{ field.name|upper_first }}({{ field.type }} value);

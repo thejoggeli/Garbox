@@ -46,14 +46,12 @@ void FanController::onInputTick(){
     // updates MeasuredRpm and FanState
     mFan.tick();
     if(mStateChanged){
-        sendStatusEvent();
+        updateFanStatus();
         mStateChanged = false;
     }
     // send rpm sample if changed
-    float measuredRpm = mFan.getMeasuredRpm();
-    if(measuredRpm != mLastMeasuredRpm){
-        sendSampleEvent(measuredRpm);
-        mLastMeasuredRpm = measuredRpm;
+    if(states().fanSample.nextMeasuredRpm() != mFan.getMeasuredRpm()){
+        updateFanSample();
     }
 }
 
@@ -105,50 +103,6 @@ void FanController::onFanCommandEvent(const FanCommandEvent& event){
     }
 }
 
-/*
-void FanController::onFanCommandEvent(const FanCommandEvent& event){
-    
-    // apply enabled
-    if(mFan.isEnabled() != event->enabled){
-        mFan.setEnabled(event->enabled);
-        if(!event->enabled){
-            mPid.reset(); // reset pid when disabling fan
-            mTargetSpeed = 0.0f;
-        }
-        stateFanStatus().setState(mFan.getState());
-    }
-
-    // apply use pid
-    if(event->enableRpmControl != mUsePid){
-        mUsePid = event->enableRpmControl;
-        if(!mUsePid){
-            mPid.reset(); // reset pid when leaving pid mode 
-        }
-        stateFanStatus().setRpmControl(mUsePid);
-    }
-
-    // apply target speed only if fan enabled
-    if(event->enabled && (event->targetSpeed != mTargetSpeed)){
-        mTargetSpeed = event->targetSpeed;
-        if(!mUsePid){
-            mFan.setTargetSpeed(mTargetSpeed);
-        }
-        stateFanStatus().setTargetSpeed(mFan.getTargetSpeed());
-    }
-
-    // set status led
-    if(stateFanStatus().isDirty()){
-        if(mFan.isEnabled()){
-            float brightness = MathUtils::Map(mTargetSpeed, 0.4f, 1.0f, 0.25f, 1.0f);
-            mStatusLed.setBrightnessSmooth(brightness, 500_ms);
-        }
-        else {
-            mStatusLed.setBrightnessSmooth(0.0f, 500_ms);
-        }
-    }
-}
-*/
-
 void FanController::handleFanStateChanged(FanState oldState, FanState newState){
     mStateChanged = true;
 }
@@ -158,18 +112,14 @@ void FanController::handleFanStalledAlert(uint32_t counter){
     piezoPlayer.playSequence(PiezoSequences::GetFanStalled());
 }
 
-void FanController::sendStatusEvent(){
-    FanStatusEvent event = makeFanStatusEvent();
-    event->state = mFan.getState();
-    event->targetSpeed = mTargetSpeed;
-    event->rpmControlEnabled = mUsePid;
-    sendEvent(event);
+void FanController::updateFanStatus(){
+    states().fanStatus.setState(mFan.getState());
+    states().fanStatus.setTargetSpeed(mFan.getTargetSpeed());
+    states().fanStatus.setRpmControl(mUsePid);
 }
 
-void FanController::sendSampleEvent(float measuredRpm){
-    FanSampleEvent event = makeFanSampleEvent();
-    event->measuredRpm = measuredRpm;
-    sendEvent(event);
+void FanController::updateFanSample(){
+    states().fanSample.setMeasuredRpm(mFan.getMeasuredRpm());
 }
 
 } // namespace

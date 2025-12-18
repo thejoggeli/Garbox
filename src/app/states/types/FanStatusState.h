@@ -17,6 +17,11 @@ public:
     float getTargetSpeed() const;
     bool isRpmControl() const;
 
+    // read access (next state)
+    FanState nextState() const;
+    float nextTargetSpeed() const;
+    bool nextRpmControl() const;
+
     // write access (next state)
     void setState(FanState value);
     void setTargetSpeed(float value);

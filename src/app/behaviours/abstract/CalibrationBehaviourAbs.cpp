@@ -18,20 +18,18 @@ void CalibrationBehaviourAbs::sendEvent(const FanCommandEvent& event){
     sendEventToHost(event.header());
 }
 
-const FanStatusState& CalibrationBehaviourAbs::stateFanStatus(){
-    return *mFanStatusState;
+CalibrationBehaviourAbs::States& CalibrationBehaviourAbs::states(){
+    return mStates.value();
 }
 
-const FanSampleState& CalibrationBehaviourAbs::stateFanSample(){
-    return *mFanSampleState;
-}
-
-void CalibrationBehaviourAbs::injectFanStatusState(const FanStatusState* state){
-    mFanStatusState = state;
-}
-
-void CalibrationBehaviourAbs::injectFanSampleState(const FanSampleState* state){
-    mFanSampleState = state;
+void CalibrationBehaviourAbs::bindStates(
+    const FanStatusState& fanStatus,
+    const FanSampleState& fanSample
+){
+    mStates.emplace(
+        fanStatus,
+        fanSample
+    );
 }
 
 } // namespace Garbox

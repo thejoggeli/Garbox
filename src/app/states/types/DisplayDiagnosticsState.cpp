@@ -13,12 +13,16 @@ uint32_t DisplayDiagnosticsState::getSkippedFrames() const {
     return mCurrent.skippedFrames;
 }
 
+uint32_t DisplayDiagnosticsState::nextSkippedFrames() const {
+    return mCurrent.skippedFrames;
+}
+
 void DisplayDiagnosticsState::setSkippedFrames(uint32_t value){
     if (mNext.skippedFrames == value) {
         return;
     }
     mNext.skippedFrames = value;
-    setDirty();
+    markDirty();
 }
 
 void DisplayDiagnosticsState::publish(){
@@ -26,6 +30,7 @@ void DisplayDiagnosticsState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

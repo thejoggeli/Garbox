@@ -19,12 +19,19 @@ namespace Garbox {
 {% endfor %}
 
 {% for field in fields.values() %}
+{{ field.type }} {{ name_with_suffix }}::next{{ field.name|upper_first }}() const {
+    return mCurrent.{{ field.name|lower_first }};
+}
+
+{% endfor %}
+
+{% for field in fields.values() %}
 void {{ name_with_suffix }}::set{{ field.name|upper_first }}({{ field.type }} value){
     if (mNext.{{ field.name|lower_first }} == value) {
         return;
     }
     mNext.{{ field.name|lower_first }} = value;
-    setDirty();
+    markDirty();
 }
 
 {% endfor %}
@@ -34,6 +41,7 @@ void {{ name_with_suffix }}::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

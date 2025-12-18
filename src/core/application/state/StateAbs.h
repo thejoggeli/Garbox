@@ -19,7 +19,9 @@ public:
 
 protected:
 
-    void setDirty(); // to be called in inheriting class
+    virtual void publish() = 0; // implemented in inheriting class
+    void markDirty(); // to be called in publish()
+    void clearDirty(); // to be called in publish()
 
 private:
 
@@ -27,9 +29,7 @@ private:
     StateType mType;
     bool mDirty = false;
 
-    void init(StateHostIfc* host); // called in RuntimeAbs
-    virtual void publish() = 0; // called in RuntimeAbs
-    void clearDirty(); // called in RuntimeAbs
+    void init(StateHostIfc* host); // inject host in RuntimeAbs
 
     // disallow copy and move 
     StateAbs(const StateAbs&) = delete;

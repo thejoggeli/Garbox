@@ -21,12 +21,24 @@ bool FanStatusState::isRpmControl() const {
     return mCurrent.rpmControl;
 }
 
+FanState FanStatusState::nextState() const {
+    return mCurrent.state;
+}
+
+float FanStatusState::nextTargetSpeed() const {
+    return mCurrent.targetSpeed;
+}
+
+bool FanStatusState::nextRpmControl() const {
+    return mCurrent.rpmControl;
+}
+
 void FanStatusState::setState(FanState value){
     if (mNext.state == value) {
         return;
     }
     mNext.state = value;
-    setDirty();
+    markDirty();
 }
 
 void FanStatusState::setTargetSpeed(float value){
@@ -34,7 +46,7 @@ void FanStatusState::setTargetSpeed(float value){
         return;
     }
     mNext.targetSpeed = value;
-    setDirty();
+    markDirty();
 }
 
 void FanStatusState::setRpmControl(bool value){
@@ -42,7 +54,7 @@ void FanStatusState::setRpmControl(bool value){
         return;
     }
     mNext.rpmControl = value;
-    setDirty();
+    markDirty();
 }
 
 void FanStatusState::publish(){
@@ -50,6 +62,7 @@ void FanStatusState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

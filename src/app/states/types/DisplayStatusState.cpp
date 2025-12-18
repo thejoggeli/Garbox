@@ -13,12 +13,16 @@ float DisplayStatusState::getBrightness() const {
     return mCurrent.brightness;
 }
 
+float DisplayStatusState::nextBrightness() const {
+    return mCurrent.brightness;
+}
+
 void DisplayStatusState::setBrightness(float value){
     if (mNext.brightness == value) {
         return;
     }
     mNext.brightness = value;
-    setDirty();
+    markDirty();
 }
 
 void DisplayStatusState::publish(){
@@ -26,6 +30,7 @@ void DisplayStatusState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

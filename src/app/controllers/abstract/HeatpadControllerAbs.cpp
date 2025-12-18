@@ -26,20 +26,18 @@ void HeatpadControllerAbs::sendEvent(const HeatpadSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-HeatpadStatusState& HeatpadControllerAbs::stateHeatpadStatus(){
-    return *mHeatpadStatusState;
+HeatpadControllerAbs::States& HeatpadControllerAbs::states(){
+    return mStates.value();
 }
 
-HeatpadSampleState& HeatpadControllerAbs::stateHeatpadSample(){
-    return *mHeatpadSampleState;
-}
-
-void HeatpadControllerAbs::injectHeatpadStatusState(HeatpadStatusState* state){
-    mHeatpadStatusState = state;
-}
-
-void HeatpadControllerAbs::injectHeatpadSampleState(HeatpadSampleState* state){
-    mHeatpadSampleState = state;
+void HeatpadControllerAbs::bindStates(
+    HeatpadStatusState& heatpadStatus,
+    HeatpadSampleState& heatpadSample
+){
+    mStates.emplace(
+        heatpadStatus,
+        heatpadSample
+    );
 }
 
 } // namespace Garbox

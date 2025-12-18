@@ -12,7 +12,7 @@ bool StateAbs::isDirty() const {
     return mDirty;
 }
 
-void StateAbs::setDirty(){
+void StateAbs::markDirty(){
     // only mark dirty on transitions to true
     if(mDirty){
         return;

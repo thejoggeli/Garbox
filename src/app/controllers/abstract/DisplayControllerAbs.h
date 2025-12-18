@@ -19,10 +19,10 @@ public:
     DisplayControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onRenderTick() = 0;
+    virtual void onRenderTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onDisplayCommandEvent(const DisplayCommandEvent& event) = 0;
+    virtual void onDisplayCommandEvent(const DisplayCommandEvent& event) {};
 
 protected:
 
@@ -32,19 +32,40 @@ protected:
     // send typed events
     void sendEvent(const DisplayStatusEvent& event);
 
-    // get writable states
-    DisplayStatusState& stateDisplayStatus();
-    DisplayDiagnosticsState& stateDisplayDiagnostics();
+    // state access struct
+    class States final {
+    public:
+
+        States(
+            DisplayStatusState& displayStatusState, // write
+            DisplayDiagnosticsState& displayDiagnosticsState // write
+        ):
+            displayStatus(displayStatusState),
+            displayDiagnostics(displayDiagnosticsState){
+        }
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+        // writable states
+        DisplayStatusState& displayStatus;
+        DisplayDiagnosticsState& displayDiagnostics;
+
+    };
+
+    States& states();
 
 private:
 
-    // writable state pointers
-    DisplayStatusState* mDisplayStatusState = nullptr;
-    DisplayDiagnosticsState* mDisplayDiagnosticsState = nullptr;
+    std::optional<States> mStates;
 
-    // dependency inject writable states
-    void injectDisplayStatusState(DisplayStatusState* state);
-    void injectDisplayDiagnosticsState(DisplayDiagnosticsState* state);
+    void bindStates(
+        DisplayStatusState& displayStatus,
+        DisplayDiagnosticsState& displayDiagnostics
+    );
 
     // hide event methods
     using ControllerAbs::makeEvent;

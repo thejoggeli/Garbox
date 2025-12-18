@@ -28,7 +28,7 @@ private:
 
     FermentationEngine mFermentationEngine;
 
-    static bool checkTemperatureStatus(const TemperatureStatusPayload& payload);
+    bool checkTemperatureStatus();
 
     void doFanTestStep();
     

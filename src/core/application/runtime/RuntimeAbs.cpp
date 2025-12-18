@@ -185,7 +185,6 @@ void RuntimeAbs::dispatchStates(){
     // swap dirty states
     for(StateAbs* state : mDirtyStates){
         state->publish();
-        state->clearDirty();
         mStateUpdatesPending.push(state);
     }
     mDirtyStates.releaseAll();

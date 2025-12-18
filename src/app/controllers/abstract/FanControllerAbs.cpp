@@ -26,20 +26,18 @@ void FanControllerAbs::sendEvent(const FanSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-FanStatusState& FanControllerAbs::stateFanStatus(){
-    return *mFanStatusState;
+FanControllerAbs::States& FanControllerAbs::states(){
+    return mStates.value();
 }
 
-FanSampleState& FanControllerAbs::stateFanSample(){
-    return *mFanSampleState;
-}
-
-void FanControllerAbs::injectFanStatusState(FanStatusState* state){
-    mFanStatusState = state;
-}
-
-void FanControllerAbs::injectFanSampleState(FanSampleState* state){
-    mFanSampleState = state;
+void FanControllerAbs::bindStates(
+    FanStatusState& fanStatus,
+    FanSampleState& fanSample
+){
+    mStates.emplace(
+        fanStatus,
+        fanSample
+    );
 }
 
 } // namespace Garbox

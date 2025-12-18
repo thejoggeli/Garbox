@@ -18,20 +18,18 @@ void DisplayControllerAbs::sendEvent(const DisplayStatusEvent& event){
     sendEventToHost(event.header());
 }
 
-DisplayStatusState& DisplayControllerAbs::stateDisplayStatus(){
-    return *mDisplayStatusState;
+DisplayControllerAbs::States& DisplayControllerAbs::states(){
+    return mStates.value();
 }
 
-DisplayDiagnosticsState& DisplayControllerAbs::stateDisplayDiagnostics(){
-    return *mDisplayDiagnosticsState;
-}
-
-void DisplayControllerAbs::injectDisplayStatusState(DisplayStatusState* state){
-    mDisplayStatusState = state;
-}
-
-void DisplayControllerAbs::injectDisplayDiagnosticsState(DisplayDiagnosticsState* state){
-    mDisplayDiagnosticsState = state;
+void DisplayControllerAbs::bindStates(
+    DisplayStatusState& displayStatus,
+    DisplayDiagnosticsState& displayDiagnostics
+){
+    mStates.emplace(
+        displayStatus,
+        displayDiagnostics
+    );
 }
 
 } // namespace Garbox

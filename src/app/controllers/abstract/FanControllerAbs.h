@@ -19,11 +19,11 @@ public:
     FanControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onInputTick() = 0;
-    virtual void onOutputTick() = 0;
+    virtual void onInputTick() {};
+    virtual void onOutputTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onFanCommandEvent(const FanCommandEvent& event) = 0;
+    virtual void onFanCommandEvent(const FanCommandEvent& event) {};
 
 protected:
 
@@ -35,19 +35,40 @@ protected:
     void sendEvent(const FanStatusEvent& event);
     void sendEvent(const FanSampleEvent& event);
 
-    // get writable states
-    FanStatusState& stateFanStatus();
-    FanSampleState& stateFanSample();
+    // state access struct
+    class States final {
+    public:
+
+        States(
+            FanStatusState& fanStatusState, // write
+            FanSampleState& fanSampleState // write
+        ):
+            fanStatus(fanStatusState),
+            fanSample(fanSampleState){
+        }
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+        // writable states
+        FanStatusState& fanStatus;
+        FanSampleState& fanSample;
+
+    };
+
+    States& states();
 
 private:
 
-    // writable state pointers
-    FanStatusState* mFanStatusState = nullptr;
-    FanSampleState* mFanSampleState = nullptr;
+    std::optional<States> mStates;
 
-    // dependency inject writable states
-    void injectFanStatusState(FanStatusState* state);
-    void injectFanSampleState(FanSampleState* state);
+    void bindStates(
+        FanStatusState& fanStatus,
+        FanSampleState& fanSample
+    );
 
     // hide event methods
     using ControllerAbs::makeEvent;

@@ -44,8 +44,8 @@ private:
     void handleRunningState();
     void handleStateChanged(FsmState oldState, FsmState newState);
 
-    void sendTemperatureStatusEvent();
-    void sendTemperatureSampleEvent();
+    void updateTemperatureStatus();
+    void updateTemperatureSample();
 
 };
 

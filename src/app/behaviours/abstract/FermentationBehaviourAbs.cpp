@@ -42,12 +42,24 @@ void FermentationBehaviourAbs::sendEvent(const FermentationStatusEvent& event){
     sendEventToHost(event.header());
 }
 
-FermentationStatusState& FermentationBehaviourAbs::stateFermentationStatus(){
-    return *mFermentationStatusState;
+FermentationBehaviourAbs::States& FermentationBehaviourAbs::states(){
+    return mStates.value();
 }
 
-void FermentationBehaviourAbs::injectFermentationStatusState(FermentationStatusState* state){
-    mFermentationStatusState = state;
+void FermentationBehaviourAbs::bindStates(
+    FermentationStatusState& fermentationStatus,
+    const FanSampleState& fanSample,
+    const FanStatusState& fanStatus,
+    const TemperatureSampleState& temperatureSample,
+    const TemperatureStatusState& temperatureStatus
+){
+    mStates.emplace(
+        fermentationStatus,
+        fanSample,
+        fanStatus,
+        temperatureSample,
+        temperatureStatus
+    );
 }
 
 } // namespace Garbox

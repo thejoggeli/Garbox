@@ -37,8 +37,8 @@ private:
     void handleFanStateChanged(FanState oldState, FanState newState);
     void handleFanStalledAlert(uint32_t counter);
 
-    void sendStatusEvent();
-    void sendSampleEvent(float measuredRpm);
+    void updateFanStatus();
+    void updateFanSample();
 
 };
 

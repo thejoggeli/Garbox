@@ -17,6 +17,12 @@ public:
     bool isResetting() const;
     bool isHasFirstSample() const;
 
+    // read access (next state)
+    bool nextDriverEnabled() const;
+    bool nextPowerEnabled() const;
+    bool nextResetting() const;
+    bool nextHasFirstSample() const;
+
     // write access (next state)
     void setDriverEnabled(bool value);
     void setPowerEnabled(bool value);

@@ -13,12 +13,16 @@ BehaviourId ActiveBehaviourState::getBehaviour() const {
     return mCurrent.behaviour;
 }
 
+BehaviourId ActiveBehaviourState::nextBehaviour() const {
+    return mCurrent.behaviour;
+}
+
 void ActiveBehaviourState::setBehaviour(BehaviourId value){
     if (mNext.behaviour == value) {
         return;
     }
     mNext.behaviour = value;
-    setDirty();
+    markDirty();
 }
 
 void ActiveBehaviourState::publish(){
@@ -26,6 +30,7 @@ void ActiveBehaviourState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

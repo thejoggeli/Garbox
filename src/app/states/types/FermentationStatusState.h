@@ -16,6 +16,10 @@ public:
     FermentationState getState() const;
     float getTargetTemperature() const;
 
+    // read access (next state)
+    FermentationState nextState() const;
+    float nextTargetTemperature() const;
+
     // write access (next state)
     void setState(FermentationState value);
     void setTargetTemperature(float value);

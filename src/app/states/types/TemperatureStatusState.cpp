@@ -25,12 +25,28 @@ bool TemperatureStatusState::isHasFirstSample() const {
     return mCurrent.hasFirstSample;
 }
 
+bool TemperatureStatusState::nextDriverEnabled() const {
+    return mCurrent.driverEnabled;
+}
+
+bool TemperatureStatusState::nextPowerEnabled() const {
+    return mCurrent.powerEnabled;
+}
+
+bool TemperatureStatusState::nextResetting() const {
+    return mCurrent.resetting;
+}
+
+bool TemperatureStatusState::nextHasFirstSample() const {
+    return mCurrent.hasFirstSample;
+}
+
 void TemperatureStatusState::setDriverEnabled(bool value){
     if (mNext.driverEnabled == value) {
         return;
     }
     mNext.driverEnabled = value;
-    setDirty();
+    markDirty();
 }
 
 void TemperatureStatusState::setPowerEnabled(bool value){
@@ -38,7 +54,7 @@ void TemperatureStatusState::setPowerEnabled(bool value){
         return;
     }
     mNext.powerEnabled = value;
-    setDirty();
+    markDirty();
 }
 
 void TemperatureStatusState::setResetting(bool value){
@@ -46,7 +62,7 @@ void TemperatureStatusState::setResetting(bool value){
         return;
     }
     mNext.resetting = value;
-    setDirty();
+    markDirty();
 }
 
 void TemperatureStatusState::setHasFirstSample(bool value){
@@ -54,7 +70,7 @@ void TemperatureStatusState::setHasFirstSample(bool value){
         return;
     }
     mNext.hasFirstSample = value;
-    setDirty();
+    markDirty();
 }
 
 void TemperatureStatusState::publish(){
@@ -62,6 +78,7 @@ void TemperatureStatusState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

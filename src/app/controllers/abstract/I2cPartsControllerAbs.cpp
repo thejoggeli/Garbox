@@ -26,20 +26,18 @@ void I2cPartsControllerAbs::sendEvent(const TemperatureSampleEvent& event){
     sendEventToHost(event.header());
 }
 
-TemperatureStatusState& I2cPartsControllerAbs::stateTemperatureStatus(){
-    return *mTemperatureStatusState;
+I2cPartsControllerAbs::States& I2cPartsControllerAbs::states(){
+    return mStates.value();
 }
 
-TemperatureSampleState& I2cPartsControllerAbs::stateTemperatureSample(){
-    return *mTemperatureSampleState;
-}
-
-void I2cPartsControllerAbs::injectTemperatureStatusState(TemperatureStatusState* state){
-    mTemperatureStatusState = state;
-}
-
-void I2cPartsControllerAbs::injectTemperatureSampleState(TemperatureSampleState* state){
-    mTemperatureSampleState = state;
+void I2cPartsControllerAbs::bindStates(
+    TemperatureStatusState& temperatureStatus,
+    TemperatureSampleState& temperatureSample
+){
+    mStates.emplace(
+        temperatureStatus,
+        temperatureSample
+    );
 }
 
 } // namespace Garbox

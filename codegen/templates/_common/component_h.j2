@@ -13,14 +13,14 @@
 {% if component.tick_phases_all %}
 
     // tick handler (to be implmeneted by user)
-    virtual void onTick(TickPhase phase) = 0;
+    virtual void onTick(TickPhase phase) {};
     
 {% endif %}
 {% if component.tick_phases %}
 
     // tick handlers (to be implmeneted by user)
 {% for tick in component.tick_phases %}
-    virtual void on{{ tick }}() = 0;
+    virtual void on{{ tick }}() {};
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -31,14 +31,14 @@
 {% if component.receive_events_all %}
 
     // event handler (to be implmeneted by user)
-    virtual void onEvent(const EventHeader* header) = 0;
+    virtual void onEvent(const EventHeader* header) {};
 
 {% endif %}
 {% if component.receive_events %}
 
     // event handlers (to be implmeneted by user)
 {% for ev in component.receive_events %}
-    virtual void on{{ ev }}Event(const {{ ev }}Event& event) = 0;
+    virtual void on{{ ev }}Event(const {{ ev }}Event& event) {};
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -50,7 +50,7 @@
 
     // state change handlers (to be implmeneted by user)
 {% for state in component.read_states.values() %}
-    virtual void on{{ state["name"]|upper_first }}StateChanged(const {{ state["name_with_suffix"] }}& state) = 0;
+    virtual void on{{ state["name"]|upper_first }}StateChanged(const {{ state["name_with_suffix"] }}& state) {};
 {% endfor %}
 {% endif %}
 {% endmacro %}
@@ -94,18 +94,56 @@
 {# states protected #}
 {% macro states_protected(component) %}
 
-{% if component.write_states %}
-    // get writable states
-{% for state_name, state_data in component.write_states.items() %}
-    {{ state_data["name_with_suffix"]|upper_first }}& state{{ state_name|upper_first }}();
-{% endfor %}
-{% endif %}
+{% if component.all_states %}
 
-{% if component.read_states %}
-    // get readable states
-{% for state_name, state_data in component.read_states.items() %}
-    const {{ state_data["name_with_suffix"]|upper_first }}& state{{ state_name|upper_first }}();
-{% endfor %}
+    // state access struct
+    class States final {
+    public:
+
+        States(
+        {% for state_name, state_data in component.write_states.items() %}
+            {% set delim = "" if loop.last and not component.read_states else ","%}
+            {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name_with_suffix"]|lower_first }}{{ delim }} // write
+        {% endfor %}
+        {% for state_name, state_data in component.read_states.items() %}
+            {% set delim = "" if loop.last else ","%}
+            const {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name_with_suffix"]|lower_first }}{{ delim }} // read
+        {% endfor %}
+        ):
+        {% for state_name, state_data in component.write_states.items() %}
+            {% set delim = "{" if loop.last and not component.read_states else ","%}
+            {{ state_data["name"]|lower_first }}({{ state_data["name_with_suffix"]|lower_first }}){{ delim }}
+        {% endfor %}
+        {% for state_name, state_data in component.read_states.items() %}
+            {% set delim = "{" if loop.last else ","%}
+            {{ state_data["name"]|lower_first }}({{ state_data["name_with_suffix"]|lower_first }}){{ delim }}
+        {% endfor %}
+        }
+
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+    {% if component.write_states %}
+        // writable states
+    {% for state_name, state_data in component.write_states.items() %}
+        {{ state_data["name_with_suffix"]|upper_first }}& {{ state_name|lower_first }};
+    {% endfor %}
+    {% endif %}
+
+    {% if component.read_states %}
+        // readable states
+    {% for state_name, state_data in component.read_states.items() %}
+        const {{ state_data["name_with_suffix"]|upper_first }}& {{ state_name|lower_first }};
+    {% endfor %}
+    {% endif %}
+    };
+
+    States& states();
+
 {% endif %}
 
 {% endmacro %}
@@ -113,34 +151,20 @@
 {# states private #}
 {% macro states_private(component) %}
 
-{% if component.write_states %}
-    // writable state pointers
-{% for state_name, state_data in component.write_states.items() %}
-    {{ state_data["name_with_suffix"]|upper_first }}* m{{ state_data["name_with_suffix"]|upper_first }} = nullptr;
-{% endfor %}
-{% endif %}
+{% if component.all_states %}
+    std::optional<States> mStates;
 
-{% if component.read_states %}
-    // readable state pointers
-{% for state_name, state_data in component.read_states.items() %}
-    const {{ state_data["name_with_suffix"]|upper_first }}* m{{ state_data["name_with_suffix"]|upper_first }} = nullptr;
-{% endfor %}
+    void bindStates(
+    {% for state_name, state_data in component.write_states.items() %}
+        {% set delim = "" if loop.last and not component.read_states else ","%}
+        {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name"]|lower_first }}{{ delim }}
+    {% endfor %}
+    {% for state_name, state_data in component.read_states.items() %}
+        {% set delim = "" if loop.last else ","%}
+        const {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name"]|lower_first }}{{ delim }}
+    {% endfor %}
+    );
 {% endif %}
-
-{% if component.write_states %}
-    // dependency inject writable states
-{% for state_name, state_data in component.write_states.items() %}
-    void inject{{ state_data["name_with_suffix"]|upper_first }}({{ state_data["name_with_suffix"]|upper_first }}* state);
-{% endfor %}
-{% endif %}
-
-{% if component.read_states %}
-    // dependency inject readable states
-{% for state_name, state_data in component.read_states.items() %}
-    void inject{{ state_data["name_with_suffix"]|upper_first }}(const {{ state_data["name_with_suffix"]|upper_first }}* state);
-{% endfor %}
-{% endif %}
-
 {% endmacro %}
 
 {# hide #}

@@ -21,12 +21,24 @@ float HeatpadSampleState::getPwmProgressMicros() const {
     return mCurrent.pwmProgressMicros;
 }
 
+float HeatpadSampleState::nextMeasuredVoltage() const {
+    return mCurrent.measuredVoltage;
+}
+
+float HeatpadSampleState::nextMeasuredCurrent() const {
+    return mCurrent.measuredCurrent;
+}
+
+float HeatpadSampleState::nextPwmProgressMicros() const {
+    return mCurrent.pwmProgressMicros;
+}
+
 void HeatpadSampleState::setMeasuredVoltage(float value){
     if (mNext.measuredVoltage == value) {
         return;
     }
     mNext.measuredVoltage = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadSampleState::setMeasuredCurrent(float value){
@@ -34,7 +46,7 @@ void HeatpadSampleState::setMeasuredCurrent(float value){
         return;
     }
     mNext.measuredCurrent = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadSampleState::setPwmProgressMicros(float value){
@@ -42,7 +54,7 @@ void HeatpadSampleState::setPwmProgressMicros(float value){
         return;
     }
     mNext.pwmProgressMicros = value;
-    setDirty();
+    markDirty();
 }
 
 void HeatpadSampleState::publish(){
@@ -50,6 +62,7 @@ void HeatpadSampleState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

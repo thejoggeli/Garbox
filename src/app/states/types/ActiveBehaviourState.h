@@ -15,6 +15,9 @@ public:
     // read access (published state)
     BehaviourId getBehaviour() const;
 
+    // read access (next state)
+    BehaviourId nextBehaviour() const;
+
     // write access (next state)
     void setBehaviour(BehaviourId value);
 

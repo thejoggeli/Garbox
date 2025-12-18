@@ -17,7 +17,7 @@ public:
     HeartbeatControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onHeartbeatTick() = 0;
+    virtual void onHeartbeatTick() {};
 
 protected:
 

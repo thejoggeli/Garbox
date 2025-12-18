@@ -13,12 +13,16 @@ float FanSampleState::getMeasuredRpm() const {
     return mCurrent.measuredRpm;
 }
 
+float FanSampleState::nextMeasuredRpm() const {
+    return mCurrent.measuredRpm;
+}
+
 void FanSampleState::setMeasuredRpm(float value){
     if (mNext.measuredRpm == value) {
         return;
     }
     mNext.measuredRpm = value;
-    setDirty();
+    markDirty();
 }
 
 void FanSampleState::publish(){
@@ -26,6 +30,7 @@ void FanSampleState::publish(){
         return;
     }
     mCurrent = mNext;
+    clearDirty();
 }
 
 } // namespace Garbox

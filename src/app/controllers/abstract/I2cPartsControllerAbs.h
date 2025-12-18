@@ -19,10 +19,10 @@ public:
     I2cPartsControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onInputTick() = 0;
+    virtual void onInputTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) = 0;
+    virtual void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) {};
 
 protected:
 
@@ -34,19 +34,40 @@ protected:
     void sendEvent(const TemperatureStatusEvent& event);
     void sendEvent(const TemperatureSampleEvent& event);
 
-    // get writable states
-    TemperatureStatusState& stateTemperatureStatus();
-    TemperatureSampleState& stateTemperatureSample();
+    // state access struct
+    class States final {
+    public:
+
+        States(
+            TemperatureStatusState& temperatureStatusState, // write
+            TemperatureSampleState& temperatureSampleState // write
+        ):
+            temperatureStatus(temperatureStatusState),
+            temperatureSample(temperatureSampleState){
+        }
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+        // writable states
+        TemperatureStatusState& temperatureStatus;
+        TemperatureSampleState& temperatureSample;
+
+    };
+
+    States& states();
 
 private:
 
-    // writable state pointers
-    TemperatureStatusState* mTemperatureStatusState = nullptr;
-    TemperatureSampleState* mTemperatureSampleState = nullptr;
+    std::optional<States> mStates;
 
-    // dependency inject writable states
-    void injectTemperatureStatusState(TemperatureStatusState* state);
-    void injectTemperatureSampleState(TemperatureSampleState* state);
+    void bindStates(
+        TemperatureStatusState& temperatureStatus,
+        TemperatureSampleState& temperatureSample
+    );
 
     // hide event methods
     using ControllerAbs::makeEvent;

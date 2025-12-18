@@ -53,13 +53,13 @@ void I2cPartsController::onInputTick(){
 
     // set new sample
     if(mNewSample){
-        sendTemperatureSampleEvent();
+        updateTemperatureSample();
         mNewSample = false;
     }
 
     // send if status event changed flag is set
     if(mStateChanged){
-        sendTemperatureStatusEvent();
+        updateTemperatureStatus();
         mStateChanged = false;
     }
 }
@@ -112,20 +112,16 @@ void I2cPartsController::handleStateChanged(FsmState oldState, FsmState newState
     }
 }
 
-void I2cPartsController::sendTemperatureStatusEvent(){
-    TemperatureStatusEvent event = makeTemperatureStatusEvent();
-    event->powerEnabled = mEnablePowerGpio.readLevel();
-    event->driverEnabled = mTemperatureSensor.isStarted();
-    event->resetting = mResetting;
-    event->hasFirstSample = mHasFirstSample;
-    sendEvent(event);
+void I2cPartsController::updateTemperatureStatus(){
+    states().temperatureStatus.setPowerEnabled(mEnablePowerGpio.readLevel());
+    states().temperatureStatus.setDriverEnabled(mTemperatureSensor.isStarted());
+    states().temperatureStatus.setResetting(mResetting);
+    states().temperatureStatus.setHasFirstSample(mHasFirstSample);
 }
 
-void I2cPartsController::sendTemperatureSampleEvent(){
-    TemperatureSampleEvent event = makeTemperatureSampleEvent();
-    event->temperatureCelcius = mTemperatureSensor.getTemperatureCelcius();
-    event->humidityRelative = mTemperatureSensor.getHumidityRelative();
-    sendEvent(event);
+void I2cPartsController::updateTemperatureSample(){
+    states().temperatureSample.setTemperatureCelcius(mTemperatureSensor.getTemperatureCelcius());
+    states().temperatureSample.setHumidityRelative(mTemperatureSensor.getHumidityRelative());
 }
 
 } // namespace

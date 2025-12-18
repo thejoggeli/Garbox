@@ -19,11 +19,11 @@ public:
     HeatpadControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onInputTick() = 0;
-    virtual void onOutputTick() = 0;
+    virtual void onInputTick() {};
+    virtual void onOutputTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onHeatpadCommandEvent(const HeatpadCommandEvent& event) = 0;
+    virtual void onHeatpadCommandEvent(const HeatpadCommandEvent& event) {};
 
 protected:
 
@@ -35,19 +35,40 @@ protected:
     void sendEvent(const HeatpadStatusEvent& event);
     void sendEvent(const HeatpadSampleEvent& event);
 
-    // get writable states
-    HeatpadStatusState& stateHeatpadStatus();
-    HeatpadSampleState& stateHeatpadSample();
+    // state access struct
+    class States final {
+    public:
+
+        States(
+            HeatpadStatusState& heatpadStatusState, // write
+            HeatpadSampleState& heatpadSampleState // write
+        ):
+            heatpadStatus(heatpadStatusState),
+            heatpadSample(heatpadSampleState){
+        }
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+        // writable states
+        HeatpadStatusState& heatpadStatus;
+        HeatpadSampleState& heatpadSample;
+
+    };
+
+    States& states();
 
 private:
 
-    // writable state pointers
-    HeatpadStatusState* mHeatpadStatusState = nullptr;
-    HeatpadSampleState* mHeatpadSampleState = nullptr;
+    std::optional<States> mStates;
 
-    // dependency inject writable states
-    void injectHeatpadStatusState(HeatpadStatusState* state);
-    void injectHeatpadSampleState(HeatpadSampleState* state);
+    void bindStates(
+        HeatpadStatusState& heatpadStatus,
+        HeatpadSampleState& heatpadSample
+    );
 
     // hide event methods
     using ControllerAbs::makeEvent;

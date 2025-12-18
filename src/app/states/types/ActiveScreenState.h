@@ -15,6 +15,9 @@ public:
     // read access (published state)
     ScreenId getScreen() const;
 
+    // read access (next state)
+    ScreenId nextScreen() const;
+
     // write access (next state)
     void setScreen(ScreenId value);
 

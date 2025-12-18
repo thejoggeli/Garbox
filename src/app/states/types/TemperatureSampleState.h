@@ -15,6 +15,10 @@ public:
     float getTemperatureCelcius() const;
     float getHumidityRelative() const;
 
+    // read access (next state)
+    float nextTemperatureCelcius() const;
+    float nextHumidityRelative() const;
+
     // write access (next state)
     void setTemperatureCelcius(float value);
     void setHumidityRelative(float value);

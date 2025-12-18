@@ -14,6 +14,9 @@ public:
     // read access (published state)
     float getBrightness() const;
 
+    // read access (next state)
+    float nextBrightness() const;
+
     // write access (next state)
     void setBrightness(float value);
 
