@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/generated/screens/EventLogScreenAbs.h"
+#include "app_generated/screens/EventLogScreenAbs.h"
 #include "core/lvgl/objects/LvObject.h"
 #include "core/lvgl/objects/LvLabel.h"
 #include "core/util/container/static/ArrayStatic.h"

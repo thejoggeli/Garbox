@@ -3,7 +3,7 @@
 // *****************************************
 #include "Runtime.h"
 
-#include "app/generated/runtime/SnapshotRegistry.h"
+#include "app_generated/runtime/SnapshotRegistry.h"
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/time/Time.h"

@@ -80,8 +80,8 @@ def _generate_runtime(ctx: Context, loader: Loader):
 def _generate_snapshot_registry(ctx: Context, loader: Loader):
     """
     Generates 
-    - app/generated/runtime/SnapshotRegistry.h
-    - app/generated/runtime/SnapshotRegistry.cpp
+    - app_generated/runtime/SnapshotRegistry.h
+    - app_generated/runtime/SnapshotRegistry.cpp
     """
 
     # filter only events with kind='snapshot'

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "app/generated/behaviours/CalibrationBehaviourAbs.h"
+#include "app_generated/behaviours/CalibrationBehaviourAbs.h"
 
 namespace Garbox {
 

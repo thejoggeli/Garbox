@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/generated/screens/DebugScreenAbs.h"
+#include "app_generated/screens/DebugScreenAbs.h"
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvLabel.h"
 #include "core/time/SoftwareTimer.h"

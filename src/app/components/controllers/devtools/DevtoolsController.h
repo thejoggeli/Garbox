@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/generated/controllers/DevtoolsControllerAbs.h"
+#include "app_generated/controllers/DevtoolsControllerAbs.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {

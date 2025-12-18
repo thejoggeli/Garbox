@@ -3,7 +3,7 @@
 // *****************************************
 #include "DebugScreenAbs.h"
 #include <math.h>
-#include "app/generated/runtime/SnapshotRegistry.h"
+#include "app_generated/runtime/SnapshotRegistry.h"
 #include "core/lvgl/LvglProvider.h"
 #include "shared/types/ComponentId.h"
 

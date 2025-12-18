@@ -2,8 +2,8 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app/generated/states/types/HeatpadStatusState.h"
-#include "app/generated/states/types/HeatpadSampleState.h"
+#include "app_generated/states/types/HeatpadStatusState.h"
+#include "app_generated/states/types/HeatpadSampleState.h"
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"

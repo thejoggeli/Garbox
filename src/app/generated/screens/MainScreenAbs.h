@@ -2,7 +2,7 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app/generated/guis/MainScreenGui.h"
+#include "app_generated/guis/MainScreenGui.h"
 
 #include "core/application/screen/ScreenAbs.h"
 #include "shared/types/EventType.h"

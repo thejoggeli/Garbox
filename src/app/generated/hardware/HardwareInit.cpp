@@ -3,12 +3,12 @@
 // *****************************************
 #include "HardwareInit.h"
 #include "core/assert/Assert.h"
-#include "app/generated/hardware/AdcInstances.h"
-#include "app/generated/hardware/GpioInstances.h"
-#include "app/generated/hardware/I2cInstances.h"
-#include "app/generated/hardware/SpiInstances.h"
-#include "app/generated/hardware/TimerInstances.h"
-#include "app/generated/hardware/LedcInstances.h"
+#include "app_generated/hardware/AdcInstances.h"
+#include "app_generated/hardware/GpioInstances.h"
+#include "app_generated/hardware/I2cInstances.h"
+#include "app_generated/hardware/SpiInstances.h"
+#include "app_generated/hardware/TimerInstances.h"
+#include "app_generated/hardware/LedcInstances.h"
 
 namespace Garbox {
     

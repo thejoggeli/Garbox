@@ -2,7 +2,7 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app/generated/states/StateRegistry.h"
+#include "app_generated/states/StateRegistry.h"
 #include "core/application/runtime/RuntimeAbs.h"
 #include "core/application/runtime/TickRunner.h"
 // include all components

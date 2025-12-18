@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/generated/screens/MainScreenAbs.h"
+#include "app_generated/screens/MainScreenAbs.h"
 #include "core/lvgl/helpers/chart/ChartGridRenderer.h"
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"

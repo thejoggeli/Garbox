@@ -1,6 +1,6 @@
 #include "I2cPartsController.h"
 
-#include "app/generated/hardware/GpioInstances.h"
+#include "app_generated/hardware/GpioInstances.h"
 #include "app/providers/PartsProvider.h"
 #include "core/assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"

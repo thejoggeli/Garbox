@@ -2,8 +2,8 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app/generated/states/types/TemperatureStatusState.h"
-#include "app/generated/states/types/TemperatureSampleState.h"
+#include "app_generated/states/types/TemperatureStatusState.h"
+#include "app_generated/states/types/TemperatureSampleState.h"
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"

@@ -2,8 +2,8 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app/generated/states/types/DisplayStatusState.h"
-#include "app/generated/states/types/DisplayDiagnosticsState.h"
+#include "app_generated/states/types/DisplayStatusState.h"
+#include "app_generated/states/types/DisplayDiagnosticsState.h"
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"

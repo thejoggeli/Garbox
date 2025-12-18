@@ -3,17 +3,17 @@
 // *****************************************
 #pragma once
 
-#include "app/generated/states/types/DisplayStatusState.h"
-#include "app/generated/states/types/DisplayDiagnosticsState.h"
-#include "app/generated/states/types/FanStatusState.h"
-#include "app/generated/states/types/FanSampleState.h"
-#include "app/generated/states/types/FermentationStatusState.h"
-#include "app/generated/states/types/HeatpadStatusState.h"
-#include "app/generated/states/types/HeatpadSampleState.h"
-#include "app/generated/states/types/TemperatureStatusState.h"
-#include "app/generated/states/types/TemperatureSampleState.h"
-#include "app/generated/states/types/ActiveBehaviourState.h"
-#include "app/generated/states/types/ActiveScreenState.h"
+#include "app_generated/states/types/DisplayStatusState.h"
+#include "app_generated/states/types/DisplayDiagnosticsState.h"
+#include "app_generated/states/types/FanStatusState.h"
+#include "app_generated/states/types/FanSampleState.h"
+#include "app_generated/states/types/FermentationStatusState.h"
+#include "app_generated/states/types/HeatpadStatusState.h"
+#include "app_generated/states/types/HeatpadSampleState.h"
+#include "app_generated/states/types/TemperatureStatusState.h"
+#include "app_generated/states/types/TemperatureSampleState.h"
+#include "app_generated/states/types/ActiveBehaviourState.h"
+#include "app_generated/states/types/ActiveScreenState.h"
 
 namespace Garbox {
 
