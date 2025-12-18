@@ -1,7 +1,5 @@
 
 #include "app/config/AppConfig.h"
-#include "generated/hardware/HardwareInit.h"
-#include "generated/runtime/Runtime.h"
 #include "app/providers/PartsProvider.h"
 #include "app/system/StartupSequence.h"
 #include "app/system/TaskManager.h"
@@ -11,6 +9,9 @@
 #include "core/lvgl/LvglProvider.h"
 #include "core/rtos/Task.h"
 #include "core/time/Time.h"
+
+#include "generated/hardware/HardwareInit.h"
+#include "generated/runtime/Runtime.h"
 
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"

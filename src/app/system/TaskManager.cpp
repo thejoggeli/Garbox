@@ -1,9 +1,9 @@
 #include "TaskManager.h"
 
 #include "app/config/AppConfig.h"
-#include "generated/hardware/SpiInstances.h"
 #include "app/providers/PartsProvider.h"
 #include "core/assert/Assert.h"
+#include "generated/hardware/SpiInstances.h"
 #include "modules/parts/display/Display.h"
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
