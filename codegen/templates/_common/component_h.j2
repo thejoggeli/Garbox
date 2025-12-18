@@ -85,7 +85,7 @@
 {% macro states_include(component) %}
 {% if component.all_states %}
 {% for state_name, state_data in component.all_states.items() %}
-#include "app_generated/states/types/{{ state_data["name_with_suffix"]|upper_first }}.h"
+#include "generated/states/types/{{ state_data["name_with_suffix"]|upper_first }}.h"
 {% endfor %}
 {% endif %}
 

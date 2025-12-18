@@ -1,7 +1,7 @@
 
 #include "app/config/AppConfig.h"
-#include "app_generated/hardware/HardwareInit.h"
-#include "app_generated/runtime/Runtime.h"
+#include "generated/hardware/HardwareInit.h"
+#include "generated/runtime/Runtime.h"
 #include "app/providers/PartsProvider.h"
 #include "app/system/StartupSequence.h"
 #include "app/system/TaskManager.h"

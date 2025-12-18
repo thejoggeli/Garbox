@@ -1,6 +1,6 @@
 #include "MainScreen.h"
 
-#include "app_generated/runtime/SnapshotRegistry.h"
+#include "generated/runtime/SnapshotRegistry.h"
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"

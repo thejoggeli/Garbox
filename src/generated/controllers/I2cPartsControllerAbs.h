@@ -2,8 +2,8 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app_generated/states/types/HeatpadStatusState.h"
-#include "app_generated/states/types/HeatpadSampleState.h"
+#include "generated/states/types/TemperatureStatusState.h"
+#include "generated/states/types/TemperatureSampleState.h"
 
 #include "core/application/controller/ControllerAbs.h"
 #include "shared/types/EventType.h"
@@ -12,39 +12,38 @@ namespace Garbox {
 
 class Runtime;
 
-class HeatpadControllerAbs : public ControllerAbs {
+class I2cPartsControllerAbs : public ControllerAbs {
 public:
 
     // component constructor
-    HeatpadControllerAbs();
+    I2cPartsControllerAbs();
 
     // tick handlers (to be implmeneted by user)
     virtual void onInputTick() {};
-    virtual void onOutputTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onHeatpadCommandEvent(const HeatpadCommandEvent& event) {};
+    virtual void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) {};
 
 protected:
 
     // make typed events 
-    HeatpadStatusEvent makeHeatpadStatusEvent();
-    HeatpadSampleEvent makeHeatpadSampleEvent();
+    TemperatureStatusEvent makeTemperatureStatusEvent();
+    TemperatureSampleEvent makeTemperatureSampleEvent();
 
     // send typed events
-    void sendEvent(const HeatpadStatusEvent& event);
-    void sendEvent(const HeatpadSampleEvent& event);
+    void sendEvent(const TemperatureStatusEvent& event);
+    void sendEvent(const TemperatureSampleEvent& event);
 
     // state access struct
     class States final {
     public:
 
         States(
-            HeatpadStatusState& heatpadStatusState, // write
-            HeatpadSampleState& heatpadSampleState // write
+            TemperatureStatusState& temperatureStatusState, // write
+            TemperatureSampleState& temperatureSampleState // write
         ):
-            heatpadStatus(heatpadStatusState),
-            heatpadSample(heatpadSampleState){
+            temperatureStatus(temperatureStatusState),
+            temperatureSample(temperatureSampleState){
         }
 
         // disallow copy and move
@@ -54,8 +53,8 @@ protected:
         States& operator=(States&&) = delete;
 
         // writable states
-        HeatpadStatusState& heatpadStatus;
-        HeatpadSampleState& heatpadSample;
+        TemperatureStatusState& temperatureStatus;
+        TemperatureSampleState& temperatureSample;
 
     };
 
@@ -66,8 +65,8 @@ private:
     std::optional<States> mStates;
 
     void bindStates(
-        HeatpadStatusState& heatpadStatus,
-        HeatpadSampleState& heatpadSample
+        TemperatureStatusState& temperatureStatus,
+        TemperatureSampleState& temperatureSample
     );
 
     // hide event methods

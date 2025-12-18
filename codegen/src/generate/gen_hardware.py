@@ -11,18 +11,18 @@ def generate_hardware(ctx: Context, loader: Loader):
 
 def _generate_instances(ctx: Context, loader: Loader):
     """
-    - app_generated/hardware/AdcInstances.h
-    - app_generated/hardware/AdcInstances.cpp
-    - app_generated/hardware/GpioInstances.h
-    - app_generated/hardware/GpioInstances.cpp
-    - app_generated/hardware/I2cInstances.h
-    - app_generated/hardware/I2cInstances.cpp
-    - app_generated/hardware/SpiInstances.h
-    - app_generated/hardware/SpiInstances.cpp
-    - app_generated/hardware/TimerInstances.h
-    - app_generated/hardware/TimerInstances.cpp
-    - app_generated/hardware/LedcInstances.h
-    - app_generated/hardware/LedcInstances.cpp
+    - generated/hardware/AdcInstances.h
+    - generated/hardware/AdcInstances.cpp
+    - generated/hardware/GpioInstances.h
+    - generated/hardware/GpioInstances.cpp
+    - generated/hardware/I2cInstances.h
+    - generated/hardware/I2cInstances.cpp
+    - generated/hardware/SpiInstances.h
+    - generated/hardware/SpiInstances.cpp
+    - generated/hardware/TimerInstances.h
+    - generated/hardware/TimerInstances.cpp
+    - generated/hardware/LedcInstances.h
+    - generated/hardware/LedcInstances.cpp
     """
 
     init_mapping = {
@@ -51,8 +51,8 @@ def _generate_instances(ctx: Context, loader: Loader):
 
 def _generate_hardware_init(ctx: Context, loader: Loader):
     """
-    - app_generated/hardware/HardwareInit.h
-    - app_generated/hardware/HardwareInit.cpp
+    - generated/hardware/HardwareInit.h
+    - generated/hardware/HardwareInit.cpp
     """
 
     hw_dir = ctx.gen_dir / "hardware"

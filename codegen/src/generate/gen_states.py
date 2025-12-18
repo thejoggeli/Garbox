@@ -12,8 +12,8 @@ def generate_states(ctx: Context, loader: Loader):
 def _generate_states(ctx: Context, loader: Loader):
     """
     Generates: 
-    - app_generated/states/types/<name>State.h
-    - app_generated/states/types/<name>State.cpp
+    - generated/states/types/<name>State.h
+    - generated/states/types/<name>State.cpp
     """
 
     items = []
@@ -31,8 +31,8 @@ def _generate_states(ctx: Context, loader: Loader):
 def _generate_state_registry(ctx: Context, loader: Loader):
     """
     Generates: 
-    - app_generated/states/StateRegistry.h
-    - app_generated/states/StateRegistry.cpp
+    - generated/states/StateRegistry.h
+    - generated/states/StateRegistry.cpp
     """
 
     template = "states/StateRegistry"

@@ -2,8 +2,8 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app_generated/states/types/FanStatusState.h"
-#include "app_generated/states/types/FanSampleState.h"
+#include "generated/states/types/FanStatusState.h"
+#include "generated/states/types/FanSampleState.h"
 
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "shared/types/EventType.h"

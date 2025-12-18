@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app_generated/controllers/HeatpadControllerAbs.h"
+#include "generated/controllers/HeatpadControllerAbs.h"
 #include "modules/parts/heatpad/HeatpadState.h"
 
 namespace Garbox {

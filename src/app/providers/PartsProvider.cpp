@@ -3,12 +3,12 @@
 #include <algorithm>
 
 #include "app/config/AppConfig.h"
-#include "app_generated/hardware/AdcInstances.h"
-#include "app_generated/hardware/GpioInstances.h"
-#include "app_generated/hardware/I2cInstances.h"
-#include "app_generated/hardware/LedcInstances.h"
-#include "app_generated/hardware/SpiInstances.h"
-#include "app_generated/hardware/TimerInstances.h"
+#include "generated/hardware/AdcInstances.h"
+#include "generated/hardware/GpioInstances.h"
+#include "generated/hardware/I2cInstances.h"
+#include "generated/hardware/LedcInstances.h"
+#include "generated/hardware/SpiInstances.h"
+#include "generated/hardware/TimerInstances.h"
 
 #include "core/assert/Assert.h"
 #include "core/util/container/Span.h"

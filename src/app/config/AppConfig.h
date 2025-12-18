@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "app_generated/config/GeneratedConfig.h"
+#include "generated/config/GeneratedConfig.h"
 
 namespace Garbox::AppConfig {
 

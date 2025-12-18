@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app_generated/controllers/FanControllerAbs.h"
+#include "generated/controllers/FanControllerAbs.h"
 #include "core/util/control/PidControl.h"
 #include "modules/parts/fan/Fan.h"
 

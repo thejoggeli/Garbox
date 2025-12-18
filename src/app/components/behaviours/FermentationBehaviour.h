@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app_generated/behaviours/FermentationBehaviourAbs.h"
+#include "generated/behaviours/FermentationBehaviourAbs.h"
 #include "app/engine/FermentationEngine.h"
 
 namespace Garbox {

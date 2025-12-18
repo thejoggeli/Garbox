@@ -2,7 +2,7 @@
 #pragma once
 
 {% for state in states.values() %}
-#include "app_generated/states/types/{{ state.name_with_suffix }}.h"
+#include "generated/states/types/{{ state.name_with_suffix }}.h"
 {% endfor %}
 
 namespace Garbox {

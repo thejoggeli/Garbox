@@ -2,11 +2,11 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "app_generated/states/types/FermentationStatusState.h"
-#include "app_generated/states/types/FanSampleState.h"
-#include "app_generated/states/types/FanStatusState.h"
-#include "app_generated/states/types/TemperatureSampleState.h"
-#include "app_generated/states/types/TemperatureStatusState.h"
+#include "generated/states/types/FermentationStatusState.h"
+#include "generated/states/types/FanSampleState.h"
+#include "generated/states/types/FanStatusState.h"
+#include "generated/states/types/TemperatureSampleState.h"
+#include "generated/states/types/TemperatureStatusState.h"
 
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "shared/types/EventType.h"

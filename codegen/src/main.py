@@ -26,7 +26,7 @@ def main():
         templates_dir = (codegen_dir / "templates"),
         res_dir       = (root_dir    / "res"),
         app_dir       = (root_dir    / "src/app"),
-        gen_dir       = (root_dir    / "src/app_generated"),
+        gen_dir       = (root_dir    / "src/generated"),
         bin_dir       = (root_dir    / "src/bin"),
         shared_dir    = (root_dir    / "src/shared")
     )
