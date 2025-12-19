@@ -17,20 +17,12 @@ float HeatpadSampleState::getMeasuredCurrent() const {
     return mCurrent.measuredCurrent;
 }
 
-float HeatpadSampleState::getPwmProgressMicros() const {
-    return mCurrent.pwmProgressMicros;
-}
-
 float HeatpadSampleState::nextMeasuredVoltage() const {
     return mCurrent.measuredVoltage;
 }
 
 float HeatpadSampleState::nextMeasuredCurrent() const {
     return mCurrent.measuredCurrent;
-}
-
-float HeatpadSampleState::nextPwmProgressMicros() const {
-    return mCurrent.pwmProgressMicros;
 }
 
 void HeatpadSampleState::setMeasuredVoltage(float value){
@@ -46,14 +38,6 @@ void HeatpadSampleState::setMeasuredCurrent(float value){
         return;
     }
     mNext.measuredCurrent = value;
-    markDirty();
-}
-
-void HeatpadSampleState::setPwmProgressMicros(float value){
-    if (mNext.pwmProgressMicros == value) {
-        return;
-    }
-    mNext.pwmProgressMicros = value;
     markDirty();
 }
 

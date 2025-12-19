@@ -1,0 +1,45 @@
+{% include "_common/header.j2" %}
+#include "{{ name }}Abs.h"
+{% if renderer.mode_lvgl_simple %}
+#include "core/lvgl/LvglProvider.h"
+{% endif %}
+{% if renderer.mode_lvgl_gui %}
+#include "core/lvgl/LvglProvider.h"
+{% endif %}
+
+namespace Garbox {
+
+{# constructor #}
+{{ name }}RendererAbs::{{ name }}RendererAbs():
+{%- if renderer.mode_lvgl_simple -%},
+    mRoot(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight())
+{%- endif -%}
+{%- if renderer.mode_lvgl_gui -%},
+    mGui(),
+    mScreenWidth(LvglProvider::GetDisplayWidth()),
+    mScreenHeight(LvglProvider::GetDisplayHeight())
+{%- endif -%}{}
+
+void {{ name }}Abs::init(ComponentHostIfc& host){
+
+{% if renderer.mode_lvgl_simple %}
+    // init lvgl container
+    mRoot.setRawSize(mScreenWidth, mScreenHeight);
+    mRoot.setBorder(0, lv_color_hex(0x000000));
+    mRoot.setRadius(0);
+    mRoot.setPad(0, 0, 0, 0);
+    mRoot.setBgOpa(LV_OPA_COVER);
+    mRoot.setScrollable(false);
+{% endif %}
+
+{% if screen.mode_lvgl_gui %}
+    // init gui
+    mGui.init();
+{% endif %}
+
+    ScreenAbs::onInit(host);
+}
+
+} // namespace

@@ -15,6 +15,7 @@ enum class ScreenId : uint16_t {
     Main,
     Debug,
     EventLog,
+    StateLog,
 
     // enum size marker
     Count,

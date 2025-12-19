@@ -33,10 +33,9 @@ StateType StateAbs::type() const {
     return mType;
 }
 
-void StateAbs::init(StateHostIfc* host){
+void StateAbs::init(StateHostIfc& host){
     AssertExit(mHost == nullptr, "StateAbs", "already initialized");
-    AssertExit(host != nullptr, "StateAbs", "passed nullptr");
-    mHost = host;
+    mHost = &host;
 }
 
 } // namespace Garbox

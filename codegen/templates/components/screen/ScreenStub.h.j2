@@ -15,16 +15,6 @@ public:
 
 private:
 
-{# onApplyX() handlers for model #}
-{% if screen.use_model %}
-    // model field callbacks to update specific parts of the screen
-{% for group_name, fields in screen.model.groups.items() %}
-    void onApply{{ group_name|upper_first }}() final;
-{% endfor %}
-{% endif %}
-
-
-    // safe to update lvgl objects in these methods
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;

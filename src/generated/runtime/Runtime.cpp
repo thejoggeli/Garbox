@@ -3,7 +3,6 @@
 // *****************************************
 #include "Runtime.h"
 
-#include "generated/runtime/SnapshotRegistry.h"
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/time/Time.h"
@@ -22,8 +21,8 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 
 Runtime::Runtime():
     RuntimeAbs(RuntimeAbs::Config {
-        .numComponents = 12,
-        .numStates = 11,
+        .numComponents = 13,
+        .numStates = 12,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
         .maxDispatchRecursionDepth = 3
@@ -39,6 +38,7 @@ Runtime::Runtime():
     registerState(&mStateRegistry.getFermentationStatus());
     registerState(&mStateRegistry.getHeatpadStatus());
     registerState(&mStateRegistry.getHeatpadSample());
+    registerState(&mStateRegistry.getHeatpadProgress());
     registerState(&mStateRegistry.getTemperatureStatus());
     registerState(&mStateRegistry.getTemperatureSample());
     registerState(&mStateRegistry.getActiveBehaviour());
@@ -57,6 +57,7 @@ Runtime::Runtime():
     registerComponent(&mMainScreen);
     registerComponent(&mDebugScreen);
     registerComponent(&mEventLogScreen);
+    registerComponent(&mStateLogScreen);
 
     // set start and end tick handlers
     mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
@@ -100,13 +101,41 @@ Runtime::Runtime():
     // bind 'HeatpadController' states
     mHeatpadController.bindStates(
         mStateRegistry.getHeatpadStatus(),
-        mStateRegistry.getHeatpadSample()
+        mStateRegistry.getHeatpadSample(),
+        mStateRegistry.getHeatpadProgress()
     );
 
     // bind 'I2cPartsController' states
     mI2cPartsController.bindStates(
         mStateRegistry.getTemperatureStatus(),
         mStateRegistry.getTemperatureSample()
+    );
+
+    // bind 'MainScreen' states
+    mMainScreen.bindStates(
+        mStateRegistry.getFanStatus(),
+        mStateRegistry.getFanSample(),
+        mStateRegistry.getHeatpadStatus(),
+        mStateRegistry.getHeatpadSample(),
+        mStateRegistry.getTemperatureStatus(),
+        mStateRegistry.getTemperatureSample(),
+        mStateRegistry.getFermentationStatus()
+    );
+
+    // bind 'DebugScreen' states
+    mDebugScreen.bindStates(
+        mStateRegistry.getFanStatus(),
+        mStateRegistry.getFanSample(),
+        mStateRegistry.getHeatpadStatus(),
+        mStateRegistry.getHeatpadSample(),
+        mStateRegistry.getHeatpadProgress(),
+        mStateRegistry.getDisplayStatus(),
+        mStateRegistry.getDisplayDiagnostics(),
+        mStateRegistry.getTemperatureStatus(),
+        mStateRegistry.getTemperatureSample(),
+        mStateRegistry.getActiveBehaviour(),
+        mStateRegistry.getActiveScreen(),
+        mStateRegistry.getFermentationStatus()
     );
 
 }
@@ -198,16 +227,38 @@ void Runtime::handleRenderTick(){
 }
 
 void Runtime::onRouteStateChanged(const StateAbs& state){
+
+    // read all state changes
+    mStateLogScreen.onStateChanged(state);
     
     switch(state.type()){
-    case StateType::DisplayStatus: break;
-    case StateType::DisplayDiagnostics: break;
+    case StateType::DisplayStatus: {
+        const DisplayStatusState& displayStatus = static_cast<const DisplayStatusState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onDisplayStatusStateChanged(displayStatus); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
+    case StateType::DisplayDiagnostics: {
+        const DisplayDiagnosticsState& displayDiagnostics = static_cast<const DisplayDiagnosticsState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onDisplayDiagnosticsStateChanged(displayDiagnostics); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
     case StateType::FanStatus: {
         const FanStatusState& fanStatus = static_cast<const FanStatusState&>(state);
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatusStateChanged(fanStatus); break;
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanStatusStateChanged(fanStatus); break;
             default: break; // active behaviour does not read state
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanStatusStateChanged(fanStatus); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFanStatusStateChanged(fanStatus); break;
+            default: break; // active screen does not read state 
         }
         break;
     }
@@ -218,16 +269,58 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onFanSampleStateChanged(fanSample); break;
             default: break; // active behaviour does not read state
         }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanSampleStateChanged(fanSample); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFanSampleStateChanged(fanSample); break;
+            default: break; // active screen does not read state 
+        }
         break;
     }
-    case StateType::FermentationStatus: break;
-    case StateType::HeatpadStatus: break;
-    case StateType::HeatpadSample: break;
+    case StateType::FermentationStatus: {
+        const FermentationStatusState& fermentationStatus = static_cast<const FermentationStatusState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
+    case StateType::HeatpadStatus: {
+        const HeatpadStatusState& heatpadStatus = static_cast<const HeatpadStatusState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
+    case StateType::HeatpadSample: {
+        const HeatpadSampleState& heatpadSample = static_cast<const HeatpadSampleState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
+    case StateType::HeatpadProgress: {
+        const HeatpadProgressState& heatpadProgress = static_cast<const HeatpadProgressState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeatpadProgressStateChanged(heatpadProgress); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
     case StateType::TemperatureStatus: {
         const TemperatureStatusState& temperatureStatus = static_cast<const TemperatureStatusState&>(state);
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatusStateChanged(temperatureStatus); break;
             default: break; // active behaviour does not read state
+        }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureStatusStateChanged(temperatureStatus); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onTemperatureStatusStateChanged(temperatureStatus); break;
+            default: break; // active screen does not read state 
         }
         break;
     }
@@ -237,10 +330,29 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSampleStateChanged(temperatureSample); break;
             default: break; // active behaviour does not read state
         }
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureSampleStateChanged(temperatureSample); break;
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onTemperatureSampleStateChanged(temperatureSample); break;
+            default: break; // active screen does not read state 
+        }
         break;
     }
-    case StateType::ActiveBehaviour: break;
-    case StateType::ActiveScreen: break;
+    case StateType::ActiveBehaviour: {
+        const ActiveBehaviourState& activeBehaviour = static_cast<const ActiveBehaviourState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onActiveBehaviourStateChanged(activeBehaviour); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
+    case StateType::ActiveScreen: {
+        const ActiveScreenState& activeScreen = static_cast<const ActiveScreenState&>(state);
+        switch(mActiveScreen->getScreenId()){
+            case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onActiveScreenStateChanged(activeScreen); break;
+            default: break; // active screen does not read state 
+        }
+        break;
+    }
     case StateType::Null:
     case StateType::Count:
         TriggerDebug("Runtime", "invalid state type");
@@ -325,204 +437,10 @@ void Runtime::onRouteEvent(const EventHeader* header){
         }
         break;
     }
-    case EventType::FermentationStatus: {
-        const FermentationStatusEvent event(header);
-        SnapshotRegistry::UpdateFermentationStatus(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setEngineState(event->fermentationState);
-                model.setEngineTargetTemperature(event->targetTemperature);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setTargetTemperature(event->targetTemperature);
-                model.setEngineState(event->fermentationState);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'FermentationStatus' event
-        }
-        break;
-    }
-    case EventType::DisplayStatus: {
-        const DisplayStatusEvent event(header);
-        SnapshotRegistry::UpdateDisplayStatus(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setDisplayBrightness(event->brightness);
-                model.setDisplaySkipped(event->skipped);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setDisplayBrightness(event->brightness);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'DisplayStatus' event
-        }
-        break;
-    }
-    case EventType::FanStatus: {
-        const FanStatusEvent event(header);
-        SnapshotRegistry::UpdateFanStatus(*event.payload());
-        if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onFanStatusEvent(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanStatusEvent(event); break;
-                default: break; // active behaviour does not receive 'FanStatus' event
-            }
-        }
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setFanState(event->state);
-                model.setFanTargetSpeed(event->targetSpeed);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setFanState(event->state);
-                model.setFanTargetSpeed(event->targetSpeed);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'FanStatus' event
-        }
-        break;
-    }
-    case EventType::FanSample: {
-        const FanSampleEvent event(header);
-        SnapshotRegistry::UpdateFanSample(*event.payload());
-        if(header->sendToInactiveComponents){
-            mCalibrationBehaviour.onFanSampleEvent(event);
-        }
-        else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Calibration: static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onFanSampleEvent(event); break;
-                default: break; // active behaviour does not receive 'FanSample' event
-            }
-        }
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setFanMeasuredRpm(event->measuredRpm);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setFanMeasuredRpm(event->measuredRpm);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'FanSample' event
-        }
-        break;
-    }
-    case EventType::HeatpadStatus: {
-        const HeatpadStatusEvent event(header);
-        SnapshotRegistry::UpdateHeatpadStatus(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setHeatpadState(event->state);
-                model.setHeatpadCurrentDuty(event->currentDutyCycle);
-                model.setHeatpadCurrentPeriod(event->currentPeriodMicros);
-                model.setHeatpadNextDuty(event->nextDutyCycle);
-                model.setHeatpadNextPeriod(event->nextPeriodMicros);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setHeatpadState(event->state);
-                model.setHeatpadNextDuty(event->nextDutyCycle);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'HeatpadStatus' event
-        }
-        break;
-    }
-    case EventType::HeatpadSample: {
-        const HeatpadSampleEvent event(header);
-        SnapshotRegistry::UpdateHeatpadSample(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setHeatpadPwmProgress(event->pwmProgressMicros);
-                model.setHeatpadMeasuredVoltage(event->measuredVoltage);
-                model.setHeatpadMeasuredCurrent(event->measuredCurrent);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setHeatpadMeasuredVoltage(event->measuredVoltage);
-                model.setHeatpadMeasuredCurrent(event->measuredCurrent);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'HeatpadSample' event
-        }
-        break;
-    }
-    case EventType::TemperatureStatus: {
-        const TemperatureStatusEvent event(header);
-        SnapshotRegistry::UpdateTemperatureStatus(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setShtDriverEnabled(event->driverEnabled);
-                model.setShtPowerEnabled(event->powerEnabled);
-                model.setShtResetting(event->resetting);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setShtDriverEnabled(event->driverEnabled);
-                model.setShtPowerEnabled(event->powerEnabled);
-                model.setShtResetting(event->resetting);
-                model.setShtHasSample(event->hasFirstSample);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'TemperatureStatus' event
-        }
-        break;
-    }
-    case EventType::TemperatureSample: {
-        const TemperatureSampleEvent event(header);
-        SnapshotRegistry::UpdateTemperatureSample(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setSensorTemperatureCelcius(event->temperatureCelcius);
-                model.setSensorHumidityRelative(event->humidityRelative);
-                break;
-            }
-            case ScreenId::Main: {
-                MainScreen::Model& model = static_cast<MainScreen*>(mActiveScreen)->model();
-                model.setMeasuredTemperature(event->temperatureCelcius);
-                model.setMeasuredHumidity(event->humidityRelative);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'TemperatureSample' event
-        }
-        break;
-    }
     case EventType::ActiveBehaviourChanged: {
-        const ActiveBehaviourChangedEvent event(header);
-        SnapshotRegistry::UpdateActiveBehaviourChanged(*event.payload());
-        switch(mActiveScreen->getScreenId()){
-            case ScreenId::Debug: {
-                DebugScreen::Model& model = static_cast<DebugScreen*>(mActiveScreen)->model();
-                model.setBehaviour(event->newBehaviour);
-                break;
-            }
-            default: break; // active screen has no model binding to any field of 'ActiveBehaviourChanged' event
-        }
         break;
     }
     case EventType::ActiveScreenChanged: {
-        const ActiveScreenChangedEvent event(header);
-        SnapshotRegistry::UpdateActiveScreenChanged(*event.payload());
         break;
     }
     case EventType::Null:
@@ -560,6 +478,7 @@ ScreenAbs* Runtime::resolveScreen(ScreenId id){
         case ScreenId::Main: return &mMainScreen;
         case ScreenId::Debug: return &mDebugScreen;
         case ScreenId::EventLog: return &mEventLogScreen;
+        case ScreenId::StateLog: return &mStateLogScreen;
         default: TriggerExit("Runtime", "screen with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;

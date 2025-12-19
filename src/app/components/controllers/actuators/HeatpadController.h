@@ -33,9 +33,10 @@ private:
     void onStart() final;
 
     void handleHeatpadStateChanged(HeatpadState oldState, HeatpadState newState);
-    void sendStatusEvent();
     void updateSensorValues();
 
+    void updateStatus();
+    void updateSample();
 };
 
 } // namespace

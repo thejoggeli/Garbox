@@ -1,7 +1,6 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_cpp.j2" import constructor, make_events, send_events, states %}
 #include "{{ name }}Abs.h"
-#include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
@@ -9,4 +8,5 @@ namespace Garbox {
 {{ make_events(name, behaviour) }}
 {{ send_events(name, behaviour) }}
 {{ states(name, behaviour) }}
+
 } // namespace Garbox

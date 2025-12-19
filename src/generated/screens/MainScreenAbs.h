@@ -3,9 +3,16 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "generated/guis/MainScreenGui.h"
+#include "core/application/screen/ScreenAbs.h"
+#include "generated/states/types/FanStatusState.h"
+#include "generated/states/types/FanSampleState.h"
+#include "generated/states/types/HeatpadStatusState.h"
+#include "generated/states/types/HeatpadSampleState.h"
+#include "generated/states/types/TemperatureStatusState.h"
+#include "generated/states/types/TemperatureSampleState.h"
+#include "generated/states/types/FermentationStatusState.h"
 
 #include "core/application/screen/ScreenAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -14,38 +21,98 @@ class Runtime;
 class MainScreenAbs : public ScreenAbs {
 public:
 
-    // constructor 
+    // component constructor
     MainScreenAbs();
+
+    // state change handlers (to be implmeneted by user)
+    virtual void onFanStatusStateChanged(const FanStatusState& state) {};
+    virtual void onFanSampleStateChanged(const FanSampleState& state) {};
+    virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) {};
+    virtual void onHeatpadSampleStateChanged(const HeatpadSampleState& state) {};
+    virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) {};
+    virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) {};
+    virtual void onFermentationStatusStateChanged(const FermentationStatusState& state) {};
+
+    // render functions (to be implmeneted by user)
+    virtual void onRenderFanInfo() {};
+    virtual void onRenderPowerInfo() {};
+    virtual void onRenderHumidityInfo() {};
+    virtual void onRenderStatusInfo() {};
+    virtual void onRenderMeasuredTemperatureSample() {};
+    virtual void onRenderMeasuredTemperatureLabel() {};
+    virtual void onRenderTargetTemperatureSample() {};
+    virtual void onRenderHeatpadPowerSample() {};
+    virtual void onRenderHeatpadPowerLabel() {};
+
+protected:
+
+    // state access struct
+    class States final {
+    public:
+
+        States(
+            const FanStatusState& fanStatusState, // read
+            const FanSampleState& fanSampleState, // read
+            const HeatpadStatusState& heatpadStatusState, // read
+            const HeatpadSampleState& heatpadSampleState, // read
+            const TemperatureStatusState& temperatureStatusState, // read
+            const TemperatureSampleState& temperatureSampleState, // read
+            const FermentationStatusState& fermentationStatusState // read
+        ):
+            fanStatus(fanStatusState),
+            fanSample(fanSampleState),
+            heatpadStatus(heatpadStatusState),
+            heatpadSample(heatpadSampleState),
+            temperatureStatus(temperatureStatusState),
+            temperatureSample(temperatureSampleState),
+            fermentationStatus(fermentationStatusState){
+        }
+
+        // disallow copy and move
+        States(const States&) = delete;
+        States& operator=(const States&) = delete;
+        States(States&&) = delete;
+        States& operator=(States&&) = delete;
+
+        // readable states
+        const FanStatusState& fanStatus;
+        const FanSampleState& fanSample;
+        const HeatpadStatusState& heatpadStatus;
+        const HeatpadSampleState& heatpadSample;
+        const TemperatureStatusState& temperatureStatus;
+        const TemperatureSampleState& temperatureSample;
+        const FermentationStatusState& fermentationStatus;
+    };
+
+    States& states();
+
+private:
+
+    std::optional<States> mStates;
+
+    void bindStates(
+        const FanStatusState& fanStatus,
+        const FanSampleState& fanSample,
+        const HeatpadStatusState& heatpadStatus,
+        const HeatpadSampleState& heatpadSample,
+        const TemperatureStatusState& temperatureStatus,
+        const TemperatureSampleState& temperatureSample,
+        const FermentationStatusState& fermentationStatus
+    );
+
+    // hide event methods
+    using ScreenAbs::makeEvent;
+    using ScreenAbs::sendEventToHost;
+
+    friend class Runtime;
+
+public:
 
     // init override from component
     void init(ComponentHostIfc& host) final;
     void updateScreen() final;
     void becomeEnabled() final;
     void becomeDisabled() final;
-
-protected:
-
-    // model field callbacks to update specific parts of the screen (to be implmeneted by user)
-    virtual void onApplyFanStatus() = 0;
-    virtual void onApplyFanTargetSpeed() = 0;
-    virtual void onApplyHeatpadStatus() = 0;
-    virtual void onApplyHeatpadMeasure() = 0;
-    virtual void onApplyDisplayBrightness() = 0;
-    virtual void onApplySensorStatus() = 0;
-    virtual void onApplyMeasuredTemperature() = 0;
-    virtual void onApplyMeasuredHumidity() = 0;
-    virtual void onApplyTargetTemperature() = 0;
-    virtual void onApplyEngineState() = 0;
-
-private:
-
-    // hide event methods
-    using ScreenAbs::makeEvent;
-    using ScreenAbs::sendEventToHost;
-
-/*******************/
-/*** GUI Section ***/
-/*******************/
 
 private:
 
@@ -59,143 +126,44 @@ protected:
 
     void setBackgroundColor(uint32_t color);
 
-/*********************/
-/*** Model Section ***/
-/*********************/
-
-public: 
-
-    class Model { 
-    public: 
-
-        // dirty-flag indices (one per group) 
-        enum class Index : uint8_t { 
-            FanStatus = 0,
-            FanTargetSpeed,
-            HeatpadStatus,
-            HeatpadMeasure,
-            DisplayBrightness,
-            SensorStatus,
-            MeasuredTemperature,
-            MeasuredHumidity,
-            TargetTemperature,
-            EngineState,
-            Count 
-        }; 
-
-        Model(MainScreenAbs& screen); 
-
-        // disallow copy and move 
-        Model(const Model&) = delete;
-        Model& operator=(const Model&) = delete;
-        Model(Model&&) = delete;
-        Model& operator=(Model&&) = delete;
-
-        // getters
-        FanState getFanState() const;
-        float getFanMeasuredRpm() const;
-        float getFanTargetSpeed() const;
-        HeatpadState getHeatpadState() const;
-        float getHeatpadNextDuty() const;
-        float getHeatpadMeasuredVoltage() const;
-        float getHeatpadMeasuredCurrent() const;
-        float getDisplayBrightness() const;
-        bool getShtDriverEnabled() const;
-        bool getShtPowerEnabled() const;
-        bool getShtResetting() const;
-        bool getShtHasSample() const;
-        float getMeasuredTemperature() const;
-        float getMeasuredHumidity() const;
-        float getTargetTemperature() const;
-        FermentationState getEngineState() const;
-
-        // setters 
-        void setFanState(FanState value);
-        void setFanMeasuredRpm(float value);
-        void setFanTargetSpeed(float value);
-        void setHeatpadState(HeatpadState value);
-        void setHeatpadNextDuty(float value);
-        void setHeatpadMeasuredVoltage(float value);
-        void setHeatpadMeasuredCurrent(float value);
-        void setDisplayBrightness(float value);
-        void setShtDriverEnabled(bool value);
-        void setShtPowerEnabled(bool value);
-        void setShtResetting(bool value);
-        void setShtHasSample(bool value);
-        void setMeasuredTemperature(float value);
-        void setMeasuredHumidity(float value);
-        void setTargetTemperature(float value);
-        void setEngineState(FermentationState value);
-
-    private: 
-
-        MainScreenAbs& mScreen; 
-
-        // all model fields
-        FanState mFanState;
-        float mFanMeasuredRpm;
-        float mFanTargetSpeed;
-        HeatpadState mHeatpadState;
-        float mHeatpadNextDuty;
-        float mHeatpadMeasuredVoltage;
-        float mHeatpadMeasuredCurrent;
-        float mDisplayBrightness;
-        bool mShtDriverEnabled;
-        bool mShtPowerEnabled;
-        bool mShtResetting;
-        bool mShtHasSample;
-        float mMeasuredTemperature;
-        float mMeasuredHumidity;
-        float mTargetTemperature;
-        FermentationState mEngineState;
-
-    };
-
-private:
-
-    // model instance
-    Model mModel;
-
-public:
-
-    Model& model();
-    const Model& model() const;
-
 protected: 
 
-    // dispatcher (calls apply methods)
-    DirtyDispatcher mDirtyDispatcher;
+    // render function indices 
+    enum class RenderFn : uint8_t { 
+        FanInfo = 0,
+        PowerInfo,
+        HumidityInfo,
+        StatusInfo,
+        MeasuredTemperatureSample,
+        MeasuredTemperatureLabel,
+        TargetTemperatureSample,
+        HeatpadPowerSample,
+        HeatpadPowerLabel,
+        Count 
+    }; 
+
+    // render dispatcher (calls render methods)
+    DirtyDispatcher mRenderDispatcher;
     uint32_t mDispatchedCount = 0;
     uint32_t getDispatchedCount() const { return mDispatchedCount; }
 
-    // method to mark an model field index dirty (for manually updated values)
-    void markDirty(Model::Index index);
-    bool isMarkedDirty(Model::Index index) const;
+    // method to mark a render function dirty
+    void markDirty(RenderFn fn);
+    bool isMarkedDirty(RenderFn fn) const;
 
 private: 
 
-    void setSnapshotFanStatus();
-    void setSnapshotFanSample();
-    void setSnapshotHeatpadStatus();
-    void setSnapshotHeatpadSample();
-    void setSnapshotDisplayStatus();
-    void setSnapshotTemperatureStatus();
-    void setSnapshotTemperatureSample();
-    void setSnapshotFermentationStatus();
+    // render trampolines
+    static void renderFanInfoTrampoline(void* context);
+    static void renderPowerInfoTrampoline(void* context);
+    static void renderHumidityInfoTrampoline(void* context);
+    static void renderStatusInfoTrampoline(void* context);
+    static void renderMeasuredTemperatureSampleTrampoline(void* context);
+    static void renderMeasuredTemperatureLabelTrampoline(void* context);
+    static void renderTargetTemperatureSampleTrampoline(void* context);
+    static void renderHeatpadPowerSampleTrampoline(void* context);
+    static void renderHeatpadPowerLabelTrampoline(void* context);
 
-    // model field apply trampolines
-    static void applyFanStatusTrampoline(void* context);
-    static void applyFanTargetSpeedTrampoline(void* context);
-    static void applyHeatpadStatusTrampoline(void* context);
-    static void applyHeatpadMeasureTrampoline(void* context);
-    static void applyDisplayBrightnessTrampoline(void* context);
-    static void applySensorStatusTrampoline(void* context);
-    static void applyMeasuredTemperatureTrampoline(void* context);
-    static void applyMeasuredHumidityTrampoline(void* context);
-    static void applyTargetTemperatureTrampoline(void* context);
-    static void applyEngineStateTrampoline(void* context);
-
-    friend class Runtime;
 };
 
 } // namespace Garbox

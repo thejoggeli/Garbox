@@ -42,6 +42,14 @@ void {{ component.name }}::on{{ ev }}Event(const {{ ev }}Event& event){
 
 {# receive state changed #}
 {% macro on_states_changed(component) %}
+{% if component.read_states_all %}
+
+void {{ component.name }}::onStateChanged(const StateAbs& state){
+    // nothing to do
+}
+
+{% endif %}
+
 {% if component.read_states %}
     // state changed handlers
 {% for state in component.read_states.values() %}

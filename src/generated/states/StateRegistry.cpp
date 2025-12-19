@@ -36,6 +36,10 @@ HeatpadSampleState& StateRegistry::getHeatpadSample(){
     return mHeatpadSample;
 }
 
+HeatpadProgressState& StateRegistry::getHeatpadProgress(){
+    return mHeatpadProgress;
+}
+
 TemperatureStatusState& StateRegistry::getTemperatureStatus(){
     return mTemperatureStatus;
 }

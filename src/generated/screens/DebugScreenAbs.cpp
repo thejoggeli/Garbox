@@ -2,10 +2,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 #include "DebugScreenAbs.h"
-#include <math.h>
-#include "generated/runtime/SnapshotRegistry.h"
 #include "core/lvgl/LvglProvider.h"
-#include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
@@ -14,8 +11,41 @@ DebugScreenAbs::DebugScreenAbs():
     mRoot(),
     mScreenWidth(LvglProvider::GetDisplayWidth()),
     mScreenHeight(LvglProvider::GetDisplayHeight()),
-    mModel(*this),
-    mDirtyDispatcher(static_cast<uint32_t>(Model::Index::Count)){}
+    mRenderDispatcher(static_cast<uint32_t>(RenderFn::Count)){}
+
+DebugScreenAbs::States& DebugScreenAbs::states(){
+    return mStates.value();
+}
+
+void DebugScreenAbs::bindStates(
+    const FanStatusState& fanStatus,
+    const FanSampleState& fanSample,
+    const HeatpadStatusState& heatpadStatus,
+    const HeatpadSampleState& heatpadSample,
+    const HeatpadProgressState& heatpadProgress,
+    const DisplayStatusState& displayStatus,
+    const DisplayDiagnosticsState& displayDiagnostics,
+    const TemperatureStatusState& temperatureStatus,
+    const TemperatureSampleState& temperatureSample,
+    const ActiveBehaviourState& activeBehaviour,
+    const ActiveScreenState& activeScreen,
+    const FermentationStatusState& fermentationStatus
+){
+    mStates.emplace(
+        fanStatus,
+        fanSample,
+        heatpadStatus,
+        heatpadSample,
+        heatpadProgress,
+        displayStatus,
+        displayDiagnostics,
+        temperatureStatus,
+        temperatureSample,
+        activeBehaviour,
+        activeScreen,
+        fermentationStatus
+    );
+}
 
 void DebugScreenAbs::init(ComponentHostIfc& host){
 
@@ -27,21 +57,21 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
     mRoot.setBgOpa(LV_OPA_COVER);
     mRoot.setScrollable(false);
 
-    mDirtyDispatcher.registerHandler(applyFanStateTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyFanMeasuredRpmTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeatpadStateTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeatpadDutyTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyBoxPositionTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeatpadSenseTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyDisplayStatusTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyTemperatureStateTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyTemperatureSampleTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyTimeTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyAppInfoTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyFermentationStatusTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeapBlocksTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeapBytesTrampoline, this);
-    mDirtyDispatcher.registerHandler(applyHeapMinimumTrampoline, this);
+    mRenderDispatcher.registerHandler(renderFanStateTrampoline, this);
+    mRenderDispatcher.registerHandler(renderFanMeasuredRpmTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeatpadStateTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeatpadDutyTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeatpadSenseTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeatpadProgressTrampoline, this);
+    mRenderDispatcher.registerHandler(renderDisplayStatusTrampoline, this);
+    mRenderDispatcher.registerHandler(renderTemperatureStateTrampoline, this);
+    mRenderDispatcher.registerHandler(renderTemperatureSampleTrampoline, this);
+    mRenderDispatcher.registerHandler(renderTimeTrampoline, this);
+    mRenderDispatcher.registerHandler(renderAppInfoTrampoline, this);
+    mRenderDispatcher.registerHandler(renderFermentationStatusTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeapBlocksTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeapBytesTrampoline, this);
+    mRenderDispatcher.registerHandler(renderHeapMinimumTrampoline, this);
 
     // calls onInit()
     ScreenAbs::init(host);
@@ -49,21 +79,30 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
 
 void DebugScreenAbs::updateScreen(){
     ScreenAbs::updateScreen();
-    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
-    mDirtyDispatcher.dispatch();
+    mDispatchedCount += mRenderDispatcher.getDirtyCount();
+    mRenderDispatcher.dispatch();
 }
 
 void DebugScreenAbs::becomeEnabled(){
     mRoot.setScreen();
-    setSnapshotFanStatus();
-    setSnapshotFanSample();
-    setSnapshotHeatpadStatus();
-    setSnapshotHeatpadSample();
-    setSnapshotDisplayStatus();
-    setSnapshotTemperatureStatus();
-    setSnapshotTemperatureSample();
-    setSnapshotActiveBehaviourChanged();
-    setSnapshotFermentationStatus();
+
+    // mark all render functions dirty for complete redraw 
+    markDirty(RenderFn::FanState);
+    markDirty(RenderFn::FanMeasuredRpm);
+    markDirty(RenderFn::HeatpadState);
+    markDirty(RenderFn::HeatpadDuty);
+    markDirty(RenderFn::HeatpadSense);
+    markDirty(RenderFn::HeatpadProgress);
+    markDirty(RenderFn::DisplayStatus);
+    markDirty(RenderFn::TemperatureState);
+    markDirty(RenderFn::TemperatureSample);
+    markDirty(RenderFn::Time);
+    markDirty(RenderFn::AppInfo);
+    markDirty(RenderFn::FermentationStatus);
+    markDirty(RenderFn::HeapBlocks);
+    markDirty(RenderFn::HeapBytes);
+    markDirty(RenderFn::HeapMinimum);
+
     ScreenAbs::becomeEnabled();
 }
 
@@ -71,483 +110,76 @@ void DebugScreenAbs::becomeDisabled(){
     ScreenAbs::becomeDisabled();
 }
 
-DisplayCommandEvent DebugScreenAbs::makeDisplayCommandEvent(){
-    return ComponentAbs::makeEvent<EventType::DisplayCommand>();
-}
-
-void DebugScreenAbs::sendEvent(const DisplayCommandEvent& event){
-    sendEventToHost(event.header());
-}
-
 void DebugScreenAbs::setBackgroundColor(uint32_t color){
     mRoot.setBgColor(lv_color_hex(color));
 }
 
-void DebugScreenAbs::setSnapshotFanStatus(){
-    const FanStatusPayload& payload = SnapshotRegistry::GetFanStatus();
-    mModel.setFanState(payload.state);
-    mModel.setFanTargetSpeed(payload.targetSpeed);
+void DebugScreenAbs::markDirty(RenderFn fn){
+    mRenderDispatcher.markDirty(static_cast<size_t>(fn));
 }
 
-void DebugScreenAbs::setSnapshotFanSample(){
-    const FanSamplePayload& payload = SnapshotRegistry::GetFanSample();
-    mModel.setFanMeasuredRpm(payload.measuredRpm);
+bool DebugScreenAbs::isMarkedDirty(RenderFn fn) const {
+    return mRenderDispatcher.isMarkedDirty(static_cast<size_t>(fn));
 }
 
-void DebugScreenAbs::setSnapshotHeatpadStatus(){
-    const HeatpadStatusPayload& payload = SnapshotRegistry::GetHeatpadStatus();
-    mModel.setHeatpadState(payload.state);
-    mModel.setHeatpadCurrentDuty(payload.currentDutyCycle);
-    mModel.setHeatpadCurrentPeriod(payload.currentPeriodMicros);
-    mModel.setHeatpadNextDuty(payload.nextDutyCycle);
-    mModel.setHeatpadNextPeriod(payload.nextPeriodMicros);
+void DebugScreenAbs::renderFanStateTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderFanState();
 }
 
-void DebugScreenAbs::setSnapshotHeatpadSample(){
-    const HeatpadSamplePayload& payload = SnapshotRegistry::GetHeatpadSample();
-    mModel.setHeatpadPwmProgress(payload.pwmProgressMicros);
-    mModel.setHeatpadMeasuredVoltage(payload.measuredVoltage);
-    mModel.setHeatpadMeasuredCurrent(payload.measuredCurrent);
+void DebugScreenAbs::renderFanMeasuredRpmTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderFanMeasuredRpm();
 }
 
-void DebugScreenAbs::setSnapshotDisplayStatus(){
-    const DisplayStatusPayload& payload = SnapshotRegistry::GetDisplayStatus();
-    mModel.setDisplayBrightness(payload.brightness);
-    mModel.setDisplaySkipped(payload.skipped);
+void DebugScreenAbs::renderHeatpadStateTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeatpadState();
 }
 
-void DebugScreenAbs::setSnapshotTemperatureStatus(){
-    const TemperatureStatusPayload& payload = SnapshotRegistry::GetTemperatureStatus();
-    mModel.setShtDriverEnabled(payload.driverEnabled);
-    mModel.setShtPowerEnabled(payload.powerEnabled);
-    mModel.setShtResetting(payload.resetting);
+void DebugScreenAbs::renderHeatpadDutyTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeatpadDuty();
 }
 
-void DebugScreenAbs::setSnapshotTemperatureSample(){
-    const TemperatureSamplePayload& payload = SnapshotRegistry::GetTemperatureSample();
-    mModel.setSensorTemperatureCelcius(payload.temperatureCelcius);
-    mModel.setSensorHumidityRelative(payload.humidityRelative);
+void DebugScreenAbs::renderHeatpadSenseTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeatpadSense();
 }
 
-void DebugScreenAbs::setSnapshotActiveBehaviourChanged(){
-    const ActiveBehaviourChangedPayload& payload = SnapshotRegistry::GetActiveBehaviourChanged();
-    mModel.setBehaviour(payload.newBehaviour);
+void DebugScreenAbs::renderHeatpadProgressTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeatpadProgress();
 }
 
-void DebugScreenAbs::setSnapshotFermentationStatus(){
-    const FermentationStatusPayload& payload = SnapshotRegistry::GetFermentationStatus();
-    mModel.setEngineState(payload.fermentationState);
-    mModel.setEngineTargetTemperature(payload.targetTemperature);
+void DebugScreenAbs::renderDisplayStatusTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderDisplayStatus();
 }
 
-DebugScreenAbs::Model::Model(DebugScreenAbs& screen) : mScreen(screen){ 
-    // nothing to do 
+void DebugScreenAbs::renderTemperatureStateTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderTemperatureState();
 }
 
-FanState DebugScreenAbs::Model::getFanState() const { 
-    return mFanState; 
+void DebugScreenAbs::renderTemperatureSampleTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderTemperatureSample();
 }
 
-float DebugScreenAbs::Model::getFanTargetSpeed() const { 
-    return mFanTargetSpeed; 
+void DebugScreenAbs::renderTimeTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderTime();
 }
 
-float DebugScreenAbs::Model::getFanMeasuredRpm() const { 
-    return mFanMeasuredRpm; 
+void DebugScreenAbs::renderAppInfoTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderAppInfo();
 }
 
-HeatpadState DebugScreenAbs::Model::getHeatpadState() const { 
-    return mHeatpadState; 
+void DebugScreenAbs::renderFermentationStatusTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderFermentationStatus();
 }
 
-float DebugScreenAbs::Model::getHeatpadCurrentDuty() const { 
-    return mHeatpadCurrentDuty; 
+void DebugScreenAbs::renderHeapBlocksTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeapBlocks();
 }
 
-uint32_t DebugScreenAbs::Model::getHeatpadCurrentPeriod() const { 
-    return mHeatpadCurrentPeriod; 
+void DebugScreenAbs::renderHeapBytesTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeapBytes();
 }
 
-float DebugScreenAbs::Model::getHeatpadNextDuty() const { 
-    return mHeatpadNextDuty; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeatpadNextPeriod() const { 
-    return mHeatpadNextPeriod; 
-}
-
-float DebugScreenAbs::Model::getHeatpadPwmProgress() const { 
-    return mHeatpadPwmProgress; 
-}
-
-float DebugScreenAbs::Model::getHeatpadMeasuredVoltage() const { 
-    return mHeatpadMeasuredVoltage; 
-}
-
-float DebugScreenAbs::Model::getHeatpadMeasuredCurrent() const { 
-    return mHeatpadMeasuredCurrent; 
-}
-
-float DebugScreenAbs::Model::getDisplayBrightness() const { 
-    return mDisplayBrightness; 
-}
-
-uint32_t DebugScreenAbs::Model::getDisplaySkipped() const { 
-    return mDisplaySkipped; 
-}
-
-bool DebugScreenAbs::Model::getShtDriverEnabled() const { 
-    return mShtDriverEnabled; 
-}
-
-bool DebugScreenAbs::Model::getShtPowerEnabled() const { 
-    return mShtPowerEnabled; 
-}
-
-bool DebugScreenAbs::Model::getShtResetting() const { 
-    return mShtResetting; 
-}
-
-float DebugScreenAbs::Model::getSensorTemperatureCelcius() const { 
-    return mSensorTemperatureCelcius; 
-}
-
-float DebugScreenAbs::Model::getSensorHumidityRelative() const { 
-    return mSensorHumidityRelative; 
-}
-
-uint32_t DebugScreenAbs::Model::getTimeSeconds() const { 
-    return mTimeSeconds; 
-}
-
-uint32_t DebugScreenAbs::Model::getEventCount() const { 
-    return mEventCount; 
-}
-
-BehaviourId DebugScreenAbs::Model::getBehaviour() const { 
-    return mBehaviour; 
-}
-
-FermentationState DebugScreenAbs::Model::getEngineState() const { 
-    return mEngineState; 
-}
-
-float DebugScreenAbs::Model::getEngineTargetTemperature() const { 
-    return mEngineTargetTemperature; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapAllocatedBlocks() const { 
-    return mHeapAllocatedBlocks; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapFreeBlocks() const { 
-    return mHeapFreeBlocks; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapLargestFreeBlock() const { 
-    return mHeapLargestFreeBlock; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapAllocatedBytes() const { 
-    return mHeapAllocatedBytes; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapMinimumFreeBytes() const { 
-    return mHeapMinimumFreeBytes; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapTotalFreeBytes() const { 
-    return mHeapTotalFreeBytes; 
-}
-
-uint32_t DebugScreenAbs::Model::getHeapMinimumTime() const { 
-    return mHeapMinimumTime; 
-}
-
-void DebugScreenAbs::Model::setFanState(FanState value){ 
-    if(mFanState != value) { 
-        mFanState = value; 
-        mScreen.markDirty(Model::Index::FanState);
-    } 
-}
-
-void DebugScreenAbs::Model::setFanTargetSpeed(float value){ 
-    if(mFanTargetSpeed != value) { 
-        mFanTargetSpeed = value; 
-        mScreen.markDirty(Model::Index::FanState);
-    } 
-}
-
-void DebugScreenAbs::Model::setFanMeasuredRpm(float value){ 
-    if(mFanMeasuredRpm != value) { 
-        mFanMeasuredRpm = value; 
-        mScreen.markDirty(Model::Index::FanMeasuredRpm);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadState(HeatpadState value){ 
-    if(mHeatpadState != value) { 
-        mHeatpadState = value; 
-        mScreen.markDirty(Model::Index::HeatpadState);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadCurrentDuty(float value){ 
-    if(mHeatpadCurrentDuty != value) { 
-        mHeatpadCurrentDuty = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadCurrentPeriod(uint32_t value){ 
-    if(mHeatpadCurrentPeriod != value) { 
-        mHeatpadCurrentPeriod = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadNextDuty(float value){ 
-    if(mHeatpadNextDuty != value) { 
-        mHeatpadNextDuty = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadNextPeriod(uint32_t value){ 
-    if(mHeatpadNextPeriod != value) { 
-        mHeatpadNextPeriod = value; 
-        mScreen.markDirty(Model::Index::HeatpadDuty);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadPwmProgress(float value){ 
-    if(mHeatpadPwmProgress != value) { 
-        mHeatpadPwmProgress = value; 
-        mScreen.markDirty(Model::Index::BoxPosition);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadMeasuredVoltage(float value){ 
-    if(mHeatpadMeasuredVoltage != value) { 
-        mHeatpadMeasuredVoltage = value; 
-        mScreen.markDirty(Model::Index::HeatpadSense);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeatpadMeasuredCurrent(float value){ 
-    if(mHeatpadMeasuredCurrent != value) { 
-        mHeatpadMeasuredCurrent = value; 
-        mScreen.markDirty(Model::Index::HeatpadSense);
-    } 
-}
-
-void DebugScreenAbs::Model::setDisplayBrightness(float value){ 
-    if(mDisplayBrightness != value) { 
-        mDisplayBrightness = value; 
-        mScreen.markDirty(Model::Index::DisplayStatus);
-    } 
-}
-
-void DebugScreenAbs::Model::setDisplaySkipped(uint32_t value){ 
-    if(mDisplaySkipped != value) { 
-        mDisplaySkipped = value; 
-        mScreen.markDirty(Model::Index::DisplayStatus);
-    } 
-}
-
-void DebugScreenAbs::Model::setShtDriverEnabled(bool value){ 
-    if(mShtDriverEnabled != value) { 
-        mShtDriverEnabled = value; 
-        mScreen.markDirty(Model::Index::TemperatureState);
-    } 
-}
-
-void DebugScreenAbs::Model::setShtPowerEnabled(bool value){ 
-    if(mShtPowerEnabled != value) { 
-        mShtPowerEnabled = value; 
-        mScreen.markDirty(Model::Index::TemperatureState);
-    } 
-}
-
-void DebugScreenAbs::Model::setShtResetting(bool value){ 
-    if(mShtResetting != value) { 
-        mShtResetting = value; 
-        mScreen.markDirty(Model::Index::TemperatureState);
-    } 
-}
-
-void DebugScreenAbs::Model::setSensorTemperatureCelcius(float value){ 
-    if(mSensorTemperatureCelcius != value) { 
-        mSensorTemperatureCelcius = value; 
-        mScreen.markDirty(Model::Index::TemperatureSample);
-    } 
-}
-
-void DebugScreenAbs::Model::setSensorHumidityRelative(float value){ 
-    if(mSensorHumidityRelative != value) { 
-        mSensorHumidityRelative = value; 
-        mScreen.markDirty(Model::Index::TemperatureSample);
-    } 
-}
-
-void DebugScreenAbs::Model::setTimeSeconds(uint32_t value){ 
-    if(mTimeSeconds != value) { 
-        mTimeSeconds = value; 
-        mScreen.markDirty(Model::Index::Time);
-    } 
-}
-
-void DebugScreenAbs::Model::setEventCount(uint32_t value){ 
-    if(mEventCount != value) { 
-        mEventCount = value; 
-        mScreen.markDirty(Model::Index::AppInfo);
-    } 
-}
-
-void DebugScreenAbs::Model::setBehaviour(BehaviourId value){ 
-    if(mBehaviour != value) { 
-        mBehaviour = value; 
-        mScreen.markDirty(Model::Index::AppInfo);
-    } 
-}
-
-void DebugScreenAbs::Model::setEngineState(FermentationState value){ 
-    if(mEngineState != value) { 
-        mEngineState = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
-}
-
-void DebugScreenAbs::Model::setEngineTargetTemperature(float value){ 
-    if(mEngineTargetTemperature != value) { 
-        mEngineTargetTemperature = value; 
-        mScreen.markDirty(Model::Index::FermentationStatus);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapAllocatedBlocks(uint32_t value){ 
-    if(mHeapAllocatedBlocks != value) { 
-        mHeapAllocatedBlocks = value; 
-        mScreen.markDirty(Model::Index::HeapBlocks);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapFreeBlocks(uint32_t value){ 
-    if(mHeapFreeBlocks != value) { 
-        mHeapFreeBlocks = value; 
-        mScreen.markDirty(Model::Index::HeapBlocks);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapLargestFreeBlock(uint32_t value){ 
-    if(mHeapLargestFreeBlock != value) { 
-        mHeapLargestFreeBlock = value; 
-        mScreen.markDirty(Model::Index::HeapBlocks);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapAllocatedBytes(uint32_t value){ 
-    if(mHeapAllocatedBytes != value) { 
-        mHeapAllocatedBytes = value; 
-        mScreen.markDirty(Model::Index::HeapBytes);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapMinimumFreeBytes(uint32_t value){ 
-    if(mHeapMinimumFreeBytes != value) { 
-        mHeapMinimumFreeBytes = value; 
-        mScreen.markDirty(Model::Index::HeapBytes);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapTotalFreeBytes(uint32_t value){ 
-    if(mHeapTotalFreeBytes != value) { 
-        mHeapTotalFreeBytes = value; 
-        mScreen.markDirty(Model::Index::HeapMinimum);
-    } 
-}
-
-void DebugScreenAbs::Model::setHeapMinimumTime(uint32_t value){ 
-    if(mHeapMinimumTime != value) { 
-        mHeapMinimumTime = value; 
-        mScreen.markDirty(Model::Index::HeapMinimum);
-    } 
-}
-
-DebugScreenAbs::Model& DebugScreenAbs::model(){
-    return mModel;
-}
-
-const DebugScreenAbs::Model& DebugScreenAbs::model() const {
-    return mModel;
-}
-
-void DebugScreenAbs::markDirty(Model::Index index){
-    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
-}
-
-bool DebugScreenAbs::isMarkedDirty(Model::Index index) const {
-    return mDirtyDispatcher.isMarkedDirty(static_cast<size_t>(index));
-}
-
-void DebugScreenAbs::applyFanStateTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyFanState();
-}
-
-void DebugScreenAbs::applyFanMeasuredRpmTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyFanMeasuredRpm();
-}
-
-void DebugScreenAbs::applyHeatpadStateTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeatpadState();
-}
-
-void DebugScreenAbs::applyHeatpadDutyTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeatpadDuty();
-}
-
-void DebugScreenAbs::applyBoxPositionTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyBoxPosition();
-}
-
-void DebugScreenAbs::applyHeatpadSenseTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeatpadSense();
-}
-
-void DebugScreenAbs::applyDisplayStatusTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyDisplayStatus();
-}
-
-void DebugScreenAbs::applyTemperatureStateTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyTemperatureState();
-}
-
-void DebugScreenAbs::applyTemperatureSampleTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyTemperatureSample();
-}
-
-void DebugScreenAbs::applyTimeTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyTime();
-}
-
-void DebugScreenAbs::applyAppInfoTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyAppInfo();
-}
-
-void DebugScreenAbs::applyFermentationStatusTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyFermentationStatus();
-}
-
-void DebugScreenAbs::applyHeapBlocksTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeapBlocks();
-}
-
-void DebugScreenAbs::applyHeapBytesTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeapBytes();
-}
-
-void DebugScreenAbs::applyHeapMinimumTrampoline(void* context){
-    static_cast<DebugScreenAbs*>(context)->onApplyHeapMinimum();
+void DebugScreenAbs::renderHeapMinimumTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderHeapMinimum();
 }
 
 } // namespace Garbox

@@ -4,6 +4,7 @@
 // *****************************************
 #include "core/application/screen/ScreenAbs.h"
 #include "core/lvgl/objects/LvObject.h"
+#include "core/application/state/StateAbs.h"
 
 #include "core/application/screen/ScreenAbs.h"
 
@@ -11,14 +12,14 @@ namespace Garbox {
 
 class Runtime;
 
-class EventLogScreenAbs : public ScreenAbs {
+class StateLogScreenAbs : public ScreenAbs {
 public:
 
     // component constructor
-    EventLogScreenAbs();
+    StateLogScreenAbs();
 
-    // event handler (to be implmeneted by user)
-    virtual void onEvent(const EventHeader* header) {};
+    // any state changed handler
+    virtual void onStateChanged(const StateAbs& state) {};
 
 protected:
 

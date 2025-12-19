@@ -1,18 +1,18 @@
 // *****************************************
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
-#include "EventLogScreenAbs.h"
+#include "StateLogScreenAbs.h"
 #include "core/lvgl/LvglProvider.h"
 
 namespace Garbox {
 
-EventLogScreenAbs::EventLogScreenAbs(): 
-    ScreenAbs(ComponentId::EventLogScreen, ScreenId::EventLog),
+StateLogScreenAbs::StateLogScreenAbs(): 
+    ScreenAbs(ComponentId::StateLogScreen, ScreenId::StateLog),
     mRoot(),
     mScreenWidth(LvglProvider::GetDisplayWidth()),
     mScreenHeight(LvglProvider::GetDisplayHeight()){}
 
-void EventLogScreenAbs::init(ComponentHostIfc& host){
+void StateLogScreenAbs::init(ComponentHostIfc& host){
 
     // init lvgl container
     mRoot.setRawSize(mScreenWidth, mScreenHeight);
@@ -26,21 +26,21 @@ void EventLogScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
 }
 
-void EventLogScreenAbs::updateScreen(){
+void StateLogScreenAbs::updateScreen(){
     ScreenAbs::updateScreen();
 }
 
-void EventLogScreenAbs::becomeEnabled(){
+void StateLogScreenAbs::becomeEnabled(){
     mRoot.setScreen();
 
     ScreenAbs::becomeEnabled();
 }
 
-void EventLogScreenAbs::becomeDisabled(){
+void StateLogScreenAbs::becomeDisabled(){
     ScreenAbs::becomeDisabled();
 }
 
-void EventLogScreenAbs::setBackgroundColor(uint32_t color){
+void StateLogScreenAbs::setBackgroundColor(uint32_t color){
     mRoot.setBgColor(lv_color_hex(color));
 }
 

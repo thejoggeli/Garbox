@@ -7,30 +7,22 @@ from loader.loader import Loader
 
 def generate_runtime(ctx: Context, loader: Loader):
     _generate_runtime(ctx, loader)
-    _generate_snapshot_registry(ctx, loader)
-
 
 def _collect_event_routes(loader: Loader):
     event_routes = {}
     for event_key, event_data, in loader.config["event_types"].items():
         event_routes[event_key] = {
+            "components": SortedSet(),
             "controllers": SortedSet(),
             "behaviours":  SortedSet(),
             "screens":  SortedSet(),
-            "screens_with_fields": SortedSet(),
             "event": event_data,
-            "count": 0
         }
     for section in ("controllers", "behaviours", "screens"):
         for key, data in loader.config[section].items():
             for event in data.get("receive_events", []):
+                event_routes[event]["components"].add(key)
                 event_routes[event][section].add(key)
-                event_routes[event]["count"] += 1
-
-    for screen_key, screen_data in loader.config["screens"].items():
-        for event in screen_data["model"]["events"].keys():
-            event_routes[event]["screens_with_fields"].add(screen_key)
-            event_routes[event]["count"] += 1
 
     return event_routes
 
@@ -76,25 +68,3 @@ def _generate_runtime(ctx: Context, loader: Loader):
 
     generate_items(ctx, items)
 
-
-def _generate_snapshot_registry(ctx: Context, loader: Loader):
-    """
-    Generates 
-    - generated/runtime/SnapshotRegistry.h
-    - generated/runtime/SnapshotRegistry.cpp
-    """
-
-    # filter only events with kind='snapshot'
-    event_types = loader.config["event_types"]
-    events = {name: ev for name, ev in event_types.items() if ev["kind"] == "snapshot"}
-
-    registry_dict = {
-        "events": events,
-    }
-        
-    items = [
-        Item(registry_dict, "*", ctx.gen_dir/"runtime/SnapshotRegistry.h",   "runtime/SnapshotRegistry.h.j2"),
-        Item(registry_dict, "*", ctx.gen_dir/"runtime/SnapshotRegistry.cpp", "runtime/SnapshotRegistry.cpp.j2"),
-    ]
-
-    generate_items(ctx, items)

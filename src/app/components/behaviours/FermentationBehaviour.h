@@ -19,12 +19,12 @@ public:
 
 private:
 
+    SoftwareTimer mStepTimer;
+
     HeatpadCommandPayload mLastHeatpadCommand; 
     FanCommandPayload mLastFanCommand;
-    FermentationStatusPayload mLastFermentationStatus;
 
     bool mFirstTick = true;
-    bool mHeartbeatReceived = false;
 
     FermentationEngine mFermentationEngine;
 
@@ -39,7 +39,7 @@ private:
 
     void sendFanCommand(bool enabled, float speed);
     void sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros);
-    void sendFermentationStatus();
+    void updateFermentationStatus();
 
 };
 

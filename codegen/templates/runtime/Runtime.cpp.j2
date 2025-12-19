@@ -2,7 +2,6 @@
 {% set RuntimeName = 'Runtime' %}
 #include "{{ RuntimeName }}.h"
 
-#include "generated/runtime/SnapshotRegistry.h"
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/time/Time.h"
@@ -159,6 +158,17 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
 {% endfor %}
 
 void {{ RuntimeName }}::onRouteStateChanged(const StateAbs& state){
+
+{% set ns = namespace(printed=0) %}
+{% for component in components.values() %}
+    {% if component["read_states_all"]: %}
+        {% if ns.printed == 0 %}
+    // read all state changes
+        {% endif %}
+    m{{ component.name }}.onStateChanged(state);
+    {% set ns.printed = ns.printed + 1 %}
+    {% endif %}
+{% endfor %}
     
     switch(state.type()){
 {% for state in states.values() %}
@@ -179,8 +189,8 @@ void {{ RuntimeName }}::onRouteStateChanged(const StateAbs& state){
         {% endif %}
         {% if state["readers"]["screens"] %}
         switch(mActiveScreen->getScreenId()){
-            {% for screen in readers["screens"]["screens"].keys() %}
-            case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->on{{ fn_call }}; break;
+            {% for screen in state["readers"]["screens"].keys() %}
+            case ScreenId::{{ screen.removesuffix("Screen") }}: static_cast<{{ screen }}*>(mActiveScreen)->{{ fn_call }}; break;
             {% endfor %}
             default: break; // active screen does not read state 
         }
@@ -216,11 +226,8 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
 {# ---- Route events ---- #}
 {% for event_name, routes in event_routes.items() %}
     case EventType::{{ event_name }}: {
-    {% if routes["count"] > 0 or routes["event"]["kind"] == "snapshot" %}
+    {% if routes.components %}
         const {{ event_name }}Event event(header);
-    {% endif %}
-    {% if routes["event"]["kind"] == "snapshot" %}
-        SnapshotRegistry::Update{{ event_name }}(*event.payload());
     {% endif %}
     {# send event to controllers supporting this event #}
     {% for ctrl in routes["controllers"] %}
@@ -260,21 +267,6 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
                 default: break; // active screen does not receive '{{ event_name }}' event
             }
         {% endif %}
-        }
-    {% endif %}
-        {# call receiveEvent() handlers on active screen (if it supports this event) #}
-    {% if routes["screens_with_fields"] | length > 0 %}
-        switch(mActiveScreen->getScreenId()){
-        {% for screen_name in routes["screens_with_fields"] %}
-            case ScreenId::{{ screen_name.removesuffix("Screen") }}: {
-                {{ screen_name }}::Model& model = static_cast<{{ screen_name }}*>(mActiveScreen)->model();
-            {% for field in screens[screen_name]["model"]["events"][event_name].values() %}
-                model.set{{ field.name|upper_first }}(event->{{ field.event_field }});
-            {% endfor %}
-                break;
-            }
-        {% endfor %}
-            default: break; // active screen has no model binding to any field of '{{ event_name }}' event
         }
     {% endif %}
         break;

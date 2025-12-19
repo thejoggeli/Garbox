@@ -81,6 +81,14 @@ def process_components(config, key, suffix):
 
         # init 'read_states' field
         read_states = ensure_list(component.get("read_states", []))
+        component["read_states_all"] = component.get("read_states_all", False)
+        if len(read_states) > 0:
+            first_entry = read_states[0]
+
+            # insert all state types (N state changed handlers)
+            if first_entry == "INSERT_ALL":
+                read_states = list(config["states"].keys())
+
         component["read_states"] = {}        
         for state_name in read_states:
             if state_name not in states:
@@ -91,6 +99,7 @@ def process_components(config, key, suffix):
             component["all_states"][state_name] = states[state_name]
             states[state_name]["readers"]["components"][component_name] = component
             states[state_name]["readers"][key][component_name] = component
+
 
         # component name
         component["name"] = component_name

@@ -38,6 +38,9 @@ states:
     fields:
       - { name: measuredVoltage, type: float }
       - { name: measuredCurrent, type: float }
+
+  HeatpadProgress:
+    fields:
       - { name: pwmProgressMicros, type: float }
 
   TemperatureStatus:

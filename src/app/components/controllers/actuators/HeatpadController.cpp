@@ -35,21 +35,20 @@ void HeatpadController::onInputTick(){
     // send sample if measured voltage or current changed
     updateSensorValues();
 
-    // send changed event
+    // upate status state
     if(mStateChanged){
-        sendStatusEvent();
+        updateStatus();
         mStateChanged = false;
     }
 
-    // send sample event
+    // update sample state
     if(mHeatpad.isEnabled() || mSensorValuesChanged){
-        HeatpadSampleEvent event = makeHeatpadSampleEvent();
-        event->measuredVoltage = mLastMeasuredVoltage;
-        event->measuredCurrent = mLastMeasuredCurrent;
-        event->pwmProgressMicros = mHeatpad.getPwmProgressMicros();
-        sendEvent(event);
+        updateSample();
         mSensorValuesChanged = false;
     }
+
+    // update progress state
+    states().heatpadProgress.setPwmProgressMicros(mHeatpad.getPwmProgressMicros());
 }
 
 void HeatpadController::onOutputTick(){
@@ -89,14 +88,19 @@ void HeatpadController::handleHeatpadStateChanged(HeatpadState oldState, Heatpad
     mSensorValuesChanged = true;
 }
 
-void HeatpadController::sendStatusEvent(){
-    HeatpadStatusEvent event = makeHeatpadStatusEvent();
-    event->state = mHeatpad.getState();
-    event->currentDutyCycle = mHeatpad.getCurrentDutyCycle();
-    event->currentPeriodMicros = mHeatpad.getCurrentPeriodDurationMicros();
-    event->nextDutyCycle = mHeatpad.getNextDutyCycle();
-    event->nextPeriodMicros = mHeatpad.getNextPeriodDurationMicros();
-    sendEvent(event);
+void HeatpadController::updateStatus(){
+    HeatpadStatusState& status = states().heatpadStatus;
+    status.setState(mHeatpad.getState());
+    status.setCurrentDutyCycle(mHeatpad.getCurrentDutyCycle());
+    status.setCurrentPeriodMicros(mHeatpad.getCurrentPeriodDurationMicros());
+    status.setNextDutyCycle(mHeatpad.getNextDutyCycle());
+    status.setNextPeriodMicros(mHeatpad.getNextPeriodDurationMicros());
+}
+
+void HeatpadController::updateSample(){
+    HeatpadSampleState& sample = states().heatpadSample;
+    sample.setMeasuredVoltage(mLastMeasuredVoltage);
+    sample.setMeasuredCurrent(mLastMeasuredCurrent);
 }
 
 void HeatpadController::updateSensorValues(){

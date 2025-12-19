@@ -1,11 +1,10 @@
 #include "MainScreen.h"
 
-#include "generated/runtime/SnapshotRegistry.h"
+#include <math.h>
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"
 #include "core/util/math/MathUtils.h"
-#include <math.h>
 
 namespace Garbox {
 
@@ -178,19 +177,17 @@ void MainScreen::onUpdateScreen(){
     // update power chart
     if(mPowerTimer.isExpired()){
         mPowerTimer.restart();
-        const float nextDuty = SnapshotRegistry::GetHeatpadStatus().nextDutyCycle;
-        const float power = nextDuty * 100.0f;
-        gui().powerGraph.chart.setNextValue(mPowerSeries, power * PowerChartYScale);
+        markDirty(RenderFn::HeatpadPowerSample);
     }
 }
 
 bool MainScreen::isSensorOk(){
-    return model().getShtPowerEnabled() && !model().getShtResetting() && model().getShtDriverEnabled() && model().getShtHasSample();
+    const TemperatureStatusState& state = states().temperatureStatus;
+    return state.isPowerEnabled() && !state.isResetting() && state.isDriverEnabled() && state.isHasFirstSample();
 }
 
 const char* MainScreen::resovleEngineStateText(){
-    const FermentationState state = model().getEngineState();
-
+    const FermentationState state = states().fermentationStatus.getState();
     switch(state){
         case FermentationState::Reset:
             return "Reset";
@@ -213,8 +210,7 @@ const char* MainScreen::resovleEngineStateText(){
 }
 
 uint32_t MainScreen::resovleEngineStateColor(){
-    const FermentationState state = model().getEngineState();
-
+    const FermentationState state = states().fermentationStatus.getState();
     switch(state){
         case FermentationState::Cooldown:
             return ColorBlue; // blue
@@ -232,121 +228,127 @@ uint32_t MainScreen::resovleEngineStateColor(){
 }
 
 const char* MainScreen::resovleSensorText(){
-    if(model().getShtResetting()){
+    const TemperatureStatusState& state = states().temperatureStatus;
+    if(state.isResetting()){
         return "Reset";
     }
-    else if(!model().getShtPowerEnabled() || !model().getShtDriverEnabled()){
+    else if(!state.isPowerEnabled() || !state.isDriverEnabled()){
         return "Off";
     }
-    else if(!model().getShtHasSample()){
+    else if(!state.isHasFirstSample()){
         return "Busy";
     }
     return "Ok";
 }
 
-void MainScreen::onApplyFanStatus(){
-    FanState state = model().getFanState();
+void MainScreen::onRenderFanInfo(){
+    FanState state = states().fanStatus.getState();
     if(state == FanState::Stalled){
         gui().fanInfo.value.setText("Stall");
-        // gui().sensorFan.unit.setHidden(true);
     }
     else {
-        float rpm = model().getFanMeasuredRpm();
+        float rpm = states().fanSample.getMeasuredRpm();
         uint32_t speed = std::clamp((rpm / 2250.0f) * 100.0f, 0.0f, 100.0f) + 0.5f; 
         gui().fanInfo.value.setTextFormatted("%u%%", speed);
-        // gui().sensorFan.unit.setHidden(false);
     }
 }
 
-void MainScreen::onApplyFanTargetSpeed(){
-    // FanState state = model().getFanState();
-    // if(state == FanState::Disabled){
-    //     gui().fanInfo.value.setText("Off");
-    //     // gui().statusFan.unit.setHidden(true);
-    // }
-    // else {
-    //     float targetSpeed = model().getFanTargetSpeed() * 100.0f;
-    //     gui().fanInfo.value.setTextFormatted("%.1f", targetSpeed);
-    //     // gui().statusFan.unit.setHidden(false);
-    // }
-}
-
-void MainScreen::onApplyHeatpadStatus(){
-    HeatpadState state = model().getHeatpadState();
-    if(state == HeatpadState::Disabled){
-        gui().powerGraph.value.setText("Off");
-        return;
-    }
-    const float power = model().getHeatpadNextDuty() * 100.0f;
-    gui().powerGraph.value.setTextFormatted("%.1f%%", power);
-}
-
-void MainScreen::onApplyHeatpadMeasure(){
-    const float voltage = model().getHeatpadMeasuredVoltage();
-    const float current = model().getHeatpadMeasuredCurrent();
-    const float duty = model().getHeatpadNextDuty();
+void MainScreen::onRenderPowerInfo(){
+    const float voltage = states().heatpadSample.getMeasuredVoltage();
+    const float current = states().heatpadSample.getMeasuredCurrent();
+    const float duty = states().heatpadStatus.getNextDutyCycle();
     const float power = voltage * current * duty;
     gui().powerInfo.value.setTextFormatted("%.1fW", power);
 }
 
-void MainScreen::onApplyDisplayBrightness(){
-    // float brightness = model().getDisplayBrightness() * 100.0f;
-    // gui().settingBrightness.value.setTextFormatted("%.1f%%", brightness);
+void MainScreen::onRenderHumidityInfo(){
+    if(isSensorOk()){
+        float humidity = states().temperatureSample.getHumidityRelative();
+        gui().humidInfo.value.setTextFormatted("%.1f%%", humidity);
+    }
+    else {
+        gui().humidInfo.value.setText(resovleSensorText());
+    }
 }
 
-void MainScreen::onApplySensorStatus(){
-    // everything handled in temperature and humidity methods
+void MainScreen::onRenderStatusInfo(){
+    gui().systemState.setText(resovleEngineStateText());
+    gui().systemStateBg.setBgColor(lv_color_hex(resovleEngineStateColor()));
 }
 
-void MainScreen::onApplyMeasuredTemperature(){
+void MainScreen::onRenderMeasuredTemperatureSample(){
+    if(!isSensorOk()){
+        return;
+    }
+    float temperature = states().temperatureSample.getTemperatureCelcius();
+    gui().tempGraph.chart.setNextValue(mTempSeries, temperature * TempChartYScale);
+}
 
+void MainScreen::onRenderMeasuredTemperatureLabel(){
     if(!isSensorOk()){
         gui().tempGraph.value.setTextFormatted(resovleSensorText());
         return;
     }
-
-    // set chart temperature
-    float temperature = model().getMeasuredTemperature();
-    gui().tempGraph.chart.setNextValue(mTempSeries, temperature * TempChartYScale);
+    float temperature = states().temperatureSample.getTemperatureCelcius();
     gui().tempGraph.value.setTextFormatted("%.1f°C", temperature);
+}
 
-    // set chart target temperature
-    float temperatureTarget = model().getTargetTemperature();
+void MainScreen::onRenderTargetTemperatureSample(){
+    if(!isSensorOk()){
+        return;
+    }
+    float temperatureTarget = states().fermentationStatus.getTargetTemperature();
     gui().tempGraph.chart.setNextValue(mTempTargetSeries, temperatureTarget * TempChartYScale);
 }
 
-void MainScreen::onApplyMeasuredHumidity(){
-    if(isSensorOk()){
-        gui().humidInfo.value.setTextFormatted("%.1f%%", model().getMeasuredHumidity());
-        // gui().sensorHumidity.unit.setHidden(false);
-    }
-    else {
-        gui().humidInfo.value.setText(resovleSensorText());
-        // gui().sensorHumidity.unit.setHidden(true);
-    }
+void MainScreen::onRenderHeatpadPowerSample(){
+    const float nextDuty = states().heatpadStatus.getNextDutyCycle();
+    const float power = nextDuty * 100.0f;
+    gui().powerGraph.chart.setNextValue(mPowerSeries, power * PowerChartYScale);
 }
 
-void MainScreen::onApplyTargetTemperature(){
-    // FermentationState state = model().getEngineState();
-    // switch(state){
-    //     case FermentationState::Ready:
-    //     case FermentationState::Regulating:
-    //     case FermentationState::OverTemperature: {
-    //         gui().statusTemperature.value.setTextFormatted("%.1f", model().getTargetTemperature());
-    //         // gui().statusTemperature.unit.setHidden(false);            
-    //         break;
-    //     }
-    //     default: {
-    //         gui().statusTemperature.value.setText("Off");
-    //         // gui().statusTemperature.unit.setHidden(true);   
-    //         break;   
-    //     }
-    // }
+void MainScreen::onRenderHeatpadPowerLabel(){
+    HeatpadState state = states().heatpadStatus.getState();
+    if(state == HeatpadState::Disabled){
+        gui().powerGraph.value.setText("Off");
+        return;
+    }
+    const float power = states().heatpadStatus.getNextDutyCycle() * 100.0f;
+    gui().powerGraph.value.setTextFormatted("%.1f%%", power);
 }
 
-void MainScreen::onApplyEngineState(){
-    gui().systemState.setText(resovleEngineStateText());
-    gui().systemStateBg.setBgColor(lv_color_hex(resovleEngineStateColor()));
+void MainScreen::onFanStatusStateChanged(const FanStatusState& state){
+    markDirty(RenderFn::FanInfo);
+}
+
+void MainScreen::onFanSampleStateChanged(const FanSampleState& state){
+    markDirty(RenderFn::FanInfo);
+}
+
+void MainScreen::onHeatpadStatusStateChanged(const HeatpadStatusState& state){
+    markDirty(RenderFn::PowerInfo);
+    markDirty(RenderFn::HeatpadPowerLabel);
+}
+
+void MainScreen::onHeatpadSampleStateChanged(const HeatpadSampleState& state){
+    markDirty(RenderFn::PowerInfo);
+}
+
+void MainScreen::onTemperatureStatusStateChanged(const TemperatureStatusState& state){
+    markDirty(RenderFn::MeasuredTemperatureLabel);
+    markDirty(RenderFn::HumidityInfo);
+}
+
+void MainScreen::onTemperatureSampleStateChanged(const TemperatureSampleState& state){
+    markDirty(RenderFn::TargetTemperatureSample);
+    markDirty(RenderFn::MeasuredTemperatureSample);
+    markDirty(RenderFn::MeasuredTemperatureLabel);
+    markDirty(RenderFn::HumidityInfo);
+}
+
+void MainScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
+    markDirty(RenderFn::TargetTemperatureSample);
+    markDirty(RenderFn::StatusInfo);
 }
 
 } // namespace Garbox

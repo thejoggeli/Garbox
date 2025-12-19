@@ -46,6 +46,12 @@
 
 {# state change #}
 {% macro on_states_changed(component) %}
+{% if component.read_states_all %}
+
+    // any state changed handler
+    virtual void onStateChanged(const StateAbs& state) {};
+
+{% endif %}
 {% if component.read_states %}
 
     // state change handlers (to be implmeneted by user)
@@ -83,12 +89,14 @@
 
 {# states include #}
 {% macro states_include(component) %}
+{% if component.read_states_all %}
+#include "core/application/state/StateAbs.h"
+{% endif %}
 {% if component.all_states %}
 {% for state_name, state_data in component.all_states.items() %}
 #include "generated/states/types/{{ state_data["name_with_suffix"]|upper_first }}.h"
 {% endfor %}
 {% endif %}
-
 {% endmacro %}
 
 {# states protected #}

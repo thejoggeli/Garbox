@@ -49,52 +49,6 @@ struct EncoderStepPayload {
     int32_t steps;
 };
 
-struct FermentationStatusPayload {
-    FermentationState fermentationState;
-    float targetTemperature;
-};
-
-struct DisplayStatusPayload {
-    float brightness;
-    uint32_t skipped;
-};
-
-struct FanStatusPayload {
-    FanState state;
-    float targetSpeed;
-    bool rpmControlEnabled;
-};
-
-struct FanSamplePayload {
-    float measuredRpm;
-};
-
-struct HeatpadStatusPayload {
-    HeatpadState state;
-    float currentDutyCycle;
-    uint32_t currentPeriodMicros;
-    float nextDutyCycle;
-    uint32_t nextPeriodMicros;
-};
-
-struct HeatpadSamplePayload {
-    float measuredVoltage;
-    float measuredCurrent;
-    float pwmProgressMicros;
-};
-
-struct TemperatureStatusPayload {
-    bool driverEnabled;
-    bool powerEnabled;
-    bool resetting;
-    bool hasFirstSample;
-};
-
-struct TemperatureSamplePayload {
-    float temperatureCelcius;
-    float humidityRelative;
-};
-
 struct ActiveBehaviourChangedPayload {
     BehaviourId oldBehaviour;
     BehaviourId newBehaviour;
@@ -142,46 +96,6 @@ struct ResolveEventPayload<EventType::ButtonRepeat> {
 template<>
 struct ResolveEventPayload<EventType::EncoderStep> {
     using type = EncoderStepPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::FermentationStatus> {
-    using type = FermentationStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::DisplayStatus> {
-    using type = DisplayStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::FanStatus> {
-    using type = FanStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::FanSample> {
-    using type = FanSamplePayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::HeatpadStatus> {
-    using type = HeatpadStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::HeatpadSample> {
-    using type = HeatpadSamplePayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::TemperatureStatus> {
-    using type = TemperatureStatusPayload;
-};
-
-template<>
-struct ResolveEventPayload<EventType::TemperatureSample> {
-    using type = TemperatureSamplePayload;
 };
 
 template<>

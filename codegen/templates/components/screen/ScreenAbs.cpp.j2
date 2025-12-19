@@ -1,42 +1,39 @@
 {% include "_common/header.j2" %}
 {% from "_common/component_cpp.j2" import constructor, make_events, send_events, states %}
 #include "{{ name }}Abs.h"
-#include <math.h>
-{% if screen.use_model %}
-#include "generated/runtime/SnapshotRegistry.h"
-{% endif %}
-{% if screen.use_lvgl %}
+{% if screen.renderer == "lvgl-simple" %}
 #include "core/lvgl/LvglProvider.h"
 {% endif %}
-{% if screen.use_gui %}
+{% if screen.renderer == "lvgl-gui" %}
 #include "core/lvgl/LvglProvider.h"
 {% endif %}
-#include "shared/types/ComponentId.h"
 
 namespace Garbox {
 
 {# constructor #}
 {{ name }}Abs::{{ name }}Abs(): 
     ScreenAbs(ComponentId::{{ name }}, ScreenId::{{ name.removesuffix("Screen") }})
-{%- if screen.use_lvgl -%},
+{%- if screen.renderer == "lvgl-simple" -%},
     mRoot(),
     mScreenWidth(LvglProvider::GetDisplayWidth()),
     mScreenHeight(LvglProvider::GetDisplayHeight())
 {%- endif -%}
-{%- if screen.use_gui -%},
+{%- if screen.renderer == "lvgl-gui" -%},
     mGui(),
     mScreenWidth(LvglProvider::GetDisplayWidth()),
     mScreenHeight(LvglProvider::GetDisplayHeight())
 {%- endif -%}
-{%- if screen.model.fields -%},
-    mModel(*this),
-    mDirtyDispatcher(static_cast<uint32_t>(Model::Index::Count))
+{%- if screen.render_fns -%},
+    mRenderDispatcher(static_cast<uint32_t>(RenderFn::Count))
 {%- endif -%}{}
 
-{# onInitScreen() #}
+{{ make_events(name, screen) }}
+{{ send_events(name, screen) }}
+{{ states(name, screen) }}
+
 void {{ name }}Abs::init(ComponentHostIfc& host){
 
-{% if screen.use_lvgl %}
+{% if screen.renderer == "lvgl-simple" %}
     // init lvgl container
     mRoot.setRawSize(mScreenWidth, mScreenHeight);
     mRoot.setBorder(0, lv_color_hex(0x000000));
@@ -46,14 +43,14 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
     mRoot.setScrollable(false);
 {% endif %}
 
-{% if screen.use_gui %}
+{% if screen.renderer == "lvgl-gui" %}
     // init gui
     mGui.init();
 {% endif %}
 
-{% if screen.use_model %}
-{% for group_name in screen.model.groups.keys() %}
-    mDirtyDispatcher.registerHandler(apply{{ group_name|upper_first }}Trampoline, this);
+{% if screen.render_fns %}
+{% for fn_name in screen.render_fns %}
+    mRenderDispatcher.registerHandler(render{{ fn_name|upper_first }}Trampoline, this);
 {% endfor %}
 {% endif %}
 
@@ -62,61 +59,45 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
 }
 
 void {{ name }}Abs::updateScreen(){
-{% if screen.model.fields and screen.model.get("debounce") %}
-    mModel.updateTimers();
-{% endif %}
     ScreenAbs::updateScreen();
-{% if screen.use_model %}
-    mDispatchedCount += mDirtyDispatcher.getDirtyCount();
-    mDirtyDispatcher.dispatch();
+{% if screen.render_fns %}
+    mDispatchedCount += mRenderDispatcher.getDirtyCount();
+    mRenderDispatcher.dispatch();
 {% endif %}
 }
 
 void {{ name }}Abs::becomeEnabled(){
-{% if screen.use_lvgl %}
+{% if screen.renderer == "lvgl-simple" %}
     mRoot.setScreen();
 {% endif %}
-{% if screen.use_gui %}
+{% if screen.renderer == "lvgl-gui" %}
     mGui.show();
 {% endif %}
-{% if screen.model.get("debounce") %}
-    mModel.resetTimers();
-{% endif %}
-{% if screen.use_model %}
-{% for event_type, event_data in screen.model.events.items() %}
-    setSnapshot{{ event_type }}();
+
+{% if screen.render_fns %}
+    // mark all render functions dirty for complete redraw 
+{% for fn_name in screen.render_fns %}
+    markDirty(RenderFn::{{ fn_name|upper_first }});
 {% endfor %}
 {% endif %}
+
     ScreenAbs::becomeEnabled();
 }
 
 void {{ name }}Abs::becomeDisabled(){
-{% if screen.model.get("debounce") %}
-    mModel.resetTimers();
-{% endif %}
     ScreenAbs::becomeDisabled();
 }
 
-{# make and send events #}
-{{ make_events(name, screen) }}
-{{ send_events(name, screen) }}
-{{ states(name, screen) }}
-
-{% if screen.use_lvgl %}
-{####################}
-{### LVGL Section ###}
-{####################}
-
+{### <LvglSimple> ###}
+{% if screen.renderer == "lvgl-simple" %}
 void {{ name }}Abs::setBackgroundColor(uint32_t color){
     mRoot.setBgColor(lv_color_hex(color));
 }
 {% endif %}
+{### </LvglSimple> ###}
 
-{% if screen.use_gui %}
-{###################}
-{### GUI Section ###}
-{###################}
-
+{### <LvglGui> ###}
+{% if screen.renderer == "lvgl-gui" %}
 {{ screen.gui["name"] }}Gui::Objects& {{ name }}Abs::gui(){
     return mGui.objects();
 }
@@ -125,50 +106,26 @@ void {{ name }}Abs::setBackgroundColor(uint32_t color){
     mGui.objects().root.setBgColor(lv_color_hex(color));
 }
 {% endif %}
+{### </LvglGui> ###}
 
-{% if screen.use_model %}
-{#####################}
-{### Model Section ###}
-{#####################}
+{### <RenderFunctions> ###}
+{% if screen.render_fns %}
 
-{% for event_type, event_data in screen.model.events.items() %}
-void {{ name }}Abs::setSnapshot{{ event_type }}(){
-    const {{ event_type }}Payload& payload = SnapshotRegistry::Get{{ event_type }}();
-    {% for field_data in event_data.values() %}
-    mModel.set{{ field_data.name|upper_first }}(payload.{{ field_data.event_field }});
-    {% endfor %}
+void {{ name }}Abs::markDirty(RenderFn fn){
+    mRenderDispatcher.markDirty(static_cast<size_t>(fn));
 }
 
-{% endfor %}
-
-{# model groups trampolines #}
-
-{% include "components/screen/ScreenModel.cpp.j2" %}
-
-{{ name }}Abs::Model& {{ name }}Abs::model(){
-    return mModel;
+bool {{ name }}Abs::isMarkedDirty(RenderFn fn) const {
+    return mRenderDispatcher.isMarkedDirty(static_cast<size_t>(fn));
 }
 
-const {{ name }}Abs::Model& {{ name }}Abs::model() const {
-    return mModel;
-}
-
-{# dirty dispatch #}
-void {{ name }}Abs::markDirty(Model::Index index){
-    mDirtyDispatcher.markDirty(static_cast<size_t>(index));
-}
-
-bool {{ name }}Abs::isMarkedDirty(Model::Index index) const {
-    return mDirtyDispatcher.isMarkedDirty(static_cast<size_t>(index));
-}
-
-{% for group_name, fields in screen.model.groups.items() %}
-void {{ name }}Abs::apply{{ group_name|upper_first }}Trampoline(void* context){
-    static_cast<{{ name }}Abs*>(context)->onApply{{ group_name|upper_first }}();
+{% for fn_name in screen.render_fns %}
+void {{ name }}Abs::render{{ fn_name|upper_first }}Trampoline(void* context){
+    static_cast<{{ name }}Abs*>(context)->onRender{{ fn_name|upper_first }}();
 }
 
 {% endfor %}
 {% endif %}
-
+{### </RenderFunctions> ###}
 
 } // namespace Garbox

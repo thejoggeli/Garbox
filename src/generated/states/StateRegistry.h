@@ -10,6 +10,7 @@
 #include "generated/states/types/FermentationStatusState.h"
 #include "generated/states/types/HeatpadStatusState.h"
 #include "generated/states/types/HeatpadSampleState.h"
+#include "generated/states/types/HeatpadProgressState.h"
 #include "generated/states/types/TemperatureStatusState.h"
 #include "generated/states/types/TemperatureSampleState.h"
 #include "generated/states/types/ActiveBehaviourState.h"
@@ -31,6 +32,7 @@ public:
     FermentationStatusState& getFermentationStatus();
     HeatpadStatusState& getHeatpadStatus();
     HeatpadSampleState& getHeatpadSample();
+    HeatpadProgressState& getHeatpadProgress();
     TemperatureStatusState& getTemperatureStatus();
     TemperatureSampleState& getTemperatureSample();
     ActiveBehaviourState& getActiveBehaviour();
@@ -46,6 +48,7 @@ private:
     FermentationStatusState mFermentationStatus;
     HeatpadStatusState mHeatpadStatus;
     HeatpadSampleState mHeatpadSample;
+    HeatpadProgressState mHeatpadProgress;
     TemperatureStatusState mTemperatureStatus;
     TemperatureSampleState mTemperatureSample;
     ActiveBehaviourState mActiveBehaviour;

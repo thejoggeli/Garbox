@@ -14,17 +14,25 @@ public:
 
     MainScreen();
 
-    // model field callbacks to update specific parts of the screen
-    void onApplyFanStatus() final;
-    void onApplyFanTargetSpeed() final;
-    void onApplyHeatpadStatus() final;
-    void onApplyHeatpadMeasure() final;
-    void onApplyDisplayBrightness() final;
-    void onApplySensorStatus() final;
-    void onApplyMeasuredTemperature() final;
-    void onApplyMeasuredHumidity() final;
-    void onApplyTargetTemperature() final;
-    void onApplyEngineState() final;
+    // state change handlers
+    void onFanStatusStateChanged(const FanStatusState& state) final;
+    void onFanSampleStateChanged(const FanSampleState& state) final;
+    void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;
+    void onHeatpadSampleStateChanged(const HeatpadSampleState& state) final;
+    void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
+    void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
+    void onFermentationStatusStateChanged(const FermentationStatusState& state) final;
+
+    // render functions 
+    void onRenderFanInfo() final;
+    void onRenderPowerInfo() final;
+    void onRenderHumidityInfo() final;
+    void onRenderStatusInfo() final;
+    void onRenderMeasuredTemperatureSample() final;
+    void onRenderMeasuredTemperatureLabel() final;
+    void onRenderTargetTemperatureSample() final;
+    void onRenderHeatpadPowerSample() final;
+    void onRenderHeatpadPowerLabel() final;
 
 private:
 

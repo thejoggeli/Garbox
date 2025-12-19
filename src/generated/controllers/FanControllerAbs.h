@@ -6,7 +6,6 @@
 #include "generated/states/types/FanSampleState.h"
 
 #include "core/application/controller/ControllerAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -26,14 +25,6 @@ public:
     virtual void onFanCommandEvent(const FanCommandEvent& event) {};
 
 protected:
-
-    // make typed events 
-    FanStatusEvent makeFanStatusEvent();
-    FanSampleEvent makeFanSampleEvent();
-
-    // send typed events
-    void sendEvent(const FanStatusEvent& event);
-    void sendEvent(const FanSampleEvent& event);
 
     // state access struct
     class States final {

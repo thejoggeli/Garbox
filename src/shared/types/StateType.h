@@ -19,6 +19,7 @@ enum class StateType : uint16_t {
     FermentationStatus,
     HeatpadStatus,
     HeatpadSample,
+    HeatpadProgress,
     TemperatureStatus,
     TemperatureSample,
     ActiveBehaviour,

@@ -17,6 +17,7 @@ const char* StateTypeToString(StateType type){
         case StateType::FermentationStatus: return "FermentationStatus";
         case StateType::HeatpadStatus: return "HeatpadStatus";
         case StateType::HeatpadSample: return "HeatpadSample";
+        case StateType::HeatpadProgress: return "HeatpadProgress";
         case StateType::TemperatureStatus: return "TemperatureStatus";
         case StateType::TemperatureSample: return "TemperatureSample";
         case StateType::ActiveBehaviour: return "ActiveBehaviour";

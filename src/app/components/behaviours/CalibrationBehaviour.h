@@ -15,8 +15,6 @@ public:
     void onLogicTick() final;
 
     void onHeartbeatEvent(const HeartbeatEvent& event) final;
-    void onFanStatusEvent(const FanStatusEvent& event) final;
-    void onFanSampleEvent(const FanSampleEvent& event) final;
 
     void onFanStatusStateChanged(const FanStatusState& state) final;
     void onFanSampleStateChanged(const FanSampleState& state) final;

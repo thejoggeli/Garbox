@@ -1,7 +1,5 @@
 #include "DebugScreen.h"
 
-#include <esp_heap_caps.h>
-#include <esp_system.h>
 #include "core/log/Log.h"
 #include "core/util/helpers/StringUtils.h"
 
@@ -75,69 +73,92 @@ void DebugScreen::onBecomeDisabled(){
 
 void DebugScreen::onUpdateScreen(){
 
-    // update time
-    model().setTimeSeconds(Time::GetTickSeconds());
+    // update time 
+    uint32_t timeSeconds = Time::GetTickSeconds();
+    if(mLastTimeSeconds != timeSeconds){
+        mLastTimeSeconds = timeSeconds;
+        markDirty(RenderFn::Time);
+    }
 
     // update heap space
     if(mHeapTimer.isExpired()){
         multi_heap_info_t info;
         heap_caps_get_info(&info, MALLOC_CAP_DEFAULT);
-        model().setHeapAllocatedBlocks(info.allocated_blocks);
-        model().setHeapFreeBlocks(info.free_blocks);
-        model().setHeapLargestFreeBlock(info.largest_free_block);
-        if(info.minimum_free_bytes != model().getHeapMinimumFreeBytes()){
-            model().setHeapMinimumTime(Time::GetTickSeconds());
-            model().setHeapMinimumFreeBytes(info.minimum_free_bytes);
+        if(info.minimum_free_bytes != mHeapInfo.minimum_free_bytes){
+            mHeapMinimumTime = Time::GetTickSeconds();
         }
-        model().setHeapTotalFreeBytes(info.total_free_bytes);
-        model().setHeapAllocatedBytes(info.total_allocated_bytes);
+        mHeapInfo = info;
+        markDirty(RenderFn::HeapBlocks);
+        markDirty(RenderFn::HeapBytes);
+        markDirty(RenderFn::HeapMinimum);
         mHeapTimer.restart();
     }
 
     // update event count
-    model().setEventCount(getContext()->eventCount);
+    uint32_t eventCount = getContext()->eventCount;
+    if(mLastEventCount != eventCount){
+        mLastEventCount = eventCount;
+        markDirty(RenderFn::AppInfo);
+    }
 
-    // last dispatched count must be updated manually, otherwise a dispatch is
-    // triggered by itself on each tick
-    if(mLastDispatchedCount != getDispatchedCount()){
-        mLastDispatchedCount = getDispatchedCount();
-        if(!isMarkedDirty(Model::Index::DisplayStatus)){
-            onApplyDisplayStatus();
-        }
+    // update state changes count
+    uint32_t stateChangesCount = getContext()->stateChangesCount;
+    if(mLastStateChangesCount != stateChangesCount){
+        mLastStateChangesCount = stateChangesCount;
+        markDirty(RenderFn::AppInfo);
     }
 }
 
-void DebugScreen::onApplyFanState(){
+void DebugScreen::onRenderFanState(){
     mFanStateLabel.setTextFormatted(
         "Fan state=%s, speed=%.1f%%", 
-        FanStateToString(model().getFanState()),
-        model().getFanTargetSpeed()*100.0f
+        FanStateToString(states().fanStatus.getState()),
+        states().fanStatus.getTargetSpeed()*100.0f
     );
 }
 
-void DebugScreen::onApplyFanMeasuredRpm(){
-    mFanMeasuredRpmLabel.setTextFormatted("Fan rpm=%.0f", model().getFanMeasuredRpm());
+void DebugScreen::onRenderFanMeasuredRpm(){
+    mFanMeasuredRpmLabel.setTextFormatted("Fan rpm=%.0f", states().fanSample.getMeasuredRpm());
 }
 
-void DebugScreen::onApplyHeatpadState(){
+void DebugScreen::onRenderHeatpadState(){
     mHeatpadStateLabel.setTextFormatted(
         "Heatpad state=%s", 
-        HeatpadStateToString(model().getHeatpadState())
+        HeatpadStateToString(states().heatpadStatus.getState())
     );
 }
 
-void DebugScreen::onApplyHeatpadDuty(){
+void DebugScreen::onRenderHeatpadDuty(){
     mHeatpadDutyLabel.setTextFormatted(
         "Duty%: %.0f%% => %.0f%%, ms: %u => %u",
-        model().getHeatpadCurrentDuty()*100.0f,
-        model().getHeatpadNextDuty()*100.0f,
-        model().getHeatpadCurrentPeriod()/1000,
-        model().getHeatpadNextPeriod()/1000
+        states().heatpadStatus.getCurrentDutyCycle()*100.0f,
+        states().heatpadStatus.getNextDutyCycle()*100.0f,
+        states().heatpadStatus.getCurrentPeriodMicros()/1000,
+        states().heatpadStatus.getNextPeriodMicros()/1000
     );
 }
 
-void DebugScreen::onApplyBoxPosition(){
-    float position = static_cast<float>(model().getHeatpadPwmProgress()) / static_cast<float>(model().getHeatpadCurrentPeriod());
+void DebugScreen::onRenderHeatpadSense(){
+    mHeatpadSenseLabel.setTextFormatted(
+        "Heatpad U=%4.1fV, I=%3.1fA", 
+        states().heatpadSample.getMeasuredVoltage(), 
+        states().heatpadSample.getMeasuredCurrent()
+    );
+}
+
+void DebugScreen::onRenderDisplayStatus(){
+    mDisplayStatusLabel.setTextFormatted(
+        "Display: b=%.1f%%, skip=%u, dirty=%u",
+        states().displayStatus.getBrightness()*100.0f, 
+        states().displayDiagnostics.getSkippedFrames(), 
+        getDispatchedCount()
+    );
+}
+
+void DebugScreen::onRenderHeatpadProgress(){
+    float progress = states().heatpadProgress.getPwmProgressMicros();
+    float period = states().heatpadStatus.getCurrentPeriodMicros();
+    float position = progress / period;
     static constexpr uint32_t y = 240-4;
     static constexpr float wDisplay = 320.0f; 
     static constexpr float wBox = 48.0f;
@@ -147,91 +168,124 @@ void DebugScreen::onApplyBoxPosition(){
     mProgressBox.setPosition(x, y);
 }
 
-void DebugScreen::onApplyHeatpadSense(){
-    mHeatpadSenseLabel.setTextFormatted(
-        "Heatpad U=%4.1fV, I=%3.1fA", 
-        model().getHeatpadMeasuredVoltage(), 
-        model().getHeatpadMeasuredCurrent()
-    );
-}
-
-void DebugScreen::onApplyDisplayStatus(){
-    mDisplayStatusLabel.setTextFormatted(
-        "Display: b=%.1f%%, skip=%u, dirty=%u",
-        model().getDisplayBrightness()*100.0f, 
-        model().getDisplaySkipped(), 
-        getDispatchedCount()
-    );
-}
-
-void DebugScreen::onApplyTemperatureState(){
+void DebugScreen::onRenderTemperatureState(){
     mTemperatureStateLabel.setTextFormatted(
         "Sht31 power=%u, driver=%u, reset=%u",
-        model().getShtPowerEnabled(),
-        model().getShtDriverEnabled(),
-        model().getShtResetting()
+        states().temperatureStatus.isPowerEnabled(),
+        states().temperatureStatus.isDriverEnabled(),
+        states().temperatureStatus.isResetting()
     );
 }
 
-void DebugScreen::onApplyTemperatureSample(){
+void DebugScreen::onRenderTemperatureSample(){
     mTemperatureSampleLabel.setTextFormatted(
         "Sht31 t=%.2f°C, rh=%.2f%%",
-        model().getSensorTemperatureCelcius(),
-        model().getSensorHumidityRelative()
+        states().temperatureSample.getTemperatureCelcius(),
+        states().temperatureSample.getHumidityRelative()
     );
 }
 
-void DebugScreen::onApplyTime(){
+void DebugScreen::onRenderTime(){
     static char buffer[32];
-    StringUtils::FormatDurationDHMS(model().getTimeSeconds(), buffer, 32);
+    StringUtils::FormatDurationDHMS(mLastTimeSeconds, buffer, 32);
     mTimeLabel.setTextFormatted("Time: %s", buffer);
 }
 
-void DebugScreen::onApplyHeapBlocks(){
-    const uint32_t integer = model().getHeapLargestFreeBlock()/1000;
-    const uint32_t fraction = model().getHeapLargestFreeBlock()%1000;
+void DebugScreen::onRenderHeapBlocks(){
+    const uint32_t integer = mHeapInfo.largest_free_block/1000;
+    const uint32_t fraction = mHeapInfo.largest_free_block%1000;
     mHeapBlocksLabel.setTextFormatted("Blocks: free=%u, alloc=%u, largest=%u.%03u kB", 
-        model().getHeapFreeBlocks(),
-        model().getHeapAllocatedBlocks(),
+        mHeapInfo.free_blocks,
+        mHeapInfo.allocated_blocks,
         integer, fraction
     );
 }
 
-void DebugScreen::onApplyHeapBytes(){
-    const uint32_t int1 = model().getHeapTotalFreeBytes()/1000;
-    const uint32_t frac1 = model().getHeapTotalFreeBytes()%1000;
-    const uint32_t int2 = model().getHeapAllocatedBytes()/1000;
-    const uint32_t frac2 = model().getHeapAllocatedBytes()%1000;
+void DebugScreen::onRenderHeapBytes(){
+    const uint32_t int1 = mHeapInfo.total_free_bytes/1000;
+    const uint32_t frac1 = mHeapInfo.total_free_bytes%1000;
+    const uint32_t int2 = mHeapInfo.total_allocated_bytes/1000;
+    const uint32_t frac2 = mHeapInfo.total_allocated_bytes%1000;
     mHeapBytesLabel.setTextFormatted("Heap: free=%u.%03u kB, alloc=%u.%03u kB", 
         int1, frac1,
         int2, frac2
     );
 }
 
-void DebugScreen::onApplyHeapMinimum(){
-    const uint32_t int1 = model().getHeapMinimumFreeBytes()/1000;
-    const uint32_t frac1 = model().getHeapMinimumFreeBytes()%1000;
+void DebugScreen::onRenderHeapMinimum(){
+    const uint32_t int1 = mHeapInfo.minimum_free_bytes/1000;
+    const uint32_t frac1 = mHeapInfo.minimum_free_bytes%1000;
     static char buffer[32];
-    StringUtils::FormatDurationDHMS(model().getHeapMinimumTime(), buffer, 32);
+    StringUtils::FormatDurationDHMS(mHeapMinimumTime, buffer, 32);
     mHeapMinimumLabel.setTextFormatted("Heap: min=%u.%03u kB, time=%s", 
         int1, frac1, buffer
     );
 }
 
-void DebugScreen::onApplyAppInfo(){
+void DebugScreen::onRenderAppInfo(){
     mAppInfoLabel.setTextFormatted(
-        "App: %s, events=%u",
-        BehaviourIdToString(model().getBehaviour()), 
-        model().getEventCount()
+        "Beha=%s, events=%u, states=%u",
+        BehaviourIdToString(states().activeBehaviour.getBehaviour()), 
+        mLastEventCount, mLastStateChangesCount
     );
 }
 
-void DebugScreen::onApplyFermentationStatus(){
+void DebugScreen::onRenderFermentationStatus(){
     mFermentationStatusLabel.setTextFormatted(
         "Eng: s=%s, t=%0.1f°C",
-        FermentationStateToString(model().getEngineState()),
-        model().getEngineTargetTemperature()
+        FermentationStateToString(states().fermentationStatus.getState()),
+        states().fermentationStatus.getTargetTemperature()
     );
+}
+
+void DebugScreen::onFanStatusStateChanged(const FanStatusState& state){
+    markDirty(RenderFn::FanState);
+}
+
+void DebugScreen::onFanSampleStateChanged(const FanSampleState& state){
+    markDirty(RenderFn::FanMeasuredRpm);
+}
+
+void DebugScreen::onHeatpadStatusStateChanged(const HeatpadStatusState& state){
+    markDirty(RenderFn::HeatpadState);
+    markDirty(RenderFn::HeatpadProgress);
+}
+
+void DebugScreen::onHeatpadSampleStateChanged(const HeatpadSampleState& state){
+    markDirty(RenderFn::HeatpadSense);
+    markDirty(RenderFn::HeatpadDuty);
+}
+
+void DebugScreen::onHeatpadProgressStateChanged(const HeatpadProgressState& state){
+    markDirty(RenderFn::HeatpadProgress);
+}
+
+void DebugScreen::onDisplayStatusStateChanged(const DisplayStatusState& state){
+    markDirty(RenderFn::DisplayStatus);
+}
+
+void DebugScreen::onDisplayDiagnosticsStateChanged(const DisplayDiagnosticsState& state){
+    markDirty(RenderFn::DisplayStatus);
+}
+
+void DebugScreen::onTemperatureStatusStateChanged(const TemperatureStatusState& state){
+    markDirty(RenderFn::TemperatureState);
+}
+
+void DebugScreen::onTemperatureSampleStateChanged(const TemperatureSampleState& state){
+    markDirty(RenderFn::TemperatureSample);
+}
+
+void DebugScreen::onActiveBehaviourStateChanged(const ActiveBehaviourState& state){
+    markDirty(RenderFn::AppInfo);
+}
+
+void DebugScreen::onActiveScreenStateChanged(const ActiveScreenState& state){
+    // add label for active screen
+}
+
+void DebugScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
+    markDirty(RenderFn::FermentationStatus);
 }
 
 } // namespace Garbox

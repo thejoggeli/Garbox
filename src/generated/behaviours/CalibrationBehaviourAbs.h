@@ -6,7 +6,6 @@
 #include "generated/states/types/FanSampleState.h"
 
 #include "core/application/behaviour/BehaviourAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -23,8 +22,6 @@ public:
 
     // event handlers (to be implmeneted by user)
     virtual void onHeartbeatEvent(const HeartbeatEvent& event) {};
-    virtual void onFanStatusEvent(const FanStatusEvent& event) {};
-    virtual void onFanSampleEvent(const FanSampleEvent& event) {};
 
     // state change handlers (to be implmeneted by user)
     virtual void onFanStatusStateChanged(const FanStatusState& state) {};

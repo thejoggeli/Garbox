@@ -26,13 +26,11 @@ void DisplayController::onStart(){
 
 void DisplayController::onRenderTick(){
 
-    bool changed = false;
-
     // update display brightness
     if(mBacklightFader.isActive()){
         float brightness = mBacklightFader.updateValue();
         mDisplay.setBrightness(brightness);
-        changed = true;
+        states().displayStatus.setBrightness(mDisplay.getBrightness());
     }
 
     // check if display is ready to render the next frame
@@ -42,16 +40,8 @@ void DisplayController::onRenderTick(){
     }
     else {
         mRenderSkippedCount++;
-        changed = true;
+        states().displayDiagnostics.setSkippedFrames(mRenderSkippedCount);
         LogDebug("DisplayController", "render skipped! total skip count = %" PRIi32, mRenderSkippedCount);
-    }
-
-    // send display status event if something changed
-    if(changed){
-        DisplayStatusEvent event = makeDisplayStatusEvent();
-        event->brightness = mDisplay.getBrightness();
-        event->skipped = mRenderSkippedCount;
-        sendEvent(event);
     }
 }
 

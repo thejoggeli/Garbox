@@ -1,6 +1,6 @@
 #pragma once
 
-#include "generated/screens/EventLogScreenAbs.h"
+#include "generated/screens/StateLogScreenAbs.h"
 #include "core/lvgl/objects/LvObject.h"
 #include "core/lvgl/objects/LvLabel.h"
 #include "core/util/container/static/ArrayStatic.h"
@@ -8,20 +8,21 @@
 
 namespace Garbox {
 
-class EventLogScreen : public EventLogScreenAbs {
+class StateLogScreen : public StateLogScreenAbs {
 public:
 
-    EventLogScreen();
+    StateLogScreen();
 
-    // event handler
-    void onEvent(const EventHeader* header) final;
+    // any state changed handler (to be implmeneted by user)
+    void onStateChanged(const StateAbs& state) final;
 
 private:
 
-    struct EventEntry {
+    uint32_t mEntryCounter = 0;
+
+    struct StateEntry {
         uint32_t id;
-        ComponentDescriptor sender;
-        EventType type;
+        StateType type;
     };
 
     struct LogRow {
@@ -36,14 +37,13 @@ private:
     ArrayStatic<LogRow, NumRows> mRows;
     size_t mNextLabelIndex = 0;
     size_t mCurrentLabelIndex = static_cast<size_t>(-1);
-    RingBufferStatic<EventEntry, NumRows> mBuffer;
+    RingBufferStatic<StateEntry, NumRows> mBuffer;
 
-    // safe to update lvgl objects in these methods
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
-    void onUpdateScreen() final;
+    void onUpdateScreen() final; 
 
 };
 

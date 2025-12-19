@@ -9,7 +9,6 @@
 #include "generated/states/types/TemperatureStatusState.h"
 
 #include "core/application/behaviour/BehaviourAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -42,13 +41,11 @@ protected:
     FanCommandEvent makeFanCommandEvent();
     DisplayCommandEvent makeDisplayCommandEvent();
     HeatpadCommandEvent makeHeatpadCommandEvent();
-    FermentationStatusEvent makeFermentationStatusEvent();
 
     // send typed events
     void sendEvent(const FanCommandEvent& event);
     void sendEvent(const DisplayCommandEvent& event);
     void sendEvent(const HeatpadCommandEvent& event);
-    void sendEvent(const FermentationStatusEvent& event);
 
     // state access struct
     class States final {

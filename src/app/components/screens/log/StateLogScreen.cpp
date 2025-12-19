@@ -1,8 +1,5 @@
-#include "EventLogScreen.h"
+#include "StateLogScreen.h"
 
-#define GarboxEventLogScreenToConsole 0
-
-#include <array>
 #include "core/log/Log.h"
 #include "core/util/math/MathUtils.h"
 
@@ -10,17 +7,17 @@ namespace Garbox {
 
 static const lv_color_t DefaultTextColor = lv_color_hex(0xFFFFFF);
 
-EventLogScreen::LogRow::LogRow(LvObject& parent):
+StateLogScreen::LogRow::LogRow(LvObject& parent):
     container(parent),
     marker(container),
     id(container),
     text(container){}
 
-EventLogScreen::EventLogScreen():
-    EventLogScreenAbs(),
+StateLogScreen::StateLogScreen(): 
+    StateLogScreenAbs(), 
     mRows(mRoot){}
 
-void EventLogScreen::onInit(){
+void StateLogScreen::onInit(){
     for(uint32_t i = 0; i < NumRows; i++){
         LogRow& row = mRows[i];
 
@@ -53,61 +50,48 @@ void EventLogScreen::onInit(){
     mRoot.setFlexAlign(LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 }
 
-void EventLogScreen::onStart(){
+void StateLogScreen::onStart(){
     // nothing to do
 }
 
-void EventLogScreen::onBecomeEnabled(){
+void StateLogScreen::onBecomeEnabled(){
     // nothing to do
 }
 
-void EventLogScreen::onBecomeDisabled(){
+void StateLogScreen::onBecomeDisabled(){
     // nothing to do
 }
 
-void EventLogScreen::onUpdateScreen(){
+void StateLogScreen::onUpdateScreen(){
 
     // write queued events to labels
     if(mBuffer.size() > 0){
-        EventEntry* entry;
+        StateEntry* entry;
         LogRow* firstRow = (mCurrentLabelIndex == static_cast<size_t>(-1)) ? nullptr : &mRows[mCurrentLabelIndex];
         LogRow* lastRow = nullptr;
         while(mBuffer.releaseFront(entry)){
             LogRow& row = mRows[mNextLabelIndex];
             row.id.setTextFormatted("%u", entry->id);
-            row.text.setTextFormatted("%s: %s", ComponentIdToString(entry->sender.id), EventTypeToString(entry->type));
+            row.text.setText(StateTypeToString(entry->type));
             lastRow = &row;
             mCurrentLabelIndex = mNextLabelIndex;
             mNextLabelIndex = MathUtils::Wrap(mNextLabelIndex+1u, NumRows);
         }
 
         // update marker
-        AssertExit(lastRow != nullptr, "EventLogScreen", "lastRow is nullptr");
+        AssertExit(lastRow != nullptr, "StateLogScreen", "lastRow is nullptr");
         if(firstRow != nullptr){
             firstRow->marker.setText("");
         }
         lastRow->marker.setText(">");
-        
-        // grayscale gradient
-        // disabled because it slows down frame rate like crazy
-        // int idx = mNextLabelIndex;
-        // for(int i = 0; i < NumRows; i++){
-        //     idx = MathUtils::Wrap(idx+1u, NumRows);
-        //     int32_t gray = MathUtils::Map<int32_t>(i, 0, (NumRows-1), 128, 255);
-        //     lv_color_t c = lv_color_make(gray, gray, gray);
-        //     mRows[idx].container.setTextColor(c);
-        // }
     }
 }
-
-void EventLogScreen::onEvent(const EventHeader* header){
-#if GarboxEventLogScreenToConsole
-    LogDebug("Event", "%u %s: %s", header->id, ComponentIdToString(header->sender.id), EventTypeToString(header->type));
-#endif
+void StateLogScreen::onStateChanged(const StateAbs& state){
     if(mBuffer.isFull()){
         mBuffer.releaseFront();
     }
-    mBuffer.pushBack({header->id, header->sender, header->type});
+    mBuffer.pushBack({ mEntryCounter, state.type() });
+    mEntryCounter++;
 }
 
 } // namespace Garbox

@@ -4,7 +4,6 @@
 // *****************************************
 
 #include "core/application/controller/ControllerAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 

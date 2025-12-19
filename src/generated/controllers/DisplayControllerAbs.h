@@ -6,7 +6,6 @@
 #include "generated/states/types/DisplayDiagnosticsState.h"
 
 #include "core/application/controller/ControllerAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -25,12 +24,6 @@ public:
     virtual void onDisplayCommandEvent(const DisplayCommandEvent& event) {};
 
 protected:
-
-    // make typed events 
-    DisplayStatusEvent makeDisplayStatusEvent();
-
-    // send typed events
-    void sendEvent(const DisplayStatusEvent& event);
 
     // state access struct
     class States final {

@@ -50,14 +50,6 @@ void CalibrationBehaviour::onHeartbeatEvent(const HeartbeatEvent& event){
     }
 }
 
-void CalibrationBehaviour::onFanStatusEvent(const FanStatusEvent& event){
-    // nothing to do
-}
-
-void CalibrationBehaviour::onFanSampleEvent(const FanSampleEvent& event){
-    // nothing to do    
-}
-
 void CalibrationBehaviour::onFanStatusStateChanged(const FanStatusState& state){
     // nothing to do
 }

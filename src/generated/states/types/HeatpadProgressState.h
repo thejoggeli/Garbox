@@ -7,27 +7,23 @@
 
 namespace Garbox {
 
-class HeatpadSampleState final : public StateAbs {
+class HeatpadProgressState final : public StateAbs {
 public:
-    HeatpadSampleState();
+    HeatpadProgressState();
 
     // read access (published state)
-    float getMeasuredVoltage() const;
-    float getMeasuredCurrent() const;
+    float getPwmProgressMicros() const;
 
     // read access (next state)
-    float nextMeasuredVoltage() const;
-    float nextMeasuredCurrent() const;
+    float nextPwmProgressMicros() const;
 
     // write access (next state)
-    void setMeasuredVoltage(float value);
-    void setMeasuredCurrent(float value);
+    void setPwmProgressMicros(float value);
 
 private:
 
     struct Data {
-        float measuredVoltage;
-        float measuredCurrent;
+        float pwmProgressMicros;
     };
 
     Data mCurrent {};

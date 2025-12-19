@@ -6,7 +6,6 @@
 #include "generated/states/types/TemperatureSampleState.h"
 
 #include "core/application/controller/ControllerAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -25,14 +24,6 @@ public:
     virtual void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) {};
 
 protected:
-
-    // make typed events 
-    TemperatureStatusEvent makeTemperatureStatusEvent();
-    TemperatureSampleEvent makeTemperatureSampleEvent();
-
-    // send typed events
-    void sendEvent(const TemperatureStatusEvent& event);
-    void sendEvent(const TemperatureSampleEvent& event);
 
     // state access struct
     class States final {

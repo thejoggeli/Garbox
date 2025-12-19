@@ -4,7 +4,6 @@ controllers:
     subdir: "hmi"
     tick_phases: Render
     receive_events: [DisplayCommand]
-    send_events: [DisplayStatus]
     write_states: [DisplayStatus, DisplayDiagnostics]
 
   DevtoolsController:
@@ -15,7 +14,6 @@ controllers:
     subdir: "actuators"
     tick_phases: [Input, Output]
     receive_events: [FanCommand]
-    send_events: [FanStatus, FanSample]
     write_states: [FanStatus, FanSample]
 
   HeartbeatController:
@@ -27,8 +25,7 @@ controllers:
     subdir: "actuators"
     tick_phases: [Input, Output]
     receive_events: [HeatpadCommand]
-    send_events: [HeatpadStatus, HeatpadSample]
-    write_states: [HeatpadStatus, HeatpadSample]
+    write_states: [HeatpadStatus, HeatpadSample, HeatpadProgress]
 
   InputController:
     subdir: "hmi"
@@ -39,6 +36,4 @@ controllers:
     subdir: "sensors"
     tick_phases: [Input]
     receive_events: [ButtonStateChanged]
-    send_events: [TemperatureStatus, TemperatureSample]
     write_states: [TemperatureStatus, TemperatureSample]
-

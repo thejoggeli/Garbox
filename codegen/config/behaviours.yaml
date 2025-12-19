@@ -2,13 +2,15 @@ behaviours:
 
   CalibrationBehaviour:
     tick_phases: [Logic]
-    receive_events: [Heartbeat, FanStatus, FanSample]
+    receive_events: [Heartbeat]
     send_events: [FanCommand]
     read_states: [FanStatus, FanSample]
 
   FermentationBehaviour:
     tick_phases: [Logic]
+
     receive_events: [Heartbeat, ButtonStateChanged, ButtonRepeat, EncoderStep]
-    send_events: [FanCommand, DisplayCommand, HeatpadCommand, FermentationStatus]
+    send_events: [FanCommand, DisplayCommand, HeatpadCommand]
+
     write_states: [FermentationStatus]
     read_states: [FanSample, FanStatus, TemperatureSample, TemperatureStatus]

@@ -8,97 +8,37 @@ event_payloads:
 
 event_types:
 
-  Heartbeat: 
-    kind: notification
+  Heartbeat:
     fields: null
 
   DisplayCommand:
-    kind: notification
     fields:
       - { name: brightness, type: float }
 
   FanCommand:
-    kind: notification
     fields:
       - { name: enabled, type: bool }
       - { name: targetSpeed, type: float }
       - { name: enableRpmControl, type: bool } # DutyCycle or RPM (depending on enableRpmControl)
 
   HeatpadCommand:
-    kind: notification
     fields:
       - { name: enabled, type: bool }
       - { name: dutyCycle, type: float }
       - { name: periodMicros, type: uint32_t }
 
   ButtonStateChanged:
-    kind: notification
     fields:
       - { name: oldState, type: ButtonState }
       - { name: newState, type: ButtonState }
 
   ButtonRepeat:
-    kind: notification
     fields:
       - { name: count, type: uint32_t }
       - { name: holdTimeMicros, type: uint32_t }
       
   EncoderStep:
-    kind: notification
     fields:
       - { name: steps, type: int32_t }
 
-  FermentationStatus:
-    kind: snapshot
-    fields:
-      - { name: fermentationState, type: FermentationState }
-      - { name: targetTemperature, type: float }
-
-  DisplayStatus:
-    kind: snapshot
-    fields:
-      - { name: brightness, type: float }
-      - { name: skipped, type: uint32_t }
-
-  FanStatus:
-    kind: snapshot
-    fields:
-      - { name: state, type: FanState }
-      - { name: targetSpeed, type: float }
-      - { name: rpmControlEnabled, type: bool } # DutyCycle or RPM (depending on rpmControlEnabled)
-
-  FanSample:
-    kind: snapshot
-    fields:
-      - { name: measuredRpm, type: float }
-
-  HeatpadStatus:
-    kind: snapshot
-    fields:
-      - { name: state, type: HeatpadState }
-      - { name: currentDutyCycle, type: float }
-      - { name: currentPeriodMicros, type: uint32_t }
-      - { name: nextDutyCycle, type: float }
-      - { name: nextPeriodMicros, type: uint32_t }
-
-  HeatpadSample:
-    kind: snapshot
-    fields:
-      - { name: measuredVoltage, type: float }
-      - { name: measuredCurrent, type: float }
-      - { name: pwmProgressMicros, type: float }
-
-  TemperatureStatus:
-    kind: snapshot
-    fields:
-      - { name: driverEnabled, type: bool }
-      - { name: powerEnabled, type: bool }
-      - { name: resetting, type: bool }
-      - { name: hasFirstSample, type: bool }
-
-  TemperatureSample:
-    kind: snapshot
-    fields:
-      - { name: temperatureCelcius, type: float }
-      - { name: humidityRelative, type: float }
     

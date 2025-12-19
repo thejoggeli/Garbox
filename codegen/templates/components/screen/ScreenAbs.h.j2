@@ -1,18 +1,15 @@
 #pragma once
 {% include "_common/header.j2" %}
 {% from "_common/component_h.j2" import constructor, on_ticks, on_events, on_states_changed, make_events, send_events, hide_events, states_include, states_protected, states_private %}
-{% if screen.use_gui %}
+{% if screen.renderer == "lvgl-gui" %}
 #include "generated/guis/{{ screen.gui["name"] }}Gui.h"
+{% endif %}
+#include "core/application/screen/ScreenAbs.h"
+{% if screen.renderer == "lvgl-simple" %}
+#include "core/lvgl/objects/LvObject.h"
 {% endif %}
 {{ states_include(screen) }}
 #include "core/application/screen/ScreenAbs.h"
-{% if screen.use_lvgl %}
-#include "core/lvgl/objects/LvObject.h"
-{% endif %}
-{% if screen.model.get("debounce") %}
-#include "core/time/SoftwareTimer.h"
-{% endif %}
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -21,8 +18,30 @@ class {{ runtime_name }};
 class {{ name }}Abs : public ScreenAbs {
 public:
 
-    // constructor 
-    {{name}}Abs();
+{{ constructor(name) }}
+{{ on_ticks(screen) }}
+{{ on_events(screen) }}
+{{ on_states_changed(screen) }}
+
+{% if screen.render_fns %}
+    // render functions (to be implmeneted by user)
+{% for fn_name in screen.render_fns %}
+    virtual void onRender{{ fn_name|upper_first }}() {};
+{% endfor %}
+{% endif %}
+
+protected:
+
+{{ make_events(screen) }}
+{{ send_events(screen) }}
+{{ states_protected(screen) }}
+private:
+{{ states_private(screen) }}
+{{ hide_events("Screen") }}
+
+    friend class {{ runtime_name }};
+
+public:
 
     // init override from component
     void init(ComponentHostIfc& host) final;
@@ -30,44 +49,8 @@ public:
     void becomeEnabled() final;
     void becomeDisabled() final;
 
-{# onTick() #}
-{{ on_ticks(screen) }}
-
-{# onEvent() #}
-{{ on_events(screen) }}
-
-{# onStateChanged() #}
-{{ on_states_changed(screen) }}
-
-protected:
-
-{# onApplyX() handlers for model #}
-{% if screen.use_model %}
-    // model field callbacks to update specific parts of the screen (to be implmeneted by user)
-{% for group_name, fields in screen.model.groups.items() %}
-    virtual void onApply{{ group_name|upper_first }}() = 0;
-{% endfor %}
-{% endif %}
-
-{# make and send events #}
-{{ make_events(screen) }}
-{{ send_events(screen) }}
-{{ states_protected(screen) }}
-
-private:
-
-{{ states_private(screen) }}
-{{ hide_events("Screen") }}
-
-{% if screen.use_lvgl %}
-{####################}
-{### LVGL Section ###}
-{####################}
-
-/********************/
-/*** LVGL Section ***/
-/********************/
-
+{### <LvglSimple> ###}
+{% if screen.renderer == "lvgl-simple" %}
 protected:
 
     LvObject mRoot;
@@ -76,16 +59,10 @@ protected:
 
     void setBackgroundColor(uint32_t color);
 {% endif %}
+{### </LvglSimple> ###}
 
-{% if screen.use_gui %}
-{###################}
-{### GUI Section ###}
-{###################}
-
-/*******************/
-/*** GUI Section ***/
-/*******************/
-
+{### <LvglGui> ###}
+{% if screen.renderer == "lvgl-gui" %}
 private:
 
     {{ screen.gui["name"] }}Gui mGui;
@@ -98,59 +75,39 @@ protected:
 
     void setBackgroundColor(uint32_t color);
 {% endif %}
+{### </LvglGui> ###}
 
-{% if screen.use_model %}
-{#####################}
-{### Model Section ###}
-{#####################}
-
-/*********************/
-/*** Model Section ***/
-/*********************/
-
-public: 
-
-{% set block %}
-    {% include "components/screen/ScreenModel.h.j2" %}
-{% endset %}
-{{ block | indent(4, true) }}
-
-private:
-
-    // model instance
-    Model mModel;
-
-public:
-
-    Model& model();
-    const Model& model() const;
-
+{### <RenderFunctions> ###}
+{% if screen.render_fns %}
 protected: 
 
-    // dispatcher (calls apply methods)
-    DirtyDispatcher mDirtyDispatcher;
+    // render function indices 
+    enum class RenderFn : uint8_t { 
+{% for fn_name in screen.render_fns %}
+        {{ fn_name }}{% if loop.first %} = 0{% endif %},
+{% endfor %}
+        Count 
+    }; 
+
+    // render dispatcher (calls render methods)
+    DirtyDispatcher mRenderDispatcher;
     uint32_t mDispatchedCount = 0;
     uint32_t getDispatchedCount() const { return mDispatchedCount; }
 
-    // method to mark an model field index dirty (for manually updated values)
-    void markDirty(Model::Index index);
-    bool isMarkedDirty(Model::Index index) const;
+    // method to mark a render function dirty
+    void markDirty(RenderFn fn);
+    bool isMarkedDirty(RenderFn fn) const;
 
 private: 
 
-{% for event_type, event_data in screen.model.events.items() %}
-    void setSnapshot{{ event_type }}();
-{% endfor %}
-
-{# model field apply trampolines #}
-    // model field apply trampolines
-{% for name in screen.model.groups.keys() %}
-    static void apply{{ name|upper_first }}Trampoline(void* context);
+    // render trampolines
+{% for fn_name in screen.render_fns %}
+    static void render{{ fn_name|upper_first }}Trampoline(void* context);
 {% endfor %}
 
 {% endif %}
+{### </RenderFunctions> ###}
 
-    friend class {{ runtime_name }};
 };
 
 } // namespace Garbox

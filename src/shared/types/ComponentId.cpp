@@ -21,6 +21,7 @@ const char* ComponentIdToString(ComponentId id){
         case ComponentId::MainScreen: return "MainScreen";
         case ComponentId::DebugScreen: return "DebugScreen";
         case ComponentId::EventLogScreen: return "EventLogScreen";
+        case ComponentId::StateLogScreen: return "StateLogScreen";
         case ComponentId::Count: return "Count";
     }
     return "Invalid";

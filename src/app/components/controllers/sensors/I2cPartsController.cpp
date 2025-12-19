@@ -122,6 +122,7 @@ void I2cPartsController::updateTemperatureStatus(){
 void I2cPartsController::updateTemperatureSample(){
     states().temperatureSample.setTemperatureCelcius(mTemperatureSensor.getTemperatureCelcius());
     states().temperatureSample.setHumidityRelative(mTemperatureSensor.getHumidityRelative());
+    states().temperatureSample.markDirty();
 }
 
 } // namespace

@@ -27,6 +27,7 @@ enum class ComponentId : uint16_t {
     MainScreen,
     DebugScreen,
     EventLogScreen,
+    StateLogScreen,
 
     // enum size marker
     Count,

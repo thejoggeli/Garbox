@@ -4,9 +4,9 @@
 // *****************************************
 #include "generated/states/types/HeatpadStatusState.h"
 #include "generated/states/types/HeatpadSampleState.h"
+#include "generated/states/types/HeatpadProgressState.h"
 
 #include "core/application/controller/ControllerAbs.h"
-#include "shared/types/EventType.h"
 
 namespace Garbox {
 
@@ -27,24 +27,18 @@ public:
 
 protected:
 
-    // make typed events 
-    HeatpadStatusEvent makeHeatpadStatusEvent();
-    HeatpadSampleEvent makeHeatpadSampleEvent();
-
-    // send typed events
-    void sendEvent(const HeatpadStatusEvent& event);
-    void sendEvent(const HeatpadSampleEvent& event);
-
     // state access struct
     class States final {
     public:
 
         States(
             HeatpadStatusState& heatpadStatusState, // write
-            HeatpadSampleState& heatpadSampleState // write
+            HeatpadSampleState& heatpadSampleState, // write
+            HeatpadProgressState& heatpadProgressState // write
         ):
             heatpadStatus(heatpadStatusState),
-            heatpadSample(heatpadSampleState){
+            heatpadSample(heatpadSampleState),
+            heatpadProgress(heatpadProgressState){
         }
 
         // disallow copy and move
@@ -56,6 +50,7 @@ protected:
         // writable states
         HeatpadStatusState& heatpadStatus;
         HeatpadSampleState& heatpadSample;
+        HeatpadProgressState& heatpadProgress;
 
     };
 
@@ -67,7 +62,8 @@ private:
 
     void bindStates(
         HeatpadStatusState& heatpadStatus,
-        HeatpadSampleState& heatpadSample
+        HeatpadSampleState& heatpadSample,
+        HeatpadProgressState& heatpadProgress
     );
 
     // hide event methods

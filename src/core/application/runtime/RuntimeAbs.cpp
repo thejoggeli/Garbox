@@ -30,6 +30,11 @@ void RuntimeAbs::init(){
 
     AssertExit(mComponents.size() > 0, "RuntimeAbs", "no components registered");
 
+    // init all states
+    for(StateAbs* state : mStates){
+        state->init(*this);
+    }
+
     // init all components
     for(ComponentAbs* component : mComponents){
         component->init(*this);
@@ -146,6 +151,7 @@ void RuntimeAbs::registerState(StateAbs* state){
 
 void RuntimeAbs::markStateDirty(StateAbs* state){
     AssertExit(!mDirtyStates.full(), "RuntimeAbs", "dirty states full");
+    mContext.stateChangesCount++;
     mDirtyStates.push(state);
 }
 
