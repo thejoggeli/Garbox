@@ -437,12 +437,12 @@ void Runtime::onRouteEvent(const EventHeader* header){
         }
         break;
     }
-    case EventType::ActiveBehaviourChanged: {
+    case EventType::ActiveBehaviourChanged:
+        // no component receives this event type
         break;
-    }
-    case EventType::ActiveScreenChanged: {
+    case EventType::ActiveScreenChanged:
+        // no component receives this event type
         break;
-    }
     case EventType::Null:
     case EventType::Count:
         TriggerDebug("Runtime", "invalid event type");

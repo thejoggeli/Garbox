@@ -198,7 +198,9 @@ void {{ RuntimeName }}::onRouteStateChanged(const StateAbs& state){
         break;
     }
     {% else %}
-    case StateType::{{ state["name"]}}: break;
+    case StateType::{{ state["name"]}}: 
+        // no component reads this state type
+        break;
     {% endif %}
 {% endfor %}
     case StateType::Null:
@@ -225,10 +227,9 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     switch(header->type){
 {# ---- Route events ---- #}
 {% for event_name, routes in event_routes.items() %}
+{% if routes.components %}
     case EventType::{{ event_name }}: {
-    {% if routes.components %}
         const {{ event_name }}Event event(header);
-    {% endif %}
     {# send event to controllers supporting this event #}
     {% for ctrl in routes["controllers"] %}
         m{{ ctrl }}.on{{ event_name }}Event(event);
@@ -271,6 +272,11 @@ void {{ RuntimeName }}::onRouteEvent(const EventHeader* header){
     {% endif %}
         break;
     }
+{% else %}
+    case EventType::{{ event_name }}:
+        // no component receives this event type
+        break;
+{% endif %}
 {% endfor %}
     case EventType::Null:
     case EventType::Count:
