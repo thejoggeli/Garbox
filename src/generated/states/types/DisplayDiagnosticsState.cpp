@@ -17,6 +17,10 @@ uint32_t DisplayDiagnosticsState::nextSkippedFrames() const {
     return mCurrent.skippedFrames;
 }
 
+uint32_t DisplayDiagnosticsState::lastSkippedFrames() const {
+    return mLast.skippedFrames;
+}
+
 void DisplayDiagnosticsState::setSkippedFrames(uint32_t value){
     if (mNext.skippedFrames == value) {
         return;
@@ -29,6 +33,7 @@ void DisplayDiagnosticsState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

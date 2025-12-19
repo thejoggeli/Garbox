@@ -148,7 +148,7 @@ void FermentationBehaviour::onEncoderStepEvent(const EncoderStepEvent& event){
 
 bool FermentationBehaviour::checkTemperatureStatus(){
     const TemperatureStatusState& status = states().temperatureStatus;
-    return status.isPowerEnabled() && status.isDriverEnabled() && !status.isResetting();
+    return status.getPowerEnabled() && status.getDriverEnabled() && !status.getResetting();
 }
 
 } // namespace

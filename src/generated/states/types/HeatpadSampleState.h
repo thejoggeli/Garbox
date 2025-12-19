@@ -19,6 +19,10 @@ public:
     float nextMeasuredVoltage() const;
     float nextMeasuredCurrent() const;
 
+    // read access (last state)
+    float lastMeasuredVoltage() const;
+    float lastMeasuredCurrent() const;
+
     // write access (next state)
     void setMeasuredVoltage(float value);
     void setMeasuredCurrent(float value);
@@ -32,6 +36,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

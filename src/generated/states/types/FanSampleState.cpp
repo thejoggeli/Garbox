@@ -17,6 +17,10 @@ float FanSampleState::nextMeasuredRpm() const {
     return mCurrent.measuredRpm;
 }
 
+float FanSampleState::lastMeasuredRpm() const {
+    return mLast.measuredRpm;
+}
+
 void FanSampleState::setMeasuredRpm(float value){
     if (mNext.measuredRpm == value) {
         return;
@@ -29,6 +33,7 @@ void FanSampleState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

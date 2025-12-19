@@ -15,12 +15,17 @@ public:
     // read access (published state)
     FanState getState() const;
     float getTargetSpeed() const;
-    bool isRpmControl() const;
+    bool getRpmControl() const;
 
     // read access (next state)
     FanState nextState() const;
     float nextTargetSpeed() const;
     bool nextRpmControl() const;
+
+    // read access (last state)
+    FanState lastState() const;
+    float lastTargetSpeed() const;
+    bool lastRpmControl() const;
 
     // write access (next state)
     void setState(FanState value);
@@ -37,6 +42,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

@@ -17,6 +17,10 @@ float DisplayStatusState::nextBrightness() const {
     return mCurrent.brightness;
 }
 
+float DisplayStatusState::lastBrightness() const {
+    return mLast.brightness;
+}
+
 void DisplayStatusState::setBrightness(float value){
     if (mNext.brightness == value) {
         return;
@@ -29,6 +33,7 @@ void DisplayStatusState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

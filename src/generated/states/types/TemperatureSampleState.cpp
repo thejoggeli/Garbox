@@ -25,6 +25,14 @@ float TemperatureSampleState::nextHumidityRelative() const {
     return mCurrent.humidityRelative;
 }
 
+float TemperatureSampleState::lastTemperatureCelcius() const {
+    return mLast.temperatureCelcius;
+}
+
+float TemperatureSampleState::lastHumidityRelative() const {
+    return mLast.humidityRelative;
+}
+
 void TemperatureSampleState::setTemperatureCelcius(float value){
     if (mNext.temperatureCelcius == value) {
         return;
@@ -45,6 +53,7 @@ void TemperatureSampleState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

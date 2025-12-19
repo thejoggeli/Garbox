@@ -17,6 +17,10 @@ BehaviourId ActiveBehaviourState::nextBehaviour() const {
     return mCurrent.behaviour;
 }
 
+BehaviourId ActiveBehaviourState::lastBehaviour() const {
+    return mLast.behaviour;
+}
+
 void ActiveBehaviourState::setBehaviour(BehaviourId value){
     if (mNext.behaviour == value) {
         return;
@@ -29,6 +33,7 @@ void ActiveBehaviourState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

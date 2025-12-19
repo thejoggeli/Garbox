@@ -25,6 +25,14 @@ float HeatpadSampleState::nextMeasuredCurrent() const {
     return mCurrent.measuredCurrent;
 }
 
+float HeatpadSampleState::lastMeasuredVoltage() const {
+    return mLast.measuredVoltage;
+}
+
+float HeatpadSampleState::lastMeasuredCurrent() const {
+    return mLast.measuredCurrent;
+}
+
 void HeatpadSampleState::setMeasuredVoltage(float value){
     if (mNext.measuredVoltage == value) {
         return;
@@ -45,6 +53,7 @@ void HeatpadSampleState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

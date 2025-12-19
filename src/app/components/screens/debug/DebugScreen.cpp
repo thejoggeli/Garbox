@@ -171,9 +171,9 @@ void DebugScreen::onRenderHeatpadProgress(){
 void DebugScreen::onRenderTemperatureState(){
     mTemperatureStateLabel.setTextFormatted(
         "Sht31 power=%u, driver=%u, reset=%u",
-        states().temperatureStatus.isPowerEnabled(),
-        states().temperatureStatus.isDriverEnabled(),
-        states().temperatureStatus.isResetting()
+        states().temperatureStatus.getPowerEnabled(),
+        states().temperatureStatus.getDriverEnabled(),
+        states().temperatureStatus.getResetting()
     );
 }
 

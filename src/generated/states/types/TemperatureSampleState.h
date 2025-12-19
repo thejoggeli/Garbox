@@ -19,6 +19,10 @@ public:
     float nextTemperatureCelcius() const;
     float nextHumidityRelative() const;
 
+    // read access (last state)
+    float lastTemperatureCelcius() const;
+    float lastHumidityRelative() const;
+
     // write access (next state)
     void setTemperatureCelcius(float value);
     void setHumidityRelative(float value);
@@ -32,6 +36,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

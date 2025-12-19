@@ -8,11 +8,7 @@ namespace Garbox {
 }
 
 {% for field in fields.values() %}
-{% if field.type == "bool" %}
-{{ field.type }} {{ name_with_suffix }}::is{{ field.name|upper_first }}() const {
-{% else %}
 {{ field.type }} {{ name_with_suffix }}::get{{ field.name|upper_first }}() const {
-{% endif %}
     return mCurrent.{{ field.name|lower_first }};
 }
 
@@ -21,6 +17,13 @@ namespace Garbox {
 {% for field in fields.values() %}
 {{ field.type }} {{ name_with_suffix }}::next{{ field.name|upper_first }}() const {
     return mCurrent.{{ field.name|lower_first }};
+}
+
+{% endfor %}
+
+{% for field in fields.values() %}
+{{ field.type }} {{ name_with_suffix }}::last{{ field.name|upper_first }}() const {
+    return mLast.{{ field.name|lower_first }};
 }
 
 {% endfor %}
@@ -40,6 +43,7 @@ void {{ name_with_suffix }}::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

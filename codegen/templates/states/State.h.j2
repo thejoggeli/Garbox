@@ -13,16 +13,17 @@ public:
 
     // read access (published state)
 {% for field in fields.values() %}
-{% if field.type == "bool" %}
-    {{ field.type }} is{{ field.name|upper_first }}() const;
-{% else %}
     {{ field.type }} get{{ field.name|upper_first }}() const;
-{% endif %}
 {% endfor %}
 
     // read access (next state)
 {% for field in fields.values() %}
     {{ field.type }} next{{ field.name|upper_first }}() const;
+{% endfor %}
+
+    // read access (last state)
+{% for field in fields.values() %}
+    {{ field.type }} last{{ field.name|upper_first }}() const;
 {% endfor %}
 
     // write access (next state)
@@ -40,6 +41,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

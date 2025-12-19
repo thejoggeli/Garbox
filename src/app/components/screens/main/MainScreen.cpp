@@ -183,7 +183,7 @@ void MainScreen::onUpdateScreen(){
 
 bool MainScreen::isSensorOk(){
     const TemperatureStatusState& state = states().temperatureStatus;
-    return state.isPowerEnabled() && !state.isResetting() && state.isDriverEnabled() && state.isHasFirstSample();
+    return state.getPowerEnabled() && !state.getResetting() && state.getDriverEnabled() && state.getHasFirstSample();
 }
 
 const char* MainScreen::resovleEngineStateText(){
@@ -229,13 +229,13 @@ uint32_t MainScreen::resovleEngineStateColor(){
 
 const char* MainScreen::resovleSensorText(){
     const TemperatureStatusState& state = states().temperatureStatus;
-    if(state.isResetting()){
+    if(state.getResetting()){
         return "Reset";
     }
-    else if(!state.isPowerEnabled() || !state.isDriverEnabled()){
+    else if(!state.getPowerEnabled() || !state.getDriverEnabled()){
         return "Off";
     }
-    else if(!state.isHasFirstSample()){
+    else if(!state.getHasFirstSample()){
         return "Busy";
     }
     return "Ok";

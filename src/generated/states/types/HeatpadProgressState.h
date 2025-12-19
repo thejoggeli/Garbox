@@ -17,6 +17,9 @@ public:
     // read access (next state)
     float nextPwmProgressMicros() const;
 
+    // read access (last state)
+    float lastPwmProgressMicros() const;
+
     // write access (next state)
     void setPwmProgressMicros(float value);
 
@@ -28,6 +31,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

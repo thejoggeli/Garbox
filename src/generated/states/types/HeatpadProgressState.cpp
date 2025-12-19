@@ -17,6 +17,10 @@ float HeatpadProgressState::nextPwmProgressMicros() const {
     return mCurrent.pwmProgressMicros;
 }
 
+float HeatpadProgressState::lastPwmProgressMicros() const {
+    return mLast.pwmProgressMicros;
+}
+
 void HeatpadProgressState::setPwmProgressMicros(float value){
     if (mNext.pwmProgressMicros == value) {
         return;
@@ -29,6 +33,7 @@ void HeatpadProgressState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

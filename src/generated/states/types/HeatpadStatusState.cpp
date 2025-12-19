@@ -49,6 +49,26 @@ uint32_t HeatpadStatusState::nextNextPeriodMicros() const {
     return mCurrent.nextPeriodMicros;
 }
 
+HeatpadState HeatpadStatusState::lastState() const {
+    return mLast.state;
+}
+
+float HeatpadStatusState::lastCurrentDutyCycle() const {
+    return mLast.currentDutyCycle;
+}
+
+uint32_t HeatpadStatusState::lastCurrentPeriodMicros() const {
+    return mLast.currentPeriodMicros;
+}
+
+float HeatpadStatusState::lastNextDutyCycle() const {
+    return mLast.nextDutyCycle;
+}
+
+uint32_t HeatpadStatusState::lastNextPeriodMicros() const {
+    return mLast.nextPeriodMicros;
+}
+
 void HeatpadStatusState::setState(HeatpadState value){
     if (mNext.state == value) {
         return;
@@ -93,6 +113,7 @@ void HeatpadStatusState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

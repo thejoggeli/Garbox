@@ -17,6 +17,10 @@ ScreenId ActiveScreenState::nextScreen() const {
     return mCurrent.screen;
 }
 
+ScreenId ActiveScreenState::lastScreen() const {
+    return mLast.screen;
+}
+
 void ActiveScreenState::setScreen(ScreenId value){
     if (mNext.screen == value) {
         return;
@@ -29,6 +33,7 @@ void ActiveScreenState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

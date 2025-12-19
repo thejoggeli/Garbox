@@ -20,6 +20,10 @@ public:
     FermentationState nextState() const;
     float nextTargetTemperature() const;
 
+    // read access (last state)
+    FermentationState lastState() const;
+    float lastTargetTemperature() const;
+
     // write access (next state)
     void setState(FermentationState value);
     void setTargetTemperature(float value);
@@ -33,6 +37,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

@@ -18,6 +18,9 @@ public:
     // read access (next state)
     ScreenId nextScreen() const;
 
+    // read access (last state)
+    ScreenId lastScreen() const;
+
     // write access (next state)
     void setScreen(ScreenId value);
 
@@ -29,6 +32,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

@@ -18,6 +18,9 @@ public:
     // read access (next state)
     BehaviourId nextBehaviour() const;
 
+    // read access (last state)
+    BehaviourId lastBehaviour() const;
+
     // write access (next state)
     void setBehaviour(BehaviourId value);
 
@@ -29,6 +32,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

@@ -17,6 +17,9 @@ public:
     // read access (next state)
     float nextMeasuredRpm() const;
 
+    // read access (last state)
+    float lastMeasuredRpm() const;
+
     // write access (next state)
     void setMeasuredRpm(float value);
 
@@ -28,6 +31,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

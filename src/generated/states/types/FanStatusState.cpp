@@ -17,7 +17,7 @@ float FanStatusState::getTargetSpeed() const {
     return mCurrent.targetSpeed;
 }
 
-bool FanStatusState::isRpmControl() const {
+bool FanStatusState::getRpmControl() const {
     return mCurrent.rpmControl;
 }
 
@@ -31,6 +31,18 @@ float FanStatusState::nextTargetSpeed() const {
 
 bool FanStatusState::nextRpmControl() const {
     return mCurrent.rpmControl;
+}
+
+FanState FanStatusState::lastState() const {
+    return mLast.state;
+}
+
+float FanStatusState::lastTargetSpeed() const {
+    return mLast.targetSpeed;
+}
+
+bool FanStatusState::lastRpmControl() const {
+    return mLast.rpmControl;
 }
 
 void FanStatusState::setState(FanState value){
@@ -61,6 +73,7 @@ void FanStatusState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

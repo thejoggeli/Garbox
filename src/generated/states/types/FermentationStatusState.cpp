@@ -25,6 +25,14 @@ float FermentationStatusState::nextTargetTemperature() const {
     return mCurrent.targetTemperature;
 }
 
+FermentationState FermentationStatusState::lastState() const {
+    return mLast.state;
+}
+
+float FermentationStatusState::lastTargetTemperature() const {
+    return mLast.targetTemperature;
+}
+
 void FermentationStatusState::setState(FermentationState value){
     if (mNext.state == value) {
         return;
@@ -45,6 +53,7 @@ void FermentationStatusState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

@@ -17,6 +17,9 @@ public:
     // read access (next state)
     uint32_t nextSkippedFrames() const;
 
+    // read access (last state)
+    uint32_t lastSkippedFrames() const;
+
     // write access (next state)
     void setSkippedFrames(uint32_t value);
 
@@ -28,6 +31,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

@@ -9,19 +9,19 @@ TemperatureStatusState::TemperatureStatusState(): StateAbs(StateType::Temperatur
     // mCurrent and mNext default-initialized
 }
 
-bool TemperatureStatusState::isDriverEnabled() const {
+bool TemperatureStatusState::getDriverEnabled() const {
     return mCurrent.driverEnabled;
 }
 
-bool TemperatureStatusState::isPowerEnabled() const {
+bool TemperatureStatusState::getPowerEnabled() const {
     return mCurrent.powerEnabled;
 }
 
-bool TemperatureStatusState::isResetting() const {
+bool TemperatureStatusState::getResetting() const {
     return mCurrent.resetting;
 }
 
-bool TemperatureStatusState::isHasFirstSample() const {
+bool TemperatureStatusState::getHasFirstSample() const {
     return mCurrent.hasFirstSample;
 }
 
@@ -39,6 +39,22 @@ bool TemperatureStatusState::nextResetting() const {
 
 bool TemperatureStatusState::nextHasFirstSample() const {
     return mCurrent.hasFirstSample;
+}
+
+bool TemperatureStatusState::lastDriverEnabled() const {
+    return mLast.driverEnabled;
+}
+
+bool TemperatureStatusState::lastPowerEnabled() const {
+    return mLast.powerEnabled;
+}
+
+bool TemperatureStatusState::lastResetting() const {
+    return mLast.resetting;
+}
+
+bool TemperatureStatusState::lastHasFirstSample() const {
+    return mLast.hasFirstSample;
 }
 
 void TemperatureStatusState::setDriverEnabled(bool value){
@@ -77,6 +93,7 @@ void TemperatureStatusState::publish(){
     if (!isDirty()) {
         return;
     }
+    mLast = mCurrent;
     mCurrent = mNext;
     clearDirty();
 }

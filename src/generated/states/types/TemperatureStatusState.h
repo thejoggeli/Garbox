@@ -12,16 +12,22 @@ public:
     TemperatureStatusState();
 
     // read access (published state)
-    bool isDriverEnabled() const;
-    bool isPowerEnabled() const;
-    bool isResetting() const;
-    bool isHasFirstSample() const;
+    bool getDriverEnabled() const;
+    bool getPowerEnabled() const;
+    bool getResetting() const;
+    bool getHasFirstSample() const;
 
     // read access (next state)
     bool nextDriverEnabled() const;
     bool nextPowerEnabled() const;
     bool nextResetting() const;
     bool nextHasFirstSample() const;
+
+    // read access (last state)
+    bool lastDriverEnabled() const;
+    bool lastPowerEnabled() const;
+    bool lastResetting() const;
+    bool lastHasFirstSample() const;
 
     // write access (next state)
     void setDriverEnabled(bool value);
@@ -40,6 +46,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };

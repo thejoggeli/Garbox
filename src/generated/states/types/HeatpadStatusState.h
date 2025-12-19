@@ -26,6 +26,13 @@ public:
     float nextNextDutyCycle() const;
     uint32_t nextNextPeriodMicros() const;
 
+    // read access (last state)
+    HeatpadState lastState() const;
+    float lastCurrentDutyCycle() const;
+    uint32_t lastCurrentPeriodMicros() const;
+    float lastNextDutyCycle() const;
+    uint32_t lastNextPeriodMicros() const;
+
     // write access (next state)
     void setState(HeatpadState value);
     void setCurrentDutyCycle(float value);
@@ -45,6 +52,7 @@ private:
 
     Data mCurrent {};
     Data mNext {};
+    Data mLast {};
 
     void publish() final;
 };
