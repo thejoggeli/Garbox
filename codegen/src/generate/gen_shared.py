@@ -21,16 +21,16 @@ def _generate_events(ctx: Context, loader: Loader):
     - shared/types/EventPayload.h
     """
 
-    payloads_dict = {
-        "event_payloads": loader.config["event_payloads"],
-        "event_types": loader.config["event_types"],
+    events_dict = {
+        "events_includes": loader.config["events_includes"],
+        "events": loader.config["events"],
     }
 
     items = [
-        Item(loader.config, "event_types", ctx.shared_dir / "types/EventAlias.h",   "shared/EventAlias.h.j2"),
-        Item(loader.config, "event_types", ctx.shared_dir / "types/EventType.h",    "shared/EventType.h.j2"),
-        Item(loader.config, "event_types", ctx.shared_dir / "types/EventType.cpp",  "shared/EventType.cpp.j2"),
-        Item(payloads_dict, "*",           ctx.shared_dir / "types/EventPayload.h", "shared/EventPayload.h.j2"),
+        Item(events_dict, "*", ctx.shared_dir / "types/EventAlias.h",   "shared/EventAlias.h.j2"),
+        Item(events_dict, "*", ctx.shared_dir / "types/EventType.h",    "shared/EventType.h.j2"),
+        Item(events_dict, "*", ctx.shared_dir / "types/EventType.cpp",  "shared/EventType.cpp.j2"),
+        Item(events_dict, "*", ctx.shared_dir / "types/EventPayload.h", "shared/EventPayload.h.j2"),
     ]
 
     generate_items(ctx, items)

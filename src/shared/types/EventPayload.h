@@ -5,10 +5,9 @@
 #include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
-#include "app/engine/FermentationState.h"
+
+// includes from config
 #include "modules/parts/button/ButtonState.h"
-#include "modules/parts/fan/FanState.h"
-#include "modules/parts/heatpad/HeatpadState.h"
 #include "shared/types/BehaviourId.h"
 #include "shared/types/ScreenId.h"
 

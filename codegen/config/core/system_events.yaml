@@ -4,14 +4,16 @@ event_payloads:
     - "shared/types/BehaviourId.h"
     - "shared/types/ScreenId.h"
 
-event_types:
+events:
+
   ActiveBehaviourChanged:
-    kind: snapshot
+    include: shared/types/BehaviourId.h
     fields:
       - { name: oldBehaviour, type: BehaviourId }
       - { name: newBehaviour, type: BehaviourId }
+
   ActiveScreenChanged:
-    kind: snapshot
+    include: shared/types/ScreenId.h
     fields:
       - { name: oldScreen, type: ScreenId }
       - { name: newScreen, type: ScreenId }

@@ -1,12 +1,4 @@
-event_payloads:
-  include_h: [
-    "app/engine/FermentationState.h",
-    "modules/parts/button/ButtonState.h",
-    "modules/parts/fan/FanState.h",
-    "modules/parts/heatpad/HeatpadState.h"
-  ]
-
-event_types:
+events:
 
   Heartbeat:
     fields: null
@@ -28,6 +20,7 @@ event_types:
       - { name: periodMicros, type: uint32_t }
 
   Button:
+    include: "modules/parts/button/ButtonState.h"
     fields:
       - { name: oldState, type: ButtonState }
       - { name: newState, type: ButtonState }

@@ -44,7 +44,7 @@ def process_components(config, key, suffix):
 
             # insert all event types (N event handlers)
             if first_entry == "INSERT_ALL":
-                component["receive_events"] = list(config["event_types"].keys())
+                component["receive_events"] = list(config["events"].keys())
 
         # init 'tick_phases' field
         component["tick_phases"] = ensure_list(component.get("tick_phases", []))

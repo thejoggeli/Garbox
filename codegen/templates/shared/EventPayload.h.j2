@@ -3,12 +3,15 @@
 #include <cstdint>
 #include <cstring>
 #include "shared/types/EventType.h"
-{% from "_common/includes.j2" import include_h %}
-{{ include_h(event_payloads) }}
+
+// includes from config
+{% from "_common/includes.j2" import emit_includes %}
+{{ emit_includes(events_includes) }}
+
 namespace Garbox {
 
 // generated payloads
-{% for event_name, type_data in event_types.items() %}
+{% for event_name, type_data in events.items() %}
 struct {{ event_name }}Payload {
     {% if type_data["fields"] %}
         {% for field_data in type_data["fields"].values() %}
@@ -28,7 +31,7 @@ struct {{ event_name }}Payload {
 template<EventType>
 struct ResolveEventPayload; // primary template (intentionally undefined)
 
-{% for event_name in event_types.keys() %}
+{% for event_name in events.keys() %}
 template<>
 struct ResolveEventPayload<EventType::{{ event_name }}> {
     using type = {{ event_name }}Payload;

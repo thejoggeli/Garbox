@@ -1,14 +1,22 @@
+from sortedcontainers import SortedSet
 from common.parse_type import render_value
 from common.str_filters import ensure_suffix
+from common.util import ensure_list
 
 def parse_events(config: dict):
 
-    event_types = config["event_types"]
+    events = config["events"]
 
-    for event_name, event_data in event_types.items():
+    includes_set = SortedSet()
+
+    for event_name, event_data in events.items():
+
+        includes_list = ensure_list(event_data.get("include", []))
+        for include in includes_list:
+            includes_set.add(include)
 
         if(event_data is None):
-            event_types[event_name] = {"meta": {}, "fields": {}}
+            events[event_name] = {"meta": {}, "fields": {}}
             continue
     
         event_meta = event_data.get("meta", {})
@@ -30,10 +38,11 @@ def parse_events(config: dict):
                 "default": render_value(default_value, field_type)
             }
 
-        event_types[event_name] = {
+        events[event_name] = {
             "name": event_name,
             "name_with_suffix": ensure_suffix(event_name, "Event"),
             "meta": event_meta,
             "fields": parsed_fields,
         }
 
+    config["events_includes"] = list(includes_set)

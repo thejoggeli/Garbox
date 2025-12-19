@@ -2,7 +2,7 @@
 {% include "_common/header.j2" %}
 {# compute max name length for white space alignment #}
 {% set ns = namespace(maxlen=0) %}
-{% for name in event_types.keys() %}
+{% for name in events.keys() %}
     {% set length = (name ~ "Event")|length %}
     {% if length > ns.maxlen %}
         {% set ns.maxlen = length %}
@@ -16,12 +16,12 @@
 namespace Garbox {
 
 // event view aliases
-{% for name, fields in event_types.items() %}
+{% for name, fields in events.items() %}
 using {{ (name ~ "Event").ljust(ns.maxlen) }} = EventView<EventType::{{ name }}>;
 {% endfor %}
 
 // event payload aliases
-{% for name, fields in event_types.items() %}
+{% for name, fields in events.items() %}
 using {{ (name ~ "Payload").ljust(ns.maxlen+2) }} = EventPayload<EventType::{{ name }}>;
 {% endfor %}
 

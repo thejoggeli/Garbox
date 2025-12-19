@@ -10,7 +10,7 @@ def generate_runtime(ctx: Context, loader: Loader):
 
 def _collect_event_routes(loader: Loader):
     event_routes = {}
-    for event_key, event_data, in loader.config["event_types"].items():
+    for event_key, event_data, in loader.config["events"].items():
         event_routes[event_key] = {
             "components": SortedSet(),
             "controllers": SortedSet(),

@@ -8,7 +8,7 @@ const char* EventTypeToString(EventType type){
 
         case EventType::Null: return "Null";
 
-{% for name, fields in event_types.items() %}
+{% for name, fields in events.items() %}
         case EventType::{{ name }}: return "{{ name }}";
 {% endfor %}
 
