@@ -2,16 +2,6 @@ screens:
 
   Main:
     subdir: main
-
-    read_states: 
-      - FanStatus
-      - FanSample
-      - HeatpadStatus
-      - HeatpadSample
-      - TemperatureStatus
-      - TemperatureSample
-      - FermentationStatus
-
     renderer: lvgl-gui # lvgl-simple or lvgl-gui 
     renderer_gui: MainScreen.xml
     render_fns: 
@@ -24,6 +14,14 @@ screens:
       - TargetTemperatureSample
       - HeatpadPowerSample
       - HeatpadPowerLabel
+    read_states: 
+      - FanStatus
+      - FanSample
+      - HeatpadStatus
+      - HeatpadSample
+      - TemperatureStatus
+      - TemperatureSample
+      - FermentationStatus
 
   Debug:
     subdir: debug
@@ -44,7 +42,6 @@ screens:
       - HeapBlocks
       - HeapBytes
       - HeapMinimum
-
     read_states:
       - FanStatus
       - FanSample
