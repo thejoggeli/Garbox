@@ -16,7 +16,7 @@ enum class EventType : uint16_t {
     DisplayCommand,
     FanCommand,
     HeatpadCommand,
-    ButtonStateChanged,
+    Button,
     ButtonRepeat,
     EncoderStep,
     ActiveBehaviourChanged,

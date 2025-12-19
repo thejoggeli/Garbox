@@ -21,12 +21,12 @@ public:
 protected:
 
     // make typed events 
-    ButtonStateChangedEvent makeButtonStateChangedEvent();
+    ButtonEvent makeButtonEvent();
     ButtonRepeatEvent makeButtonRepeatEvent();
     EncoderStepEvent makeEncoderStepEvent();
 
     // send typed events
-    void sendEvent(const ButtonStateChangedEvent& event);
+    void sendEvent(const ButtonEvent& event);
     void sendEvent(const ButtonRepeatEvent& event);
     void sendEvent(const EncoderStepEvent& event);
 

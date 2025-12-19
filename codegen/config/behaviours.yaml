@@ -9,7 +9,7 @@ behaviours:
   FermentationBehaviour:
     tick_phases: [Logic]
 
-    receive_events: [Heartbeat, ButtonStateChanged, ButtonRepeat, EncoderStep]
+    receive_events: [Heartbeat, Button, ButtonRepeat, EncoderStep]
     send_events: [FanCommand, DisplayCommand, HeatpadCommand]
 
     write_states: [FermentationStatus]

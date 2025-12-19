@@ -27,7 +27,7 @@ event_types:
       - { name: dutyCycle, type: float }
       - { name: periodMicros, type: uint32_t }
 
-  ButtonStateChanged:
+  Button:
     fields:
       - { name: oldState, type: ButtonState }
       - { name: newState, type: ButtonState }

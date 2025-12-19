@@ -21,7 +21,7 @@ public:
     virtual void onInputTick() {};
 
     // event handlers (to be implmeneted by user)
-    virtual void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) {};
+    virtual void onButtonEvent(const ButtonEvent& event) {};
 
 protected:
 

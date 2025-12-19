@@ -14,7 +14,7 @@ const char* EventTypeToString(EventType type){
         case EventType::DisplayCommand: return "DisplayCommand";
         case EventType::FanCommand: return "FanCommand";
         case EventType::HeatpadCommand: return "HeatpadCommand";
-        case EventType::ButtonStateChanged: return "ButtonStateChanged";
+        case EventType::Button: return "Button";
         case EventType::ButtonRepeat: return "ButtonRepeat";
         case EventType::EncoderStep: return "EncoderStep";
         case EventType::ActiveBehaviourChanged: return "ActiveBehaviourChanged";

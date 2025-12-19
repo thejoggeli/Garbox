@@ -25,7 +25,7 @@ public:
 
     // event handlers (to be implmeneted by user)
     virtual void onHeartbeatEvent(const HeartbeatEvent& event) {};
-    virtual void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) {};
+    virtual void onButtonEvent(const ButtonEvent& event) {};
     virtual void onButtonRepeatEvent(const ButtonRepeatEvent& event) {};
     virtual void onEncoderStepEvent(const EncoderStepEvent& event) {};
 

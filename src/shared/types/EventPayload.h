@@ -35,7 +35,7 @@ struct HeatpadCommandPayload {
     uint32_t periodMicros;
 };
 
-struct ButtonStateChangedPayload {
+struct ButtonPayload {
     ButtonState oldState;
     ButtonState newState;
 };
@@ -84,8 +84,8 @@ struct ResolveEventPayload<EventType::HeatpadCommand> {
 };
 
 template<>
-struct ResolveEventPayload<EventType::ButtonStateChanged> {
-    using type = ButtonStateChangedPayload;
+struct ResolveEventPayload<EventType::Button> {
+    using type = ButtonPayload;
 };
 
 template<>

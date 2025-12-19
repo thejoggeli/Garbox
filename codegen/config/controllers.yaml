@@ -30,10 +30,10 @@ controllers:
   InputController:
     subdir: "hmi"
     tick_phases: [Input]
-    send_events: [ButtonStateChanged, ButtonRepeat, EncoderStep]
+    send_events: [Button, ButtonRepeat, EncoderStep]
 
   I2cPartsController:
     subdir: "sensors"
     tick_phases: [Input]
-    receive_events: [ButtonStateChanged]
+    receive_events: [Button]
     write_states: [TemperatureStatus, TemperatureSample]

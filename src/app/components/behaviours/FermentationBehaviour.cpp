@@ -104,7 +104,7 @@ void FermentationBehaviour::onHeartbeatEvent(const HeartbeatEvent& event){
     // nothing to do
 }
 
-void FermentationBehaviour::onButtonStateChangedEvent(const ButtonStateChangedEvent& event){
+void FermentationBehaviour::onButtonEvent(const ButtonEvent& event){
     if(event->newState == ButtonState::Released){
 
         static uint32_t s = 0;

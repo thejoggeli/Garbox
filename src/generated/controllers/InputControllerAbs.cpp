@@ -9,8 +9,8 @@ InputControllerAbs::InputControllerAbs() : ControllerAbs(ComponentId::InputContr
     // nothing to do
 }
 
-ButtonStateChangedEvent InputControllerAbs::makeButtonStateChangedEvent(){
-    return ComponentAbs::makeEvent<EventType::ButtonStateChanged>();
+ButtonEvent InputControllerAbs::makeButtonEvent(){
+    return ComponentAbs::makeEvent<EventType::Button>();
 }
 
 ButtonRepeatEvent InputControllerAbs::makeButtonRepeatEvent(){
@@ -21,7 +21,7 @@ EncoderStepEvent InputControllerAbs::makeEncoderStepEvent(){
     return ComponentAbs::makeEvent<EventType::EncoderStep>();
 }
 
-void InputControllerAbs::sendEvent(const ButtonStateChangedEvent& event){
+void InputControllerAbs::sendEvent(const ButtonEvent& event){
     sendEventToHost(event.header());
 }
 

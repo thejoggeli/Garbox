@@ -13,7 +13,7 @@ public:
     void onLogicTick() final;
 
     void onHeartbeatEvent(const HeartbeatEvent& event) final;
-    void onButtonStateChangedEvent(const ButtonStateChangedEvent& event) final;
+    void onButtonEvent(const ButtonEvent& event) final;
     void onButtonRepeatEvent(const ButtonRepeatEvent& event) final;
     void onEncoderStepEvent(const EncoderStepEvent& event) final;
 

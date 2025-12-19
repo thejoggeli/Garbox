@@ -397,16 +397,16 @@ void Runtime::onRouteEvent(const EventHeader* header){
         mHeatpadController.onHeatpadCommandEvent(event);
         break;
     }
-    case EventType::ButtonStateChanged: {
-        const ButtonStateChangedEvent event(header);
-        mI2cPartsController.onButtonStateChangedEvent(event);
+    case EventType::Button: {
+        const ButtonEvent event(header);
+        mI2cPartsController.onButtonEvent(event);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonStateChangedEvent(event);
+            mFermentationBehaviour.onButtonEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonStateChangedEvent(event); break;
-                default: break; // active behaviour does not receive 'ButtonStateChanged' event
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonEvent(event); break;
+                default: break; // active behaviour does not receive 'Button' event
             }
         }
         break;
