@@ -22,8 +22,8 @@ def _generate_states(ctx: Context, loader: Loader):
 
         filename = state_data["name_with_suffix"]
 
-        items.append(Item(state_data, "*", ctx.gen_dir/f"states/types/{filename}.h",   "states/State.h.j2"))
-        items.append(Item(state_data, "*", ctx.gen_dir/f"states/types/{filename}.cpp", "states/State.cpp.j2"))
+        items.append(Item(state_data, ctx.gen_dir/f"states/types/{filename}.h",   "states/State.h.j2"))
+        items.append(Item(state_data, ctx.gen_dir/f"states/types/{filename}.cpp", "states/State.cpp.j2"))
 
     generate_items(ctx, items)
 
@@ -41,7 +41,7 @@ def _generate_state_registry(ctx: Context, loader: Loader):
     }
 
     items = []
-    items.append(Item(data_dict, "*", ctx.gen_dir/f"states/StateRegistry.h",   f"{template}.h.j2"))
-    items.append(Item(data_dict, "*", ctx.gen_dir/f"states/StateRegistry.cpp", f"{template}.cpp.j2"))
+    items.append(Item(data_dict, ctx.gen_dir/f"states/StateRegistry.h",   f"{template}.h.j2"))
+    items.append(Item(data_dict, ctx.gen_dir/f"states/StateRegistry.cpp", f"{template}.cpp.j2"))
 
     generate_items(ctx, items)

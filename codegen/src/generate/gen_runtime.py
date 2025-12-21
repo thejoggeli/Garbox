@@ -62,8 +62,8 @@ def _generate_runtime(ctx: Context, loader: Loader):
     }
 
     items = [
-        Item(runtime_dict, "*", out_base.with_suffix(".h"),   "runtime/Runtime.h.j2"),
-        Item(runtime_dict, "*", out_base.with_suffix(".cpp"), "runtime/Runtime.cpp.j2"),
+        Item(runtime_dict, out_base.with_suffix(".h"),   "runtime/Runtime.h.j2"),
+        Item(runtime_dict, out_base.with_suffix(".cpp"), "runtime/Runtime.cpp.j2"),
     ]
 
     generate_items(ctx, items)

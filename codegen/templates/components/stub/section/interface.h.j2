@@ -1,0 +1,64 @@
+
+{# constructor #}
+    // generated constructor
+    {{ component.name }}();
+
+{# lifecycle handlers #}
+    // generated lifecycle handlers
+    void onInit() final;
+    void onStart() final;
+{% if component.type == "screen" or component.type == "behaviour" %}
+    void onBecomeEnabled() final;
+    void onBecomeDisabled() final;
+{% endif %}
+
+{# tick handlers #}
+{% if component.tick_phases_all or component.tick_phases %}
+    // generated tick handlers
+{% endif %}
+{% if component.tick_phases_all %}
+    void onTick(TickPhase phase) final;
+{% endif %}
+{% if component.tick_phases %}
+    {% for tick in component.tick_phases %}
+    void on{{ tick }}() final;
+    {% endfor %}
+{% endif %}
+
+{# event handlers #}
+{% if component.receive_events_all or component.receive_events %}
+    // generated event handlers
+{% endif %}
+{% if component.receive_events_all %}
+    void onEvent(const EventHeader* header) final;
+{% endif %}
+{% if component.receive_events %}
+    {% for ev in component.receive_events %}
+    void on{{ ev }}Event(const {{ ev }}Event& event) final;
+    {% endfor %}
+{% endif %}
+
+{# state changed handlers #}
+{% if component.read_states_all or component.read_states %}
+    // generated state changed handlers
+{% endif %}
+{% if component.read_states_all %}
+    void onStateChanged(const StateAbs& state) final;
+{% endif %}
+{% if component.read_states %}
+{% for state in component.read_states.values() %}
+    void on{{ state.name|upper_first }}StateChanged(const {{ state.name_with_suffix|upper_first }}& state) final;
+{% endfor %}
+{% endif %}
+
+
+{# render handlers #}
+{% if component.type == "screen" %}
+    // generated render functions
+    void onRender() final;
+{% if component.render_fns %}
+{% for fn_name in component.render_fns %}
+    void onRender{{ fn_name|upper_first }}() final;
+{% endfor %}
+{% endif %}
+{% endif %}

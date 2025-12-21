@@ -1,0 +1,5 @@
+{# begin/end #}
+{% macro emit_section_tags(block, indent=0) -%}
+{{" " * indent}}// {{ ("GENERATED BEGIN: " ~ block) | sentinel(4, 80-indent, "=") }}
+{{" " * indent}}// {{ ("GENERATED END: " ~ block) | sentinel(4, 80-indent, "=") }}
+{%- endmacro %}

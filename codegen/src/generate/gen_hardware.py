@@ -43,8 +43,8 @@ def _generate_instances(ctx: Context, loader: Loader):
             init_config["init"].append(name)
 
     items = [
-        Item(init_config, "*", hw_dir / "HardwareInit.h",   "hardware/HardwareInit.h.j2"),
-        Item(init_config, "*", hw_dir / "HardwareInit.cpp", "hardware/HardwareInit.cpp.j2"),
+        Item(init_config, hw_dir / "HardwareInit.h",   "hardware/HardwareInit.h.j2"),
+        Item(init_config, hw_dir / "HardwareInit.cpp", "hardware/HardwareInit.cpp.j2"),
     ]
     generate_items(ctx, items)
 
@@ -59,17 +59,17 @@ def _generate_hardware_init(ctx: Context, loader: Loader):
     config = loader.config["hardware"]
 
     items = [
-        Item(config, "*", hw_dir/"AdcInstances.h",     "hardware/AdcInstances.h.j2"),
-        Item(config, "*", hw_dir/"AdcInstances.cpp",   "hardware/AdcInstances.cpp.j2"),
-        Item(config, "*", hw_dir/"GpioInstances.h",    "hardware/GpioInstances.h.j2"),
-        Item(config, "*", hw_dir/"GpioInstances.cpp",  "hardware/GpioInstances.cpp.j2"),
-        Item(config, "*", hw_dir/"I2cInstances.h",     "hardware/I2cInstances.h.j2"),
-        Item(config, "*", hw_dir/"I2cInstances.cpp",   "hardware/I2cInstances.cpp.j2"),
-        Item(config, "*", hw_dir/"SpiInstances.h",     "hardware/SpiInstances.h.j2"),
-        Item(config, "*", hw_dir/"SpiInstances.cpp",   "hardware/SpiInstances.cpp.j2"),
-        Item(config, "*", hw_dir/"TimerInstances.h",   "hardware/TimerInstances.h.j2"),
-        Item(config, "*", hw_dir/"TimerInstances.cpp", "hardware/TimerInstances.cpp.j2"),
-        Item(config, "*", hw_dir/"LedcInstances.h",    "hardware/LedcInstances.h.j2"),
-        Item(config, "*", hw_dir/"LedcInstances.cpp",  "hardware/LedcInstances.cpp.j2"),
+        Item(config, hw_dir/"AdcInstances.h",     "hardware/AdcInstances.h.j2"),
+        Item(config, hw_dir/"AdcInstances.cpp",   "hardware/AdcInstances.cpp.j2"),
+        Item(config, hw_dir/"GpioInstances.h",    "hardware/GpioInstances.h.j2"),
+        Item(config, hw_dir/"GpioInstances.cpp",  "hardware/GpioInstances.cpp.j2"),
+        Item(config, hw_dir/"I2cInstances.h",     "hardware/I2cInstances.h.j2"),
+        Item(config, hw_dir/"I2cInstances.cpp",   "hardware/I2cInstances.cpp.j2"),
+        Item(config, hw_dir/"SpiInstances.h",     "hardware/SpiInstances.h.j2"),
+        Item(config, hw_dir/"SpiInstances.cpp",   "hardware/SpiInstances.cpp.j2"),
+        Item(config, hw_dir/"TimerInstances.h",   "hardware/TimerInstances.h.j2"),
+        Item(config, hw_dir/"TimerInstances.cpp", "hardware/TimerInstances.cpp.j2"),
+        Item(config, hw_dir/"LedcInstances.h",    "hardware/LedcInstances.h.j2"),
+        Item(config, hw_dir/"LedcInstances.cpp",  "hardware/LedcInstances.cpp.j2"),
     ]
     generate_items(ctx, items)

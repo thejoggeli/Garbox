@@ -5,14 +5,14 @@ from common.util import (
 from common.str_filters import ensure_suffix
 from loader.parse_screens import parse_screens
 
-COMPONENT_TYPES = ["controllers", "behaviours", "screens"]
+COMPONENT_TYPES = ["controller", "behaviour", "screen"]
 
 def parse_application(config: dict):
 
     # process components
-    process_components(config, "behaviours", "Behaviour")  
-    process_components(config, "controllers", "Controller")
-    process_components(config, "screens", "Screen")
+    process_components(config, "behaviour", "Behaviour")  
+    process_components(config, "controller", "Controller")
+    process_components(config, "screen", "Screen")
 
     # access all components
     config["components"] = {
@@ -28,13 +28,15 @@ def parse_application(config: dict):
     parse_screens(config)
 
 
-def process_components(config, key, suffix):
+def process_components(config, comp_type, suffix):
 
-    config[key] = ensure_dict_keys_have_suffix(config[key], suffix)
+    type_key = comp_type + "s"
 
-    for component_name, component in config[key].items():
+    config[type_key] = ensure_dict_keys_have_suffix(config[type_key], suffix)
 
-        print(component_name)
+    for component_name, component in config[type_key].items():
+
+        component["type"] = comp_type
 
         # init 'receive_events' field
         component["receive_events"] = ensure_list(component.get("receive_events", []))
@@ -98,8 +100,7 @@ def process_components(config, key, suffix):
             component["read_states"][state_name] = states[state_name]
             component["all_states"][state_name] = states[state_name]
             states[state_name]["readers"]["components"][component_name] = component
-            states[state_name]["readers"][key][component_name] = component
-
+            states[state_name]["readers"][type_key][component_name] = component
 
         # component name
         component["name"] = component_name
@@ -118,19 +119,22 @@ def process_tick_phases(config):
         phase["controllers"] = {}
         phase["screens"] = {}
         idx[phase["name"]] = i
-    for section in COMPONENT_TYPES:
-        for comp_key, comp_data in config[section].items(): 
+        
+    for comp_type in COMPONENT_TYPES:
+        type_key = comp_type + "s"
+
+        for comp_key, comp_data in config[type_key].items(): 
             
             # add component to all tick phases
             if(comp_data["tick_phases_all"] == True):
                 for phase_idx in range(len(phases)):
-                    phases[phase_idx][section][comp_key] = comp_data
+                    phases[phase_idx][type_key][comp_key] = comp_data
 
             # add component to selected tick phases
             else:
                 comp_data["tick_phases"] = comp_data["tick_phases"]
                 for phase in comp_data["tick_phases"]:
-                    phases[idx[phase]][section][comp_key] = comp_data
+                    phases[idx[phase]][type_key][comp_key] = comp_data
 
     # order tick phases
     next_order = 0

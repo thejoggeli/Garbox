@@ -1,0 +1,93 @@
+#include "{{ component.name }}.h"
+// This file was initially generated and is no longer modified by the generator.
+// Interface changes must be applied manually in this file.
+// See the corresponding header for the interface method declarations.
+
+namespace Garbox {
+
+{{ component.name }}::{{ component.name }}() : {{ component.name }}Abs(){
+    // to be implemented
+}
+
+{# lifecycle init/start handlers #}
+void {{ component.name }}::onInit(){
+    // to be implemented
+}
+
+void {{ component.name }}::onStart(){
+    // to be implemented
+}
+
+{# lifecycle become enabled/disabled handlers #}
+{% if component.type == "screen" or component.type == "behaviour" %}
+void {{ component.name }}::onBecomeEnabled(){
+    // to be implemented
+}
+
+void {{ component.name }}::onBecomeDisabled(){
+    // to be implemented
+}
+{% endif %}
+
+
+{# receive ticks #}
+{% if component.tick_phases_all %}
+void {{ component.name }}::onTick(TickPhase phase){
+    // to be implemented
+}
+{% endif %}
+{% if component.tick_phases %}
+{% for tick in component.tick_phases %}
+
+void {{ component.name }}::on{{ tick }}(){
+    // to be implemented
+}
+{% endfor %}
+{% endif %}
+
+{# event handlers #}
+{% if component.receive_events_all %}
+void {{ component.name }}::onEvent(const EventHeader* header){
+    // to be implemented
+}
+{% endif %}
+{% if component.receive_events %}
+{% for ev in component.receive_events %}
+
+void {{ component.name }}::on{{ ev }}Event(const {{ ev }}Event& event){
+    // to be implemented
+}
+{% endfor %}
+{% endif %}
+
+{# state changed handlers #}
+{% if component.read_states_all %}
+void {{ component.name }}::onStateChanged(const StateAbs& state){
+    // to be implemented
+}
+{% endif %}
+{% if component.read_states %}
+{% for state in component.read_states.values() %}
+
+void {{ component.name }}::on{{ state.name|upper_first }}StateChanged(const {{ state.name_with_suffix|upper_first }}& state){
+    // to be implemented
+}
+{% endfor %}
+{% endif %}
+
+{# render handlers #}
+{% if component.type == "screen" %}
+void {{ component.name }}::onRender(){
+    // to be implemented
+}
+{% if component.render_fns %}
+{% for fn_name in component.render_fns %}
+
+void {{ component.name }}::onRender{{ fn_name|upper_first }}() {
+    // to be implemented
+}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+} // namespace Garbox

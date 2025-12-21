@@ -1,0 +1,28 @@
+{% from "_common/section_tags.j2" import emit_section_tags, section_divider_line %}
+#pragma once
+// Sections marked with GENERATED BEGIN/END may be overwritten by the generator.
+// Do not modify or remove these sections. Changes outside these markers will be preserved.
+
+{# section content will be inserted via python script #}
+{{ emit_section_tags("include") }}
+
+// insert your code here (e.g. includes)
+// #include "SomeHelper.h"
+
+namespace Garbox {
+
+class {{ component.name }} : public {{ component.name }}Abs {
+private:
+
+    // insert your code here (e.g. class members, methods)
+    // uint32_t mValue = 7;
+    // void someMethod(bool value);
+
+public:
+
+{# section content will be inserted via python script #}
+{{ emit_section_tags("interface") }}
+
+};
+
+} // namespace Garbox

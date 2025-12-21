@@ -48,3 +48,15 @@ def ensure_suffix(value: str, suffix: str):
     if not value.endswith(suffix):
         return value + suffix
     return value
+
+def sentinel(text: str, pad_left, pad_total, sep="="):
+
+    begin = sep*pad_left + f" {text.strip()} "
+    begin_len = len(begin)
+    total_len = pad_total
+
+    if begin_len >= pad_total:
+        return begin.strip()
+
+    end_len = total_len - begin_len
+    return begin + sep * end_len
