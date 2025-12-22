@@ -230,10 +230,10 @@ void RuntimeAbs::requestChangeScreen(ScreenId id){
     setQueuedScreen(resolveScreen(id));
 }
 
-void RuntimeAbs::requestUpdateScreenNow(){
+void RuntimeAbs::requestRenderScreenNow(){
     AssertExit(mActiveScreen != nullptr, "RuntimeAbs", "active screen is nullptr");
     applyQueuedScreen();
-    mActiveScreen->updateScreen();
+    mActiveScreen->render();
 }
 
 } // namespace

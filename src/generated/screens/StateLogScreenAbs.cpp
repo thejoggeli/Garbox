@@ -26,8 +26,8 @@ void StateLogScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
 }
 
-void StateLogScreenAbs::updateScreen(){
-    ScreenAbs::updateScreen();
+void StateLogScreenAbs::render(){
+    ScreenAbs::render();
 }
 
 void StateLogScreenAbs::becomeEnabled(){

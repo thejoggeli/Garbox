@@ -77,8 +77,8 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
 }
 
-void DebugScreenAbs::updateScreen(){
-    ScreenAbs::updateScreen();
+void DebugScreenAbs::render(){
+    ScreenAbs::render();
     mDispatchedCount += mRenderDispatcher.getDirtyCount();
     mRenderDispatcher.dispatch();
 }

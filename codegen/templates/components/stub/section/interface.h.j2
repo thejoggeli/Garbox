@@ -10,6 +10,7 @@
 {% if component.type == "screen" or component.type == "behaviour" %}
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
+
 {% endif %}
 
 {# tick handlers #}
@@ -23,6 +24,7 @@
     {% for tick in component.tick_phases %}
     void on{{ tick }}() final;
     {% endfor %}
+
 {% endif %}
 
 {# event handlers #}
@@ -36,6 +38,7 @@
     {% for ev in component.receive_events %}
     void on{{ ev }}Event(const {{ ev }}Event& event) final;
     {% endfor %}
+
 {% endif %}
 
 {# state changed handlers #}
@@ -49,6 +52,7 @@
 {% for state in component.read_states.values() %}
     void on{{ state.name|upper_first }}StateChanged(const {{ state.name_with_suffix|upper_first }}& state) final;
 {% endfor %}
+
 {% endif %}
 
 
@@ -61,4 +65,5 @@
     void onRender{{ fn_name|upper_first }}() final;
 {% endfor %}
 {% endif %}
+
 {% endif %}

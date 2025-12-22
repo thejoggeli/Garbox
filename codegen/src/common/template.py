@@ -27,6 +27,8 @@ def render_template(jinja_env,
     context: dict,
     sections: list[GenSection] | None = None,
 ):
+
+    print(output_path)
     
     template = jinja_env.get_template(template_name)
     result_text = template.render(**context)
@@ -44,4 +46,27 @@ def render_template(jinja_env,
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(result_text)
 
-    print(output_path)
+
+def render_sections_to_existing_file(
+    jinja_env,
+    input_path: Path,
+    sections: list[GenSection],
+):
+
+    print(input_path)
+
+    if not input_path.exists():
+        raise FileNotFoundError(input_path)
+
+    result_text = input_path.read_text()
+
+    # insert sections
+    for section in sections:
+        section_template = jinja_env.get_template(section.template_path)
+        section_text = section_template.render(**section.config)
+        result_text = section.apply(result_text, section_text)
+
+    # collapse 2+ blank lines into exactly one
+    result_text = re.sub(r"\n{2,}", "\n\n", result_text)
+
+    input_path.write_text(result_text)

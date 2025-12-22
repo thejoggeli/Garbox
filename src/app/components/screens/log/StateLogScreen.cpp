@@ -62,7 +62,7 @@ void StateLogScreen::onBecomeDisabled(){
     // nothing to do
 }
 
-void StateLogScreen::onUpdateScreen(){
+void StateLogScreen::onRender(){
 
     // write queued events to labels
     if(mBuffer.size() > 0){

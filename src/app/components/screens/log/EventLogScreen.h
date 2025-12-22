@@ -1,6 +1,9 @@
 #pragma once
 
+// ==== GENERATED BEGIN: include ==================================================
 #include "generated/screens/EventLogScreenAbs.h"
+// ==== GENERATED END: include ====================================================
+
 #include "core/lvgl/objects/LvObject.h"
 #include "core/lvgl/objects/LvLabel.h"
 #include "core/util/container/static/ArrayStatic.h"
@@ -9,13 +12,6 @@
 namespace Garbox {
 
 class EventLogScreen : public EventLogScreenAbs {
-public:
-
-    EventLogScreen();
-
-    // event handler
-    void onEvent(const EventHeader* header) final;
-
 private:
 
     struct EventEntry {
@@ -38,12 +34,27 @@ private:
     size_t mCurrentLabelIndex = static_cast<size_t>(-1);
     RingBufferStatic<EventEntry, NumRows> mBuffer;
 
-    // safe to update lvgl objects in these methods
+public:
+
+// ==== GENERATED BEGIN: interface ================================================
+
+    // generated constructor
+    EventLogScreen();
+
+    // generated lifecycle handlers
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
-    void onUpdateScreen() final;
+
+    // generated event handlers
+    void onEvent(const EventHeader* header) final;
+
+    // generated render functions
+    void onRender() final;
+
+// ==== GENERATED END: interface ==================================================
+
 };
 
 } // namespace Garbox

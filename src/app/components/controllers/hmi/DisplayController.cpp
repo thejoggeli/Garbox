@@ -1,10 +1,9 @@
 #include "DisplayController.h"
 
-#include <esp_heap_caps.h>
 #include "app/providers/PartsProvider.h"
 #include "core/log/Log.h"
+#include "core/time/TimeLiterals.h"
 #include "core/util/function/default/EasingFunctions.h"
-#include "core/util/math/MathUtils.h"
 #include "modules/parts/display/Display.h"
 
 namespace Garbox {
@@ -35,7 +34,7 @@ void DisplayController::onRenderTick(){
 
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
-        getHost()->requestUpdateScreenNow();
+        getHost()->requestRenderScreenNow();
         mDisplay.giveRenderTrigger();
     }
     else {

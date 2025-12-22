@@ -56,8 +56,8 @@ void MainScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
 }
 
-void MainScreenAbs::updateScreen(){
-    ScreenAbs::updateScreen();
+void MainScreenAbs::render(){
+    ScreenAbs::render();
     mDispatchedCount += mRenderDispatcher.getDirtyCount();
     mRenderDispatcher.dispatch();
 }

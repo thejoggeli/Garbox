@@ -172,7 +172,7 @@ void MainScreen::onBecomeDisabled(){
     // nothing to do
 }
 
-void MainScreen::onUpdateScreen(){
+void MainScreen::onRender(){
 
     // update power chart
     if(mPowerTimer.isExpired()){

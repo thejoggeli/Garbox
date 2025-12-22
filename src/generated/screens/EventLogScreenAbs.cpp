@@ -26,8 +26,8 @@ void EventLogScreenAbs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
 }
 
-void EventLogScreenAbs::updateScreen(){
-    ScreenAbs::updateScreen();
+void EventLogScreenAbs::render(){
+    ScreenAbs::render();
 }
 
 void EventLogScreenAbs::becomeEnabled(){

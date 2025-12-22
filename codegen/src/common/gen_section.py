@@ -13,10 +13,11 @@ class GenSectionError(RuntimeError):
     pass
 
 class GenSection:
-    def __init__(self, section_name: str, config: dict, template_path: Path):
+    def __init__(self, filename: str, section_name: str, config: dict, template_path: Path):
         if not section_name:
             raise ValueError("section_name must not be empty")
 
+        self.filename = filename
         self.section_name = section_name
         self.config = config
         self.template_path = template_path
@@ -40,7 +41,7 @@ class GenSection:
                 if name == section_name:
                     if begin_found:
                         raise GenSectionError(
-                            f"Duplicate GENERATED BEGIN for section '{section_name}'"
+                            f"Duplicate GENERATED BEGIN for section '{section_name}' in file '{self.filename}'"
                         )
                     begin_found = True
                     in_target = True
@@ -55,7 +56,7 @@ class GenSection:
                 if name == section_name:
                     if not begin_found:
                         raise GenSectionError(
-                            f"gen:end without GENERATED BEGIN for section '{section_name}'"
+                            f"gen:end without GENERATED BEGIN for section '{section_name}' in file '{self.filename}'"
                         )
                     end_found = True
                     in_target = False
@@ -67,12 +68,12 @@ class GenSection:
 
         if not begin_found:
             raise GenSectionError(
-                f"Missing GENERATED BEGIN for section '{section_name}'"
+                f"Missing GENERATED BEGIN for section '{section_name}' in file '{self.filename}'"
             )
 
         if not end_found:
             raise GenSectionError(
-                f"Missing GENERATED END for section '{section_name}'"
+                f"Missing GENERATED END for section '{section_name}' in file '{self.filename}'"
             )
 
         return "".join(out)

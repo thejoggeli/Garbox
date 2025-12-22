@@ -151,4 +151,20 @@ bool FermentationBehaviour::checkTemperatureStatus(){
     return status.getPowerEnabled() && status.getDriverEnabled() && !status.getResetting();
 }
 
+void FermentationBehaviour::onFanSampleStateChanged(const FanSampleState& state){
+    // nothing to do
+}
+
+void FermentationBehaviour::onFanStatusStateChanged(const FanStatusState& state){
+    // nothing to do
+}
+
+void FermentationBehaviour::onTemperatureSampleStateChanged(const TemperatureSampleState& state){
+    // nothing to do
+}
+
+void FermentationBehaviour::onTemperatureStatusStateChanged(const TemperatureStatusState& state){
+    // nothing to do
+}
+
 } // namespace

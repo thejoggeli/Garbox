@@ -1,7 +1,10 @@
 #pragma once
 
-#include "core/util/fsm/FiniteStateMachine.h"
+// ==== GENERATED BEGIN: include ==================================================
 #include "generated/controllers/I2cPartsControllerAbs.h"
+// ==== GENERATED END: include ====================================================
+
+#include "core/util/fsm/FiniteStateMachine.h"
 
 namespace Garbox {
 
@@ -9,13 +12,6 @@ class Gpio;
 class Sht31;
 
 class I2cPartsController : public I2cPartsControllerAbs {
-public:
-    
-    I2cPartsController();
-
-    void onInputTick() final;
-    void onButtonEvent(const ButtonEvent& event) final;
-
 private:
 
     enum class FsmState {
@@ -37,15 +33,31 @@ private:
     bool mNewSample = false;
     bool mStateChanged = true;
     bool mResetting = false;
-    
-    void onInit() final;
-    void onStart() final;
 
     void handleRunningState();
     void handleStateChanged(FsmState oldState, FsmState newState);
 
     void updateTemperatureStatus();
     void updateTemperatureSample();
+
+public:
+
+// ==== GENERATED BEGIN: interface ================================================
+
+    // generated constructor
+    I2cPartsController();
+
+    // generated lifecycle handlers
+    void onInit() final;
+    void onStart() final;
+
+    // generated tick handlers
+    void onInputTick() final;
+
+    // generated event handlers
+    void onButtonEvent(const ButtonEvent& event) final;
+
+// ==== GENERATED END: interface ==================================================
 
 };
 

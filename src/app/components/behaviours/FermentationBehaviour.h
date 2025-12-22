@@ -1,21 +1,15 @@
 #pragma once
 
+// ==== GENERATED BEGIN: include ==================================================
 #include "generated/behaviours/FermentationBehaviourAbs.h"
+// ==== GENERATED END: include ====================================================
+
 #include "app/engine/FermentationEngine.h"
+#include "shared/types/EventAlias.h"
 
 namespace Garbox {
 
 class FermentationBehaviour : public FermentationBehaviourAbs {
-public:
-
-    FermentationBehaviour();
-    
-    void onLogicTick() final;
-
-    void onHeartbeatEvent(const HeartbeatEvent& event) final;
-    void onButtonEvent(const ButtonEvent& event) final;
-    void onButtonRepeatEvent(const ButtonRepeatEvent& event) final;
-    void onEncoderStepEvent(const EncoderStepEvent& event) final;
 
 private:
 
@@ -29,17 +23,40 @@ private:
     FermentationEngine mFermentationEngine;
 
     bool checkTemperatureStatus();
-
-    void doFanTestStep();
     
+    void sendFanCommand(bool enabled, float speed);
+    void sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros);
+    void updateFermentationStatus();
+
+public:
+
+// ==== GENERATED BEGIN: interface ================================================
+
+    // generated constructor
+    FermentationBehaviour();
+
+    // generated lifecycle handlers
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
 
-    void sendFanCommand(bool enabled, float speed);
-    void sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros);
-    void updateFermentationStatus();
+    // generated tick handlers
+    void onLogicTick() final;
+
+    // generated event handlers
+    void onHeartbeatEvent(const HeartbeatEvent& event) final;
+    void onButtonEvent(const ButtonEvent& event) final;
+    void onButtonRepeatEvent(const ButtonRepeatEvent& event) final;
+    void onEncoderStepEvent(const EncoderStepEvent& event) final;
+
+    // generated state changed handlers
+    void onFanSampleStateChanged(const FanSampleState& state) final;
+    void onFanStatusStateChanged(const FanStatusState& state) final;
+    void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
+    void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
+
+// ==== GENERATED END: interface ==================================================
 
 };
 

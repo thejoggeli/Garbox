@@ -15,7 +15,7 @@ public:
     virtual void init(ComponentHostIfc& host) override;
     virtual void becomeEnabled() override;
     virtual void becomeDisabled() override;
-    virtual void updateScreen();
+    virtual void render();
 
     // get the behaviour id
     ScreenId getScreenId() const { return mScreenId; }
@@ -26,7 +26,7 @@ protected:
 
     bool mFirstUpdate = true;
 
-    virtual void onUpdateScreen() = 0;
+    virtual void onRender() = 0;
 
 private:
 

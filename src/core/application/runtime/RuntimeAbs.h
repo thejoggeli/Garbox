@@ -43,7 +43,7 @@ public:
     // ComponentHostIfc
     void requestChangeBehaviour(BehaviourId id) final;
     void requestChangeScreen(ScreenId id) final;
-    void requestUpdateScreenNow() final;
+    void requestRenderScreenNow() final;
     void receiveEvent(const EventHeader* header) final;
     EventFactory& getEventFactory() final;
     const RuntimeContext& getContext() const final;
@@ -103,7 +103,7 @@ private:
     void dispatchStates();
     void dispatchEvents();
 
-    // private because this is already called in requestUpdateScreenNow()
+    // private because this is already called in requestRenderScreenNow()
     void applyQueuedScreen(); 
 
     // component descriptor

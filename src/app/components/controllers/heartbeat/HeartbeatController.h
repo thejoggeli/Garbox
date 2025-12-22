@@ -1,6 +1,9 @@
 #pragma once
 
+// ==== GENERATED BEGIN: include ==================================================
 #include "generated/controllers/HeartbeatControllerAbs.h"
+// ==== GENERATED END: include ====================================================
+
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
@@ -8,20 +11,27 @@ namespace Garbox {
 class AnimatedLed;
 
 class HeartbeatController : public HeartbeatControllerAbs {
-public:
-
-    HeartbeatController();
-
-    void onHeartbeatTick() final;
-
 private: 
-
-    void onInit();
-    void onStart();
 
     uint32_t mIntervalMicros;
     AnimatedLed& mHeartbeatLed;
     SoftwareTimer mHeartbeatTimer;
+
+public:
+
+// ==== GENERATED BEGIN: interface ================================================
+
+    // generated constructor
+    HeartbeatController();
+
+    // generated lifecycle handlers
+    void onInit() final;
+    void onStart() final;
+
+    // generated tick handlers
+    void onHeartbeatTick() final;
+
+// ==== GENERATED END: interface ==================================================
 
 };
 

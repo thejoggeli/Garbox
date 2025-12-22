@@ -64,7 +64,7 @@ void EventLogScreen::onBecomeDisabled(){
     // nothing to do
 }
 
-void EventLogScreen::onUpdateScreen(){
+void EventLogScreen::onRender(){
 
     // write queued events to labels
     if(mBuffer.size() > 0){

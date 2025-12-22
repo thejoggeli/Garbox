@@ -58,8 +58,8 @@ void {{ name }}Abs::init(ComponentHostIfc& host){
     ScreenAbs::init(host);
 }
 
-void {{ name }}Abs::updateScreen(){
-    ScreenAbs::updateScreen();
+void {{ name }}Abs::render(){
+    ScreenAbs::render();
 {% if screen.render_fns %}
     mDispatchedCount += mRenderDispatcher.getDirtyCount();
     mRenderDispatcher.dispatch();

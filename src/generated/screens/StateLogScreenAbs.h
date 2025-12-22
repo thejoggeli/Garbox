@@ -35,7 +35,7 @@ public:
 
     // init override from component
     void init(ComponentHostIfc& host) final;
-    void updateScreen() final;
+    void render() final;
     void becomeEnabled() final;
     void becomeDisabled() final;
 

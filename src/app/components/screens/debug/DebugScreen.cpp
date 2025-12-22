@@ -71,7 +71,7 @@ void DebugScreen::onBecomeDisabled(){
     // nothing to do
 }
 
-void DebugScreen::onUpdateScreen(){
+void DebugScreen::onRender(){
 
     // update time 
     uint32_t timeSeconds = Time::GetTickSeconds();

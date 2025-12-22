@@ -15,7 +15,7 @@ public:
 
     virtual void requestChangeBehaviour(BehaviourId id) = 0;
     virtual void requestChangeScreen(ScreenId id) = 0;
-    virtual void requestUpdateScreenNow() = 0;
+    virtual void requestRenderScreenNow() = 0;
 
     virtual void receiveEvent(const EventHeader* header) = 0;
     virtual EventFactory& getEventFactory() = 0;

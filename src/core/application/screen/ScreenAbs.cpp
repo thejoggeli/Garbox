@@ -23,8 +23,8 @@ void ScreenAbs::becomeDisabled(){
     ComponentAbs::becomeDisabled();
 }
 
-void ScreenAbs::updateScreen(){
-    onUpdateScreen();
+void ScreenAbs::render(){
+    onRender();
     mFirstUpdate = false;
 }
 

@@ -1,6 +1,9 @@
 #pragma once
 
+// ==== GENERATED BEGIN: include ==================================================
 #include "generated/screens/StateLogScreenAbs.h"
+// ==== GENERATED END: include ====================================================
+
 #include "core/lvgl/objects/LvObject.h"
 #include "core/lvgl/objects/LvLabel.h"
 #include "core/util/container/static/ArrayStatic.h"
@@ -9,13 +12,6 @@
 namespace Garbox {
 
 class StateLogScreen : public StateLogScreenAbs {
-public:
-
-    StateLogScreen();
-
-    // any state changed handler (to be implmeneted by user)
-    void onStateChanged(const StateAbs& state) final;
-
 private:
 
     uint32_t mEntryCounter = 0;
@@ -39,11 +35,26 @@ private:
     size_t mCurrentLabelIndex = static_cast<size_t>(-1);
     RingBufferStatic<StateEntry, NumRows> mBuffer;
 
+public:
+
+// ==== GENERATED BEGIN: interface ================================================
+
+    // generated constructor
+    StateLogScreen();
+
+    // generated lifecycle handlers
     void onInit() final;
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
-    void onUpdateScreen() final; 
+
+    // generated state changed handlers
+    void onStateChanged(const StateAbs& state) final;
+
+    // generated render functions
+    void onRender() final;
+
+// ==== GENERATED END: interface ==================================================
 
 };
 
