@@ -16,6 +16,7 @@ const char* ComponentIdToString(ComponentId id){
         case ComponentId::HeatpadController: return "HeatpadController";
         case ComponentId::InputController: return "InputController";
         case ComponentId::I2cPartsController: return "I2cPartsController";
+        case ComponentId::TimeSeriesController: return "TimeSeriesController";
         case ComponentId::CalibrationBehaviour: return "CalibrationBehaviour";
         case ComponentId::FermentationBehaviour: return "FermentationBehaviour";
         case ComponentId::MainScreen: return "MainScreen";

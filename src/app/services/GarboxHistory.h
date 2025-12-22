@@ -8,8 +8,10 @@ class GarboxHistory {
 public:
 
     enum class SeriesIndex : uint8_t {
+        Window_1min = 0,
+        Window_5min = 0,
         Window_15min = 0,
-        Window_60min,
+        Window_1h,
         Window_6h,
         Window_1d,
         Window_4d,
@@ -18,6 +20,7 @@ public:
 
     static GarboxHistory& Instance();
 
+    void reset();
     void temperatureSample(float temperature);
     void powerSample(float power);
     

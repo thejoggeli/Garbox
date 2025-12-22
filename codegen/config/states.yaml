@@ -49,6 +49,7 @@ states:
       - { name: powerEnabled, type: bool }
       - { name: resetting, type: bool }
       - { name: hasFirstSample, type: bool }
+      - { name: isRunning, type: bool }
 
   TemperatureSample:
     fields:

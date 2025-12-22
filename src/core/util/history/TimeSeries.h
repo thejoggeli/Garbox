@@ -20,6 +20,7 @@ public:
         SamplingMode samplingMode
     );
 
+    void reset();
     void tick(float value);
 
     const Span<float> getData() const;

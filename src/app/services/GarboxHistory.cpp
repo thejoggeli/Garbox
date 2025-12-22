@@ -7,9 +7,11 @@ namespace Garbox {
 static constexpr uint32_t MinutesToSeconds = 60;
 static constexpr uint32_t HoursToSeconds = 3600;
 static constexpr uint32_t DaysToSeconds = 24*3600;
-static constexpr std::array<uint32_t, 5> Windows = {
+static constexpr std::array<uint32_t, 7> Windows = {
+    1  * MinutesToSeconds,  // 1 minute
+    5  * MinutesToSeconds,  // 5 minutes
     15 * MinutesToSeconds,  // 15 minutes
-    60 * MinutesToSeconds,  // 60 minutes
+    1  * HoursToSeconds,    // 1 hours
     6  * HoursToSeconds,    // 6 hours 
     1  * DaysToSeconds,     // 1 day
     2  * DaysToSeconds,     // 2 days
@@ -31,6 +33,11 @@ GarboxHistory::GarboxHistory():
         mTemperatureHistory.registerSeries(window, SampleCount, SamplingMode);
         mPowerHistory.registerSeries(window, SampleCount, SamplingMode);
     }
+}
+
+void GarboxHistory::reset(){
+    mTemperatureHistory.reset();
+    mPowerHistory.reset();
 }
 
 void GarboxHistory::temperatureSample(float temperature){

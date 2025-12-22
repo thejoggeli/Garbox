@@ -18,6 +18,14 @@ TimeSeries::TimeSeries(
     mSamplingMode(samplingMode),
     mBuffer(sampleCount){}
 
+void TimeSeries::reset(){
+    mWriteIndex = 0;
+    mTotalUpdatesCount = 0;
+    mLastSampleMicros = 0;
+    mAccumulatedValue = 0.0f;
+    mAccumulatedCount = 0;
+}
+
 void TimeSeries::tick(float value){
 
     uint32_t nowMicros = Time::GetTickMicros();
@@ -30,7 +38,7 @@ void TimeSeries::tick(float value){
 
     const uint32_t elapsedMicros = nowMicros - mLastSampleMicros;
 
-    if(elapsedMicros >= mSampleIntervalMicros){
+    if(elapsedMicros >= mSampleIntervalMicros || mTotalUpdatesCount == 0){
 
         // write to ring buffer
         if(mSamplingMode == SamplingMode::Average){
@@ -45,7 +53,12 @@ void TimeSeries::tick(float value){
 
         // update state
         mWriteIndex = MathUtils::Wrap<uint16_t>(mWriteIndex + 1, mSampleCount);
-        mLastSampleMicros += mSampleIntervalMicros;
+        if(mTotalUpdatesCount == 0){
+            mLastSampleMicros = nowMicros;
+        }
+        else {
+            mLastSampleMicros += mSampleIntervalMicros;
+        }
         mTotalUpdatesCount++;
     }
 }

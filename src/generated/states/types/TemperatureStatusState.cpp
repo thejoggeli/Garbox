@@ -25,6 +25,10 @@ bool TemperatureStatusState::getHasFirstSample() const {
     return mCurrent.hasFirstSample;
 }
 
+bool TemperatureStatusState::getIsRunning() const {
+    return mCurrent.isRunning;
+}
+
 bool TemperatureStatusState::nextDriverEnabled() const {
     return mCurrent.driverEnabled;
 }
@@ -41,6 +45,10 @@ bool TemperatureStatusState::nextHasFirstSample() const {
     return mCurrent.hasFirstSample;
 }
 
+bool TemperatureStatusState::nextIsRunning() const {
+    return mCurrent.isRunning;
+}
+
 bool TemperatureStatusState::lastDriverEnabled() const {
     return mLast.driverEnabled;
 }
@@ -55,6 +63,10 @@ bool TemperatureStatusState::lastResetting() const {
 
 bool TemperatureStatusState::lastHasFirstSample() const {
     return mLast.hasFirstSample;
+}
+
+bool TemperatureStatusState::lastIsRunning() const {
+    return mLast.isRunning;
 }
 
 void TemperatureStatusState::setDriverEnabled(bool value){
@@ -86,6 +98,14 @@ void TemperatureStatusState::setHasFirstSample(bool value){
         return;
     }
     mNext.hasFirstSample = value;
+    markDirty();
+}
+
+void TemperatureStatusState::setIsRunning(bool value){
+    if (mNext.isRunning == value) {
+        return;
+    }
+    mNext.isRunning = value;
     markDirty();
 }
 

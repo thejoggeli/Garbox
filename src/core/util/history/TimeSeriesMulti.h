@@ -17,6 +17,7 @@ public:
         TimeSeries::SamplingMode samplingMode
     );
 
+    void reset();
     void tick(float value);
 
     uint8_t getSeriesCount() const;

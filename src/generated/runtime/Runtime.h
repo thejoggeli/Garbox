@@ -14,6 +14,7 @@
 #include "app/components/controllers/heartbeat/HeartbeatController.h"
 #include "app/components/controllers/hmi/DisplayController.h"
 #include "app/components/controllers/hmi/InputController.h"
+#include "app/components/controllers/hmi/TimeSeriesController.h"
 #include "app/components/controllers/sensors/I2cPartsController.h"
 #include "app/components/screens/debug/DebugScreen.h"
 #include "app/components/screens/log/EventLogScreen.h"
@@ -46,6 +47,7 @@ private:
     HeatpadController mHeatpadController;
     InputController mInputController;
     I2cPartsController mI2cPartsController;
+    TimeSeriesController mTimeSeriesController;
 
     // screens instances
     MainScreen mMainScreen;

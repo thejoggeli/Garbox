@@ -16,24 +16,28 @@ public:
     bool getPowerEnabled() const;
     bool getResetting() const;
     bool getHasFirstSample() const;
+    bool getIsRunning() const;
 
     // read access (next state)
     bool nextDriverEnabled() const;
     bool nextPowerEnabled() const;
     bool nextResetting() const;
     bool nextHasFirstSample() const;
+    bool nextIsRunning() const;
 
     // read access (last state)
     bool lastDriverEnabled() const;
     bool lastPowerEnabled() const;
     bool lastResetting() const;
     bool lastHasFirstSample() const;
+    bool lastIsRunning() const;
 
     // write access (next state)
     void setDriverEnabled(bool value);
     void setPowerEnabled(bool value);
     void setResetting(bool value);
     void setHasFirstSample(bool value);
+    void setIsRunning(bool value);
 
 private:
 
@@ -42,6 +46,7 @@ private:
         bool powerEnabled;
         bool resetting;
         bool hasFirstSample;
+        bool isRunning;
     };
 
     Data mCurrent {};

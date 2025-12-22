@@ -37,3 +37,8 @@ controllers:
     tick_phases: [Input]
     receive_events: [Button]
     write_states: [TemperatureStatus, TemperatureSample]
+
+  TimeSeriesController:
+    subdir: "hmi"
+    tick_phases: [Output]
+    read_states: [HeatpadStatus, TemperatureStatus, TemperatureSample]

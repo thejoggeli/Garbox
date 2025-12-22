@@ -18,6 +18,12 @@ void TimeSeriesMulti::registerSeries(
     mSeries.emplace(windowSeconds, sampleCount, samplingMode);
 }
 
+void TimeSeriesMulti::reset(){
+    for(TimeSeries& series : mSeries){
+        series.reset();
+    }
+}
+
 void TimeSeriesMulti::tick(float value){
     for(TimeSeries& series : mSeries){
         series.tick(value);

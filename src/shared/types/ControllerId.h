@@ -19,6 +19,7 @@ enum class ControllerId : uint16_t {
     Heatpad,
     Input,
     I2cParts,
+    TimeSeries,
 
     // enum size marker
     Count,

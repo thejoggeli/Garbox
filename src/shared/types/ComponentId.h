@@ -22,6 +22,7 @@ enum class ComponentId : uint16_t {
     HeatpadController,
     InputController,
     I2cPartsController,
+    TimeSeriesController,
     CalibrationBehaviour,
     FermentationBehaviour,
     MainScreen,

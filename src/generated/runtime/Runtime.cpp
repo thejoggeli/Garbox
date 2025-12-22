@@ -21,7 +21,7 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 
 Runtime::Runtime():
     RuntimeAbs(RuntimeAbs::Config {
-        .numComponents = 13,
+        .numComponents = 14,
         .numStates = 12,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
@@ -54,6 +54,7 @@ Runtime::Runtime():
     registerComponent(&mHeatpadController);
     registerComponent(&mInputController);
     registerComponent(&mI2cPartsController);
+    registerComponent(&mTimeSeriesController);
     registerComponent(&mMainScreen);
     registerComponent(&mDebugScreen);
     registerComponent(&mEventLogScreen);
@@ -107,6 +108,13 @@ Runtime::Runtime():
 
     // bind 'I2cPartsController' states
     mI2cPartsController.mStates.emplace(
+        mStateRegistry.getTemperatureStatus(),
+        mStateRegistry.getTemperatureSample()
+    );
+
+    // bind 'TimeSeriesController' states
+    mTimeSeriesController.mStates.emplace(
+        mStateRegistry.getHeatpadStatus(),
         mStateRegistry.getTemperatureStatus(),
         mStateRegistry.getTemperatureSample()
     );
@@ -211,6 +219,7 @@ void Runtime::handleOutputTick(){
     Profiler::MeasureScoped profiler(ProfilerId::OutputTick);
     mFanController.onOutputTick();
     mHeatpadController.onOutputTick();
+    mTimeSeriesController.onOutputTick();
     dispatch();
 }
 
@@ -287,6 +296,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     }
     case StateType::HeatpadStatus: {
         const HeatpadStatusState& heatpadStatus = static_cast<const HeatpadStatusState&>(state);
+        mTimeSeriesController.onHeatpadStatusStateChanged(heatpadStatus);
         switch(mActiveScreen->getScreenId()){
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
@@ -313,6 +323,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     }
     case StateType::TemperatureStatus: {
         const TemperatureStatusState& temperatureStatus = static_cast<const TemperatureStatusState&>(state);
+        mTimeSeriesController.onTemperatureStatusStateChanged(temperatureStatus);
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureStatusStateChanged(temperatureStatus); break;
             default: break; // active behaviour does not read state
@@ -326,6 +337,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     }
     case StateType::TemperatureSample: {
         const TemperatureSampleState& temperatureSample = static_cast<const TemperatureSampleState&>(state);
+        mTimeSeriesController.onTemperatureSampleStateChanged(temperatureSample);
         switch(mActiveBehaviour->getBehaviourId()){
             case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onTemperatureSampleStateChanged(temperatureSample); break;
             default: break; // active behaviour does not read state
@@ -468,6 +480,7 @@ ControllerAbs* Runtime::resolveController(ControllerId id){
         case ControllerId::Heatpad: return &mHeatpadController;
         case ControllerId::Input: return &mInputController;
         case ControllerId::I2cParts: return &mI2cPartsController;
+        case ControllerId::TimeSeries: return &mTimeSeriesController;
         default: TriggerExit("Runtime", "controller with id not found", static_cast<uint32_t>(id));
     }
     return nullptr;

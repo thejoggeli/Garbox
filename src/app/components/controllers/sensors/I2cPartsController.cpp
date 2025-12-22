@@ -117,6 +117,7 @@ void I2cPartsController::updateTemperatureStatus(){
     states().temperatureStatus.setDriverEnabled(mTemperatureSensor.isStarted());
     states().temperatureStatus.setResetting(mResetting);
     states().temperatureStatus.setHasFirstSample(mHasFirstSample);
+    states().temperatureStatus.setIsRunning(mFsm.getState() == FsmState::Running);
 }
 
 void I2cPartsController::updateTemperatureSample(){

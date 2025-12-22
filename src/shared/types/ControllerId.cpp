@@ -15,6 +15,7 @@ const char* ControllerIdToString(ControllerId id){
         case ControllerId::Heatpad: return "Heatpad";
         case ControllerId::Input: return "Input";
         case ControllerId::I2cParts: return "I2cParts";
+        case ControllerId::TimeSeries: return "TimeSeries";
         case ControllerId::Count: return "Count";
     }
     return "Invalid";
