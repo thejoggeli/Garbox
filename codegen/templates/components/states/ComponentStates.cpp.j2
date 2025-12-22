@@ -1,0 +1,27 @@
+{% include "_common/header.j2" %}
+
+#include "{{ component.name }}States.h"
+
+namespace Garbox {
+
+{{ component.name }}States::{{ component.name }}States(
+{% for state_name, state_data in component.write_states.items() %}
+    {% set delim = "" if loop.last and not component.read_states else ","%}
+    {{ state_data.name_with_suffix|upper_first }}& {{ state_data.name_with_suffix|lower_first }}{{ delim }} // write
+{% endfor %}
+{% for state_name, state_data in component.read_states.items() %}
+    {% set delim = "" if loop.last else ","%}
+    const {{ state_data.name_with_suffix|upper_first }}& {{ state_data.name_with_suffix|lower_first }}{{ delim }} // read
+{% endfor %}
+):
+{% for state_name, state_data in component.write_states.items() %}
+    {% set delim = "{" if loop.last and not component.read_states else ","%}
+    {{ state_data.name|lower_first }}({{ state_data.name_with_suffix|lower_first }}){{ delim }}
+{% endfor %}
+{% for state_name, state_data in component.read_states.items() %}
+    {% set delim = "{" if loop.last else ","%}
+    {{ state_data.name|lower_first }}({{ state_data.name_with_suffix|lower_first }}){{ delim }}
+{% endfor %}
+}
+
+} // namespace

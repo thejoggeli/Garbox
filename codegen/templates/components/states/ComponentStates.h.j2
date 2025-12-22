@@ -1,0 +1,50 @@
+{% include "_common/header.j2" %}
+
+{% if component.read_states_all %}
+#include "core/application/state/StateAbs.h"
+{% endif %}
+{% if component.all_states %}
+{% for state_name, state_data in component.all_states.items() %}
+#include "generated/states/types/{{ state_data.name_with_suffix|upper_first }}.h"
+{% endfor %}
+{% endif %}
+
+namespace Garbox {
+
+class {{ component.name }}States final {
+public:
+
+    {{ component.name }}States(
+    {% for state_name, state_data in component.write_states.items() %}
+        {% set delim = "" if loop.last and not component.read_states else ","%}
+        {{ state_data.name_with_suffix|upper_first }}& {{ state_data.name_with_suffix|lower_first }}{{ delim }} // write
+    {% endfor %}
+    {% for state_name, state_data in component.read_states.items() %}
+        {% set delim = "" if loop.last else ","%}
+        const {{ state_data.name_with_suffix|upper_first }}& {{ state_data.name_with_suffix|lower_first }}{{ delim }} // read
+    {% endfor %}
+    );
+
+    // disallow copy and move
+    {{ component.name }}States(const {{ component.name }}States&) = delete;
+    {{ component.name }}States& operator=(const {{ component.name }}States&) = delete;
+    {{ component.name }}States({{ component.name }}States&&) = delete;
+    {{ component.name }}States& operator=({{ component.name }}States&&) = delete;
+
+{% if component.write_states %}
+    // writable states
+{% for state_name, state_data in component.write_states.items() %}
+    {{ state_data.name_with_suffix|upper_first }}& {{ state_name|lower_first }};
+{% endfor %}
+{% endif %}
+
+{% if component.read_states %}
+    // readable states
+{% for state_name, state_data in component.read_states.items() %}
+    const {{ state_data.name_with_suffix|upper_first }}& {{ state_name|lower_first }};
+{% endfor %}
+{% endif %}
+
+};
+
+} // namespace

@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/controllers/HeartbeatControllerAbs.h"
+#include "generated/components/controllers/heartbeat/HeartbeatControllerAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include "core/time/SoftwareTimer.h"

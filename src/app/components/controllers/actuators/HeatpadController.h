@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/controllers/HeatpadControllerAbs.h"
+#include "generated/components/controllers/heatpad/HeatpadControllerAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include "modules/parts/heatpad/HeatpadState.h"

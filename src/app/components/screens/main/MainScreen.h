@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/screens/MainScreenAbs.h"
+#include "generated/components/screens/main/MainScreenAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include "core/lvgl/helpers/chart/ChartGridRenderer.h"

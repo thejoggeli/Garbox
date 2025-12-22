@@ -2,7 +2,7 @@ from common.util import (
     ensure_list,
     ensure_dict_keys_have_suffix
 )
-from common.str_filters import ensure_suffix
+from common.str_filters import ensure_suffix, to_snake_case
 from loader.parse_screens import parse_screens
 
 COMPONENT_TYPES = ["controller", "behaviour", "screen"]
@@ -37,6 +37,7 @@ def process_components(config, comp_type, suffix):
     for component_name, component in config[type_key].items():
 
         component["type"] = comp_type
+        component["gendir"] = f"components/{type_key}/" + to_snake_case(component_name.removesuffix(suffix), "").lower()
 
         # init 'receive_events' field
         component["receive_events"] = ensure_list(component.get("receive_events", []))

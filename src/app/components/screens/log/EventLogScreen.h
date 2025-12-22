@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/screens/EventLogScreenAbs.h"
+#include "generated/components/screens/eventlog/EventLogScreenAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include "core/lvgl/objects/LvObject.h"

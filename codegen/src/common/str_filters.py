@@ -14,18 +14,18 @@ def to_camel_case(name: str, delim: str | None = None) -> str:
         return name[0].lower() + name[1:]
     return name
 
-def to_snake_case(name: str, delim: str | None = None) -> str:
+def to_snake_case(name: str, sep: str = "_", delim: str | None = None) -> str:
     # Case 1: delimiter-based conversion
     if delim and delim in name:
         parts = name.split(delim)
-        return "_".join(p.lower() for p in parts if p)
+        return sep.join(p.lower() for p in parts if p)
 
     # Case 2: camelCase or PascalCase → snake_case
     if not name:
         return name
 
     # Insert underscore before capitals (except at start), then lowercase
-    snake = re.sub(r'(?<!^)(?=[A-Z])', '_', name)
+    snake = re.sub(r'(?<!^)(?=[A-Z])', sep, name)
     return snake.lower()
 
 def upper_first(s):

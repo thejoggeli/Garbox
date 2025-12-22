@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/controllers/DisplayControllerAbs.h"
+#include "generated/components/controllers/display/DisplayControllerAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include <functional>

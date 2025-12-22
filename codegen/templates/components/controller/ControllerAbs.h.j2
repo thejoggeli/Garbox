@@ -1,8 +1,12 @@
 #pragma once
 {% include "_common/header.j2" %}
-{% from "_common/component_h.j2" import constructor, on_ticks, on_events, on_states_changed, make_events, send_events, hide_events, states_include, states_protected, states_private  %}
-{{ states_include(controller) }}
+{% from "_common/component_h.j2" import comp_includes, constructor %} 
+{% from "_common/component_h.j2" import on_ticks, on_events, on_states_changed %}
+{% from "_common/component_h.j2" import make_events, send_events, hide_events %}
+{% from "_common/component_h.j2" import states_protected, states_private %}
+
 #include "core/application/controller/ControllerAbs.h"
+{{ comp_includes(controller) }}
 
 namespace Garbox {
 

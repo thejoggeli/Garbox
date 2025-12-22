@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/behaviours/FermentationBehaviourAbs.h"
+#include "generated/components/behaviours/fermentation/FermentationBehaviourAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include "app/engine/FermentationEngine.h"

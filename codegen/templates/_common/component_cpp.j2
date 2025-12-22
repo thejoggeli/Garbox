@@ -33,33 +33,10 @@ void {{ name }}Abs::sendEvent(const {{ ev }}Event& event){
 
 {# states #}
 {% macro states(name, component) %}
-
 {% if component.all_states %}
 
-{{ name }}Abs::States& {{ name }}Abs::states(){
+{{ name }}States& {{ name }}Abs::states(){
     return mStates.value();
-}
-
-void {{ name }}Abs::bindStates(
-{% for state_name, state_data in component.write_states.items() %}
-    {% set delim = "" if loop.last and not component.read_states else ","%}
-    {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name"]|lower_first }}{{ delim }}
-{% endfor %}
-{% for state_name, state_data in component.read_states.items() %}
-    {% set delim = "" if loop.last else ","%}
-    const {{ state_data["name_with_suffix"]|upper_first }}& {{ state_data["name"]|lower_first }}{{ delim }}
-{% endfor %}
-){
-    mStates.emplace(
-    {% for state_name, state_data in component.write_states.items() %}
-        {% set delim = "" if loop.last and not component.read_states else ","%}
-        {{ state_data["name"]|lower_first }}{{ delim }}
-    {% endfor %}
-    {% for state_name, state_data in component.read_states.items() %}
-        {% set delim = "" if loop.last else ","%}
-        {{ state_data["name"]|lower_first }}{{ delim }}
-    {% endfor %}
-    );
 }
 
 {% endif %}

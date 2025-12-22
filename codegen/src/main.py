@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from common.util import print_json, print_section, print_sep
 from common.context import Context
@@ -42,6 +43,10 @@ def main():
     print_section("saving all processed files")
     loader.save_config(ctx.output_dir / "parsed")
     
+    # delete old generated code
+    if ctx.gen_dir.exists():
+        shutil.rmtree(ctx.gen_dir)
+
     # hardware generation
     print_section("generating hardware files")
     generate_hardware(ctx, loader)

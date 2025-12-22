@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/controllers/I2cPartsControllerAbs.h"
+#include "generated/components/controllers/i2cparts/I2cPartsControllerAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include "core/util/fsm/FiniteStateMachine.h"

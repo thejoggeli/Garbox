@@ -3,6 +3,7 @@ from common.context import Context
 from loader.loader import Loader
 from common.util import nested_get_dot
 from common.gen_section import GenSection
+from common.str_filters import upper_first
 from pathlib import Path
 
 def generate_components(ctx: Context, loader: Loader):
@@ -30,29 +31,36 @@ def generate_components(ctx: Context, loader: Loader):
     """
 
     # generate components
-    _generate_components(ctx, loader, "behaviour", "Behaviour")
-    _generate_components(ctx, loader, "controller", "Controller")
-    _generate_components(ctx, loader, "screen", "Screen")
+    _generate_components(ctx, loader, "behaviour")
+    _generate_components(ctx, loader, "controller")
+    _generate_components(ctx, loader, "screen")
+
+    # generate states
+    _generate_states(ctx, loader, "behaviour")
+    _generate_states(ctx, loader, "controller")
+    _generate_states(ctx, loader, "screen")
 
     # generate stubs
-    _generate_stubs(ctx, loader, "behaviour", "Behaviour")
-    _generate_stubs(ctx, loader, "controller", "Controller")
-    _generate_stubs(ctx, loader, "screen", "Screen")
+    _generate_stubs(ctx, loader, "behaviour")
+    _generate_stubs(ctx, loader, "controller")
+    _generate_stubs(ctx, loader, "screen")
 
 
-def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name: str):
+def _generate_components(ctx: Context, loader: Loader, type_key: str):
     """
     Generates either behaviours or controllers, depending on passed parameters
     """
 
     config = loader.config
     components = config[f"{type_key}s"]
+    type_name = upper_first(type_key)
     
     # list of items to be generated
     items = []
     for comp_key, comp_dict in components.items():
 
-        out_path = ctx.gen_dir /  f"{type_key}s/{comp_key}Abs"
+        gendir = comp_dict["gendir"]
+        out_path = ctx.gen_dir/f"{gendir}/{comp_key}Abs"
         template_path = f"components/{type_key}/{type_name}Abs"
         item_dict = {
             "type": type_key,
@@ -60,7 +68,6 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
             "runtime_name": "Runtime",
             f"{type_key}": comp_dict
         }
-        comp_dict["name"] = comp_key
 
         # generate abstract files, e.g. generated/controllers/FanControllerAbs.h
         items.append(Item(item_dict, f"{out_path}.h", f"{template_path}.h.j2"))
@@ -70,7 +77,7 @@ def _generate_components(ctx: Context, loader: Loader, type_key: str, type_name:
     generate_items(ctx, items)
 
 
-def _generate_stubs(ctx: Context, loader: Loader, type_key: str, type_name: str):
+def _generate_stubs(ctx: Context, loader: Loader, type_key: str):
 
     config = loader.config
     components = config[f"{type_key}s"]
@@ -111,5 +118,30 @@ def _generate_stubs(ctx: Context, loader: Loader, type_key: str, type_name: str)
     # generate all h/cpp files
     generate_items(ctx, items)
 
-    # 
 
+def _generate_states(ctx: Context, loader: Loader, type_key: str):
+
+    config = loader.config
+    components = config[f"{type_key}s"]
+    
+    # list of items to be generated
+    items = []
+    for comp_key, comp_dict in components.items():
+
+        if len(comp_dict["all_states"].keys()) == 0:
+            continue
+
+
+        gendir = comp_dict["gendir"]
+        out_path = ctx.gen_dir/f"{gendir}/{comp_key}States"
+        template_path = f"components/states/ComponentStates"
+        item_dict = {
+            "component": comp_dict
+        }
+
+        # generate abstract files, e.g. generated/controllers/FanControllerAbs.h
+        items.append(Item(item_dict, f"{out_path}.h", f"{template_path}.h.j2"))
+        items.append(Item(item_dict, f"{out_path}.cpp", f"{template_path}.cpp.j2"))
+
+    # generate all h/cpp files
+    generate_items(ctx, items)

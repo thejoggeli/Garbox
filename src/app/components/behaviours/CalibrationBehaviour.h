@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/behaviours/CalibrationBehaviourAbs.h"
+#include "generated/components/behaviours/calibration/CalibrationBehaviourAbs.h"
 // ==== GENERATED END: include ====================================================
 
 namespace Garbox {

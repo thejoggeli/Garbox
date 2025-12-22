@@ -72,13 +72,13 @@ Runtime::Runtime():
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
 
     // bind 'CalibrationBehaviour' states
-    mCalibrationBehaviour.bindStates(
+    mCalibrationBehaviour.mStates.emplace(
         mStateRegistry.getFanStatus(),
         mStateRegistry.getFanSample()
     );
 
     // bind 'FermentationBehaviour' states
-    mFermentationBehaviour.bindStates(
+    mFermentationBehaviour.mStates.emplace(
         mStateRegistry.getFermentationStatus(),
         mStateRegistry.getFanSample(),
         mStateRegistry.getFanStatus(),
@@ -87,32 +87,32 @@ Runtime::Runtime():
     );
 
     // bind 'DisplayController' states
-    mDisplayController.bindStates(
+    mDisplayController.mStates.emplace(
         mStateRegistry.getDisplayStatus(),
         mStateRegistry.getDisplayDiagnostics()
     );
 
     // bind 'FanController' states
-    mFanController.bindStates(
+    mFanController.mStates.emplace(
         mStateRegistry.getFanStatus(),
         mStateRegistry.getFanSample()
     );
 
     // bind 'HeatpadController' states
-    mHeatpadController.bindStates(
+    mHeatpadController.mStates.emplace(
         mStateRegistry.getHeatpadStatus(),
         mStateRegistry.getHeatpadSample(),
         mStateRegistry.getHeatpadProgress()
     );
 
     // bind 'I2cPartsController' states
-    mI2cPartsController.bindStates(
+    mI2cPartsController.mStates.emplace(
         mStateRegistry.getTemperatureStatus(),
         mStateRegistry.getTemperatureSample()
     );
 
     // bind 'MainScreen' states
-    mMainScreen.bindStates(
+    mMainScreen.mStates.emplace(
         mStateRegistry.getFanStatus(),
         mStateRegistry.getFanSample(),
         mStateRegistry.getHeatpadStatus(),
@@ -123,7 +123,7 @@ Runtime::Runtime():
     );
 
     // bind 'DebugScreen' states
-    mDebugScreen.bindStates(
+    mDebugScreen.mStates.emplace(
         mStateRegistry.getFanStatus(),
         mStateRegistry.getFanSample(),
         mStateRegistry.getHeatpadStatus(),

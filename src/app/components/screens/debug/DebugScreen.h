@@ -1,7 +1,7 @@
 #pragma once
 
 // ==== GENERATED BEGIN: include ==================================================
-#include "generated/screens/DebugScreenAbs.h"
+#include "generated/components/screens/debug/DebugScreenAbs.h"
 // ==== GENERATED END: include ====================================================
 
 #include <esp_heap_caps.h>
