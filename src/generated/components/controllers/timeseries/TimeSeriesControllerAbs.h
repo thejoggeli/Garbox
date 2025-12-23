@@ -23,6 +23,7 @@ public:
     virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;
     virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) = 0;
     virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) = 0;
+    virtual void onFermentationStatusStateChanged(const FermentationStatusState& state) = 0;
 
 protected:
 

@@ -116,7 +116,8 @@ Runtime::Runtime():
     mTimeSeriesController.mStates.emplace(
         mStateRegistry.getHeatpadStatus(),
         mStateRegistry.getTemperatureStatus(),
-        mStateRegistry.getTemperatureSample()
+        mStateRegistry.getTemperatureSample(),
+        mStateRegistry.getFermentationStatus()
     );
 
     // bind 'MainScreen' states
@@ -287,6 +288,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     }
     case StateType::FermentationStatus: {
         const FermentationStatusState& fermentationStatus = static_cast<const FermentationStatusState&>(state);
+        mTimeSeriesController.onFermentationStatusStateChanged(fermentationStatus);
         switch(mActiveScreen->getScreenId()){
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;

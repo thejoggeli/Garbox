@@ -130,7 +130,7 @@ void DebugScreen::onRenderHeatpadState(){
 
 void DebugScreen::onRenderHeatpadDuty(){
     mHeatpadDutyLabel.setTextFormatted(
-        "Duty%: %.0f%% => %.0f%%, ms: %u => %u",
+        "Duty: %.0f%% => %.0f%%, ms: %u => %u",
         states().heatpadStatus.getCurrentDutyCycle()*100.0f,
         states().heatpadStatus.getNextDutyCycle()*100.0f,
         states().heatpadStatus.getCurrentPeriodMicros()/1000,
@@ -249,6 +249,7 @@ void DebugScreen::onFanSampleStateChanged(const FanSampleState& state){
 void DebugScreen::onHeatpadStatusStateChanged(const HeatpadStatusState& state){
     markDirty(RenderFn::HeatpadState);
     markDirty(RenderFn::HeatpadProgress);
+    markDirty(RenderFn::HeatpadDuty);
 }
 
 void DebugScreen::onHeatpadSampleStateChanged(const HeatpadSampleState& state){

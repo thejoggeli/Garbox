@@ -31,10 +31,7 @@ public:
     virtual void onRenderPowerInfo() = 0;
     virtual void onRenderHumidityInfo() = 0;
     virtual void onRenderStatusInfo() = 0;
-    virtual void onRenderMeasuredTemperatureSample() = 0;
     virtual void onRenderMeasuredTemperatureLabel() = 0;
-    virtual void onRenderTargetTemperatureSample() = 0;
-    virtual void onRenderHeatpadPowerSample() = 0;
     virtual void onRenderHeatpadPowerLabel() = 0;
 
 protected:
@@ -79,10 +76,7 @@ protected:
         PowerInfo,
         HumidityInfo,
         StatusInfo,
-        MeasuredTemperatureSample,
         MeasuredTemperatureLabel,
-        TargetTemperatureSample,
-        HeatpadPowerSample,
         HeatpadPowerLabel,
         Count 
     }; 
@@ -103,10 +97,7 @@ private:
     static void renderPowerInfoTrampoline(void* context);
     static void renderHumidityInfoTrampoline(void* context);
     static void renderStatusInfoTrampoline(void* context);
-    static void renderMeasuredTemperatureSampleTrampoline(void* context);
     static void renderMeasuredTemperatureLabelTrampoline(void* context);
-    static void renderTargetTemperatureSampleTrampoline(void* context);
-    static void renderHeatpadPowerSampleTrampoline(void* context);
     static void renderHeatpadPowerLabelTrampoline(void* context);
 
 };

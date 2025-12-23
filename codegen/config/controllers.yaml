@@ -41,4 +41,4 @@ controllers:
   TimeSeriesController:
     subdir: "hmi"
     tick_phases: [Output]
-    read_states: [HeatpadStatus, TemperatureStatus, TemperatureSample]
+    read_states: [HeatpadStatus, TemperatureStatus, TemperatureSample, FermentationStatus]

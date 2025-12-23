@@ -23,41 +23,51 @@ GarboxHistory& GarboxHistory::Instance(){
 }
 
 GarboxHistory::GarboxHistory():
-    mTemperatureHistory(Windows.size()),
+    mMeasuredTemperatureHistory(Windows.size()),
+    mTargetTemperatureHistory(Windows.size()),
     mPowerHistory(Windows.size()){
     
     // register series
-    constexpr uint16_t SampleCount = 64;
     constexpr TimeSeries::SamplingMode SamplingMode = TimeSeries::SamplingMode::Average;
     for(uint32_t window : Windows){
-        mTemperatureHistory.registerSeries(window, SampleCount, SamplingMode);
+        mMeasuredTemperatureHistory.registerSeries(window, SampleCount, SamplingMode);
+        mTargetTemperatureHistory.registerSeries(window, SampleCount, SamplingMode);
         mPowerHistory.registerSeries(window, SampleCount, SamplingMode);
     }
 }
 
 void GarboxHistory::reset(){
-    mTemperatureHistory.reset();
+    mMeasuredTemperatureHistory.reset();
+    mTargetTemperatureHistory.reset();
     mPowerHistory.reset();
 }
 
-void GarboxHistory::temperatureSample(float temperature){
-    mTemperatureHistory.tick(temperature);
+void GarboxHistory::measuredTemperatureSample(int32_t temperature){
+    mMeasuredTemperatureHistory.tick(temperature);
 }
 
-void GarboxHistory::powerSample(float power){
+void GarboxHistory::targetTemperatureSample(int32_t temperature){
+    mTargetTemperatureHistory.tick(temperature);
+}
+
+void GarboxHistory::powerSample(int32_t power){
     mPowerHistory.tick(power);
 }
 
-const TimeSeriesMulti& GarboxHistory::getPowerHistory() const {
-    return mPowerHistory;
-}
-
-const TimeSeries& GarboxHistory::getTemperatureSeries(SeriesIndex index) const {
+const TimeSeries& GarboxHistory::getMeasuredTemperatureSeries(SeriesIndex index) const {
     constexpr uint8_t lastIndex = static_cast<uint8_t>(SeriesIndex::Count) - 1;
     if(static_cast<uint8_t>(index) > lastIndex){
         TriggerExit("GarboxHistory", "invalid series index", static_cast<uint8_t>(index));
     }
-    return mTemperatureHistory.getSeries(static_cast<uint8_t>(index));
+    return mMeasuredTemperatureHistory.getSeries(static_cast<uint8_t>(index));
+}
+
+const TimeSeries& GarboxHistory::getTargetTemperatureSeries(SeriesIndex index) const {
+    constexpr uint8_t lastIndex = static_cast<uint8_t>(SeriesIndex::Count) - 1;
+    if(static_cast<uint8_t>(index) > lastIndex){
+        TriggerExit("GarboxHistory", "invalid series index", static_cast<uint8_t>(index));
+    }
+    return mTargetTemperatureHistory.getSeries(static_cast<uint8_t>(index));
 }
 
 const TimeSeries& GarboxHistory::getPowerSeries(SeriesIndex index) const {

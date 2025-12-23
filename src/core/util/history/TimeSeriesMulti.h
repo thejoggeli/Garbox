@@ -18,7 +18,7 @@ public:
     );
 
     void reset();
-    void tick(float value);
+    void tick(int32_t value);
 
     uint8_t getSeriesCount() const;
     const TimeSeries& getSeries(uint8_t index) const;

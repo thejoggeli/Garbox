@@ -62,7 +62,6 @@ void LvChart::setAxisMaxValue(lv_chart_axis_t axis, int32_t max){
     lv_chart_set_axis_max_value(mRaw, axis, max);
 }
 
-
 // ==============================================================================
 // series creation & management
 // ==============================================================================
@@ -72,6 +71,10 @@ lv_chart_series_t* LvChart::addSeries(lv_color_t color, lv_chart_axis_t axis){
 
 lv_chart_series_t* LvChart::addSeries(lv_color_t color){
     return lv_chart_add_series(mRaw, color, LV_CHART_AXIS_PRIMARY_Y);
+}
+
+void LvChart::resetSeries(lv_chart_series_t* series){
+    lv_chart_set_all_values(mRaw, series, LV_CHART_POINT_NONE);
 }
 
 void LvChart::removeSeries(lv_chart_series_t* series){

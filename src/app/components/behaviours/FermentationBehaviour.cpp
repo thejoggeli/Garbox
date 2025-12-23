@@ -51,7 +51,14 @@ void FermentationBehaviour::onLogicTick(){
         input.measuredTemperature        = states().temperatureSample.getTemperatureCelcius();
         input.measuredHumidityValid      = temperatureStatusValid;
         input.measuredTemperatureValid   = temperatureStatusValid;
-        input.targetTemperature          = 30.0f;
+
+        static uint32_t count = 0;
+        static uint32_t target = 30;
+        if(count++ >= 10*10){
+            count = 0;
+            target = (target == 30) ? 35 : 30;
+        }
+        input.targetTemperature = target;
 
         // perform control engine step
         mFermentationEngine.step();

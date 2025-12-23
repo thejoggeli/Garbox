@@ -9,10 +9,7 @@ screens:
       - PowerInfo 
       - HumidityInfo
       - StatusInfo
-      - MeasuredTemperatureSample
       - MeasuredTemperatureLabel
-      - TargetTemperatureSample
-      - HeatpadPowerSample
       - HeatpadPowerLabel
     read_states: 
       - FanStatus

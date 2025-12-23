@@ -15,6 +15,7 @@ private:
     GarboxHistory& mHistory;
     bool mStarted = false;
 
+public:
 // ==== GENERATED BEGIN: interface ================================================
 
     // generated constructor
@@ -31,6 +32,7 @@ private:
     void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;
     void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
     void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
+    void onFermentationStatusStateChanged(const FermentationStatusState& state) final;
 
 // ==== GENERATED END: interface ==================================================
 

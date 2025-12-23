@@ -8,24 +8,25 @@
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
-#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
 class MainScreen : public MainScreenAbs {
 private:
 
-    SoftwareTimer mPowerTimer;
-
     LvImage mTempLabel;
     LvImage mPowerLabel;
-
+    
     ChartGridRenderer mTempGrid;
     ChartGridRenderer mPowerGrid;
     
     LvChartSeries* mTempSeries = nullptr;
     LvChartSeries* mTempTargetSeries = nullptr;
     LvChartSeries* mPowerSeries = nullptr;
+
+    uint32_t mTempLastWriteSequence = 0;
+    uint32_t mTempTargetLastWriteSequence = 0;
+    uint32_t mPowerLastWriteSequence = 0;
 
     void initTemperatureChart();
     void initPowerChart();
@@ -63,10 +64,7 @@ public:
     void onRenderPowerInfo() final;
     void onRenderHumidityInfo() final;
     void onRenderStatusInfo() final;
-    void onRenderMeasuredTemperatureSample() final;
     void onRenderMeasuredTemperatureLabel() final;
-    void onRenderTargetTemperatureSample() final;
-    void onRenderHeatpadPowerSample() final;
     void onRenderHeatpadPowerLabel() final;
 
 // ==== GENERATED END: interface ==================================================

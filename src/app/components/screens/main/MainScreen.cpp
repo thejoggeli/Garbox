@@ -1,6 +1,7 @@
 #include "MainScreen.h"
 
 #include <math.h>
+#include "app/services/GarboxHistory.h"
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"
@@ -20,13 +21,13 @@ static constexpr uint32_t GridTicksCountY = 3;
 static constexpr uint32_t GridLineColor = 0x101010;
 static constexpr uint32_t GridLineWidth = 1;
 
-static constexpr uint32_t ChartsPointCount = 8*8+1;
+static constexpr uint32_t ChartsPointCount = GarboxHistory::SampleCount;
 
-static constexpr int32_t TempChartYScale = 1024*8; // scale y-values by factor to prevent staircase effect (LVGL chart uses ints internally)
+static constexpr int32_t TempChartYScale = GarboxHistory::TemperaturScaleFactor;
 static constexpr int32_t TempChartYMin = TempChartYScale * 16;
 static constexpr int32_t TempChartYMax = TempChartYScale * 44;
  
-static constexpr int32_t PowerChartYScale = 1024*8; // scale y-values factor to prevent staircase effect (LVGL chart uses ints internally)
+static constexpr int32_t PowerChartYScale = GarboxHistory::PowerScaleFactor;
 static constexpr int32_t PowerChartYMin = PowerChartYScale * (0 - 20);
 static constexpr int32_t PowerChartYMax = PowerChartYScale * (100 + 20);
 
@@ -161,11 +162,60 @@ void MainScreen::initPowerChart(){
 }
 
 void MainScreen::onStart(){
-    mPowerTimer.start(250_ms);
+    // nothing to do
 }
 
 void MainScreen::onBecomeEnabled(){
-    // nothing to do
+
+    GarboxHistory& history = GarboxHistory::Instance();
+
+    // load temperature history
+    {
+        const TimeSeries& series = history.getMeasuredTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
+
+        LvChart& chart = gui().tempGraph.chart;
+        chart.resetSeries(mTempSeries);
+
+        auto it = series.iterateOldestToNewest();
+        while(it.hasNext()){
+            int32_t value = it.next();
+            chart.setNextValue(mTempSeries, value);
+            LogDebug("MS", "T=%.1f", static_cast<float>(value)/TempChartYScale);
+        }
+        mTempLastWriteSequence = series.getWriteSequence();
+    }
+
+    // load temperature target history
+    {
+        const TimeSeries& series = history.getTargetTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
+
+        LvChart& chart = gui().tempGraph.chart;
+        chart.resetSeries(mTempTargetSeries);
+
+        auto it = series.iterateOldestToNewest();
+        while(it.hasNext()){
+            int32_t value = it.next();
+            chart.setNextValue(mTempTargetSeries, value);
+            LogDebug("MS", "T=%.1f", static_cast<float>(value)/TempChartYScale);
+        }
+        mTempTargetLastWriteSequence = series.getWriteSequence();
+    }
+
+    // load power history
+    {
+        const TimeSeries& series = history.getPowerSeries(GarboxHistory::SeriesIndex::Window_01min);
+
+        LvChart& chart = gui().powerGraph.chart;
+        chart.resetSeries(mPowerSeries);
+
+        auto it = series.iterateOldestToNewest();
+        while(it.hasNext()){
+            int32_t value = it.next();
+            chart.setNextValue(mPowerSeries, value);
+            LogDebug("MS", "P=%.1f", static_cast<float>(value)/PowerChartYScale);
+        }
+        mPowerLastWriteSequence = series.getWriteSequence();
+    }
 }
 
 void MainScreen::onBecomeDisabled(){
@@ -174,11 +224,38 @@ void MainScreen::onBecomeDisabled(){
 
 void MainScreen::onRender(){
 
-    // update power chart
-    if(mPowerTimer.isExpired()){
-        mPowerTimer.restart();
-        markDirty(RenderFn::HeatpadPowerSample);
+    GarboxHistory& history = GarboxHistory::Instance();
+
+    // update temperature history
+    const TimeSeries& tempSeries = history.getMeasuredTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
+    if(tempSeries.getWriteSequence() != mTempLastWriteSequence){
+        auto it = tempSeries.iterateSince(mTempLastWriteSequence);
+        while(it.hasNext()){
+            gui().tempGraph.chart.setNextValue(mTempSeries, it.next());
+        }        
+        mTempLastWriteSequence = tempSeries.getWriteSequence();
     }
+
+    // update temperature target history
+    const TimeSeries& tempTargetSeries = history.getTargetTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
+    if(tempTargetSeries.getWriteSequence() != mTempTargetLastWriteSequence){
+        auto it = tempTargetSeries.iterateSince(mTempTargetLastWriteSequence);
+        while(it.hasNext()){
+            gui().tempGraph.chart.setNextValue(mTempTargetSeries, it.next());
+        }        
+        mTempTargetLastWriteSequence = tempTargetSeries.getWriteSequence();
+    }
+
+    // update power history
+    const TimeSeries& powerSeries = history.getPowerSeries(GarboxHistory::SeriesIndex::Window_01min);
+    if(powerSeries.getWriteSequence() != mPowerLastWriteSequence){
+        auto it = powerSeries.iterateSince(mPowerLastWriteSequence);
+        while(it.hasNext()){
+            gui().powerGraph.chart.setNextValue(mPowerSeries, it.next());
+        }        
+        mPowerLastWriteSequence = powerSeries.getWriteSequence();
+    }
+
 }
 
 bool MainScreen::isSensorOk(){
@@ -276,14 +353,6 @@ void MainScreen::onRenderStatusInfo(){
     gui().systemStateBg.setBgColor(lv_color_hex(resovleEngineStateColor()));
 }
 
-void MainScreen::onRenderMeasuredTemperatureSample(){
-    if(!isSensorOk()){
-        return;
-    }
-    float temperature = states().temperatureSample.getTemperatureCelcius();
-    gui().tempGraph.chart.setNextValue(mTempSeries, temperature * TempChartYScale);
-}
-
 void MainScreen::onRenderMeasuredTemperatureLabel(){
     if(!isSensorOk()){
         gui().tempGraph.value.setTextFormatted(resovleSensorText());
@@ -291,20 +360,6 @@ void MainScreen::onRenderMeasuredTemperatureLabel(){
     }
     float temperature = states().temperatureSample.getTemperatureCelcius();
     gui().tempGraph.value.setTextFormatted("%.1f°C", temperature);
-}
-
-void MainScreen::onRenderTargetTemperatureSample(){
-    if(!isSensorOk()){
-        return;
-    }
-    float temperatureTarget = states().fermentationStatus.getTargetTemperature();
-    gui().tempGraph.chart.setNextValue(mTempTargetSeries, temperatureTarget * TempChartYScale);
-}
-
-void MainScreen::onRenderHeatpadPowerSample(){
-    const float nextDuty = states().heatpadStatus.getNextDutyCycle();
-    const float power = nextDuty * 100.0f;
-    gui().powerGraph.chart.setNextValue(mPowerSeries, power * PowerChartYScale);
 }
 
 void MainScreen::onRenderHeatpadPowerLabel(){
@@ -340,14 +395,11 @@ void MainScreen::onTemperatureStatusStateChanged(const TemperatureStatusState& s
 }
 
 void MainScreen::onTemperatureSampleStateChanged(const TemperatureSampleState& state){
-    markDirty(RenderFn::TargetTemperatureSample);
-    markDirty(RenderFn::MeasuredTemperatureSample);
     markDirty(RenderFn::MeasuredTemperatureLabel);
     markDirty(RenderFn::HumidityInfo);
 }
 
 void MainScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
-    markDirty(RenderFn::TargetTemperatureSample);
     markDirty(RenderFn::StatusInfo);
 }
 

@@ -20,10 +20,12 @@ void TimeSeriesController::onStart(){
 void TimeSeriesController::onOutputTick(){
     // add sample
     if(mStarted){
-        float temperature = states().temperatureSample.getTemperatureCelcius();
+        float measuredTemperature = states().temperatureSample.getTemperatureCelcius();
+        float targetTemperature = states().fermentationStatus.getTargetTemperature();
         float power = states().heatpadStatus.getNextDutyCycle() * 100.0f;
-        mHistory.temperatureSample(temperature);
-        mHistory.powerSample(power);
+        mHistory.measuredTemperatureSample(measuredTemperature * GarboxHistory::TemperaturScaleFactor);
+        mHistory.targetTemperatureSample(targetTemperature * GarboxHistory::TemperaturScaleFactor);
+        mHistory.powerSample(power * GarboxHistory::PowerScaleFactor);
     }
 }
 
@@ -35,5 +37,6 @@ void TimeSeriesController::onTemperatureStatusStateChanged(const TemperatureStat
 
 void TimeSeriesController::onHeatpadStatusStateChanged(const HeatpadStatusState& state){}
 void TimeSeriesController::onTemperatureSampleStateChanged(const TemperatureSampleState& state){}
+void TimeSeriesController::onFermentationStatusStateChanged(const FermentationStatusState& state){};
 
 } // namespace Garbox

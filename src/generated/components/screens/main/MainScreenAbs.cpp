@@ -26,10 +26,7 @@ void MainScreenAbs::init(ComponentHostIfc& host){
     mRenderDispatcher.registerHandler(renderPowerInfoTrampoline, this);
     mRenderDispatcher.registerHandler(renderHumidityInfoTrampoline, this);
     mRenderDispatcher.registerHandler(renderStatusInfoTrampoline, this);
-    mRenderDispatcher.registerHandler(renderMeasuredTemperatureSampleTrampoline, this);
     mRenderDispatcher.registerHandler(renderMeasuredTemperatureLabelTrampoline, this);
-    mRenderDispatcher.registerHandler(renderTargetTemperatureSampleTrampoline, this);
-    mRenderDispatcher.registerHandler(renderHeatpadPowerSampleTrampoline, this);
     mRenderDispatcher.registerHandler(renderHeatpadPowerLabelTrampoline, this);
 
     // calls onInit()
@@ -50,10 +47,7 @@ void MainScreenAbs::becomeEnabled(){
     markDirty(RenderFn::PowerInfo);
     markDirty(RenderFn::HumidityInfo);
     markDirty(RenderFn::StatusInfo);
-    markDirty(RenderFn::MeasuredTemperatureSample);
     markDirty(RenderFn::MeasuredTemperatureLabel);
-    markDirty(RenderFn::TargetTemperatureSample);
-    markDirty(RenderFn::HeatpadPowerSample);
     markDirty(RenderFn::HeatpadPowerLabel);
 
     ScreenAbs::becomeEnabled();
@@ -95,20 +89,8 @@ void MainScreenAbs::renderStatusInfoTrampoline(void* context){
     static_cast<MainScreenAbs*>(context)->onRenderStatusInfo();
 }
 
-void MainScreenAbs::renderMeasuredTemperatureSampleTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onRenderMeasuredTemperatureSample();
-}
-
 void MainScreenAbs::renderMeasuredTemperatureLabelTrampoline(void* context){
     static_cast<MainScreenAbs*>(context)->onRenderMeasuredTemperatureLabel();
-}
-
-void MainScreenAbs::renderTargetTemperatureSampleTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onRenderTargetTemperatureSample();
-}
-
-void MainScreenAbs::renderHeatpadPowerSampleTrampoline(void* context){
-    static_cast<MainScreenAbs*>(context)->onRenderHeatpadPowerSample();
 }
 
 void MainScreenAbs::renderHeatpadPowerLabelTrampoline(void* context){

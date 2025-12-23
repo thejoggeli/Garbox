@@ -9,11 +9,13 @@ namespace Garbox {
 TimeSeriesControllerStates::TimeSeriesControllerStates(
     const HeatpadStatusState& heatpadStatusState, // read
     const TemperatureStatusState& temperatureStatusState, // read
-    const TemperatureSampleState& temperatureSampleState // read
+    const TemperatureSampleState& temperatureSampleState, // read
+    const FermentationStatusState& fermentationStatusState // read
 ):
     heatpadStatus(heatpadStatusState),
     temperatureStatus(temperatureStatusState),
-    temperatureSample(temperatureSampleState){
+    temperatureSample(temperatureSampleState),
+    fermentationStatus(fermentationStatusState){
 }
 
 } // namespace

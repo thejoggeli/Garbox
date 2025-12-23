@@ -7,27 +7,30 @@ namespace Garbox {
 class GarboxHistory {
 public:
 
+    static constexpr uint32_t SampleCount = 65;
+    static constexpr int32_t TemperaturScaleFactor = 1024;
+    static constexpr int32_t PowerScaleFactor = 1024;
+
     enum class SeriesIndex : uint8_t {
-        Window_1min = 0,
-        Window_5min = 0,
+        Window_01min = 0,
+        Window_05min = 0,
         Window_15min = 0,
-        Window_1h,
-        Window_6h,
-        Window_1d,
-        Window_4d,
+        Window_01h,
+        Window_06h,
+        Window_01d,
+        Window_04d,
         Count
     };
 
     static GarboxHistory& Instance();
 
     void reset();
-    void temperatureSample(float temperature);
-    void powerSample(float power);
-    
-    const TimeSeriesMulti& getTemperatureHistory() const;
-    const TimeSeriesMulti& getPowerHistory() const;
+    void measuredTemperatureSample(int32_t temperature);
+    void targetTemperatureSample(int32_t temperature);
+    void powerSample(int32_t power);
 
-    const TimeSeries& getTemperatureSeries(SeriesIndex index) const;
+    const TimeSeries& getMeasuredTemperatureSeries(SeriesIndex index) const;
+    const TimeSeries& getTargetTemperatureSeries(SeriesIndex index) const;
     const TimeSeries& getPowerSeries(SeriesIndex index) const;
 
     SeriesIndex prevIndex(SeriesIndex index) const;
@@ -43,7 +46,8 @@ private:
     GarboxHistory(GarboxHistory&&) = delete;
     GarboxHistory& operator=(GarboxHistory&&) = delete;
 
-    TimeSeriesMulti mTemperatureHistory;
+    TimeSeriesMulti mMeasuredTemperatureHistory;
+    TimeSeriesMulti mTargetTemperatureHistory;
     TimeSeriesMulti mPowerHistory;
 
 };

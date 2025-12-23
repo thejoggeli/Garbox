@@ -24,7 +24,7 @@ void TimeSeriesMulti::reset(){
     }
 }
 
-void TimeSeriesMulti::tick(float value){
+void TimeSeriesMulti::tick(int32_t value){
     for(TimeSeries& series : mSeries){
         series.tick(value);
     }

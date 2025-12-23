@@ -5,6 +5,7 @@
 #include "generated/states/types/HeatpadStatusState.h"
 #include "generated/states/types/TemperatureStatusState.h"
 #include "generated/states/types/TemperatureSampleState.h"
+#include "generated/states/types/FermentationStatusState.h"
 
 namespace Garbox {
 
@@ -14,7 +15,8 @@ public:
     TimeSeriesControllerStates(
         const HeatpadStatusState& heatpadStatusState, // read
         const TemperatureStatusState& temperatureStatusState, // read
-        const TemperatureSampleState& temperatureSampleState // read
+        const TemperatureSampleState& temperatureSampleState, // read
+        const FermentationStatusState& fermentationStatusState // read
     );
 
     // disallow copy and move
@@ -27,6 +29,7 @@ public:
     const HeatpadStatusState& heatpadStatus;
     const TemperatureStatusState& temperatureStatus;
     const TemperatureSampleState& temperatureSample;
+    const FermentationStatusState& fermentationStatus;
 
 };
 
