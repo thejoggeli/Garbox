@@ -5,6 +5,7 @@
 // ==== GENERATED END: include ====================================================
 
 #include "core/lvgl/helpers/chart/ChartGridRenderer.h"
+#include "core/lvgl/helpers/chart/MultiSeriesChart.h"
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
@@ -16,20 +17,14 @@ private:
 
     LvImage mTempLabel;
     LvImage mPowerLabel;
+
+    MultiSeriesChart mTempChart;
+    MultiSeriesChart mPowerChart;
     
     ChartGridRenderer mTempGrid;
     ChartGridRenderer mPowerGrid;
-    
-    LvChartSeries* mTempSeries = nullptr;
-    LvChartSeries* mTempTargetSeries = nullptr;
-    LvChartSeries* mPowerSeries = nullptr;
 
-    uint32_t mTempLastWriteSequence = 0;
-    uint32_t mTempTargetLastWriteSequence = 0;
-    uint32_t mPowerLastWriteSequence = 0;
-
-    void initTemperatureChart();
-    void initPowerChart();
+    void initChart(MultiSeriesChart& chart, int32_t yMin, int32_t yMax);
 
     bool isSensorOk();
     const char* resovleEngineStateText();

@@ -38,7 +38,7 @@ public:
     lv_chart_series_t* addSeries(lv_color_t color, lv_chart_axis_t axis);
     lv_chart_series_t* addSeries(lv_color_t color); // convenience overload (default axis)
     
-    void resetSeries(lv_chart_series_t* series);
+    void clearSeries(lv_chart_series_t* series);
     void removeSeries(lv_chart_series_t* series);
     void hideSeries(lv_chart_series_t* series, bool hide);
 

@@ -73,7 +73,7 @@ lv_chart_series_t* LvChart::addSeries(lv_color_t color){
     return lv_chart_add_series(mRaw, color, LV_CHART_AXIS_PRIMARY_Y);
 }
 
-void LvChart::resetSeries(lv_chart_series_t* series){
+void LvChart::clearSeries(lv_chart_series_t* series){
     lv_chart_set_all_values(mRaw, series, LV_CHART_POINT_NONE);
 }
 

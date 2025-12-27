@@ -47,6 +47,8 @@ MainScreen::MainScreen() :
         .bgColor = 0x0,
         .angle = RotationRenderer::Angle::Deg270,
     })),
+    mTempChart(gui().tempGraph.chart, 2),
+    mPowerChart(gui().powerGraph.chart, 1),
     mTempGrid(
         gui().tempGraph.chart,
         GridTicksCountX,
@@ -89,8 +91,11 @@ void MainScreen::onInit(){
     gui().menuContainer.setFont(menuFont);
 
     // init charts
-    initTemperatureChart();
-    initPowerChart();
+    initChart(mTempChart, TempChartYMin, TempChartYMax);
+    initChart(mPowerChart, PowerChartYMin, PowerChartYMax);
+    mTempChart.addSeries(ColorBlue, TempChartYScale);
+    mTempChart.addSeries(ColorTarget, TempChartYScale);
+    mPowerChart.addSeries(ColorRed, PowerChartYScale);
 
     const int32_t pointIndexLeft = ChartsPointCount * 0.1f;
     const int32_t pointIndexRight = ChartsPointCount * 0.9f;
@@ -120,45 +125,20 @@ void MainScreen::onInit(){
     }
 }
 
-void MainScreen::initTemperatureChart(){
+void MainScreen::initChart(MultiSeriesChart& chart, int32_t yMin, int32_t yMax){
 
-    // setup temperature chart
-    LvChart& chart = gui().tempGraph.chart;
-    chart.setType(LV_CHART_TYPE_LINE);
-    chart.setPointCount(ChartsPointCount);
-    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, TempChartYMin, TempChartYMax);
-    chart.setDivLineCount(0, 0);
-    chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
-    chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
-    chart.setStyleLineWidth(ChartSeriesLineWidth, LV_PART_ITEMS); // series line width
-
-    // create temperature series
-    mTempSeries = chart.addSeries(lv_color_hex(ColorBlue)); 
-
-    // create temperature target series
-    mTempTargetSeries = chart.addSeries(lv_color_hex(ColorTarget)); 
+    // setup chart
+    LvChart& lvChart = chart.getLvChart();
+    lvChart.setType(LV_CHART_TYPE_LINE);
+    lvChart.setPointCount(ChartsPointCount);
+    lvChart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, TempChartYMin, TempChartYMax);
+    lvChart.setDivLineCount(0, 0);
+    lvChart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
+    lvChart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
+    lvChart.setStyleLineWidth(ChartSeriesLineWidth, LV_PART_ITEMS); // series line width
 
     // refresh chart
-    chart.refresh();
-}
-
-void MainScreen::initPowerChart(){
-
-    // setup temperature chart
-    LvChart& chart = gui().powerGraph.chart;
-    chart.setType(LV_CHART_TYPE_LINE);
-    chart.setPointCount(ChartsPointCount);
-    chart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, PowerChartYMin, PowerChartYMax);
-    chart.setDivLineCount(0, 0);
-    chart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
-    chart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
-    chart.setStyleLineWidth(ChartSeriesLineWidth, LV_PART_ITEMS); // series line width
-
-    // create temperature series
-    mPowerSeries = chart.addSeries(lv_color_hex(ColorRed)); 
-
-    // refresh chart
-    chart.refresh();
+    lvChart.refresh();
 }
 
 void MainScreen::onStart(){
@@ -168,54 +148,11 @@ void MainScreen::onStart(){
 void MainScreen::onBecomeEnabled(){
 
     GarboxHistory& history = GarboxHistory::Instance();
+    GarboxHistory::SeriesIndex index = GarboxHistory::SeriesIndex::Window_01min;
 
-    // load temperature history
-    {
-        const TimeSeries& series = history.getMeasuredTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
-
-        LvChart& chart = gui().tempGraph.chart;
-        chart.resetSeries(mTempSeries);
-
-        auto it = series.iterateOldestToNewest();
-        while(it.hasNext()){
-            int32_t value = it.next();
-            chart.setNextValue(mTempSeries, value);
-            LogDebug("MS", "T=%.1f", static_cast<float>(value)/TempChartYScale);
-        }
-        mTempLastWriteSequence = series.getWriteSequence();
-    }
-
-    // load temperature target history
-    {
-        const TimeSeries& series = history.getTargetTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
-
-        LvChart& chart = gui().tempGraph.chart;
-        chart.resetSeries(mTempTargetSeries);
-
-        auto it = series.iterateOldestToNewest();
-        while(it.hasNext()){
-            int32_t value = it.next();
-            chart.setNextValue(mTempTargetSeries, value);
-            LogDebug("MS", "T=%.1f", static_cast<float>(value)/TempChartYScale);
-        }
-        mTempTargetLastWriteSequence = series.getWriteSequence();
-    }
-
-    // load power history
-    {
-        const TimeSeries& series = history.getPowerSeries(GarboxHistory::SeriesIndex::Window_01min);
-
-        LvChart& chart = gui().powerGraph.chart;
-        chart.resetSeries(mPowerSeries);
-
-        auto it = series.iterateOldestToNewest();
-        while(it.hasNext()){
-            int32_t value = it.next();
-            chart.setNextValue(mPowerSeries, value);
-            LogDebug("MS", "P=%.1f", static_cast<float>(value)/PowerChartYScale);
-        }
-        mPowerLastWriteSequence = series.getWriteSequence();
-    }
+    mTempChart.attach(0, history.getTargetTemperatureSeries(index));
+    mTempChart.attach(1, history.getMeasuredTemperatureSeries(index));
+    mPowerChart.attach(0, history.getPowerSeries(index));
 }
 
 void MainScreen::onBecomeDisabled(){
@@ -226,36 +163,8 @@ void MainScreen::onRender(){
 
     GarboxHistory& history = GarboxHistory::Instance();
 
-    // update temperature history
-    const TimeSeries& tempSeries = history.getMeasuredTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
-    if(tempSeries.getWriteSequence() != mTempLastWriteSequence){
-        auto it = tempSeries.iterateSince(mTempLastWriteSequence);
-        while(it.hasNext()){
-            gui().tempGraph.chart.setNextValue(mTempSeries, it.next());
-        }        
-        mTempLastWriteSequence = tempSeries.getWriteSequence();
-    }
-
-    // update temperature target history
-    const TimeSeries& tempTargetSeries = history.getTargetTemperatureSeries(GarboxHistory::SeriesIndex::Window_01min);
-    if(tempTargetSeries.getWriteSequence() != mTempTargetLastWriteSequence){
-        auto it = tempTargetSeries.iterateSince(mTempTargetLastWriteSequence);
-        while(it.hasNext()){
-            gui().tempGraph.chart.setNextValue(mTempTargetSeries, it.next());
-        }        
-        mTempTargetLastWriteSequence = tempTargetSeries.getWriteSequence();
-    }
-
-    // update power history
-    const TimeSeries& powerSeries = history.getPowerSeries(GarboxHistory::SeriesIndex::Window_01min);
-    if(powerSeries.getWriteSequence() != mPowerLastWriteSequence){
-        auto it = powerSeries.iterateSince(mPowerLastWriteSequence);
-        while(it.hasNext()){
-            gui().powerGraph.chart.setNextValue(mPowerSeries, it.next());
-        }        
-        mPowerLastWriteSequence = powerSeries.getWriteSequence();
-    }
-
+    mTempChart.updateAll();
+    mPowerChart.updateAll();
 }
 
 bool MainScreen::isSensorOk(){
