@@ -4,16 +4,22 @@
 #include "generated/components/screens/main/MainScreenAbs.h"
 // ==== GENERATED END: include ====================================================
 
+#include "app/services/GarboxHistory.h"
 #include "core/lvgl/helpers/chart/ChartGridRenderer.h"
 #include "core/lvgl/helpers/chart/MultiSeriesChart.h"
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvImage.h"
 #include "core/lvgl/objects/LvLabel.h"
+#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
 class MainScreen : public MainScreenAbs {
 private:
+
+    GarboxHistory::SeriesIndex mHistoryIndex = GarboxHistory::SeriesIndex::Window_01min;
+
+    SoftwareTimer mDebugTimer;
 
     LvImage mTempLabel;
     LvImage mPowerLabel;
@@ -30,6 +36,8 @@ private:
     const char* resovleEngineStateText();
     uint32_t resovleEngineStateColor();
     const char* resovleSensorText();
+
+    void setHistoryIndex(GarboxHistory::SeriesIndex index);
 
 public:
 
@@ -61,6 +69,8 @@ public:
     void onRenderStatusInfo() final;
     void onRenderMeasuredTemperatureLabel() final;
     void onRenderHeatpadPowerLabel() final;
+    void onRenderTimeAxis() final;
+    void onRenderTimeSeries() final;
 
 // ==== GENERATED END: interface ==================================================
 

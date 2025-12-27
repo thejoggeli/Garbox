@@ -33,6 +33,8 @@ public:
     virtual void onRenderStatusInfo() = 0;
     virtual void onRenderMeasuredTemperatureLabel() = 0;
     virtual void onRenderHeatpadPowerLabel() = 0;
+    virtual void onRenderTimeAxis() = 0;
+    virtual void onRenderTimeSeries() = 0;
 
 protected:
 
@@ -78,6 +80,8 @@ protected:
         StatusInfo,
         MeasuredTemperatureLabel,
         HeatpadPowerLabel,
+        TimeAxis,
+        TimeSeries,
         Count 
     }; 
 
@@ -99,6 +103,8 @@ private:
     static void renderStatusInfoTrampoline(void* context);
     static void renderMeasuredTemperatureLabelTrampoline(void* context);
     static void renderHeatpadPowerLabelTrampoline(void* context);
+    static void renderTimeAxisTrampoline(void* context);
+    static void renderTimeSeriesTrampoline(void* context);
 
 };
 

@@ -11,6 +11,8 @@ screens:
       - StatusInfo
       - MeasuredTemperatureLabel
       - HeatpadPowerLabel
+      - TimeAxis
+      - TimeSeries
     read_states: 
       - FanStatus
       - FanSample

@@ -60,7 +60,7 @@
 
         <GraphComponent name="powerGraph" width="100%" height="96px" pad-top="4px" />
 
-        <container width="100%" flex-grow="1" layout="flex" flex-flow="row" flex-align="space-around center center" pad-left="22px" pad-bottom="1px">
+        <container name="time-axis" width="100%" flex-grow="1" layout="flex" flex-flow="row" flex-align="space-around center center" pad-left="22px" pad-bottom="1px">
           <label name="t4" width="20%" text-align="center" text-color="#808080" text="12h" pad-left="1px" /> <!-- 1px padding to compensate border of graph -->
           <label name="t3" width="20%" text-align="center" text-color="#808080" text="9h" />
           <label name="t2" width="20%" text-align="center" text-color="#808080" text="6h" />
@@ -109,7 +109,7 @@
         </container>
 
         <!-- Info Tiles -->
-        <container width="100%" height="content" layout="flex" flex-flow="row-wrap" flex-align="center space-around space-around" pad-top="4px" pad-bottom="4px">
+        <container name="info-tiles" width="100%" height="content" layout="flex" flex-flow="row-wrap" flex-align="center space-around space-around" pad-top="4px" pad-bottom="4px">
           <InfoTile opa="75%" name="fanInfo"   $icon="fan16"      $value="0%"    width="50%" height="content" />
           <InfoTile opa="75%" name="humidInfo" $icon="humidity16" $value="0.0%"  width="50%" height="content" />
           <InfoTile opa="75%" name="powerInfo" $icon="power16"    $value="0.0W"  width="50%" height="content" />

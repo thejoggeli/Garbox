@@ -13,10 +13,11 @@ public:
 
     enum class SeriesIndex : uint8_t {
         Window_01min = 0,
-        Window_05min = 0,
-        Window_15min = 0,
+        Window_04min = 0,
+        Window_16min = 0,
         Window_01h,
-        Window_06h,
+        Window_04h,
+        Window_12h,
         Window_01d,
         Window_04d,
         Count
@@ -33,8 +34,8 @@ public:
     const TimeSeries& getTargetTemperatureSeries(SeriesIndex index) const;
     const TimeSeries& getPowerSeries(SeriesIndex index) const;
 
-    SeriesIndex prevIndex(SeriesIndex index) const;
-    SeriesIndex nextIndex(SeriesIndex index) const;
+    static SeriesIndex PrevIndex(SeriesIndex index);
+    static SeriesIndex NextIndex(SeriesIndex index);
 
 private:
 

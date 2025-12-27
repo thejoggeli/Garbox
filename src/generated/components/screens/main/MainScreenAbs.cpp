@@ -28,6 +28,8 @@ void MainScreenAbs::init(ComponentHostIfc& host){
     mRenderDispatcher.registerHandler(renderStatusInfoTrampoline, this);
     mRenderDispatcher.registerHandler(renderMeasuredTemperatureLabelTrampoline, this);
     mRenderDispatcher.registerHandler(renderHeatpadPowerLabelTrampoline, this);
+    mRenderDispatcher.registerHandler(renderTimeAxisTrampoline, this);
+    mRenderDispatcher.registerHandler(renderTimeSeriesTrampoline, this);
 
     // calls onInit()
     ScreenAbs::init(host);
@@ -49,6 +51,8 @@ void MainScreenAbs::becomeEnabled(){
     markDirty(RenderFn::StatusInfo);
     markDirty(RenderFn::MeasuredTemperatureLabel);
     markDirty(RenderFn::HeatpadPowerLabel);
+    markDirty(RenderFn::TimeAxis);
+    markDirty(RenderFn::TimeSeries);
 
     ScreenAbs::becomeEnabled();
 }
@@ -95,6 +99,14 @@ void MainScreenAbs::renderMeasuredTemperatureLabelTrampoline(void* context){
 
 void MainScreenAbs::renderHeatpadPowerLabelTrampoline(void* context){
     static_cast<MainScreenAbs*>(context)->onRenderHeatpadPowerLabel();
+}
+
+void MainScreenAbs::renderTimeAxisTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onRenderTimeAxis();
+}
+
+void MainScreenAbs::renderTimeSeriesTrampoline(void* context){
+    static_cast<MainScreenAbs*>(context)->onRenderTimeSeries();
 }
 
 } // namespace Garbox

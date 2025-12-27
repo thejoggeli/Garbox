@@ -1,7 +1,6 @@
 #include "MainScreen.h"
 
 #include <math.h>
-#include "app/services/GarboxHistory.h"
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"
@@ -68,11 +67,7 @@ void MainScreen::onInit(){
 
     // setup time axis labels
     const lv_font_t* timeAxisFont = &lv_font_montserrat_10; 
-    gui().t0.setFont(timeAxisFont);
-    gui().t1.setFont(timeAxisFont);
-    gui().t2.setFont(timeAxisFont);
-    gui().t3.setFont(timeAxisFont);
-    gui().t4.setFont(timeAxisFont);
+    gui().timeAxis.setFont(timeAxisFont);
 
     // setup graph values
     gui().tempGraph.value.setTextColor(lv_color_hex(ColorBlue));
@@ -81,10 +76,7 @@ void MainScreen::onInit(){
 
     // setup info labels
     const lv_font_t* infoLabelFont = &lv_font_montserrat_12; 
-    gui().fanInfo.value.setFont(infoLabelFont);
-    gui().timeInfo.value.setFont(infoLabelFont);
-    gui().humidInfo.value.setFont(infoLabelFont);
-    gui().powerInfo.value.setFont(infoLabelFont);
+    gui().infoTiles.setFont(infoLabelFont);
 
     // setup menu
     const lv_font_t* menuFont = &lv_font_montserrat_12;
@@ -139,13 +131,7 @@ void MainScreen::onStart(){
 }
 
 void MainScreen::onBecomeEnabled(){
-
-    GarboxHistory& history = GarboxHistory::Instance();
-    GarboxHistory::SeriesIndex index = GarboxHistory::SeriesIndex::Window_01min;
-
-    mTempChart.attach(0, history.getTargetTemperatureSeries(index));
-    mTempChart.attach(1, history.getMeasuredTemperatureSeries(index));
-    mPowerChart.attach(0, history.getPowerSeries(index));
+    mDebugTimer.start(2500_ms);
 }
 
 void MainScreen::onBecomeDisabled(){
@@ -153,8 +139,18 @@ void MainScreen::onBecomeDisabled(){
 }
 
 void MainScreen::onRender(){
-    mTempChart.updateAll();
-    mPowerChart.updateAll();
+
+    if(mDebugTimer.isExpired()){
+        GarboxHistory::SeriesIndex nextIndex = GarboxHistory::NextIndex(mHistoryIndex);
+        setHistoryIndex(nextIndex);
+        mDebugTimer.restart();
+    }
+
+    if(!isMarkedDirty(RenderFn::TimeSeries)){
+        mTempChart.updateAll();
+        mPowerChart.updateAll();
+        
+    }
 }
 
 bool MainScreen::isSensorOk(){
@@ -271,6 +267,24 @@ void MainScreen::onRenderHeatpadPowerLabel(){
     gui().powerGraph.value.setTextFormatted("%.1f%%", power);
 }
 
+void MainScreen::onRenderTimeAxis(){
+    static const char* t1_arr[] = {"15s", "1m", "4m",  "15m", "1h", "3h",  "6h",  "1d"};
+    static const char* t2_arr[] = {"30s", "2m", "8m",  "30m", "2h", "4h",  "12h", "2d"};
+    static const char* t3_arr[] = {"45s", "3m", "12n", "45m", "3h", "9h",  "18h", "3d"};
+    static const char* t4_arr[] = {"60s", "4m", "16n", "60m", "4h", "12h", "24h", "4d"};
+    gui().t1.setText(t1_arr[static_cast<uint8_t>(mHistoryIndex)]);
+    gui().t2.setText(t2_arr[static_cast<uint8_t>(mHistoryIndex)]);
+    gui().t3.setText(t3_arr[static_cast<uint8_t>(mHistoryIndex)]);
+    gui().t4.setText(t4_arr[static_cast<uint8_t>(mHistoryIndex)]);
+}
+
+void MainScreen::onRenderTimeSeries(){
+    GarboxHistory& history = GarboxHistory::Instance();
+    mTempChart.attach(0, history.getTargetTemperatureSeries(mHistoryIndex));
+    mTempChart.attach(1, history.getMeasuredTemperatureSeries(mHistoryIndex));
+    mPowerChart.attach(0, history.getPowerSeries(mHistoryIndex));
+}
+
 void MainScreen::onFanStatusStateChanged(const FanStatusState& state){
     markDirty(RenderFn::FanInfo);
 }
@@ -300,6 +314,12 @@ void MainScreen::onTemperatureSampleStateChanged(const TemperatureSampleState& s
 
 void MainScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
     markDirty(RenderFn::StatusInfo);
+}
+
+void MainScreen::setHistoryIndex(GarboxHistory::SeriesIndex index){
+    mHistoryIndex = index;
+    markDirty(RenderFn::TimeAxis);
+    markDirty(RenderFn::TimeSeries);
 }
 
 } // namespace Garbox
