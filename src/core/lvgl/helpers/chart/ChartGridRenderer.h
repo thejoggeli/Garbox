@@ -21,6 +21,9 @@ public:
     void setXTickPosition(uint32_t index, float relativePosition);
     void setYTickPosition(uint32_t index, float relativePosition);
 
+    void distributeXTicksUniform(float relativeStart, float relativeEnd);
+    void distributeYTicksUniform(float relativeStart, float relativeEnd);
+
     void setXTickLabel(uint32_t index, const char* text);
     void setYTickLabel(uint32_t index, const char* text);
 

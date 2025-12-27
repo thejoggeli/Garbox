@@ -199,6 +199,52 @@ void ChartGridRenderer::setYTickPosition(uint32_t index, float relativePosition)
     lv_obj_invalidate(mChart.raw());
 }
 
+void ChartGridRenderer::distributeXTicksUniform(float relativeStart, float relativeEnd){
+    const uint32_t count = mXTicks.size();
+    if(count == 0){
+        return;
+    }
+
+    if(count == 1){
+        setXTickPosition(0, relativeStart);
+        return;
+    }
+
+    for(uint32_t i = 0; i < count; i++){
+        const float t =
+            static_cast<float>(i)
+            / static_cast<float>(count - 1);
+
+        const float relativePos =
+            relativeStart + t * (relativeEnd - relativeStart);
+
+        setXTickPosition(i, relativePos);
+    }
+}
+
+void ChartGridRenderer::distributeYTicksUniform(float relativeStart, float relativeEnd){
+    const uint32_t count = mYTicks.size();
+    if(count == 0){
+        return;
+    }
+
+    if(count == 1){
+        setYTickPosition(0, relativeStart);
+        return;
+    }
+
+    for(uint32_t i = 0; i < count; i++){
+        const float t =
+            static_cast<float>(i)
+            / static_cast<float>(count - 1);
+
+        const float relativePos =
+            relativeStart + t * (relativeEnd - relativeStart);
+
+        setYTickPosition(i, relativePos);
+    }
+}
+
 void ChartGridRenderer::setXTickLabel(uint32_t index, const char* text){
     AssertExit(index < mXTicks.size(), "ChartGridRenderer", "index out of range");
     mXTicks[index].label.text = (std::strcmp(text, "") == 0) ? nullptr : text;

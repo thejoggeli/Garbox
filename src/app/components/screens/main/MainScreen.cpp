@@ -97,9 +97,6 @@ void MainScreen::onInit(){
     mTempChart.addSeries(ColorTarget);
     mPowerChart.addSeries(ColorRed);
 
-    const int32_t pointIndexLeft = ChartsPointCount * 0.1f;
-    const int32_t pointIndexRight = ChartsPointCount * 0.9f;
-
     // temperature horizontal grid
     mTempGrid.setYTickPosition(0, MathUtils::Normalize(20 * TempChartYScale, TempChartYMin, TempChartYMax));
     mTempGrid.setYTickPosition(1, MathUtils::Normalize(30 * TempChartYScale, TempChartYMin, TempChartYMax));
@@ -117,12 +114,8 @@ void MainScreen::onInit(){
     mPowerGrid.setYTickLabel(2, "100%");
 
     // charts vertical grid
-    for(int32_t i = 0; i < GridTicksCountX; i++){
-        float pointIndex = MathUtils::Map<float>(i, 0, GridTicksCountX-1, pointIndexLeft, pointIndexRight);
-        float relativePos = MathUtils::Normalize(pointIndex, 0, ChartsPointCount);
-        mTempGrid.setXTickPosition(i, relativePos);
-        mPowerGrid.setXTickPosition(i, relativePos);
-    }
+    mTempGrid.distributeXTicksUniform(0.1f, 0.9f);
+    mPowerGrid.distributeXTicksUniform(0.1f, 0.9f);
 }
 
 void MainScreen::initChart(MultiSeriesChart& chart, int32_t yMin, int32_t yMax){
