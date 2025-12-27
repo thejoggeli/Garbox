@@ -6,15 +6,12 @@
 
 namespace Garbox {
 
-TimeSeriesChartAdapter::TimeSeriesChartAdapter(
-    LvChart& chart,
-    lv_color_t lineColor,
-    int32_t yScale):
+TimeSeriesChartAdapter::TimeSeriesChartAdapter(LvChart& chart, lv_color_t lineColor):
     // initialize members
     mChart(chart),
-    mSeries(chart.addSeries(lineColor)),
-    mYScale(yScale){
+    mSeries(chart.addSeries(lineColor)){
     // constructor body
+    AssertExit(mSeries != nullptr, "TimeSeriesChartAdapter", "series is nullptr");
 }
 
 void TimeSeriesChartAdapter::attach(const TimeSeries& timeSeries){
@@ -37,7 +34,7 @@ void TimeSeriesChartAdapter::clear(){
     mLastSeenWriteSequence = 0;
 }
 
-lv_chart_series_t* TimeSeriesChartAdapter::getChartSeries(){
+LvChartSeries* TimeSeriesChartAdapter::getLvChartSeries(){
     return mSeries;
 }
 
@@ -47,10 +44,7 @@ void TimeSeriesChartAdapter::pushAllSamples(){
 
     while(it.hasNext()){
         const int32_t value = it.next();
-        mChart.setNextValue(
-            mSeries,
-            value * mYScale
-        );
+        mChart.setNextValue(mSeries, value);
     }
 
     mLastSeenWriteSequence = mTimeSeries->getWriteSequence();
@@ -63,13 +57,9 @@ void TimeSeriesChartAdapter::pushNewSamples(){
     }
 
     auto it = mTimeSeries->iterateSince(mLastSeenWriteSequence);
-
     while(it.hasNext()){
         const int32_t value = it.next();
-        mChart.setNextValue(
-            mSeries,
-            value * mYScale
-        );
+        mChart.setNextValue(mSeries, value);
     }
 
     mLastSeenWriteSequence = it.getNewWriteSequence();

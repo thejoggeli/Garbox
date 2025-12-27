@@ -54,7 +54,7 @@ void FermentationBehaviour::onLogicTick(){
 
         static uint32_t count = 0;
         static uint32_t target = 30;
-        if(count++ >= 10*10){
+        if(count++ >= 50*10){
             count = 0;
             target = (target == 30) ? 35 : 30;
         }

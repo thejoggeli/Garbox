@@ -10,13 +10,13 @@ MultiSeriesChart::MultiSeriesChart(LvChart& chart, uint8_t maxSeriesCount):
     // constructor body
 }
 
-void MultiSeriesChart::addSeries(uint32_t lineColor, int32_t yScale){
+void MultiSeriesChart::addSeries(uint32_t lineColor){
     AssertExit((mSeries.size() < mSeries.capacity()), "MultiSeriesChart", "series capacity exceeded");
-    mSeries.emplace(mChart, lv_color_hex(lineColor), yScale);
+    mSeries.emplace(mChart, lv_color_hex(lineColor));
 }
 
 void MultiSeriesChart::attach(uint8_t seriesIndex, const TimeSeries& timeSeries){
-    AssertDebug((seriesIndex < mSeries.size()), "MultiSeriesChart", "invalid series index");
+    AssertExit((seriesIndex < mSeries.size()), "MultiSeriesChart", "invalid series index");
     mSeries[seriesIndex].attach(timeSeries);
 }
 
@@ -44,6 +44,15 @@ void MultiSeriesChart::clearAll(){
 
 uint8_t MultiSeriesChart::getSeriesCount() const{
     return static_cast<uint8_t>(mSeries.size());
+}
+
+LvChartSeries* MultiSeriesChart::getLvChartSeries(uint8_t seriesIndex){
+    AssertExit(seriesIndex < mSeries.size(), "MultiSeriesChart", "series index out of range");
+    return mSeries[seriesIndex].getLvChartSeries();
+}
+
+LvChart& MultiSeriesChart::getLvChart(){
+    return mChart;
 }
 
 } // namespace Garbox

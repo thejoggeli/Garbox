@@ -93,9 +93,9 @@ void MainScreen::onInit(){
     // init charts
     initChart(mTempChart, TempChartYMin, TempChartYMax);
     initChart(mPowerChart, PowerChartYMin, PowerChartYMax);
-    mTempChart.addSeries(ColorBlue, TempChartYScale);
-    mTempChart.addSeries(ColorTarget, TempChartYScale);
-    mPowerChart.addSeries(ColorRed, PowerChartYScale);
+    mTempChart.addSeries(ColorBlue);
+    mTempChart.addSeries(ColorTarget);
+    mPowerChart.addSeries(ColorRed);
 
     const int32_t pointIndexLeft = ChartsPointCount * 0.1f;
     const int32_t pointIndexRight = ChartsPointCount * 0.9f;
@@ -131,7 +131,7 @@ void MainScreen::initChart(MultiSeriesChart& chart, int32_t yMin, int32_t yMax){
     LvChart& lvChart = chart.getLvChart();
     lvChart.setType(LV_CHART_TYPE_LINE);
     lvChart.setPointCount(ChartsPointCount);
-    lvChart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, TempChartYMin, TempChartYMax);
+    lvChart.setAxisRange(LV_CHART_AXIS_PRIMARY_Y, yMin, yMax);
     lvChart.setDivLineCount(0, 0);
     lvChart.setUpdateMode(LV_CHART_UPDATE_MODE_SHIFT);
     lvChart.setStyleSize(0, 0, LV_PART_INDICATOR); // markers size
@@ -160,9 +160,6 @@ void MainScreen::onBecomeDisabled(){
 }
 
 void MainScreen::onRender(){
-
-    GarboxHistory& history = GarboxHistory::Instance();
-
     mTempChart.updateAll();
     mPowerChart.updateAll();
 }

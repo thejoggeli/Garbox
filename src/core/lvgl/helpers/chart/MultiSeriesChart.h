@@ -13,20 +13,11 @@ class TimeSeries;
 class MultiSeriesChart {
 public:
 
-    MultiSeriesChart(
-        LvChart& chart,
-        uint8_t maxSeriesCount
-    );
+    MultiSeriesChart(LvChart& chart, uint8_t maxSeriesCount);
 
-    void addSeries(
-        uint32_t lineColor,
-        int32_t yScale
-    );
+    void addSeries(uint32_t lineColor);
 
-    void attach(
-        uint8_t seriesIndex,
-        const TimeSeries& timeSeries
-    );
+    void attach(uint8_t seriesIndex, const TimeSeries& timeSeries);
 
     void update(uint8_t seriesIndex);
     void updateAll();
@@ -35,9 +26,10 @@ public:
     void clearAll();
 
     uint8_t getSeriesCount() const;
-    LvChart& getLvChart() { return mChart; }
+    LvChartSeries* getLvChartSeries(uint8_t seriesIndex);
+    LvChart& getLvChart();
 
-protected:
+private:
 
     LvChart& mChart;
     VectorHeap<TimeSeriesChartAdapter> mSeries;
