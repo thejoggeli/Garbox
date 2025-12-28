@@ -34,4 +34,15 @@ events:
     fields:
       - { name: steps, type: int32_t }
 
+  RequestFanMode:
+    fields:
+      - { name: autoFan, type: bool }
+
+  RequestFermentationMode:
+    fields:
+      - { name: enabled, type: bool }
+
+  RequestTargetTemperature:
+    fields:
+      - { name: targetTemperature, type: float }
     

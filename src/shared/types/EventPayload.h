@@ -48,6 +48,18 @@ struct EncoderStepPayload {
     int32_t steps;
 };
 
+struct RequestFanModePayload {
+    bool autoFan;
+};
+
+struct RequestFermentationModePayload {
+    bool enabled;
+};
+
+struct RequestTargetTemperaturePayload {
+    float targetTemperature;
+};
+
 struct ActiveBehaviourChangedPayload {
     BehaviourId oldBehaviour;
     BehaviourId newBehaviour;
@@ -95,6 +107,21 @@ struct ResolveEventPayload<EventType::ButtonRepeat> {
 template<>
 struct ResolveEventPayload<EventType::EncoderStep> {
     using type = EncoderStepPayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::RequestFanMode> {
+    using type = RequestFanModePayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::RequestFermentationMode> {
+    using type = RequestFermentationModePayload;
+};
+
+template<>
+struct ResolveEventPayload<EventType::RequestTargetTemperature> {
+    using type = RequestTargetTemperaturePayload;
 };
 
 template<>

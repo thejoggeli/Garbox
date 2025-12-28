@@ -51,6 +51,8 @@ void FermentationEngine::setRegulationEnabled(bool enabled){
 
 void FermentationEngine::step(){
 
+    setRegulationEnabled(mInput.regulationEnabled);
+
     // input tracking
     if(mInput.targetTemperature != mLastTargetTemperature){
         mTargetTemperatureChanged = true;

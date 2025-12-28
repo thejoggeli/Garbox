@@ -22,6 +22,7 @@ RowMenu::RowMenu(
     mActiveTextColor(lv_color_hex(activeTextColor)),
     mNormalBgColor(lv_color_hex(normalBgColor)),
     mActiveBgColor(lv_color_hex(activeBgColor)),
+    mVisibleRowCount(visibleRowCount),
     mCallbackCtx(callbackCtx),
     mValueToTextCallback(valueToTextCallback),
     mChangeValueCallback(changeValueCallback){

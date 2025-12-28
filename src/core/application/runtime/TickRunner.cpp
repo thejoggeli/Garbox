@@ -5,12 +5,11 @@
 
 namespace Garbox {
 
-TickRunner::TickRunner(size_t maxTickPhaseHandlers, uint32_t periodMillis):
+TickRunner::TickRunner(size_t maxTickPhaseHandlers, uint32_t periodMillis, void* callbackCtx):
     mTickPhaseHandlers(maxTickPhaseHandlers),
     mPeriodMillis(periodMillis),
-    mRemainingDelay(periodMillis){
-    // nothing to do
-}
+    mRemainingDelay(periodMillis),
+    mCallbackCtx(callbackCtx){}
 
 void TickRunner::setTickStartHandler(Handler handler){
     mTickStartHandler = handler;
@@ -38,7 +37,7 @@ void TickRunner::run(){
 
         // call tick start handler
         if(mTickStartHandler){
-            mTickStartHandler();
+            mTickStartHandler(mCallbackCtx);
         }
 
         // call tick phases handlers
@@ -50,12 +49,12 @@ void TickRunner::run(){
             }
 
             // call handler for current tick
-            phase.handler();
+            phase.handler(mCallbackCtx);
         }
 
         // call tick end handler
         if(mTickEndHandler){
-            mTickEndHandler();
+            mTickEndHandler(mCallbackCtx);
         }
 
         // wait until period is complete

@@ -55,16 +55,16 @@ private:
     EventLogScreen mEventLogScreen;
     StateLogScreen mStateLogScreen;
 
-    void handleTickStart();
-    void handleTickEnd();
+    static void handleTickStart(void* ctx);
+    static void handleTickEnd(void* ctx);
 
-    void handleHeartbeatTick();
-    void handleSensorReadTick();
-    void handleUserInputTick();
-    void handleLogicTick();
-    void handleActorWriteTick();
-    void handleLoggingTick();
-    void handleRenderTick();
+    static void handleHeartbeatTick(void* ctx);
+    static void handleSensorReadTick(void* ctx);
+    static void handleUserInputTick(void* ctx);
+    static void handleLogicTick(void* ctx);
+    static void handleActorWriteTick(void* ctx);
+    static void handleLoggingTick(void* ctx);
+    static void handleRenderTick(void* ctx);
 
     void onInit() final;
     void onStart() final;

@@ -19,6 +19,9 @@ enum class EventType : uint16_t {
     Button,
     ButtonRepeat,
     EncoderStep,
+    RequestFanMode,
+    RequestFermentationMode,
+    RequestTargetTemperature,
     ActiveBehaviourChanged,
     ActiveScreenChanged,
 

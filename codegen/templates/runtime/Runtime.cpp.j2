@@ -23,7 +23,7 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
         .eventQueueLength = {{ application.event_queue_length }},
         .maxDispatchRecursionDepth = {{ application.max_dispatch_recursion_depth }}
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis),
+    mTickRunner(TickHandlersCount, TickPeriodMillis, this),
     mStateRegistry(){
 
     // register states
@@ -43,12 +43,12 @@ static constexpr uint32_t {{ tick.name }}DelayMillis = {{ tick.delay_millis | de
 {% endfor %}
 
     // set start and end tick handlers
-    mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
-    mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
+    mTickRunner.setTickStartHandler(handleTickStart);
+    mTickRunner.setTickEndHandler(handleTickEnd);
 
     //  register all tick phases
 {% for tick in application.tick_phases %}
-    mTickRunner.registerTickPhase([this](){ handle{{ tick.name }}(); }, {{ tick.name }}DelayMillis);
+    mTickRunner.registerTickPhase(handle{{ tick.name }}, {{ tick.name }}DelayMillis);
 {% endfor %}
 
 {% for comp_name, comp_data in components.items() %}
@@ -95,41 +95,44 @@ void {{ RuntimeName}}::onActiveScreenChanged(){
     mStateRegistry.getActiveScreen().setScreen(mActiveScreen->getScreenId());
 }
 
-void {{ RuntimeName}}::handleTickStart(){
+void {{ RuntimeName}}::handleTickStart(void* ctx){
+    {{ RuntimeName }}* self = static_cast<{{ RuntimeName }}*>(ctx);
     Time::Tick();
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
-    applyQueuedBehaviour();
+    self->applyQueuedBehaviour();
 }
 
-void {{ RuntimeName}}::handleTickEnd(){
-    mContext.tickCount++;
+void {{ RuntimeName}}::handleTickEnd(void* ctx){
+    {{ RuntimeName }}* self = static_cast<{{ RuntimeName }}*>(ctx);
+    self->mContext.tickCount++;
     Profiler::MeasureEnd(ProfilerId::MainBusy);
 }
 
 {# ---- GENERATE tick_phases ---- #}
 {% for tick in application.tick_phases %}
-void {{ RuntimeName }}::handle{{ tick.name }}(){
+void {{ RuntimeName }}::handle{{ tick.name }}(void* ctx){
+    {{ RuntimeName }}* self = static_cast<{{ RuntimeName }}*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::{{ tick.name }});
 {# ---- Call tick on controllers ---- #}
 {% for ctrl in tick["controllers"].values() %}
 {% if ctrl["tick_phases_all"] %}
-    m{{ ctrl.name }}.onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+    self->m{{ ctrl.name }}.onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
 {% endif %}
 {% if tick.name in ctrl["tick_phases"] %}
-    m{{ ctrl.name }}.on{{ tick.name }}();
+    self->m{{ ctrl.name }}.on{{ tick.name }}();
 {% endif %}
 {% endfor %}
 {# ---- Call tick on active behaviour ----#}
 {% if tick["behaviours"] | length > 0 %}
-    switch(mActiveBehaviour->getBehaviourId()){
+    switch(self->mActiveBehaviour->getBehaviourId()){
     {% for beha in tick["behaviours"].values() %}
         case BehaviourId::{{ beha.name.removesuffix("Behaviour") }}:
         {% if beha["tick_phases_all"] %}
-            static_cast<{{ beha.name }}*>(mActiveBehaviour)->onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+            static_cast<{{ beha.name }}*>(self->mActiveBehaviour)->onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
         {% endif %}
         {% if tick.name in beha["tick_phases"] %}
-            static_cast<{{ beha.name }}*>(mActiveBehaviour)->on{{ tick.name }}();
+            static_cast<{{ beha.name }}*>(self->mActiveBehaviour)->on{{ tick.name }}();
         {% endif %}
             break;
     {% endfor %}
@@ -138,13 +141,13 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
 {% endif %}
 {# ---- Call tick on active screen ----#}
 {% if tick["screens"] | length > 0 %}
-    switch(mActiveScreen->getScreenId()){
+    switch(self->mActiveScreen->getScreenId()){
     {% for screen in tick["screens"].values() %}
         case ScreenId::{{ screen.name.removesuffix("Screen") }}:
         {% if screen["tick_phases_all"] %}
-            static_cast<{{ screen.name }}*>(mActiveScreen)->onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
+            static_cast<{{ screen.name }}*>(self->mActiveScreen)->onTick(TickPhase::{{ tick.name.removesuffix("Tick") }});
         {% else %}
-            static_cast<{{ screen.name }}*>(mActiveScreen)->on{{ tick.name }}();
+            static_cast<{{ screen.name }}*>(self->mActiveScreen)->on{{ tick.name }}();
         {% endif %}
         break;
     {% endfor %}
@@ -152,7 +155,7 @@ void {{ RuntimeName }}::handle{{ tick.name }}(){
     }
 {% endif %}
     {# Call dispatch events #}
-    dispatch();
+    self->dispatch();
 }
 
 {% endfor %}

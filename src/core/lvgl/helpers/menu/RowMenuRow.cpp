@@ -71,19 +71,17 @@ void RowMenuRow::setActive(bool rowActive, bool valueActive){
 
 void RowMenuRow::changeValue(int32_t delta){
     int32_t newValue = mMenu.mChangeValueCallback(mMenu.mCallbackCtx, mRowIndex, mValue, delta);
-    if(mValue == newValue){
-        return;
+    if(mValue != newValue){
+        mValue = newValue;
+        mNeedsRender = true;
     }
-    mValue = newValue;
-    mNeedsRender = true;
 }
 
 void RowMenuRow::setValue(int32_t value){
-    if(mValue == value){
-        return;
+    if(mValue != value){
+        mValue = value;
+        mNeedsRender = true;
     }
-    mValue = value;
-    mNeedsRender = true;
 }
 
 int32_t RowMenuRow::getValue() const{

@@ -8,14 +8,14 @@ static constexpr uint32_t MinutesToSeconds = 60;
 static constexpr uint32_t HoursToSeconds = 3600;
 static constexpr uint32_t DaysToSeconds = 24*3600;
 static constexpr std::array<uint32_t, 8> Windows = {
-    1  * MinutesToSeconds,
-    4  * MinutesToSeconds,
-    16 * MinutesToSeconds,
-    1  * HoursToSeconds,
-    4  * HoursToSeconds,
-    12 * HoursToSeconds,
-    1  * DaysToSeconds,
-    4  * DaysToSeconds,
+    static_cast<uint32_t>(1)  * MinutesToSeconds,
+    static_cast<uint32_t>(4)  * MinutesToSeconds,
+    static_cast<uint32_t>(16) * MinutesToSeconds,
+    static_cast<uint32_t>(1)  * HoursToSeconds,
+    static_cast<uint32_t>(4)  * HoursToSeconds,
+    static_cast<uint32_t>(12) * HoursToSeconds,
+    static_cast<uint32_t>(1)  * DaysToSeconds,
+    static_cast<uint32_t>(4)  * DaysToSeconds,
 };
 
 GarboxHistory& GarboxHistory::Instance(){

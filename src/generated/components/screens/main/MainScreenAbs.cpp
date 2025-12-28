@@ -13,6 +13,30 @@ MainScreenAbs::MainScreenAbs():
     mScreenHeight(LvglProvider::GetDisplayHeight()),
     mRenderDispatcher(static_cast<uint32_t>(RenderFn::Count)){}
 
+RequestFermentationModeEvent MainScreenAbs::makeRequestFermentationModeEvent(){
+    return ComponentAbs::makeEvent<EventType::RequestFermentationMode>();
+}
+
+RequestTargetTemperatureEvent MainScreenAbs::makeRequestTargetTemperatureEvent(){
+    return ComponentAbs::makeEvent<EventType::RequestTargetTemperature>();
+}
+
+RequestFanModeEvent MainScreenAbs::makeRequestFanModeEvent(){
+    return ComponentAbs::makeEvent<EventType::RequestFanMode>();
+}
+
+void MainScreenAbs::sendEvent(const RequestFermentationModeEvent& event){
+    sendEventToHost(event.header());
+}
+
+void MainScreenAbs::sendEvent(const RequestTargetTemperatureEvent& event){
+    sendEventToHost(event.header());
+}
+
+void MainScreenAbs::sendEvent(const RequestFanModeEvent& event){
+    sendEventToHost(event.header());
+}
+
 MainScreenStates& MainScreenAbs::states(){
     return mStates.value();
 }

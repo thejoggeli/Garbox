@@ -14,7 +14,7 @@ TimeSeries::TimeSeries(
     SamplingMode samplingMode):
     // initialize members
     mWindowSeconds(windowSeconds),
-    mSampleIntervalMicros((windowSeconds * 1000000UL) / sampleCount),
+    mSampleIntervalMicros(static_cast<uint64_t>(windowSeconds) * 1000000ull / static_cast<uint64_t>(sampleCount)),
     mSamplingMode(samplingMode),
     mBuffer(sampleCount){
     // constructor body

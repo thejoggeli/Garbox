@@ -23,6 +23,10 @@ screens:
       - TemperatureStatus
       - TemperatureSample
       - FermentationStatus
+    send_events:
+      - RequestFermentationMode
+      - RequestTargetTemperature
+      - RequestFanMode
 
   Debug:
     subdir: debug

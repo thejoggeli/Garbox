@@ -50,12 +50,12 @@ private:
     {{ screen }} m{{ screen }};
     {% endfor %}
 
-    void handleTickStart();
-    void handleTickEnd();
+    static void handleTickStart(void* ctx);
+    static void handleTickEnd(void* ctx);
 
     {# Generate tick method declarations #}
     {% for tick in application.tick_phases %}
-    void handle{{ tick.name }}();
+    static void handle{{ tick.name }}(void* ctx);
     {% endfor %}
 
     void onInit() final;

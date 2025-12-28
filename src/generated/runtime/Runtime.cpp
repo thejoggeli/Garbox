@@ -28,7 +28,7 @@ Runtime::Runtime():
         .eventQueueLength = 128,
         .maxDispatchRecursionDepth = 3
     }),
-    mTickRunner(TickHandlersCount, TickPeriodMillis),
+    mTickRunner(TickHandlersCount, TickPeriodMillis, this),
     mStateRegistry(){
 
     // register states
@@ -62,17 +62,17 @@ Runtime::Runtime():
     registerComponent(&mStateLogScreen);
 
     // set start and end tick handlers
-    mTickRunner.setTickStartHandler([this](){ handleTickStart(); });
-    mTickRunner.setTickEndHandler([this](){ handleTickEnd(); });
+    mTickRunner.setTickStartHandler(handleTickStart);
+    mTickRunner.setTickEndHandler(handleTickEnd);
 
     //  register all tick phases
-    mTickRunner.registerTickPhase([this](){ handleHeartbeatTick(); }, HeartbeatTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleSensorReadTick(); }, SensorReadTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleUserInputTick(); }, UserInputTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleLogicTick(); }, LogicTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleActorWriteTick(); }, ActorWriteTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
+    mTickRunner.registerTickPhase(handleHeartbeatTick, HeartbeatTickDelayMillis);
+    mTickRunner.registerTickPhase(handleSensorReadTick, SensorReadTickDelayMillis);
+    mTickRunner.registerTickPhase(handleUserInputTick, UserInputTickDelayMillis);
+    mTickRunner.registerTickPhase(handleLogicTick, LogicTickDelayMillis);
+    mTickRunner.registerTickPhase(handleActorWriteTick, ActorWriteTickDelayMillis);
+    mTickRunner.registerTickPhase(handleLoggingTick, LoggingTickDelayMillis);
+    mTickRunner.registerTickPhase(handleRenderTick, RenderTickDelayMillis);
 
     // bind 'CalibrationBehaviour' states
     mCalibrationBehaviour.mStates.emplace(
@@ -177,76 +177,85 @@ void Runtime::onActiveScreenChanged(){
     mStateRegistry.getActiveScreen().setScreen(mActiveScreen->getScreenId());
 }
 
-void Runtime::handleTickStart(){
+void Runtime::handleTickStart(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Time::Tick();
     Profiler::MeasurePeriodic(ProfilerId::MainPeriod);
     Profiler::MeasureBegin(ProfilerId::MainBusy);
-    applyQueuedBehaviour();
+    self->applyQueuedBehaviour();
 }
 
-void Runtime::handleTickEnd(){
-    mContext.tickCount++;
+void Runtime::handleTickEnd(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
+    self->mContext.tickCount++;
     Profiler::MeasureEnd(ProfilerId::MainBusy);
 }
 
-void Runtime::handleHeartbeatTick(){
+void Runtime::handleHeartbeatTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::HeartbeatTick);
-    mHeartbeatController.onHeartbeatTick();
-    dispatch();
+    self->mHeartbeatController.onHeartbeatTick();
+    self->dispatch();
 }
 
-void Runtime::handleSensorReadTick(){
+void Runtime::handleSensorReadTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::SensorReadTick);
-    mFanController.onSensorReadTick();
-    mHeatpadController.onSensorReadTick();
-    mInputController.onSensorReadTick();
-    mI2cPartsController.onSensorReadTick();
-    dispatch();
+    self->mFanController.onSensorReadTick();
+    self->mHeatpadController.onSensorReadTick();
+    self->mInputController.onSensorReadTick();
+    self->mI2cPartsController.onSensorReadTick();
+    self->dispatch();
 }
 
-void Runtime::handleUserInputTick(){
+void Runtime::handleUserInputTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::UserInputTick);
-    switch(mActiveScreen->getScreenId()){
+    switch(self->mActiveScreen->getScreenId()){
         case ScreenId::Main:
-            static_cast<MainScreen*>(mActiveScreen)->onUserInputTick();
+            static_cast<MainScreen*>(self->mActiveScreen)->onUserInputTick();
         break;
         default: break; // active behaviour does not receive tick type
     }
-    dispatch();
+    self->dispatch();
 }
 
-void Runtime::handleLogicTick(){
+void Runtime::handleLogicTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::LogicTick);
-    switch(mActiveBehaviour->getBehaviourId()){
+    switch(self->mActiveBehaviour->getBehaviourId()){
         case BehaviourId::Calibration:
-            static_cast<CalibrationBehaviour*>(mActiveBehaviour)->onLogicTick();
+            static_cast<CalibrationBehaviour*>(self->mActiveBehaviour)->onLogicTick();
             break;
         case BehaviourId::Fermentation:
-            static_cast<FermentationBehaviour*>(mActiveBehaviour)->onLogicTick();
+            static_cast<FermentationBehaviour*>(self->mActiveBehaviour)->onLogicTick();
             break;
         default: break; // active behaviour does not receive tick type
     }
-    dispatch();
+    self->dispatch();
 }
 
-void Runtime::handleActorWriteTick(){
+void Runtime::handleActorWriteTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::ActorWriteTick);
-    mFanController.onActorWriteTick();
-    mHeatpadController.onActorWriteTick();
-    mTimeSeriesController.onActorWriteTick();
-    dispatch();
+    self->mFanController.onActorWriteTick();
+    self->mHeatpadController.onActorWriteTick();
+    self->mTimeSeriesController.onActorWriteTick();
+    self->dispatch();
 }
 
-void Runtime::handleLoggingTick(){
+void Runtime::handleLoggingTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::LoggingTick);
-    mDevtoolsController.onLoggingTick();
-    dispatch();
+    self->mDevtoolsController.onLoggingTick();
+    self->dispatch();
 }
 
-void Runtime::handleRenderTick(){
+void Runtime::handleRenderTick(void* ctx){
+    Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::RenderTick);
-    mDisplayController.onRenderTick();
-    dispatch();
+    self->mDisplayController.onRenderTick();
+    self->dispatch();
 }
 
 void Runtime::onRouteStateChanged(const StateAbs& state){
@@ -460,6 +469,45 @@ void Runtime::onRouteEvent(const EventHeader* header){
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStepEvent(event); break;
                 default: break; // active behaviour does not receive 'EncoderStep' event
+            }
+        }
+        break;
+    }
+    case EventType::RequestFanMode: {
+        const RequestFanModeEvent event(header);
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onRequestFanModeEvent(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onRequestFanModeEvent(event); break;
+                default: break; // active behaviour does not receive 'RequestFanMode' event
+            }
+        }
+        break;
+    }
+    case EventType::RequestFermentationMode: {
+        const RequestFermentationModeEvent event(header);
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onRequestFermentationModeEvent(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onRequestFermentationModeEvent(event); break;
+                default: break; // active behaviour does not receive 'RequestFermentationMode' event
+            }
+        }
+        break;
+    }
+    case EventType::RequestTargetTemperature: {
+        const RequestTargetTemperatureEvent event(header);
+        if(header->sendToInactiveComponents){
+            mFermentationBehaviour.onRequestTargetTemperatureEvent(event);
+        }
+        else {
+            switch(mActiveBehaviour->getBehaviourId()){
+                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onRequestTargetTemperatureEvent(event); break;
+                default: break; // active behaviour does not receive 'RequestTargetTemperature' event
             }
         }
         break;

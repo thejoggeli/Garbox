@@ -49,6 +49,9 @@ public:
     void onButtonEvent(const ButtonEvent& event) final;
     void onButtonRepeatEvent(const ButtonRepeatEvent& event) final;
     void onEncoderStepEvent(const EncoderStepEvent& event) final;
+    void onRequestFermentationModeEvent(const RequestFermentationModeEvent& event) final;
+    void onRequestTargetTemperatureEvent(const RequestTargetTemperatureEvent& event) final;
+    void onRequestFanModeEvent(const RequestFanModeEvent& event) final;
 
     // generated state changed handlers
     void onFanSampleStateChanged(const FanSampleState& state) final;

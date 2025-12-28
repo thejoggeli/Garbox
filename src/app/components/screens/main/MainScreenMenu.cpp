@@ -12,7 +12,6 @@ static const char* HistoryLabels[] = {
 
 static constexpr uint32_t HistoryCount = sizeof(HistoryLabels) / sizeof(HistoryLabels[0]);
 
-
 static constexpr uint32_t VisibleRows = 5;
 static constexpr uint32_t ColorTextDefault = 0xFFFFFF;
 static constexpr uint32_t ColorTextActive = 0x0;
@@ -31,7 +30,9 @@ MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChan
         this, 
         valueToText, 
         changeValue
-    ){
+    ),
+    mCallbackCtx(callbackCtx),
+    mValueChangedCallback(valueChangedCallback){
 
     mMenu.addRow("Power", 0);
     mMenu.addRow("Target", 0);

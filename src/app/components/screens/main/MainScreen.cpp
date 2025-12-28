@@ -162,17 +162,34 @@ void MainScreen::onUserInputTick(){
 }
 
 void MainScreen::handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, int32_t newValue){
-    // nothing to do
+    switch(index){
+        case MenuRowIndex::Power: {
+            RequestFermentationModeEvent event = makeRequestFermentationModeEvent();
+            event->enabled = newValue != 0;
+            sendEvent(event);
+            break;
+        }  
+        case MenuRowIndex::Target: {
+            RequestTargetTemperatureEvent event = makeRequestTargetTemperatureEvent();
+            event->targetTemperature = newValue*0.1f;
+            sendEvent(event);
+            break;
+        }  
+        case MenuRowIndex::History: {
+            setHistoryIndex(static_cast<HistoryIndex>(newValue));
+            break;
+        }  
+        case MenuRowIndex::Fan: {
+            RequestFanModeEvent event = makeRequestFanModeEvent();
+            event->autoFan = newValue != 0;
+            sendEvent(event);
+            break;
+        }  
+        default: break;
+    }
 }
 
 void MainScreen::onRender(){
-
-    if(mAxisTimer.isExpired()){
-        HistoryIndex nextIndex = GarboxHistory::NextIndex(mHistoryIndex);
-        setHistoryIndex(nextIndex);
-        mAxisTimer.restart();
-    }
-
     if(!isMarkedDirty(RenderFn::TimeSeries)){
         mTempChart.updateAll();
         mPowerChart.updateAll();

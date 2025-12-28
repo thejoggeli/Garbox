@@ -14,6 +14,8 @@ public:
 
     struct Input {
 
+        bool regulationEnabled = false;
+
         // temperature control
         float targetTemperature = 0.0f; // Celcius 
 
@@ -47,12 +49,9 @@ public:
     void reset();
     void step();
 
-    void setRegulationEnabled(bool enabled);
-
     Input& getInput() { return mInput; };
     const Output& getOutput() const { return mOutput; };
     State getState() const { return mFsm.getState(); }
-    bool isRegulationEnabled() const { return mRegulationEnabled; }
 
 private:
 
@@ -75,6 +74,8 @@ private:
     // input tracking
     float mLastTargetTemperature = 0.0f;
     bool mTargetTemperatureChanged = false;
+
+    void setRegulationEnabled(bool enabled);
 
     // FSM
     FiniteStateMachine<State, State::Count> mFsm;

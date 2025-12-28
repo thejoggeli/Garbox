@@ -42,6 +42,16 @@ public:
 
 protected:
 
+    // make typed events 
+    RequestFermentationModeEvent makeRequestFermentationModeEvent();
+    RequestTargetTemperatureEvent makeRequestTargetTemperatureEvent();
+    RequestFanModeEvent makeRequestFanModeEvent();
+
+    // send typed events
+    void sendEvent(const RequestFermentationModeEvent& event);
+    void sendEvent(const RequestTargetTemperatureEvent& event);
+    void sendEvent(const RequestFanModeEvent& event);
+
     MainScreenStates& states();
 
 private:

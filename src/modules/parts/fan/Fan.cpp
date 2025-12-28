@@ -88,7 +88,7 @@ void Fan::tick(){
     }
 
     // fan monitor tick
-    const bool shouldSpin = isEnabled();
+    const bool shouldSpin = isEnabled() && (mTargetSpeed != 0.0f);
     const bool filtered = false;
     mMonitor.tick(getMeasuredRpm(filtered), shouldSpin);
 }
