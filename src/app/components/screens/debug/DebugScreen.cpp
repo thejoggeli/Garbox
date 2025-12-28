@@ -8,6 +8,7 @@ namespace Garbox {
 DebugScreen::DebugScreen():
     DebugScreenAbs(),
     mProgressBox(mRoot),
+    mMicrosLabel(mRoot),
     mTimeLabel(mRoot),
     mFanStateLabel(mRoot),
     mFanMeasuredRpmLabel(mRoot),
@@ -37,6 +38,8 @@ void DebugScreen::onInit(){
     const int16_t startYPx = 10;
     const int16_t deltaYPx = 15;
     int16_t currentYPx = startYPx;
+
+    initLabel(mMicrosLabel,             startXPx, currentYPx, "us");
     initLabel(mTimeLabel,               startXPx, currentYPx, "Time:"); currentYPx += deltaYPx;
     initLabel(mAppInfoLabel,            startXPx, currentYPx, "App:"); currentYPx += deltaYPx;
     initLabel(mHeapBytesLabel,          startXPx, currentYPx, "Heap:"); currentYPx += deltaYPx;
@@ -51,6 +54,14 @@ void DebugScreen::onInit(){
     initLabel(mHeatpadStateLabel,       startXPx, currentYPx, "Heatpad"); currentYPx += deltaYPx;
     initLabel(mHeatpadSenseLabel,       startXPx, currentYPx, "Heatpad");currentYPx += deltaYPx;
     initLabel(mHeatpadDutyLabel,        startXPx, currentYPx, "Duty%:"); currentYPx += deltaYPx;
+
+    mMicrosLabel.setTextAlign(LV_TEXT_ALIGN_RIGHT);
+    mMicrosLabel.setPositionX(0);
+    mMicrosLabel.setWidth(mScreenWidth);
+    mMicrosLabel.setFont(&lv_font_unscii_8);
+    mMicrosLabel.setPadRight(startXPx);
+
+    mTimeLabel.setFont(&lv_font_unscii_8);
 
     mProgressBox.setRawSize(48, 8);
     mProgressBox.setBgColor(lv_color_hex(0xFFFFFF));
@@ -79,6 +90,9 @@ void DebugScreen::onRender(){
         mLastTimeSeconds = timeSeconds;
         markDirty(RenderFn::Time);
     }
+    
+    // update micros
+    markDirty(RenderFn::Micros);
 
     // update heap space
     if(mHeapTimer.isExpired()){
@@ -188,7 +202,15 @@ void DebugScreen::onRenderTemperatureSample(){
 void DebugScreen::onRenderTime(){
     static char buffer[32];
     StringUtils::FormatDurationDHMS(mLastTimeSeconds, buffer, 32);
-    mTimeLabel.setTextFormatted("Time: %s", buffer);
+    mTimeLabel.setTextFormatted("%s", buffer);
+}
+
+void DebugScreen::onRenderMicros(){
+    uint32_t t0 = Time::GetTickMicros() % 1000;
+    uint32_t t1 = (Time::GetTickMicros() / 1000) % 1000;
+    uint32_t t2 = (Time::GetTickMicros() / 1000000) % 1000;
+    uint32_t t3 = (Time::GetTickMicros() / 1000000000);
+    mMicrosLabel.setTextFormatted("%03u'%03u'%03u'%03u us", t3, t2, t1, t0);
 }
 
 void DebugScreen::onRenderHeapBlocks(){

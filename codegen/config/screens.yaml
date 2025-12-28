@@ -3,6 +3,7 @@ screens:
   Main:
     subdir: main
     renderer: lvgl-gui # lvgl-simple or lvgl-gui 
+    tick_phases: [UserInput]
     renderer_gui: MainScreen.xml
     render_fns: 
       - FanInfo 
@@ -13,6 +14,7 @@ screens:
       - HeatpadPowerLabel
       - TimeAxis
       - TimeSeries
+      - Menu
     read_states: 
       - FanStatus
       - FanSample
@@ -36,6 +38,7 @@ screens:
       - TemperatureState 
       - TemperatureSample 
       - Time 
+      - Micros
       - AppInfo 
       - FermentationStatus 
       - HeapBlocks

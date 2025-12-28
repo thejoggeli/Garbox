@@ -23,6 +23,7 @@ private:
     uint32_t mHeapMinimumTime = 0;
 
     LvBox mProgressBox;
+    LvLabel mMicrosLabel;
     LvLabel mTimeLabel;
     LvLabel mFanStateLabel;
     LvLabel mFanMeasuredRpmLabel;
@@ -82,6 +83,7 @@ public:
     void onRenderTemperatureState() final;
     void onRenderTemperatureSample() final;
     void onRenderTime() final;
+    void onRenderMicros() final;
     void onRenderAppInfo() final;
     void onRenderFermentationStatus() final;
     void onRenderHeapBlocks() final;

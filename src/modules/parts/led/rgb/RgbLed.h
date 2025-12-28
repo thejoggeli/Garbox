@@ -24,6 +24,7 @@ public:
     void setColor(uint8_t r, uint8_t g, uint8_t b);
 
     bool isInitialized() const;
+    void setNeedsUpdate();
 
     // disallow copy and move 
     RgbLed(const RgbLed&) = delete;
@@ -35,7 +36,12 @@ private:
     Adafruit_NeoPixel* mRgbLed = nullptr;
     Gpio& mGpio;
     bool mInitialized = false;
-    bool mNeedsUpdate = false;
+    bool mNeedsUpdate = true;
+
+    uint8_t mCurrentRed = 0;
+    uint8_t mCurrentGreen = 0;
+    uint8_t mCurrentBlue = 0;
+
 };
 
 } // namespace

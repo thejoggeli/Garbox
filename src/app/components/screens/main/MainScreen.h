@@ -4,6 +4,7 @@
 #include "generated/components/screens/main/MainScreenAbs.h"
 // ==== GENERATED END: include ====================================================
 
+#include "app/components/screens/main/MainScreenMenu.h"
 #include "app/services/GarboxHistory.h"
 #include "core/lvgl/helpers/chart/ChartGridRenderer.h"
 #include "core/lvgl/helpers/chart/MultiSeriesChart.h"
@@ -17,9 +18,15 @@ namespace Garbox {
 class MainScreen : public MainScreenAbs {
 private:
 
-    GarboxHistory::SeriesIndex mHistoryIndex = GarboxHistory::SeriesIndex::Window_01min;
+    using HistoryIndex = GarboxHistory::SeriesIndex;
+    using MenuRowIndex = MainScreenMenu::RowIndex;
 
-    SoftwareTimer mDebugTimer;
+    MainScreenMenu mMenu;
+
+    HistoryIndex mHistoryIndex = HistoryIndex::Window_01min;
+
+    SoftwareTimer mMenuTimer;
+    SoftwareTimer mAxisTimer;
 
     LvImage mTempLabel;
     LvImage mPowerLabel;
@@ -37,7 +44,12 @@ private:
     uint32_t resovleEngineStateColor();
     const char* resovleSensorText();
 
-    void setHistoryIndex(GarboxHistory::SeriesIndex index);
+    void setHistoryIndex(HistoryIndex index);
+
+    void handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, int32_t newValue);
+    static void menuValueChangedTrampoline(void* ctx, MenuRowIndex index, int32_t oldValue, int32_t newValue){
+        static_cast<MainScreen*>(ctx)->handleMenuValueChanged(index, oldValue, newValue);
+    }
 
 public:
 
@@ -51,6 +63,9 @@ public:
     void onStart() final;
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
+
+    // generated tick handlers
+    void onUserInputTick() final;
 
     // generated state changed handlers
     void onFanStatusStateChanged(const FanStatusState& state) final;
@@ -71,6 +86,7 @@ public:
     void onRenderHeatpadPowerLabel() final;
     void onRenderTimeAxis() final;
     void onRenderTimeSeries() final;
+    void onRenderMenu() final;
 
 // ==== GENERATED END: interface ==================================================
 

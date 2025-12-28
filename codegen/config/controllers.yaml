@@ -12,7 +12,7 @@ controllers:
 
   FanController:
     subdir: "actuators"
-    tick_phases: [Input, Output]
+    tick_phases: [SensorRead, ActorWrite]
     receive_events: [FanCommand]
     write_states: [FanStatus, FanSample]
 
@@ -23,22 +23,22 @@ controllers:
 
   HeatpadController:
     subdir: "actuators"
-    tick_phases: [Input, Output]
+    tick_phases: [SensorRead, ActorWrite]
     receive_events: [HeatpadCommand]
     write_states: [HeatpadStatus, HeatpadSample, HeatpadProgress]
 
   InputController:
     subdir: "hmi"
-    tick_phases: [Input]
+    tick_phases: [SensorRead]
     send_events: [Button, ButtonRepeat, EncoderStep]
 
   I2cPartsController:
     subdir: "sensors"
-    tick_phases: [Input]
+    tick_phases: [SensorRead]
     receive_events: [Button]
     write_states: [TemperatureStatus, TemperatureSample]
 
   TimeSeriesController:
     subdir: "hmi"
-    tick_phases: [Output]
+    tick_phases: [ActorWrite]
     read_states: [HeatpadStatus, TemperatureStatus, TemperatureSample, FermentationStatus]

@@ -17,6 +17,9 @@ public:
     // component constructor
     MainScreenAbs();
 
+    // tick handlers (to be implmeneted by user)
+    virtual void onUserInputTick() = 0;
+
     // state change handlers (to be implmeneted by user)
     virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
     virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
@@ -35,6 +38,7 @@ public:
     virtual void onRenderHeatpadPowerLabel() = 0;
     virtual void onRenderTimeAxis() = 0;
     virtual void onRenderTimeSeries() = 0;
+    virtual void onRenderMenu() = 0;
 
 protected:
 
@@ -82,6 +86,7 @@ protected:
         HeatpadPowerLabel,
         TimeAxis,
         TimeSeries,
+        Menu,
         Count 
     }; 
 
@@ -105,6 +110,7 @@ private:
     static void renderHeatpadPowerLabelTrampoline(void* context);
     static void renderTimeAxisTrampoline(void* context);
     static void renderTimeSeriesTrampoline(void* context);
+    static void renderMenuTrampoline(void* context);
 
 };
 

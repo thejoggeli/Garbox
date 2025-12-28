@@ -32,6 +32,7 @@ static constexpr int32_t PowerChartYMax = PowerChartYScale * (100 + 20);
 
 MainScreen::MainScreen() : 
     MainScreenAbs(),
+    mMenu(gui().menuRows, this, menuValueChangedTrampoline),
     mTempLabel(RotationRenderer::createRotatedLabelRgb565(gui().tempGraph.labelContainer, {
         .text = "Temperature",
         .font = &lv_font_montserrat_14,
@@ -131,25 +132,50 @@ void MainScreen::onStart(){
 }
 
 void MainScreen::onBecomeEnabled(){
-    mDebugTimer.start(2500_ms);
+    mMenuTimer.start(750_ms);
+    mAxisTimer.start(2500_ms);
 }
 
 void MainScreen::onBecomeDisabled(){
     // nothing to do
 }
 
+void MainScreen::onUserInputTick(){
+    if(mMenuTimer.isExpired()){
+        static uint32_t state = 0;
+        int32_t steps = 0;
+        bool buttonAction = false;
+        if(state == 0){
+            steps = 1;
+            state = 1;
+        }
+        else {
+            buttonAction = true; 
+            state = 0;
+        }
+        const bool menuChanged = mMenu.onEncoderInput(steps, buttonAction);
+        if(menuChanged){
+            markDirty(RenderFn::Menu);
+        }
+        mMenuTimer.restart();
+    }
+}
+
+void MainScreen::handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, int32_t newValue){
+    // nothing to do
+}
+
 void MainScreen::onRender(){
 
-    if(mDebugTimer.isExpired()){
-        GarboxHistory::SeriesIndex nextIndex = GarboxHistory::NextIndex(mHistoryIndex);
+    if(mAxisTimer.isExpired()){
+        HistoryIndex nextIndex = GarboxHistory::NextIndex(mHistoryIndex);
         setHistoryIndex(nextIndex);
-        mDebugTimer.restart();
+        mAxisTimer.restart();
     }
 
     if(!isMarkedDirty(RenderFn::TimeSeries)){
         mTempChart.updateAll();
         mPowerChart.updateAll();
-        
     }
 }
 
@@ -285,6 +311,14 @@ void MainScreen::onRenderTimeSeries(){
     mPowerChart.attach(0, history.getPowerSeries(mHistoryIndex));
 }
 
+void MainScreen::onRenderMenu(){
+    mMenu.setPowerEnabled(states().fermentationStatus.getPowerOn());
+    mMenu.setTargetTemperatureCelsius(states().fermentationStatus.getTargetTemperature());
+    mMenu.setHistoryIndex(mHistoryIndex);
+    mMenu.setFanAuto(states().fermentationStatus.getFanAuto());
+    mMenu.render();
+}
+
 void MainScreen::onFanStatusStateChanged(const FanStatusState& state){
     markDirty(RenderFn::FanInfo);
 }
@@ -314,12 +348,14 @@ void MainScreen::onTemperatureSampleStateChanged(const TemperatureSampleState& s
 
 void MainScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
     markDirty(RenderFn::StatusInfo);
+    markDirty(RenderFn::Menu);
 }
 
-void MainScreen::setHistoryIndex(GarboxHistory::SeriesIndex index){
+void MainScreen::setHistoryIndex(HistoryIndex index){
     mHistoryIndex = index;
     markDirty(RenderFn::TimeAxis);
     markDirty(RenderFn::TimeSeries);
+    markDirty(RenderFn::Menu);
 }
 
 } // namespace Garbox

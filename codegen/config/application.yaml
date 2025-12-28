@@ -8,9 +8,10 @@ application:
   tick_period_millis: 33 # ~30.3 FPS
   tick_phases: 
     - { name: Heartbeat }
-    - { name: Input }
+    - { name: SensorRead }
+    - { name: UserInput }
     - { name: Logic }
-    - { name: Output }
+    - { name: ActorWrite }
     - { name: Logging }
     - { name: Render, delay_millis: 20 }
   max_dispatch_recursion_depth: 3

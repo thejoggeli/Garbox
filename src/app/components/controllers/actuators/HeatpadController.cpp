@@ -29,7 +29,7 @@ void HeatpadController::onStart(){
     mHeatpad.setPeriodDurationMicros(5000_ms);
 }
 
-void HeatpadController::onInputTick(){
+void HeatpadController::onSensorReadTick(){
     mHeatpad.tick();
 
     // send sample if measured voltage or current changed
@@ -51,7 +51,7 @@ void HeatpadController::onInputTick(){
     states().heatpadProgress.setPwmProgressMicros(mHeatpad.getPwmProgressMicros());
 }
 
-void HeatpadController::onOutputTick(){
+void HeatpadController::onActorWriteTick(){
 
     // get measured voltage
     const float measuredVoltageNorm = mHeatpad.getMeasuredVoltage() / 17.0f;

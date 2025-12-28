@@ -38,7 +38,7 @@ void InputController::onStart(){
     // nothing to do
 }
 
-void InputController::onInputTick(){
+void InputController::onSensorReadTick(){
     // button tick
     mButton.tick();
 }

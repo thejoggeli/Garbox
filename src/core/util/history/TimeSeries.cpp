@@ -45,8 +45,7 @@ void TimeSeries::tick(int32_t value){
 
         // write to ring buffer
         if(mSamplingMode == SamplingMode::Average){
-            const int32_t averagedValue =
-                mAccumulatedValue / static_cast<int32_t>(mAccumulatedCount);
+            const int32_t averagedValue = mAccumulatedValue / static_cast<int32_t>(mAccumulatedCount);
 
             mBuffer[mWriteIndex] = averagedValue;
             mAccumulatedValue = 0;

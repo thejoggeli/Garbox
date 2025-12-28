@@ -30,15 +30,7 @@
       </body>
     </GraphComponent>
 
-    <!-- SETTINGS ROW COMPONENT -->
-    <MenuRow $label $value>
-      <body layout="flex" flex-flow="row" width="100%" height="content">
-        <label name="label" text=$label text-align="left" flex-grow="1" height="content"/>
-        <label name="value" text=$value text-align="right" width="content" height="content" />
-      </body>
-    </MenuRow>
-
-    <!-- INFO ROW COMPONENT -->
+    <!-- INFO TILE COMPONENT -->
     <InfoTile $icon $value>
       <body layout="flex" flex-flow="column" flex-align="center" margin="0 0 4px 4px">
         <image name="icon" src=$icon width="16" height="16" />
@@ -79,34 +71,24 @@
         </container>
 
         <!-- Menu -->
-        <container 
-          name="menu-container"
-          width="100%" flex-grow="1" pad-top="16px" pad-bottom="8px"
+        <container name="menu-container"
+          width="100%" flex-grow="1"
           layout="flex" flex-flow="column" flex-align="center">
-           
-          <!-- arrow up + horizontal line -->
-          <image src="arrow-up" name="menuArrUp" opa="40%" />
-          <container width="100%" height="4px" />
-
-          <!-- Menu Rows Container -->
+        
+          <image src="arrow-up" name="menuArrUp" />
+          <container width="100%" height="2px" />
           <container 
-            width="100%" flex-grow="1" border-color="#fff" border-width="1px" border-side="top bottom"
-            layout="flex" flex-flow="column" flex-align ="space-evenly center center">
-
-            <!-- Menu Rows -->
-            <MenuRow $label="Power" $value="On" />
-            <MenuRow $label="Target" $value="32.5°C" />
-            <MenuRow $label="History" $value="12h" />
-            <MenuRow $label="Fan" $value="Auto" />
-            <MenuRow $label="Calib" $value="-->" />
-
-          </container>
-
-          <!-- horizontal line + arrow down -->
-          <container width="100%" height="4px" />
+            name="menu-rows" width="100%" height="content" 
+          />
+          <container width="100%" height="2px" />
           <image src="arrow-down" name="menuArrDown" />
 
         </container>
+
+        <!-- Menu -->
+        <!-- <container name="menu-container" width="100%" flex-grow="1">
+          <container name="menu-rows" width="100%" height="100%" />
+        </container> -->
 
         <!-- Info Tiles -->
         <container name="info-tiles" width="100%" height="content" layout="flex" flex-flow="row-wrap" flex-align="center space-around space-around" pad-top="4px" pad-bottom="4px">

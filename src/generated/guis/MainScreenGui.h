@@ -39,19 +39,6 @@ public:
         ~GraphComponent() = default;
     };
 
-    struct MenuRow {
-        MenuRow(LvObject& parent);
-        LvObject body;
-        LvLabel label;
-        LvLabel value;
-
-        MenuRow(const MenuRow&) = delete;
-        MenuRow& operator=(const MenuRow&) = delete;
-        MenuRow(MenuRow&&) = delete;
-        MenuRow& operator=(MenuRow&&) = delete;
-        ~MenuRow() = default;
-    };
-
     struct InfoTile {
         InfoTile(LvObject& parent);
         LvObject body;
@@ -88,13 +75,8 @@ public:
         LvObject menuContainer;
         LvImage menuArrUp;
         LvObject _namelessContainer_2;
+        LvObject menuRows;
         LvObject _namelessContainer_3;
-        MenuRow _namelessMenuRow_0;
-        MenuRow _namelessMenuRow_1;
-        MenuRow _namelessMenuRow_2;
-        MenuRow _namelessMenuRow_3;
-        MenuRow _namelessMenuRow_4;
-        LvObject _namelessContainer_4;
         LvImage menuArrDown;
         LvObject infoTiles;
         InfoTile fanInfo;

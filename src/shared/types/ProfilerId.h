@@ -17,9 +17,10 @@ enum class ProfilerId : uint16_t {
 
     // tick phases
     HeartbeatTick,
-    InputTick,
+    SensorReadTick,
+    UserInputTick,
     LogicTick,
-    OutputTick,
+    ActorWriteTick,
     LoggingTick,
     RenderTick,
 

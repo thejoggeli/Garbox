@@ -11,10 +11,10 @@ public:
     static constexpr int32_t TemperaturScaleFactor = 1024;
     static constexpr int32_t PowerScaleFactor = 1024;
 
-    enum class SeriesIndex : uint8_t {
+    enum SeriesIndex : uint8_t {
         Window_01min = 0,
-        Window_04min = 0,
-        Window_16min = 0,
+        Window_04min,
+        Window_16min,
         Window_01h,
         Window_04h,
         Window_12h,

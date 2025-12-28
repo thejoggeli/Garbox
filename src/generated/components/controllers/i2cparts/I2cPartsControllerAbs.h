@@ -17,7 +17,7 @@ public:
     I2cPartsControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onInputTick() = 0;
+    virtual void onSensorReadTick() = 0;
 
     // event handlers (to be implmeneted by user)
     virtual void onButtonEvent(const ButtonEvent& event) = 0;

@@ -59,9 +59,10 @@ private:
     void handleTickEnd();
 
     void handleHeartbeatTick();
-    void handleInputTick();
+    void handleSensorReadTick();
+    void handleUserInputTick();
     void handleLogicTick();
-    void handleOutputTick();
+    void handleActorWriteTick();
     void handleLoggingTick();
     void handleRenderTick();
 

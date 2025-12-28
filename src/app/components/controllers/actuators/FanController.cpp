@@ -42,7 +42,7 @@ void FanController::onStart(){
     mFan.start();
 }
 
-void FanController::onInputTick(){
+void FanController::onSensorReadTick(){
     // updates MeasuredRpm and FanState
     mFan.tick();
     if(mStateChanged){
@@ -55,7 +55,7 @@ void FanController::onInputTick(){
     }
 }
 
-void FanController::onOutputTick(){
+void FanController::onActorWriteTick(){
     if(mUsePid && mFan.isEnabled()){
         const bool filtered = false;
         const float measuredRpm = mFan.getMeasuredRpm(filtered);

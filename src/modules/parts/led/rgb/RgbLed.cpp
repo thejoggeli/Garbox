@@ -43,13 +43,35 @@ void RgbLed::setColor(const Rgb888& color){
 }
 
 void RgbLed::setColor(uint8_t r, uint8_t g, uint8_t b){
-    const uint32_t color = mRgbLed->Color(r, g, b);
-    mRgbLed->setPixelColor(0, color);
+
+    // check if needs update
+    if(!mNeedsUpdate){
+
+        // check if color changed
+        const bool colorChanged =
+            mCurrentRed   != r || 
+            mCurrentGreen != g ||
+            mCurrentBlue  != b;
+
+        if(!colorChanged){
+            return;
+        }        
+    }
+    else {
+        mNeedsUpdate = false;
+    }
+    
+    // write color to rgb led
+    mRgbLed->setPixelColor(0, r, g, b);
     mRgbLed->show();
 }
 
 bool RgbLed::isInitialized() const {
     return mInitialized;
+}
+
+void RgbLed::setNeedsUpdate(){
+    mNeedsUpdate = true;
 }
 
 } // namespace

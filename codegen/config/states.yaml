@@ -24,6 +24,8 @@ states:
     fields:
       - { name: State, type: FermentationState }
       - { name: TargetTemperature, type: float }
+      - { name: FanAuto, type: bool, default: true }
+      - { name: PowerOn, type: bool, default: true }
 
   HeatpadStatus:
     include: "modules/parts/heatpad/HeatpadState.h"

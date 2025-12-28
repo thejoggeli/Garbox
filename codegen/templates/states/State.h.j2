@@ -35,7 +35,11 @@ private:
 
     struct Data {
 {% for field in fields.values() %}
+    {% if field.default is not none %}
+        {{ field.type }} {{ field.name|lower_first }} = {{ field.default }};
+    {% else %}
         {{ field.type }} {{ field.name|lower_first }};
+    {% endif %}
 {% endfor %}
     };
 

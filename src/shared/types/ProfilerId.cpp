@@ -11,9 +11,10 @@ const char* ProfilerIdToString(ProfilerId id){
         case ProfilerId::MainPeriod: return "MainPeriod";
         case ProfilerId::MainBusy: return "MainBusy";
         case ProfilerId::HeartbeatTick: return "HeartbeatTick";
-        case ProfilerId::InputTick: return "InputTick";
+        case ProfilerId::SensorReadTick: return "SensorReadTick";
+        case ProfilerId::UserInputTick: return "UserInputTick";
         case ProfilerId::LogicTick: return "LogicTick";
-        case ProfilerId::OutputTick: return "OutputTick";
+        case ProfilerId::ActorWriteTick: return "ActorWriteTick";
         case ProfilerId::LoggingTick: return "LoggingTick";
         case ProfilerId::RenderTick: return "RenderTick";
         case ProfilerId::LedAnimation: return "LedAnimation";

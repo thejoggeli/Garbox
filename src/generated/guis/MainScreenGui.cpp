@@ -127,85 +127,16 @@ void MainScreenGui::init(){
     mObjects.systemState.setTextColor(lv_color_hex(0x000000));                  // text-color="#000"
     mObjects.menuContainer.setWidth(LV_PCT(100));                               // width="100%"
     mObjects.menuContainer.setFlexGrow(1);                                      // flex-grow="1"
-    mObjects.menuContainer.setPadTop(16);                                       // pad-top="16px"
-    mObjects.menuContainer.setPadBottom(8);                                     // pad-bottom="8px"
     mObjects.menuContainer.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.menuContainer.setFlexFlow(LV_FLEX_FLOW_COLUMN);                    // flex-flow="column"
     mObjects.menuContainer.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center"
     mObjects.menuArrUp.setSource(&MainScreen_image_arrow_up);                   // src="arrow-up"
-    mObjects.menuArrUp.setOpa(102);                                             // opa="40%"
     mObjects._namelessContainer_2.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_2.setHeight(4);                                 // height="4px"
+    mObjects._namelessContainer_2.setHeight(2);                                 // height="2px"
+    mObjects.menuRows.setWidth(LV_PCT(100));                                    // width="100%"
+    mObjects.menuRows.setHeightContent();                                       // height="content"
     mObjects._namelessContainer_3.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_3.setFlexGrow(1);                               // flex-grow="1"
-    mObjects._namelessContainer_3.setBorderColor(lv_color_hex(0xffffff));       // border-color="#fff"
-    mObjects._namelessContainer_3.setBorderWidth(1);                            // border-width="1px"
-    mObjects._namelessContainer_3.setBorderSide(LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM); // border-side="top bottom"
-    mObjects._namelessContainer_3.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
-    mObjects._namelessContainer_3.setFlexFlow(LV_FLEX_FLOW_COLUMN);             // flex-flow="column"
-    mObjects._namelessContainer_3.setFlexAlign(LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="space-evenly center center"
-    mObjects._namelessMenuRow_0.body.setLayout(LV_LAYOUT_FLEX);                 // layout="flex"
-    mObjects._namelessMenuRow_0.body.setFlexFlow(LV_FLEX_FLOW_ROW);             // flex-flow="row"
-    mObjects._namelessMenuRow_0.body.setWidth(LV_PCT(100));                     // width="100%"
-    mObjects._namelessMenuRow_0.body.setHeightContent();                        // height="content"
-    mObjects._namelessMenuRow_0.label.setText("Power");                         // text="Power"
-    mObjects._namelessMenuRow_0.label.setTextAlign(LV_TEXT_ALIGN_LEFT);         // text-align="left"
-    mObjects._namelessMenuRow_0.label.setFlexGrow(1);                           // flex-grow="1"
-    mObjects._namelessMenuRow_0.label.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_0.value.setText("On");                            // text="On"
-    mObjects._namelessMenuRow_0.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);        // text-align="right"
-    mObjects._namelessMenuRow_0.value.setWidthContent();                        // width="content"
-    mObjects._namelessMenuRow_0.value.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_1.body.setLayout(LV_LAYOUT_FLEX);                 // layout="flex"
-    mObjects._namelessMenuRow_1.body.setFlexFlow(LV_FLEX_FLOW_ROW);             // flex-flow="row"
-    mObjects._namelessMenuRow_1.body.setWidth(LV_PCT(100));                     // width="100%"
-    mObjects._namelessMenuRow_1.body.setHeightContent();                        // height="content"
-    mObjects._namelessMenuRow_1.label.setText("Target");                        // text="Target"
-    mObjects._namelessMenuRow_1.label.setTextAlign(LV_TEXT_ALIGN_LEFT);         // text-align="left"
-    mObjects._namelessMenuRow_1.label.setFlexGrow(1);                           // flex-grow="1"
-    mObjects._namelessMenuRow_1.label.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_1.value.setText("32.5°C");                        // text="32.5°C"
-    mObjects._namelessMenuRow_1.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);        // text-align="right"
-    mObjects._namelessMenuRow_1.value.setWidthContent();                        // width="content"
-    mObjects._namelessMenuRow_1.value.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_2.body.setLayout(LV_LAYOUT_FLEX);                 // layout="flex"
-    mObjects._namelessMenuRow_2.body.setFlexFlow(LV_FLEX_FLOW_ROW);             // flex-flow="row"
-    mObjects._namelessMenuRow_2.body.setWidth(LV_PCT(100));                     // width="100%"
-    mObjects._namelessMenuRow_2.body.setHeightContent();                        // height="content"
-    mObjects._namelessMenuRow_2.label.setText("History");                       // text="History"
-    mObjects._namelessMenuRow_2.label.setTextAlign(LV_TEXT_ALIGN_LEFT);         // text-align="left"
-    mObjects._namelessMenuRow_2.label.setFlexGrow(1);                           // flex-grow="1"
-    mObjects._namelessMenuRow_2.label.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_2.value.setText("12h");                           // text="12h"
-    mObjects._namelessMenuRow_2.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);        // text-align="right"
-    mObjects._namelessMenuRow_2.value.setWidthContent();                        // width="content"
-    mObjects._namelessMenuRow_2.value.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_3.body.setLayout(LV_LAYOUT_FLEX);                 // layout="flex"
-    mObjects._namelessMenuRow_3.body.setFlexFlow(LV_FLEX_FLOW_ROW);             // flex-flow="row"
-    mObjects._namelessMenuRow_3.body.setWidth(LV_PCT(100));                     // width="100%"
-    mObjects._namelessMenuRow_3.body.setHeightContent();                        // height="content"
-    mObjects._namelessMenuRow_3.label.setText("Fan");                           // text="Fan"
-    mObjects._namelessMenuRow_3.label.setTextAlign(LV_TEXT_ALIGN_LEFT);         // text-align="left"
-    mObjects._namelessMenuRow_3.label.setFlexGrow(1);                           // flex-grow="1"
-    mObjects._namelessMenuRow_3.label.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_3.value.setText("Auto");                          // text="Auto"
-    mObjects._namelessMenuRow_3.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);        // text-align="right"
-    mObjects._namelessMenuRow_3.value.setWidthContent();                        // width="content"
-    mObjects._namelessMenuRow_3.value.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_4.body.setLayout(LV_LAYOUT_FLEX);                 // layout="flex"
-    mObjects._namelessMenuRow_4.body.setFlexFlow(LV_FLEX_FLOW_ROW);             // flex-flow="row"
-    mObjects._namelessMenuRow_4.body.setWidth(LV_PCT(100));                     // width="100%"
-    mObjects._namelessMenuRow_4.body.setHeightContent();                        // height="content"
-    mObjects._namelessMenuRow_4.label.setText("Calib");                         // text="Calib"
-    mObjects._namelessMenuRow_4.label.setTextAlign(LV_TEXT_ALIGN_LEFT);         // text-align="left"
-    mObjects._namelessMenuRow_4.label.setFlexGrow(1);                           // flex-grow="1"
-    mObjects._namelessMenuRow_4.label.setHeightContent();                       // height="content"
-    mObjects._namelessMenuRow_4.value.setText("-->");                           // text="-->"
-    mObjects._namelessMenuRow_4.value.setTextAlign(LV_TEXT_ALIGN_RIGHT);        // text-align="right"
-    mObjects._namelessMenuRow_4.value.setWidthContent();                        // width="content"
-    mObjects._namelessMenuRow_4.value.setHeightContent();                       // height="content"
-    mObjects._namelessContainer_4.setWidth(LV_PCT(100));                        // width="100%"
-    mObjects._namelessContainer_4.setHeight(4);                                 // height="4px"
+    mObjects._namelessContainer_3.setHeight(2);                                 // height="2px"
     mObjects.menuArrDown.setSource(&MainScreen_image_arrow_down);               // src="arrow-down"
     mObjects.infoTiles.setWidth(LV_PCT(100));                                   // width="100%"
     mObjects.infoTiles.setHeightContent();                                      // height="content"
@@ -287,11 +218,6 @@ MainScreenGui::GraphComponent::GraphComponent(LvObject& parent):
     chart(_namelessContainer_0),
     value(_namelessContainer_0){}
 
-MainScreenGui::MenuRow::MenuRow(LvObject& parent):
-    body(parent),
-    label(body),
-    value(body){}
-
 MainScreenGui::InfoTile::InfoTile(LvObject& parent):
     body(parent),
     icon(body),
@@ -319,13 +245,8 @@ MainScreenGui::Objects::Objects():
     menuContainer(_namelessContainer_1),
     menuArrUp(menuContainer),
     _namelessContainer_2(menuContainer),
+    menuRows(menuContainer),
     _namelessContainer_3(menuContainer),
-    _namelessMenuRow_0(_namelessContainer_3),
-    _namelessMenuRow_1(_namelessContainer_3),
-    _namelessMenuRow_2(_namelessContainer_3),
-    _namelessMenuRow_3(_namelessContainer_3),
-    _namelessMenuRow_4(_namelessContainer_3),
-    _namelessContainer_4(menuContainer),
     menuArrDown(menuContainer),
     infoTiles(_namelessContainer_1),
     fanInfo(infoTiles),

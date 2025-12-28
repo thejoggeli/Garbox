@@ -33,7 +33,7 @@ void I2cPartsController::onStart(){
     // nothing to do
 }
 
-void I2cPartsController::onInputTick(){
+void I2cPartsController::onSensorReadTick(){
 
     // handle current fsm state
     mFsm.tick();

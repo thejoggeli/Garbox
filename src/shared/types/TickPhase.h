@@ -9,9 +9,10 @@ namespace Garbox {
 enum class TickPhase : uint16_t {
     Null = 0,
     Heartbeat,
-    Input,
+    SensorRead,
+    UserInput,
     Logic,
-    Output,
+    ActorWrite,
     Logging,
     Render,
     Count,

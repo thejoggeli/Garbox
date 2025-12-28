@@ -9,13 +9,14 @@
 
 namespace Garbox {
 
-static constexpr size_t TickHandlersCount = 6;
+static constexpr size_t TickHandlersCount = 7;
 static constexpr size_t TickPeriodMillis = 33;
 
 static constexpr uint32_t HeartbeatTickDelayMillis = 0;
-static constexpr uint32_t InputTickDelayMillis = 0;
+static constexpr uint32_t SensorReadTickDelayMillis = 0;
+static constexpr uint32_t UserInputTickDelayMillis = 0;
 static constexpr uint32_t LogicTickDelayMillis = 0;
-static constexpr uint32_t OutputTickDelayMillis = 0;
+static constexpr uint32_t ActorWriteTickDelayMillis = 0;
 static constexpr uint32_t LoggingTickDelayMillis = 0;
 static constexpr uint32_t RenderTickDelayMillis = 20;
 
@@ -66,9 +67,10 @@ Runtime::Runtime():
 
     //  register all tick phases
     mTickRunner.registerTickPhase([this](){ handleHeartbeatTick(); }, HeartbeatTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleInputTick(); }, InputTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleSensorReadTick(); }, SensorReadTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleUserInputTick(); }, UserInputTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleLogicTick(); }, LogicTickDelayMillis);
-    mTickRunner.registerTickPhase([this](){ handleOutputTick(); }, OutputTickDelayMillis);
+    mTickRunner.registerTickPhase([this](){ handleActorWriteTick(); }, ActorWriteTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleLoggingTick(); }, LoggingTickDelayMillis);
     mTickRunner.registerTickPhase([this](){ handleRenderTick(); }, RenderTickDelayMillis);
 
@@ -193,12 +195,23 @@ void Runtime::handleHeartbeatTick(){
     dispatch();
 }
 
-void Runtime::handleInputTick(){
-    Profiler::MeasureScoped profiler(ProfilerId::InputTick);
-    mFanController.onInputTick();
-    mHeatpadController.onInputTick();
-    mInputController.onInputTick();
-    mI2cPartsController.onInputTick();
+void Runtime::handleSensorReadTick(){
+    Profiler::MeasureScoped profiler(ProfilerId::SensorReadTick);
+    mFanController.onSensorReadTick();
+    mHeatpadController.onSensorReadTick();
+    mInputController.onSensorReadTick();
+    mI2cPartsController.onSensorReadTick();
+    dispatch();
+}
+
+void Runtime::handleUserInputTick(){
+    Profiler::MeasureScoped profiler(ProfilerId::UserInputTick);
+    switch(mActiveScreen->getScreenId()){
+        case ScreenId::Main:
+            static_cast<MainScreen*>(mActiveScreen)->onUserInputTick();
+        break;
+        default: break; // active behaviour does not receive tick type
+    }
     dispatch();
 }
 
@@ -216,11 +229,11 @@ void Runtime::handleLogicTick(){
     dispatch();
 }
 
-void Runtime::handleOutputTick(){
-    Profiler::MeasureScoped profiler(ProfilerId::OutputTick);
-    mFanController.onOutputTick();
-    mHeatpadController.onOutputTick();
-    mTimeSeriesController.onOutputTick();
+void Runtime::handleActorWriteTick(){
+    Profiler::MeasureScoped profiler(ProfilerId::ActorWriteTick);
+    mFanController.onActorWriteTick();
+    mHeatpadController.onActorWriteTick();
+    mTimeSeriesController.onActorWriteTick();
     dispatch();
 }
 

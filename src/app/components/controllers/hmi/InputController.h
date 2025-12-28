@@ -35,7 +35,7 @@ public:
     void onStart() final;
 
     // generated tick handlers
-    void onInputTick() final;
+    void onSensorReadTick() final;
 
 // ==== GENERATED END: interface ==================================================
 

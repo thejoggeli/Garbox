@@ -9,9 +9,10 @@ const char* TickPhaseToString(TickPhase phase){
     switch(phase){
         case TickPhase::Null: return "Null";
         case TickPhase::Heartbeat: return "Heartbeat";
-        case TickPhase::Input: return "Input";
+        case TickPhase::SensorRead: return "SensorRead";
+        case TickPhase::UserInput: return "UserInput";
         case TickPhase::Logic: return "Logic";
-        case TickPhase::Output: return "Output";
+        case TickPhase::ActorWrite: return "ActorWrite";
         case TickPhase::Logging: return "Logging";
         case TickPhase::Render: return "Render";
         case TickPhase::Count: return "Count";

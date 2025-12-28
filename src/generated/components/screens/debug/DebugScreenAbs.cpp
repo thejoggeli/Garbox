@@ -37,6 +37,7 @@ void DebugScreenAbs::init(ComponentHostIfc& host){
     mRenderDispatcher.registerHandler(renderTemperatureStateTrampoline, this);
     mRenderDispatcher.registerHandler(renderTemperatureSampleTrampoline, this);
     mRenderDispatcher.registerHandler(renderTimeTrampoline, this);
+    mRenderDispatcher.registerHandler(renderMicrosTrampoline, this);
     mRenderDispatcher.registerHandler(renderAppInfoTrampoline, this);
     mRenderDispatcher.registerHandler(renderFermentationStatusTrampoline, this);
     mRenderDispatcher.registerHandler(renderHeapBlocksTrampoline, this);
@@ -67,6 +68,7 @@ void DebugScreenAbs::becomeEnabled(){
     markDirty(RenderFn::TemperatureState);
     markDirty(RenderFn::TemperatureSample);
     markDirty(RenderFn::Time);
+    markDirty(RenderFn::Micros);
     markDirty(RenderFn::AppInfo);
     markDirty(RenderFn::FermentationStatus);
     markDirty(RenderFn::HeapBlocks);
@@ -130,6 +132,10 @@ void DebugScreenAbs::renderTemperatureSampleTrampoline(void* context){
 
 void DebugScreenAbs::renderTimeTrampoline(void* context){
     static_cast<DebugScreenAbs*>(context)->onRenderTime();
+}
+
+void DebugScreenAbs::renderMicrosTrampoline(void* context){
+    static_cast<DebugScreenAbs*>(context)->onRenderMicros();
 }
 
 void DebugScreenAbs::renderAppInfoTrampoline(void* context){

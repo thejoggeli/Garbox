@@ -52,7 +52,7 @@ public:
     void onStart() final;
 
     // generated tick handlers
-    void onInputTick() final;
+    void onSensorReadTick() final;
 
     // generated event handlers
     void onButtonEvent(const ButtonEvent& event) final;

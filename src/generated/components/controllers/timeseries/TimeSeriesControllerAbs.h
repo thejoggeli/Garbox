@@ -17,7 +17,7 @@ public:
     TimeSeriesControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onOutputTick() = 0;
+    virtual void onActorWriteTick() = 0;
 
     // state change handlers (to be implmeneted by user)
     virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;

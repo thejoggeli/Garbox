@@ -43,8 +43,8 @@ public:
     void onStart() final;
 
     // generated tick handlers
-    void onInputTick() final;
-    void onOutputTick() final;
+    void onSensorReadTick() final;
+    void onActorWriteTick() final;
 
     // generated event handlers
     void onFanCommandEvent(const FanCommandEvent& event) final;

@@ -16,7 +16,7 @@ public:
     InputControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onInputTick() = 0;
+    virtual void onSensorReadTick() = 0;
 
 protected:
 

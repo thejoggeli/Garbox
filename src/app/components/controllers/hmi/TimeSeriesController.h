@@ -26,7 +26,7 @@ public:
     void onStart() final;
 
     // generated tick handlers
-    void onOutputTick() final;
+    void onActorWriteTick() final;
 
     // generated state changed handlers
     void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;

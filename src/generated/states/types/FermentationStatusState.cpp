@@ -17,6 +17,14 @@ float FermentationStatusState::getTargetTemperature() const {
     return mCurrent.targetTemperature;
 }
 
+bool FermentationStatusState::getFanAuto() const {
+    return mCurrent.fanAuto;
+}
+
+bool FermentationStatusState::getPowerOn() const {
+    return mCurrent.powerOn;
+}
+
 FermentationState FermentationStatusState::nextState() const {
     return mCurrent.state;
 }
@@ -25,12 +33,28 @@ float FermentationStatusState::nextTargetTemperature() const {
     return mCurrent.targetTemperature;
 }
 
+bool FermentationStatusState::nextFanAuto() const {
+    return mCurrent.fanAuto;
+}
+
+bool FermentationStatusState::nextPowerOn() const {
+    return mCurrent.powerOn;
+}
+
 FermentationState FermentationStatusState::lastState() const {
     return mLast.state;
 }
 
 float FermentationStatusState::lastTargetTemperature() const {
     return mLast.targetTemperature;
+}
+
+bool FermentationStatusState::lastFanAuto() const {
+    return mLast.fanAuto;
+}
+
+bool FermentationStatusState::lastPowerOn() const {
+    return mLast.powerOn;
 }
 
 void FermentationStatusState::setState(FermentationState value){
@@ -46,6 +70,22 @@ void FermentationStatusState::setTargetTemperature(float value){
         return;
     }
     mNext.targetTemperature = value;
+    markDirty();
+}
+
+void FermentationStatusState::setFanAuto(bool value){
+    if (mNext.fanAuto == value) {
+        return;
+    }
+    mNext.fanAuto = value;
+    markDirty();
+}
+
+void FermentationStatusState::setPowerOn(bool value){
+    if (mNext.powerOn == value) {
+        return;
+    }
+    mNext.powerOn = value;
     markDirty();
 }
 

@@ -17,8 +17,8 @@ public:
     FanControllerAbs();
 
     // tick handlers (to be implmeneted by user)
-    virtual void onInputTick() = 0;
-    virtual void onOutputTick() = 0;
+    virtual void onSensorReadTick() = 0;
+    virtual void onActorWriteTick() = 0;
 
     // event handlers (to be implmeneted by user)
     virtual void onFanCommandEvent(const FanCommandEvent& event) = 0;

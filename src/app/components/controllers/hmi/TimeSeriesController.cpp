@@ -17,7 +17,7 @@ void TimeSeriesController::onStart(){
     mHistory.reset();
 }
 
-void TimeSeriesController::onOutputTick(){
+void TimeSeriesController::onActorWriteTick(){
     // add sample
     if(mStarted){
         float measuredTemperature = states().temperatureSample.getTemperatureCelcius();

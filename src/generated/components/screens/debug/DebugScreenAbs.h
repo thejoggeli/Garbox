@@ -42,6 +42,7 @@ public:
     virtual void onRenderTemperatureState() = 0;
     virtual void onRenderTemperatureSample() = 0;
     virtual void onRenderTime() = 0;
+    virtual void onRenderMicros() = 0;
     virtual void onRenderAppInfo() = 0;
     virtual void onRenderFermentationStatus() = 0;
     virtual void onRenderHeapBlocks() = 0;
@@ -92,6 +93,7 @@ protected:
         TemperatureState,
         TemperatureSample,
         Time,
+        Micros,
         AppInfo,
         FermentationStatus,
         HeapBlocks,
@@ -122,6 +124,7 @@ private:
     static void renderTemperatureStateTrampoline(void* context);
     static void renderTemperatureSampleTrampoline(void* context);
     static void renderTimeTrampoline(void* context);
+    static void renderMicrosTrampoline(void* context);
     static void renderAppInfoTrampoline(void* context);
     static void renderFermentationStatusTrampoline(void* context);
     static void renderHeapBlocksTrampoline(void* context);
