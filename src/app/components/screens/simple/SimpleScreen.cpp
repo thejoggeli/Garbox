@@ -3,6 +3,9 @@
 // Interface changes must be applied manually in this file.
 // See the corresponding header for the interface method declarations.
 
+#include <math.h>
+#include "core/util/function/default/MathFunctions.h"
+
 namespace Garbox {
 
 SimpleScreen::SimpleScreen() : SimpleScreenAbs(){
@@ -15,15 +18,19 @@ void SimpleScreen::onInit(){
     gui().tempUnit.setFont(&lv_font_montserrat_14);
     gui().infoTiles.setFont(&lv_font_montserrat_12);
 
-    gui().arcBg.removeKnob();
-    gui().arcBg.setClickable(false);
+    initArc(gui().arcBg);
+    initArc(gui().arcMeasured);
+    initArc(gui().arcMeasuredEnd);
+    initArc(gui().arcMeasuredBorder);
+    initArc(gui().arcTarget);
+    initArc(gui().arcTargetEnd);
+    initArc(gui().arcTargetBorder);
+}
 
-    gui().arcMeasured.removeKnob();
-    gui().arcMeasured.setClickable(false);
-
-    gui().arcTarget.removeKnob();
-    gui().arcTarget.setClickable(false);
-
+void SimpleScreen::initArc(LvArc& arc){
+    arc.removeKnob();
+    arc.setClickable(false);
+    arc.setArcRotation(90);
 }
 
 void SimpleScreen::onStart(){
@@ -43,7 +50,21 @@ void SimpleScreen::onUserInputTick(){
 }
 
 void SimpleScreen::onRender(){
-    // to be implemented
+
+    const MathFunctionIfc& fn = MathFunctions::GetSinAnim();
+
+    const float speed = 0.2f;
+    const float t = fmodf(Time::GetTickMicros() * 1e-6f * speed, 1.0f);
+    const uint16_t angle = static_cast<uint16_t>(fn.evaluate(t) * 300.0f + 30.0f);
+
+    LvArc& arc = gui().arcTarget;
+    arc.setArcEndAngle(angle);
+
+    LvArc& end = gui().arcTargetEnd;
+    end.setArcAngles(angle, angle+1);
+
+    LvArc& border = gui().arcTargetBorder;
+    border.setArcEndAngle(angle);
 }
 
 } // namespace Garbox

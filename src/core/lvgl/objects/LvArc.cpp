@@ -23,8 +23,24 @@ void LvArc::setArcBgAngles(uint16_t start, uint16_t end) {
     lv_arc_set_bg_angles(raw(), start, end);
 }
 
+void LvArc::setArcBgStartAngle(uint16_t start){
+    lv_arc_set_bg_start_angle(raw(), start);
+}
+
+void LvArc::setArcBgEndAngle(uint16_t end){
+    lv_arc_set_bg_end_angle(raw(), end);
+}
+
 void LvArc::setArcAngles(uint16_t start, uint16_t end) {
     lv_arc_set_angles(raw(), start, end);
+}
+
+void LvArc::setArcStartAngle(uint16_t start){
+    lv_arc_set_start_angle(raw(), start);
+}
+
+void LvArc::setArcEndAngle(uint16_t end){
+    lv_arc_set_end_angle(raw(), end);
 }
 
 void LvArc::setArcMode(lv_arc_mode_t mode) {

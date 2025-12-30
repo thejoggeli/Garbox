@@ -34,29 +34,72 @@
 
           <arc name="arc-bg"
             align="center" width="212px" height="212px"
-            arc-opa="0%"
             arc-bg-width="20px"
-            arc-bg-angles="0 360"
-            arc-bg-color="#666" arc-bg-opa="100%"
-            arc-rounded="0"
+            arc-bg-angles="0 359"
+            arc-bg-color="#666"
+            arc-opa="0%"
+            arc-bg-opa="100%"
+            arc-bg-rounded="0"
           />
 
           <arc name="arc-measured"
             align="center" width="224px" height="224px"
             arc-width="20px"
-            arc-range="15 50" arc-value="25" 
-            arc-color="#8AB4F4" arc-opa="100%" 
-            arc-rounded="0"
+            arc-angles="0 60" 
+            arc-color="#8AB4F4" 
+            arc-opa="100%" 
             arc-bg-opa="0%"
+            arc-rounded="0"
+          />
+
+          <arc name="arc-measured-end"
+            align="center" width="224px" height="224px"
+            arc-width="20px"
+            arc-angles="60 61" 
+            arc-color="#000" 
+            arc-opa="100%" 
+            arc-bg-opa="0%"
+            arc-rounded="0"
+          />
+
+          <arc name="arc-measured-border"
+            align="center" width="186px" height="186px"
+            arc-width="2px"
+            arc-angles="0 60" 
+            arc-color="#000" 
+            arc-opa="100%" 
+            arc-bg-opa="0%"
+            arc-rounded="0"
           />
 
           <arc name="arc-target"
             align="center" width="200px" height="200px"
             arc-width="20px" 
-            arc-range="15 50" arc-value="35" 
-            arc-color="#FFF" arc-opa="100%"
-            arc-rounded="0"
+            arc-angles="0 120"
+            arc-color="#FFF"
+            arc-opa="100%"
             arc-bg-opa="0%"
+            arc-rounded="0"
+          />
+
+          <arc name="arc-target-end"
+            align="center" width="200px" height="200px"
+            arc-width="20px" 
+            arc-angles="120 121"
+            arc-color="#000"
+            arc-opa="100%"
+            arc-bg-opa="0%"
+            arc-rounded="0"
+          />
+
+          <arc name="arc-target-border"
+            align="center" width="202px" height="202px"
+            arc-width="2px"
+            arc-angles="0 120" 
+            arc-color="#000" 
+            arc-opa="100%" 
+            arc-bg-opa="0%"
+            arc-rounded="0"
           />
 
         </container>

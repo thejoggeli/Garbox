@@ -47,7 +47,11 @@ public:
         LvObject arcContainer;
         LvArc arcBg;
         LvArc arcMeasured;
+        LvArc arcMeasuredEnd;
+        LvArc arcMeasuredBorder;
         LvArc arcTarget;
+        LvArc arcTargetEnd;
+        LvArc arcTargetBorder;
         LvObject _namelessContainer_1;
         LvLabel tempLabel;
         LvLabel tempValue;

@@ -13,9 +13,16 @@ public:
     void setArcValue(int32_t value);
     void setArcRange(int32_t min, int32_t max);
     void setArcRotation(uint16_t rotation);
-    void setArcBgAngles(uint16_t start, uint16_t end);
-    void setArcAngles(uint16_t start, uint16_t end);
+
     void setArcMode(lv_arc_mode_t mode);
+
+    void setArcAngles(uint16_t start, uint16_t end);
+    void setArcStartAngle(uint16_t start);
+    void setArcEndAngle(uint16_t end);
+
+    void setArcBgAngles(uint16_t start, uint16_t end);
+    void setArcBgStartAngle(uint16_t start);
+    void setArcBgEndAngle(uint16_t end);
 
     void setArcColor(lv_color_t color);
     void setArcWidth(int32_t width);

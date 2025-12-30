@@ -13,6 +13,8 @@ namespace Garbox {
 class SimpleScreen : public SimpleScreenAbs {
 private:
 
+    void initArc(LvArc& arc);
+
 public:
 // ==== GENERATED BEGIN: interface ================================================
 
