@@ -119,6 +119,10 @@ public:
     void clearFlag(lv_obj_flag_t flag);
     void setHidden(bool hidden);
 
+    // clicking
+    void setClickable(bool clickable);
+    void setClickFocusable(bool clickFocusable);
+
     // scrolling
     void setScrollable(bool scrollable);
     void setScrollOne(bool enabled);

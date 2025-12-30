@@ -8,6 +8,7 @@ namespace Garbox {
 const char* ScreenIdToString(ScreenId id){
     switch(id){
         case ScreenId::Null: return "Null";
+        case ScreenId::Simple: return "Simple";
         case ScreenId::Main: return "Main";
         case ScreenId::Debug: return "Debug";
         case ScreenId::EventLog: return "EventLog";

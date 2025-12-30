@@ -1,0 +1,86 @@
+<gui>
+
+  <resources>
+    <image name="power16"       path="icons/power.png"        format="RGB565A8" resize="16x16" /> <!-- resize not supported yet -->
+    <image name="fan16"         path="icons/fan.png"          format="RGB565A8" resize="16x16" /> <!-- resize not supported yet -->
+    <image name="heat16"        path="icons/heat.png"         format="RGB565A8" resize="16x16" /> <!-- resize not supported yet -->
+    <image name="humidity16"    path="icons/humidity.png"     format="RGB565A8" resize="16x16" /> <!-- resize not supported yet -->
+    <image name="temperature16" path="icons/temperature.png"  format="RGB565A8" resize="16x16" /> <!-- resize not supported yet -->
+  </resources>
+
+  <components>
+
+    <!-- INFO TILE COMPONENT -->
+    <InfoTile $icon $value $bgColor>
+      <body 
+        layout="flex" flex-flow="column" flex-align="center"
+        bg-color=$bgColor bg-opa="50%" radius="8px" text-color="#fff" >
+
+        <image name="icon" src=$icon width="16" height="16" />
+        <label name="value" text=$value width="100%" text-align="center" />
+      </body>
+    </InfoTile>
+
+  </components>
+
+  <root bg-color="#000000" text-color="#ffffff">
+
+    <!-- Wrapper -->
+    <container name="wrapper" layout="flex" flex-flow="row" width="100%" height="100%">
+
+      <!-- Arc -->
+      <container width="240px" height="240px">
+        <container align="center" name="arc-container" width="224px" height="224px">
+
+          <arc name="arc-bg"
+            align="center" width="212px" height="212px"
+            arc-opa="0%"
+            arc-bg-width="20px"
+            arc-bg-angles="0 360"
+            arc-bg-color="#666" arc-bg-opa="100%"
+            arc-rounded="0"
+          />
+
+          <arc name="arc-measured"
+            align="center" width="224px" height="224px"
+            arc-width="20px"
+            arc-range="15 50" arc-value="25" 
+            arc-color="#8AB4F4" arc-opa="100%" 
+            arc-rounded="0"
+            arc-bg-opa="0%"
+          />
+
+          <arc name="arc-target"
+            align="center" width="200px" height="200px"
+            arc-width="20px" 
+            arc-range="15 50" arc-value="35" 
+            arc-color="#FFF" arc-opa="100%"
+            arc-rounded="0"
+            arc-bg-opa="0%"
+          />
+
+        </container>
+        <container align="center" layout="flex" flex-flow="column" flex-align="center">
+          <label name="tempLabel" text="TEMPERATURE" />
+          <label name="tempValue" text="25.0" margin="0 0 4px 4px" />
+          <label name="tempUnit"  text="°C" />
+        </container>
+      </container>
+
+      <!-- Info Tiles -->
+      <container 
+        name="info-tiles" flex-grow="1" height="100%" pad="0 8px 8px 8px" pad-gap="8px"
+        layout="flex" flex-flow="column" flex-align="space-around start start">
+
+        <InfoTile name="onoffInfo"  $icon="power16"       $value="ON"     $bgColor="#0A0" width="100%" flex-grow="1" />
+        <InfoTile name="tempInfo"   $icon="temperature16" $value="20.0°C" $bgColor="#08C" width="100%" flex-grow="1" />
+        <InfoTile name="humidInfo"  $icon="humidity16"    $value="50.0%"  $bgColor="#666" width="100%" flex-grow="1" />
+        <InfoTile name="heatInfo"   $icon="heat16"        $value="50%"    $bgColor="#666" width="100%" flex-grow="1" />
+      </container>
+
+    <!-- End Wrapper -->
+    </container>
+
+  </root>
+
+</gui>

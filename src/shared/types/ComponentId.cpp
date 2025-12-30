@@ -19,6 +19,7 @@ const char* ComponentIdToString(ComponentId id){
         case ComponentId::TimeSeriesController: return "TimeSeriesController";
         case ComponentId::CalibrationBehaviour: return "CalibrationBehaviour";
         case ComponentId::FermentationBehaviour: return "FermentationBehaviour";
+        case ComponentId::SimpleScreen: return "SimpleScreen";
         case ComponentId::MainScreen: return "MainScreen";
         case ComponentId::DebugScreen: return "DebugScreen";
         case ComponentId::EventLogScreen: return "EventLogScreen";

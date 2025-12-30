@@ -25,6 +25,7 @@ enum class ComponentId : uint16_t {
     TimeSeriesController,
     CalibrationBehaviour,
     FermentationBehaviour,
+    SimpleScreen,
     MainScreen,
     DebugScreen,
     EventLogScreen,

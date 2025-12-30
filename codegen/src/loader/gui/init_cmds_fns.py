@@ -42,7 +42,7 @@ INITIALIZER_MAP = {
         "scroll-dir":       lambda v: f"setScrollDirection({DIRECTION[prep_val(v)]})",
 
         # background and opacity
-        "bg-color":         lambda v: f"setBgColor(lv_color_hex(0x{render_color(v)}))",
+        "bg-color":         lambda v: f"setBgColor({render_color(v)})",
         "bg-opa":           lambda v: f"setBgOpa({render_opa(v)})",
         "opa":              lambda v: f"setOpa({render_opa(v)})",
 
@@ -72,7 +72,7 @@ INITIALIZER_MAP = {
 
         # border
         "border-width":     lambda v: f"setBorderWidth({render_style_val(v)})",
-        "border-color":     lambda v: f"setBorderColor(lv_color_hex(0x{render_color(v)}))",
+        "border-color":     lambda v: f"setBorderColor({render_color(v)})",
         "border-opa":       lambda v: f"setBorderOpa({render_opa(v)})",
         "border-side":      lambda v: f"setBorderSide({render_border_side(v)})",
         "border-post":      lambda v: f"setBorderPost({render_color(v)})",
@@ -102,11 +102,11 @@ INITIALIZER_MAP = {
         # text helpers
         "text-letter-space":    lambda v: f"setTextLetterSpace({render_style_val(v)})",
         "text-line-space":      lambda v: f"setTextLineSpace({render_style_val(v)})",
-        "text-color":           lambda v: f"setTextColor(lv_color_hex(0x{render_color(v)}))",
+        "text-color":           lambda v: f"setTextColor({render_color(v)})",
         "text-align":           lambda v: f"setTextAlign({TEXT_ALIGN[prep_val(v)]})",
         "text-decor":           lambda v: f"setTextDecor({TEXT_DECOR[prep_val(v)]})",
         "text-opa":             lambda v: f"setTextOpa({render_opa(v)})",
-        "text-outline-color":   lambda v: f"setTextOutlineColor(lv_color_hex(0x{render_color(v)}))",
+        "text-outline-color":   lambda v: f"setTextOutlineColor({render_color(v)})",
         "text-outline-opa":     lambda v: f"setTextOutlineOpa({render_opa(v)})",
         "text-outline-width":   lambda v: f"setTextOutlineWidth({render_style_val(v)})",
 
@@ -115,6 +115,26 @@ INITIALIZER_MAP = {
     # label specific functions
     "label": {
         "text": lambda v: f"setText({render_string(v)})",
+    },
+
+    # label specific functions
+    "arc": {
+        "arc-value":        lambda v: f"setArcValue({render_int(v)})",
+        "arc-range":        lambda v: f"setArcRange({render_ints(v, 2, 'range')})",
+        "arc-rotation":     lambda v: f"setArcRotation({render_int(v)})",
+        "arc-bg-angles":    lambda v: f"setArcBgAngles({render_ints(v, 2, 'bg-angles')})",
+        "arc-angles":       lambda v: f"setArcAngles({render_ints(v, 2, 'angles')})",
+        "arc-mode":         lambda v: f"setArcMode({ARC_MODE[prep_val(v)]})",
+        "arc-color":        lambda v: f"setArcColor({render_color(v)})",
+        "arc-width":        lambda v: f"setArcWidth({render_px(v)})",
+        "arc-rounded":      lambda v: f"setArcRounded({render_bool(v)})",
+        "arc-opa":          lambda v: f"setArcOpa({render_opa(v)})",
+        "arc-image-src":    lambda v: f"setArcImageSrc(&{v})",
+        "arc-bg-color":     lambda v: f"setArcBgColor({render_color(v)})",
+        "arc-bg-width":     lambda v: f"setArcBgWidth({render_px(v)})",
+        "arc-bg-rounded":   lambda v: f"setArcBgRounded({render_bool(v)})",
+        "arc-bg-opa":       lambda v: f"setArcBgOpa({render_opa(v)})",
+        "arc-bg-image-src": lambda v: f"setArcBgImageSrc(&{v})",
     },
 
     # image specific functions

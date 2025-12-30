@@ -1,5 +1,11 @@
 screens:
 
+  Simple: 
+    subdir: simple
+    renderer: lvgl-gui
+    tick_phases: [UserInput]
+    renderer_gui: SimpleScreen.xml
+
   Main:
     subdir: main
     renderer: lvgl-gui # lvgl-simple or lvgl-gui 

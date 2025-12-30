@@ -96,9 +96,10 @@ LINE_ROUNDED = {
     "on":  1,
 }
 
-ARC_ROUNDED = {
-    "off": 0,
-    "on":  1,
+ARC_MODE = {
+    "normal": "LV_ARC_MODE_NORMAL",
+    "symmetrical": "LV_ARC_MODE_SYMMETRICAL",
+    "reverse": "LV_ARC_MODE_REVERSE",
 }
 
 FLEX_ALIGN = {

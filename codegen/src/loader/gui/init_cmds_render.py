@@ -14,7 +14,7 @@ def split_attr(val):
 
 
 def render_color(val):
-    return parse_color_to_hex(val)
+    return f"lv_color_hex(0x{parse_color_to_hex(val)})"
 
 
 def render_string(val):
@@ -23,6 +23,23 @@ def render_string(val):
 
 def render_int(val):
     return render_value(val ,'int')
+
+
+def render_ints(val, count, name):
+    split = split_attr(val)
+
+    if len(split) != count:
+        raise ValueError(f"invalid {name}. expected 1 or 2 values, got '{val}'")
+    
+    result = ""
+
+    for val in split:
+        if result == "":
+            result = f"{render_value(val, 'int')}"
+        else:
+            result += ", " + f"{render_value(val, 'int')}"
+
+    return result
 
 
 def render_bool(val):

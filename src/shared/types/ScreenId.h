@@ -12,6 +12,7 @@ enum class ScreenId : uint16_t {
     Null = 0,
 
     // generated from config
+    Simple,
     Main,
     Debug,
     EventLog,

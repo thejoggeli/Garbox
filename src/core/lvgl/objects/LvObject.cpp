@@ -286,6 +286,28 @@ void LvObject::setHidden(bool hidden){
 }
 
 // ==============================================================================
+// clicking
+// ==============================================================================
+
+void LvObject::setClickable(bool clickling){
+    if(clickling){
+        lv_obj_add_flag(mRaw, LV_OBJ_FLAG_CLICKABLE);
+    }
+    else {
+        lv_obj_clear_flag(mRaw, LV_OBJ_FLAG_CLICKABLE);
+    }
+}
+
+void LvObject::setClickFocusable(bool clickFocusable){
+    if(clickFocusable){
+        lv_obj_add_flag(mRaw, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    }
+    else {
+        lv_obj_clear_flag(mRaw, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    }
+}
+
+// ==============================================================================
 // scrolling
 // ==============================================================================
 

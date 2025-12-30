@@ -22,7 +22,7 @@ static constexpr uint32_t RenderTickDelayMillis = 20;
 
 Runtime::Runtime():
     RuntimeAbs(RuntimeAbs::Config {
-        .numComponents = 14,
+        .numComponents = 15,
         .numStates = 12,
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 128,
@@ -56,6 +56,7 @@ Runtime::Runtime():
     registerComponent(&mInputController);
     registerComponent(&mI2cPartsController);
     registerComponent(&mTimeSeriesController);
+    registerComponent(&mSimpleScreen);
     registerComponent(&mMainScreen);
     registerComponent(&mDebugScreen);
     registerComponent(&mEventLogScreen);
@@ -154,7 +155,7 @@ Runtime::Runtime():
 void Runtime::onInit(){
     // behaviours and controllers are already initialized when this method is called
     setQueuedBehaviour(&mFermentationBehaviour);
-    setQueuedScreen(&mMainScreen);
+    setQueuedScreen(&mSimpleScreen);
     Profiler::Init();
 }
 
@@ -212,6 +213,9 @@ void Runtime::handleUserInputTick(void* ctx){
     Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::UserInputTick);
     switch(self->mActiveScreen->getScreenId()){
+        case ScreenId::Simple:
+            static_cast<SimpleScreen*>(self->mActiveScreen)->onUserInputTick();
+        break;
         case ScreenId::Main:
             static_cast<MainScreen*>(self->mActiveScreen)->onUserInputTick();
         break;
@@ -551,6 +555,7 @@ ControllerAbs* Runtime::resolveController(ControllerId id){
 
 ScreenAbs* Runtime::resolveScreen(ScreenId id){
     switch(id){
+        case ScreenId::Simple: return &mSimpleScreen;
         case ScreenId::Main: return &mMainScreen;
         case ScreenId::Debug: return &mDebugScreen;
         case ScreenId::EventLog: return &mEventLogScreen;

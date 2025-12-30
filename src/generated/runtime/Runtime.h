@@ -20,6 +20,7 @@
 #include "app/components/screens/log/EventLogScreen.h"
 #include "app/components/screens/log/StateLogScreen.h"
 #include "app/components/screens/main/MainScreen.h"
+#include "app/components/screens/simple/SimpleScreen.h"
 
 namespace Garbox {
 
@@ -50,6 +51,7 @@ private:
     TimeSeriesController mTimeSeriesController;
 
     // screens instances
+    SimpleScreen mSimpleScreen;
     MainScreen mMainScreen;
     DebugScreen mDebugScreen;
     EventLogScreen mEventLogScreen;

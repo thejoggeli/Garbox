@@ -2,7 +2,7 @@ application:
 
   app_name: Garbox # The generated runtime instance will be called NameRuntime
   initial_behaviour: FermentationBehaviour
-  initial_screen: MainScreen
+  initial_screen: SimpleScreen
   event_pool_size_bytes: 1024
   event_queue_length: 128
   tick_period_millis: 33 # ~30.3 FPS
