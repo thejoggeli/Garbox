@@ -76,10 +76,6 @@ void SimpleScreen::onBecomeDisabled(){
     // to be implemented
 }
 
-void SimpleScreen::onUserInputTick(){
-    // to be implemented
-}
-
 void SimpleScreen::onButtonEvent(const ButtonEvent& event){
     if(event->newState == ButtonState::Pressed){
         RequestFermentationModeEvent request = makeRequestFermentationModeEvent();

@@ -3,7 +3,6 @@ screens:
   Simple: 
     subdir: simple
     renderer: lvgl-gui
-    tick_phases: [UserInput]
     renderer_gui: SimpleScreen.xml
     render_fns: 
       - EngineStatus

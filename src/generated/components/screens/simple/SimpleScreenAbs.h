@@ -17,9 +17,6 @@ public:
     // component constructor
     SimpleScreenAbs();
 
-    // tick handlers (to be implmeneted by user)
-    virtual void onUserInputTick() = 0;
-
     // render functions (to be implmeneted by user)
     virtual void onRenderEngineStatus() = 0;
     virtual void onRenderTargetTemperature() = 0;

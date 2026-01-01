@@ -224,9 +224,6 @@ void Runtime::handleUserInputTick(void* ctx){
     Runtime* self = static_cast<Runtime*>(ctx);
     Profiler::MeasureScoped profiler(ProfilerId::UserInputTick);
     switch(self->mActiveScreen->getScreenId()){
-        case ScreenId::Simple:
-            static_cast<SimpleScreen*>(self->mActiveScreen)->onUserInputTick();
-        break;
         case ScreenId::Main:
             static_cast<MainScreen*>(self->mActiveScreen)->onUserInputTick();
         break;

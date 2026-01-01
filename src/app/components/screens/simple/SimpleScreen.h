@@ -34,9 +34,6 @@ public:
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
 
-    // generated tick handlers
-    void onUserInputTick() final;
-
     // generated render functions
     void onRender() final;
     void onRenderEngineStatus() final;
