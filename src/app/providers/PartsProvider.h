@@ -10,6 +10,7 @@ class Fan;
 class Heatpad;
 class PiezoPlayer;
 class Sht31;
+class RotaryEncoder;
 
 class AnimatedLed;
 class AnimatedLedGroup;
@@ -24,7 +25,8 @@ public:
     static Heatpad& GetHeatpad(); 
     static Display& GetDisplay(); 
     static PiezoPlayer& GetPiezoPlayer(); 
-    static ButtonIfc& GetEncoderButton(); 
+    static ButtonIfc& GetEncoderButton();
+    static RotaryEncoder& GetRotaryEncoder();
     static Sht31& GetTemperatureSensor();
 
     static AnimatedLed& GetStatusLed(StatusLedId id);

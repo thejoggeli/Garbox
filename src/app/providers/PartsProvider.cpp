@@ -15,6 +15,7 @@
 
 #include "modules/parts/button/InterruptButton.h"
 #include "modules/parts/display/Display.h"
+#include "modules/parts/encoder/RotaryEncoder.h"
 #include "modules/parts/fan/Fan.h"
 #include "modules/parts/heatpad/Heatpad.h"
 #include "modules/parts/led/rgb/RgbLed.h"
@@ -56,6 +57,14 @@ void PartsProvider::Init(){
     button.setLongPressMicros(600_ms),
     button.setInitialHoldDelayMicros(1200_ms);
     button.setRepeatHoldDelayMicros(300_ms);
+
+    // init rotary encoder 
+    RotaryEncoder& encoder = GetRotaryEncoder();
+    encoder.init({
+        .pinA = 2,
+        .pinB = 42,
+        .unit = PCNT_UNIT_0,
+    });
 
     // init sht31
     Sht31& sht31 = GetTemperatureSensor();
@@ -125,6 +134,11 @@ ButtonIfc& PartsProvider::GetEncoderButton(){
     static InterruptButton instance(
         GpioInstances::GetEncoderButton()
     );
+    return instance;
+}
+
+RotaryEncoder& PartsProvider::GetRotaryEncoder(){
+    static RotaryEncoder instance;
     return instance;
 }
 

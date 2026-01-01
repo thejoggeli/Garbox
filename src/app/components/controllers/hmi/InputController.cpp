@@ -6,6 +6,7 @@
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 #include "core/util/function/default/EasingFunctions.h"
+#include "modules/parts/encoder/RotaryEncoder.h"
 #include "modules/parts/led/AnimatedLedGroup.h"
 #include "modules/parts/piezo/PiezoPlayer.h"
 
@@ -16,9 +17,8 @@ InputController::InputController():
     InputControllerAbs(),
     mButtonStatusLed(PartsProvider::GetStatusLed(StatusLedId::Custom2)),
     mPiezoPlayer(PartsProvider::GetPiezoPlayer()),
-    mButton(PartsProvider::GetEncoderButton()){
-    // nothing to do
-}
+    mButton(PartsProvider::GetEncoderButton()),
+    mEncoder(PartsProvider::GetRotaryEncoder()){}
 
 void InputController::onInit(){
 
@@ -32,6 +32,9 @@ void InputController::onInit(){
         handleButtonHold(counter, holdTimeMicros);
     });
 
+    // encoder steps callback
+    mEncoder.setCallback(this, encoderCallbackTrampoline);
+
 }
 
 void InputController::onStart(){
@@ -39,8 +42,8 @@ void InputController::onStart(){
 }
 
 void InputController::onSensorReadTick(){
-    // button tick
     mButton.tick();
+    mEncoder.tick();
 }
 
 void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState newState){
@@ -87,6 +90,12 @@ void InputController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros
     ButtonRepeatEvent event = makeButtonRepeatEvent();
     event->count = counter;
     event->holdTimeMicros = holdTimeMicros;
+    sendEvent(event);
+}
+
+void InputController::handleEncoderCallback(int32_t steps){
+    EncoderStepEvent event = makeEncoderStepEvent();
+    event->steps = steps;
     sendEvent(event);
 }
 

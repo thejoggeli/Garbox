@@ -23,7 +23,7 @@ SimpleScreen::SimpleScreen() : SimpleScreenAbs(){
 void SimpleScreen::onInit(){
     gui().tempLabel.setFont(&lv_font_montserrat_12);
     gui().tempValue.setFont(&lv_font_montserrat_30);
-    gui().tempUnit.setFont(&lv_font_montserrat_14);
+    gui().tempUnit.setFont(&lv_font_montserrat_20);
     gui().infoTiles.setFont(&lv_font_montserrat_12);
 
     initArc(gui().arcBg);

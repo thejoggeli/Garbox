@@ -12,6 +12,7 @@ namespace Garbox {
 class ButtonIfc;
 class PiezoPlayer;
 class AnimatedLed;
+class RotaryEncoder;
 
 class InputController : public InputControllerAbs {
 private:
@@ -19,9 +20,15 @@ private:
     void handleButtonStateChanged(ButtonState oldState, ButtonState newState);
     void handleButtonHold(uint32_t counter, uint32_t holdTimeMicros);
 
+    void handleEncoderCallback(int32_t steps);
+    static void encoderCallbackTrampoline(void* ctx, int32_t steps){
+        static_cast<InputController*>(ctx)->handleEncoderCallback(steps);
+    }
+
     AnimatedLed& mButtonStatusLed;
     PiezoPlayer& mPiezoPlayer;
     ButtonIfc& mButton;
+    RotaryEncoder& mEncoder;
 
 public:
 
