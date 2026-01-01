@@ -67,15 +67,6 @@ public:
     // generated tick handlers
     void onUserInputTick() final;
 
-    // generated state changed handlers
-    void onFanStatusStateChanged(const FanStatusState& state) final;
-    void onFanSampleStateChanged(const FanSampleState& state) final;
-    void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;
-    void onHeatpadSampleStateChanged(const HeatpadSampleState& state) final;
-    void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
-    void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
-    void onFermentationStatusStateChanged(const FermentationStatusState& state) final;
-
     // generated render functions
     void onRender() final;
     void onRenderFanInfo() final;
@@ -87,6 +78,15 @@ public:
     void onRenderTimeAxis() final;
     void onRenderTimeSeries() final;
     void onRenderMenu() final;
+
+    // generated state changed handlers
+    void onFanStatusStateChanged(const FanStatusState& state) final;
+    void onFanSampleStateChanged(const FanSampleState& state) final;
+    void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;
+    void onHeatpadSampleStateChanged(const HeatpadSampleState& state) final;
+    void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
+    void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
+    void onFermentationStatusStateChanged(const FermentationStatusState& state) final;
 
 // ==== GENERATED END: interface ==================================================
 

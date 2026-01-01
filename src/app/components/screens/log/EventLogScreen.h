@@ -47,11 +47,11 @@ public:
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
 
-    // generated event handlers
-    void onEvent(const EventHeader* header) final;
-
     // generated render functions
     void onRender() final;
+
+    // generated event handlers
+    void onEvent(const EventHeader* header) final;
 
 // ==== GENERATED END: interface ==================================================
 

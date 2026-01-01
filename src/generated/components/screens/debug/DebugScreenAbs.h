@@ -17,20 +17,6 @@ public:
     // component constructor
     DebugScreenAbs();
 
-    // state change handlers (to be implmeneted by user)
-    virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
-    virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
-    virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;
-    virtual void onHeatpadSampleStateChanged(const HeatpadSampleState& state) = 0;
-    virtual void onHeatpadProgressStateChanged(const HeatpadProgressState& state) = 0;
-    virtual void onDisplayStatusStateChanged(const DisplayStatusState& state) = 0;
-    virtual void onDisplayDiagnosticsStateChanged(const DisplayDiagnosticsState& state) = 0;
-    virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) = 0;
-    virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) = 0;
-    virtual void onActiveBehaviourStateChanged(const ActiveBehaviourState& state) = 0;
-    virtual void onActiveScreenStateChanged(const ActiveScreenState& state) = 0;
-    virtual void onFermentationStatusStateChanged(const FermentationStatusState& state) = 0;
-
     // render functions (to be implmeneted by user)
     virtual void onRenderFanState() = 0;
     virtual void onRenderFanMeasuredRpm() = 0;
@@ -48,6 +34,20 @@ public:
     virtual void onRenderHeapBlocks() = 0;
     virtual void onRenderHeapBytes() = 0;
     virtual void onRenderHeapMinimum() = 0;
+
+    // state change handlers (to be implmeneted by user)
+    virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
+    virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
+    virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;
+    virtual void onHeatpadSampleStateChanged(const HeatpadSampleState& state) = 0;
+    virtual void onHeatpadProgressStateChanged(const HeatpadProgressState& state) = 0;
+    virtual void onDisplayStatusStateChanged(const DisplayStatusState& state) = 0;
+    virtual void onDisplayDiagnosticsStateChanged(const DisplayDiagnosticsState& state) = 0;
+    virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) = 0;
+    virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) = 0;
+    virtual void onActiveBehaviourStateChanged(const ActiveBehaviourState& state) = 0;
+    virtual void onActiveScreenStateChanged(const ActiveScreenState& state) = 0;
+    virtual void onFermentationStatusStateChanged(const FermentationStatusState& state) = 0;
 
 protected:
 

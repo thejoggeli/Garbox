@@ -57,20 +57,6 @@ public:
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
 
-    // generated state changed handlers
-    void onFanStatusStateChanged(const FanStatusState& state) final;
-    void onFanSampleStateChanged(const FanSampleState& state) final;
-    void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;
-    void onHeatpadSampleStateChanged(const HeatpadSampleState& state) final;
-    void onHeatpadProgressStateChanged(const HeatpadProgressState& state) final;
-    void onDisplayStatusStateChanged(const DisplayStatusState& state) final;
-    void onDisplayDiagnosticsStateChanged(const DisplayDiagnosticsState& state) final;
-    void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
-    void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
-    void onActiveBehaviourStateChanged(const ActiveBehaviourState& state) final;
-    void onActiveScreenStateChanged(const ActiveScreenState& state) final;
-    void onFermentationStatusStateChanged(const FermentationStatusState& state) final;
-
     // generated render functions
     void onRender() final;
     void onRenderFanState() final;
@@ -89,6 +75,20 @@ public:
     void onRenderHeapBlocks() final;
     void onRenderHeapBytes() final;
     void onRenderHeapMinimum() final;
+
+    // generated state changed handlers
+    void onFanStatusStateChanged(const FanStatusState& state) final;
+    void onFanSampleStateChanged(const FanSampleState& state) final;
+    void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;
+    void onHeatpadSampleStateChanged(const HeatpadSampleState& state) final;
+    void onHeatpadProgressStateChanged(const HeatpadProgressState& state) final;
+    void onDisplayStatusStateChanged(const DisplayStatusState& state) final;
+    void onDisplayDiagnosticsStateChanged(const DisplayDiagnosticsState& state) final;
+    void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
+    void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
+    void onActiveBehaviourStateChanged(const ActiveBehaviourState& state) final;
+    void onActiveScreenStateChanged(const ActiveScreenState& state) final;
+    void onFermentationStatusStateChanged(const FermentationStatusState& state) final;
 
 // ==== GENERATED END: interface ==================================================
 

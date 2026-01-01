@@ -123,6 +123,17 @@ Runtime::Runtime():
         mStateRegistry.getFermentationStatus()
     );
 
+    // bind 'SimpleScreen' states
+    mSimpleScreen.mStates.emplace(
+        mStateRegistry.getFanStatus(),
+        mStateRegistry.getFanSample(),
+        mStateRegistry.getHeatpadStatus(),
+        mStateRegistry.getHeatpadSample(),
+        mStateRegistry.getTemperatureStatus(),
+        mStateRegistry.getTemperatureSample(),
+        mStateRegistry.getFermentationStatus()
+    );
+
     // bind 'MainScreen' states
     mMainScreen.mStates.emplace(
         mStateRegistry.getFanStatus(),
@@ -292,6 +303,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
             default: break; // active behaviour does not read state
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onFanStatusStateChanged(fanStatus); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanStatusStateChanged(fanStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFanStatusStateChanged(fanStatus); break;
             default: break; // active screen does not read state 
@@ -306,6 +318,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
             default: break; // active behaviour does not read state
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onFanSampleStateChanged(fanSample); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFanSampleStateChanged(fanSample); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFanSampleStateChanged(fanSample); break;
             default: break; // active screen does not read state 
@@ -316,6 +329,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
         const FermentationStatusState& fermentationStatus = static_cast<const FermentationStatusState&>(state);
         mTimeSeriesController.onFermentationStatusStateChanged(fermentationStatus);
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onFermentationStatusStateChanged(fermentationStatus); break;
             default: break; // active screen does not read state 
@@ -326,6 +340,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
         const HeatpadStatusState& heatpadStatus = static_cast<const HeatpadStatusState&>(state);
         mTimeSeriesController.onHeatpadStatusStateChanged(heatpadStatus);
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeatpadStatusStateChanged(heatpadStatus); break;
             default: break; // active screen does not read state 
@@ -335,6 +350,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     case StateType::HeatpadSample: {
         const HeatpadSampleState& heatpadSample = static_cast<const HeatpadSampleState&>(state);
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;
             default: break; // active screen does not read state 
@@ -357,6 +373,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
             default: break; // active behaviour does not read state
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onTemperatureStatusStateChanged(temperatureStatus); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureStatusStateChanged(temperatureStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onTemperatureStatusStateChanged(temperatureStatus); break;
             default: break; // active screen does not read state 
@@ -371,6 +388,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
             default: break; // active behaviour does not read state
         }
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onTemperatureSampleStateChanged(temperatureSample); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onTemperatureSampleStateChanged(temperatureSample); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onTemperatureSampleStateChanged(temperatureSample); break;
             default: break; // active screen does not read state 
@@ -442,11 +460,16 @@ void Runtime::onRouteEvent(const EventHeader* header){
         mI2cPartsController.onButtonEvent(event);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onButtonEvent(event);
+            mSimpleScreen.onButtonEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonEvent(event); break;
                 default: break; // active behaviour does not receive 'Button' event
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onButtonEvent(event); break;
+                default: break; // active screen does not receive 'Button' event
             }
         }
         break;
@@ -455,11 +478,16 @@ void Runtime::onRouteEvent(const EventHeader* header){
         const ButtonRepeatEvent event(header);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onButtonRepeatEvent(event);
+            mSimpleScreen.onButtonRepeatEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeatEvent(event); break;
                 default: break; // active behaviour does not receive 'ButtonRepeat' event
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onButtonRepeatEvent(event); break;
+                default: break; // active screen does not receive 'ButtonRepeat' event
             }
         }
         break;
@@ -468,11 +496,16 @@ void Runtime::onRouteEvent(const EventHeader* header){
         const EncoderStepEvent event(header);
         if(header->sendToInactiveComponents){
             mFermentationBehaviour.onEncoderStepEvent(event);
+            mSimpleScreen.onEncoderStepEvent(event);
         }
         else {
             switch(mActiveBehaviour->getBehaviourId()){
                 case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStepEvent(event); break;
                 default: break; // active behaviour does not receive 'EncoderStep' event
+            }
+            switch(mActiveScreen->getScreenId()){
+                case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onEncoderStepEvent(event); break;
+                default: break; // active screen does not receive 'EncoderStep' event
             }
         }
         break;

@@ -34,7 +34,7 @@ public:
     const RuntimeContext* getContext() { return mContext; }
 
     // get the host of this behaviour
-    ComponentHostIfc* getHost() { return mHost; }
+    ComponentHostIfc* host() { return mHost; }
 
     // component descriptor
     ComponentDescriptor getComponentDescriptor() const { return mComponentDescriptor; }

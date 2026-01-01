@@ -13,8 +13,12 @@ class EventFactory;
 class ComponentHostIfc {
 public:
 
+    virtual BehaviourId getActiveBehaviourId() const = 0;
+    virtual ScreenId getActiveScreenId () const = 0;
+
     virtual void requestChangeBehaviour(BehaviourId id) = 0;
     virtual void requestChangeScreen(ScreenId id) = 0;
+
     virtual void requestRenderScreenNow() = 0;
 
     virtual void receiveEvent(const EventHeader* header) = 0;

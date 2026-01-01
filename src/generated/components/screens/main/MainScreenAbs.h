@@ -20,15 +20,6 @@ public:
     // tick handlers (to be implmeneted by user)
     virtual void onUserInputTick() = 0;
 
-    // state change handlers (to be implmeneted by user)
-    virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
-    virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
-    virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;
-    virtual void onHeatpadSampleStateChanged(const HeatpadSampleState& state) = 0;
-    virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) = 0;
-    virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) = 0;
-    virtual void onFermentationStatusStateChanged(const FermentationStatusState& state) = 0;
-
     // render functions (to be implmeneted by user)
     virtual void onRenderFanInfo() = 0;
     virtual void onRenderPowerInfo() = 0;
@@ -39,6 +30,15 @@ public:
     virtual void onRenderTimeAxis() = 0;
     virtual void onRenderTimeSeries() = 0;
     virtual void onRenderMenu() = 0;
+
+    // state change handlers (to be implmeneted by user)
+    virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
+    virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
+    virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;
+    virtual void onHeatpadSampleStateChanged(const HeatpadSampleState& state) = 0;
+    virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) = 0;
+    virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) = 0;
+    virtual void onFermentationStatusStateChanged(const FermentationStatusState& state) = 0;
 
 protected:
 

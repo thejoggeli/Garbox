@@ -41,6 +41,8 @@ public:
     void run();
 
     // ComponentHostIfc
+    BehaviourId getActiveBehaviourId() const final;
+    ScreenId getActiveScreenId () const final;
     void requestChangeBehaviour(BehaviourId id) final;
     void requestChangeScreen(ScreenId id) final;
     void requestRenderScreenNow() final;

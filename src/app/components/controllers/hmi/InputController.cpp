@@ -44,6 +44,8 @@ void InputController::onSensorReadTick(){
 }
 
 void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState newState){
+    
+    // play tone and animation
     LogDebug("InputController", "button state changed: %s => %s", ButtonStateToString(oldState), ButtonStateToString(newState));
     const uint32_t deadTime = 0;
     switch(newState){
@@ -64,6 +66,7 @@ void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState
         // nothing to do
         break;
     }
+
     // send button state changed event
     ButtonEvent event = makeButtonEvent();
     event->oldState = oldState;

@@ -23,8 +23,6 @@ public:
 
 {{ constructor(name) }}
 {{ on_ticks(screen) }}
-{{ on_events(screen) }}
-{{ on_states_changed(screen) }}
 
 {% if screen.render_fns %}
     // render functions (to be implmeneted by user)
@@ -32,6 +30,9 @@ public:
     virtual void onRender{{ fn_name|upper_first }}() = 0;
 {% endfor %}
 {% endif %}
+
+{{ on_events(screen) }}
+{{ on_states_changed(screen) }}
 
 protected:
 

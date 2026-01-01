@@ -57,10 +57,10 @@ public:
         LvLabel tempValue;
         LvLabel tempUnit;
         LvObject infoTiles;
-        InfoTile onoffInfo;
-        InfoTile tempInfo;
-        InfoTile humidInfo;
-        InfoTile heatInfo;
+        InfoTile fermentationStatus;
+        InfoTile measuredTemperature;
+        InfoTile measuredHumidity;
+        InfoTile heaterPower;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

@@ -48,12 +48,11 @@ public:
     void onBecomeEnabled() final;
     void onBecomeDisabled() final;
 
-    // generated state changed handlers
-    void onStateChanged(const StateAbs& state) final;
-
     // generated render functions
     void onRender() final;
 
+    // generated state changed handlers
+    void onStateChanged(const StateAbs& state) final;
 // ==== GENERATED END: interface ==================================================
 
 };

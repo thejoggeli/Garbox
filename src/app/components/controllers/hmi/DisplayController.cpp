@@ -34,7 +34,7 @@ void DisplayController::onRenderTick(){
 
     // check if display is ready to render the next frame
     if(mDisplay.tryTakeRenderReady()){
-        getHost()->requestRenderScreenNow();
+        host()->requestRenderScreenNow();
         mDisplay.giveRenderTrigger();
     }
     else {

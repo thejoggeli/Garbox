@@ -109,25 +109,29 @@ void FermentationBehaviour::onHeartbeatEvent(const HeartbeatEvent& event){
 }
 
 void FermentationBehaviour::onButtonEvent(const ButtonEvent& event){
+    if(host()->getActiveScreenId() == ScreenId::Simple){
+        return;
+    }
+
     if(event->newState == ButtonState::Released){
 
         static uint32_t s = 0;
         s = MathUtils::Wrap(s+1u, 5u);
         switch(s){
             case 0:
-                getHost()->requestChangeScreen(ScreenId::Simple);
+                host()->requestChangeScreen(ScreenId::Simple);
                 break;
             case 1:
-                getHost()->requestChangeScreen(ScreenId::Main);
+                host()->requestChangeScreen(ScreenId::Main);
                 break;
             case 2:
-                getHost()->requestChangeScreen(ScreenId::Debug);
+                host()->requestChangeScreen(ScreenId::Debug);
                 break;
             case 3:
-                getHost()->requestChangeScreen(ScreenId::EventLog);
+                host()->requestChangeScreen(ScreenId::EventLog);
                 break;
             case 4:
-                getHost()->requestChangeScreen(ScreenId::StateLog);
+                host()->requestChangeScreen(ScreenId::StateLog);
                 break;
             default: break;
         }
@@ -145,8 +149,12 @@ void FermentationBehaviour::onButtonEvent(const ButtonEvent& event){
 }
     
 void FermentationBehaviour::onButtonRepeatEvent(const ButtonRepeatEvent& event){
+    if(host()->getActiveScreenId() == ScreenId::Simple){
+        return;
+    }
+
     if(event->count == 5){
-        getHost()->requestChangeBehaviour(BehaviourId::Calibration);
+        host()->requestChangeBehaviour(BehaviourId::Calibration);
     }
 }
     

@@ -5,6 +5,28 @@ screens:
     renderer: lvgl-gui
     tick_phases: [UserInput]
     renderer_gui: SimpleScreen.xml
+    render_fns: 
+      - EngineStatus
+      - TargetTemperature
+      - MeasuredTemperature
+      - MeasuredHumidity
+      - HeaterPower
+      - FanStatus
+    read_states:
+      - FanStatus
+      - FanSample
+      - HeatpadStatus
+      - HeatpadSample
+      - TemperatureStatus
+      - TemperatureSample
+      - FermentationStatus
+    receive_events: 
+      - Button
+      - ButtonRepeat
+      - EncoderStep
+    send_events:
+      - RequestFermentationMode
+      - RequestTargetTemperature
 
   Main:
     subdir: main

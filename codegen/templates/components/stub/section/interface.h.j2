@@ -27,6 +27,17 @@
 
 {% endif %}
 
+{# render handlers #}
+{% if component.type == "screen" %}
+    // generated render functions
+    void onRender() final;
+{% if component.render_fns %}
+{% for fn_name in component.render_fns %}
+    void onRender{{ fn_name|upper_first }}() final;
+{% endfor %}
+{% endif %}
+{% endif %}
+
 {# event handlers #}
 {% if component.receive_events_all or component.receive_events %}
     // generated event handlers
@@ -52,18 +63,5 @@
 {% for state in component.read_states.values() %}
     void on{{ state.name|upper_first }}StateChanged(const {{ state.name_with_suffix|upper_first }}& state) final;
 {% endfor %}
-
-{% endif %}
-
-
-{# render handlers #}
-{% if component.type == "screen" %}
-    // generated render functions
-    void onRender() final;
-{% if component.render_fns %}
-{% for fn_name in component.render_fns %}
-    void onRender{{ fn_name|upper_first }}() final;
-{% endfor %}
-{% endif %}
 
 {% endif %}

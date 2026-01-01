@@ -222,6 +222,20 @@ const RuntimeContext& RuntimeAbs::getContext() const {
     return mContext;
 }
 
+BehaviourId RuntimeAbs::getActiveBehaviourId() const {
+    if(mActiveBehaviour){
+        return mActiveBehaviour->getBehaviourId();
+    }
+    return BehaviourId::Null;
+}
+
+ScreenId RuntimeAbs::getActiveScreenId () const {
+    if(mActiveScreen){
+        return mActiveScreen->getScreenId();
+    }
+    return ScreenId::Null;
+}
+
 void RuntimeAbs::requestChangeBehaviour(BehaviourId id){
     setQueuedBehaviour(resolveBehaviour(id));
 }

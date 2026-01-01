@@ -45,6 +45,21 @@ void {{ component.name }}::on{{ tick }}(){
 {% endfor %}
 {% endif %}
 
+{# render handlers #}
+{% if component.type == "screen" %}
+void {{ component.name }}::onRender(){
+    // to be implemented
+}
+{% if component.render_fns %}
+{% for fn_name in component.render_fns %}
+
+void {{ component.name }}::onRender{{ fn_name|upper_first }}() {
+    // to be implemented
+}
+{% endfor %}
+{% endif %}
+{% endif %}
+
 {# event handlers #}
 {% if component.receive_events_all %}
 void {{ component.name }}::onEvent(const EventHeader* header){
@@ -73,21 +88,6 @@ void {{ component.name }}::on{{ state.name|upper_first }}StateChanged(const {{ s
     // to be implemented
 }
 {% endfor %}
-{% endif %}
-
-{# render handlers #}
-{% if component.type == "screen" %}
-void {{ component.name }}::onRender(){
-    // to be implemented
-}
-{% if component.render_fns %}
-{% for fn_name in component.render_fns %}
-
-void {{ component.name }}::onRender{{ fn_name|upper_first }}() {
-    // to be implemented
-}
-{% endfor %}
-{% endif %}
 {% endif %}
 
 } // namespace Garbox
