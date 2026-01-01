@@ -28,7 +28,6 @@ void FermentationBehaviour::onBecomeEnabled(){
     states().fermentationStatus.setPowerOn(true);
     states().fermentationStatus.setFanAuto(true);
     mFirstTick = true;
-    mStepTimer.reset();
 }
 
 void FermentationBehaviour::onBecomeDisabled(){
@@ -36,39 +35,34 @@ void FermentationBehaviour::onBecomeDisabled(){
     sendFanCommand(false, 0.0f);
     sendHeatpadCommand(false, 0.0f, 5000_ms);
     updateFermentationStatus();
-    mStepTimer.reset();
 }
 
 void FermentationBehaviour::onLogicTick(){
-
-    if(mFirstTick || mStepTimer.isExpired()){
     
-        const bool temperatureStatusValid = checkTemperatureStatus();
+    const bool temperatureStatusValid = checkTemperatureStatus();
 
-        // set control engine input
-        FermentationEngine::Input& input = mFermentationEngine.getInput();
-        input.targetTemperature          = states().fermentationStatus.getTargetTemperature();
-        input.regulationEnabled          = states().fermentationStatus.getPowerOn();
-        input.fanMeasuredRpm             = states().fanSample.getMeasuredRpm();
-        input.fanStalled                 = states().fanStatus.getState() == FanState::Stalled;
-        input.measuredHumidity           = states().temperatureSample.getHumidityRelative();
-        input.measuredTemperature        = states().temperatureSample.getTemperatureCelcius();
-        input.measuredHumidityValid      = temperatureStatusValid;
-        input.measuredTemperatureValid   = temperatureStatusValid;
+    // set control engine input
+    FermentationEngine::Input& input = mFermentationEngine.getInput();
+    input.targetTemperature          = states().fermentationStatus.getTargetTemperature();
+    input.regulationEnabled          = states().fermentationStatus.getPowerOn();
+    input.fanMeasuredRpm             = states().fanSample.getMeasuredRpm();
+    input.fanStalled                 = states().fanStatus.getState() == FanState::Stalled;
+    input.measuredHumidity           = states().temperatureSample.getHumidityRelative();
+    input.measuredTemperature        = states().temperatureSample.getTemperatureCelcius();
+    input.measuredHumidityValid      = temperatureStatusValid;
+    input.measuredTemperatureValid   = temperatureStatusValid;
 
-        // perform control engine step
-        mFermentationEngine.step();
-        
-        // send actuator commands
-        const FermentationEngine::Output& output = mFermentationEngine.getOutput();
-        const bool autoFan = states().fermentationStatus.getFanAuto();
-        sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
-        sendFanCommand(output.fanEnabled && autoFan, output.fanTargetSpeed);
-        updateFermentationStatus();
-        
-        mStepTimer.restart(100_ms); // 10 Hz
-        mFirstTick = false;
-    }
+    // perform control engine step
+    mFermentationEngine.step();
+    
+    // send actuator commands
+    const FermentationEngine::Output& output = mFermentationEngine.getOutput();
+    const bool autoFan = states().fermentationStatus.getFanAuto();
+    sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
+    sendFanCommand(output.fanEnabled && autoFan, output.fanTargetSpeed);
+    updateFermentationStatus();
+    
+    mFirstTick = false;
 }
 
 void FermentationBehaviour::sendHeatpadCommand(bool enabled, float dutyCycle, uint32_t periodMicros){
@@ -105,60 +99,6 @@ void FermentationBehaviour::updateFermentationStatus(){
 }
 
 void FermentationBehaviour::onHeartbeatEvent(const HeartbeatEvent& event){
-    // nothing to do
-}
-
-void FermentationBehaviour::onButtonEvent(const ButtonEvent& event){
-    if(host()->getActiveScreenId() == ScreenId::Simple){
-        return;
-    }
-
-    if(event->newState == ButtonState::Released){
-
-        static uint32_t s = 0;
-        s = MathUtils::Wrap(s+1u, 5u);
-        switch(s){
-            case 0:
-                host()->requestChangeScreen(ScreenId::Simple);
-                break;
-            case 1:
-                host()->requestChangeScreen(ScreenId::Main);
-                break;
-            case 2:
-                host()->requestChangeScreen(ScreenId::Debug);
-                break;
-            case 3:
-                host()->requestChangeScreen(ScreenId::EventLog);
-                break;
-            case 4:
-                host()->requestChangeScreen(ScreenId::StateLog);
-                break;
-            default: break;
-        }
-
-        static uint32_t b = 4;
-        b = MathUtils::Wrap(b+1, 4u) + 1;
-        DisplayCommandEvent cmd = makeDisplayCommandEvent();
-        cmd->brightness = b/4.0f;
-        sendEvent(cmd);
-    }
-    else if(event->newState == ButtonState::PressedLong){
-        FermentationStatusState& status = states().fermentationStatus;
-        status.setPowerOn(!status.getPowerOn());
-    }
-}
-    
-void FermentationBehaviour::onButtonRepeatEvent(const ButtonRepeatEvent& event){
-    if(host()->getActiveScreenId() == ScreenId::Simple){
-        return;
-    }
-
-    if(event->count == 5){
-        host()->requestChangeBehaviour(BehaviourId::Calibration);
-    }
-}
-    
-void FermentationBehaviour::onEncoderStepEvent(const EncoderStepEvent& event){
     // nothing to do
 }
 

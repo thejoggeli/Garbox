@@ -82,6 +82,12 @@ void DebugScreen::onBecomeDisabled(){
     // nothing to do
 }
 
+void DebugScreen::onButtonEvent(const ButtonEvent& event){
+    if(event->newState == ButtonState::Pressed){
+        host()->requestChangeScreen(ScreenId::EventLog);
+    }
+}
+
 void DebugScreen::onRender(){
 
     // update time 

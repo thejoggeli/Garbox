@@ -454,18 +454,21 @@ void Runtime::onRouteEvent(const EventHeader* header){
     }
     case EventType::Button: {
         const ButtonEvent event(header);
-        mI2cPartsController.onButtonEvent(event);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonEvent(event);
+            mDebugScreen.onButtonEvent(event);
+            mEventLogScreen.onButtonEvent(event);
+            mMainScreen.onButtonEvent(event);
             mSimpleScreen.onButtonEvent(event);
+            mStateLogScreen.onButtonEvent(event);
         }
         else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonEvent(event); break;
-                default: break; // active behaviour does not receive 'Button' event
-            }
+            // no active receivers for this event type
             switch(mActiveScreen->getScreenId()){
+                case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onButtonEvent(event); break;
+                case ScreenId::EventLog: static_cast<EventLogScreen*>(mActiveScreen)->onButtonEvent(event); break;
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onButtonEvent(event); break;
                 case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onButtonEvent(event); break;
+                case ScreenId::StateLog: static_cast<StateLogScreen*>(mActiveScreen)->onButtonEvent(event); break;
                 default: break; // active screen does not receive 'Button' event
             }
         }
@@ -474,14 +477,10 @@ void Runtime::onRouteEvent(const EventHeader* header){
     case EventType::ButtonRepeat: {
         const ButtonRepeatEvent event(header);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onButtonRepeatEvent(event);
             mSimpleScreen.onButtonRepeatEvent(event);
         }
         else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onButtonRepeatEvent(event); break;
-                default: break; // active behaviour does not receive 'ButtonRepeat' event
-            }
+            // no active receivers for this event type
             switch(mActiveScreen->getScreenId()){
                 case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onButtonRepeatEvent(event); break;
                 default: break; // active screen does not receive 'ButtonRepeat' event
@@ -492,14 +491,10 @@ void Runtime::onRouteEvent(const EventHeader* header){
     case EventType::EncoderStep: {
         const EncoderStepEvent event(header);
         if(header->sendToInactiveComponents){
-            mFermentationBehaviour.onEncoderStepEvent(event);
             mSimpleScreen.onEncoderStepEvent(event);
         }
         else {
-            switch(mActiveBehaviour->getBehaviourId()){
-                case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onEncoderStepEvent(event); break;
-                default: break; // active behaviour does not receive 'EncoderStep' event
-            }
+            // no active receivers for this event type
             switch(mActiveScreen->getScreenId()){
                 case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onEncoderStepEvent(event); break;
                 default: break; // active screen does not receive 'EncoderStep' event

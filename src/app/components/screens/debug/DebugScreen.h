@@ -76,6 +76,9 @@ public:
     void onRenderHeapBytes() final;
     void onRenderHeapMinimum() final;
 
+    // generated event handlers
+    void onButtonEvent(const ButtonEvent& event) final;
+
     // generated state changed handlers
     void onFanStatusStateChanged(const FanStatusState& state) final;
     void onFanSampleStateChanged(const FanSampleState& state) final;

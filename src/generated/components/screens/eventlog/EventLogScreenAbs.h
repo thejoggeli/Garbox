@@ -19,6 +19,9 @@ public:
     // event handler (to be implmeneted by user)
     virtual void onEvent(const EventHeader* header) = 0;
 
+    // event handlers (to be implmeneted by user)
+    virtual void onButtonEvent(const ButtonEvent& event) = 0;
+
 protected:
 
 private:

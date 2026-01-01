@@ -35,6 +35,9 @@ public:
     virtual void onRenderHeapBytes() = 0;
     virtual void onRenderHeapMinimum() = 0;
 
+    // event handlers (to be implmeneted by user)
+    virtual void onButtonEvent(const ButtonEvent& event) = 0;
+
     // state change handlers (to be implmeneted by user)
     virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
     virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;

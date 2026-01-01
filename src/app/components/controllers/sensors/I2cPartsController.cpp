@@ -64,12 +64,6 @@ void I2cPartsController::onSensorReadTick(){
     }
 }
 
-void I2cPartsController::onButtonEvent(const ButtonEvent& event){
-    if(event->newState == ButtonState::Pressed){
-        mFsm.forceTransition(FsmState::ResetPowerOffPhase);
-    }
-}
-
 void I2cPartsController::handleRunningState(){
     mNewSample = mTemperatureSensor.tryFetch();
     if(!mNewSample){

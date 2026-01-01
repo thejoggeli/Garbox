@@ -31,6 +31,9 @@ public:
     virtual void onRenderTimeSeries() = 0;
     virtual void onRenderMenu() = 0;
 
+    // event handlers (to be implmeneted by user)
+    virtual void onButtonEvent(const ButtonEvent& event) = 0;
+
     // state change handlers (to be implmeneted by user)
     virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
     virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;

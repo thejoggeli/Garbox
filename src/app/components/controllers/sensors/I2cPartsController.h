@@ -54,9 +54,6 @@ public:
     // generated tick handlers
     void onSensorReadTick() final;
 
-    // generated event handlers
-    void onButtonEvent(const ButtonEvent& event) final;
-
 // ==== GENERATED END: interface ==================================================
 
 };

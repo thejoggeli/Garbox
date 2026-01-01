@@ -11,9 +11,6 @@ behaviours:
 
     receive_events: [
       Heartbeat, 
-      Button, 
-      ButtonRepeat, 
-      EncoderStep, 
       RequestFermentationMode,
       RequestTargetTemperature,
       RequestFanMode

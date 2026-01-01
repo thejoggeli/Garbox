@@ -19,9 +19,6 @@ public:
     // tick handlers (to be implmeneted by user)
     virtual void onSensorReadTick() = 0;
 
-    // event handlers (to be implmeneted by user)
-    virtual void onButtonEvent(const ButtonEvent& event) = 0;
-
 protected:
 
     I2cPartsControllerStates& states();

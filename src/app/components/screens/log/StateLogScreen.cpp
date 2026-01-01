@@ -62,6 +62,12 @@ void StateLogScreen::onBecomeDisabled(){
     // nothing to do
 }
 
+void StateLogScreen::onButtonEvent(const ButtonEvent& event){
+    if(event->newState == ButtonState::Pressed){
+        host()->requestChangeScreen(ScreenId::Simple);
+    }
+}
+
 void StateLogScreen::onRender(){
 
     // write queued events to labels

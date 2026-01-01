@@ -17,6 +17,9 @@ public:
     // component constructor
     StateLogScreenAbs();
 
+    // event handlers (to be implmeneted by user)
+    virtual void onButtonEvent(const ButtonEvent& event) = 0;
+
     // any state changed handler
     virtual void onStateChanged(const StateAbs& state) = 0;
 

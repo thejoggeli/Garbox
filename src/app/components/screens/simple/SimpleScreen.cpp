@@ -2,10 +2,14 @@
 
 #include <math.h>
 #include "core/assert/Assert.h"
+#include "core/log/Log.h"
 #include "core/util/function/default/MathFunctions.h"
 #include "core/util/math/MathUtils.h"
 
 namespace Garbox {
+
+static constexpr uint32_t ColorRed = 0xB85450;
+static constexpr uint32_t ColorGreen = 0x7BBF56;
 
 static constexpr float ArcTempMin = 15.0f;
 static constexpr float ArcTempMax = 50.0f;
@@ -93,9 +97,10 @@ void SimpleScreen::onButtonRepeatEvent(const ButtonRepeatEvent& event){
 void SimpleScreen::onEncoderStepEvent(const EncoderStepEvent& event){
 
     // compute new target temperature 
-    const int16_t tempOldInt = states().fermentationStatus.getTargetTemperature() * 10.0f;
+    constexpr float scaleFactor = 10.0f;
+    const int16_t tempOldInt = states().fermentationStatus.getTargetTemperature() * scaleFactor + 0.5f;
     const int16_t tempNewInt = tempOldInt + event->steps;
-    const float tempNew = static_cast<float>(tempNewInt) * 0.1f;
+    const float tempNew = static_cast<float>(tempNewInt) / scaleFactor;
     const float tempNewClamped = MathUtils::Clamp(tempNew, ArcTempMin, ArcTempMax);
 
     // send target temperature request
@@ -105,40 +110,32 @@ void SimpleScreen::onEncoderStepEvent(const EncoderStepEvent& event){
 }
 
 void SimpleScreen::onRender(){
-
-    const MathFunctionIfc& fn1 = MathFunctions::GetSinNorm();
-    const MathFunctionIfc& fn2 = MathFunctions::GetSinNorm90();
-
-    const float speed = 0.2f;
-    const float t = fmodf(Time::GetTickMicros() * 1e-6f * speed, 1.0f);
-    const float tempVal1 = static_cast<uint16_t>(fn1.evaluate(t) * 35.0f + 15.0f);
-    const float tempVal2 = static_cast<uint16_t>(fn2.evaluate(t) * 35.0f + 15.0f);
-
-    setArcTemperature(ArcIndex::MeasuredTemperature, tempVal1);
-    setArcTemperature(ArcIndex::TargetTemperature, tempVal2);
+    // nothing to do
 }
 
 void SimpleScreen::onRenderEngineStatus(){
     const FermentationStatusState& status = states().fermentationStatus;
     if(status.getPowerOn()){
-        gui().fermentationStatus.value.setText("ON");
+        gui().fermentationStatus.value.setText("On");
+        gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorGreen));
     }
     else {
-        gui().fermentationStatus.value.setText("OFF");
+        gui().fermentationStatus.value.setText("Off");
+        gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorRed));
     }
 }
 
 void SimpleScreen::onRenderTargetTemperature(){
     const float targetTemperature = states().fermentationStatus.getTargetTemperature();
     gui().tempValue.setTextFormatted("%.1f", targetTemperature);
-    // setArcTemperature(ArcIndex::TargetTemperature, targetTemperature);
+    setArcTemperature(ArcIndex::TargetTemperature, targetTemperature);
     
 }
 
 void SimpleScreen::onRenderMeasuredTemperature(){
     const float measuredTemperature = states().temperatureSample.getTemperatureCelcius();
     gui().measuredTemperature.value.setTextFormatted("%.1f°C", measuredTemperature);
-    // setArcTemperature(ArcIndex::MeasuredTemperature, measuredTemperature);
+    setArcTemperature(ArcIndex::MeasuredTemperature, measuredTemperature);
 }
 
 void SimpleScreen::onRenderMeasuredHumidity(){

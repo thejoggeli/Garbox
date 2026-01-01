@@ -51,6 +51,9 @@ public:
     // generated render functions
     void onRender() final;
 
+    // generated event handlers
+    void onButtonEvent(const ButtonEvent& event) final;
+
     // generated state changed handlers
     void onStateChanged(const StateAbs& state) final;
 // ==== GENERATED END: interface ==================================================

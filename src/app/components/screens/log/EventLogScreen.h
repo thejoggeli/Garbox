@@ -52,6 +52,7 @@ public:
 
     // generated event handlers
     void onEvent(const EventHeader* header) final;
+    void onButtonEvent(const ButtonEvent& event) final;
 
 // ==== GENERATED END: interface ==================================================
 

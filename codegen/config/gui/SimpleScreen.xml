@@ -14,7 +14,7 @@
     <InfoTile $icon $value $bgColor>
       <body 
         layout="flex" flex-flow="column" flex-align="center"
-        bg-color=$bgColor bg-opa="50%" radius="8px" text-color="#fff" >
+        bg-color=$bgColor bg-opa="100%" radius="8px" text-color="#fff" >
 
         <image name="icon" src=$icon width="16" height="16" />
         <label name="value" text=$value width="100%" text-align="center" />
@@ -115,8 +115,8 @@
         name="info-tiles" flex-grow="1" height="100%" pad="0 8px 8px 8px" pad-gap="8px"
         layout="flex" flex-flow="column" flex-align="space-around start start">
 
-        <InfoTile name="fermentationStatus" $icon="power16" $value="" $bgColor="#0A0" width="100%" flex-grow="1" />
-        <InfoTile name="measuredTemperature" $icon="temperature16" $value="20.0°C" $bgColor="#08C" width="100%" flex-grow="1" />
+        <InfoTile name="fermentationStatus" $icon="power16" $value="" $bgColor="#666" width="100%" flex-grow="1" />
+        <InfoTile name="measuredTemperature" $icon="temperature16" $value="20.0°C" $bgColor="#8AB4F4" width="100%" flex-grow="1" />
         <InfoTile name="measuredHumidity" $icon="humidity16" $value="50.0%" $bgColor="#666" width="100%" flex-grow="1" />
         <InfoTile name="heaterPower" $icon="heat16" $value="50%" $bgColor="#666" width="100%" flex-grow="1" />
       </container>

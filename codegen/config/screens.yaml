@@ -54,6 +54,8 @@ screens:
       - RequestFermentationMode
       - RequestTargetTemperature
       - RequestFanMode
+    receive_events: 
+      - Button
 
   Debug:
     subdir: debug
@@ -88,13 +90,19 @@ screens:
       - ActiveBehaviour
       - ActiveScreen
       - FermentationStatus
+    receive_events: 
+      - Button
 
   EventLog:
     subdir: log
     renderer: lvgl-simple # lvgl-simple or lvgl-gui 
     receive_events_all: true
+    receive_events: 
+      - Button
     
   StateLog:
     subdir: log
     renderer: lvgl-simple # lvgl-simple or lvgl-gui 
     read_states_all: true
+    receive_events: 
+      - Button

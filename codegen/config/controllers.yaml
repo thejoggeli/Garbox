@@ -35,7 +35,6 @@ controllers:
   I2cPartsController:
     subdir: "sensors"
     tick_phases: [SensorRead]
-    receive_events: [Button]
     write_states: [TemperatureStatus, TemperatureSample]
 
   TimeSeriesController:

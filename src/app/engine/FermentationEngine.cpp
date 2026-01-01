@@ -4,8 +4,8 @@
 #include "core/log/Log.h"
 #include "core/time/Time.h"
 
-static constexpr float PidKp = 0.2f; 
-static constexpr float PidKi = 0.001f;
+static constexpr float PidKp = 0.05f; 
+static constexpr float PidKi = 0.02f;
 static constexpr float PidKd = 0.0f;
 static constexpr float PidOutputMin = 0.0f;
 static constexpr float PidOutputMax = 1.0f;

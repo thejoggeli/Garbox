@@ -161,6 +161,12 @@ void MainScreen::onUserInputTick(){
     }
 }
 
+void MainScreen::onButtonEvent(const ButtonEvent& event){
+    if(event->newState == ButtonState::Pressed){
+        host()->requestChangeScreen(ScreenId::Debug);
+    }
+}
+
 void MainScreen::handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, int32_t newValue){
     switch(index){
         case MenuRowIndex::Power: {
