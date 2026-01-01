@@ -31,7 +31,8 @@ public:
     MainScreenMenu(LvObject& container, void* callbackCtx, ValueChangedCallback valueChangedCallback);
 
     void render();
-    bool onEncoderInput(int32_t steps, bool buttonAction);
+    void onButtonInput();
+    void onEncoderInput(int32_t steps);
 
     void setPowerEnabled(bool enabled);
     void setTargetTemperatureCelsius(float temperature);

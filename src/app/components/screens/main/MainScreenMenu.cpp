@@ -49,27 +49,23 @@ void MainScreenMenu::render(){
     mMenu.render();
 }
 
-bool MainScreenMenu::onEncoderInput(int32_t steps, bool buttonAction){
-    bool changed = false;
-    if(buttonAction){
-        mMenu.toggleLock();
-        changed = true;
-    }
-    else if(steps > 0){
+void MainScreenMenu::onButtonInput(){
+    mMenu.toggleLock();
+}
+
+void MainScreenMenu::onEncoderInput(int32_t steps){
+    if(steps > 0){
         for(int32_t i = 0; i < steps; i++){
             mMenu.nextValue();
             mMenu.selectNextRow();
         }
-        changed = true;
     }
     else if(steps < 0){
         for(int32_t i = 0; i < -steps; i++){
             mMenu.previousValue();
             mMenu.selectPreviousRow();
         }
-        changed = true;
     }
-    return changed;
 }
 
 int32_t MainScreenMenu::changeValue(void* callbackCtx, uint8_t rowIndex, int32_t currentValue, int32_t delta){

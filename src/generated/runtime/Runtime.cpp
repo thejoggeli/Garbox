@@ -491,11 +491,13 @@ void Runtime::onRouteEvent(const EventHeader* header){
     case EventType::EncoderStep: {
         const EncoderStepEvent event(header);
         if(header->sendToInactiveComponents){
+            mMainScreen.onEncoderStepEvent(event);
             mSimpleScreen.onEncoderStepEvent(event);
         }
         else {
             // no active receivers for this event type
             switch(mActiveScreen->getScreenId()){
+                case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onEncoderStepEvent(event); break;
                 case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onEncoderStepEvent(event); break;
                 default: break; // active screen does not receive 'EncoderStep' event
             }

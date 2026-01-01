@@ -83,7 +83,7 @@ void DebugScreen::onBecomeDisabled(){
 }
 
 void DebugScreen::onButtonEvent(const ButtonEvent& event){
-    if(event->newState == ButtonState::Pressed){
+    if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
         host()->requestChangeScreen(ScreenId::EventLog);
     }
 }

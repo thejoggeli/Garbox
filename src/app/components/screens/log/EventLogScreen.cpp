@@ -65,7 +65,7 @@ void EventLogScreen::onBecomeDisabled(){
 }
 
 void EventLogScreen::onButtonEvent(const ButtonEvent& event){
-    if(event->newState == ButtonState::Pressed){
+    if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
         host()->requestChangeScreen(ScreenId::StateLog);
     }
 }

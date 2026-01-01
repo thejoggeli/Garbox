@@ -81,6 +81,7 @@ public:
 
     // generated event handlers
     void onButtonEvent(const ButtonEvent& event) final;
+    void onEncoderStepEvent(const EncoderStepEvent& event) final;
 
     // generated state changed handlers
     void onFanStatusStateChanged(const FanStatusState& state) final;

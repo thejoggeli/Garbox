@@ -18,6 +18,8 @@ private:
         TargetTemperature,
     };
 
+    bool mFermentationStatusGlow = false;
+
     void initArc(LvArc& arc);
     
     void setArcTemperature(ArcIndex index, float temperature);

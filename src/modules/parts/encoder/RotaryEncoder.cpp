@@ -77,14 +77,7 @@ void RotaryEncoder::tick(){
     }
 
     // compute wrap-safe delta
-    static uint32_t cnt = 0;
-    static int16_t step = -1;
-    if(++cnt > 50){
-        cnt = 0;
-        step = -step;
-    }
-
-    const int16_t delta16 = step; // wrapDelta(nowCount, mLastCount);
+    const int16_t delta16 = wrapDelta(nowCount, mLastCount);
     mLastCount = nowCount;
 
     if(delta16 == 0){

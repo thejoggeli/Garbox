@@ -84,7 +84,7 @@ void SimpleScreen::onStart(){
 }
 
 void SimpleScreen::onBecomeEnabled(){
-    // to be implemented
+    mFermentationStatusGlow = false;
 }
 
 void SimpleScreen::onBecomeDisabled(){
@@ -93,16 +93,28 @@ void SimpleScreen::onBecomeDisabled(){
 
 void SimpleScreen::onButtonEvent(const ButtonEvent& event){
     if(event->newState == ButtonState::Pressed){
+        // enable engine status glow
+        mFermentationStatusGlow = true;
+        markDirty(RenderFn::EngineStatus);
+    }
+    else if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
+        // disable engine status glow
+        mFermentationStatusGlow = false;
+        markDirty(RenderFn::EngineStatus);
+
+        // send request toggle engine power 
         RequestFermentationModeEvent request = makeRequestFermentationModeEvent();
         request->enabled = !states().fermentationStatus.getPowerOn();
         sendEvent(request);
     }
+    else if(event->newState == ButtonState::PressedLong){
+        // send request change screen
+        host()->requestChangeScreen(ScreenId::Main);
+    }
 }
 
 void SimpleScreen::onButtonRepeatEvent(const ButtonRepeatEvent& event){
-    if(event->count > 5){
-        host()->requestChangeScreen(ScreenId::Main);
-    }
+    // nothing to do
 }
 
 void SimpleScreen::onEncoderStepEvent(const EncoderStepEvent& event){
@@ -126,13 +138,25 @@ void SimpleScreen::onRender(){
 
 void SimpleScreen::onRenderEngineStatus(){
     const FermentationStatusState& status = states().fermentationStatus;
+
+    // set text
     if(status.getPowerOn()){
         gui().fermentationStatus.value.setText("On");
+    }
+    else {
+        gui().fermentationStatus.value.setText("Off");
+    }
+    
+    // set color
+    if(mFermentationStatusGlow){
+        gui().fermentationStatus.body.setBorderColor(lv_color_hex(0xAAAAAA));
+        gui().fermentationStatus.body.setBgColor(lv_color_hex(0xAAAAAA));     
+    }
+    else if(status.getPowerOn()){
         gui().fermentationStatus.body.setBorderColor(lv_color_hex(ColorGreen));
         gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorGreen));
     }
     else {
-        gui().fermentationStatus.value.setText("Off");
         gui().fermentationStatus.body.setBorderColor(lv_color_hex(ColorRed));
         gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorRed));
     }

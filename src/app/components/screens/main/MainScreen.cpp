@@ -141,29 +141,27 @@ void MainScreen::onBecomeDisabled(){
 }
 
 void MainScreen::onUserInputTick(){
-    if(mMenuTimer.isExpired()){
-        static uint32_t state = 0;
-        int32_t steps = 0;
-        bool buttonAction = false;
-        if(state == 0){
-            steps = 1;
-            state = 1;
-        }
-        else {
-            buttonAction = true; 
-            state = 0;
-        }
-        const bool menuChanged = mMenu.onEncoderInput(steps, buttonAction);
-        if(menuChanged){
-            markDirty(RenderFn::Menu);
-        }
-        mMenuTimer.restart();
-    }
+    // nothing to do
 }
 
 void MainScreen::onButtonEvent(const ButtonEvent& event){
-    if(event->newState == ButtonState::Pressed){
+    if(event->newState == ButtonState::PressedLong){
         host()->requestChangeScreen(ScreenId::Debug);
+    }
+    else if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
+        mMenu.onButtonInput();
+        markDirty(RenderFn::Menu);
+    }
+}
+
+void MainScreen::onEncoderStepEvent(const EncoderStepEvent& event){
+    if(event->steps > 0){
+        mMenu.onEncoderInput(1);
+        markDirty(RenderFn::Menu);
+    }
+    else if(event->steps < 0){
+        mMenu.onEncoderInput(-1);
+        markDirty(RenderFn::Menu);
     }
 }
 
