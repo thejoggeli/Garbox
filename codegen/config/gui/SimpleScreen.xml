@@ -11,10 +11,12 @@
   <components>
 
     <!-- INFO TILE COMPONENT -->
-    <InfoTile $icon $value $bgColor>
+    <InfoTile $icon $value $color>
       <body 
         layout="flex" flex-flow="column" flex-align="center"
-        bg-color=$bgColor bg-opa="100%" radius="8px" text-color="#fff" >
+        border-color=$color border-opa="100%" border-width="1px" border-side="full" 
+        bg-color=$color bg-opa="50%"
+        text-color="#fff" radius="4px">
 
         <image name="icon" src=$icon width="16" height="16" />
         <label name="value" text=$value width="100%" text-align="center" />
@@ -112,13 +114,13 @@
 
       <!-- Info Tiles -->
       <container 
-        name="info-tiles" flex-grow="1" height="100%" pad="0 8px 8px 8px" pad-gap="8px"
+        name="info-tiles" flex-grow="1" height="100%" pad="0 4px 4px 4px" pad-gap="4px"
         layout="flex" flex-flow="column" flex-align="space-around start start">
 
-        <InfoTile name="fermentationStatus" $icon="power16" $value="" $bgColor="#666" width="100%" flex-grow="1" />
-        <InfoTile name="measuredTemperature" $icon="temperature16" $value="20.0°C" $bgColor="#8AB4F4" width="100%" flex-grow="1" />
-        <InfoTile name="measuredHumidity" $icon="humidity16" $value="50.0%" $bgColor="#666" width="100%" flex-grow="1" />
-        <InfoTile name="heaterPower" $icon="heat16" $value="50%" $bgColor="#666" width="100%" flex-grow="1" />
+        <InfoTile name="fermentationStatus" $icon="power16" $value="" $color="#666" width="100%" flex-grow="1" />
+        <InfoTile name="measuredTemperature" $icon="temperature16" $value="20.0°C" $color="#666" width="100%" flex-grow="1" />
+        <InfoTile name="measuredHumidity" $icon="humidity16" $value="50.0%" $color="#666" width="100%" flex-grow="1" />
+        <InfoTile name="heaterPower" $icon="heat16" $value="50%" $color="#666" width="100%" flex-grow="1" />
       </container>
 
     <!-- End Wrapper -->

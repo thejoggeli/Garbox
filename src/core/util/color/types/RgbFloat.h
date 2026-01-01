@@ -23,6 +23,8 @@ public:
     RgbFloat toStandardRgb() const;
     RgbFloat toLinearRgb() const;
 
+    uint32_t hex() const;
+
     static RgbFloat From(const HslColor& hsl); // returns RgbFloat in StandardRGB format
     static RgbFloat From(const LabColor& lab); // returns RgbFloat in LinearRGB format
     static RgbFloat From(const Rgb888& rgb);   // returns RgbFloat in StandardRGB format

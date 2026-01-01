@@ -1,9 +1,9 @@
 #include "SimpleScreen.h"
 
 #include <math.h>
+#include "app/providers/ColorMaps.h"
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
-#include "core/util/function/default/MathFunctions.h"
 #include "core/util/math/MathUtils.h"
 
 namespace Garbox {
@@ -68,6 +68,17 @@ void SimpleScreen::setArcTemperature(ArcIndex index, float temperature){
     }
 }
 
+void SimpleScreen::updateArcColor(){
+    const ColorMap& cm = ColorMaps::GetCoolWarm();
+    const float tempMeasured = states().fermentationStatus.getTargetTemperature(); 
+    const float tempTarget = states().temperatureSample.getTemperatureCelcius();
+    const float range = 5.0f;
+    const float t = (tempMeasured - tempTarget) / range + 0.5f;
+    LabColor lab = cm.interpolateLab(t);
+    uint32_t hex = lab.hexStandard();
+    gui().arcMeasured.setArcColor(lv_color_hex(hex));
+}
+
 void SimpleScreen::onStart(){
     // to be implemented
 }
@@ -117,10 +128,12 @@ void SimpleScreen::onRenderEngineStatus(){
     const FermentationStatusState& status = states().fermentationStatus;
     if(status.getPowerOn()){
         gui().fermentationStatus.value.setText("On");
+        gui().fermentationStatus.body.setBorderColor(lv_color_hex(ColorGreen));
         gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorGreen));
     }
     else {
         gui().fermentationStatus.value.setText("Off");
+        gui().fermentationStatus.body.setBorderColor(lv_color_hex(ColorRed));
         gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorRed));
     }
 }
@@ -129,13 +142,13 @@ void SimpleScreen::onRenderTargetTemperature(){
     const float targetTemperature = states().fermentationStatus.getTargetTemperature();
     gui().tempValue.setTextFormatted("%.1f", targetTemperature);
     setArcTemperature(ArcIndex::TargetTemperature, targetTemperature);
-    
 }
 
 void SimpleScreen::onRenderMeasuredTemperature(){
     const float measuredTemperature = states().temperatureSample.getTemperatureCelcius();
     gui().measuredTemperature.value.setTextFormatted("%.1f°C", measuredTemperature);
     setArcTemperature(ArcIndex::MeasuredTemperature, measuredTemperature);
+    updateArcColor();
 }
 
 void SimpleScreen::onRenderMeasuredHumidity(){
@@ -180,6 +193,9 @@ void SimpleScreen::onTemperatureSampleStateChanged(const TemperatureSampleState&
 
 void SimpleScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
     markDirty(RenderFn::EngineStatus);
+    markDirty(RenderFn::FanStatus);
+    markDirty(RenderFn::TargetTemperature);
+    markDirty(RenderFn::MeasuredTemperature);
 }
 
 } // namespace Garbox

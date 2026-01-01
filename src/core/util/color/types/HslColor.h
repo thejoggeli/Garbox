@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Garbox {
 
 class LabColor;
@@ -15,6 +17,9 @@ public:
 
     HslColor();
     HslColor(float h, float s, float l);
+
+    uint32_t hexStandard() const;
+    uint32_t hexLinear() const;
 
     LabColor toLab() const;
     RgbFloat toStandardRgb() const;

@@ -14,6 +14,14 @@ LabColor::LabColor(float LVal, float aVal, float bVal) : L(LVal), a(aVal), b(bVa
     // constructor body
 }
 
+uint32_t LabColor::hexStandard() const {
+    return toStandardRgb().hex();
+}
+
+uint32_t LabColor::hexLinear() const {
+    return toLinearRgb().hex();
+}
+
 HslColor LabColor::toHsl() const {
     return ColorConverter::ToHsl(*this);
 }

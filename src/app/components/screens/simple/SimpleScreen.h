@@ -21,6 +21,7 @@ private:
     void initArc(LvArc& arc);
     
     void setArcTemperature(ArcIndex index, float temperature);
+    void updateArcColor();
 
 public:
 // ==== GENERATED BEGIN: interface ================================================

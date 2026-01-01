@@ -23,6 +23,10 @@ RgbFloat RgbFloat::toLinearRgb() const {
     return ColorConverter::ToLinearRgb(*this);
 }
 
+uint32_t RgbFloat::hex() const {
+    return Rgb888::FromRgbFloat(*this).hex();
+}
+
 RgbFloat RgbFloat::From(const HslColor& hsl){
     return ColorConverter::ToRgbFloat(hsl);
 }

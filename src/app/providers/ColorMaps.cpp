@@ -14,6 +14,20 @@ const ColorMap& ColorMaps::GetRedBlue(){
     return instance;   
 }
 
+const ColorMap& ColorMaps::GetCoolWarm(){
+    static const ColorMapEntry entries[] = {
+        { 0.00f, RgbFloat::FromHex(0x1f31fa) }, // blue,
+        { 0.30f, RgbFloat::FromHex(0xaaaaff) }, // light blue
+        { 0.40f, RgbFloat::FromHex(0x40FF40) }, // green
+        { 0.60f, RgbFloat::FromHex(0x40FF40) }, // green
+        { 0.70f, RgbFloat::FromHex(0xffaaaa) }, // light red
+        { 1.00f, RgbFloat::FromHex(0xdb2503) }, // red
+    };
+    static const Span span(entries);
+    static const ColorMap instance(span);
+    return instance;   
+}
+
 const ColorMap& ColorMaps::GetTestRBR_Uniform(){
     static const ColorMapEntry entries[] = {
         RgbFloat(1, 0, 0),
