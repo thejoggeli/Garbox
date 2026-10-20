@@ -16,7 +16,7 @@ namespace Garbox {
 
 {% for field in fields.values() %}
 {{ field.type }} {{ name_with_suffix }}::next{{ field.name|upper_first }}() const {
-    return mCurrent.{{ field.name|lower_first }};
+    return mNext.{{ field.name|lower_first }};
 }
 
 {% endfor %}

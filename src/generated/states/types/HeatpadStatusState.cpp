@@ -30,23 +30,23 @@ uint32_t HeatpadStatusState::getNextPeriodMicros() const {
 }
 
 HeatpadState HeatpadStatusState::nextState() const {
-    return mCurrent.state;
+    return mNext.state;
 }
 
 float HeatpadStatusState::nextCurrentDutyCycle() const {
-    return mCurrent.currentDutyCycle;
+    return mNext.currentDutyCycle;
 }
 
 uint32_t HeatpadStatusState::nextCurrentPeriodMicros() const {
-    return mCurrent.currentPeriodMicros;
+    return mNext.currentPeriodMicros;
 }
 
 float HeatpadStatusState::nextNextDutyCycle() const {
-    return mCurrent.nextDutyCycle;
+    return mNext.nextDutyCycle;
 }
 
 uint32_t HeatpadStatusState::nextNextPeriodMicros() const {
-    return mCurrent.nextPeriodMicros;
+    return mNext.nextPeriodMicros;
 }
 
 HeatpadState HeatpadStatusState::lastState() const {

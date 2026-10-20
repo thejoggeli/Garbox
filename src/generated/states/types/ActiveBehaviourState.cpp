@@ -14,7 +14,7 @@ BehaviourId ActiveBehaviourState::getBehaviour() const {
 }
 
 BehaviourId ActiveBehaviourState::nextBehaviour() const {
-    return mCurrent.behaviour;
+    return mNext.behaviour;
 }
 
 BehaviourId ActiveBehaviourState::lastBehaviour() const {

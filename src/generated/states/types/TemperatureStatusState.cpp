@@ -30,23 +30,23 @@ bool TemperatureStatusState::getIsRunning() const {
 }
 
 bool TemperatureStatusState::nextDriverEnabled() const {
-    return mCurrent.driverEnabled;
+    return mNext.driverEnabled;
 }
 
 bool TemperatureStatusState::nextPowerEnabled() const {
-    return mCurrent.powerEnabled;
+    return mNext.powerEnabled;
 }
 
 bool TemperatureStatusState::nextResetting() const {
-    return mCurrent.resetting;
+    return mNext.resetting;
 }
 
 bool TemperatureStatusState::nextHasFirstSample() const {
-    return mCurrent.hasFirstSample;
+    return mNext.hasFirstSample;
 }
 
 bool TemperatureStatusState::nextIsRunning() const {
-    return mCurrent.isRunning;
+    return mNext.isRunning;
 }
 
 bool TemperatureStatusState::lastDriverEnabled() const {

@@ -18,11 +18,11 @@ float TemperatureSampleState::getHumidityRelative() const {
 }
 
 float TemperatureSampleState::nextTemperatureCelcius() const {
-    return mCurrent.temperatureCelcius;
+    return mNext.temperatureCelcius;
 }
 
 float TemperatureSampleState::nextHumidityRelative() const {
-    return mCurrent.humidityRelative;
+    return mNext.humidityRelative;
 }
 
 float TemperatureSampleState::lastTemperatureCelcius() const {

@@ -14,7 +14,7 @@ ScreenId ActiveScreenState::getScreen() const {
 }
 
 ScreenId ActiveScreenState::nextScreen() const {
-    return mCurrent.screen;
+    return mNext.screen;
 }
 
 ScreenId ActiveScreenState::lastScreen() const {

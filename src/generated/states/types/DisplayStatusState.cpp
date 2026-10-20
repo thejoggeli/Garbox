@@ -14,7 +14,7 @@ float DisplayStatusState::getBrightness() const {
 }
 
 float DisplayStatusState::nextBrightness() const {
-    return mCurrent.brightness;
+    return mNext.brightness;
 }
 
 float DisplayStatusState::lastBrightness() const {

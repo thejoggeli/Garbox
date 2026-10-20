@@ -26,19 +26,19 @@ bool FermentationStatusState::getPowerOn() const {
 }
 
 FermentationState FermentationStatusState::nextState() const {
-    return mCurrent.state;
+    return mNext.state;
 }
 
 float FermentationStatusState::nextTargetTemperature() const {
-    return mCurrent.targetTemperature;
+    return mNext.targetTemperature;
 }
 
 bool FermentationStatusState::nextFanAuto() const {
-    return mCurrent.fanAuto;
+    return mNext.fanAuto;
 }
 
 bool FermentationStatusState::nextPowerOn() const {
-    return mCurrent.powerOn;
+    return mNext.powerOn;
 }
 
 FermentationState FermentationStatusState::lastState() const {

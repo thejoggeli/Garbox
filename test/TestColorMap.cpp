@@ -10,6 +10,7 @@ using namespace Garbox;
 using namespace GarboxTest;
 
 void RegisterContainerTests();
+void RegisterStateTests();
 void RegisterTimeTests();
 
 static void assertRgbNear(const RgbFloat& c, float r, float g, float b, float eps){
@@ -449,6 +450,7 @@ int main(int argc, char **argv){
     RUN_TEST(test_bucket_boundaries);
     RUN_TEST(test_max_entries);
     RegisterContainerTests();
+    RegisterStateTests();
     RegisterTimeTests();
 
     return UNITY_END();

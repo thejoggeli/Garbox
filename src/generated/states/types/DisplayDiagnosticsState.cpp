@@ -14,7 +14,7 @@ uint32_t DisplayDiagnosticsState::getSkippedFrames() const {
 }
 
 uint32_t DisplayDiagnosticsState::nextSkippedFrames() const {
-    return mCurrent.skippedFrames;
+    return mNext.skippedFrames;
 }
 
 uint32_t DisplayDiagnosticsState::lastSkippedFrames() const {

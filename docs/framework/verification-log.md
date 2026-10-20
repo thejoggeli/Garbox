@@ -35,3 +35,12 @@ Flash: 859,089 / 6,291,456 bytes (13.7%)
 ```
 
 No sanitizer diagnostics were emitted. The firmware footprint is unchanged from baseline. These tasks are therefore marked **SOFTWARE VERIFIED**. No hardware claim is made.
+
+## 2026-10-20 — STATE-01
+
+- Corrected the state generator template so `nextX()` reads the pending `mNext` snapshot.
+- Regenerated all state implementations; all twelve generated state types changed only at their pending getters.
+- Added a generated-state regression that distinguishes pending, current, and last values both before and across two publications.
+- Native ASan/UBSan suite: 24 of 24 tests passed in 6.748 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 117.534 seconds at the unchanged 30,232-byte RAM and 859,089-byte flash footprint.
+- Generator completed successfully with the current configuration. Its pre-existing generated hardware differences remain part of the protected user work, not this task.

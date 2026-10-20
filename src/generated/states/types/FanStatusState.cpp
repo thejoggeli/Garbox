@@ -22,15 +22,15 @@ bool FanStatusState::getRpmControl() const {
 }
 
 FanState FanStatusState::nextState() const {
-    return mCurrent.state;
+    return mNext.state;
 }
 
 float FanStatusState::nextTargetSpeed() const {
-    return mCurrent.targetSpeed;
+    return mNext.targetSpeed;
 }
 
 bool FanStatusState::nextRpmControl() const {
-    return mCurrent.rpmControl;
+    return mNext.rpmControl;
 }
 
 FanState FanStatusState::lastState() const {

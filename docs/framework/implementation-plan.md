@@ -27,7 +27,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
-| STATE-01 | TODO | BUILD-01 | Fix pending getters in the state template and regenerate. | Generated fixture proves pending/current/last before and after publication; generator output clean. |
+| STATE-01 | SOFTWARE VERIFIED | BUILD-01 | Fix pending getters in the state template and regenerate. | Generated fixture proves pending/current/last before and after publication; generator output clean. |
 | EVT-01 | TODO | CNT-02, TEST-01 | Prevent pool release with queued events; define dispatch-limit behavior. | Cascade tests cover exact limit, one beyond limit, stable completion, and no dangling queue pointers. |
 | EVT-02 | TODO | EVT-01 | Define allocation/queue exhaustion and invalid-view behavior. | Tiny pool/queue tests produce one documented deterministic outcome without null dereference. |
 | EVT-03 | TODO | EVT-01 | Enforce post-submit immutability and payload lifetime restrictions. | Routed handlers receive const payloads; compile-time or runtime tests cover prohibited retention/type. |

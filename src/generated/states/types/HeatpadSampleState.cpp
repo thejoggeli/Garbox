@@ -18,11 +18,11 @@ float HeatpadSampleState::getMeasuredCurrent() const {
 }
 
 float HeatpadSampleState::nextMeasuredVoltage() const {
-    return mCurrent.measuredVoltage;
+    return mNext.measuredVoltage;
 }
 
 float HeatpadSampleState::nextMeasuredCurrent() const {
-    return mCurrent.measuredCurrent;
+    return mNext.measuredCurrent;
 }
 
 float HeatpadSampleState::lastMeasuredVoltage() const {

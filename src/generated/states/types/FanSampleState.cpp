@@ -14,7 +14,7 @@ float FanSampleState::getMeasuredRpm() const {
 }
 
 float FanSampleState::nextMeasuredRpm() const {
-    return mCurrent.measuredRpm;
+    return mNext.measuredRpm;
 }
 
 float FanSampleState::lastMeasuredRpm() const {
