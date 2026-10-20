@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include "core/util/container/heap/RingBufferHeap.h"
 #include "core/util/container/heap/VectorHeap.h"
@@ -17,7 +18,7 @@ public:
         bool dirty;
     };
 
-    DirtyDispatcher(size_t capacity);
+    DirtyDispatcher(std::size_t capacity);
 
     void registerHandler(HandlerFunction function, void* context);
     void markDirty(uint32_t index);

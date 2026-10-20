@@ -119,7 +119,7 @@ const TimeSlotScheduler::Diagnostics& TimeSlotScheduler::getDiagnostics(uint8_t 
     return mDiagnostics[index];
 }
 
-size_t TimeSlotScheduler::getSlotCount() const {
+std::size_t TimeSlotScheduler::getSlotCount() const {
     return mSlots.size();
 }
 

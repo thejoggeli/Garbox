@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 namespace Garbox {
@@ -41,7 +42,7 @@ public:
     }
 
     std::size_t capacityBytes() const {
-        return N * sizeof(N);
+        return N * sizeof(T);
     }
 
 private:

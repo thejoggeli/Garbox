@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vector>
+#include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <vector>
 
 namespace Garbox {
 
@@ -31,7 +32,7 @@ public:
     void run();
 
     const Diagnostics& getDiagnostics(uint8_t index) const;
-    size_t getSlotCount() const;
+    std::size_t getSlotCount() const;
     void clearMaxTimes();
 
 private:

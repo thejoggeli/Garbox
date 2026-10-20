@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include "core/assert/Assert.h"
 
 namespace Garbox {

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+#include <utility>
+
 #include "core/util/container/base/ArrayBase.h"
 #include "core/util/container/storage/StaticStorage.h"
 

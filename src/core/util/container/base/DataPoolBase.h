@@ -2,6 +2,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <new>
+#include <utility>
 
 #include "core/assert/Assert.h"
 
@@ -24,7 +26,7 @@ public:
 
     // Construct with arguments forwarded to Storage
     template<typename... Args>
-    DataPoolBase(Args... storageArgs) : Storage(storageArgs...) , mOffsetBytes(0){}
+    DataPoolBase(Args&&... storageArgs) : Storage(std::forward<Args>(storageArgs)...) , mOffsetBytes(0){}
 
     // Reset the allocation offset (does not destruct objects)
     void releaseAll(){
@@ -78,7 +80,7 @@ public:
 
     // Construct T in-place with arbitrary constructor arguments
     template<typename T, typename... Args>
-    T* emplace(Args... args){
+    T* emplace(Args&&... args){
         void* rawPtr = allocateRaw(sizeof(T), alignof(T));
         if(rawPtr == 0){
             return 0;

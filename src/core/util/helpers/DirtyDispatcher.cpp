@@ -4,7 +4,7 @@
 
 namespace Garbox {
 
-DirtyDispatcher::DirtyDispatcher(size_t capacity):
+DirtyDispatcher::DirtyDispatcher(std::size_t capacity):
     // initialize members
     mHandlers(capacity),
     mQueue(capacity){

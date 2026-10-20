@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <new>
+#include <utility>
 #include "core/assert/Assert.h"
 
 namespace Garbox {
@@ -31,7 +33,7 @@ public:
         // nothing to do
     }
 
-    RingBufferBase(size_t elementCount):
+    RingBufferBase(std::size_t elementCount):
         // initialize members
         Storage(elementCount),
         mFront(0),

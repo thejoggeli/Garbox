@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
 #include "core/util/container/base/BitsetBase.h"
 #include "core/util/container/storage/HeapStorage.h"
 
