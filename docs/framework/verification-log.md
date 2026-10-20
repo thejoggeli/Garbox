@@ -44,3 +44,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native ASan/UBSan suite: 24 of 24 tests passed in 6.748 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 117.534 seconds at the unchanged 30,232-byte RAM and 859,089-byte flash footprint.
 - Generator completed successfully with the current configuration. Its pre-existing generated hardware differences remain part of the protected user work, not this task.
+
+## 2026-10-20 — EVT-01
+
+- Runtime dispatch now releases the event bump pool only after both the dirty-state and event queues are empty.
+- If the configured dispatch-pass limit is reached with work remaining, queued event pointers and their pool storage survive until a later dispatch.
+- Regression coverage exercises a cascade ending exactly at a two-pass limit, a cascade extending one event beyond it, allocations between dispatches that would deterministically overwrite the queued event under the old behavior, ordered completion, and pool reuse after stability.
+- Expanding host coverage exposed an unqualified-name lookup failure in `DataPoolHeap` under the native compiler; explicitly qualifying its storage base fixed the public header without changing target behavior.
+- Native ASan/UBSan suite: 26 of 26 tests passed in 8.464 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 124.888 seconds: RAM remains 30,232 bytes; flash is 859,105 bytes, a 16-byte increase from baseline.

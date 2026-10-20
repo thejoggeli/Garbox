@@ -10,6 +10,7 @@ using namespace Garbox;
 using namespace GarboxTest;
 
 void RegisterContainerTests();
+void RegisterRuntimeTests();
 void RegisterStateTests();
 void RegisterTimeTests();
 
@@ -450,6 +451,7 @@ int main(int argc, char **argv){
     RUN_TEST(test_bucket_boundaries);
     RUN_TEST(test_max_entries);
     RegisterContainerTests();
+    RegisterRuntimeTests();
     RegisterStateTests();
     RegisterTimeTests();
 

@@ -183,7 +183,13 @@ void RuntimeAbs::dispatch(){
             break;
         }
     }
-    mEventFactory.releaseDataPool();
+
+    // Queued events are non-owning pointers into the factory's pool. If the
+    // configured pass limit is reached, retain the pool until a later dispatch
+    // drains both queues; releasing it here would invalidate those pointers.
+    if(mDirtyStates.size() == 0 && mEventQueue.size() == 0){
+        mEventFactory.releaseDataPool();
+    }
 }
 
 void RuntimeAbs::dispatchStates(){
