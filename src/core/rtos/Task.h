@@ -1,16 +1,19 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <functional>
+
+#include "core/rtos/TaskStopToken.h"
 
 namespace Garbox {
 
 class Task {
 public:
 
-    using TaskHandler = std::function<void()>;
+    using TaskHandler = std::function<void(const TaskStopToken&)>;
 
     Task();
     ~Task();
@@ -24,7 +27,12 @@ public:
 
 
     void start();
-    void stop();
+
+    // Cooperative stop contract: the handler must observe its token and
+    // return after releasing owned resources. No caller deletes another task.
+    void requestStop();
+    bool waitForStop(TickType_t timeoutTicks);
+    bool stop(TickType_t timeoutTicks = pdMS_TO_TICKS(1500));
 
     void setHandler(TaskHandler handler);
 
@@ -41,8 +49,9 @@ private:
 
     TaskHandler mTaskHandler = nullptr;
     void* mContext = nullptr;
-    TaskHandle_t mTaskHandle = nullptr;
+    std::atomic<TaskHandle_t> mTaskHandle{nullptr};
     bool mConfigured = false;
+    TaskStopSource mStopSource;
 
     static void handleTask(void* arg);
 };

@@ -60,7 +60,7 @@ private:
 
     void onInit() final;
     void onStart() final;
-    void onRun() final;
+    void onRun(const TaskStopToken& stopToken) final;
     void onRouteStateChanged(const StateAbs& state) final;
     void onRouteEvent(const EventHeader* header) final;
     void onActiveBehaviourChanged() final;

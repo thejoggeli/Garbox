@@ -15,6 +15,7 @@ void RegisterRuntimeTests();
 void RegisterLvglGeometryTests();
 void RegisterStateTests();
 void RegisterSynchronizationTests();
+void RegisterTaskTests();
 void RegisterTimeTests();
 void RegisterTimerPwmTests();
 
@@ -460,6 +461,7 @@ int main(int argc, char **argv){
     RegisterLvglGeometryTests();
     RegisterStateTests();
     RegisterSynchronizationTests();
+    RegisterTaskTests();
     RegisterTimeTests();
     RegisterTimerPwmTests();
 

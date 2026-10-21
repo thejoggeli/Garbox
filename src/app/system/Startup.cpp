@@ -18,7 +18,7 @@
 
 using namespace Garbox;
 
-void handleMainTask();
+void handleMainTask(const TaskStopToken& stopToken);
 
 Runtime& getRuntime(){
     static Runtime instance;
@@ -135,8 +135,8 @@ void loop(){
     Time::DelayMillis(1000);
 }
 
-void handleMainTask(){
+void handleMainTask(const TaskStopToken& stopToken){
     LogDebug("Main", "main task started");
     getRuntime().start();
-    getRuntime().run();
+    getRuntime().run(stopToken);
 }

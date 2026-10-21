@@ -29,11 +29,11 @@ void TickRunner::registerTickPhase(Handler handler, uint32_t delayMillis){
     }
 }
 
-void TickRunner::run(){
+void TickRunner::run(const TaskStopToken& stopToken){
 
     TickType_t lastWakeTime = xTaskGetTickCount();
 
-    while(true){
+    while(!stopToken.stopRequested()){
 
         // call tick start handler
         if(mTickStartHandler){
@@ -43,9 +43,17 @@ void TickRunner::run(){
         // call tick phases handlers
         for(TickPhase& phase : mTickPhaseHandlers){
 
+            if(stopToken.stopRequested()){
+                break;
+            }
+
             // wait until delay time for current tick passed
             if(phase.delayMillis > 0){
                 vTaskDelayUntil(&lastWakeTime, phase.delayMillis);
+            }
+
+            if(stopToken.stopRequested()){
+                break;
             }
 
             // call handler for current tick
@@ -53,12 +61,14 @@ void TickRunner::run(){
         }
 
         // call tick end handler
-        if(mTickEndHandler){
+        if(mTickEndHandler && !stopToken.stopRequested()){
             mTickEndHandler(mCallbackCtx);
         }
 
         // wait until period is complete
-        vTaskDelayUntil(&lastWakeTime, mRemainingDelay);
+        if(!stopToken.stopRequested()){
+            vTaskDelayUntil(&lastWakeTime, mRemainingDelay);
+        }
     }
 }
 

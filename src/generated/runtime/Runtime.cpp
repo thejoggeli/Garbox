@@ -175,10 +175,10 @@ void Runtime::onStart(){
     Profiler::SetEnabled(true);
 }
 
-void Runtime::onRun(){
+void Runtime::onRun(const TaskStopToken& stopToken){
     Time::Start();
     Profiler::Reset();
-    mTickRunner.run();
+    mTickRunner.run(stopToken);
 }
 
 void Runtime::onActiveBehaviourChanged(){

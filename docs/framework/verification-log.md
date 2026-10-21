@@ -112,3 +112,15 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native ASan/UBSan suite: 47 of 47 tests passed in 3.179 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 34.723 seconds: 30,296 bytes RAM (64 more than baseline) and 861,329 bytes flash (2,240 more than baseline).
 - This is intentionally not marked software-verified yet. Generic `Task::stop()` still directly deletes tasks and can interrupt the sender while it owns the SPI path; TASK-01 must close that deadlock risk. Physical transport-failure injection remains hardware-gated.
+
+## 2026-10-21 — TASK-01 and DISP-03 closure
+
+- Replaced external `vTaskDelete()` with an atomic cooperative stop token passed to every managed task handler. Only a worker whose handler has returned may delete itself.
+- `Task::stop()` is idempotent and waits for at most 1.5 seconds. A current-task call is request-only; an external timeout is reported without forced deletion.
+- Task owners close new-work admission and bound or wake their specific blockers: display semaphores/queue, a 100 ms piezo notification poll, one-second SPI completion polling, periodic LED delay, and main tick-phase boundaries. SPI admission is an atomic gate, so stop never waits for the transfer mutex merely to reject new work.
+- Display stop now wakes render, free-buffer, queue, and DMA waits before joining. SPI stop rejects new synchronous/asynchronous transfers before joining, so shutdown cannot delete the sender while it owns the SPI mutex or driver stack.
+- The generated runtime and its generator templates both propagate the stop token through `RuntimeAbs` into `TickRunner`, preventing regeneration from reverting the contract.
+- Added a deterministic native FreeRTOS task model. Regressions prove external stop never deletes the worker, current-task stop is request-only, simulated in-flight ownership is released by handler unwinding, self-deletion happens once, and repeated stop succeeds.
+- Final native ASan/UBSan suite: 50 of 50 tests passed in 1.846 seconds with no sanitizer diagnostics.
+- Final incremental ESP32-S3 firmware build passed in 38.160 seconds: 30,296 bytes RAM (64 more than baseline) and 862,289 bytes flash (3,200 more than baseline).
+- TASK-01 and DISP-03 are therefore **SOFTWARE VERIFIED**. An ESP-IDF transaction already accepted at shutdown may finish against process-lifetime storage; physical bus/panel behavior and transport-failure injection remain hardware-gated under DISP-04. Hazardous actuator shutdown ordering remains SAFE-01.

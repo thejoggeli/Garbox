@@ -99,8 +99,8 @@ private:
     // callback handlers
     void handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data);
     void handleFlushWait();
-    void handleRenderTask();
-    void handleSenderTask();
+    void handleRenderTask(const TaskStopToken& stopToken);
+    void handleSenderTask(const TaskStopToken& stopToken);
     void handleChunkComplete(bool success);
 
     // st7789v handlers

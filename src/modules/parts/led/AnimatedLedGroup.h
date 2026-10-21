@@ -51,7 +51,7 @@ private:
     Task mTask;
     uint32_t mTaskFrequencyHz = 0;
 
-    void handleTask();
+    void handleTask(const TaskStopToken& stopToken);
 
 };
 

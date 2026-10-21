@@ -66,8 +66,8 @@ void SpiDma::init(const Config& config){
     }
 
     // task handler
-    mTask.setHandler([this](){
-        this->handleTask();
+    mTask.setHandler([this](const TaskStopToken& stopToken){
+        this->handleTask(stopToken);
     });
 
     // create mutex
@@ -75,6 +75,7 @@ void SpiDma::init(const Config& config){
     AssertExit(mMutex != nullptr, "SpiDma", "mutex creation failed");
 
     mInitialized = true;
+    mAcceptingTransfers.store(true, std::memory_order_release);
 }
 
 bool SpiDma::validateTransferArgs(const uint8_t* data, size_t lenBits){
@@ -131,6 +132,9 @@ void SpiDma::freeSlotUnlocked(TxSlot* slot){
 bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user){
     MutexGuard lock(mMutex);
 
+    if(!mAcceptingTransfers.load(std::memory_order_acquire)){
+        return false;
+    }
     if (!validateTransferArgs(data, lenBits)){
         return false;
     }
@@ -166,6 +170,9 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user){
 bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, CompleteCallback callback){
     MutexGuard lock(mMutex);
 
+    if(!mAcceptingTransfers.load(std::memory_order_acquire)){
+        return false;
+    }
     if (!validateTransferArgs(data, lenBits)){
         return false;
     }
@@ -210,17 +217,23 @@ void SpiDma::startTask(const char* name, uint32_t stackSize, UBaseType_t priorit
 }
 
 void SpiDma::stopTask(){
-    MutexGuard lock(mMutex);
-    mTask.stop();
-    // TODO stop all spi activity
+    // Close admission without waiting on the transfer mutex. An in-progress
+    // polling transfer may own that mutex until the driver call returns.
+    mAcceptingTransfers.store(false, std::memory_order_release);
+
+    const bool isCurrent = mTask.isCurrentTask();
+    mTask.requestStop();
+    if(!mTask.stop() && !isCurrent){
+        LogError("SpiDma", "completion task did not stop cooperatively");
+    }
 }
 
-void SpiDma::handleTask(){
+void SpiDma::handleTask(const TaskStopToken& stopToken){
 
     spi_transaction_t* transaction = nullptr;
     constexpr TickType_t waitTicks = pdMS_TO_TICKS(1000); // 1000ms timeout
 
-    while (true){
+    while (!stopToken.stopRequested()){
         esp_err_t ret = spi_device_get_trans_result(mDevice, &transaction, waitTicks);
 
         if (ret == ESP_OK){

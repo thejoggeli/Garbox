@@ -4,6 +4,7 @@
 
 #include "core/diagnostics/Profiler.h"
 #include "core/rtos/MutexGuard.h"
+#include "core/rtos/TaskStopToken.h"
 #include "freertos/semphr.h"
 #include "helpers/AssertHelper.h"
 #include "helpers/FakeTime.h"
@@ -79,10 +80,29 @@ void test_profiler_uses_one_normal_lock_for_reset_and_returns_snapshots(){
     TEST_ASSERT_NO_ASSERTS();
 }
 
+void test_task_stop_signal_is_shared_idempotent_and_restartable(){
+    TaskStopSource source;
+    const TaskStopToken firstToken = source.token();
+    const TaskStopToken copiedToken = firstToken;
+
+    TEST_ASSERT_FALSE(firstToken.stopRequested());
+    source.requestStop();
+    source.requestStop();
+    TEST_ASSERT_TRUE(firstToken.stopRequested());
+    TEST_ASSERT_TRUE(copiedToken.stopRequested());
+    TEST_ASSERT_TRUE(source.stopRequested());
+
+    source.reset();
+    TEST_ASSERT_FALSE(firstToken.stopRequested());
+    TEST_ASSERT_FALSE(copiedToken.stopRequested());
+    TEST_ASSERT_FALSE(source.stopRequested());
+}
+
 } // namespace
 
 void RegisterSynchronizationTests(){
     RUN_TEST(test_mutex_guards_use_matching_freertos_apis);
     RUN_TEST(test_mutex_guard_reports_mismatched_mutex_kind);
     RUN_TEST(test_profiler_uses_one_normal_lock_for_reset_and_returns_snapshots);
+    RUN_TEST(test_task_stop_signal_is_shared_idempotent_and_restartable);
 }

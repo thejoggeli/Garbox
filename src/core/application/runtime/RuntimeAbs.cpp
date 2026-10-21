@@ -57,8 +57,8 @@ void RuntimeAbs::start(){
     onStart();
 }
 
-void RuntimeAbs::run(){
-    onRun();
+void RuntimeAbs::run(const TaskStopToken& stopToken){
+    onRun(stopToken);
 }
 
 void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){

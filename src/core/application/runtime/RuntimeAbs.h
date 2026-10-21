@@ -8,6 +8,7 @@
 #include "core/application/screen/ScreenAbs.h"
 #include "core/application/state/StateAbs.h"
 #include "core/application/state/StateHostIfc.h"
+#include "core/rtos/TaskStopToken.h"
 #include "core/util/container/heap/RingBufferHeap.h"
 #include "core/util/container/Span.h"
 #include "core/util/container/heap/VectorHeap.h"
@@ -38,7 +39,7 @@ public:
 
     void init();
     void start();
-    void run();
+    void run(const TaskStopToken& stopToken);
 
     // ComponentHostIfc
     BehaviourId getActiveBehaviourId() const final;
@@ -86,7 +87,7 @@ protected:
     // to be implemented by user
     virtual void onInit() = 0;
     virtual void onStart() = 0;
-    virtual void onRun() = 0;
+    virtual void onRun(const TaskStopToken& stopToken) = 0;
     virtual void onRouteStateChanged(const StateAbs& state) = 0;
     virtual void onRouteEvent(const EventHeader* event) = 0;
     virtual void onActiveBehaviourChanged() = 0;

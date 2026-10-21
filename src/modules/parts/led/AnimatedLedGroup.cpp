@@ -26,8 +26,8 @@ void AnimatedLedGroup::init(){
     }
 
     // task handler
-    mTask.setHandler([this](){
-        this->handleTask();
+    mTask.setHandler([this](const TaskStopToken& stopToken){
+        this->handleTask(stopToken);
     });
 
     mInitialized = true;
@@ -49,15 +49,18 @@ void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uin
 }
 
 void AnimatedLedGroup::stopTask(){
-    MutexGuard lock(mMutex);
-    mTask.stop();
+    const bool isCurrent = mTask.isCurrentTask();
+    mTask.requestStop();
+    if(!mTask.stop() && !isCurrent){
+        LogError("AnimatedLedGroup", "task did not stop cooperatively");
+    }
 }
 
 const Task& AnimatedLedGroup::getTask() const {
     return mTask;
 }
 
-void AnimatedLedGroup::handleTask(){
+void AnimatedLedGroup::handleTask(const TaskStopToken& stopToken){
     
     // task timing
     const uint32_t periodMillis = 1000.0f / mTaskFrequencyHz;
@@ -65,7 +68,7 @@ void AnimatedLedGroup::handleTask(){
     TickType_t lastWake = xTaskGetTickCount();
 
     // loop task forever
-    while(true){
+    while(!stopToken.stopRequested()){
         tick();
         vTaskDelayUntil(&lastWake, periodTicks);
     }

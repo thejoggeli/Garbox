@@ -33,8 +33,8 @@ void PiezoPlayer::init(uint32_t defaultSilentTimeMicros){
     AssertExit(mMutex != nullptr, "PiezoPlayer", "mutex creation failed");  
 
     // task handler
-    mTask.setHandler([this](){
-        this->handleTask();
+    mTask.setHandler([this](const TaskStopToken& stopToken){
+        this->handleTask(stopToken);
     });
 
     // initialization complete
@@ -65,16 +65,19 @@ void PiezoPlayer::startTask(const char* name, uint32_t frequencyHz, uint32_t sta
 }
 
 void PiezoPlayer::stopTask(){
-    RecursiveMutexGuard lock(mMutex);
+    const bool isCurrent = mTask.isCurrentTask();
+    mTask.requestStop();
+    const bool stopped = mTask.stop();
+    if(!stopped && !isCurrent){
+        LogError("PiezoPlayer", "task did not stop cooperatively");
+        return;
+    }
 
-    // stop task
-    mTask.stop();
-    
-    // stop piezo
-    stop(); 
+    RecursiveMutexGuard lock(mMutex);
+    stop();
 }
 
-void PiezoPlayer::handleTask(){
+void PiezoPlayer::handleTask(const TaskStopToken& stopToken){
 
     // task timing
     const uint32_t periodMillis = static_cast<uint32_t>(1000.0f / mTaskFrequencyHz);
@@ -82,10 +85,14 @@ void PiezoPlayer::handleTask(){
     TickType_t lastWake = xTaskGetTickCount();
 
     // loop forever
-    while(true){
+    while(!stopToken.stopRequested()){
         if (!isPlaying()){
-            // Sleep until playTone() / playSequence() notifies us
-            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+            // Notification makes playback immediate; the finite wait also
+            // bounds cooperative shutdown without racing a task handle.
+            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+            if(stopToken.stopRequested()){
+                break;
+            }
             // Re-sync wake time so the next loop starts fresh
             lastWake = xTaskGetTickCount();
         }

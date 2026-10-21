@@ -91,7 +91,7 @@ private:
     static uint16_t interpolateFrequency(Tone const& tone, uint32_t elapsedMicros);
 
     // playback task
-    void handleTask();
+    void handleTask(const TaskStopToken& stopToken);
 };
 
 } // namespace Garbox

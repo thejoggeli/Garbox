@@ -10,7 +10,9 @@ Task::Task(){
 }
 
 Task::~Task(){
-    TriggerExit("Task", "std::function can use heap");
+    if(isRunning()){
+        TriggerExit("Task", "destroyed while still running");
+    }
 }
 
 void Task::configure(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId){
@@ -24,32 +26,55 @@ void Task::configure(const char* name, uint32_t stackSize, UBaseType_t priority,
 
 void Task::start(){
     AssertExit(mConfigured, "Task", "not configured");
-    AssertExit(mTaskHandle == nullptr, "Task", "task already running");
+    AssertExit(mTaskHandle.load(std::memory_order_acquire) == nullptr,
+               "Task", "task already running");
+    AssertExit(mTaskHandler != nullptr, "Task", "handler not set");
+    mStopSource.reset();
+    TaskHandle_t taskHandle = nullptr;
     BaseType_t result = xTaskCreatePinnedToCore(
         handleTask,
         mName,
         mStackSize,
         this,
         mPriority,
-        &mTaskHandle,
+        &taskHandle,
         mCoreId
     );
 
     AssertExit(result == pdPASS, "Task", "task creation failed");
+    mTaskHandle.store(taskHandle, std::memory_order_release);
 }
 
-void Task::stop(){
-    if(mTaskHandle == nullptr){
-        TriggerDebug("Task", "stop failed, task is not running");
+void Task::requestStop(){
+    if(mTaskHandle.load(std::memory_order_acquire) == nullptr){
         return;
     }
-    if(xTaskGetCurrentTaskHandle() == mTaskHandle){
-        TriggerDebug("Task", "task not allowed to stop itself");
-        return;
+
+    mStopSource.requestStop();
+}
+
+bool Task::waitForStop(TickType_t timeoutTicks){
+    if(mTaskHandle.load(std::memory_order_acquire) == nullptr){
+        return true;
     }
-    vTaskDelete(mTaskHandle);
-    mTaskHandle = nullptr;
-    LogDebug("Task", "%s stopped", mName);
+    if(isCurrentTask()){
+        return false;
+    }
+
+    const TickType_t start = xTaskGetTickCount();
+    while(mTaskHandle.load(std::memory_order_acquire) != nullptr){
+        if(timeoutTicks != portMAX_DELAY
+           && static_cast<TickType_t>(xTaskGetTickCount() - start) >= timeoutTicks){
+            return false;
+        }
+        vTaskDelay(1);
+    }
+    return true;
+}
+
+bool Task::stop(TickType_t timeoutTicks){
+    requestStop();
+    return waitForStop(timeoutTicks);
 }
 
 void Task::setHandler(TaskHandler handler){
@@ -57,7 +82,7 @@ void Task::setHandler(TaskHandler handler){
 }
 
 bool Task::isRunning() const {
-    return (mTaskHandle != nullptr);
+    return mTaskHandle.load(std::memory_order_acquire) != nullptr;
 }
 
 bool Task::isConfigured() const {
@@ -65,18 +90,25 @@ bool Task::isConfigured() const {
 }
 
 bool Task::isCurrentTask() const {
-    return (mTaskHandle == xTaskGetCurrentTaskHandle());
+    const TaskHandle_t taskHandle = mTaskHandle.load(std::memory_order_acquire);
+    return taskHandle != nullptr && taskHandle == xTaskGetCurrentTaskHandle();
 }
 
 void Task::handleTask(void* arg){
     Task* self = static_cast<Task*>(arg);
     LogDebug("Task", "%s started", self->mName);
-    self->mTaskHandler();
-    TriggerExit("Task", "reach end of handler");
+    self->mTaskHandler(self->mStopSource.token());
+    if(!self->mStopSource.stopRequested()){
+        TriggerExit("Task", "handler returned without stop request");
+    }
+
+    LogDebug("Task", "%s stopped", self->mName);
+    self->mTaskHandle.store(nullptr, std::memory_order_release);
+    vTaskDelete(nullptr);
 }
 
 TaskHandle_t Task::getHandle() const {
-    return mTaskHandle;
+    return mTaskHandle.load(std::memory_order_acquire);
 }
 
 } // namespace Garbox

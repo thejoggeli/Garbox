@@ -402,14 +402,15 @@ Pinning LVGL more tightly and adding compile/generation tests are more valuable 
 
 Every generated GUI is constructed at runtime creation. This makes screen changes cheap but increases LVGL heap usage and keeps rotated canvases and all inactive widget trees alive. It is a defensible tradeoff at the present scale, but heap high-water measurements should determine when lazy construction becomes worthwhile.
 
-### Error and shutdown paths are incomplete
+### Error and shutdown paths have explicit limits
 
 - final chunk failure now deselects the panel, changes all registered buffers to a terminal invalid state, releases the sender barrier, and raises the fatal signal without returning a reusable-buffer token;
 - display stop rejects further render/flush/transport transitions and deselects the panel; process-lifetime buffers keep an already captured DMA address valid;
-- generic task shutdown still uses direct deletion, so it can interrupt the sender while it owns the SPI path. Cooperative/idempotent task stopping remains TASK-01 and is required before DISP-03 can claim deadlock-free shutdown;
+- display render/sender and SPI completion tasks now receive cooperative stop tokens. Shutdown closes admission, wakes display blockers, and waits with a bound; no task is deleted by another context while it may own the SPI path;
+- an asynchronous transaction already accepted by ESP-IDF may complete after logical shutdown. Its draw-buffer allocation remains valid, and the terminal tracker ignores late completion, but electrical/panel behavior still needs target fault-injection testing;
 - FreeRTOS queues, semaphores, task wrappers, and draw buffers are process-lifetime objects and have no teardown/restart contract.
 
-Normal operation can work while these paths remain weak, but fatal handling occurs in a system that may be actively driving DMA. They should be made deterministic.
+The software ownership and bounded-stop contracts are deterministic. Physical chip-select, bus, and panel behavior during injected transport failure remains part of DISP-04 hardware validation.
 
 ### Memory assumptions need measurement
 

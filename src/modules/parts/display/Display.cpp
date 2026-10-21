@@ -85,11 +85,11 @@ void Display::init(){
     mLvglHandler.setFlushWaitHandler([this](){
         handleFlushWait();
     });
-    mRenderTask.setHandler([this](){
-        this->handleRenderTask();
+    mRenderTask.setHandler([this](const TaskStopToken& stopToken){
+        this->handleRenderTask(stopToken);
     });
-    mSenderTask.setHandler([this](){
-        this->handleSenderTask();
+    mSenderTask.setHandler([this](const TaskStopToken& stopToken){
+        this->handleSenderTask(stopToken);
     });
     mChunkSender.setCompleteHandler([this](bool success){
         this->handleChunkComplete(success);
@@ -128,11 +128,24 @@ void Display::stopTasks(){
         mActiveSendBuffer = nullptr;
     }
 
-    if(mRenderTask.isRunning() && !mRenderTask.isCurrentTask()){
-        mRenderTask.stop();
+    mRenderTask.requestStop();
+    mSenderTask.requestStop();
+
+    // Wake every place where either display worker can block. The queue entry
+    // is only a sentinel; terminal tracker state prevents it from being sent.
+    xSemaphoreGive(mRenderTrigger);
+    xSemaphoreGive(mBufferCounter);
+    xSemaphoreGive(mDmaBarrier);
+    SendQueueEntry stopEntry;
+    xQueueSend(mSendQueue, &stopEntry, 0);
+
+    const bool renderIsCurrent = mRenderTask.isCurrentTask();
+    const bool senderIsCurrent = mSenderTask.isCurrentTask();
+    if(!mRenderTask.stop() && !renderIsCurrent){
+        LogError("Display", "render task did not stop cooperatively");
     }
-    if(mSenderTask.isRunning() && !mSenderTask.isCurrentTask()){
-        mSenderTask.stop();
+    if(!mSenderTask.stop() && !senderIsCurrent){
+        LogError("Display", "sender task did not stop cooperatively");
     }
 
     // Buffers have static process lifetime, so an already queued hardware DMA
@@ -171,10 +184,13 @@ void Display::giveRenderTrigger(){
     xSemaphoreGive(mRenderTrigger);
 }
 
-void Display::handleRenderTask(){
-    while(true){
+void Display::handleRenderTask(const TaskStopToken& stopToken){
+    while(!stopToken.stopRequested()){
         // wait for render trigger
         xSemaphoreTake(mRenderTrigger, portMAX_DELAY);
+        if(stopToken.stopRequested()){
+            break;
+        }
 
         // render frame
         Profiler::MeasureBegin(ProfilerId::DisplayRender);
@@ -260,10 +276,13 @@ void Display::handleFlushWait(){
     xSemaphoreGive(mBufferCounter); // give token back immediately so next flush_cb can proceed
 }
 
-void Display::handleSenderTask(){
+void Display::handleSenderTask(const TaskStopToken& stopToken){
     SendQueueEntry entry;
-    while(true){
+    while(!stopToken.stopRequested()){
         if(xQueueReceive(mSendQueue, &entry, portMAX_DELAY) == pdTRUE) {
+            if(stopToken.stopRequested()){
+                break;
+            }
             DisplayBufferTracker::Result dmaResult;
             {
                 MutexGuard lock(mBufferTrackerMutex);
@@ -293,7 +312,10 @@ void Display::handleSenderTask(){
             );
             
             // wait until spi dma transfer is complete (ping)
-            xSemaphoreTake(mDmaBarrier, portMAX_DELAY); 
+            xSemaphoreTake(mDmaBarrier, portMAX_DELAY);
+            if(stopToken.stopRequested()){
+                break;
+            }
         }
     }
 }

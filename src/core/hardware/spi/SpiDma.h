@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <driver/spi_master.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -65,6 +66,7 @@ private:
     spi_device_handle_t mDevice = nullptr;
     CompleteCallback mTxCallback = nullptr;
     bool mInitialized = false;
+    std::atomic<bool> mAcceptingTransfers{false};
 
     TxSlot* mTxSlots = nullptr;
     int mNumSlots = 0;
@@ -81,7 +83,7 @@ private:
     TxSlot* allocFreeSlotUnlocked();
     void freeSlotUnlocked(TxSlot* slot);
 
-    void handleTask();
+    void handleTask(const TaskStopToken& stopToken);
     void handleCompletedTransaction(spi_transaction_t* transaction, bool success);
 };
 

@@ -39,7 +39,7 @@ public:
 protected:
     void onInit() override {}
     void onStart() override {}
-    void onRun() override {}
+    void onRun(const TaskStopToken&) override {}
     void onRouteStateChanged(const StateAbs&) override {}
 
     void onRouteEvent(const EventHeader* event) override {

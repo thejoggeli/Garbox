@@ -46,6 +46,10 @@ Most objects have static process lifetime. Several heap-using types deliberately
 
 The intended framework contract is: application events, states, lifecycle callbacks, mode changes, and semantic screen updates belong to `MainTask`. No component callback from an auxiliary task or ISR may mutate them directly. Cross-task inputs must be transferred through an explicitly synchronized mailbox/queue and consumed by `MainTask`.
 
+Every managed task receives a shared atomic `TaskStopToken`. `Task::stop()` requests cancellation and waits at most 1.5 seconds; it never calls `vTaskDelete()` on another task. The owning component must first close admission to new work and ensure each blocking point is bounded or explicitly woken. The main tick runner checks between phases, the display wakes its trigger/queue/buffer/DMA waits, the piezo task uses a 100 ms notification poll, periodic LED work observes the token after its delay, and the SPI completion task has a one-second polling bound. After its handler returns and releases stack-owned guards/resources, the worker clears its handle and deletes only itself.
+
+Stop is idempotent. A call from the current task is request-only and cannot wait for itself; during fatal handling that task remains the error-reporting context. A timed-out external wait is logged but never converted into unsafe forced deletion. Managed objects remain process-lifetime and are not restartable as a group; restart/teardown is outside the current product contract.
+
 ## Synchronization and lock order
 
 `MutexGuard` is only for handles created by `xSemaphoreCreateMutex()`; `RecursiveMutexGuard` is only for handles created by `xSemaphoreCreateRecursiveMutex()`. Both are task-context APIs and fail fatally on null handles or failed take/give operations. ISR code must instead use an ISR-safe critical section or the appropriate FreeRTOS `...FromISR` primitive.
@@ -165,7 +169,7 @@ any non-terminal state ── stop → Invalid / Stopped
 
 `DisplayBufferTracker` registers the three exact allocation addresses and enforces the observable transitions. Its fixed-capacity FIFO must agree with the FreeRTOS send queue, only its head may become DMA-owned, only one DMA owner may exist, and completion must name that same buffer. Unknown, duplicate, out-of-order, and repeated transitions are fatal invariant violations. A normal mutex protects the tracker across the render, sender, and SPI completion tasks; the counting semaphore remains responsible for blocking/backpressure. The tracker deliberately treats LVGL's internal reusable/rendering distinction as one `LvglOwned` state because there is no driver callback at the start of software rendering.
 
-A failed final chunk completion changes the tracker to `Faulted`, invalidates all registered buffers, clears its logical queue/current-DMA identity, releases the sender barrier, and then raises the fatal signal. A normal stop changes it to `Stopped` and also invalidates every buffer. Both terminal states reject future render, flush, queue, and completion work; a later stop preserves an earlier fault diagnosis. The allocations themselves have process lifetime, so a hardware DMA engine that has already captured an address cannot read freed memory. TASK-01 still has to replace direct task deletion before this is a complete deadlock-free shutdown contract.
+A failed final chunk completion changes the tracker to `Faulted`, invalidates all registered buffers, clears its logical queue/current-DMA identity, releases the sender barrier, and then raises the fatal signal. A normal stop changes it to `Stopped` and also invalidates every buffer. Both terminal states reject future render, flush, queue, and completion work; a later stop preserves an earlier fault diagnosis. The allocations themselves have process lifetime, so a hardware DMA engine that has already captured an address cannot read freed memory. Cooperative display/SPI shutdown prevents a sender from being deleted while it owns the SPI path; a transaction already accepted by the ESP-IDF driver may finish after logical shutdown, but cannot address freed buffer memory.
 
 Application-side LVGL object mutation occurs in `MainTask` only after taking the render-ready token. It finishes before triggering the display render task. `lv_timer_handler()` then runs alone. Because LVGL is configured with `LV_OS_NONE`, this handshake is the entire thread-safety contract.
 
@@ -175,7 +179,7 @@ The RGB565 buffer contract is `stride = lv_draw_buf_width_to_stride(width, LV_CO
 
 ## Failure and shutdown ownership
 
-At baseline, fatal handling stops registered tasks and produces LED/piezo feedback, but it does not synchronously force the heater and fan GPIO/PWM outputs to safe states before task shutdown. The display now enters a terminal ownership state, releases its sender barrier on transport failure, and deselects the panel during stop. However, generic `Task::stop()` still deletes other tasks directly; deleting the display sender while it owns the SPI path can strand a mutex or interrupt an in-flight operation. That remaining shutdown risk is tracked by TASK-01.
+At baseline, fatal handling stopped tasks by deleting them from another context and produced LED/piezo feedback without first forcing heater and fan outputs safe. Managed tasks now stop cooperatively with bounded waits; display shutdown enters a terminal ownership state, wakes all display blockers, prevents new SPI admission, and deselects the panel. It no longer interrupts a worker while it owns a mutex or driver call. An already accepted SPI transaction and exact target timing still require hardware validation. Synchronously forcing hazardous outputs safe remains SAFE-01.
 
 Target ordering for fatal shutdown is:
 

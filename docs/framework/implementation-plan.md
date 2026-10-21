@@ -50,7 +50,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 | SYNC-01 | SOFTWARE VERIFIED | BUILD-01 | Split normal/recursive mutex guards or normalize creation; audit nested calls. | Creation/take/give APIs match; recursive call paths are tested or structurally eliminated. |
 | ISR-01 | TODO | BUILD-01 | Remove duplicate ISR registration and document ISR-safe contract. | One checked registration; firmware builds; target tachometer smoke test remains gated. |
 | SAFE-01 | TODO | SYNC-01 | Add idempotent emergency-safe-output hook before task shutdown. | Software test verifies ordering and idempotence; electrical levels remain hardware-gated. |
-| TASK-01 | TODO | SYNC-01 | Define task stop ownership and eliminate unsafe fatal destructors. | Stop is idempotent; current-task and in-flight-worker cases are documented/tested where possible. |
+| TASK-01 | SOFTWARE VERIFIED | SYNC-01 | Define task stop ownership and eliminate unsafe task-wrapper destruction/forced deletion. | Stop is idempotent; current-task and in-flight-worker cases are documented/tested where possible. |
 
 ## Milestone 5 — Generator and reproducible workflow
 
@@ -69,7 +69,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 |---|---|---|---|---|
 | DISP-01 | SOFTWARE VERIFIED | BUILD-01 | Replace manual RGB565 stride/buffer initialization with public LVGL API and validated size calculations. | Compile-time/unit checks prove 320px stride is 640 bytes and 60-row buffer is 38,400 bytes; firmware builds. |
 | DISP-02 | SOFTWARE VERIFIED | DISP-01, TEST-01 | Model buffer identity/state transitions and validate queue/DMA ownership. | Host model covers partial flushes, three in flight, ordered completion, duplicate/wrong completion, and reuse. |
-| DISP-03 | IN PROGRESS | DISP-02, SYNC-01, TASK-01 | Propagate transport failure; define screen-change and shutdown behavior. | Failure injection reaches defined fault state, releases/invalidates ownership safely, and does not deadlock. |
+| DISP-03 | SOFTWARE VERIFIED | DISP-02, SYNC-01, TASK-01 | Propagate transport failure; define screen-change and shutdown behavior. | Failure injection reaches defined fault state, releases/invalidates ownership safely, and does not deadlock. |
 | DISP-04 | HARDWARE BLOCKED | DISP-03 | Benchmark unchanged architecture and corrected implementation. | Full/small/chart/load metrics plus CPU, skipped frames, heap, stack, and main latency are recorded comparably. |
 | UI-01 | TODO | BUILD-01 | Fix/test row-menu selection and chart adapter edge cases. | Host tests cover selection/window/lock and history catch-up. |
 

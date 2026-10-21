@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/rtos/TaskStopToken.h"
 #include "core/util/container/heap/VectorHeap.h"
 
 namespace Garbox {
@@ -19,7 +20,7 @@ public:
     void setTickStartHandler(Handler handler);
     void setTickEndHandler(Handler handler);
     void registerTickPhase(Handler handler, uint32_t delayMillis);
-    void run();
+    void run(const TaskStopToken& stopToken);
 
 private:
 
