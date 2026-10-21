@@ -14,6 +14,7 @@ void RegisterDisplayBufferTrackerTests();
 void RegisterRuntimeTests();
 void RegisterLvglGeometryTests();
 void RegisterStateTests();
+void RegisterSynchronizationTests();
 void RegisterTimeTests();
 void RegisterTimerPwmTests();
 
@@ -458,6 +459,7 @@ int main(int argc, char **argv){
     RegisterRuntimeTests();
     RegisterLvglGeometryTests();
     RegisterStateTests();
+    RegisterSynchronizationTests();
     RegisterTimeTests();
     RegisterTimerPwmTests();
 

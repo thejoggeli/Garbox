@@ -37,14 +37,32 @@ Most objects have static process lifetime. Several heap-using types deliberately
 |---|---|---|
 | Arduino task | Startup/composition only after boot; idle `loop()` afterward | Must not enter the application runtime after `MainTask` starts. |
 | `MainTask` | Runtime context, component lifecycle, active mode/screen, event creation/queueing/routing, shared-state mutation/publication, screen semantic updates | Intended sole owner; currently documented only implicitly. |
-| LED task | Animated LED progression | Group/LED mutexes. |
+| LED task | Animated LED progression | Normal group mutex; per-LED recursive mutex for composed animation operations. |
 | Piezo task | Tone queue playback and PWM updates | Recursive mutex because public operations call locked helpers. |
 | Display render task | `lv_timer_handler()` and LVGL pixel production | Serialized against main-task LVGL mutation by render-ready/trigger handshake. |
 | Display sender task | ST7789 window commands and one asynchronous pixel stream at a time | Queue plus DMA-completion barrier. |
-| SPI DMA task | ESP-IDF completion polling/routing and transaction-slot release | SPI recursive mutex and transaction queue. |
+| SPI DMA task | ESP-IDF completion polling/routing and transaction-slot release | Normal SPI mutex and transaction queue; callbacks run after unlock. |
 | GPIO ISR | Frequency-sensor edge timestamps/flags | Port critical section and volatile fields; only ISR-safe operations allowed. |
 
 The intended framework contract is: application events, states, lifecycle callbacks, mode changes, and semantic screen updates belong to `MainTask`. No component callback from an auxiliary task or ISR may mutate them directly. Cross-task inputs must be transferred through an explicitly synchronized mailbox/queue and consumed by `MainTask`.
+
+## Synchronization and lock order
+
+`MutexGuard` is only for handles created by `xSemaphoreCreateMutex()`; `RecursiveMutexGuard` is only for handles created by `xSemaphoreCreateRecursiveMutex()`. Both are task-context APIs and fail fatally on null handles or failed take/give operations. ISR code must instead use an ISR-safe critical section or the appropriate FreeRTOS `...FromISR` primitive.
+
+The audited mutex map is:
+
+| Owner | Kind | Reason |
+|---|---|---|
+| Profiler | Normal | All operations take one lock; reset no longer calls other locked public methods. Records are returned as value snapshots. |
+| Animated LED group | Normal | Group operations do not reacquire the group mutex. |
+| Static LED | Normal | Each operation has a single critical section. |
+| Display buffer tracker | Normal | Each identity transition is atomic and the lock is released before ST7789/SPI calls. |
+| SPI DMA | Normal | Slot allocation/release occurs under one lock; completion callbacks are copied and invoked after unlock, so chunk chaining may re-enter `transferAsync()`. |
+| Animated LED | Recursive | Public animation operations intentionally compose locked helpers such as `animationClear()`, `animationStart()`, `stop()`, and `enterState()`. |
+| Piezo player | Recursive | Queue/playback operations intentionally compose `playNextInQueue()`, `clearQueue()`, and `stop()`. |
+
+Observed nesting is group → profiler → animated LED in the LED tick, and piezo → profiler in playback. Neither path has a reverse acquisition. SPI completion invokes callbacks without its mutex, and display code never holds the tracker mutex while entering SPI. Assertion handlers are registered during single-threaded startup, are task-context only, and use an atomic first-fatal latch rather than an uninitialized mutex.
 
 ## Component lifecycle
 
@@ -143,7 +161,7 @@ LVGL-owned (Reusable/Rendering) → Queued → DMA-owned → LVGL-owned
 - **DMA-owned:** the sender has set the ST7789 window and the chunk sender is still reading the buffer.
 - **Reusable:** final DMA completion has released chip-select and returned ownership.
 
-`DisplayBufferTracker` registers the three exact allocation addresses and enforces the observable transitions. Its fixed-capacity FIFO must agree with the FreeRTOS send queue, only its head may become DMA-owned, only one DMA owner may exist, and completion must name that same buffer. Unknown, duplicate, out-of-order, and repeated transitions are fatal invariant violations. A recursive mutex protects the tracker across the render, sender, and SPI completion tasks; the counting semaphore remains responsible for blocking/backpressure. The tracker deliberately treats LVGL's internal reusable/rendering distinction as one `LvglOwned` state because there is no driver callback at the start of software rendering.
+`DisplayBufferTracker` registers the three exact allocation addresses and enforces the observable transitions. Its fixed-capacity FIFO must agree with the FreeRTOS send queue, only its head may become DMA-owned, only one DMA owner may exist, and completion must name that same buffer. Unknown, duplicate, out-of-order, and repeated transitions are fatal invariant violations. A normal mutex protects the tracker across the render, sender, and SPI completion tasks; the counting semaphore remains responsible for blocking/backpressure. The tracker deliberately treats LVGL's internal reusable/rendering distinction as one `LvglOwned` state because there is no driver callback at the start of software rendering.
 
 Application-side LVGL object mutation occurs in `MainTask` only after taking the render-ready token. It finishes before triggering the display render task. `lv_timer_handler()` then runs alone. Because LVGL is configured with `LV_OS_NONE`, this handshake is the entire thread-safety contract.
 

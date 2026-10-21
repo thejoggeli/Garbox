@@ -6,7 +6,7 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/hardware/spi/SpiDma.h"
-#include "core/rtos/LockGuard.h"
+#include "core/rtos/MutexGuard.h"
 #include "core/util/helpers/ByteUtils.h"
 #include "core/util/color/types/Rgb565.h"
 #include "core/util/color/types/Rgb888.h"
@@ -69,7 +69,7 @@ void Display::init(){
     mRenderTrigger = xSemaphoreCreateBinary();
     mRenderReady = xSemaphoreCreateBinary();
     mDmaBarrier = xSemaphoreCreateBinary();
-    mBufferTrackerMutex = xSemaphoreCreateRecursiveMutex();
+    mBufferTrackerMutex = xSemaphoreCreateMutex();
 
     AssertExit(mBufferCounter != nullptr, "Display", "failed to create buffer sem");
     AssertExit(mRenderTrigger != nullptr, "Display", "failed to create display mutex");
@@ -169,7 +169,7 @@ void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
 
     DisplayBufferTracker::Result queueResult;
     {
-        LockGuard lock(mBufferTrackerMutex);
+        MutexGuard lock(mBufferTrackerMutex);
         queueResult = mBufferTracker.queue(data);
     }
     if(queueResult != DisplayBufferTracker::Result::Ok){
@@ -203,7 +203,7 @@ void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
     if(xQueueSend(mSendQueue, &entry, 0) != pdTRUE){
         DisplayBufferTracker::Result cancelResult;
         {
-            LockGuard lock(mBufferTrackerMutex);
+            MutexGuard lock(mBufferTrackerMutex);
             cancelResult = mBufferTracker.cancelQueued(data);
         }
         AssertExit(cancelResult == DisplayBufferTracker::Result::Ok,
@@ -226,7 +226,7 @@ void Display::handleSenderTask(){
         if(xQueueReceive(mSendQueue, &entry, portMAX_DELAY) == pdTRUE) {
             DisplayBufferTracker::Result dmaResult;
             {
-                LockGuard lock(mBufferTrackerMutex);
+                MutexGuard lock(mBufferTrackerMutex);
                 dmaResult = mBufferTracker.beginDma(entry.data);
                 if(dmaResult == DisplayBufferTracker::Result::Ok){
                     mActiveSendBuffer = entry.data;
@@ -260,7 +260,7 @@ void Display::handleChunkComplete(bool success){
 
     DisplayBufferTracker::Result result;
     {
-        LockGuard lock(mBufferTrackerMutex);
+        MutexGuard lock(mBufferTrackerMutex);
         result = mBufferTracker.completeDma(mActiveSendBuffer);
         if(result == DisplayBufferTracker::Result::Ok){
             mActiveSendBuffer = nullptr;

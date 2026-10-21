@@ -1,6 +1,10 @@
 #include "Profiler.h"
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
 #include "core/assert/Assert.h"
+#include "core/rtos/MutexGuard.h"
 
 namespace Garbox {
 
@@ -29,13 +33,12 @@ bool Profiler::Init(){
 
 void Profiler::Reset(){
     AssertExit(sInitialized, "Profiler", "not initialized");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
     sLastUpdateTime = Time::GetMicros();
     for (uint8_t i = 0; i < RecordsCount; ++i){
         ResetRecord(static_cast<ProfilerId>(i));
     }
-    Profiler::ResetAllTotals();
-    Profiler::ResetIteration();
+    sNextIndex = 0;
 }
 
 void Profiler::ResetRecord(ProfilerId id){
@@ -50,30 +53,32 @@ void Profiler::ResetRecord(ProfilerId id){
 }
 
 void Profiler::SetEnabled(bool on){
-    LockGuard lock(sMutex);
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    MutexGuard lock(sMutex);
     sEnabled = on;
 }
 
 bool Profiler::IsEnabled(){
-    LockGuard lock(sMutex);
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    MutexGuard lock(sMutex);
     return sEnabled;
 }
 
 void Profiler::MeasureBegin(ProfilerId id){
-    if (!sEnabled) return;
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
+    if (!sEnabled) return;
     Record& r = sRecords[static_cast<uint8_t>(id)];
     r.lastBegin = Time::GetMicros();
     r.active = true;
 }
 
 void Profiler::MeasureEnd(ProfilerId id){
-    if (!sEnabled) return;
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
+    if (!sEnabled) return;
     Record& r = sRecords[static_cast<uint8_t>(id)];
     if (!r.active) return;
     r.active = false;
@@ -119,10 +124,10 @@ void Profiler::ProcessRecord(Record& r, uint32_t elapsed){
 }
 
 void Profiler::Update(ProfilerId id){
-    if (!sEnabled) return;
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
+    if (!sEnabled) return;
     const uint32_t now = Time::GetMicros();
     const uint32_t elapsed = now - sLastUpdateTime;
     if (elapsed == 0) return;
@@ -134,9 +139,9 @@ void Profiler::Update(ProfilerId id){
 }
 
 void Profiler::UpdateAll(){
-    if (!sEnabled) return;
     AssertExit(sInitialized, "Profiler", "not initialized");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
+    if (!sEnabled) return;
     const uint32_t now = Time::GetMicros();
     const uint32_t elapsed = now - sLastUpdateTime;
     if (elapsed == 0) return;
@@ -147,31 +152,32 @@ void Profiler::UpdateAll(){
     sLastUpdateTime = now;
 }
 
-const Profiler::Record& Profiler::GetRecord(ProfilerId id){
+Profiler::Record Profiler::GetRecord(ProfilerId id){
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
     return sRecords[static_cast<uint8_t>(id)];
 }
 
-const Profiler::Record* Profiler::GetNextRecord(){
+Profiler::Record Profiler::GetNextRecord(){
     AssertExit(sInitialized, "Profiler", "not initialized");
-    LockGuard lock(sMutex);
-    const Record* r = &sRecords[sNextIndex];
+    MutexGuard lock(sMutex);
+    const Record record = sRecords[sNextIndex];
     sNextIndex++;
     if (sNextIndex >= RecordsCount) sNextIndex = 0;
-    return r;
+    return record;
 }
 
 void Profiler::ResetIteration(){
-    LockGuard lock(sMutex);
+    AssertExit(sInitialized, "Profiler", "not initialized");
+    MutexGuard lock(sMutex);
     sNextIndex = 0;
 }
 
 void Profiler::ResetTotals(ProfilerId id){
     AssertExit(sInitialized, "Profiler", "not initialized");
     AssertExit(static_cast<uint8_t>(id) < RecordsCount, "Profiler", "invalid id");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
     Record& r = sRecords[static_cast<uint8_t>(id)];
     r.minDurationTotal = 0xFFFFFFFF;
     r.maxDurationTotal = 0;
@@ -179,7 +185,7 @@ void Profiler::ResetTotals(ProfilerId id){
 
 void Profiler::ResetAllTotals(){
     AssertExit(sInitialized, "Profiler", "not initialized");
-    LockGuard lock(sMutex);
+    MutexGuard lock(sMutex);
     for (uint8_t i = 0; i < RecordsCount; ++i){
         sRecords[i].minDurationTotal = 0xFFFFFFFF;
         sRecords[i].maxDurationTotal = 0;

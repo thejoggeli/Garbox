@@ -1,14 +1,11 @@
 #pragma once
 
 #include <array>
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
 #include <stdint.h>
 #include <stddef.h>
 
 #include "shared/types/ProfilerId.h"
 #include "core/time/Time.h"
-#include "core/rtos/LockGuard.h"
 
 namespace Garbox {
 
@@ -60,8 +57,8 @@ public:
     static void Update(ProfilerId id);
     static void UpdateAll();
 
-    static const Record& GetRecord(ProfilerId id);
-    static const Record* GetNextRecord();
+    static Record GetRecord(ProfilerId id);
+    static Record GetNextRecord();
     static void ResetIteration();
 
     static void ResetTotals(ProfilerId id);

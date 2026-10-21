@@ -7,7 +7,7 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
-#include "core/rtos/LockGuard.h"
+#include "core/rtos/MutexGuard.h"
 
 namespace Garbox {
 
@@ -50,7 +50,7 @@ void PiezoPlayer::stop(){
 }
 
 void PiezoPlayer::startTask(const char* name, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
-    LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
 
     // check state
     AssertExit(mInitialized, "PiezoPlayer", "not initialized");
@@ -65,7 +65,7 @@ void PiezoPlayer::startTask(const char* name, uint32_t frequencyHz, uint32_t sta
 }
 
 void PiezoPlayer::stopTask(){
-    LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
 
     // stop task
     mTask.stop();
@@ -103,7 +103,7 @@ const Task& PiezoPlayer::getTask() const {
 }
 
 void PiezoPlayer::playbackTick(){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     Profiler::MeasureScoped profiler { ProfilerId::PiezoPlayer };
 
     if (!mPlaying || !mCurrentSequence){
@@ -204,12 +204,12 @@ void PiezoPlayer::setPiezoTone(const Tone& tone){
 }
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     playSequence(sequence, mDefaultSilentTimeMicros);
 }
 
 void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTimeMicros){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     if(!mInitialized || !mTask.isRunning()){
         TriggerDebug("PiezoPlayer", "invalid state");
         return;
@@ -252,12 +252,12 @@ void PiezoPlayer::playSequence(const ToneSequence& sequence, uint32_t silentTime
 }
 
 void PiezoPlayer::playTone(const Tone& tone){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     playTone(tone, mDefaultSilentTimeMicros);
 }
 
 void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     if(!mInitialized || !mTask.isRunning()){
         TriggerDebug("PiezoPlayer", "invalid state");
         return;
@@ -300,7 +300,7 @@ void PiezoPlayer::playTone(const Tone& tone, uint32_t silentTimeMicros){
 }
 
 void PiezoPlayer::playNextInQueue(){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
 
     QueueItem* nextItem;
     if(mQueue.releaseFront(nextItem)){
@@ -352,12 +352,12 @@ void PiezoPlayer::playNextInQueue(){
 }
 
 bool PiezoPlayer::isPlaying() const {
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     return mPlaying;
 }
 
 void PiezoPlayer::clearQueue(){
-    Garbox::LockGuard lock(mMutex);
+    RecursiveMutexGuard lock(mMutex);
     mQueue.releaseAll();
 }
 

@@ -34,7 +34,7 @@ void DevtoolsController::logProfiler(){
     LogInfo("Dev", " | ProfilerId    | Count | freq(Hz) | min(us) | avg(us) | max(us) |");
     for (uint32_t i = 1; i < static_cast<uint32_t>(ProfilerId::Count); ++i){
         const ProfilerId id = static_cast<ProfilerId>(i);
-        const Profiler::Record& r = Profiler::GetRecord(id);
+        const Profiler::Record r = Profiler::GetRecord(id);
         const char* idStr = ProfilerIdToString(id);
         LogInfo("Dev", " | %-13.13s | %5" PRIu32 " | %8.3f | %7" PRIu32 " | %7.0f | %7" PRIu32 " |", idStr, r.countLast, r.frequency, r.minDurationLast, r.avgDuration, r.maxDurationLast);
     }

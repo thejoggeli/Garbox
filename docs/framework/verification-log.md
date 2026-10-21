@@ -90,3 +90,15 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native ASan/UBSan suite: 42 of 42 tests passed in 1.311 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 34.472 seconds: 30,288 bytes RAM (56 more than baseline) and 860,709 bytes flash (1,620 more than baseline).
 - Physical scheduling, panel output, and sustained-load behavior remain hardware-gated under DISP-04; transport failure and shutdown semantics remain DISP-03.
+
+## 2026-10-21 — SYNC-01
+
+- Replaced the ambiguous `LockGuard`, which always used recursive FreeRTOS APIs, with explicit `MutexGuard` and `RecursiveMutexGuard` types. Null handles and failed take/give operations are fatal contract violations.
+- Normal creation/take/give is now used by Profiler, AnimatedLedGroup, StaticLed, the display ownership tracker, and SpiDma. AnimatedLed and PiezoPlayer retain recursive mutexes because their public operations intentionally call locked helpers.
+- Removed Profiler's nested locked calls during reset, moved enabled checks under its mutex, and changed record accessors to return value snapshots rather than references/pointers that outlived the lock.
+- SpiDma now frees a completed transaction slot and releases its normal mutex before invoking a copied callback. Chunk completion may safely queue the next asynchronous transfer without recursive lock re-entry or a lock held across user code.
+- Assertion handlers no longer construct no-op guards around never-created mutexes. Handler registration is a single-threaded startup operation, and an atomic latch selects the first fatal caller; invocation remains explicitly task-context only.
+- Added a host FreeRTOS semaphore model that distinguishes normal and recursive handles/APIs. Tests prove matching calls, two-level recursive acquisition, mismatch detection, single-lock Profiler reset, and snapshot behavior.
+- Native ASan/UBSan suite: 45 of 45 tests passed in 7.003 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 37.828 seconds: 30,288 bytes RAM (56 more than baseline) and 860,793 bytes flash (1,704 more than baseline).
+- ISR registration and target interrupt behavior remain separately tracked by ISR-01; no mutex guard is permitted in ISR context.

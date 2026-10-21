@@ -47,7 +47,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
-| SYNC-01 | TODO | BUILD-01 | Split normal/recursive mutex guards or normalize creation; audit nested calls. | Creation/take/give APIs match; recursive call paths are tested or structurally eliminated. |
+| SYNC-01 | SOFTWARE VERIFIED | BUILD-01 | Split normal/recursive mutex guards or normalize creation; audit nested calls. | Creation/take/give APIs match; recursive call paths are tested or structurally eliminated. |
 | ISR-01 | TODO | BUILD-01 | Remove duplicate ISR registration and document ISR-safe contract. | One checked registration; firmware builds; target tachometer smoke test remains gated. |
 | SAFE-01 | TODO | SYNC-01 | Add idempotent emergency-safe-output hook before task shutdown. | Software test verifies ordering and idempotence; electrical levels remain hardware-gated. |
 | TASK-01 | TODO | SYNC-01 | Define task stop ownership and eliminate unsafe fatal destructors. | Stop is idempotent; current-task and in-flight-worker cases are documented/tested where possible. |

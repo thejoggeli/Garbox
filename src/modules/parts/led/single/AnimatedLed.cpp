@@ -5,7 +5,7 @@
 #include "core/assert/Assert.h"
 #include "core/hardware/ledc/LedcChannel.h"
 #include "core/util/function/default/EasingFunctions.h"
-#include "core/rtos/LockGuard.h"
+#include "core/rtos/MutexGuard.h"
 
 namespace Garbox {
 
@@ -15,7 +15,7 @@ AnimatedLed::AnimatedLed(LedcChannel& ledChannel) : mLed(ledChannel){
 }
 
 void AnimatedLed::init(){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     AssertExit(!mInitialized, "AnimatedLed", "already initialized");
 
     if(mDefaultFunction == nullptr){
@@ -27,12 +27,12 @@ void AnimatedLed::init(){
 }
 
 void AnimatedLed::setDefaultFunction(const MathFunctionIfc& fn){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     mDefaultFunction = &fn;
 }
 
 void AnimatedLed::setBrightness(float brightness){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(!mInitialized){
         TriggerDebug("AnimatedLed", "not initialized");
         return;
@@ -42,7 +42,7 @@ void AnimatedLed::setBrightness(float brightness){
 }
 
 void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros, const MathFunctionIfc* fn){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(!mInitialized){
         TriggerDebug("AnimatedLed", "not initialized");
         return;
@@ -67,7 +67,7 @@ void AnimatedLed::setBrightnessSmooth(float brightness, uint32_t durationMicros,
 }
 
 void AnimatedLed::setAnimation(const MathFunctionIfc& fn, uint32_t cycles, uint32_t durationMicros, float yStart, float yEnd){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(mFrameCount >= MaxPlaybackFrames){
         TriggerDebug("AnimatedLed", "playback buffer full");
         return;
@@ -78,7 +78,7 @@ void AnimatedLed::setAnimation(const MathFunctionIfc& fn, uint32_t cycles, uint3
 }
 
 void AnimatedLed::animationAddFrame(const MathFunctionIfc& fn, uint32_t durationMicros, float yStart, float yEnd){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(mFrameCount >= MaxPlaybackFrames){
         TriggerDebug("AnimatedLed", "playback buffer full");
         return;
@@ -96,7 +96,7 @@ void AnimatedLed::animationAddFrame(const MathFunctionIfc& fn, uint32_t duration
 }
 
 void AnimatedLed::animationAddDelay(uint32_t durationMicros){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(mFrameCount >= MaxPlaybackFrames){
         TriggerDebug("AnimatedLed", "playback buffer full");
         return;
@@ -112,7 +112,7 @@ void AnimatedLed::animationAddDelay(uint32_t durationMicros){
 }
 
 void AnimatedLed::animationStart(uint32_t cycles){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(!mInitialized){
         TriggerDebug("AnimatedLed", "not initialized");
         return;
@@ -133,14 +133,14 @@ void AnimatedLed::animationStart(uint32_t cycles){
 }
 
 void AnimatedLed::animationClear(){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     mFrameCount = 0;
     mCurrentFrame = 0;
     stop();
 }
 
 void AnimatedLed::stop(){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(mState == State::Static){
         return;
     }
@@ -148,7 +148,7 @@ void AnimatedLed::stop(){
 }
 
 void AnimatedLed::tick(){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(!mInitialized){
         TriggerDebug("AnimatedLed", "not initialized");
         return;
@@ -167,7 +167,7 @@ void AnimatedLed::tick(){
 }
 
 void AnimatedLed::enterState(State state){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     mState = state;
     if(state == State::Static){
         mCurrentFrame = 0;
@@ -176,7 +176,7 @@ void AnimatedLed::enterState(State state){
 }
 
 void AnimatedLed::handlePlaybackState(){
-    LockGuard guard(mMutex);
+    RecursiveMutexGuard guard(mMutex);
     if(mFrameCount == 0){
         stop();
         return;

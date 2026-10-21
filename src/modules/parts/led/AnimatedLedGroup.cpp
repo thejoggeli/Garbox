@@ -3,7 +3,7 @@
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
-#include "core/rtos/LockGuard.h"
+#include "core/rtos/MutexGuard.h"
 
 namespace Garbox {
 
@@ -17,7 +17,7 @@ AnimatedLedGroup::~AnimatedLedGroup(){
 }
 
 void AnimatedLedGroup::init(){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
     AssertExit(!mInitialized, "AnimatedLedGroup", "already initialized");
 
     // init leds
@@ -34,7 +34,7 @@ void AnimatedLedGroup::init(){
 }
 
 void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     // check state
     AssertExit(mInitialized, "AnimatedLedGroup", "not initialized");
@@ -49,7 +49,7 @@ void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uin
 }
 
 void AnimatedLedGroup::stopTask(){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
     mTask.stop();
 }
 
@@ -72,7 +72,7 @@ void AnimatedLedGroup::handleTask(){
 }
 
 void AnimatedLedGroup::tick(){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
     Profiler::MeasureScoped profiler { ProfilerId::LedAnimation };
 
     // must be initialized
@@ -99,7 +99,7 @@ Span<AnimatedLed>& AnimatedLedGroup::getAllLeds(){
 }
 
 void AnimatedLedGroup::setLed(uint8_t index, float brightness){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if(!mInitialized){
         TriggerDebug("AnimatedLedGroup", "not initialized");
@@ -115,7 +115,7 @@ void AnimatedLedGroup::setLed(uint8_t index, float brightness){
 }
 
 void AnimatedLedGroup::setAllLeds(float brightness){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if(!mInitialized){
         TriggerDebug("AnimatedLedGroup", "not initialized");
@@ -128,7 +128,7 @@ void AnimatedLedGroup::setAllLeds(float brightness){
 }
 
 void AnimatedLedGroup::setAllLedsSmooth(float brightness, uint32_t durationMicros){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if(!mInitialized){
         TriggerDebug("AnimatedLedGroup", "not initialized");
@@ -141,7 +141,7 @@ void AnimatedLedGroup::setAllLedsSmooth(float brightness, uint32_t durationMicro
 }
 
 void AnimatedLedGroup::toggleLed(uint8_t index){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if(!mInitialized){
         TriggerDebug("AnimatedLedGroup", "not initialized");
@@ -162,7 +162,7 @@ void AnimatedLedGroup::toggleLed(uint8_t index){
 }
 
 void AnimatedLedGroup::toggleAllLeds(){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if(!mInitialized){
         TriggerDebug("AnimatedLedGroup", "not initialized");
@@ -180,7 +180,7 @@ void AnimatedLedGroup::toggleAllLeds(){
 }
 
 void AnimatedLedGroup::toggleAllLedsSmooth(uint32_t durationMicros){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if(!mInitialized){
         TriggerDebug("AnimatedLedGroup", "not initialized");

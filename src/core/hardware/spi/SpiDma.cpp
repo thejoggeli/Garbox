@@ -4,7 +4,7 @@
 #include <esp_heap_caps.h>
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
-#include "core/rtos/LockGuard.h"
+#include "core/rtos/MutexGuard.h"
 
 namespace Garbox {
 
@@ -71,8 +71,8 @@ void SpiDma::init(const Config& config){
     });
 
     // create mutex
-    mMutex = xSemaphoreCreateRecursiveMutex();
-    AssertExit(mMutex != nullptr, "PiezoPlayer", "mutex creation failed");  
+    mMutex = xSemaphoreCreateMutex();
+    AssertExit(mMutex != nullptr, "SpiDma", "mutex creation failed");
 
     mInitialized = true;
 }
@@ -105,8 +105,7 @@ bool SpiDma::validateTransferArgs(const uint8_t* data, size_t lenBits){
     return true;
 }
 
-SpiDma::TxSlot* SpiDma::allocFreeSlot(){
-    LockGuard lock(mMutex);
+SpiDma::TxSlot* SpiDma::allocFreeSlotUnlocked(){
     // find next free tx slot
     for (int i = 0; i < mNumSlots; ++i){
         if (!mTxSlots[i].inUse){
@@ -119,8 +118,7 @@ SpiDma::TxSlot* SpiDma::allocFreeSlot(){
     return nullptr;
 }
 
-void SpiDma::freeSlot(TxSlot* slot){
-    LockGuard lock(mMutex);
+void SpiDma::freeSlotUnlocked(TxSlot* slot){
     if (slot == nullptr){
         TriggerDebug("SpiDma", "invalid slot ptr");
         return;
@@ -131,7 +129,7 @@ void SpiDma::freeSlot(TxSlot* slot){
 }
 
 bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if (!validateTransferArgs(data, lenBits)){
         return false;
@@ -166,13 +164,13 @@ bool SpiDma::transferSync(const uint8_t* data, size_t lenBits, void* user){
 }
 
 bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, CompleteCallback callback){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
 
     if (!validateTransferArgs(data, lenBits)){
         return false;
     }
 
-    TxSlot* slot = allocFreeSlot();
+    TxSlot* slot = allocFreeSlotUnlocked();
     if (slot == nullptr){
         TriggerDebug("SpiDma", "no free tx slots available");
         return false;
@@ -188,7 +186,7 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, Comp
     esp_err_t res = spi_device_queue_trans(mDevice, &transaction, portMAX_DELAY);
     if (res != ESP_OK){
         TriggerDebug("SpiDma", "failed to queue transaction", static_cast<int32_t>(res));
-        freeSlot(slot);
+        freeSlotUnlocked(slot);
         return false;
     }
 
@@ -196,12 +194,12 @@ bool SpiDma::transferAsync(const uint8_t* data, size_t lenBits, void* user, Comp
 }
 
 void SpiDma::setCompleteCallback(CompleteCallback callback){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
     mTxCallback = callback;
 }
 
 void SpiDma::startTask(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t core){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
     
     // check state
     AssertExit(mInitialized, "SpiDma", "not initialized");
@@ -212,7 +210,7 @@ void SpiDma::startTask(const char* name, uint32_t stackSize, UBaseType_t priorit
 }
 
 void SpiDma::stopTask(){
-    LockGuard lock(mMutex);
+    MutexGuard lock(mMutex);
     mTask.stop();
     // TODO stop all spi activity
 }
@@ -244,26 +242,23 @@ const Task& SpiDma::getTask() const {
 }
 
 void SpiDma::handleCompletedTransaction(spi_transaction_t* transaction, bool success){
-    LockGuard lock(mMutex);
-    // invoke callback and free transaction slot
-    for (int i = 0; i < mNumSlots; ++i){
-        if (&mTxSlots[i].trans == transaction){
-            invokeCallback(&mTxSlots[i], transaction->user, success);
-            freeSlot(&mTxSlots[i]);
-            return;
+    CompleteCallback callback = nullptr;
+    void* user = nullptr;
+
+    {
+        MutexGuard lock(mMutex);
+        for (int i = 0; i < mNumSlots; ++i){
+            if (&mTxSlots[i].trans == transaction){
+                callback = mTxSlots[i].callback != nullptr ? mTxSlots[i].callback : mTxCallback;
+                user = transaction->user;
+                freeSlotUnlocked(&mTxSlots[i]);
+                break;
+            }
         }
     }
-}
 
-void SpiDma::invokeCallback(TxSlot* slot, void* user, bool success){
-    LockGuard lock(mMutex);
-    CompleteCallback globalCb = mTxCallback;
-
-    if (slot->callback != nullptr){
-        slot->callback(user, success);
-    }
-    else if (globalCb != nullptr){
-        globalCb(user, success);
+    if(callback != nullptr){
+        callback(user, success);
     }
 }
 

@@ -2,12 +2,12 @@
 
 #include "core/assert/Assert.h"
 #include "core/hardware/gpio/Gpio.h"
-#include "core/rtos/LockGuard.h"
+#include "core/rtos/MutexGuard.h"
 
 namespace Garbox {
 
 StaticLed::StaticLed(Gpio& gpio) : mGpio(gpio){
-    mMutex = xSemaphoreCreateRecursiveMutex();
+    mMutex = xSemaphoreCreateMutex();
     AssertExit(mMutex != nullptr, "StaticLed", "mutex creation failed");
 }
 
@@ -16,17 +16,17 @@ void StaticLed::init(){
 }
 
 void StaticLed::toggle(){
-    LockGuard guard(mMutex);
+    MutexGuard guard(mMutex);
     mGpio.toggle();
 }
 
 void StaticLed::setEnabled(bool enabled){
-    LockGuard guard(mMutex);
+    MutexGuard guard(mMutex);
     mGpio.writeLevel(enabled);
 }
 
 bool StaticLed::isEnabled() const {
-    LockGuard guard(mMutex);
+    MutexGuard guard(mMutex);
     return mGpio.readLevel();
 }
 

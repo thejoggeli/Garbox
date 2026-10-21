@@ -14,6 +14,8 @@ namespace Garbox {
  *  - Synchronous calls (transferSync) from within the completion callback
  *    are NOT supported for now. This could be added later using semaphores
  *    for safe reentry, but is intentionally disabled to keep behavior simple.
+ *  - Completion callbacks run in the SPI DMA task after the SPI mutex is
+ *    released. They may queue another asynchronous transfer.
  */
 class SpiDma {
 public:
@@ -75,12 +77,12 @@ private:
 
     bool validateTransferArgs(const uint8_t* data, size_t lenBits);
 
-    TxSlot* allocFreeSlot();
-    void freeSlot(TxSlot* slot);
+    // Caller must hold mMutex.
+    TxSlot* allocFreeSlotUnlocked();
+    void freeSlotUnlocked(TxSlot* slot);
 
     void handleTask();
     void handleCompletedTransaction(spi_transaction_t* transaction, bool success);
-    void invokeCallback(TxSlot* slot, void* user, bool success);
 };
 
 } // namespace Garbox
