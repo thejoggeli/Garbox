@@ -223,6 +223,21 @@ void test_pwm_stop_reconfigure_and_restart(){
     TEST_ASSERT_EQUAL(SoftwarePwm::State::Low, pwm.getState());
 }
 
+void test_pwm_silent_stop_resets_without_invoking_handler(){
+    FakeTime::Reset();
+    SoftwarePwm pwm(1.0f, 100U);
+    uint32_t callbackCount = 0U;
+    pwm.setStateChangedHandler([&callbackCount](SoftwarePwm::State){
+        ++callbackCount;
+    });
+
+    pwm.start();
+    TEST_ASSERT_EQUAL_UINT32(1U, callbackCount);
+    pwm.stop(false);
+    TEST_ASSERT_TRUE(pwm.isReset());
+    TEST_ASSERT_EQUAL_UINT32(1U, callbackCount);
+}
+
 } // namespace
 
 void RegisterTimerPwmTests(){
@@ -237,4 +252,5 @@ void RegisterTimerPwmTests(){
     RUN_TEST(test_pwm_immediate_change_starts_new_cycle_now);
     RUN_TEST(test_pwm_deferred_and_immediate_period_changes_have_distinct_boundaries);
     RUN_TEST(test_pwm_stop_reconfigure_and_restart);
+    RUN_TEST(test_pwm_silent_stop_resets_without_invoking_handler);
 }

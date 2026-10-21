@@ -16,7 +16,8 @@ public:
     // starts all system tasks
     static void StartAll();
 
-    // stops all system tasks, excluding the task that is calling this function
+    // Requests every managed task to stop. Each external task is joined with a
+    // bound; the calling task is request-only and may remain as fatal reporter.
     static void StopAll();
 
 };

@@ -31,7 +31,7 @@ public:
     SoftwarePwm(float duty, uint32_t periodMicros);
 
     void start();
-    void stop();
+    void stop(bool notifyHandler = true);
     void tick();
 
     void setDutyCycle(float duty, bool finishCurrent = true); // duty value must be in the range [0, 1] 
@@ -55,7 +55,7 @@ private:
 
     void startNextCycle(bool restartNow = false);
     void updateState();
-    void enterState(State state);
+    void enterState(State state, bool notifyHandler = true);
     void updateThreshold();
 
     SoftwareTimer mTimer;

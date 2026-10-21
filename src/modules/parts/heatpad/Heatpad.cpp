@@ -55,6 +55,9 @@ void Heatpad::init(){
 }
 
 void Heatpad::tick(){
+    if(mSafeOutputLatched.load(std::memory_order_acquire)){
+        return;
+    }
     mPwm.tick();
 
     // sample adc voltages
@@ -67,6 +70,9 @@ void Heatpad::tick(){
 }
 
 void Heatpad::setEnabled(bool enabled){
+    if(mSafeOutputLatched.load(std::memory_order_acquire)){
+        return;
+    }
     if(enabled == mEnabled){
         return;
     }
@@ -82,6 +88,9 @@ void Heatpad::setEnabled(bool enabled){
 }
 
 void Heatpad::setDutyCycle(float duty){
+    if(mSafeOutputLatched.load(std::memory_order_acquire)){
+        return;
+    }
     bool const finishCurrent = true;
     mPwm.setDutyCycle(duty, finishCurrent);    
 }
@@ -91,8 +100,24 @@ void Heatpad::setStateChangedHandler(StateChangedHandler handler){
 }
 
 void Heatpad::setPeriodDurationMicros(float durationMicros){
+    if(mSafeOutputLatched.load(std::memory_order_acquire)){
+        return;
+    }
     bool const finishCurrent = true;
     mPwm.setPeriodDurationMicros(durationMicros, finishCurrent);
+}
+
+void Heatpad::forceSafeOutput(){
+    mSafeOutputLatched.store(true, std::memory_order_release);
+    mPwm.stop(false);
+    mGpioHeatpadEnable.writeLevel(false);
+    mHeatEnabled = false;
+    mEnabled = false;
+    mState = HeatpadState::Disabled;
+}
+
+bool Heatpad::isSafeOutputLatched() const {
+    return mSafeOutputLatched.load(std::memory_order_acquire);
 }
 
 void Heatpad::handlePwmStateChanged(SoftwarePwm::State state){
@@ -126,6 +151,9 @@ void Heatpad::updateState(){
 }
 
 void Heatpad::setHeatEnabled(bool enabled){
+    if(enabled && mSafeOutputLatched.load(std::memory_order_acquire)){
+        return;
+    }
     if (mHeatEnabled != enabled){
         mGpioHeatpadEnable.writeLevel(enabled);
         mHeatEnabled = enabled;

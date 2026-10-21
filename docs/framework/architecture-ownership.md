@@ -181,7 +181,11 @@ The RGB565 buffer contract is `stride = lv_draw_buf_width_to_stride(width, LV_CO
 
 ## Failure and shutdown ownership
 
-At baseline, fatal handling stopped tasks by deleting them from another context and produced LED/piezo feedback without first forcing heater and fan outputs safe. Managed tasks now stop cooperatively with bounded waits; display shutdown enters a terminal ownership state, wakes all display blockers, prevents new SPI admission, and deselects the panel. It no longer interrupts a worker while it owns a mutex or driver call. An already accepted SPI transaction and exact target timing still require hardware validation. Synchronously forcing hazardous outputs safe remains SAFE-01.
+At baseline, fatal handling stopped tasks by deleting them from another context and produced LED/piezo feedback without first forcing heater and fan outputs safe. Managed tasks now stop cooperatively with bounded waits; display shutdown enters a terminal ownership state, wakes all display blockers, prevents new SPI admission, and deselects the panel. It no longer interrupts a worker while it owns a mutex or driver call. An already accepted SPI transaction and exact target timing still require hardware validation.
+
+Fatal handling now calls a fixed-capacity, allocation-free `SafeOutputRegistry` before any task stop or wait. Its atomic latch makes application idempotent and prevents recursive fatal paths from replaying handlers. The heatpad handler atomically rejects future commands, silently resets software PWM, drives the logical enable output low, and emits no state callback. `MainTask` is also the first registered stop handler, limiting the interval in which normal application code can run after the latch. The generated hardware configuration currently maps logical heater-off to a non-inverted low output on GPIO 14; that electrical path still requires target confirmation.
+
+The fatal fan policy is intentionally unresolved: maximum cooling and power-off are both plausible depending on the enclosure, power stage, and failure model. Until the owner confirms the policy, SAFE-01 remains in progress and the registry does not alter the fan.
 
 Target ordering for fatal shutdown is:
 

@@ -1,6 +1,7 @@
 
 #include "app/config/AppConfig.h"
 #include "app/providers/PartsProvider.h"
+#include "app/system/SafeOutputManager.h"
 #include "app/system/StartupSequence.h"
 #include "app/system/TaskManager.h"
 
@@ -48,7 +49,11 @@ void handleAssertExit(const char* context, const char* message, int32_t arg){
     // print error to log
     LogError("Main", "AssertExit! %s %s (arg=%" PRIi32 "|0x%X)", context, message, arg, arg);
 
-    // stop all tasks (automatically excludes the current task running this handler)
+    // Latch hazardous outputs safe before any potentially blocking shutdown.
+    SafeOutputManager::Apply();
+
+    // Stop all managed tasks cooperatively. The current task becomes the
+    // fatal-reporting context and is only requested to stop.
     TaskManager::StopAll();
 
     // get status leds and piezo
@@ -103,14 +108,18 @@ void setup(){
     // init all parts
     PartsProvider::Init();
 
+    // register the minimal, allocation-free fatal output path
+    SafeOutputManager::Init();
+
     // init lvgl
     LvglProvider::Init(AppConfig::DisplayWidth, AppConfig::DisplayHeight);
 
-    // start system tasks
-    TaskManager::StartAll();
+    // Register MainTask first so fatal shutdown prevents new application
+    // output commands before waiting for auxiliary workers.
     TaskManager::RegisterStopHandler([](){
         getMainTask().stop();
     });
+    TaskManager::StartAll();
 
     // run startup sequence
     StartupSequence startup;

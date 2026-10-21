@@ -25,12 +25,12 @@ void SoftwarePwm::start(){
     startNextCycle();
 }
 
-void SoftwarePwm::stop(){
+void SoftwarePwm::stop(bool notifyHandler){
     if(isReset()){
         return;
     }
     mTimer.reset();
-    enterState(State::Reset);
+    enterState(State::Reset, notifyHandler);
 }
 
 void SoftwarePwm::tick(){
@@ -117,12 +117,12 @@ void SoftwarePwm::updateState(){
 }
 
 
-void SoftwarePwm::enterState(State state){
+void SoftwarePwm::enterState(State state, bool notifyHandler){
     if(mState == state){
         return;
     }
     mState = state;
-    if(mHandler){
+    if(notifyHandler && mHandler){
         mHandler(state);
     }
 }

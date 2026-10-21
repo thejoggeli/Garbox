@@ -133,3 +133,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Startup remains the sole owner of `gpio_install_isr_service()`, executed before parts attach handlers.
 - ESP32-S3 firmware build passed in 34.263 seconds: 30,296 bytes RAM (64 more than baseline) and 862,421 bytes flash (3,332 more than baseline).
 - Native tests do not emulate ESP32 interrupt dispatch; target tachometer edge/timeout behavior remains hardware-gated.
+
+## 2026-10-21 — SAFE-01 heater-off slice
+
+- Added a fixed-capacity safe-output registry using plain function/context pairs, with no recurring allocation or `std::function` dependency. Atomic first-apply semantics make it idempotent and reject late registration.
+- Fatal handling applies safe outputs before any cooperative task stop/wait. `MainTask` is registered as the first stop handler so ordinary application output commands are stopped before auxiliary joins.
+- The heatpad now has a one-way emergency latch: future enable/duty/period commands and ticks are ignored, software PWM resets without invoking callbacks, and the logical enable output is driven low.
+- Native tests cover registration order, exactly-once application, null/capacity/late-registration rejection, and callback-free PWM reset. ASan/UBSan suite: 53 of 53 tests passed in 8.470 seconds.
+- ESP32-S3 firmware build passed in 107.886 seconds: 30,344 bytes RAM (112 more than baseline) and 862,961 bytes flash (3,872 more than baseline).
+- SAFE-01 remains **IN PROGRESS** pending the product decision for fatal fan behavior (full-speed cooldown versus power-off). GPIO polarity and physical heater-off behavior remain hardware-gated.

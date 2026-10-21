@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 
 #include "core/time/SoftwarePwm.h"
@@ -35,6 +36,11 @@ public:
     void setDutyCycle(float duty);
     void setPeriodDurationMicros(float durationMicros);
 
+    // Fatal-path operation: latch future heat commands out and drive the
+    // logical enable output low without invoking application callbacks.
+    void forceSafeOutput();
+    bool isSafeOutputLatched() const;
+
     void setStateChangedHandler(StateChangedHandler handler);
 
     bool isEnabled() const;
@@ -63,6 +69,7 @@ private:
     bool isHeating();
 
     bool mEnabled = false;
+    std::atomic<bool> mSafeOutputLatched{false};
     HeatpadState mState = HeatpadState::Disabled;
     StateChangedHandler mStateChangedHandler = nullptr;
     

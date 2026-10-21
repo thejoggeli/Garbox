@@ -12,6 +12,7 @@ using namespace GarboxTest;
 void RegisterContainerTests();
 void RegisterDisplayBufferTrackerTests();
 void RegisterRuntimeTests();
+void RegisterSafeOutputRegistryTests();
 void RegisterLvglGeometryTests();
 void RegisterStateTests();
 void RegisterSynchronizationTests();
@@ -458,6 +459,7 @@ int main(int argc, char **argv){
     RegisterContainerTests();
     RegisterDisplayBufferTrackerTests();
     RegisterRuntimeTests();
+    RegisterSafeOutputRegistryTests();
     RegisterLvglGeometryTests();
     RegisterStateTests();
     RegisterSynchronizationTests();
