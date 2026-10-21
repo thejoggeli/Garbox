@@ -147,7 +147,7 @@ Current enforcement uses only a free-buffer count. It does not track or validate
 
 Application-side LVGL object mutation occurs in `MainTask` only after taking the render-ready token. It finishes before triggering the display render task. `lv_timer_handler()` then runs alone. Because LVGL is configured with `LV_OS_NONE`, this handshake is the entire thread-safety contract.
 
-The RGB565 buffer contract must be `stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_RGB565)` and `data_size >= stride * height`. The current code uses `sizeof(lv_color_t)` for stride; under LVGL 9.4 `lv_color_t` is a three-byte RGB structure, not the two-byte RGB565 storage type.
+The RGB565 buffer contract is `stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_RGB565)` and `data_size >= stride * height`. `LvglHandler` now computes the two-byte RGB565 geometry independently, verifies it against LVGL's public stride helper, and initializes each buffer through `lv_draw_buf_init()`. For the configured 320 by 60 partial buffers this is a 640-byte stride and 38,400-byte allocation. Physical color, orientation, and sustained-transfer validation remains hardware-gated.
 
 ## Failure and shutdown ownership
 

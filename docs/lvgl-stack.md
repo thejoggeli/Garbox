@@ -388,7 +388,7 @@ Resource names are prefixed by screen, so the same `power.png`, `fan.png`, and o
 
 ### Wrapper surface and generator mapping can drift
 
-`LvObject` is very broad, while the XML initializer map independently repeats the supported subset and its naming rules. LVGL upgrades can affect both. The manual `lv_draw_buf_t` field initialization in `LvglHandler` also relies on LVGL internals more directly than a public buffer-construction API would.
+`LvObject` is very broad, while the XML initializer map independently repeats the supported subset and its naming rules. LVGL upgrades can affect both. `LvglHandler` previously initialized `lv_draw_buf_t` fields directly; DISP-01 replaced that baseline behavior with `lv_draw_buf_init()` plus an explicit check against LVGL's public RGB565 stride calculation.
 
 Pinning LVGL more tightly and adding compile/generation tests are more valuable here than adding more wrapper methods.
 
@@ -424,7 +424,7 @@ The render-ready handshake makes the existing path safe, but it is possible for 
 - `RowMenu::setSelectedRow(index)` never assigns `index` to `mActiveRowIndex`.
 - chart catch-up inherits the `TimeSeries::iterateSince()` overrun problem described in the main review and can replay retained ring data repeatedly when far behind.
 - the persistent rotated canvas/draw-buffer lifetime depends on LVGL ownership behavior and lacks a focused lifecycle test.
-- manually initialized draw-buffer internals increase upgrade risk across LVGL versions.
+- physical RGB565 color, orientation, and sustained partial-buffer transfer still need target validation even though buffer geometry and public-API initialization are now software-verified.
 
 ## 12. Recommended stabilization plan
 

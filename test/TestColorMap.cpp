@@ -11,6 +11,7 @@ using namespace GarboxTest;
 
 void RegisterContainerTests();
 void RegisterRuntimeTests();
+void RegisterLvglGeometryTests();
 void RegisterStateTests();
 void RegisterTimeTests();
 void RegisterTimerPwmTests();
@@ -453,6 +454,7 @@ int main(int argc, char **argv){
     RUN_TEST(test_max_entries);
     RegisterContainerTests();
     RegisterRuntimeTests();
+    RegisterLvglGeometryTests();
     RegisterStateTests();
     RegisterTimeTests();
     RegisterTimerPwmTests();

@@ -1,10 +1,12 @@
 #include "LvglHandler.h"
 
 #include <cmath>
+#include <limits>
 #include <esp_heap_caps.h>
 #include <themes/lv_theme_private.h>
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
+#include "core/lvgl/helpers/Rgb565DrawBufferGeometry.h"
 #include "core/time/Time.h"
 
 namespace Garbox {
@@ -14,15 +16,24 @@ LvglHandler::LvglHandler(const Config& config):
     mHeight(config.height),
     mBytesPerPixel(config.bytesPerPixel),
     mPartialFactor(config.partialFactor),
-    mBufferSize(mWidth * mHeight * mBytesPerPixel / mPartialFactor),
     mBufferWidth(mWidth),
-    mBufferHeight(mHeight / mPartialFactor){
+    mBufferHeight(mPartialFactor > 0 ? mHeight / mPartialFactor : 0),
+    mBufferStride(static_cast<uint32_t>(Rgb565DrawBufferGeometry::strideBytes(mBufferWidth))),
+    mBufferSize(static_cast<uint32_t>(Rgb565DrawBufferGeometry::sizeBytes(mBufferWidth, mBufferHeight))){
     // constructor body
+    AssertExit(mPartialFactor > 0, "LvglHandler", "partial factor cannot be zero");
+    AssertExit(mWidth > 0 && mHeight > 0, "LvglHandler", "display dimensions must be nonzero");
     AssertExit(mWidth == mBufferWidth, "LvglHandler", "display and buffer width must be equal");
     AssertExit((mBufferHeight * mPartialFactor) == mHeight, "LvglHandler", "inconsistent buffer and display height");
-    AssertExit((mWidth / mPartialFactor) > 0, "LvglHandler", "partial buffer height cannot be zero");
-    AssertExit(mBytesPerPixel == 2, "LvglHandler", "RGB565 requires exactly 2 bytes per pixel");
-    AssertExit(mBufferSize == (mWidth * mHeight * mBytesPerPixel / mPartialFactor), "LvglHandler", "frame size inconsistent with constants");
+    AssertExit(mBufferHeight > 0, "LvglHandler", "partial buffer height cannot be zero");
+    AssertExit(mBytesPerPixel == Rgb565DrawBufferGeometry::BytesPerPixel,
+               "LvglHandler", "RGB565 requires exactly 2 bytes per pixel");
+    AssertExit(Rgb565DrawBufferGeometry::strideBytes(mBufferWidth)
+                   <= std::numeric_limits<uint32_t>::max(),
+               "LvglHandler", "draw buffer stride exceeds uint32_t");
+    AssertExit(Rgb565DrawBufferGeometry::sizeBytes(mBufferWidth, mBufferHeight)
+                   <= std::numeric_limits<uint32_t>::max(),
+               "LvglHandler", "draw buffer size exceeds uint32_t");
 }
 
 LvglHandler::~LvglHandler(){
@@ -39,13 +50,17 @@ void LvglHandler::init(){
     lv_log_register_print_cb(handleLog);
     lv_tick_set_cb(lvglTickProvider);
 
+    const uint32_t lvglStride = lv_draw_buf_width_to_stride(mBufferWidth, LV_COLOR_FORMAT_RGB565);
+    AssertExit(lvglStride == mBufferStride, "LvglHandler", "unexpected RGB565 stride",
+               static_cast<int32_t>(lvglStride));
+
     // init draw buffers
     mDrawBufferData1 = allocDrawBufferData(mBufferSize);
     mDrawBufferData2 = allocDrawBufferData(mBufferSize);
     mDrawBufferData3 = allocDrawBufferData(mBufferSize);
-    initDrawBuffer(mDrawBuffer1, mDrawBufferData1, mBufferSize, mBufferWidth, mBufferHeight);
-    initDrawBuffer(mDrawBuffer2, mDrawBufferData2, mBufferSize, mBufferWidth, mBufferHeight);
-    initDrawBuffer(mDrawBuffer3, mDrawBufferData3, mBufferSize, mBufferWidth, mBufferHeight);
+    initDrawBuffer(mDrawBuffer1, mDrawBufferData1, mBufferSize, mBufferWidth, mBufferHeight, mBufferStride);
+    initDrawBuffer(mDrawBuffer2, mDrawBufferData2, mBufferSize, mBufferWidth, mBufferHeight, mBufferStride);
+    initDrawBuffer(mDrawBuffer3, mDrawBufferData3, mBufferSize, mBufferWidth, mBufferHeight, mBufferStride);
 
     // init display
     mLvDisplay = lv_display_create(mWidth, mHeight);
@@ -144,15 +159,18 @@ uint8_t* LvglHandler::allocDrawBufferData(uint32_t size){
     return buffer;
 }
 
-void LvglHandler::initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t size, uint32_t width, uint32_t height){
-    buffer.header.cf = LV_COLOR_FORMAT_RGB565;      
-    buffer.header.w = width;
-    buffer.header.h = height;
-    buffer.header.stride = width * sizeof(lv_color_t);
-    buffer.data = data;
-    buffer.data_size = size;
-    buffer.unaligned_data = data;
-    buffer.handlers = nullptr;
+void LvglHandler::initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t size,
+                                 uint32_t width, uint32_t height, uint32_t stride){
+    const lv_result_t result = lv_draw_buf_init(
+        &buffer,
+        width,
+        height,
+        LV_COLOR_FORMAT_RGB565,
+        stride,
+        data,
+        size
+    );
+    AssertExit(result == LV_RESULT_OK, "LvglHandler", "lv_draw_buf_init failed");
 }
 
 void LvglHandler::myThemeCallback(lv_theme_t* th, lv_obj_t * obj){

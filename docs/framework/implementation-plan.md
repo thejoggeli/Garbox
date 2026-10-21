@@ -67,7 +67,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
-| DISP-01 | TODO | BUILD-01 | Replace manual RGB565 stride/buffer initialization with public LVGL API and validated size calculations. | Compile-time/unit checks prove 320px stride is 640 bytes and 60-row buffer is 38,400 bytes; firmware builds. |
+| DISP-01 | SOFTWARE VERIFIED | BUILD-01 | Replace manual RGB565 stride/buffer initialization with public LVGL API and validated size calculations. | Compile-time/unit checks prove 320px stride is 640 bytes and 60-row buffer is 38,400 bytes; firmware builds. |
 | DISP-02 | TODO | DISP-01, TEST-01 | Model buffer identity/state transitions and validate queue/DMA ownership. | Host model covers partial flushes, three in flight, ordered completion, duplicate/wrong completion, and reuse. |
 | DISP-03 | TODO | DISP-02, SYNC-01 | Propagate transport failure; define screen-change and shutdown behavior. | Failure injection reaches defined fault state, releases/invalidates ownership safely, and does not deadlock. |
 | DISP-04 | HARDWARE BLOCKED | DISP-03 | Benchmark unchanged architecture and corrected implementation. | Full/small/chart/load metrics plus CPU, skipped frames, heap, stack, and main latency are recorded comparably. |

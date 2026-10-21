@@ -69,3 +69,13 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Aligned the implementation with the target bounded-cascade contract: reaching the configured pass limit with state/event work still queued now raises `TriggerExit` before retaining the pool.
 - The host assert handler deliberately returns, allowing the regression to prove that the queued event remains intact even after the fatal signal. Exact-limit stable completion raises no assertion and resets the pool normally.
 - Native ASan/UBSan suite: 37 of 37 tests passed in 2.380 seconds. ESP32-S3 build passed in 34.354 seconds at 30,224 bytes RAM and 859,137 bytes flash.
+
+## 2026-10-21 — DISP-01
+
+- Replaced direct writes to LVGL's internal `lv_draw_buf_t` fields with the public `lv_draw_buf_init()` API.
+- RGB565 allocation geometry is explicit and overflow-safe: the configured 320-pixel width has a 640-byte stride, and each 60-row partial buffer occupies 38,400 bytes.
+- At initialization, the independently calculated stride is checked against `lv_draw_buf_width_to_stride(..., LV_COLOR_FORMAT_RGB565)` from the pinned LVGL version before any buffer is registered.
+- Preserved the existing three-buffer, render-task, queue, and chunked-DMA architecture; this milestone changes buffer construction, not transport scheduling.
+- Native ASan/UBSan suite: 38 of 38 tests passed in 1.345 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 34.009 seconds: 30,232 bytes RAM (equal to baseline) and 859,481 bytes flash (392 more than baseline).
+- Physical color order, orientation, rendering, and sustained DMA behavior remain unverified until target hardware is available and are tracked by DISP-04.

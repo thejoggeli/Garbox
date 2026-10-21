@@ -52,9 +52,10 @@ private:
     const uint32_t mHeight;
     const uint32_t mBytesPerPixel;
     const uint32_t mPartialFactor;
-    const uint32_t mBufferSize;
     const uint32_t mBufferWidth;
     const uint32_t mBufferHeight;
+    const uint32_t mBufferStride;
+    const uint32_t mBufferSize;
 
     // trampolines
     static void handleFlush(lv_display_t* disp, const lv_area_t* area, uint8_t* pixelMap);
@@ -66,7 +67,8 @@ private:
 
     // buffer helpers
     static uint8_t* allocDrawBufferData(uint32_t size);
-    static void initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t size, uint32_t width, uint32_t height);
+    static void initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t size,
+                               uint32_t width, uint32_t height, uint32_t stride);
 
     // theme helpers
     static void myThemeCallback(lv_theme_t * th, lv_obj_t * obj);
