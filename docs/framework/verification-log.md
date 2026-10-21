@@ -79,3 +79,14 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native ASan/UBSan suite: 38 of 38 tests passed in 1.345 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 34.009 seconds: 30,232 bytes RAM (equal to baseline) and 859,481 bytes flash (392 more than baseline).
 - Physical color order, orientation, rendering, and sustained DMA behavior remain unverified until target hardware is available and are tracked by DISP-04.
+
+## 2026-10-21 — DISP-02
+
+- Added a fixed-capacity ownership tracker for the three exact LVGL draw-buffer addresses and integrated it with the real flush queue, sender task, and final chunk-completion path.
+- The tracker mirrors FIFO order and rejects unknown or duplicate buffers, duplicate queueing, out-of-order DMA starts, multiple DMA owners, wrong/duplicate completion, and invalid reuse.
+- FreeRTOS semaphores remain the blocking/backpressure mechanism. A dedicated recursive mutex serializes identity/FIFO state transitions across render, sender, and SPI completion tasks.
+- A failed FreeRTOS queue insertion now rolls back both tracker ownership and the free-buffer token. Queue, render-ready, and tracker synchronization objects are all checked with fatal initialization assertions.
+- Host coverage exercises repeated partial flushes, all three buffers in flight, ordered completion, duplicate and wrong transitions, queue rollback, and post-completion reuse.
+- Native ASan/UBSan suite: 42 of 42 tests passed in 1.311 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 34.472 seconds: 30,288 bytes RAM (56 more than baseline) and 860,709 bytes flash (1,620 more than baseline).
+- Physical scheduling, panel output, and sustained-load behavior remain hardware-gated under DISP-04; transport failure and shutdown semantics remain DISP-03.

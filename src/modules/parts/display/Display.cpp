@@ -6,6 +6,7 @@
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
 #include "core/hardware/spi/SpiDma.h"
+#include "core/rtos/LockGuard.h"
 #include "core/util/helpers/ByteUtils.h"
 #include "core/util/color/types/Rgb565.h"
 #include "core/util/color/types/Rgb888.h"
@@ -14,6 +15,8 @@
 #define GarboxDebugDisplay 0
 
 namespace Garbox {
+
+static_assert(LvglHandler::DrawBufferCount == DisplayBufferTracker::Capacity);
 
 Display::Display(const Config& config): 
     // init members 
@@ -54,17 +57,26 @@ void Display::init(){
 
     // init lvgl handler
     mLvglHandler.init();
+    for(const uint8_t* buffer : mLvglHandler.getDrawBufferPointers()){
+        const DisplayBufferTracker::Result result = mBufferTracker.registerBuffer(buffer);
+        AssertExit(result == DisplayBufferTracker::Result::Ok,
+                   "Display", "failed to register draw buffer", static_cast<int32_t>(result));
+    }
 
     // create semaphores
-    mBufferCounter = xSemaphoreCreateCounting(3, 3); // 3 free buffers at startup
+    constexpr UBaseType_t bufferCount = static_cast<UBaseType_t>(DisplayBufferTracker::Capacity);
+    mBufferCounter = xSemaphoreCreateCounting(bufferCount, bufferCount);
     mRenderTrigger = xSemaphoreCreateBinary();
     mRenderReady = xSemaphoreCreateBinary();
     mDmaBarrier = xSemaphoreCreateBinary();
-    xSemaphoreGive(mRenderReady);
+    mBufferTrackerMutex = xSemaphoreCreateRecursiveMutex();
 
     AssertExit(mBufferCounter != nullptr, "Display", "failed to create buffer sem");
     AssertExit(mRenderTrigger != nullptr, "Display", "failed to create display mutex");
+    AssertExit(mRenderReady != nullptr, "Display", "failed to create render-ready sem");
     AssertExit(mDmaBarrier != nullptr, "Display", "failed to create dma sem");
+    AssertExit(mBufferTrackerMutex != nullptr, "Display", "failed to create buffer-tracker mutex");
+    xSemaphoreGive(mRenderReady);
 
     // set handlers
     mLvglHandler.setFlushHandler([this](const RectXXYY<int32_t>& area, uint8_t* buffer){
@@ -84,8 +96,8 @@ void Display::init(){
     });
 
     // create queue
-    mSendQueue = xQueueCreate(3, sizeof(SendQueueEntry));
-    AssertDebug(mSendQueue != nullptr, "Display", "create queue failed");
+    mSendQueue = xQueueCreate(DisplayBufferTracker::Capacity, sizeof(SendQueueEntry));
+    AssertExit(mSendQueue != nullptr, "Display", "create queue failed");
 
     // initialization complete
     mInitialized = true;
@@ -155,6 +167,17 @@ void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
     // first ensure buffer availability
     xSemaphoreTake(mBufferCounter, portMAX_DELAY);
 
+    DisplayBufferTracker::Result queueResult;
+    {
+        LockGuard lock(mBufferTrackerMutex);
+        queueResult = mBufferTracker.queue(data);
+    }
+    if(queueResult != DisplayBufferTracker::Result::Ok){
+        xSemaphoreGive(mBufferCounter);
+        TriggerExit("Display", "invalid draw-buffer queue transition", static_cast<int32_t>(queueResult));
+        return;
+    }
+
     // debug logging
 #if GarboxDebugDisplay
     if(pixelMap == mDrawBufferData1){
@@ -178,6 +201,14 @@ void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
     entry.rect = rect;
 
     if(xQueueSend(mSendQueue, &entry, 0) != pdTRUE){
+        DisplayBufferTracker::Result cancelResult;
+        {
+            LockGuard lock(mBufferTrackerMutex);
+            cancelResult = mBufferTracker.cancelQueued(data);
+        }
+        AssertExit(cancelResult == DisplayBufferTracker::Result::Ok,
+                   "Display", "failed to roll back draw-buffer queue", static_cast<int32_t>(cancelResult));
+        xSemaphoreGive(mBufferCounter);
         TriggerExit("Display", "flush queue is full");
         return;
     }
@@ -193,6 +224,19 @@ void Display::handleSenderTask(){
     SendQueueEntry entry;
     while(true){
         if(xQueueReceive(mSendQueue, &entry, portMAX_DELAY) == pdTRUE) {
+            DisplayBufferTracker::Result dmaResult;
+            {
+                LockGuard lock(mBufferTrackerMutex);
+                dmaResult = mBufferTracker.beginDma(entry.data);
+                if(dmaResult == DisplayBufferTracker::Result::Ok){
+                    mActiveSendBuffer = entry.data;
+                }
+            }
+            if(dmaResult != DisplayBufferTracker::Result::Ok){
+                TriggerExit("Display", "invalid draw-buffer DMA transition", static_cast<int32_t>(dmaResult));
+                continue;
+            }
+
             // send data to display via spi
             // the send command sends 3 spi sync commands, followed by 1 spi async (dma) command
             // the ST7789 requires this, which is why we can't directly queue DMA commands and
@@ -213,6 +257,20 @@ void Display::handleSenderTask(){
 
 void Display::handleChunkComplete(bool success){
     mSt7789v.onSendAsyncComplete();
+
+    DisplayBufferTracker::Result result;
+    {
+        LockGuard lock(mBufferTrackerMutex);
+        result = mBufferTracker.completeDma(mActiveSendBuffer);
+        if(result == DisplayBufferTracker::Result::Ok){
+            mActiveSendBuffer = nullptr;
+        }
+    }
+    if(result != DisplayBufferTracker::Result::Ok){
+        TriggerExit("Display", "invalid draw-buffer completion", static_cast<int32_t>(result));
+        return;
+    }
+
     // return one free-buffer token
     xSemaphoreGive(mBufferCounter);
     // notify sender task that dma is complete and safe to start another spi call (pong)

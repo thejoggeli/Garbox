@@ -5,6 +5,7 @@
 #include <lvgl.h>
 
 #include "core/hardware/spi/SpiDmaChunkSender.h"
+#include "core/lvgl/helpers/DisplayBufferTracker.h"
 #include "core/rtos/Task.h"
 #include "modules/parts/display/LvglHandler.h"
 #include "modules/parts/display/St7789v.h"
@@ -74,6 +75,8 @@ private:
 
     // state
     bool mInitialized = false;
+    DisplayBufferTracker mBufferTracker;
+    uint8_t* mActiveSendBuffer = nullptr;
 
     // lvgl display configuration
     const uint32_t mWidth;
@@ -84,13 +87,14 @@ private:
     Task mSenderTask; // worker that sends pixeldata to display via SPI
 
     // queue for sender task
-    QueueHandle_t mSendQueue;
+    QueueHandle_t mSendQueue = nullptr;
 
     // semaphores
-    SemaphoreHandle_t mBufferCounter; // semaphore counts how many draw buffers are free (3 for triple buffering)
-    SemaphoreHandle_t mRenderTrigger; // display render barrier
-    SemaphoreHandle_t mRenderReady; // display render barrier
-    SemaphoreHandle_t mDmaBarrier; // dma semaphore
+    SemaphoreHandle_t mBufferCounter = nullptr; // counts free draw buffers
+    SemaphoreHandle_t mRenderTrigger = nullptr; // display render barrier
+    SemaphoreHandle_t mRenderReady = nullptr; // display render barrier
+    SemaphoreHandle_t mDmaBarrier = nullptr; // dma semaphore
+    SemaphoreHandle_t mBufferTrackerMutex = nullptr; // protects buffer identity/FIFO transitions
 
     // callback handlers
     void handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data);

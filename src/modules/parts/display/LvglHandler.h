@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <lvgl.h>
@@ -9,6 +11,8 @@ namespace Garbox {
 
 class LvglHandler {
 public:
+
+    static constexpr std::size_t DrawBufferCount = 3U;
 
     using FlushHandler = std::function<void(const RectXXYY<int32_t> area, uint8_t* buffer)>;
     using FlushWaitHandler = std::function<void()>;
@@ -28,6 +32,7 @@ public:
 
     void setFlushHandler(FlushHandler handler);
     void setFlushWaitHandler(FlushWaitHandler handler);
+    std::array<const uint8_t*, DrawBufferCount> getDrawBufferPointers() const;
 
 private: 
 

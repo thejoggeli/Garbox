@@ -99,6 +99,11 @@ void LvglHandler::setFlushWaitHandler(FlushWaitHandler handler){
     mFlushWaitHandler = handler;
 }
 
+std::array<const uint8_t*, LvglHandler::DrawBufferCount> LvglHandler::getDrawBufferPointers() const {
+    AssertExit(mInitialized, "LvglHandler", "not initialized");
+    return {mDrawBufferData1, mDrawBufferData2, mDrawBufferData3};
+}
+
 void LvglHandler::handleFlush(lv_display_t* disp, const lv_area_t* area, uint8_t* pixelMap){
     AssertExit(disp != nullptr, "LvglHandler", "disp is nullptr");
     LvglHandler* self = static_cast<LvglHandler*>(lv_display_get_user_data(disp));

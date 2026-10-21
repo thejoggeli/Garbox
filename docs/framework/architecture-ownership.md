@@ -131,10 +131,10 @@ The target is conventional RAII plus explicit fixed-capacity semantics. Types th
 
 ## Display buffer ownership
 
-The intended states for each LVGL partial buffer are:
+The enforced ownership states for each LVGL partial buffer are:
 
 ```text
-Reusable → Rendering → Queued → DMA-owned → Reusable
+LVGL-owned (Reusable/Rendering) → Queued → DMA-owned → LVGL-owned
 ```
 
 - **Reusable:** LVGL may select the buffer for a draw operation.
@@ -143,7 +143,7 @@ Reusable → Rendering → Queued → DMA-owned → Reusable
 - **DMA-owned:** the sender has set the ST7789 window and the chunk sender is still reading the buffer.
 - **Reusable:** final DMA completion has released chip-select and returned ownership.
 
-Current enforcement uses only a free-buffer count. It does not track or validate buffer identity. Correctness therefore depends on LVGL buffer rotation and FIFO transport order matching the counting-semaphore model.
+`DisplayBufferTracker` registers the three exact allocation addresses and enforces the observable transitions. Its fixed-capacity FIFO must agree with the FreeRTOS send queue, only its head may become DMA-owned, only one DMA owner may exist, and completion must name that same buffer. Unknown, duplicate, out-of-order, and repeated transitions are fatal invariant violations. A recursive mutex protects the tracker across the render, sender, and SPI completion tasks; the counting semaphore remains responsible for blocking/backpressure. The tracker deliberately treats LVGL's internal reusable/rendering distinction as one `LvglOwned` state because there is no driver callback at the start of software rendering.
 
 Application-side LVGL object mutation occurs in `MainTask` only after taking the render-ready token. It finishes before triggering the display render task. `lv_timer_handler()` then runs alone. Because LVGL is configured with `LV_OS_NONE`, this handshake is the entire thread-safety contract.
 

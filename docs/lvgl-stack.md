@@ -294,7 +294,7 @@ ST7789 completion
 LVGL may reuse the buffer
 ```
 
-The free-buffer semaphore provides backpressure between LVGL and transport. Its count, the flush queue capacity, and the number of draw buffers are all three. `flush_wait_cb` waits until at least one DMA transfer returns a token before allowing LVGL to reuse storage.
+The free-buffer semaphore provides backpressure between LVGL and transport. Its count, the flush queue capacity, and the number of draw buffers are all three. `flush_wait_cb` waits until at least one DMA transfer returns a token before allowing LVGL to reuse storage. A separate fixed-capacity identity tracker mirrors the queue order and validates each registered pointer's `LvglOwned → Queued → DmaOwned → LvglOwned` lifecycle; a mutex serializes those transitions across the three display-related tasks.
 
 The controller records skipped frames when the previous `lv_timer_handler()` call has not finished. Rendering is therefore opportunistic rather than allowed to stall the main application tick.
 
@@ -337,7 +337,7 @@ The current handshake is coherent:
 
 This prevents the normal screen update path and LVGL rendering from running concurrently. It is, however, an implicit system rule: any future code that calls an LVGL or wrapper function from another task can violate it. The rule should be stated in code documentation and preferably guarded with task-context assertions or one centralized UI command boundary.
 
-DMA transfer continues after `lv_timer_handler()` returns, but the buffer-count protocol prevents LVGL from reusing an in-flight draw buffer.
+DMA transfer continues after `lv_timer_handler()` returns. The buffer-count protocol prevents LVGL from reusing an in-flight draw buffer, while the identity tracker detects count/queue/pointer drift instead of assuming that any returned token represents the right allocation.
 
 ## 10. What is especially good
 
