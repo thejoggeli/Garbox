@@ -190,6 +190,10 @@ void RuntimeAbs::dispatch(){
     if(mDirtyStates.size() == 0 && mEventQueue.size() == 0){
         mEventFactory.releaseDataPool();
     }
+    else {
+        const std::size_t pendingCount = mDirtyStates.size() + mEventQueue.size();
+        TriggerExit("RuntimeAbs", "dispatch pass limit exceeded", static_cast<int32_t>(pendingCount));
+    }
 }
 
 void RuntimeAbs::dispatchStates(){

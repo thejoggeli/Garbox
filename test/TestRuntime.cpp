@@ -5,8 +5,10 @@
 #include <unity.h>
 
 #include "core/application/runtime/RuntimeAbs.h"
+#include "helpers/AssertHelper.h"
 
 using namespace Garbox;
+using namespace GarboxTest;
 
 namespace {
 
@@ -79,6 +81,7 @@ void assertRoutedIds(const CascadeRuntime& runtime,
 }
 
 void test_event_cascade_at_pass_limit_releases_pool_when_stable(){
+    TEST_RESET_ASSERTS();
     static CascadeRuntime* runtime = new CascadeRuntime(2);
     runtime->cascadeFor(1);
 
@@ -87,6 +90,7 @@ void test_event_cascade_at_pass_limit_releases_pool_when_stable(){
     runtime->dispatch();
 
     assertRoutedIds(*runtime, {1, 2});
+    TEST_ASSERT_NO_ASSERTS();
 
     // Stable completion resets the bump pool, so its first address is reused.
     const EventHeader* allocationAfterStableDispatch = runtime->submitHeartbeat();
@@ -94,6 +98,7 @@ void test_event_cascade_at_pass_limit_releases_pool_when_stable(){
 }
 
 void test_event_cascade_beyond_pass_limit_retains_queued_storage(){
+    TEST_RESET_ASSERTS();
     static CascadeRuntime* runtime = new CascadeRuntime(2);
     runtime->cascadeFor(2);
 
@@ -103,14 +108,18 @@ void test_event_cascade_beyond_pass_limit_retains_queued_storage(){
 
     // IDs 1 and 2 route in the two allowed passes; ID 3 stays queued.
     assertRoutedIds(*runtime, {1, 2});
+    TEST_ASSERT_EQUAL_UINT32(0U, AssertDebugCount);
+    TEST_ASSERT_EQUAL_UINT32(1U, AssertExitCount);
 
     // These allocations overwrite ID 3 under the old premature pool reset.
+    TEST_RESET_ASSERTS();
     runtime->submitHeartbeat();
     runtime->submitHeartbeat();
     runtime->submitHeartbeat();
     runtime->dispatch();
 
     assertRoutedIds(*runtime, {1, 2, 3, 4, 5, 6});
+    TEST_ASSERT_NO_ASSERTS();
 
     // The second dispatch is stable, so the pool may now be reused safely.
     const EventHeader* allocationAfterStableDispatch = runtime->submitHeartbeat();

@@ -63,3 +63,9 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Fake-clock coverage includes zero-duration/reset behavior, `UINT32_MAX` crossing, missed periods, a 4,000,000,321-microsecond stall, both PWM phase modes, 0%/100%, pre-start configuration, deferred/immediate duty and period changes, and stop/restart.
 - Native ASan/UBSan suite: 37 of 37 tests passed in 2.312 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 95.700 seconds: 30,224 bytes RAM (8 fewer than baseline) and 859,105 bytes flash (16 more than baseline).
+
+## 2026-10-21 — EVT-01 contract refinement
+
+- Aligned the implementation with the target bounded-cascade contract: reaching the configured pass limit with state/event work still queued now raises `TriggerExit` before retaining the pool.
+- The host assert handler deliberately returns, allowing the regression to prove that the queued event remains intact even after the fatal signal. Exact-limit stable completion raises no assertion and resets the pool normally.
+- Native ASan/UBSan suite: 37 of 37 tests passed in 2.380 seconds. ESP32-S3 build passed in 34.354 seconds at 30,224 bytes RAM and 859,137 bytes flash.
