@@ -53,7 +53,7 @@ public:
 
 private:
 
-    void startNextCycle();
+    void startNextCycle(bool restartNow = false);
     void updateState();
     void enterState(State state);
     void updateThreshold();
@@ -70,8 +70,6 @@ private:
     State mState = State::Reset;
     Mode mMode = Mode::StartLow;
     Handler mHandler = nullptr;
-
-    bool mFirstTick = true;
 
 };
 

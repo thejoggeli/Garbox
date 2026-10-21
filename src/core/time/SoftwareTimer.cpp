@@ -50,10 +50,13 @@ void SoftwareTimer::restartInner(){
     // get current time
     uint32_t currentTimeMicros = Time::GetMicros();
 
-    // keep adding full periods until next target is in the future
-    // works correctly with uint32_t wrap-around
-    while ((uint32_t)(currentTimeMicros - mStartTimeMicros) >= mDurationMicros){
-        mStartTimeMicros += mDurationMicros;
+    // Advance directly to the most recent period boundary. Unsigned
+    // subtraction/multiplication preserve the intended modulo-2^32 timer
+    // behavior without an unbounded catch-up loop after a long stall.
+    const uint32_t elapsedMicros = currentTimeMicros - mStartTimeMicros;
+    if(elapsedMicros >= mDurationMicros){
+        const uint32_t elapsedPeriods = elapsedMicros / mDurationMicros;
+        mStartTimeMicros += elapsedPeriods * mDurationMicros;
     }
 }
 

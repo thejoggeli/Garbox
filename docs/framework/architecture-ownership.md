@@ -93,7 +93,7 @@ dispatchStates → mLast = mCurrent; mCurrent = mNext; clear dirty
               → route state-changed callbacks
 ```
 
-Normal getters read published `mCurrent`. Pending getters are intended to read `mNext`; the current generator incorrectly emits reads from `mCurrent`. Previous getters read `mLast`.
+Normal getters read published `mCurrent`, pending getters read staged `mNext`, and previous getters read `mLast`. The pending getter contract is covered by a generated-state host regression.
 
 The configuration assigns one writer and zero or more readers. Generated component state bundles enforce that topology at compile time. State mutation/publication belongs to `MainTask`; auxiliary tasks must not write generated state directly.
 
@@ -103,7 +103,9 @@ Changes made while routing state callbacks enter the dirty queue for a later cas
 
 The generated tick runner executes ordered phases on a nominal 33 ms period and dispatches state/events after each phase. The phase boundary is the application visibility boundary.
 
-`Time::GetMicros()` truncates the ESP timer to `uint32_t`, wrapping every 2^32 microseconds (about 71.6 minutes). Short timers use unsigned subtraction, which is wrap-safe provided durations stay below the unsigned ambiguity limit and consumers do not require absolute timestamps. Millisecond and second snapshots wrap on much longer periods.
+`Time::GetMicros()` truncates the ESP timer to `uint32_t`, wrapping every 2^32 microseconds (about 71.6 minutes). `SoftwareTimer` uses unsigned subtraction and is valid across a wrap provided it is observed before a complete counter lap becomes indistinguishable. Restart skips missed periods in constant work while retaining the most recent period boundary. Millisecond and second snapshots wrap on much longer periods.
+
+`SoftwarePwm` applies configuration made while stopped to its first cycle. While running, `finishCurrent=true` stages duty/period changes for the next natural boundary; `finishCurrent=false` starts a new cycle at the call time. Phase modes and the 0%/100% constant-output cases follow the same timer contract.
 
 Current time contracts are inconsistent: most timers use 32-bit microseconds, while advertised history windows exceed what 32-bit microseconds can represent. The target is to keep 32-bit modular time for short real-time intervals and use 64-bit duration/accumulation types for multi-hour/day data.
 

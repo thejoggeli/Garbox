@@ -22,7 +22,6 @@ void SoftwarePwm::start(){
     if(isRunning()){
         return;
     }
-    mFirstTick = true;
     startNextCycle();
 }
 
@@ -49,10 +48,9 @@ void SoftwarePwm::tick(){
     else {
         updateState();
     }
-    mFirstTick = false;
 }
 
-void SoftwarePwm::startNextCycle(){
+void SoftwarePwm::startNextCycle(bool restartNow){
 
     bool thresholdNeedsUpdate = false;
 
@@ -74,7 +72,7 @@ void SoftwarePwm::startNextCycle(){
     }
 
     // restart timer
-    if(mTimer.isReset()){
+    if(mTimer.isReset() || restartNow){
         mTimer.start(mCurrentPeriodDurationMicros);
     }
     else {
@@ -141,17 +139,21 @@ void SoftwarePwm::setPeriodDurationMicros(uint32_t durationMicros, bool finishCu
         return; 
     }
 
-    // pwm not started yet, we can still set the current period cycle
-    if(mFirstTick || !isRunning()){
+    // Before start there is no active cycle, so update both snapshots and the
+    // threshold that the first cycle will use.
+    if(!isRunning()){
         mCurrentPeriodDurationMicros = durationMicros;
+        mNextPeriodDurationMicros = durationMicros;
+        updateThreshold();
+        return;
     }
 
     // queue period duration for next pwm cycle 
     mNextPeriodDurationMicros = durationMicros;
 
     // start next pwm cycle immediately
-    if(!finishCurrent && isRunning()){
-        startNextCycle();
+    if(!finishCurrent){
+        startNextCycle(true);
     }
 }
 
@@ -162,17 +164,21 @@ void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
         return; 
     }
 
-    // pwm not started yet, we can still set the current duty cycle
-    if(mFirstTick || !isRunning()){
+    // Before start there is no active cycle, so update both snapshots and the
+    // threshold that the first cycle will use.
+    if(!isRunning()){
         mCurrentDutyCycle = duty;
+        mNextDutyCycle = duty;
+        updateThreshold();
+        return;
     }
 
     // queue duty cycle for next pwm cycle 
     mNextDutyCycle = duty;
 
     // start next pwm cycle immediately
-    if(!finishCurrent && isRunning()){
-        startNextCycle();
+    if(!finishCurrent){
+        startNextCycle(true);
     }
 }
 

@@ -6,7 +6,11 @@
 namespace Garbox {
 
 /**
- * Uses microseconds for maximum performance on esp32
+ * Uses modulo-2^32 microseconds for short real-time intervals.
+ *
+ * Elapsed-time checks remain valid across one counter wrap as long as the
+ * timer is observed before a complete 2^32-microsecond lap becomes
+ * indistinguishable. restart() skips missed periods and preserves phase.
  */
 class SoftwareTimer {
 public:

@@ -53,3 +53,13 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Expanding host coverage exposed an unqualified-name lookup failure in `DataPoolHeap` under the native compiler; explicitly qualifying its storage base fixed the public header without changing target behavior.
 - Native ASan/UBSan suite: 26 of 26 tests passed in 8.464 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 124.888 seconds: RAM remains 30,232 bytes; flash is 859,105 bytes, a 16-byte increase from baseline.
+
+## 2026-10-21 — TIME-01, PWM-01
+
+- Replaced `SoftwareTimer`'s period-by-period catch-up loop with constant-work modular arithmetic while retaining the latest phase boundary.
+- Documented the 32-bit timer observation limit; long history horizons remain a separate 64-bit task.
+- Removed the ambiguous PWM “first tick” window. Configuration made while stopped now defines the first cycle and recalculates its threshold.
+- Running changes with `finishCurrent=true` remain staged for the next natural cycle. Changes with `finishCurrent=false` now start a new cycle immediately rather than retaining the previous cycle's time origin.
+- Fake-clock coverage includes zero-duration/reset behavior, `UINT32_MAX` crossing, missed periods, a 4,000,000,321-microsecond stall, both PWM phase modes, 0%/100%, pre-start configuration, deferred/immediate duty and period changes, and stop/restart.
+- Native ASan/UBSan suite: 37 of 37 tests passed in 2.312 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 95.700 seconds: 30,224 bytes RAM (8 fewer than baseline) and 859,105 bytes flash (16 more than baseline).

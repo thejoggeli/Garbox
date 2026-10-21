@@ -13,6 +13,7 @@ void RegisterContainerTests();
 void RegisterRuntimeTests();
 void RegisterStateTests();
 void RegisterTimeTests();
+void RegisterTimerPwmTests();
 
 static void assertRgbNear(const RgbFloat& c, float r, float g, float b, float eps){
     TEST_ASSERT_FLOAT_WITHIN(eps, r, c.r);
@@ -454,6 +455,7 @@ int main(int argc, char **argv){
     RegisterRuntimeTests();
     RegisterStateTests();
     RegisterTimeTests();
+    RegisterTimerPwmTests();
 
     return UNITY_END();
 }

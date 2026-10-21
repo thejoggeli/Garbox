@@ -1,6 +1,6 @@
 # Verified framework review
 
-This is a finding ledger for the current revision. The earlier [engineering review](../review.md) contains broader Garbox product findings; this file emphasizes reusable-framework contracts and the explicit verification list from the stabilization brief.
+This is the finding ledger established at the 2026-10-20 baseline. It intentionally preserves the original evidence even after a finding is fixed; live resolution status and post-change evidence are recorded in the [implementation plan](implementation-plan.md) and [verification log](verification-log.md). The earlier [engineering review](../review.md) contains broader Garbox product findings.
 
 ## Critical
 
