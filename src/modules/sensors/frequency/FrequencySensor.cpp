@@ -41,11 +41,8 @@ void FrequencySensor::init(Config const& config){
     gpioConfig.interrupt = Gpio::Interrupt::PositiveEdge;
     mGpio.applyConfig(gpioConfig);
 
-    // add ISR handler to gpio
-    mGpio.addInterruptHandler(isrHandler, this);
-    
-    // Register per-instance ISR (context pointer passed to handler)
-    portENTER_CRITICAL(&mFrequencySensorMux);
+    // Register this instance exactly once. The GPIO ISR service is installed
+    // globally during startup before any parts are initialized.
     if(!mGpio.addInterruptHandler(isrHandler, this)){
         TriggerExit("FrequencySensor", "add interrupt handler failed");
     }
@@ -54,6 +51,11 @@ void FrequencySensor::init(Config const& config){
     if(!mGpio.setInterruptEnabled(false)){
         TriggerExit("FrequencySensor", "disable interrupt failed");
     }
+
+    portENTER_CRITICAL(&mFrequencySensorMux);
+    vLastEdgeTicks = 0;
+    vCurrentEdgeTicks = 0;
+    vHasNewEdge = false;
     portEXIT_CRITICAL(&mFrequencySensorMux);
 
     // finish initialization
@@ -63,9 +65,12 @@ void FrequencySensor::init(Config const& config){
 void IRAM_ATTR FrequencySensor::isrHandler(void* arg){
     FrequencySensor* self = static_cast<FrequencySensor*>(arg);
     uint64_t nowTicks64 = self->mTimer.getValueFromIsr();
+
+    portENTER_CRITICAL_ISR(&self->mFrequencySensorMux);
     self->vLastEdgeTicks = self->vCurrentEdgeTicks;
     self->vCurrentEdgeTicks = static_cast<uint32_t>(nowTicks64);
     self->vHasNewEdge = true;
+    portEXIT_CRITICAL_ISR(&self->mFrequencySensorMux);
 }
 
 void FrequencySensor::tick(){
@@ -125,17 +130,31 @@ void FrequencySensor::setEnabled(bool enabled){
         return;
     }
 
-    portENTER_CRITICAL(&mFrequencySensorMux);
     if (enabled){
-        mGpio.setInterruptEnabled(true);
+        portENTER_CRITICAL(&mFrequencySensorMux);
+        vHasNewEdge = false;
         mState = State::Idle;
-    } else {
-        mGpio.setInterruptEnabled(false);
+        portEXIT_CRITICAL(&mFrequencySensorMux);
+
+        if(!mGpio.setInterruptEnabled(true)){
+            portENTER_CRITICAL(&mFrequencySensorMux);
+            mState = State::Disabled;
+            portEXIT_CRITICAL(&mFrequencySensorMux);
+            TriggerExit("FrequencySensor", "enable interrupt failed");
+        }
+    }
+    else {
+        if(!mGpio.setInterruptEnabled(false)){
+            TriggerExit("FrequencySensor", "disable interrupt failed");
+            return;
+        }
+
+        portENTER_CRITICAL(&mFrequencySensorMux);
         vHasNewEdge = false;
         mMeasuredFrequencyHz = 0;
         mState = State::Disabled;
+        portEXIT_CRITICAL(&mFrequencySensorMux);
     }
-    portEXIT_CRITICAL(&mFrequencySensorMux);
 }
 
 bool FrequencySensor::isEnabled(){

@@ -124,3 +124,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Final native ASan/UBSan suite: 50 of 50 tests passed in 1.846 seconds with no sanitizer diagnostics.
 - Final incremental ESP32-S3 firmware build passed in 38.160 seconds: 30,296 bytes RAM (64 more than baseline) and 862,289 bytes flash (3,200 more than baseline).
 - TASK-01 and DISP-03 are therefore **SOFTWARE VERIFIED**. An ESP-IDF transaction already accepted at shutdown may finish against process-lifetime storage; physical bus/panel behavior and transport-failure injection remain hardware-gated under DISP-04. Hazardous actuator shutdown ordering remains SAFE-01.
+
+## 2026-10-21 — ISR-01
+
+- Removed the duplicate frequency-sensor `gpio_isr_handler_add()` call. The per-instance handler is now registered exactly once and the result is fatal-checked.
+- Kept GPIO driver calls and failure reporting outside port critical sections.
+- The frequency ISR now protects its edge timestamp/flag update with `portENTER_CRITICAL_ISR`; task code uses the matching task-context critical section for coherent snapshot/reset operations.
+- Startup remains the sole owner of `gpio_install_isr_service()`, executed before parts attach handlers.
+- ESP32-S3 firmware build passed in 34.263 seconds: 30,296 bytes RAM (64 more than baseline) and 862,421 bytes flash (3,332 more than baseline).
+- Native tests do not emulate ESP32 interrupt dispatch; target tachometer edge/timeout behavior remains hardware-gated.

@@ -91,7 +91,8 @@ void setup(){
     AssertHandler::SetDebugHandler(handleAssertDebug);
     AssertHandler::SetExitHandler(handleAssertExit);
 
-    // install ISR service once globally (safe to call multiple times)
+    // Install the per-pin GPIO ISR service exactly once, before parts attach
+    // their instance handlers.
     if (gpio_install_isr_service(0) != ESP_OK){
         TriggerExit("Main", "gpio_install_isr_service failed");
     }
