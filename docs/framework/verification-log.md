@@ -102,3 +102,13 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native ASan/UBSan suite: 45 of 45 tests passed in 7.003 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware build passed in 37.828 seconds: 30,288 bytes RAM (56 more than baseline) and 860,793 bytes flash (1,704 more than baseline).
 - ISR registration and target interrupt behavior remain separately tracked by ISR-01; no mutex guard is permitted in ISR context.
+
+## 2026-10-21 — DISP-03 transport-failure slice
+
+- Extended `DisplayBufferTracker` with explicit `Running`, `Faulted`, and `Stopped` lifecycle states plus a terminal `Invalid` state for every registered allocation.
+- A failed final DMA chunk now verifies the active buffer identity, invalidates queued/in-flight ownership, deselects the panel, releases the sender barrier, and then raises the fatal signal. It deliberately does not return an LVGL reuse token.
+- Terminal display states reject new render, flush, queue, and completion work. Stop is idempotent and preserves an earlier fault state.
+- Screen changes remain safe under the existing render-ready handshake: activation precedes the next render, while generated screen trees and draw-buffer allocations have process lifetime. An older transfer therefore cannot reference freed screen or buffer memory.
+- Native ASan/UBSan suite: 47 of 47 tests passed in 3.179 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware build passed in 34.723 seconds: 30,296 bytes RAM (64 more than baseline) and 861,329 bytes flash (2,240 more than baseline).
+- This is intentionally not marked software-verified yet. Generic `Task::stop()` still directly deletes tasks and can interrupt the sender while it owns the SPI path; TASK-01 must close that deadlock risk. Physical transport-failure injection remains hardware-gated.

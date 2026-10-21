@@ -153,6 +153,8 @@ The enforced ownership states for each LVGL partial buffer are:
 
 ```text
 LVGL-owned (Reusable/Rendering) → Queued → DMA-owned → LVGL-owned
+                                      └─ transport failure → Invalid / Faulted
+any non-terminal state ── stop → Invalid / Stopped
 ```
 
 - **Reusable:** LVGL may select the buffer for a draw operation.
@@ -163,13 +165,17 @@ LVGL-owned (Reusable/Rendering) → Queued → DMA-owned → LVGL-owned
 
 `DisplayBufferTracker` registers the three exact allocation addresses and enforces the observable transitions. Its fixed-capacity FIFO must agree with the FreeRTOS send queue, only its head may become DMA-owned, only one DMA owner may exist, and completion must name that same buffer. Unknown, duplicate, out-of-order, and repeated transitions are fatal invariant violations. A normal mutex protects the tracker across the render, sender, and SPI completion tasks; the counting semaphore remains responsible for blocking/backpressure. The tracker deliberately treats LVGL's internal reusable/rendering distinction as one `LvglOwned` state because there is no driver callback at the start of software rendering.
 
+A failed final chunk completion changes the tracker to `Faulted`, invalidates all registered buffers, clears its logical queue/current-DMA identity, releases the sender barrier, and then raises the fatal signal. A normal stop changes it to `Stopped` and also invalidates every buffer. Both terminal states reject future render, flush, queue, and completion work; a later stop preserves an earlier fault diagnosis. The allocations themselves have process lifetime, so a hardware DMA engine that has already captured an address cannot read freed memory. TASK-01 still has to replace direct task deletion before this is a complete deadlock-free shutdown contract.
+
 Application-side LVGL object mutation occurs in `MainTask` only after taking the render-ready token. It finishes before triggering the display render task. `lv_timer_handler()` then runs alone. Because LVGL is configured with `LV_OS_NONE`, this handshake is the entire thread-safety contract.
+
+Screen activation follows that same render-ready boundary: the queued generated screen becomes active before the next render is triggered. All generated screen trees and draw-buffer allocations remain alive for the process lifetime. Consequently a screen change does not invalidate memory referenced by an older in-flight transfer and does not require draining DMA; buffer reuse remains governed by the normal ownership protocol.
 
 The RGB565 buffer contract is `stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_RGB565)` and `data_size >= stride * height`. `LvglHandler` now computes the two-byte RGB565 geometry independently, verifies it against LVGL's public stride helper, and initializes each buffer through `lv_draw_buf_init()`. For the configured 320 by 60 partial buffers this is a 640-byte stride and 38,400-byte allocation. Physical color, orientation, and sustained-transfer validation remains hardware-gated.
 
 ## Failure and shutdown ownership
 
-At baseline, fatal handling stops registered tasks and produces LED/piezo feedback, but it does not synchronously force the heater and fan GPIO/PWM outputs to safe states before task shutdown. Display and SPI shutdown also leave in-flight work unresolved.
+At baseline, fatal handling stops registered tasks and produces LED/piezo feedback, but it does not synchronously force the heater and fan GPIO/PWM outputs to safe states before task shutdown. The display now enters a terminal ownership state, releases its sender barrier on transport failure, and deselects the panel during stop. However, generic `Task::stop()` still deletes other tasks directly; deleting the display sender while it owns the SPI path can strand a mutex or interrupt an in-flight operation. That remaining shutdown risk is tracked by TASK-01.
 
 Target ordering for fatal shutdown is:
 

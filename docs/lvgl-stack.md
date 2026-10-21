@@ -339,6 +339,8 @@ This prevents the normal screen update path and LVGL rendering from running conc
 
 DMA transfer continues after `lv_timer_handler()` returns. The buffer-count protocol prevents LVGL from reusing an in-flight draw buffer, while the identity tracker detects count/queue/pointer drift instead of assuming that any returned token represents the right allocation.
 
+Screen changes use the same boundary: `MainTask` applies the queued screen only after taking render-ready, then triggers the next render. Generated screen trees and the three draw buffers have process lifetime, so switching the active screen cannot free memory referenced by an older DMA transfer. The transfer need not be drained solely for a screen change.
+
 ## 10. What is especially good
 
 ### It is vertically coherent
@@ -402,10 +404,10 @@ Every generated GUI is constructed at runtime creation. This makes screen change
 
 ### Error and shutdown paths are incomplete
 
-- `Display::stopTasks()` explicitly leaves in-flight SPI handling and final panel state as TODOs.
-- `Display::handleChunkComplete(bool success)` ignores `success`, releases the buffer, and proceeds as if the transport succeeded.
-- the send queue allocation is guarded with a debug assertion rather than the fatal assertion used for semaphores;
-- task/buffer cleanup is absent because these objects are expected to live forever.
+- final chunk failure now deselects the panel, changes all registered buffers to a terminal invalid state, releases the sender barrier, and raises the fatal signal without returning a reusable-buffer token;
+- display stop rejects further render/flush/transport transitions and deselects the panel; process-lifetime buffers keep an already captured DMA address valid;
+- generic task shutdown still uses direct deletion, so it can interrupt the sender while it owns the SPI path. Cooperative/idempotent task stopping remains TASK-01 and is required before DISP-03 can claim deadlock-free shutdown;
+- FreeRTOS queues, semaphores, task wrappers, and draw buffers are process-lifetime objects and have no teardown/restart contract.
 
 Normal operation can work while these paths remain weak, but fatal handling occurs in a system that may be actively driving DMA. They should be made deterministic.
 

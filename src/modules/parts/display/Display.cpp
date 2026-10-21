@@ -122,10 +122,22 @@ void Display::startSenderTask(const char* name, uint32_t stackSize, UBaseType_t 
 }
 
 void Display::stopTasks(){
-    mRenderTask.stop();
-    mSenderTask.stop();
-    // TODO stop all spi activity
-    // TODO leave display in a defined state after stopping
+    {
+        MutexGuard lock(mBufferTrackerMutex);
+        mBufferTracker.stop();
+        mActiveSendBuffer = nullptr;
+    }
+
+    if(mRenderTask.isRunning() && !mRenderTask.isCurrentTask()){
+        mRenderTask.stop();
+    }
+    if(mSenderTask.isRunning() && !mSenderTask.isCurrentTask()){
+        mSenderTask.stop();
+    }
+
+    // Buffers have static process lifetime, so an already queued hardware DMA
+    // read remains memory-safe. Deselect the panel and reject all future reuse.
+    mSt7789v.onSendAsyncComplete();
 }
 
 const Task& Display::getRenderTask() const {
@@ -137,6 +149,12 @@ const Task& Display::getSenderTask() const {
 }
 
 bool Display::tryTakeRenderReady(){
+    {
+        MutexGuard lock(mBufferTrackerMutex);
+        if(mBufferTracker.lifecycle() != DisplayBufferTracker::Lifecycle::Running){
+            return false;
+        }
+    }
     if(xSemaphoreTake(mRenderReady, 0) == pdTRUE){
         return true;
     }
@@ -144,6 +162,12 @@ bool Display::tryTakeRenderReady(){
 }
 
 void Display::giveRenderTrigger(){
+    {
+        MutexGuard lock(mBufferTrackerMutex);
+        if(mBufferTracker.lifecycle() != DisplayBufferTracker::Lifecycle::Running){
+            return;
+        }
+    }
     xSemaphoreGive(mRenderTrigger);
 }
 
@@ -164,6 +188,13 @@ void Display::handleRenderTask(){
 
 void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
 
+    {
+        MutexGuard lock(mBufferTrackerMutex);
+        if(mBufferTracker.lifecycle() != DisplayBufferTracker::Lifecycle::Running){
+            return;
+        }
+    }
+
     // first ensure buffer availability
     xSemaphoreTake(mBufferCounter, portMAX_DELAY);
 
@@ -174,6 +205,9 @@ void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
     }
     if(queueResult != DisplayBufferTracker::Result::Ok){
         xSemaphoreGive(mBufferCounter);
+        if(queueResult == DisplayBufferTracker::Result::NotRunning){
+            return;
+        }
         TriggerExit("Display", "invalid draw-buffer queue transition", static_cast<int32_t>(queueResult));
         return;
     }
@@ -215,6 +249,12 @@ void Display::handleFlush(const RectXXYY<int32_t>& rect, uint8_t* data){
 }
 
 void Display::handleFlushWait(){
+    {
+        MutexGuard lock(mBufferTrackerMutex);
+        if(mBufferTracker.lifecycle() != DisplayBufferTracker::Lifecycle::Running){
+            return;
+        }
+    }
     xSemaphoreTake(mBufferCounter, portMAX_DELAY); // block until at least one DMA finishes (token returned)
     // now we are sure that at least one buffer is free to be used by LVGL
     xSemaphoreGive(mBufferCounter); // give token back immediately so next flush_cb can proceed
@@ -233,6 +273,9 @@ void Display::handleSenderTask(){
                 }
             }
             if(dmaResult != DisplayBufferTracker::Result::Ok){
+                if(dmaResult == DisplayBufferTracker::Result::NotRunning){
+                    continue;
+                }
                 TriggerExit("Display", "invalid draw-buffer DMA transition", static_cast<int32_t>(dmaResult));
                 continue;
             }
@@ -259,15 +302,32 @@ void Display::handleChunkComplete(bool success){
     mSt7789v.onSendAsyncComplete();
 
     DisplayBufferTracker::Result result;
+    bool transportFailed = false;
     {
         MutexGuard lock(mBufferTrackerMutex);
-        result = mBufferTracker.completeDma(mActiveSendBuffer);
+        if(mBufferTracker.lifecycle() != DisplayBufferTracker::Lifecycle::Running){
+            mActiveSendBuffer = nullptr;
+            return;
+        }
+
+        result = success
+            ? mBufferTracker.completeDma(mActiveSendBuffer)
+            : mBufferTracker.failDma(mActiveSendBuffer);
         if(result == DisplayBufferTracker::Result::Ok){
             mActiveSendBuffer = nullptr;
+            transportFailed = !success;
         }
     }
     if(result != DisplayBufferTracker::Result::Ok){
         TriggerExit("Display", "invalid draw-buffer completion", static_cast<int32_t>(result));
+        return;
+    }
+
+    // Always release the sender task before escalating a transport failure.
+    // Normal completion additionally returns exactly one reusable LVGL token.
+    if(transportFailed){
+        xSemaphoreGive(mDmaBarrier);
+        TriggerExit("Display", "pixel transport failed");
         return;
     }
 

@@ -10,6 +10,7 @@ namespace {
 
 using Result = DisplayBufferTracker::Result;
 using State = DisplayBufferTracker::State;
+using Lifecycle = DisplayBufferTracker::Lifecycle;
 
 void assertResult(Result expected, Result actual){
     TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(expected), static_cast<uint8_t>(actual));
@@ -106,6 +107,59 @@ void test_display_buffer_queue_rollback_preserves_fifo(){
     assertResult(Result::Ok, tracker.completeDma(&a));
 }
 
+void test_display_transport_failure_invalidates_every_buffer(){
+    DisplayBufferTracker tracker;
+    uint8_t a = 0U;
+    uint8_t b = 0U;
+    uint8_t c = 0U;
+    registerThree(tracker, a, b, c);
+
+    assertResult(Result::Ok, tracker.queue(&a));
+    assertResult(Result::Ok, tracker.queue(&b));
+    assertResult(Result::Ok, tracker.queue(&c));
+    assertResult(Result::Ok, tracker.beginDma(&a));
+    assertResult(Result::WrongDmaCompletion, tracker.failDma(&b));
+    assertResult(Result::Ok, tracker.failDma(&a));
+
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(Lifecycle::Faulted),
+                           static_cast<uint8_t>(tracker.lifecycle()));
+    assertState(State::Invalid, tracker.stateOf(&a));
+    assertState(State::Invalid, tracker.stateOf(&b));
+    assertState(State::Invalid, tracker.stateOf(&c));
+    TEST_ASSERT_EQUAL_UINT32(0U, tracker.queuedCount());
+    TEST_ASSERT_NULL(tracker.dmaBuffer());
+    assertResult(Result::NotRunning, tracker.queue(&a));
+    assertResult(Result::NotRunning, tracker.completeDma(&a));
+
+    tracker.stop();
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(Lifecycle::Faulted),
+                           static_cast<uint8_t>(tracker.lifecycle()));
+}
+
+void test_display_stop_is_terminal_and_idempotent_with_work_in_flight(){
+    DisplayBufferTracker tracker;
+    uint8_t a = 0U;
+    uint8_t b = 0U;
+    uint8_t c = 0U;
+    registerThree(tracker, a, b, c);
+
+    assertResult(Result::Ok, tracker.queue(&a));
+    assertResult(Result::Ok, tracker.queue(&b));
+    assertResult(Result::Ok, tracker.beginDma(&a));
+
+    tracker.stop();
+    tracker.stop();
+
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(Lifecycle::Stopped),
+                           static_cast<uint8_t>(tracker.lifecycle()));
+    assertState(State::Invalid, tracker.stateOf(&a));
+    assertState(State::Invalid, tracker.stateOf(&b));
+    assertState(State::Invalid, tracker.stateOf(&c));
+    TEST_ASSERT_EQUAL_UINT32(0U, tracker.queuedCount());
+    TEST_ASSERT_NULL(tracker.dmaBuffer());
+    assertResult(Result::NotRunning, tracker.completeDma(&a));
+}
+
 } // namespace
 
 void RegisterDisplayBufferTrackerTests(){
@@ -113,4 +167,6 @@ void RegisterDisplayBufferTrackerTests(){
     RUN_TEST(test_display_buffer_rejects_duplicate_and_wrong_transitions);
     RUN_TEST(test_display_buffer_can_be_reused_for_successive_partial_flushes);
     RUN_TEST(test_display_buffer_queue_rollback_preserves_fifo);
+    RUN_TEST(test_display_transport_failure_invalidates_every_buffer);
+    RUN_TEST(test_display_stop_is_terminal_and_idempotent_with_work_in_flight);
 }
