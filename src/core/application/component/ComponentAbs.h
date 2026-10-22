@@ -68,9 +68,6 @@ protected:
             TriggerExit("BehaviourAbs", "not initialized");
         }
         EventView<E> event = mEventFactory->make<E>(mComponentDescriptor);
-        if(!event.header()){
-            TriggerExit("BehaviourAbs", "could not allocate event");
-        }
         return event;
     }
 

@@ -59,6 +59,11 @@ void ComponentAbs::sendEventToHost(const EventHeader* header){
     if(!mInitialized){
         TriggerExit("ComponentAbs", "not initialized");
     }
+    // Allocation failure has already raised a fatal error. Host assertion
+    // handlers may return, in which case an invalid event is simply discarded.
+    if(!header){
+        return;
+    }
     mHost->receiveEvent(header);
 }
 

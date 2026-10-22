@@ -81,6 +81,9 @@ void RuntimeAbs::applyQueuedBehaviour() {
 
     // create event
     EventView event = mEventFactory.make<EventType::ActiveBehaviourChanged>(mComponentDescriptor);
+    if(!event){
+        return;
+    }
     event->newBehaviour = mQueuedBehaviour->getBehaviourId();
 
     // set queued behaviour active
@@ -120,6 +123,9 @@ void RuntimeAbs::applyQueuedScreen() {
 
     // create event
     EventView event = mEventFactory.make<EventType::ActiveScreenChanged>(mComponentDescriptor);
+    if(!event){
+        return;
+    }
     event->newScreen = mQueuedScreen->getScreenId();
 
     // set queued screen active
@@ -156,17 +162,25 @@ void RuntimeAbs::markStateDirty(StateAbs* state){
 }
 
 void RuntimeAbs::receiveEvent(const EventHeader* header){
+    if(!header){
+        TriggerExit("RuntimeAbs", "cannot receive invalid event");
+        return;
+    }
 #if GarboxRuntimeAbsPrintEvents
     LogDebug("Event", "[%u] %s: %s", header->id, ComponentIdToString(header->sender.id), EventTypeToString(header->type));
 #endif
  
     // send event to router event
-    mContext.eventCount++;
     if(header->bypassQueue){
+        mContext.eventCount++;
         onRouteEvent(header);
     }
-    else if(!mEventQueue.pushBack(header)){
-        TriggerExit("RuntimeAbs", "event queue is full");
+    else {
+        if(!mEventQueue.pushBack(header)){
+            TriggerExit("RuntimeAbs", "event queue is full");
+            return;
+        }
+        mContext.eventCount++;
     }
 }
 

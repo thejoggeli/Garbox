@@ -142,3 +142,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native tests cover registration order, exactly-once application, null/capacity/late-registration rejection, and callback-free PWM reset. ASan/UBSan suite: 53 of 53 tests passed in 8.470 seconds.
 - ESP32-S3 firmware build passed in 107.886 seconds: 30,344 bytes RAM (112 more than baseline) and 862,961 bytes flash (3,872 more than baseline).
 - SAFE-01 remains **IN PROGRESS** pending the product decision for fatal fan behavior (full-speed cooldown versus power-off). GPIO polarity and physical heater-off behavior remain hardware-gated.
+
+## 2026-10-22 — EVT-02
+
+- Event-pool allocation exhaustion is now an explicit fatal contract rather than a debug-only factory result. The returned view is invalid and retains a null header, while payload access uses discard storage so a recovery-capable host handler cannot expose existing call sites to a null dereference.
+- Invalid views expose `valid()` and an explicit boolean conversion. Component submission drops their null headers after the originating fatal error; direct null submission to the runtime is itself fatal and is neither counted nor routed.
+- A full event queue rejects the new pointer, preserves the existing FIFO, and increments the runtime event count only for accepted events. The dispatch/pool-retention guarantees from EVT-01 remain unchanged.
+- Native ASan/UBSan coverage uses a zero-byte pool and a one-entry queue, and also tests direct null submission. The full suite passed 56 of 56 tests in 3.354 seconds with no sanitizer diagnostics.
+- ESP32-S3 firmware built successfully in 47.493 seconds: 30,408 bytes RAM and 862,945 bytes flash.
+- EVT-02 is therefore **SOFTWARE VERIFIED**. As before, fatal-handler continuation exists only to make failure aftermath testable; the target fatal handler does not return.

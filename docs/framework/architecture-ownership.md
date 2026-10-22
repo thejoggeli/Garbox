@@ -97,15 +97,17 @@ make event → caller initializes payload → receiveEvent queues pointer
            → event pool releaseAll invalidates every event/view
 ```
 
-Current behavior and remaining ambiguities:
+Current contract:
 
 - stable completion resets the pool; exhausting the configured pass bound with queued work raises a fatal contract violation first and retains the pool, so recovery-capable test handlers cannot observe dangling pointers;
-- allocation failure returns a view containing null pointers, but callers generally dereference it immediately;
+- allocation exhaustion is fatal and returns an explicitly invalid view only for recovery-capable host handlers; the view retains a null header but maps payload access to zero-initialized discard storage, so existing caller initialization cannot dereference null and `sendEventToHost()` drops it;
+- `EventView::valid()` and its explicit boolean conversion are the supported validity checks; a null event passed directly to the runtime is a fatal contract violation and is neither counted nor routed;
+- queue exhaustion is fatal, rejects the new event, leaves the existing FIFO untouched, and counts only successfully accepted events; its pool storage is retained while queued work exists under the dispatch contract above;
 - a `const EventHeader*` can be converted to a mutable view with `const_cast`, so post-send immutability is not enforced;
 - immediate/bypass routing can create nested routing and shares the same pool lifetime;
 - pool reset does not destroy non-trivial payloads.
 
-Remaining target contract: event construction is mutable only before submission; routing receives const views; event payload types must satisfy an enforced lifetime rule; allocation/queue overflow must fail deterministically without leaving live dangling pointers.
+Remaining target contract: event construction is mutable only before submission; routing receives const views; event payload types must satisfy an enforced lifetime rule.
 
 ## Shared-state ownership and visibility
 

@@ -15,9 +15,12 @@ namespace Garbox {
  * Always stores mutable pointers. Passing a const EventHeader* drops constness;
  * callers must ensure the underlying memory is safe to modify.
  *
- * - operator-> accessesthe payload
+ * - operator-> accesses the payload
  * - header() returns the header pointer
  * - payload() returns the payload pointer
+ * - invalid views have a null header and a discard payload, so fatal handlers
+ *   that return during host tests cannot turn allocation failure into a null
+ *   dereference
  * 
  * A runtime check verifies that the header’s event type matches E.
  */
@@ -37,6 +40,9 @@ public:
         // constructor body
     }
 
+    bool valid() const { return mHeader != nullptr; }
+    explicit operator bool() const { return valid(); }
+
     // non-const access
     EventHeader* header() { return mHeader; }
     EventPayload<E>* payload() { return mPayload; }
@@ -54,9 +60,12 @@ private:
 
     static EventPayload<E>* extractPayload(EventHeader* header){
 
-        // factory may pass nullptr if allocation failed
+        // Allocation failure is fatal. Host test handlers may nevertheless
+        // return, so provide writable discard storage for normal payload setup
+        // while preserving a null header that cannot be submitted.
         if(!header){
-            return nullptr;
+            static EventPayload<E> invalidPayload {};
+            return &invalidPayload;
         }
 
         // verify type consistency.

@@ -26,7 +26,7 @@ public:
         // consturct block in data pool with default values
         EventBlock<E>* block = mPool.construct<EventBlock<E>>();
         if(!block){
-            TriggerDebug("EventFactory", "failed to allocate event");
+            TriggerExit("EventFactory", "failed to allocate event");
             return EventView<E>((EventHeader*)nullptr);
         }
 
