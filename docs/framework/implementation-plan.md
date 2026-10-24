@@ -77,8 +77,8 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
-| APP-01 | TODO | STATE-02, PWM-01 | Add host tests for fermentation state/output transitions and startup-disabled policy. | Deterministic tests cover invalid input, overtemperature, cooldown, enable/disable, and target changes. |
-| APP-02 | TODO | APP-01 | Correct safety-fan precedence, sensor freshness/validity, and PID anti-windup. | Regression tests prove safety overrides preferences and saturated PID can recover. |
+| APP-01 | SOFTWARE VERIFIED | STATE-01, PWM-01 | Add host tests for fermentation state/output transitions and startup-disabled policy. | Deterministic tests cover invalid input, overtemperature, cooldown, enable/disable, target changes, and a closed-loop plant. |
+| APP-02 | IN PROGRESS | APP-01 | Correct safety-fan precedence, sensor freshness/validity, and PID anti-windup. | Safety-fan precedence is fixed and covered. Sensor freshness and PID recovery remain. |
 | APP-03 | TODO | SAFE-01, APP-02 | Add independent software safety supervisor contract. | Tests cover absolute limit, stale/implausible sensor, and command/measurement mismatch; physical protection remains documented. |
 | APP-04 | HARDWARE BLOCKED | APP-03 | Validate real sensor, fan tachometer, heater-off path, electrical limits, and failure behavior without uncontrolled heating. | Coordinated hardware checklist completed. |
 
@@ -90,6 +90,20 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 | CLEAN-01 | TODO | EXAMPLE-01 | Audit framework dependencies on Garbox-specific code and remove only demonstrated blockers. | Dependency report has no unexplained app-layer imports in reusable code. |
 | DOC-01 | TODO | all software milestones | Finalize contract, workflow, retained/removed abstraction, limitation, and evidence docs. | A new checkout can follow docs; all commands/results and hardware gates are current. |
 | FINAL-01 | HARDWARE BLOCKED | DOC-01, DISP-04, APP-04 | Final assessment with target evidence. | Separates software verification, hardware verification, and assumptions. |
+
+## Desktop simulation track
+
+The detailed design and acceptance criteria live in [desktop-simulation-plan.md](desktop-simulation-plan.md). The simulator substitutes semantic components rather than emulating ESP-IDF peripherals.
+
+| ID | Status | Depends on | Work | Acceptance and verification |
+|---|---|---|---|---|
+| SIM-00 | DONE | M0-02, M0-04 | Define simulation boundary and evidence limits. | Architecture separates application simulation from target validation. |
+| SIM-01 | SOFTWARE VERIFIED | TEST-01, STATE-01, EVT-02 | Deterministic headless runtime with real framework and fermentation behaviour. | Native scenarios boot, step virtual time, publish sensor state, and record typed commands. |
+| SIM-02 | SOFTWARE VERIFIED | SIM-01, APP-01 | Thermal/fan plant, traces, and safety scenarios. | Deterministic startup/regulation/fault/cooldown scenarios and invariants pass. |
+| SIM-03 | SOFTWARE VERIFIED | SIM-01 | Script semantic user and mode requests. | Direct typed requests and UI-generated requests exercise real routing and publish expected state. |
+| SIM-04 | IN PROGRESS | SIM-01, UI-01 | Run generated UI and custom LVGL stack against a host framebuffer. | `SimpleScreen` renders with inspectable output and reacts to real input events; remaining screens and sanitizer-clean teardown are pending. |
+| SIM-05 | DEFERRED | SIM-04 | Optional interactive SDL frontend. | Deferred until interactive use justifies the optional SDL development dependency. |
+| SIM-06 | SOFTWARE VERIFIED | SIM-02, SIM-04 | Reproducible simulator workflow. | Commands and evidence are documented; generator check/CI integration remains tracked by GEN-03. |
 
 ## Optional refactoring, explicitly deferred
 
