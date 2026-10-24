@@ -17,6 +17,7 @@
 namespace Garbox {
 
 class {{ runtime_name }};
+class SimulationRuntime;
 
 class {{ name }}Abs : public ScreenAbs {
 public:
@@ -44,6 +45,7 @@ private:
 {{ hide_events("Screen") }}
 
     friend class {{ runtime_name }};
+    friend class SimulationRuntime;
 
 public:
 

@@ -3,12 +3,14 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
+#include <optional>
 #include "core/application/controller/ControllerAbs.h"
 #include "generated/components/controllers/i2cparts/I2cPartsControllerStates.h"
 
 namespace Garbox {
 
 class Runtime;
+class SimulationRuntime;
 
 class I2cPartsControllerAbs : public ControllerAbs {
 public:
@@ -32,6 +34,7 @@ private:
     using ControllerAbs::sendEventToHost;
 
     friend class Runtime;
+    friend class SimulationRuntime;
 };
 
 } // namespace Garbox

@@ -4,6 +4,7 @@
 #include "core/application/state/StateAbs.h"
 {% endif %}
 {% if component.all_states %}
+#include <optional>
 #include "generated/{{ component.gendir }}/{{ component.name }}States.h"
 {% endif %}
 {% endmacro %}

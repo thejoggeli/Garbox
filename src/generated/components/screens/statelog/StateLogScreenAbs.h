@@ -10,6 +10,7 @@
 namespace Garbox {
 
 class Runtime;
+class SimulationRuntime;
 
 class StateLogScreenAbs : public ScreenAbs {
 public:
@@ -32,6 +33,7 @@ private:
     using ScreenAbs::sendEventToHost;
 
     friend class Runtime;
+    friend class SimulationRuntime;
 
 public:
 

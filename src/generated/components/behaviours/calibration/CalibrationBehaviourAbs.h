@@ -3,12 +3,14 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
+#include <optional>
 #include "core/application/behaviour/BehaviourAbs.h"
 #include "generated/components/behaviours/calibration/CalibrationBehaviourStates.h"
 
 namespace Garbox {
 
 class Runtime;
+class SimulationRuntime;
 
 class CalibrationBehaviourAbs : public BehaviourAbs {
 public:
@@ -45,6 +47,7 @@ private:
     using BehaviourAbs::sendEventToHost;
 
     friend class Runtime;
+    friend class SimulationRuntime;
 };
 
 } // namespace Garbox

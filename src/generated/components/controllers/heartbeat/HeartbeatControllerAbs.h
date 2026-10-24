@@ -8,6 +8,7 @@
 namespace Garbox {
 
 class Runtime;
+class SimulationRuntime;
 
 class HeartbeatControllerAbs : public ControllerAbs {
 public:
@@ -33,6 +34,7 @@ private:
     using ControllerAbs::sendEventToHost;
 
     friend class Runtime;
+    friend class SimulationRuntime;
 };
 
 } // namespace Garbox

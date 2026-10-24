@@ -42,7 +42,7 @@ private:
         FermentationState state;
         float targetTemperature;
         bool fanAuto = true;
-        bool powerOn = true;
+        bool powerOn = false;
     };
 
     Data mCurrent {};

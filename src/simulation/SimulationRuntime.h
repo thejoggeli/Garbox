@@ -1,0 +1,106 @@
+#pragma once
+
+#include <cstdint>
+
+#include "app/components/behaviours/FermentationBehaviour.h"
+#include "core/application/runtime/RuntimeAbs.h"
+#include "generated/states/types/FanSampleState.h"
+#include "generated/states/types/FanStatusState.h"
+#include "generated/states/types/FermentationStatusState.h"
+#include "generated/states/types/TemperatureSampleState.h"
+#include "generated/states/types/TemperatureStatusState.h"
+#include "shared/types/EventPayload.h"
+
+#if defined(GARBOX_SIMULATION_UI)
+#include "app/components/screens/simple/SimpleScreen.h"
+#include "generated/states/types/HeatpadSampleState.h"
+#include "generated/states/types/HeatpadStatusState.h"
+#endif
+
+namespace Garbox {
+
+/**
+ * Deterministic, headless application runtime.
+ *
+ * It uses the real fermentation behaviour, generated state/event contracts,
+ * and RuntimeAbs dispatch machinery. Physical controllers are replaced at the
+ * semantic boundary by explicit inputs and recorded command payloads.
+ */
+class SimulationRuntime final : public RuntimeAbs {
+public:
+    struct Inputs {
+        bool sensorAvailable = false;
+        float temperatureCelcius = 20.0f;
+        float humidityRelative = 50.0f;
+        bool fanStalled = false;
+        float fanMeasuredRpm = 0.0f;
+    };
+
+    struct Outputs {
+        FanCommandPayload fan {};
+        HeatpadCommandPayload heatpad {};
+        DisplayCommandPayload display {};
+        uint32_t fanCommandCount = 0;
+        uint32_t heatpadCommandCount = 0;
+        uint32_t displayCommandCount = 0;
+    };
+
+    SimulationRuntime();
+
+    void boot();
+    void step();
+
+    void setInputs(const Inputs& inputs);
+    const Inputs& inputs() const;
+    const Outputs& outputs() const;
+
+    void requestFermentationEnabled(bool enabled);
+    void requestTargetTemperature(float temperatureCelcius);
+    void requestAutomaticFan(bool enabled);
+
+    const FermentationStatusState& fermentationStatus() const;
+    const TemperatureStatusState& temperatureStatus() const;
+    const TemperatureSampleState& temperatureSample() const;
+    uint32_t tickCount() const;
+
+#if defined(GARBOX_SIMULATION_UI)
+    void render();
+    void injectButton(ButtonState oldState, ButtonState newState);
+    void injectEncoderSteps(int32_t steps);
+#endif
+
+protected:
+    void onInit() override;
+    void onStart() override;
+    void onRun(const TaskStopToken&) override;
+    void onRouteStateChanged(const StateAbs& state) override;
+    void onRouteEvent(const EventHeader* event) override;
+    void onActiveBehaviourChanged() override;
+    void onActiveScreenChanged() override;
+
+    BehaviourAbs* resolveBehaviour(BehaviourId id) override;
+    ControllerAbs* resolveController(ControllerId) override;
+    ScreenAbs* resolveScreen(ScreenId) override;
+
+private:
+    Inputs mInputs {};
+    Outputs mOutputs {};
+    bool mBooted = false;
+
+    FermentationStatusState mFermentationStatus;
+    FanSampleState mFanSample;
+    FanStatusState mFanStatus;
+    TemperatureSampleState mTemperatureSample;
+    TemperatureStatusState mTemperatureStatus;
+    FermentationBehaviour mFermentationBehaviour;
+
+#if defined(GARBOX_SIMULATION_UI)
+    HeatpadStatusState mHeatpadStatus;
+    HeatpadSampleState mHeatpadSample;
+    SimpleScreen mSimpleScreen;
+#endif
+
+    void publishInputs();
+};
+
+} // namespace Garbox

@@ -3,12 +3,14 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
+#include <optional>
 #include "core/application/controller/ControllerAbs.h"
 #include "generated/components/controllers/display/DisplayControllerStates.h"
 
 namespace Garbox {
 
 class Runtime;
+class SimulationRuntime;
 
 class DisplayControllerAbs : public ControllerAbs {
 public:
@@ -35,6 +37,7 @@ private:
     using ControllerAbs::sendEventToHost;
 
     friend class Runtime;
+    friend class SimulationRuntime;
 };
 
 } // namespace Garbox

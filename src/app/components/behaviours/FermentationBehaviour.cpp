@@ -25,7 +25,6 @@ void FermentationBehaviour::onStart(){
 
 void FermentationBehaviour::onBecomeEnabled(){
     mFermentationEngine.reset();
-    states().fermentationStatus.setPowerOn(true);
     states().fermentationStatus.setFanAuto(true);
     mFirstTick = true;
 }
@@ -58,8 +57,12 @@ void FermentationBehaviour::onLogicTick(){
     // send actuator commands
     const FermentationEngine::Output& output = mFermentationEngine.getOutput();
     const bool autoFan = states().fermentationStatus.getFanAuto();
+    const FermentationState engineState = mFermentationEngine.getState();
+    const bool safetyFanRequired = engineState == FermentationState::InvalidInput
+        || engineState == FermentationState::OverTemperature
+        || engineState == FermentationState::Cooldown;
     sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
-    sendFanCommand(output.fanEnabled && autoFan, output.fanTargetSpeed);
+    sendFanCommand(output.fanEnabled && (autoFan || safetyFanRequired), output.fanTargetSpeed);
     updateFermentationStatus();
     
     mFirstTick = false;

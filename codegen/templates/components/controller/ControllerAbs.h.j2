@@ -11,6 +11,7 @@
 namespace Garbox {
 
 class {{ runtime_name }};
+class SimulationRuntime;
 
 class {{ name }}Abs : public ControllerAbs {
 public:
@@ -27,6 +28,7 @@ private:
 {{ hide_events("Controller") }}
 
     friend class {{ runtime_name }};
+    friend class SimulationRuntime;
 };
 
 } // namespace Garbox

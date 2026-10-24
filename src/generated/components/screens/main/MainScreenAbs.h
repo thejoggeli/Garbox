@@ -3,6 +3,7 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
+#include <optional>
 #include "core/application/screen/ScreenAbs.h"
 #include "generated/guis/MainScreenGui.h"
 #include "generated/components/screens/main/MainScreenStates.h"
@@ -10,6 +11,7 @@
 namespace Garbox {
 
 class Runtime;
+class SimulationRuntime;
 
 class MainScreenAbs : public ScreenAbs {
 public:
@@ -67,6 +69,7 @@ private:
     using ScreenAbs::sendEventToHost;
 
     friend class Runtime;
+    friend class SimulationRuntime;
 
 public:
 
