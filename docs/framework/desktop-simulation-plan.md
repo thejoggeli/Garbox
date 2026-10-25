@@ -40,7 +40,7 @@ The plant is deliberately simple and parameterized: ambient leakage, heater gain
 
 ### Real LVGL above the backend
 
-The UI phase will compile the pinned LVGL core, generated GUIs, screens, and custom LVGL wrappers on the host. A memory/framebuffer backend is the reproducible baseline. An SDL window is optional when SDL development headers are available. Embedded `Display`, ST7789, SPI, DMA, and FreeRTOS buffer scheduling are not used by the desktop backend; their ownership model remains covered by target-neutral contract tests and later hardware tests.
+The UI simulator compiles the pinned LVGL core, all generated GUIs, all five screens, and the custom LVGL wrappers on the host. A memory/framebuffer backend is the reproducible baseline. A small Python standard-library server streams its live RGB output into an HTML canvas, so interactive use does not require SDL development packages. Embedded `Display`, ST7789, SPI, DMA, and FreeRTOS buffer scheduling are not used by the desktop backend; their ownership model remains covered by target-neutral contract tests and later hardware tests.
 
 The host and embedded backends install the same `LvglTheme` implementation.
 This is part of the layout contract: generated GUIs assume that LVGL's default
@@ -56,8 +56,8 @@ pixel size also come from the shared `AppConfig` constants.
 | SIM-01 | SOFTWARE VERIFIED | TEST-01, STATE-01, EVT-02 | Add deterministic application stepping and a headless simulation runtime using the real behaviour and framework contracts. | Native tests boot, publish inputs, run logic, and record typed fan/heatpad commands without sleeping or ESP headers. |
 | SIM-02 | SOFTWARE VERIFIED | SIM-01, APP-01 | Add a parameterized thermal/fan plant, scenario runner, trace records, and safety invariants. | Startup, regulation, overtemperature, invalid sensor, cooldown, recovery, and a five-minute closed loop run deterministically. |
 | SIM-03 | SOFTWARE VERIFIED | SIM-01 | Add scripted requests and UI input at the semantic event boundary. | Direct typed requests and real `Button`/`EncoderStep` routing produce expected power, target, and fan-policy changes. |
-| SIM-04 | IN PROGRESS | SIM-01, UI-01 | Compile the real generated GUI/wrapper stack against a host framebuffer backend and export inspectable frames. | `SimpleScreen` constructs and renders at 320x240; input changes application state and the frame checksum. Main/debug/log screens and sanitizer-clean teardown remain. |
-| SIM-05 | DEFERRED | SIM-04 | Add an optional interactive SDL frontend without making it a required test dependency. | Deferred until interactive use justifies adding SDL development packages; the headless path is sufficient for automated checks. |
+| SIM-04 | SOFTWARE VERIFIED | SIM-01, UI-01 | Compile the real generated GUI/wrapper stack against a host framebuffer backend and export inspectable frames. | All five screens construct and render at 320x240; input changes application state and the frame checksum; the complete screen cycle is verified. |
+| SIM-05 | SOFTWARE VERIFIED | SIM-04 | Add a real-time interactive frontend without making native GUI libraries a required dependency. | The local browser frontend streams live LVGL pixels and maps the simulated rotary encoder and its push button to the real typed events. |
 | SIM-06 | SOFTWARE VERIFIED | SIM-02, SIM-04 | Add reproducible build/run commands. | Documented commands run unit/scenario/UI checks; the embedded build remains separately green. CI integration waits for the generator check work. |
 
 ## Directory and build layout
@@ -103,17 +103,33 @@ pio run -e simulator
 pio run -e ui-simulator
 .pio/build/ui-simulator/program --output /tmp/garbox-simple.ppm
 
+# Interactive real LVGL UI (also works when `pio` is not on PATH)
+python3 tools/ui_simulator.py
+
 # Target compilation remains a separate evidence class
 pio run -e esp32-s3-devkitc-1
 ```
 
-The UI executable first renders the disabled state, then injects encoder and
-button events through `SimpleScreen`. It fails unless the target becomes
-32.5 °C, fermentation becomes enabled, LVGL flushes a non-empty frame, and the
-disabled/enabled checksums differ. The optional PPM is an inspectable artifact,
-not a checked-in golden image.
+The one-shot UI executable first renders the disabled state, then injects
+encoder and button events through `SimpleScreen`. It fails unless the target
+becomes 32.5 °C, fermentation becomes enabled, LVGL flushes a non-empty frame,
+and the disabled/enabled checksums differ. The optional PPM is an inspectable
+artifact, not a checked-in golden image.
 
-## Current verification record (2026-10-24)
+The interactive launcher builds the same executable in protocol mode, advances
+the deterministic plant at about 30 Hz, and serves only on `127.0.0.1` by
+default. The browser displays the live 320x240 framebuffer; it does not
+reimplement any screen. Its controls are:
+
+- on-screen arrows, mouse wheel, or left/right keys: rotate the encoder;
+- click, Space, or Enter: short encoder-button press;
+- hold the on-screen encoder, Space, or Enter for 0.7 seconds: long press.
+
+Long presses navigate `Simple → Main → Debug`; short presses then navigate
+`Debug → EventLog → StateLog → Simple`. In `Main`, encoder rotation and short
+presses operate the actual menu.
+
+## Current verification record (2026-10-25)
 
 - Native ASan/UBSan suite: 63/63 tests passed.
 - Standalone simulator: builds and runs a one-minute deterministic trace with
@@ -121,6 +137,9 @@ not a checked-in golden image.
 - Headless LVGL 9.4.0: 320x240 RGB565 render with the shared embedded theme
   succeeded; disabled checksum `62a1bc832670339f`, enabled checksum
   `e6a84a9fcba3a912`.
+- Interactive protocol: all five screens rendered and completed the full input
+  navigation cycle. The local HTTP page, 230,400-byte RGB frame endpoint, and
+  encoder input endpoint were exercised successfully.
 - ESP32-S3 firmware: builds successfully; 30,408 bytes RAM and 863,089 bytes
   flash. `src/simulation` is excluded from this build.
 - No hardware evidence was produced. Sensor behavior, actuator polarity,

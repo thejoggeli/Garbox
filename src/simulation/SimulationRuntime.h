@@ -12,7 +12,16 @@
 #include "shared/types/EventPayload.h"
 
 #if defined(GARBOX_SIMULATION_UI)
+#include "app/components/screens/debug/DebugScreen.h"
+#include "app/components/screens/log/EventLogScreen.h"
+#include "app/components/screens/log/StateLogScreen.h"
+#include "app/components/screens/main/MainScreen.h"
 #include "app/components/screens/simple/SimpleScreen.h"
+#include "generated/states/types/ActiveBehaviourState.h"
+#include "generated/states/types/ActiveScreenState.h"
+#include "generated/states/types/DisplayDiagnosticsState.h"
+#include "generated/states/types/DisplayStatusState.h"
+#include "generated/states/types/HeatpadProgressState.h"
 #include "generated/states/types/HeatpadSampleState.h"
 #include "generated/states/types/HeatpadStatusState.h"
 #endif
@@ -97,7 +106,16 @@ private:
 #if defined(GARBOX_SIMULATION_UI)
     HeatpadStatusState mHeatpadStatus;
     HeatpadSampleState mHeatpadSample;
+    HeatpadProgressState mHeatpadProgress;
+    DisplayStatusState mDisplayStatus;
+    DisplayDiagnosticsState mDisplayDiagnostics;
+    ActiveBehaviourState mActiveBehaviourState;
+    ActiveScreenState mActiveScreenState;
     SimpleScreen mSimpleScreen;
+    MainScreen mMainScreen;
+    DebugScreen mDebugScreen;
+    EventLogScreen mEventLogScreen;
+    StateLogScreen mStateLogScreen;
 #endif
 
     void publishInputs();

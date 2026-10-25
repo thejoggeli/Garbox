@@ -101,8 +101,8 @@ The detailed design and acceptance criteria live in [desktop-simulation-plan.md]
 | SIM-01 | SOFTWARE VERIFIED | TEST-01, STATE-01, EVT-02 | Deterministic headless runtime with real framework and fermentation behaviour. | Native scenarios boot, step virtual time, publish sensor state, and record typed commands. |
 | SIM-02 | SOFTWARE VERIFIED | SIM-01, APP-01 | Thermal/fan plant, traces, and safety scenarios. | Deterministic startup/regulation/fault/cooldown scenarios and invariants pass. |
 | SIM-03 | SOFTWARE VERIFIED | SIM-01 | Script semantic user and mode requests. | Direct typed requests and UI-generated requests exercise real routing and publish expected state. |
-| SIM-04 | IN PROGRESS | SIM-01, UI-01 | Run generated UI and custom LVGL stack against a host framebuffer. | `SimpleScreen` renders with inspectable output and reacts to real input events; remaining screens and sanitizer-clean teardown are pending. |
-| SIM-05 | DEFERRED | SIM-04 | Optional interactive SDL frontend. | Deferred until interactive use justifies the optional SDL development dependency. |
+| SIM-04 | SOFTWARE VERIFIED | SIM-01, UI-01 | Run generated UI and custom LVGL stack against a host framebuffer. | All five real screens construct, render, and navigate using the shared embedded theme and generated state/event contracts. |
+| SIM-05 | SOFTWARE VERIFIED | SIM-04 | Interactive desktop frontend. | A dependency-free local browser frontend streams the live framebuffer and maps encoder rotation plus short/long button presses to real input events. |
 | SIM-06 | SOFTWARE VERIFIED | SIM-02, SIM-04 | Reproducible simulator workflow. | Commands and evidence are documented; generator check/CI integration remains tracked by GEN-03. |
 
 ## Optional refactoring, explicitly deferred

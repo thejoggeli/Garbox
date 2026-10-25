@@ -14,7 +14,9 @@
 #include "core/lvgl/LvglProvider.h"
 #include "core/lvgl/LvglTheme.h"
 #include "helpers/FakeTime.h"
+#include "shared/types/ScreenId.h"
 #include "simulation/SimulationRuntime.h"
+#include "simulation/ThermalPlant.h"
 
 using namespace Garbox;
 using namespace GarboxTest;
@@ -25,10 +27,16 @@ constexpr uint32_t Width = AppConfig::DisplayWidth;
 constexpr uint32_t Height = AppConfig::DisplayHeight;
 constexpr uint32_t BytesPerPixel = AppConfig::DisplayBytesPerPixel;
 constexpr uint64_t TickMicros = 33'000ULL;
+constexpr float TickSeconds = static_cast<float>(TickMicros) / 1'000'000.0f;
 
 std::vector<uint8_t> Framebuffer(Width * Height * BytesPerPixel, 0);
 std::vector<uint8_t> DrawBuffer(Width * Height * BytesPerPixel, 0);
 bool FatalTriggered = false;
+
+struct Options {
+    const char* outputPath = nullptr;
+    bool interactive = false;
+};
 
 uint32_t tickProvider(){
     return Time::GetMillis();
@@ -66,15 +74,8 @@ uint64_t renderFrame(SimulationRuntime& runtime, lv_display_t* display){
     return frameChecksum();
 }
 
-bool writePpm(const char* path){
-    if(!path){
-        return true;
-    }
-    std::FILE* file = std::fopen(path, "wb");
-    if(!file){
-        return false;
-    }
-    std::fprintf(file, "P6\n%u %u\n255\n", Width, Height);
+std::vector<uint8_t> rgbFrame(){
+    std::vector<uint8_t> rgb(Width * Height * 3U);
     for(std::size_t i = 0; i < Width * Height; ++i){
 #if LV_COLOR_16_SWAP
         const uint16_t pixel = static_cast<uint16_t>(Framebuffer[i * 2] << 8U)
@@ -83,31 +84,143 @@ bool writePpm(const char* path){
         const uint16_t pixel = static_cast<uint16_t>(Framebuffer[i * 2])
             | static_cast<uint16_t>(Framebuffer[i * 2 + 1] << 8U);
 #endif
-        const uint8_t rgb[3] = {
-            static_cast<uint8_t>(((pixel >> 11U) & 0x1fU) * 255U / 31U),
-            static_cast<uint8_t>(((pixel >> 5U) & 0x3fU) * 255U / 63U),
-            static_cast<uint8_t>((pixel & 0x1fU) * 255U / 31U),
-        };
-        std::fwrite(rgb, sizeof(rgb), 1, file);
+        rgb[i * 3] = static_cast<uint8_t>(((pixel >> 11U) & 0x1fU) * 255U / 31U);
+        rgb[i * 3 + 1] = static_cast<uint8_t>(((pixel >> 5U) & 0x3fU) * 255U / 63U);
+        rgb[i * 3 + 2] = static_cast<uint8_t>((pixel & 0x1fU) * 255U / 31U);
     }
-    return std::fclose(file) == 0;
+    return rgb;
 }
 
-const char* outputPath(int argc, char** argv){
+bool writePpm(const char* path){
+    if(!path){
+        return true;
+    }
+    std::FILE* file = std::fopen(path, "wb");
+    if(!file){
+        return false;
+    }
+    const std::vector<uint8_t> rgb = rgbFrame();
+    std::fprintf(file, "P6\n%u %u\n255\n", Width, Height);
+    const bool wrote = std::fwrite(rgb.data(), rgb.size(), 1, file) == 1;
+    return std::fclose(file) == 0 && wrote;
+}
+
+Options parseOptions(int argc, char** argv){
+    Options options;
     if(argc == 1){
-        return nullptr;
+        return options;
+    }
+    if(argc == 2 && std::strcmp(argv[1], "--interactive") == 0){
+        options.interactive = true;
+        return options;
     }
     if(argc == 3 && std::strcmp(argv[1], "--output") == 0){
-        return argv[2];
+        options.outputPath = argv[2];
+        return options;
     }
-    std::fprintf(stderr, "usage: %s [--output frame.ppm]\n", argv[0]);
+    std::fprintf(stderr, "usage: %s [--interactive | --output frame.ppm]\n", argv[0]);
     std::exit(2);
+}
+
+void stepPlant(SimulationRuntime& runtime, ThermalPlant& plant, uint32_t count){
+    for(uint32_t i = 0; i < count; ++i){
+        runtime.setInputs(SimulationRuntime::Inputs {
+            .sensorAvailable = plant.sensorAvailable(),
+            .temperatureCelcius = plant.temperatureCelcius(),
+            .humidityRelative = plant.humidityRelative(),
+            .fanStalled = plant.fanStalled(),
+            .fanMeasuredRpm = plant.fanRpm(),
+        });
+        FakeTime::AdvanceMicros(TickMicros);
+        runtime.step();
+        const SimulationRuntime::Outputs& outputs = runtime.outputs();
+        plant.setHeater(outputs.heatpad.enabled, outputs.heatpad.dutyCycle);
+        plant.setFan(outputs.fan.enabled, outputs.fan.targetSpeed);
+        plant.step(TickSeconds);
+    }
+}
+
+int runInteractive(SimulationRuntime& runtime, ThermalPlant& plant, lv_display_t* display){
+    ButtonState buttonState = ButtonState::Released;
+    char command[128] {};
+    std::printf("READY %u %u\n", Width, Height);
+    std::fflush(stdout);
+
+    while(std::fgets(command, sizeof(command), stdin)){
+        if(std::strncmp(command, "step ", 5) == 0){
+            unsigned count = 0;
+            if(std::sscanf(command + 5, "%u", &count) != 1 || count > 1000U){
+                std::printf("ERR invalid step count\n");
+            }
+            else {
+                stepPlant(runtime, plant, count);
+                std::printf("OK\n");
+            }
+        }
+        else if(std::strncmp(command, "encoder ", 8) == 0){
+            int steps = 0;
+            if(std::sscanf(command + 8, "%d", &steps) != 1 || steps < -100 || steps > 100){
+                std::printf("ERR invalid encoder step count\n");
+            }
+            else {
+                runtime.injectEncoderSteps(steps);
+                std::printf("OK\n");
+            }
+        }
+        else if(std::strcmp(command, "button press\n") == 0){
+            if(buttonState == ButtonState::Released){
+                runtime.injectButton(buttonState, ButtonState::Pressed);
+                buttonState = ButtonState::Pressed;
+            }
+            std::printf("OK\n");
+        }
+        else if(std::strcmp(command, "button long\n") == 0){
+            if(buttonState == ButtonState::Pressed){
+                runtime.injectButton(buttonState, ButtonState::PressedLong);
+                buttonState = ButtonState::PressedLong;
+            }
+            std::printf("OK\n");
+        }
+        else if(std::strcmp(command, "button release\n") == 0){
+            if(buttonState != ButtonState::Released){
+                runtime.injectButton(buttonState, ButtonState::Released);
+                buttonState = ButtonState::Released;
+            }
+            std::printf("OK\n");
+        }
+        else if(std::strcmp(command, "frame\n") == 0){
+            renderFrame(runtime, display);
+            const std::vector<uint8_t> rgb = rgbFrame();
+            std::printf("FRAME %zu %s %.3f %.3f %u %u\n",
+                rgb.size(),
+                ScreenIdToString(runtime.getActiveScreenId()),
+                runtime.temperatureSample().getTemperatureCelcius(),
+                runtime.fermentationStatus().getTargetTemperature(),
+                runtime.fermentationStatus().getPowerOn() ? 1U : 0U,
+                runtime.tickCount());
+            std::fwrite(rgb.data(), rgb.size(), 1, stdout);
+        }
+        else if(std::strcmp(command, "quit\n") == 0){
+            std::printf("BYE\n");
+            std::fflush(stdout);
+            return FatalTriggered ? 1 : 0;
+        }
+        else {
+            std::printf("ERR unknown command\n");
+        }
+        std::fflush(stdout);
+        if(FatalTriggered){
+            std::fprintf(stderr, "fatal application assertion in interactive simulator\n");
+            return 1;
+        }
+    }
+    return FatalTriggered ? 1 : 0;
 }
 
 } // namespace
 
 int main(int argc, char** argv){
-    const char* path = outputPath(argc, argv);
+    const Options options = parseOptions(argc, argv);
     AssertHandler::SetDebugHandler([](const char*, const char*, int32_t){});
     AssertHandler::SetExitHandler([](const char*, const char*, int32_t){
         FatalTriggered = true;
@@ -135,16 +248,18 @@ int main(int argc, char** argv){
 
     static SimulationRuntime* runtime = new SimulationRuntime();
     runtime->boot();
-    runtime->setInputs(SimulationRuntime::Inputs {
-        .sensorAvailable = true,
-        .temperatureCelcius = 24.5f,
-        .humidityRelative = 61.0f,
-        .fanStalled = false,
-        .fanMeasuredRpm = 960.0f,
-    });
+    ThermalPlant::Config plantConfig;
+    plantConfig.initialTemperatureCelcius = 24.5f;
+    plantConfig.humidityRelative = 61.0f;
+    ThermalPlant plant(plantConfig);
+    stepPlant(*runtime, plant, 1);
 
-    FakeTime::AdvanceMicros(TickMicros);
-    runtime->step();
+    if(options.interactive){
+        const int result = runInteractive(*runtime, plant, display);
+        std::fflush(nullptr);
+        std::_Exit(result);
+    }
+
     const uint64_t disabledChecksum = renderFrame(*runtime, display);
 
     // Exercise the same typed Button and EncoderStep events emitted by the
@@ -153,18 +268,15 @@ int main(int argc, char** argv){
     runtime->injectEncoderSteps(5);
     runtime->injectButton(ButtonState::Released, ButtonState::Pressed);
     runtime->injectButton(ButtonState::Pressed, ButtonState::Released);
+    stepPlant(*runtime, plant, 2);
 
-    for(uint32_t i = 0; i < 2; ++i){
-        FakeTime::AdvanceMicros(TickMicros);
-        runtime->step();
-    }
     const uint64_t enabledChecksum = renderFrame(*runtime, display);
     const bool frameChanged = std::any_of(
         Framebuffer.begin(),
         Framebuffer.end(),
         [](uint8_t value){ return value != 0; }
     );
-    const bool wroteFrame = writePpm(path);
+    const bool wroteFrame = writePpm(options.outputPath);
     const bool inputReachedApplication = runtime->fermentationStatus().getPowerOn()
         && runtime->fermentationStatus().getTargetTemperature() == 32.5f;
     const bool frameResponded = disabledChecksum != enabledChecksum;
@@ -182,12 +294,12 @@ int main(int argc, char** argv){
         static_cast<unsigned long long>(enabledChecksum),
         runtime->fermentationStatus().getPowerOn() ? "on" : "off",
         runtime->fermentationStatus().getTargetTemperature(),
-        path ? path : "(not written)");
+        options.outputPath ? options.outputPath : "(not written)");
     if(!frameChanged){
         std::fprintf(stderr, "LVGL did not flush a non-empty frame\n");
     }
     if(!wroteFrame){
-        std::fprintf(stderr, "failed to write %s\n", path);
+        std::fprintf(stderr, "failed to write %s\n", options.outputPath);
     }
     if(!frameResponded){
         std::fprintf(stderr, "LVGL frame did not respond to simulated input\n");
