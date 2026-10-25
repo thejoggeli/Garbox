@@ -42,6 +42,12 @@ The plant is deliberately simple and parameterized: ambient leakage, heater gain
 
 The UI phase will compile the pinned LVGL core, generated GUIs, screens, and custom LVGL wrappers on the host. A memory/framebuffer backend is the reproducible baseline. An SDL window is optional when SDL development headers are available. Embedded `Display`, ST7789, SPI, DMA, and FreeRTOS buffer scheduling are not used by the desktop backend; their ownership model remains covered by target-neutral contract tests and later hardware tests.
 
+The host and embedded backends install the same `LvglTheme` implementation.
+This is part of the layout contract: generated GUIs assume that LVGL's default
+padding, margin, border, radius, background, and scrolling styles have been
+cleared before their explicit XML styles are applied. Display dimensions and
+pixel size also come from the shared `AppConfig` constants.
+
 ## Work packages
 
 | ID | Status | Depends on | Work | Acceptance |
@@ -112,9 +118,10 @@ not a checked-in golden image.
 - Native ASan/UBSan suite: 63/63 tests passed.
 - Standalone simulator: builds and runs a one-minute deterministic trace with
   all step invariants satisfied.
-- Headless LVGL 9.4.0: 320x240 RGB565 render succeeded; disabled checksum
-  `d55dfe460ecc7aec`, enabled checksum `eeac9e71e1440f4d`.
-- ESP32-S3 firmware: builds successfully; 30,408 bytes RAM and 862,945 bytes
+- Headless LVGL 9.4.0: 320x240 RGB565 render with the shared embedded theme
+  succeeded; disabled checksum `62a1bc832670339f`, enabled checksum
+  `e6a84a9fcba3a912`.
+- ESP32-S3 firmware: builds successfully; 30,408 bytes RAM and 863,089 bytes
   flash. `src/simulation` is excluded from this build.
 - No hardware evidence was produced. Sensor behavior, actuator polarity,
   thermal response, display transport/DMA, and timing remain target-gated.

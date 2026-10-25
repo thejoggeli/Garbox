@@ -3,10 +3,10 @@
 #include <cmath>
 #include <limits>
 #include <esp_heap_caps.h>
-#include <themes/lv_theme_private.h>
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/Rgb565DrawBufferGeometry.h"
+#include "core/lvgl/LvglTheme.h"
 #include "core/time/Time.h"
 
 namespace Garbox {
@@ -75,13 +75,7 @@ void LvglHandler::init(){
     lv_display_set_flush_cb(mLvDisplay, handleFlush);
     lv_display_set_flush_wait_cb(mLvDisplay, handleFlushWait);
 
-    // apply my theme
-    lv_theme_t* base = lv_display_get_theme(mLvDisplay);
-    static lv_theme_t myTheme; 
-    myTheme = *base; // inherit all default theme behavior
-    lv_theme_set_parent(&myTheme, base);
-    lv_theme_set_apply_cb(&myTheme, myThemeCallback);
-    lv_display_set_theme(mLvDisplay, &myTheme);
+    LvglTheme::Install(mLvDisplay);
 
 
     mInitialized = true;
@@ -176,19 +170,6 @@ void LvglHandler::initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t 
         size
     );
     AssertExit(result == LV_RESULT_OK, "LvglHandler", "lv_draw_buf_init failed");
-}
-
-void LvglHandler::myThemeCallback(lv_theme_t* th, lv_obj_t * obj){
-    LV_UNUSED(th);
-    lv_obj_set_style_radius(obj, 0, 0);
-    lv_obj_set_style_border_width(obj, 0, 0);
-    lv_obj_set_style_pad_all(obj, 0, 0);
-    lv_obj_set_style_margin_all(obj, 0, 0);
-    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_row(obj, 0, 0);
-    lv_obj_set_style_pad_column(obj, 0, 0);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    // lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
 }
 
 } // namespace

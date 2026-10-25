@@ -9,8 +9,10 @@
 
 #include <lvgl.h>
 
+#include "app/config/AppConfig.h"
 #include "core/assert/AssertHandler.h"
 #include "core/lvgl/LvglProvider.h"
+#include "core/lvgl/LvglTheme.h"
 #include "helpers/FakeTime.h"
 #include "simulation/SimulationRuntime.h"
 
@@ -19,9 +21,9 @@ using namespace GarboxTest;
 
 namespace {
 
-constexpr uint32_t Width = 320;
-constexpr uint32_t Height = 240;
-constexpr uint32_t BytesPerPixel = 2;
+constexpr uint32_t Width = AppConfig::DisplayWidth;
+constexpr uint32_t Height = AppConfig::DisplayHeight;
+constexpr uint32_t BytesPerPixel = AppConfig::DisplayBytesPerPixel;
 constexpr uint64_t TickMicros = 33'000ULL;
 
 std::vector<uint8_t> Framebuffer(Width * Height * BytesPerPixel, 0);
@@ -128,6 +130,7 @@ int main(int argc, char** argv){
         LV_DISPLAY_RENDER_MODE_FULL
     );
     lv_display_set_flush_cb(display, flushDisplay);
+    LvglTheme::Install(display);
     LvglProvider::Init(Width, Height);
 
     static SimulationRuntime* runtime = new SimulationRuntime();

@@ -75,9 +75,6 @@ private:
     static void initDrawBuffer(lv_draw_buf_t& buffer, uint8_t* data, uint32_t size,
                                uint32_t width, uint32_t height, uint32_t stride);
 
-    // theme helpers
-    static void myThemeCallback(lv_theme_t * th, lv_obj_t * obj);
-
 };
 
 } // namespace
