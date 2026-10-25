@@ -20,7 +20,7 @@ void DisplayController::onInit(){
 }
 
 void DisplayController::onStart(){
-    setBrightnessSmooth(0.65f, 1500_ms);
+    setBrightnessSmooth(1.0f, 1500_ms);
 }
 
 void DisplayController::onRenderTick(){

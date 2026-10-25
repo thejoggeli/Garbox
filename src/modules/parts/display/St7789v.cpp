@@ -89,7 +89,7 @@ void St7789v::sendInit(){
 
     // memory access control (rotation, RGB order)
     cmd = Command::MADCTL; 
-    data = St7789vHelper::makeLandscapeRGB(false, true);
+    data = St7789vHelper::makeLandscapeRGB(true, false);
     mGpioCs.writeLevel(false);
     sendCommand(cmd, data);
     mGpioCs.writeLevel(true);

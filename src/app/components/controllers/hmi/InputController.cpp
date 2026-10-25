@@ -99,4 +99,4 @@ void InputController::handleEncoderCallback(int32_t steps){
     sendEvent(event);
 }
 
-} // namespace
+} // namespace Garbox

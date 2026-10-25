@@ -10,6 +10,11 @@ RotaryEncoder::RotaryEncoder(){
 
 void RotaryEncoder::init(const  Config& config){
     AssertExit(!mInitialized, "RotaryEncoder", "already initialized");
+    AssertExit(config.countsPerStep > 0, "RotaryEncoder", "counts per step must be positive");
+
+    mUnit = config.unit;
+    mCountsPerStep = config.countsPerStep;
+    mInvertDirection = config.invertDirection;
 
     // configure PCNT channel 0
     pcnt_config_t configA = {};
@@ -31,7 +36,7 @@ void RotaryEncoder::init(const  Config& config){
     pcnt_config_t configB = {};
     configB.pulse_gpio_num = config.pinB;
     configB.ctrl_gpio_num = config.pinA;
-    configB.unit = config.unit;
+    configB.unit = mUnit;
     configB.channel = PCNT_CHANNEL_1;
     configB.pos_mode = PCNT_COUNT_DEC;
     configB.neg_mode = PCNT_COUNT_INC;
@@ -44,18 +49,18 @@ void RotaryEncoder::init(const  Config& config){
     AssertExit((configBError == ESP_OK), "RotaryEncoder", "pcnt_unit_config B failed");
 
     // optional glitch filter disabled by default
-    pcnt_filter_disable(PCNT_UNIT_0);
+    pcnt_filter_disable(mUnit);
 
     // clear and start counter
-    const esp_err_t clearError = pcnt_counter_clear(PCNT_UNIT_0);
+    const esp_err_t clearError = pcnt_counter_clear(mUnit);
     AssertExit((clearError == ESP_OK), "RotaryEncoder", "pcnt_counter_clear failed");
 
-    const esp_err_t resumeError = pcnt_counter_resume(PCNT_UNIT_0);
+    const esp_err_t resumeError = pcnt_counter_resume(mUnit);
     AssertExit((resumeError == ESP_OK), "RotaryEncoder", "pcnt_counter_resume failed");
 
     // read initial count
     int16_t count = 0;
-    const esp_err_t getError = pcnt_get_counter_value(PCNT_UNIT_0, &count);
+    const esp_err_t getError = pcnt_get_counter_value(mUnit, &count);
     AssertExit((getError == ESP_OK), "RotaryEncoder", "pcnt_get_counter_value failed");
 
     mLastCount = count;
@@ -70,7 +75,7 @@ void RotaryEncoder::tick(){
 
     // read current hardware counter
     int16_t nowCount = 0;
-    const esp_err_t getError = pcnt_get_counter_value(PCNT_UNIT_0, &nowCount);
+    const esp_err_t getError = pcnt_get_counter_value(mUnit, &nowCount);
     if(getError != ESP_OK){
         AssertDebug(false, "RotaryEncoder", "pcnt_get_counter_value failed");
         return;
@@ -84,9 +89,16 @@ void RotaryEncoder::tick(){
         return;
     }
 
-    // forward delta to callback
-    const int32_t steps = static_cast<int32_t>(delta16);
-    if(mCallback != nullptr){
+    // Convert PCNT edges into physical detents. Keeping the remainder on the
+    // instance preserves partial turns and direction reversals correctly.
+    mPendingCounts += static_cast<int32_t>(delta16);
+    int32_t steps = mPendingCounts / static_cast<int32_t>(mCountsPerStep);
+    mPendingCounts %= static_cast<int32_t>(mCountsPerStep);
+    if(mInvertDirection){
+        steps = -steps;
+    }
+
+    if(steps != 0 && mCallback != nullptr){
         mCallback(mCallbackCtx, steps);
     }
 }

@@ -64,6 +64,8 @@ void PartsProvider::Init(){
         .pinA = 2,
         .pinB = 42,
         .unit = PCNT_UNIT_0,
+        .countsPerStep = 2,
+        .invertDirection = true,
     });
 
     // init sht31

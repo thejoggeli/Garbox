@@ -36,7 +36,7 @@ void GpioInstances::Init(){
     );
     GetI2cEnable().init(
         PinI2cEnable, InitialHigh,
-        { Mode::Output, Pull::Disable, Interrupt::Disable, NonInverted }
+        { Mode::Output, Pull::Disable, Interrupt::Disable, Inverted }
     );
     GetDisplayDc().init(
         PinDisplayDc, InitialLow,

@@ -21,10 +21,10 @@ void LedcInstances::Init(){
     GetPiezoTimer().init(TimerId::Timer2, 1000, 6);
 
     // setup channels
-    GetStatusLed0Channel().init(ChannelId::Channel0, &GetDimmingTimer(), PinStatusLed0Channel, false);
-    GetStatusLed1Channel().init(ChannelId::Channel1, &GetDimmingTimer(), PinStatusLed1Channel, false);
-    GetStatusLed2Channel().init(ChannelId::Channel2, &GetDimmingTimer(), PinStatusLed2Channel, false);
-    GetStatusLed3Channel().init(ChannelId::Channel3, &GetDimmingTimer(), PinStatusLed3Channel, false);
+    GetStatusLed0Channel().init(ChannelId::Channel0, &GetDimmingTimer(), PinStatusLed0Channel, true);
+    GetStatusLed1Channel().init(ChannelId::Channel1, &GetDimmingTimer(), PinStatusLed1Channel, true);
+    GetStatusLed2Channel().init(ChannelId::Channel2, &GetDimmingTimer(), PinStatusLed2Channel, true);
+    GetStatusLed3Channel().init(ChannelId::Channel3, &GetDimmingTimer(), PinStatusLed3Channel, true);
     GetBacklightChannel().init(ChannelId::Channel4, &GetDimmingTimer(), PinBacklightChannel, false);
     GetFanSpeedChannel().init(ChannelId::Channel5, &GetFanSpeedTimer(), PinFanSpeedChannel, true);
     GetPiezoChannel().init(ChannelId::Channel6, &GetPiezoTimer(), PinPiezoChannel, false);
