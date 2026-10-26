@@ -74,8 +74,8 @@ public:
         MetricCard heater;
         MetricCard fan;
         LvObject footer;
-        LvLabel powerHint;
-        LvLabel rangeHint;
+        LvLabel pressHint;
+        LvLabel holdHint;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

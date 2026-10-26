@@ -1,6 +1,7 @@
 #include "MainScreen.h"
 
 #include <math.h>
+#include "app/components/screens/ScreenCommandBar.h"
 #include "core/log/Log.h"
 #include "core/lvgl/helpers/RotationRenderer.h"
 #include "core/util/function/default/MathFunctions.h"
@@ -69,8 +70,13 @@ void MainScreen::onInit(){
     gui().trendsTitle.setFont(&lv_font_montserrat_12);
     gui().windowLabel.setFont(&lv_font_unscii_8);
     gui().controlsTitle.setFont(&lv_font_unscii_8);
-    gui().editHint.setFont(&lv_font_unscii_8);
-    gui().homeHint.setFont(&lv_font_unscii_8);
+    ConfigureScreenCommandBar(
+        gui().footer,
+        gui().pressHint,
+        gui().holdHint,
+        "PRESS: EDIT/OPEN",
+        "HOLD: HOME"
+    );
 
     // setup time axis labels
     const lv_font_t* timeAxisFont = &lv_font_montserrat_10; 

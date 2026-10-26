@@ -25,8 +25,11 @@ void MainScreenGui::init(){
     mObjects.wrapper.setLayout(LV_LAYOUT_FLEX);                                 // layout="flex"
     mObjects.wrapper.setFlexFlow(LV_FLEX_FLOW_ROW);                             // flex-flow="row"
     mObjects.wrapper.setWidth(LV_PCT(100));                                     // width="100%"
-    mObjects.wrapper.setHeight(LV_PCT(100));                                    // height="100%"
-    mObjects.wrapper.setPad(6, 6, 6, 6);                                        // pad="6px"
+    mObjects.wrapper.setHeight(220);                                            // height="220px"
+    mObjects.wrapper.setPadLeft(6);                                             // pad-left="6px"
+    mObjects.wrapper.setPadRight(6);                                            // pad-right="6px"
+    mObjects.wrapper.setPadTop(5);                                              // pad-top="5px"
+    mObjects.wrapper.setPadBottom(4);                                           // pad-bottom="4px"
     mObjects.wrapper.setPadGap(6);                                              // pad-gap="6px"
     mObjects.chartsPanel.setLayout(LV_LAYOUT_FLEX);                             // layout="flex"
     mObjects.chartsPanel.setFlexFlow(LV_FLEX_FLOW_COLUMN);                      // flex-flow="column"
@@ -46,7 +49,7 @@ void MainScreenGui::init(){
     mObjects.tempGraph.body.setLayout(LV_LAYOUT_FLEX);                          // layout="flex"
     mObjects.tempGraph.body.setFlexFlow(LV_FLEX_FLOW_ROW);                      // flex-flow="row"
     mObjects.tempGraph.body.setWidth(LV_PCT(100));                              // width="100%"
-    mObjects.tempGraph.body.setHeight(105);                                     // height="105px"
+    mObjects.tempGraph.body.setHeight(98);                                      // height="98px"
     mObjects.tempGraph.labelContainer.setWidth(18);                             // width="18px"
     mObjects.tempGraph.labelContainer.setHeight(LV_PCT(100));                   // height="100%"
     mObjects.tempGraph.labelContainer.setLayout(LV_LAYOUT_FLEX);                // layout="flex"
@@ -73,7 +76,7 @@ void MainScreenGui::init(){
     mObjects.powerGraph.body.setLayout(LV_LAYOUT_FLEX);                         // layout="flex"
     mObjects.powerGraph.body.setFlexFlow(LV_FLEX_FLOW_ROW);                     // flex-flow="row"
     mObjects.powerGraph.body.setWidth(LV_PCT(100));                             // width="100%"
-    mObjects.powerGraph.body.setHeight(72);                                     // height="72px"
+    mObjects.powerGraph.body.setHeight(66);                                     // height="66px"
     mObjects.powerGraph.labelContainer.setWidth(18);                            // width="18px"
     mObjects.powerGraph.labelContainer.setHeight(LV_PCT(100));                  // height="100%"
     mObjects.powerGraph.labelContainer.setLayout(LV_LAYOUT_FLEX);               // layout="flex"
@@ -141,10 +144,7 @@ void MainScreenGui::init(){
     mObjects.controlHeader.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.controlHeader.setFlexFlow(LV_FLEX_FLOW_ROW);                       // flex-flow="row"
     mObjects.controlsTitle.setText("CONTROLS");                                 // text="CONTROLS"
-    mObjects.controlsTitle.setFlexGrow(1);                                      // flex-grow="1"
     mObjects.controlsTitle.setTextColor(lv_color_hex(0x778791));                // text-color="#778791"
-    mObjects.editHint.setText("PRESS");                                         // text="PRESS"
-    mObjects.editHint.setTextColor(lv_color_hex(0x60717b));                     // text-color="#60717B"
     mObjects.menuContainer.setWidth(LV_PCT(100));                               // width="100%"
     mObjects.menuContainer.setFlexGrow(1);                                      // flex-grow="1"
     mObjects.menuContainer.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
@@ -213,10 +213,10 @@ void MainScreenGui::init(){
     mObjects.timeInfo.icon.setOpa(166);                                         // opa="65%"
     mObjects.timeInfo.value.setText("32.0°");                                   // text="32.0°"
     mObjects.timeInfo.value.setTextAlign(LV_TEXT_ALIGN_LEFT);                   // text-align="left"
-    mObjects.homeHint.setText("HOLD: HOME");                                    // text="HOLD: HOME"
-    mObjects.homeHint.setWidth(LV_PCT(100));                                    // width="100%"
-    mObjects.homeHint.setTextAlign(LV_TEXT_ALIGN_CENTER);                       // text-align="center"
-    mObjects.homeHint.setTextColor(lv_color_hex(0x60717b));                     // text-color="#60717B"
+    mObjects.footer.setWidth(LV_PCT(100));                                      // width="100%"
+    mObjects.footer.setHeight(20);                                              // height="20px"
+    mObjects.pressHint.setText("PRESS: EDIT/OPEN");                             // text="PRESS: EDIT/OPEN"
+    mObjects.holdHint.setText("HOLD: HOME");                                    // text="HOLD: HOME"
 }
 
 void MainScreenGui::show(){
@@ -267,7 +267,6 @@ MainScreenGui::Objects::Objects():
     systemState(systemStateBg),
     controlHeader(controlPanel),
     controlsTitle(controlHeader),
-    editHint(controlHeader),
     menuContainer(controlPanel),
     menuArrUp(menuContainer),
     menuRows(menuContainer),
@@ -277,7 +276,9 @@ MainScreenGui::Objects::Objects():
     humidInfo(infoTiles),
     powerInfo(infoTiles),
     timeInfo(infoTiles),
-    homeHint(controlPanel){}
+    footer(root),
+    pressHint(footer),
+    holdHint(footer){}
 
 } // namespace
 

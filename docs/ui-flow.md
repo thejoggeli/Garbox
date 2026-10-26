@@ -37,6 +37,11 @@ Main also has an explicit Home row. Diagnostics, Event Log, and State Log each h
 | Event Log | No action | Open State Log | Return Main |
 | State Log | No action | Open Diagnostics | Return Main |
 
+Every screen reserves the bottom 20 pixels for the same command bar. The action
+for a short press is always shown on the left and the long-press destination is
+always shown on the right. Screen content and transient status text never share
+that area.
+
 The selected Main row is highlighted across its width. While editing, only its value remains highlighted, making the mode change visible without adding another modal screen.
 
 ## Home
@@ -69,7 +74,7 @@ If the sensor is not ready, measured temperature and humidity show placeholders 
 
 The left side preserves the original project's strongest advanced feature: multi-window time series. It plots measured temperature and target together, plots heater output separately, shows current values, and labels the selected interval. Available history windows are 1, 4, and 16 minutes; 1, 4, and 12 hours; and 1 and 4 days.
 
-The right side contains current system state, a six-row scrolling menu, compact fan/humidity/power/target tiles, and a persistent Home hint.
+The right side contains current system state, a six-row scrolling menu, and compact fan/humidity/power/target tiles. The shared command bar provides the persistent Home hint.
 
 ### Settings and actions
 

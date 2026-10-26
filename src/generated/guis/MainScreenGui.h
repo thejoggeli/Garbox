@@ -77,7 +77,6 @@ public:
         LvLabel systemState;
         LvObject controlHeader;
         LvLabel controlsTitle;
-        LvLabel editHint;
         LvObject menuContainer;
         LvImage menuArrUp;
         LvObject menuRows;
@@ -87,7 +86,9 @@ public:
         InfoTile humidInfo;
         InfoTile powerInfo;
         InfoTile timeInfo;
-        LvLabel homeHint;
+        LvObject footer;
+        LvLabel pressHint;
+        LvLabel holdHint;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

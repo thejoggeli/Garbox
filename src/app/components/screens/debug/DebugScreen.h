@@ -8,6 +8,7 @@
 #include <esp_system.h>
 #include "core/lvgl/objects/LvBox.h"
 #include "core/lvgl/objects/LvLabel.h"
+#include "core/lvgl/objects/LvObject.h"
 #include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
@@ -23,7 +24,9 @@ private:
     uint32_t mHeapMinimumTime = 0;
 
     LvLabel mHeaderLabel;
-    LvLabel mFooterLabel;
+    LvObject mFooter;
+    LvLabel mFooterPressHint;
+    LvLabel mFooterHoldHint;
     LvBox mProgressBox;
     LvLabel mMicrosLabel;
     LvLabel mTimeLabel;

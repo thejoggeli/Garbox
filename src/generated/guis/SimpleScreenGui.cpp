@@ -25,8 +25,11 @@ void SimpleScreenGui::init(){
     mObjects.wrapper.setLayout(LV_LAYOUT_FLEX);                                 // layout="flex"
     mObjects.wrapper.setFlexFlow(LV_FLEX_FLOW_COLUMN);                          // flex-flow="column"
     mObjects.wrapper.setWidth(LV_PCT(100));                                     // width="100%"
-    mObjects.wrapper.setHeight(LV_PCT(100));                                    // height="100%"
-    mObjects.wrapper.setPad(7, 8, 7, 8);                                        // pad="7px 8px 7px 8px"
+    mObjects.wrapper.setHeight(220);                                            // height="220px"
+    mObjects.wrapper.setPadLeft(8);                                             // pad-left="8px"
+    mObjects.wrapper.setPadRight(8);                                            // pad-right="8px"
+    mObjects.wrapper.setPadTop(7);                                              // pad-top="7px"
+    mObjects.wrapper.setPadBottom(5);                                           // pad-bottom="5px"
     mObjects.wrapper.setPadGap(6);                                              // pad-gap="6px"
     mObjects.header.setWidth(LV_PCT(100));                                      // width="100%"
     mObjects.header.setHeight(25);                                              // height="25px"
@@ -51,7 +54,7 @@ void SimpleScreenGui::init(){
     mObjects.screenTitle.setFlexGrow(1);                                        // flex-grow="1"
     mObjects.screenTitle.setTextAlign(LV_TEXT_ALIGN_CENTER);                    // text-align="center"
     mObjects.screenTitle.setTextColor(lv_color_hex(0xaab8c0));                  // text-color="#AAB8C0"
-    mObjects.menuHint.setText("HOLD: MENU");                                    // text="HOLD: MENU"
+    mObjects.menuHint.setText("15-50 C");                                       // text="15-50 C"
     mObjects.menuHint.setWidth(82);                                             // width="82px"
     mObjects.menuHint.setTextAlign(LV_TEXT_ALIGN_RIGHT);                        // text-align="right"
     mObjects.menuHint.setTextColor(lv_color_hex(0x60717b));                     // text-color="#60717B"
@@ -148,7 +151,10 @@ void SimpleScreenGui::init(){
     mObjects.humidity.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
     mObjects.humidity.body.setWidth(LV_PCT(100));                               // width="100%"
     mObjects.humidity.body.setFlexGrow(1);                                      // flex-grow="1"
-    mObjects.humidity.body.setPad(4, 7, 4, 7);                                  // pad="4px 7px 4px 7px"
+    mObjects.humidity.body.setPadLeft(7);                                       // pad-left="7px"
+    mObjects.humidity.body.setPadRight(7);                                      // pad-right="7px"
+    mObjects.humidity.body.setPadTop(2);                                        // pad-top="2px"
+    mObjects.humidity.body.setPadBottom(2);                                     // pad-bottom="2px"
     mObjects.humidity.body.setPadGap(7);                                        // pad-gap="7px"
     mObjects.humidity.body.setBgColor(lv_color_hex(0x111a21));                  // bg-color="#111A21"
     mObjects.humidity.body.setBgOpa(255);                                       // bg-opa="100%"
@@ -164,6 +170,7 @@ void SimpleScreenGui::init(){
     mObjects.humidity._namelessContainer_0.setFlexFlow(LV_FLEX_FLOW_COLUMN);    // flex-flow="column"
     mObjects.humidity._namelessContainer_0.setFlexGrow(1);                      // flex-grow="1"
     mObjects.humidity._namelessContainer_0.setHeightContent();                  // height="content"
+    mObjects.humidity._namelessContainer_0.setPadGap(0);                        // pad-gap="0px"
     mObjects.humidity.label.setText("HUMIDITY");                                // text="HUMIDITY"
     mObjects.humidity.label.setTextColor(lv_color_hex(0x778791));               // text-color="#778791"
     mObjects.humidity.value.setText("--.-%");                                   // text="--.-%"
@@ -173,7 +180,10 @@ void SimpleScreenGui::init(){
     mObjects.heater.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
     mObjects.heater.body.setWidth(LV_PCT(100));                                 // width="100%"
     mObjects.heater.body.setFlexGrow(1);                                        // flex-grow="1"
-    mObjects.heater.body.setPad(4, 7, 4, 7);                                    // pad="4px 7px 4px 7px"
+    mObjects.heater.body.setPadLeft(7);                                         // pad-left="7px"
+    mObjects.heater.body.setPadRight(7);                                        // pad-right="7px"
+    mObjects.heater.body.setPadTop(2);                                          // pad-top="2px"
+    mObjects.heater.body.setPadBottom(2);                                       // pad-bottom="2px"
     mObjects.heater.body.setPadGap(7);                                          // pad-gap="7px"
     mObjects.heater.body.setBgColor(lv_color_hex(0x111a21));                    // bg-color="#111A21"
     mObjects.heater.body.setBgOpa(255);                                         // bg-opa="100%"
@@ -189,6 +199,7 @@ void SimpleScreenGui::init(){
     mObjects.heater._namelessContainer_0.setFlexFlow(LV_FLEX_FLOW_COLUMN);      // flex-flow="column"
     mObjects.heater._namelessContainer_0.setFlexGrow(1);                        // flex-grow="1"
     mObjects.heater._namelessContainer_0.setHeightContent();                    // height="content"
+    mObjects.heater._namelessContainer_0.setPadGap(0);                          // pad-gap="0px"
     mObjects.heater.label.setText("HEATER");                                    // text="HEATER"
     mObjects.heater.label.setTextColor(lv_color_hex(0x778791));                 // text-color="#778791"
     mObjects.heater.value.setText("0%");                                        // text="0%"
@@ -198,7 +209,10 @@ void SimpleScreenGui::init(){
     mObjects.fan.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
     mObjects.fan.body.setWidth(LV_PCT(100));                                    // width="100%"
     mObjects.fan.body.setFlexGrow(1);                                           // flex-grow="1"
-    mObjects.fan.body.setPad(4, 7, 4, 7);                                       // pad="4px 7px 4px 7px"
+    mObjects.fan.body.setPadLeft(7);                                            // pad-left="7px"
+    mObjects.fan.body.setPadRight(7);                                           // pad-right="7px"
+    mObjects.fan.body.setPadTop(2);                                             // pad-top="2px"
+    mObjects.fan.body.setPadBottom(2);                                          // pad-bottom="2px"
     mObjects.fan.body.setPadGap(7);                                             // pad-gap="7px"
     mObjects.fan.body.setBgColor(lv_color_hex(0x111a21));                       // bg-color="#111A21"
     mObjects.fan.body.setBgOpa(255);                                            // bg-opa="100%"
@@ -214,20 +228,15 @@ void SimpleScreenGui::init(){
     mObjects.fan._namelessContainer_0.setFlexFlow(LV_FLEX_FLOW_COLUMN);         // flex-flow="column"
     mObjects.fan._namelessContainer_0.setFlexGrow(1);                           // flex-grow="1"
     mObjects.fan._namelessContainer_0.setHeightContent();                       // height="content"
+    mObjects.fan._namelessContainer_0.setPadGap(0);                             // pad-gap="0px"
     mObjects.fan.label.setText("FAN");                                          // text="FAN"
     mObjects.fan.label.setTextColor(lv_color_hex(0x778791));                    // text-color="#778791"
     mObjects.fan.value.setText("OFF");                                          // text="OFF"
     mObjects.fan.value.setTextColor(lv_color_hex(0xffffff));                    // text-color="#FFFFFF"
     mObjects.footer.setWidth(LV_PCT(100));                                      // width="100%"
-    mObjects.footer.setHeight(18);                                              // height="18px"
-    mObjects.footer.setLayout(LV_LAYOUT_FLEX);                                  // layout="flex"
-    mObjects.footer.setFlexFlow(LV_FLEX_FLOW_ROW);                              // flex-flow="row"
-    mObjects.footer.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
-    mObjects.powerHint.setText("PRESS: START/STOP");                            // text="PRESS: START/STOP"
-    mObjects.powerHint.setFlexGrow(1);                                          // flex-grow="1"
-    mObjects.powerHint.setTextColor(lv_color_hex(0x60717b));                    // text-color="#60717B"
-    mObjects.rangeHint.setText("15-50 C");                                      // text="15-50 C"
-    mObjects.rangeHint.setTextColor(lv_color_hex(0x60717b));                    // text-color="#60717B"
+    mObjects.footer.setHeight(20);                                              // height="20px"
+    mObjects.pressHint.setText("PRESS: START/STOP");                            // text="PRESS: START/STOP"
+    mObjects.holdHint.setText("HOLD: MENU");                                    // text="HOLD: MENU"
 }
 
 void SimpleScreenGui::show(){
@@ -284,9 +293,9 @@ SimpleScreenGui::Objects::Objects():
     humidity(sidePanel),
     heater(sidePanel),
     fan(sidePanel),
-    footer(wrapper),
-    powerHint(footer),
-    rangeHint(footer){}
+    footer(root),
+    pressHint(footer),
+    holdHint(footer){}
 
 } // namespace
 

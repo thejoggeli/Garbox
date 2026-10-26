@@ -1,6 +1,7 @@
 #include "SimpleScreen.h"
 
 #include <math.h>
+#include "app/components/screens/ScreenCommandBar.h"
 #include "app/providers/ColorMaps.h"
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
@@ -41,7 +42,27 @@ void SimpleScreen::onInit(){
     gui().humidity.value.setFont(&lv_font_montserrat_12);
     gui().heater.value.setFont(&lv_font_montserrat_12);
     gui().fan.value.setFont(&lv_font_montserrat_12);
-    gui().footer.setFont(&lv_font_unscii_8);
+
+    // Metric cards are fixed status displays, not scrollable viewports. LVGL's
+    // default scrollbar becomes visible when font metrics round up by a pixel,
+    // which looks like an unexplained grey indicator at the card's right edge.
+    auto configureMetricCard = [](SimpleScreenGui::MetricCard& card){
+        card.body.setScrollable(false);
+        lv_obj_set_scrollbar_mode(card.body.raw(), LV_SCROLLBAR_MODE_OFF);
+        card._namelessContainer_0.setScrollable(false);
+        lv_obj_set_scrollbar_mode(card._namelessContainer_0.raw(), LV_SCROLLBAR_MODE_OFF);
+    };
+    configureMetricCard(gui().humidity);
+    configureMetricCard(gui().heater);
+    configureMetricCard(gui().fan);
+
+    ConfigureScreenCommandBar(
+        gui().footer,
+        gui().pressHint,
+        gui().holdHint,
+        "PRESS: START/STOP",
+        "HOLD: MENU"
+    );
 
     initArc(gui().arcBg);
     initArc(gui().arcMeasured);

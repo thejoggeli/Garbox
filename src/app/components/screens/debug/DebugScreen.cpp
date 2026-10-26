@@ -1,5 +1,6 @@
 #include "DebugScreen.h"
 
+#include "app/components/screens/ScreenCommandBar.h"
 #include "core/log/Log.h"
 #include "core/util/helpers/StringUtils.h"
 
@@ -8,7 +9,9 @@ namespace Garbox {
 DebugScreen::DebugScreen():
     DebugScreenAbs(),
     mHeaderLabel(mRoot),
-    mFooterLabel(mRoot),
+    mFooter(mRoot),
+    mFooterPressHint(mFooter),
+    mFooterHoldHint(mFooter),
     mProgressBox(mRoot),
     mMicrosLabel(mRoot),
     mTimeLabel(mRoot),
@@ -41,12 +44,13 @@ void DebugScreen::onInit(){
     mHeaderLabel.setFont(&lv_font_montserrat_12);
     mHeaderLabel.setTextColor(lv_color_hex(0x8AB4F4));
 
-    mFooterLabel.setText("PRESS: EVENT LOG     HOLD: BACK");
-    mFooterLabel.setPosition(0, 222);
-    mFooterLabel.setWidth(mScreenWidth);
-    mFooterLabel.setTextAlign(LV_TEXT_ALIGN_CENTER);
-    mFooterLabel.setFont(&lv_font_unscii_8);
-    mFooterLabel.setTextColor(lv_color_hex(0x60717B));
+    ConfigureScreenCommandBar(
+        mFooter,
+        mFooterPressHint,
+        mFooterHoldHint,
+        "PRESS: EVENT LOG",
+        "HOLD: MAIN"
+    );
 
     const int16_t startXPx = 9;
     const int16_t startYPx = 29;

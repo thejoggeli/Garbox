@@ -37,7 +37,8 @@
   <root bg-color="#070B0E" text-color="#FFFFFF">
     <container
       name="wrapper" layout="flex" flex-flow="row"
-      width="100%" height="100%" pad="6px" pad-gap="6px">
+      width="100%" height="220px"
+      pad-left="6px" pad-right="6px" pad-top="5px" pad-bottom="4px" pad-gap="6px">
 
       <container name="chartsPanel" layout="flex" flex-flow="column" width="194px" height="100%" pad-gap="4px">
         <container name="chartsHeader" width="100%" height="20px" layout="flex" flex-flow="row" flex-align="center center center">
@@ -45,8 +46,8 @@
           <label name="windowLabel" text="1 MIN" text-color="#8AB4F4" />
         </container>
 
-        <GraphComponent name="tempGraph" width="100%" height="105px" />
-        <GraphComponent name="powerGraph" width="100%" height="72px" />
+        <GraphComponent name="tempGraph" width="100%" height="98px" />
+        <GraphComponent name="powerGraph" width="100%" height="66px" />
 
         <container name="timeAxis" width="100%" flex-grow="1" layout="flex" flex-flow="row" flex-align="space-around center center" pad-left="18px">
           <label name="t4" width="20%" text-align="center" text-color="#60717B" text="60s" />
@@ -65,8 +66,7 @@
         </container>
 
         <container name="controlHeader" width="100%" height="14px" layout="flex" flex-flow="row">
-          <label name="controlsTitle" text="CONTROLS" flex-grow="1" text-color="#778791" />
-          <label name="editHint" text="PRESS" text-color="#60717B" />
+          <label name="controlsTitle" text="CONTROLS" text-color="#778791" />
         </container>
 
         <container name="menuContainer" width="100%" flex-grow="1" layout="flex" flex-flow="column" flex-align="center">
@@ -84,9 +84,12 @@
           <InfoTile name="powerInfo" $icon="power16"       $value="0.0W"  width="50%" height="50%" />
           <InfoTile name="timeInfo"  $icon="temperature16" $value="32.0°" width="50%" height="50%" />
         </container>
-
-        <label name="homeHint" text="HOLD: HOME" width="100%" text-align="center" text-color="#60717B" />
       </container>
+    </container>
+
+    <container name="footer" width="100%" height="20px">
+      <label name="pressHint" text="PRESS: EDIT/OPEN" />
+      <label name="holdHint" text="HOLD: HOME" />
     </container>
   </root>
 </gui>

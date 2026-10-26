@@ -1,5 +1,6 @@
 #include "StateLogScreen.h"
 
+#include "app/components/screens/ScreenCommandBar.h"
 #include "core/log/Log.h"
 #include "core/util/math/MathUtils.h"
 
@@ -17,7 +18,9 @@ StateLogScreen::StateLogScreen():
     StateLogScreenAbs(), 
     mHeader(mRoot),
     mRows(mRoot),
-    mFooter(mRoot){}
+    mFooter(mRoot),
+    mFooterPressHint(mFooter),
+    mFooterHoldHint(mFooter){}
 
 void StateLogScreen::onInit(){
     mHeader.setText("STATE LOG");
@@ -35,6 +38,8 @@ void StateLogScreen::onInit(){
         row.container.setFlexGrow(1);
         row.container.setLayout(LV_LAYOUT_FLEX);
         row.container.setFlexFlow(LV_FLEX_FLOW_ROW);
+        row.container.setScrollable(false);
+        lv_obj_set_scrollbar_mode(row.container.raw(), LV_SCROLLBAR_MODE_OFF);
         row.container.setTextColor(DefaultTextColor);
         row.container.setFont(&lv_font_montserrat_10);
 
@@ -53,17 +58,18 @@ void StateLogScreen::onInit(){
         row.text.setText("...");
     }
 
-    mFooter.setText("PRESS: DIAGNOSTICS     HOLD: BACK");
-    mFooter.setWidth(LV_PCT(100));
-    mFooter.setHeight(17);
-    mFooter.setTextAlign(LV_TEXT_ALIGN_CENTER);
-    mFooter.setFont(&lv_font_unscii_8);
-    mFooter.setTextColor(lv_color_hex(0x756A94));
+    ConfigureScreenCommandBar(
+        mFooter,
+        mFooterPressHint,
+        mFooterHoldHint,
+        "PRESS: DIAGNOSTICS",
+        "HOLD: MAIN"
+    );
 
     setBackgroundColor(0x0C0918);
     mRoot.setLayout(LV_LAYOUT_FLEX);
     mRoot.setFlexFlow(LV_FLEX_FLOW_COLUMN);
-    mRoot.setFlexAlign(LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    mRoot.setFlexAlign(LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 }
 
 void StateLogScreen::onStart(){
