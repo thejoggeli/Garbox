@@ -269,9 +269,11 @@ class SimulationTicker:
         self._simulator = simulator
         self._stop = threading.Event()
         self._thread = threading.Thread(target=self._run, name="garbox-ticker", daemon=True)
+        self._started = False
 
     def start(self) -> None:
         self._thread.start()
+        self._started = True
 
     def _run(self) -> None:
         deadline = time.monotonic()
@@ -286,7 +288,8 @@ class SimulationTicker:
 
     def stop(self) -> None:
         self._stop.set()
-        self._thread.join(timeout=2)
+        if self._started:
+            self._thread.join(timeout=2)
 
 
 class Handler(BaseHTTPRequestHandler):
