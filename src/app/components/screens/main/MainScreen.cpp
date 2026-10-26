@@ -91,6 +91,16 @@ void MainScreen::onInit(){
     // setup info labels
     const lv_font_t* infoLabelFont = &lv_font_montserrat_12; 
     gui().infoTiles.setFont(infoLabelFont);
+    gui().infoTiles.setScrollable(false);
+    lv_obj_set_scrollbar_mode(gui().infoTiles.raw(), LV_SCROLLBAR_MODE_OFF);
+    auto disableInfoTileScrolling = [](MainScreenGui::InfoTile& tile){
+        tile.body.setScrollable(false);
+        lv_obj_set_scrollbar_mode(tile.body.raw(), LV_SCROLLBAR_MODE_OFF);
+    };
+    disableInfoTileScrolling(gui().fanInfo);
+    disableInfoTileScrolling(gui().humidInfo);
+    disableInfoTileScrolling(gui().powerInfo);
+    disableInfoTileScrolling(gui().deltaInfo);
 
     // setup menu
     const lv_font_t* menuFont = &lv_font_montserrat_10;

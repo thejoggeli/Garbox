@@ -49,7 +49,8 @@ def verify(output_dir: Path | None) -> None:
 
         simulator.command("encoder 5")
         short_press(simulator)
-        simulator.command("step 2")
+        capture(simulator, "Simple", "02-home-starting", output_dir)
+        simulator.command("step 20")
         active = capture(simulator, "Simple", "02-home-running", output_dir)
         if active["target"] != "32.500" or active["power"] != "1":
             raise AssertionError(f"home controls did not update application state: {active}")

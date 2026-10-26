@@ -112,8 +112,8 @@ void DebugScreen::onInit(){
     // column and leave room for future diagnostic fields.
     initCard(mSystemCard,   6,   4, 304, 143, "SYSTEM",  0x8AB4F4);
     initCard(mClimateCard,  6, 153, 304, 118, "CLIMATE", 0x75C8C8);
-    initCard(mOutputsCard,  6, 277, 304, 180, "OUTPUTS", 0xD1B254);
-    initCard(mMemoryCard,   6, 463, 304, 126, "MEMORY",  0xBDA7FF);
+    initCard(mOutputsCard,  6, 277, 304, 150, "OUTPUTS", 0xD1B254);
+    initCard(mMemoryCard,   6, 433, 304, 120, "MEMORY",  0xBDA7FF);
 
     initLabel(mTimeLabel,               10,  29, "UPTIME");
     initLabel(mMicrosLabel,             10,  44, "CLOCK");
@@ -131,7 +131,7 @@ void DebugScreen::onInit(){
     initLabel(mHeapMinimumLabel,        10,  54, "MIN FREE");
     initLabel(mHeapBlocksLabel,         10,  79, "FREE BLOCKS");
 
-    mProgressTrack.setPosition(10, 165);
+    mProgressTrack.setPosition(10, 137);
     mProgressTrack.setRawSize(284, 4);
     mProgressTrack.setBgColor(lv_color_hex(0x26343D));
     mProgressTrack.setBgOpa(LV_OPA_COVER);

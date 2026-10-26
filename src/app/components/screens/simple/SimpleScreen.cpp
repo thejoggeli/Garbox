@@ -36,9 +36,11 @@ void SimpleScreen::onInit(){
     gui().targetRotateLeft.setText(LV_SYMBOL_LEFT);
     gui().targetRotateLeft.setFont(&lv_font_montserrat_12);
     gui().targetRotateLeft.setTextColor(lv_color_hex(ColorBlue));
+    gui().targetRotateLeft.setStyleTranslateY(-4, LV_PART_MAIN);
     gui().targetRotateRight.setText(LV_SYMBOL_RIGHT);
     gui().targetRotateRight.setFont(&lv_font_montserrat_12);
     gui().targetRotateRight.setTextColor(lv_color_hex(ColorBlue));
+    gui().targetRotateRight.setStyleTranslateY(-4, LV_PART_MAIN);
     gui().humidity.label.setFont(&lv_font_unscii_8);
     gui().heater.label.setFont(&lv_font_unscii_8);
     gui().fan.label.setFont(&lv_font_unscii_8);
@@ -128,7 +130,7 @@ void SimpleScreen::onBecomeEnabled(){
 }
 
 void SimpleScreen::onBecomeDisabled(){
-    // to be implemented
+    mStartupBannerTimer.reset();
 }
 
 void SimpleScreen::onButtonEvent(const ButtonEvent& event){
@@ -143,8 +145,18 @@ void SimpleScreen::onButtonEvent(const ButtonEvent& event){
         markDirty(RenderFn::EngineStatus);
 
         // send request toggle engine power 
+        const bool enable = !states().fermentationStatus.getPowerOn();
+        if(enable){
+            // The engine crosses an internal startup state in one or two
+            // control ticks. Present it long enough to read instead of
+            // allowing an unexplained amber flash.
+            mStartupBannerTimer.start(600_ms);
+        }
+        else {
+            mStartupBannerTimer.reset();
+        }
         RequestFermentationModeEvent request = makeRequestFermentationModeEvent();
-        request->enabled = !states().fermentationStatus.getPowerOn();
+        request->enabled = enable;
         sendEvent(request);
     }
     else if(event->newState == ButtonState::PressedLong){
@@ -173,14 +185,23 @@ void SimpleScreen::onEncoderStepEvent(const EncoderStepEvent& event){
 }
 
 void SimpleScreen::onRender(){
-    // nothing to do
+    if(mStartupBannerTimer.isExpired()){
+        mStartupBannerTimer.reset();
+        markDirty(RenderFn::EngineStatus);
+    }
 }
 
 void SimpleScreen::onRenderEngineStatus(){
     const FermentationStatusState& status = states().fermentationStatus;
     const char* text = "CONTROL OFF";
     uint32_t color = 0x3A2528;
-    if(status.getPowerOn()){
+    const bool priorityState = status.getState() == FermentationState::InvalidInput
+        || status.getState() == FermentationState::OverTemperature;
+    if(status.getPowerOn() && mStartupBannerTimer.isRunningAndNotExpired() && !priorityState){
+        text = "STARTING";
+        color = ColorAmber;
+    }
+    else if(status.getPowerOn()){
         switch(status.getState()){
         case FermentationState::Ready: text = "CONTROL READY"; color = ColorAmber; break;
         case FermentationState::Regulating:

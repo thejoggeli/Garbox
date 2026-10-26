@@ -61,7 +61,9 @@ The large chamber value and outer measured arc dominate the screen. The thinner 
 The header is a single full-width control-state banner. Normal sensor health and
 automatic fan policy are intentionally omitted: neither requires action, while
 sensor failures and exceptional cooling states appear directly in the banner and
-the affected measurement cards.
+the affected measurement cards. After power-on, `STARTING` remains visible for
+600 ms before the stable operating state replaces it; safety faults bypass this
+presentation delay and appear immediately.
 
 The status pill uses explicit words rather than color alone:
 

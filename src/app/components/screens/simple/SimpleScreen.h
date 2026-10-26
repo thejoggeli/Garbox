@@ -7,6 +7,7 @@
 // ==== GENERATED END: include ====================================================
 
 #include "core/lvgl/objects/LvArc.h"
+#include "core/time/SoftwareTimer.h"
 
 namespace Garbox {
 
@@ -19,6 +20,7 @@ private:
     };
 
     bool mFermentationStatusGlow = false;
+    SoftwareTimer mStartupBannerTimer;
 
     void initArc(LvArc& arc);
     bool isSensorOk();
