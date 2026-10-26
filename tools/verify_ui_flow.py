@@ -97,17 +97,28 @@ def verify(output_dir: Path | None) -> None:
         ):
             raise AssertionError(f"Main manual fan control failed: {manual_fan}")
 
-        # Fan speed is row three; Diagnostics is three rows clockwise.
+        # Fan speed is row three. Exercise the two plot-range editors before
+        # continuing to Diagnostics.
         simulator.command("encoder 3")
+        short_press(simulator)
+        simulator.command("encoder 1")
+        short_press(simulator)
+        simulator.command("encoder 1")
+        short_press(simulator)
+        simulator.command("encoder 2")
+        short_press(simulator)
+        capture(simulator, "Main", "03f-temperature-range", output_dir)
+
+        simulator.command("encoder 1")
         short_press(simulator)
         capture(simulator, "Debug", "04-diagnostics", output_dir)
 
         # Diagnostics is a vertically scrollable report; rotation must not
         # unexpectedly switch screens.
-        simulator.command("encoder 7")
+        simulator.command("encoder 9")
         capture(simulator, "Debug", "04a-diagnostics-middle", output_dir)
 
-        simulator.command("encoder 13")
+        simulator.command("encoder 11")
         capture(simulator, "Debug", "04b-diagnostics-bottom", output_dir)
 
         simulator.command("encoder -20")

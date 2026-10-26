@@ -17,6 +17,8 @@ public:
         FanSpeed,
         Brightness,
         History,
+        PlotMinimum,
+        PlotMaximum,
         Diagnostics,
         EventLog,
         StateLog,
@@ -45,6 +47,7 @@ public:
     void setPowerEnabled(bool enabled);
     void setTargetTemperatureCelsius(float temperature);
     void setHistoryIndex(uint8_t index);
+    void setPlotRange(int32_t minimumCelsius, int32_t maximumCelsius);
     void setFanAuto(bool isAuto);
     void setFanManualSpeed(float speed);
     void setBrightness(float brightness);
@@ -52,6 +55,8 @@ public:
     bool isPowerEnabled() const;
     float getTargetTemperatureCelsius() const;
     uint32_t getHistoryIndex() const;
+    int32_t getPlotMinimumCelsius() const;
+    int32_t getPlotMaximumCelsius() const;
     bool isFanAuto() const;
     float getFanManualSpeed() const;
     float getBrightness() const;

@@ -1,5 +1,7 @@
 #include "MainScreen.h"
 
+#include <algorithm>
+#include <cstdio>
 #include <math.h>
 #include "app/components/screens/ScreenCommandBar.h"
 #include "core/log/Log.h"
@@ -24,8 +26,6 @@ static constexpr uint32_t GridLineWidth = 1;
 static constexpr uint32_t ChartsPointCount = GarboxHistory::SampleCount;
 
 static constexpr int32_t TempChartYScale = GarboxHistory::TemperaturScaleFactor;
-static constexpr int32_t TempChartYMin = TempChartYScale * 16;
-static constexpr int32_t TempChartYMax = TempChartYScale * 44;
  
 static constexpr int32_t PowerChartYScale = GarboxHistory::PowerScaleFactor;
 static constexpr int32_t PowerChartYMin = PowerChartYScale * (0 - 20);
@@ -99,19 +99,14 @@ void MainScreen::onInit(){
     gui().menuArrDown.setOpa(LV_OPA_COVER);
 
     // init charts
-    initChart(mTempChart, TempChartYMin, TempChartYMax);
+    initChart(mTempChart, 19 * TempChartYScale, 41 * TempChartYScale);
     initChart(mPowerChart, PowerChartYMin, PowerChartYMax);
     mTempChart.addSeries(ColorBlue);
     mTempChart.addSeries(ColorTarget);
     mPowerChart.addSeries(ColorRed);
 
-    // temperature horizontal grid
-    mTempGrid.setYTickPosition(0, MathUtils::Normalize(20 * TempChartYScale, TempChartYMin, TempChartYMax));
-    mTempGrid.setYTickPosition(1, MathUtils::Normalize(30 * TempChartYScale, TempChartYMin, TempChartYMax));
-    mTempGrid.setYTickPosition(2, MathUtils::Normalize(40 * TempChartYScale, TempChartYMin, TempChartYMax));
-    mTempGrid.setYTickLabel(0, "20°C");
-    mTempGrid.setYTickLabel(1, "30°C");
-    mTempGrid.setYTickLabel(2, "40°C");
+    // Temperature range and grid labels are user-selectable from the menu.
+    setTemperaturePlotRange(mTemperaturePlotMinimumCelsius, mTemperaturePlotMaximumCelsius);
 
     // power horizontal grid
     mPowerGrid.setYTickPosition(0, MathUtils::Normalize(0   * PowerChartYScale, PowerChartYMin, PowerChartYMax));
@@ -245,6 +240,12 @@ void MainScreen::handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, in
         case MenuRowIndex::History:
             setHistoryIndex(static_cast<HistoryIndex>(newValue));
             break;
+        case MenuRowIndex::PlotMinimum:
+            setTemperaturePlotRange(newValue, mTemperaturePlotMaximumCelsius);
+            break;
+        case MenuRowIndex::PlotMaximum:
+            setTemperaturePlotRange(mTemperaturePlotMinimumCelsius, newValue);
+            break;
         default: break;
     }
 }
@@ -353,10 +354,13 @@ void MainScreen::onRenderStatusInfo(){
 void MainScreen::onRenderMeasuredTemperatureLabel(){
     if(!isSensorOk()){
         gui().tempGraph.value.setTextFormatted(resovleSensorText());
+        gui().deltaInfo.value.setText(resovleSensorText());
         return;
     }
     float temperature = states().temperatureSample.getTemperatureCelcius();
     gui().tempGraph.value.setTextFormatted("%.1f°C", temperature);
+    const float error = temperature - states().fermentationStatus.getTargetTemperature();
+    gui().deltaInfo.value.setTextFormatted("%+.1f°", error);
 }
 
 void MainScreen::onRenderHeatpadPowerLabel(){
@@ -393,10 +397,10 @@ void MainScreen::onRenderMenu(){
     mMenu.setPowerEnabled(states().fermentationStatus.getPowerOn());
     mMenu.setTargetTemperatureCelsius(states().fermentationStatus.getTargetTemperature());
     mMenu.setHistoryIndex(mHistoryIndex);
+    mMenu.setPlotRange(mTemperaturePlotMinimumCelsius, mTemperaturePlotMaximumCelsius);
     mMenu.setFanAuto(states().fermentationStatus.getFanAuto());
     mMenu.setFanManualSpeed(states().fermentationStatus.getFanManualSpeed());
     mMenu.setBrightness(states().displayStatus.getBrightness());
-    gui().timeInfo.value.setTextFormatted("%.1f°", states().fermentationStatus.getTargetTemperature());
     mMenu.render();
     updateMenuChrome();
 }
@@ -434,6 +438,7 @@ void MainScreen::onTemperatureSampleStateChanged(const TemperatureSampleState& s
 
 void MainScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){
     markDirty(RenderFn::StatusInfo);
+    markDirty(RenderFn::MeasuredTemperatureLabel);
     markDirty(RenderFn::Menu);
 }
 
@@ -441,6 +446,36 @@ void MainScreen::setHistoryIndex(HistoryIndex index){
     mHistoryIndex = index;
     markDirty(RenderFn::TimeAxis);
     markDirty(RenderFn::TimeSeries);
+    markDirty(RenderFn::Menu);
+}
+
+void MainScreen::setTemperaturePlotRange(int32_t minimumCelsius, int32_t maximumCelsius){
+    if(minimumCelsius >= maximumCelsius){
+        return;
+    }
+
+    mTemperaturePlotMinimumCelsius = minimumCelsius;
+    mTemperaturePlotMaximumCelsius = maximumCelsius;
+
+    const int32_t rangeCelsius = maximumCelsius - minimumCelsius;
+    const int32_t paddingScaled = std::max(1, rangeCelsius * TempChartYScale / 20);
+    const int32_t chartMinimum = minimumCelsius * TempChartYScale - paddingScaled;
+    const int32_t chartMaximum = maximumCelsius * TempChartYScale + paddingScaled;
+    const int32_t middleCelsius = (minimumCelsius + maximumCelsius) / 2;
+
+    mTempChart.getLvChart().setAxisRange(LV_CHART_AXIS_PRIMARY_Y, chartMinimum, chartMaximum);
+
+    const int32_t ticks[] = {minimumCelsius, middleCelsius, maximumCelsius};
+    for(uint32_t i = 0; i < 3; i++){
+        mTempGrid.setYTickPosition(
+            i,
+            MathUtils::Normalize(ticks[i] * TempChartYScale, chartMinimum, chartMaximum)
+        );
+        std::snprintf(mTemperatureGridLabels[i], sizeof(mTemperatureGridLabels[i]), "%d°C", ticks[i]);
+        mTempGrid.setYTickLabel(i, mTemperatureGridLabels[i]);
+    }
+
+    mTempChart.getLvChart().refresh();
     markDirty(RenderFn::Menu);
 }
 

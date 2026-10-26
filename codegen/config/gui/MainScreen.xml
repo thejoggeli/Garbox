@@ -83,7 +83,7 @@
           <InfoTile name="fanInfo"   $icon="fan16"         $value="OFF"   width="50%" height="50%" />
           <InfoTile name="humidInfo" $icon="humidity16"    $value="--%"   width="50%" height="50%" />
           <InfoTile name="powerInfo" $icon="power16"       $value="0.0W"  width="50%" height="50%" />
-          <InfoTile name="timeInfo"  $icon="temperature16" $value="32.0°" width="50%" height="50%" />
+          <InfoTile name="deltaInfo" $icon="temperature16" $value="--.-°" width="50%" height="50%" />
         </container>
       </container>
     </container>

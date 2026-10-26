@@ -86,7 +86,7 @@ public:
         InfoTile fanInfo;
         InfoTile humidInfo;
         InfoTile powerInfo;
-        InfoTile timeInfo;
+        InfoTile deltaInfo;
         LvObject footer;
         LvLabel pressHint;
         LvLabel holdHint;

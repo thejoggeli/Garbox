@@ -204,18 +204,18 @@ void MainScreenGui::init(){
     mObjects.powerInfo.icon.setOpa(166);                                        // opa="65%"
     mObjects.powerInfo.value.setText("0.0W");                                   // text="0.0W"
     mObjects.powerInfo.value.setTextAlign(LV_TEXT_ALIGN_LEFT);                  // text-align="left"
-    mObjects.timeInfo.body.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
-    mObjects.timeInfo.body.setFlexFlow(LV_FLEX_FLOW_ROW);                       // flex-flow="row"
-    mObjects.timeInfo.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
-    mObjects.timeInfo.body.setPadGap(3);                                        // pad-gap="3px"
-    mObjects.timeInfo.body.setWidth(LV_PCT(50));                                // width="50%"
-    mObjects.timeInfo.body.setHeight(LV_PCT(50));                               // height="50%"
-    mObjects.timeInfo.icon.setSource(&MainScreen_image_temperature16);          // src="temperature16"
-    mObjects.timeInfo.icon.setWidth(16);                                        // width="16px"
-    mObjects.timeInfo.icon.setHeight(16);                                       // height="16px"
-    mObjects.timeInfo.icon.setOpa(166);                                         // opa="65%"
-    mObjects.timeInfo.value.setText("32.0°");                                   // text="32.0°"
-    mObjects.timeInfo.value.setTextAlign(LV_TEXT_ALIGN_LEFT);                   // text-align="left"
+    mObjects.deltaInfo.body.setLayout(LV_LAYOUT_FLEX);                          // layout="flex"
+    mObjects.deltaInfo.body.setFlexFlow(LV_FLEX_FLOW_ROW);                      // flex-flow="row"
+    mObjects.deltaInfo.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
+    mObjects.deltaInfo.body.setPadGap(3);                                       // pad-gap="3px"
+    mObjects.deltaInfo.body.setWidth(LV_PCT(50));                               // width="50%"
+    mObjects.deltaInfo.body.setHeight(LV_PCT(50));                              // height="50%"
+    mObjects.deltaInfo.icon.setSource(&MainScreen_image_temperature16);         // src="temperature16"
+    mObjects.deltaInfo.icon.setWidth(16);                                       // width="16px"
+    mObjects.deltaInfo.icon.setHeight(16);                                      // height="16px"
+    mObjects.deltaInfo.icon.setOpa(166);                                        // opa="65%"
+    mObjects.deltaInfo.value.setText("--.-°");                                  // text="--.-°"
+    mObjects.deltaInfo.value.setTextAlign(LV_TEXT_ALIGN_LEFT);                  // text-align="left"
     mObjects.footer.setWidth(LV_PCT(100));                                      // width="100%"
     mObjects.footer.setHeight(20);                                              // height="20px"
     mObjects.pressHint.setText("PRESS: EDIT/OPEN");                             // text="PRESS: EDIT/OPEN"
@@ -279,7 +279,7 @@ MainScreenGui::Objects::Objects():
     fanInfo(infoTiles),
     humidInfo(infoTiles),
     powerInfo(infoTiles),
-    timeInfo(infoTiles),
+    deltaInfo(infoTiles),
     footer(root),
     pressHint(footer),
     holdHint(footer){}

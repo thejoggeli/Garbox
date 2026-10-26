@@ -44,6 +44,8 @@ MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChan
     mMenu.addRow("Fan speed", 0);
     mMenu.addRow("Brightness", 50);
     mMenu.addRow("History", 0);
+    mMenu.addRow("Plot min", 20);
+    mMenu.addRow("Plot max", 40);
     mMenu.addRow("Diagnostics", 0);
     mMenu.addRow("Event log", 0);
     mMenu.addRow("State log", 0);
@@ -131,6 +133,12 @@ int32_t MainScreenMenu::changeValue(void* callbackCtx, uint8_t rowIndex, int32_t
         case History:
             newValue = MathUtils::Wrap<int32_t>(currentValue + delta, 0, static_cast<int32_t>(HistoryCount));
             break;
+        case PlotMinimum:
+            newValue = currentValue == 10 ? 20 : 10;
+            break;
+        case PlotMaximum:
+            newValue = MathUtils::Wrap<int32_t>(currentValue + delta * 10, 40, 70);
+            break;
         default:
             newValue = currentValue;
             break;
@@ -154,6 +162,11 @@ void MainScreenMenu::valueToText(void* callbackCtx, uint8_t rowIndex, int32_t va
 
         case History:
             std::snprintf(outText, maxLen, "%s", HistoryLabels[value]);
+            break;
+
+        case PlotMinimum:
+        case PlotMaximum:
+            std::snprintf(outText, maxLen, "%d°C", value);
             break;
 
         case FanMode:
@@ -193,6 +206,11 @@ void MainScreenMenu::setHistoryIndex(uint8_t index){
     mMenu.setValue(RowIndex::History, index);
 }
 
+void MainScreenMenu::setPlotRange(int32_t minimumCelsius, int32_t maximumCelsius){
+    mMenu.setValue(RowIndex::PlotMinimum, minimumCelsius);
+    mMenu.setValue(RowIndex::PlotMaximum, maximumCelsius);
+}
+
 void MainScreenMenu::setFanAuto(bool isAuto){
     mMenu.setValue(RowIndex::FanMode, isAuto ? 1 : 0);
 }
@@ -215,6 +233,14 @@ float MainScreenMenu::getTargetTemperatureCelsius() const{
 
 uint32_t MainScreenMenu::getHistoryIndex() const{
     return static_cast<uint32_t>(mMenu.getValue(RowIndex::History));
+}
+
+int32_t MainScreenMenu::getPlotMinimumCelsius() const{
+    return mMenu.getValue(RowIndex::PlotMinimum);
+}
+
+int32_t MainScreenMenu::getPlotMaximumCelsius() const{
+    return mMenu.getValue(RowIndex::PlotMaximum);
 }
 
 bool MainScreenMenu::isFanAuto() const{

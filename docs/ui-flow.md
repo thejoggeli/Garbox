@@ -56,24 +56,25 @@ Home answers the questions that matter during normal use, in visual priority ord
 3. What target am I controlling toward?
 4. What are humidity, heater duty, and fan speed doing?
 
-The large chamber value and outer measured arc dominate the screen. The thinner amber target arc provides a stable reference, while the measured arc changes color according to error relative to the target. The text below the value reports the signed error. A separate outlined target card uses blue left/right arrows that mirror encoder rotation, making adjustment discoverable without a sentence of instruction.
+The large chamber value and outer measured arc dominate the screen. The thinner amber target arc provides a stable reference, while the measured arc changes color according to error relative to the target. The text below the value reports the signed error. A separate outlined target card places blue left/right arrows directly around the setpoint, mirroring encoder rotation without an additional instruction label.
 
-The header now uses its limited space for live status: sensor readiness in the
-middle and automatic/manual fan policy on the right. These replace the redundant
-application title and static temperature-range label.
+The header is a single full-width control-state banner. Normal sensor health and
+automatic fan policy are intentionally omitted: neither requires action, while
+sensor failures and exceptional cooling states appear directly in the banner and
+the affected measurement cards.
 
 The status pill uses explicit words rather than color alone:
 
 | State | Home label | Meaning |
 |---|---|---|
-| Power off | `OFF` | Regulation is disabled. |
+| Power off | `CONTROL OFF` | Regulation is disabled. |
 | Reset/initial transition | `STARTING` | Control is entering a usable state. |
-| Ready | `READY` | Enabled but waiting to regulate. |
+| Ready | `CONTROL READY` | Enabled but waiting to regulate. |
 | Regulating with heat | `HEATING` | Heater duty is non-zero. |
 | Regulating without heat | `HOLDING` | Running at zero heater duty. |
 | Cooldown | `COOLING` | Heater off, safety cooling active. |
-| Over-temperature | `TOO HOT` | Heater off, safety cooling active. |
-| Invalid input | `SENSOR` | Input fault; heater off and safety fan requested. |
+| Over-temperature | `OVER TEMPERATURE` | Heater off, safety cooling active. |
+| Invalid input | `SENSOR FAULT` | Input fault; heater off and safety fan requested. |
 
 If the sensor is not ready, measured temperature and humidity show placeholders rather than default data.
 
@@ -81,7 +82,7 @@ If the sensor is not ready, measured temperature and humidity show placeholders 
 
 The left side preserves the original project's strongest advanced feature: multi-window time series. It plots measured temperature and target together, plots heater output separately, shows current values, and labels the selected interval. Available history windows are 1, 4, and 16 minutes; 1, 4, and 12 hours; and 1 and 4 days.
 
-The right side contains current system state, a six-row scrolling menu, and compact fan/humidity/power/target tiles. The shared command bar provides the persistent Home hint.
+The right side contains current system state, a six-row scrolling menu, and compact fan, humidity, electrical-power, and signed temperature-error tiles. The error tile replaces the target tile because target is already represented by both the graph and menu. The shared command bar provides the persistent Home hint.
 
 ### Settings and actions
 
@@ -93,6 +94,8 @@ The right side contains current system state, a six-row scrolling menu, and comp
 | Fan speed | 0–100%, 5% steps | Sets the manual fan command. The value is retained while Auto is selected. |
 | Brightness | 0–100%, 5% steps | Sends the real display-brightness command. |
 | History | 1 minute–4 days | Selects the chart aggregation window. |
+| Plot min | 10 or 20 °C | Selects the lowest labeled temperature-grid value. |
+| Plot max | 40, 50, or 60 °C | Selects the highest labeled temperature-grid value. |
 | Diagnostics | Action | Opens live engineering diagnostics. |
 | Event log | Action | Opens the routed-event log. |
 | State log | Action | Opens the published-state log. |
@@ -111,6 +114,12 @@ at the bottom of Outputs visualizes heater PWM cycle progress. The report is
 intentionally taller than the display: rotating scrolls it vertically while the
 header and command bar remain fixed, leaving room to add future diagnostics
 without compressing the existing data.
+
+Heater duty and period show one value when the applied and queued PWM settings
+match. During the interval between a control update and the next PWM-cycle
+boundary, Diagnostics instead displays `applied -> queued`. The desktop plant
+currently applies its idealized heater output immediately, so it normally shows
+the single-value form.
 
 Event Log is a rolling view of routed event ID, sender, and event type. State Log is a rolling view of state-publication sequence and state type. Both retain a marker on the newest entry. Short press moves from Diagnostics to Event Log and onward to State Log; long press returns to Main. Rotation navigates between the two compact log views, while Diagnostics reserves it for scrolling.
 

@@ -24,6 +24,9 @@ private:
     MainScreenMenu mMenu;
 
     HistoryIndex mHistoryIndex = HistoryIndex::Window_01min;
+    int32_t mTemperaturePlotMinimumCelsius = 20;
+    int32_t mTemperaturePlotMaximumCelsius = 40;
+    char mTemperatureGridLabels[3][8] {};
 
     SoftwareTimer mMenuTimer;
     SoftwareTimer mAxisTimer;
@@ -46,6 +49,7 @@ private:
     const char* resovleSensorText();
 
     void setHistoryIndex(HistoryIndex index);
+    void setTemperaturePlotRange(int32_t minimumCelsius, int32_t maximumCelsius);
 
     void handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, int32_t newValue);
     static void menuValueChangedTrampoline(void* ctx, MenuRowIndex index, int32_t oldValue, int32_t newValue){
