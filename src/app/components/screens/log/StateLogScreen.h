@@ -30,7 +30,9 @@ private:
     };
 
     static constexpr size_t NumRows = 17;
-    LvLabel mHeader;
+    LvObject mHeader;
+    LvLabel mHeaderTitle;
+    LvLabel mViewHint;
     ArrayStatic<LogRow, NumRows> mRows;
     LvObject mFooter;
     LvLabel mFooterPressHint;
@@ -57,6 +59,7 @@ public:
 
     // generated event handlers
     void onButtonEvent(const ButtonEvent& event) final;
+    void onEncoderStepEvent(const EncoderStepEvent& event) final;
 
     // generated state changed handlers
     void onStateChanged(const StateAbs& state) final;

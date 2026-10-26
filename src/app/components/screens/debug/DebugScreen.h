@@ -16,6 +16,12 @@ namespace Garbox {
 class DebugScreen : public DebugScreenAbs {
 private:
 
+    struct DiagnosticCard {
+        LvObject body;
+        LvLabel title;
+        explicit DiagnosticCard(LvObject& parent): body(parent), title(body) {}
+    };
+
     uint32_t mLastTimeSeconds = 0;
     uint32_t mLastEventCount = 0;
     uint32_t mLastStateChangesCount = 0;
@@ -24,9 +30,15 @@ private:
     uint32_t mHeapMinimumTime = 0;
 
     LvLabel mHeaderLabel;
+    LvLabel mViewHint;
     LvObject mFooter;
     LvLabel mFooterPressHint;
     LvLabel mFooterHoldHint;
+    DiagnosticCard mSystemCard;
+    DiagnosticCard mMemoryCard;
+    DiagnosticCard mClimateCard;
+    DiagnosticCard mOutputsCard;
+    LvBox mProgressTrack;
     LvBox mProgressBox;
     LvLabel mMicrosLabel;
     LvLabel mTimeLabel;
@@ -46,7 +58,15 @@ private:
 
     SoftwareTimer mHeapTimer;
 
-    // helper to init a label with position and text
+    void initCard(
+        DiagnosticCard& card,
+        int16_t x,
+        int16_t y,
+        int16_t width,
+        int16_t height,
+        const char* title,
+        uint32_t accentColor
+    );
     void initLabel(LvLabel& label, int16_t x, int16_t y, const char* text);
 
 public:
@@ -83,6 +103,7 @@ public:
 
     // generated event handlers
     void onButtonEvent(const ButtonEvent& event) final;
+    void onEncoderStepEvent(const EncoderStepEvent& event) final;
 
     // generated state changed handlers
     void onFanStatusStateChanged(const FanStatusState& state) final;

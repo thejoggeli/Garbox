@@ -17,18 +17,27 @@ StateLogScreen::LogRow::LogRow(LvObject& parent):
 StateLogScreen::StateLogScreen(): 
     StateLogScreenAbs(), 
     mHeader(mRoot),
+    mHeaderTitle(mHeader),
+    mViewHint(mHeader),
     mRows(mRoot),
     mFooter(mRoot),
     mFooterPressHint(mFooter),
     mFooterHoldHint(mFooter){}
 
 void StateLogScreen::onInit(){
-    mHeader.setText("STATE LOG");
     mHeader.setWidth(LV_PCT(100));
     mHeader.setHeight(22);
     mHeader.setPad(6, 6, 4, 2);
-    mHeader.setFont(&lv_font_montserrat_12);
-    mHeader.setTextColor(lv_color_hex(0xBDA7FF));
+    mHeader.setLayout(LV_LAYOUT_FLEX);
+    mHeader.setFlexFlow(LV_FLEX_FLOW_ROW);
+    mHeader.setFlexAlign(LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    mHeaderTitle.setText("STATE LOG");
+    mHeaderTitle.setFont(&lv_font_montserrat_12);
+    mHeaderTitle.setTextColor(lv_color_hex(0xBDA7FF));
+    mViewHint.setText("ROTATE VIEWS 3/3");
+    mViewHint.setFont(&lv_font_unscii_8);
+    mViewHint.setTextColor(lv_color_hex(0x8AB4F4));
 
     for(uint32_t i = 0; i < NumRows; i++){
         LogRow& row = mRows[i];
@@ -90,6 +99,15 @@ void StateLogScreen::onButtonEvent(const ButtonEvent& event){
     }
     else if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
         host()->requestChangeScreen(ScreenId::Debug);
+    }
+}
+
+void StateLogScreen::onEncoderStepEvent(const EncoderStepEvent& event){
+    if(event->steps > 0){
+        host()->requestChangeScreen(ScreenId::Debug);
+    }
+    else if(event->steps < 0){
+        host()->requestChangeScreen(ScreenId::EventLog);
     }
 }
 

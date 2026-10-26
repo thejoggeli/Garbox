@@ -406,6 +406,15 @@ void SimulationRuntime::onRouteEvent(const EventHeader* header){
         else if(getActiveScreenId() == ScreenId::Main){
             mMainScreen.onEncoderStepEvent(event);
         }
+        else if(getActiveScreenId() == ScreenId::Debug){
+            mDebugScreen.onEncoderStepEvent(event);
+        }
+        else if(getActiveScreenId() == ScreenId::EventLog){
+            mEventLogScreen.onEncoderStepEvent(event);
+        }
+        else if(getActiveScreenId() == ScreenId::StateLog){
+            mStateLogScreen.onEncoderStepEvent(event);
+        }
         break;
     }
     case EventType::ActiveScreenChanged:

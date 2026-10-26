@@ -33,9 +33,9 @@ Main also has an explicit Home row. Diagnostics, Event Log, and State Log each h
 | Home | Adjust target by 0.1 °C | Start/stop fermentation | Open Main |
 | Main, browsing | Move selection | Toggle binary value, enter edit mode, or open selected screen | Return Home |
 | Main, editing | Change the selected value | Accept value and leave edit mode | Return Home |
-| Diagnostics | No action | Open Event Log | Return Main |
-| Event Log | No action | Open State Log | Return Main |
-| State Log | No action | Open Diagnostics | Return Main |
+| Diagnostics | Previous/next advanced view | Open Event Log | Return Main |
+| Event Log | Previous/next advanced view | Open State Log | Return Main |
+| State Log | Previous/next advanced view | Open Diagnostics | Return Main |
 
 Every screen reserves the bottom 20 pixels for the same command bar. The action
 for a short press is always shown on the left and the long-press destination is
@@ -102,9 +102,14 @@ Manual fan control deliberately does not mean “override safety.” Invalid sen
 
 ## Advanced screens
 
-Diagnostics shows time, active behavior/screen, event and state counts, heap data, display status, fermentation state/target, SHT31 status and sample, fan state/RPM, heater state/electrical measurements, and PWM duty/period. Its moving bar visualizes heater PWM cycle progress.
+Diagnostics retains the complete engineering data set but groups it into four
+bordered cards: System, Memory, Climate, and Outputs. It shows time and the raw
+microsecond clock, active behavior/screen, event and state counts, heap data,
+display status, fermentation state/target, SHT31 status and sample, fan
+state/RPM, heater state/electrical measurements, and PWM duty/period. A fill bar
+at the bottom of Outputs visualizes heater PWM cycle progress.
 
-Event Log is a rolling view of routed event ID, sender, and event type. State Log is a rolling view of state-publication sequence and state type. Both retain a marker on the newest entry. These remain intentionally dense engineering views rather than consumer screens.
+Event Log is a rolling view of routed event ID, sender, and event type. State Log is a rolling view of state-publication sequence and state type. Both retain a marker on the newest entry. Rotation moves backward or forward through the three advanced views; short press remains a convenient next-view action. These remain intentionally dense engineering views rather than consumer screens.
 
 ## Desktop verification
 
@@ -122,6 +127,7 @@ The verifier drives typed `EncoderStep` and `Button` events through the real scr
 - Main target editing and restoration;
 - switching fan mode to Manual, selecting 35%, and observing a 35% behavior output;
 - direct entry to Diagnostics and the complete advanced-screen loop;
+- forward and backward rotation through the advanced-screen carousel;
 - return through Main to Home without losing power or target state;
 - a correctly sized framebuffer for every captured screen.
 

@@ -95,6 +95,7 @@ screens:
       - FermentationStatus
     receive_events: 
       - Button
+      - EncoderStep
 
   EventLog:
     subdir: log
@@ -102,6 +103,7 @@ screens:
     receive_events_all: true
     receive_events: 
       - Button
+      - EncoderStep
     
   StateLog:
     subdir: log
@@ -109,3 +111,4 @@ screens:
     read_states_all: true
     receive_events: 
       - Button
+      - EncoderStep

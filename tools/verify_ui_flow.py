@@ -102,13 +102,19 @@ def verify(output_dir: Path | None) -> None:
         short_press(simulator)
         capture(simulator, "Debug", "04-diagnostics", output_dir)
 
+        simulator.command("encoder 1")
+        capture(simulator, "EventLog", "04a-rotate-event-log", output_dir)
+
+        simulator.command("encoder -1")
+        capture(simulator, "Debug", "04b-rotate-diagnostics", output_dir)
+
         short_press(simulator)
         capture(simulator, "EventLog", "05-event-log", output_dir)
 
         short_press(simulator)
         capture(simulator, "StateLog", "06-state-log", output_dir)
 
-        short_press(simulator)
+        simulator.command("encoder 1")
         capture(simulator, "Debug", "07-diagnostics-loop", output_dir)
 
         long_press(simulator)
