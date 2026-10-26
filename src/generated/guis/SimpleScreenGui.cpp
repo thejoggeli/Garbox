@@ -150,14 +150,10 @@ void SimpleScreenGui::init(){
     mObjects.targetRotateHint.setFlexFlow(LV_FLEX_FLOW_ROW);                    // flex-flow="row"
     mObjects.targetRotateHint.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
     mObjects.targetRotateHint.setPadGap(3);                                     // pad-gap="3px"
-    mObjects.targetRotateUp.setSource(&SimpleScreen_image_arrow_up);            // src="arrow-up"
-    mObjects.targetRotateUp.setWidth(11);                                       // width="11px"
-    mObjects.targetRotateUp.setHeight(6);                                       // height="6px"
+    mObjects.targetRotateLeft.setText("");                                      // text=""
     mObjects.targetHint.setText("ROTATE");                                      // text="ROTATE"
     mObjects.targetHint.setTextColor(lv_color_hex(0x60717b));                   // text-color="#60717B"
-    mObjects.targetRotateDown.setSource(&SimpleScreen_image_arrow_down);        // src="arrow-down"
-    mObjects.targetRotateDown.setWidth(11);                                     // width="11px"
-    mObjects.targetRotateDown.setHeight(6);                                     // height="6px"
+    mObjects.targetRotateRight.setText("");                                     // text=""
     mObjects.humidity.body.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.humidity.body.setFlexFlow(LV_FLEX_FLOW_ROW);                       // flex-flow="row"
     mObjects.humidity.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
@@ -302,9 +298,9 @@ SimpleScreenGui::Objects::Objects():
     targetValue(_namelessContainer_2),
     targetUnit(_namelessContainer_2),
     targetRotateHint(targetCard),
-    targetRotateUp(targetRotateHint),
+    targetRotateLeft(targetRotateHint),
     targetHint(targetRotateHint),
-    targetRotateDown(targetRotateHint),
+    targetRotateRight(targetRotateHint),
     humidity(sidePanel),
     heater(sidePanel),
     fan(sidePanel),

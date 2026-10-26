@@ -9,8 +9,6 @@
 #include "core/lvgl/objects/LvLabel.h"
 
 LV_IMAGE_DECLARE(SimpleScreen_image_power16);
-LV_IMAGE_DECLARE(SimpleScreen_image_arrow_up);
-LV_IMAGE_DECLARE(SimpleScreen_image_arrow_down);
 LV_IMAGE_DECLARE(SimpleScreen_image_humidity16);
 LV_IMAGE_DECLARE(SimpleScreen_image_heat16);
 LV_IMAGE_DECLARE(SimpleScreen_image_fan16);
@@ -72,9 +70,9 @@ public:
         LvLabel targetValue;
         LvLabel targetUnit;
         LvObject targetRotateHint;
-        LvImage targetRotateUp;
+        LvLabel targetRotateLeft;
         LvLabel targetHint;
-        LvImage targetRotateDown;
+        LvLabel targetRotateRight;
         MetricCard humidity;
         MetricCard heater;
         MetricCard fan;

@@ -36,17 +36,18 @@ void SimpleScreen::onInit(){
     gui().targetValue.setFont(&lv_font_montserrat_20);
     gui().targetUnit.setFont(&lv_font_montserrat_12);
     gui().targetHint.setFont(&lv_font_unscii_8);
+    gui().targetRotateLeft.setText(LV_SYMBOL_LEFT);
+    gui().targetRotateLeft.setFont(&lv_font_montserrat_12);
+    gui().targetRotateLeft.setTextColor(lv_color_hex(ColorBlue));
+    gui().targetRotateRight.setText(LV_SYMBOL_RIGHT);
+    gui().targetRotateRight.setFont(&lv_font_montserrat_12);
+    gui().targetRotateRight.setTextColor(lv_color_hex(ColorBlue));
     gui().humidity.label.setFont(&lv_font_unscii_8);
     gui().heater.label.setFont(&lv_font_unscii_8);
     gui().fan.label.setFont(&lv_font_unscii_8);
     gui().humidity.value.setFont(&lv_font_montserrat_12);
     gui().heater.value.setFont(&lv_font_montserrat_12);
     gui().fan.value.setFont(&lv_font_montserrat_12);
-    gui().targetRotateUp.setStyleImageRecolor(lv_color_hex(ColorBlue), LV_PART_MAIN);
-    gui().targetRotateUp.setStyleImageRecolorOpa(LV_OPA_COVER, LV_PART_MAIN);
-    gui().targetRotateDown.setStyleImageRecolor(lv_color_hex(ColorBlue), LV_PART_MAIN);
-    gui().targetRotateDown.setStyleImageRecolorOpa(LV_OPA_COVER, LV_PART_MAIN);
-
     // Metric cards are fixed status displays, not scrollable viewports. LVGL's
     // default scrollbar becomes visible when font metrics round up by a pixel,
     // which looks like an unexplained grey indicator at the card's right edge.

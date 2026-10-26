@@ -5,8 +5,6 @@
     <image name="fan16"        path="icons/fan.png"        format="RGB565A8" />
     <image name="heat16"       path="icons/heat.png"       format="RGB565A8" />
     <image name="humidity16"   path="icons/humidity.png"   format="RGB565A8" />
-    <image name="arrow-up"     path="icons/arrow_up.png"    format="RGB565A8" />
-    <image name="arrow-down"   path="icons/arrow_down.png"  format="RGB565A8" />
   </resources>
 
   <components>
@@ -85,9 +83,9 @@
               <label name="targetUnit" text="°C" pad-bottom="2px" />
             </container>
             <container name="targetRotateHint" width="content" height="content" layout="flex" flex-flow="row" flex-align="center center center" pad-gap="3px">
-              <image name="targetRotateUp" src="arrow-up" width="11px" height="6px" />
+              <label name="targetRotateLeft" text="" />
               <label name="targetHint" text="ROTATE" text-color="#60717B" />
-              <image name="targetRotateDown" src="arrow-down" width="11px" height="6px" />
+              <label name="targetRotateRight" text="" />
             </container>
           </container>
 
