@@ -31,7 +31,7 @@ Main also has an explicit Home row. Diagnostics, Event Log, and State Log each h
 | Context | Rotate | Short press | Long press |
 |---|---|---|---|
 | Home | Adjust target by 0.1 °C | Start/stop fermentation | Open Main |
-| Main, browsing | Move selection | Enter edit mode or open selected screen | Return Home |
+| Main, browsing | Move selection | Toggle binary value, enter edit mode, or open selected screen | Return Home |
 | Main, editing | Change the selected value | Accept value and leave edit mode | Return Home |
 | Diagnostics | No action | Open Event Log | Return Main |
 | Event Log | No action | Open State Log | Return Main |
@@ -42,7 +42,10 @@ for a short press is always shown on the left and the long-press destination is
 always shown on the right. Screen content and transient status text never share
 that area.
 
-The selected Main row is highlighted across its width. While editing, only its value remains highlighted, making the mode change visible without adding another modal screen.
+The Main header explicitly reports `BROWSE` or `EDIT`. In browse mode the selected
+row and rotation arrows are blue. In edit mode only the value and arrows are
+amber, and the footer changes to `PRESS: DONE`. Power and fan mode are binary,
+so pressing either row toggles it immediately without entering edit mode.
 
 ## Home
 
@@ -53,7 +56,11 @@ Home answers the questions that matter during normal use, in visual priority ord
 3. What target am I controlling toward?
 4. What are humidity, heater duty, and fan speed doing?
 
-The large chamber value and outer measured arc dominate the screen. The thinner amber target arc provides a stable reference, while the measured arc changes color according to error relative to the target. The text below the value reports the signed error. A separate outlined target card makes rotation discoverable and avoids confusing the target with the measured value.
+The large chamber value and outer measured arc dominate the screen. The thinner amber target arc provides a stable reference, while the measured arc changes color according to error relative to the target. The text below the value reports the signed error. A separate outlined target card uses the same blue rotation arrows as the Main menu, making adjustment discoverable without a sentence of instruction.
+
+The header now uses its limited space for live status: sensor readiness in the
+middle and automatic/manual fan policy on the right. These replace the redundant
+application title and static temperature-range label.
 
 The status pill uses explicit words rather than color alone:
 

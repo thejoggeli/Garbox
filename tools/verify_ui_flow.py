@@ -57,44 +57,39 @@ def verify(output_dir: Path | None) -> None:
         long_press(simulator)
         capture(simulator, "Main", "03-trends-controls", output_dir)
 
-        # Exercise the editable rows through the same press/turn/press contract.
+        # Binary controls toggle immediately and remain in browse mode.
         short_press(simulator)
-        simulator.command("encoder -1")
-        short_press(simulator)
-        simulator.command("step 1")
         power_off = capture(simulator, "Main", "03a-power-off", output_dir)
         if power_off["power"] != "0":
             raise AssertionError(f"Main power control failed: {power_off}")
 
         short_press(simulator)
-        simulator.command("encoder 1")
-        short_press(simulator)
-        simulator.command("step 1")
         power_on = capture(simulator, "Main", "03b-power-on", output_dir)
         if power_on["power"] != "1":
             raise AssertionError(f"Main power control failed: {power_on}")
 
+        # Numeric controls retain explicit press/edit/press behavior.
         simulator.command("encoder 1")
         short_press(simulator)
+        capture(simulator, "Main", "03c-target-edit", output_dir)
         simulator.command("encoder 5")
         short_press(simulator)
-        target_up = capture(simulator, "Main", "03c-target-up", output_dir)
+        target_up = capture(simulator, "Main", "03d-target-up", output_dir)
         if target_up["target"] != "33.000":
             raise AssertionError(f"Main target control failed: {target_up}")
         short_press(simulator)
         simulator.command("encoder -5")
         short_press(simulator)
 
+        # Fan mode is binary, while manual speed remains a numeric editor.
         simulator.command("encoder 1")
-        short_press(simulator)
-        simulator.command("encoder -1")
         short_press(simulator)
         simulator.command("encoder 1")
         short_press(simulator)
         simulator.command("encoder 7")
         short_press(simulator)
         simulator.command("step 1")
-        manual_fan = capture(simulator, "Main", "03d-manual-fan", output_dir)
+        manual_fan = capture(simulator, "Main", "03e-manual-fan", output_dir)
         if (manual_fan["fan_auto"], manual_fan["fan_manual"], manual_fan["fan_output"]) != (
             "0",
             "0.350",

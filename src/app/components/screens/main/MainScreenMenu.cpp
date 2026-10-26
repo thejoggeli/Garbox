@@ -17,6 +17,8 @@ static constexpr uint32_t ColorTextDefault = 0xD9E2E8;
 static constexpr uint32_t ColorTextActive = 0x081018;
 static constexpr uint32_t ColorBgDefault = 0x0D141A;
 static constexpr uint32_t ColorBgActive = 0x8AB4F4;
+static constexpr uint32_t ColorTextEdit = 0x081018;
+static constexpr uint32_t ColorBgEdit = 0xD1B254;
 
 MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChangedCallback valueChangedCallback):
     mMenu(
@@ -25,6 +27,8 @@ MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChan
         ColorTextActive, 
         ColorBgDefault, 
         ColorBgActive, 
+        ColorTextEdit,
+        ColorBgEdit,
         RowIndex::Count,
         VisibleRows,
         this, 
@@ -45,7 +49,7 @@ MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChan
     mMenu.addRow("State log", 0);
     mMenu.addRow("Home", 0);
     mMenu.setSelectedRow(0);
-    mMenu.setPad(1,1,1,1);
+    mMenu.setPad(1, 1, 2, 2);
 }
 
 void MainScreenMenu::render(){
@@ -57,11 +61,40 @@ MainScreenMenu::RowIndex MainScreenMenu::onButtonInput(){
         return RowIndex::Count;
     }
     const RowIndex selected = static_cast<RowIndex>(mMenu.getSelectedRow());
-    if(!mMenu.isLocked() && selected >= RowIndex::Diagnostics){
+    if(mMenu.isLocked()){
+        mMenu.toggleLock();
+        return RowIndex::Count;
+    }
+    if(selectedRowIsToggle()){
+        mMenu.changeSelectedValue(+1);
+        return RowIndex::Count;
+    }
+    if(selectedRowIsAction()){
         return selected;
     }
     mMenu.toggleLock();
     return RowIndex::Count;
+}
+
+bool MainScreenMenu::isEditing() const{
+    return mMenu.isLocked();
+}
+
+MainScreenMenu::RowIndex MainScreenMenu::getSelectedRow() const{
+    if(!mMenu.hasSelection()){
+        return RowIndex::Count;
+    }
+    return static_cast<RowIndex>(mMenu.getSelectedRow());
+}
+
+bool MainScreenMenu::selectedRowIsToggle() const{
+    const RowIndex selected = getSelectedRow();
+    return selected == RowIndex::Power || selected == RowIndex::FanMode;
+}
+
+bool MainScreenMenu::selectedRowIsAction() const{
+    const RowIndex selected = getSelectedRow();
+    return selected >= RowIndex::Diagnostics && selected < RowIndex::Count;
 }
 
 void MainScreenMenu::onEncoderInput(int32_t steps){

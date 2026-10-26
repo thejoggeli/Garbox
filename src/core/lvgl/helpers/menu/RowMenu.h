@@ -32,6 +32,8 @@ public:
         uint32_t activeTextColor,
         uint32_t normalBgColor,
         uint32_t activeBgColor,
+        uint32_t editTextColor,
+        uint32_t editBgColor,
         uint8_t totalRowCount,
         uint8_t visibleRowCount,
         void* callbackCtx,
@@ -49,6 +51,7 @@ public:
 
     void nextValue();
     void previousValue();
+    void changeSelectedValue(int32_t delta);
 
     void clearSelection();
 
@@ -78,6 +81,8 @@ private:
 
     const lv_color_t mNormalBgColor;
     const lv_color_t mActiveBgColor;
+    const lv_color_t mEditTextColor;
+    const lv_color_t mEditBgColor;
 
     uint8_t mVisibleRowCount;
     uint8_t mActiveRowIndex = 0;

@@ -26,8 +26,8 @@ SimpleScreen::SimpleScreen() : SimpleScreenAbs(){
 
 void SimpleScreen::onInit(){
     gui().statusText.setFont(&lv_font_montserrat_12);
-    gui().screenTitle.setFont(&lv_font_montserrat_10);
-    gui().menuHint.setFont(&lv_font_unscii_8);
+    gui().sensorStatus.setFont(&lv_font_unscii_8);
+    gui().fanModeLabel.setFont(&lv_font_unscii_8);
     gui().measuredLabel.setFont(&lv_font_montserrat_10);
     gui().measuredValue.setFont(&lv_font_montserrat_36);
     gui().measuredUnit.setFont(&lv_font_montserrat_20);
@@ -42,6 +42,10 @@ void SimpleScreen::onInit(){
     gui().humidity.value.setFont(&lv_font_montserrat_12);
     gui().heater.value.setFont(&lv_font_montserrat_12);
     gui().fan.value.setFont(&lv_font_montserrat_12);
+    gui().targetRotateUp.setStyleImageRecolor(lv_color_hex(ColorBlue), LV_PART_MAIN);
+    gui().targetRotateUp.setStyleImageRecolorOpa(LV_OPA_COVER, LV_PART_MAIN);
+    gui().targetRotateDown.setStyleImageRecolor(lv_color_hex(ColorBlue), LV_PART_MAIN);
+    gui().targetRotateDown.setStyleImageRecolorOpa(LV_OPA_COVER, LV_PART_MAIN);
 
     // Metric cards are fixed status displays, not scrollable viewports. LVGL's
     // default scrollbar becomes visible when font metrics round up by a pixel,
@@ -207,6 +211,24 @@ void SimpleScreen::onRenderTargetTemperature(){
 }
 
 void SimpleScreen::onRenderMeasuredTemperature(){
+    const TemperatureStatusState& sensor = states().temperatureStatus;
+    if(isSensorOk()){
+        gui().sensorStatus.setText("SENSOR OK");
+        gui().sensorStatus.setTextColor(lv_color_hex(ColorGreen));
+    }
+    else if(sensor.getResetting() || (sensor.getPowerEnabled() && sensor.getDriverEnabled())){
+        gui().sensorStatus.setText("SENSOR WAIT");
+        gui().sensorStatus.setTextColor(lv_color_hex(ColorAmber));
+    }
+    else if(!sensor.getPowerEnabled()){
+        gui().sensorStatus.setText("SENSOR OFF");
+        gui().sensorStatus.setTextColor(lv_color_hex(ColorMuted));
+    }
+    else {
+        gui().sensorStatus.setText("SENSOR FAULT");
+        gui().sensorStatus.setTextColor(lv_color_hex(ColorRed));
+    }
+
     if(!isSensorOk()){
         gui().measuredValue.setText("--.-");
         gui().temperatureDelta.setText("WAITING FOR SENSOR");
@@ -239,6 +261,9 @@ void SimpleScreen::onRenderHeaterPower(){
 }
 
 void SimpleScreen::onRenderFanStatus(){
+    gui().fanModeLabel.setText(
+        states().fermentationStatus.getFanAuto() ? "AUTO FAN" : "MANUAL FAN"
+    );
     if(states().fanStatus.getState() == FanState::Stalled){
         gui().fan.value.setText("STALLED");
         gui().fan.value.setTextColor(lv_color_hex(ColorRed));

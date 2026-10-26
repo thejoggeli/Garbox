@@ -143,8 +143,11 @@ void MainScreenGui::init(){
     mObjects.controlHeader.setHeight(14);                                       // height="14px"
     mObjects.controlHeader.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.controlHeader.setFlexFlow(LV_FLEX_FLOW_ROW);                       // flex-flow="row"
-    mObjects.controlsTitle.setText("CONTROLS");                                 // text="CONTROLS"
+    mObjects.controlHeader.setFlexAlign(LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="space-between center center"
+    mObjects.controlsTitle.setText("MENU");                                     // text="MENU"
     mObjects.controlsTitle.setTextColor(lv_color_hex(0x778791));                // text-color="#778791"
+    mObjects.modeLabel.setText("BROWSE");                                       // text="BROWSE"
+    mObjects.modeLabel.setTextColor(lv_color_hex(0x8ab4f4));                    // text-color="#8AB4F4"
     mObjects.menuContainer.setWidth(LV_PCT(100));                               // width="100%"
     mObjects.menuContainer.setFlexGrow(1);                                      // flex-grow="1"
     mObjects.menuContainer.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
@@ -267,6 +270,7 @@ MainScreenGui::Objects::Objects():
     systemState(systemStateBg),
     controlHeader(controlPanel),
     controlsTitle(controlHeader),
+    modeLabel(controlHeader),
     menuContainer(controlPanel),
     menuArrUp(menuContainer),
     menuRows(menuContainer),

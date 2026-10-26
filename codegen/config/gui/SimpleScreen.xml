@@ -5,6 +5,8 @@
     <image name="fan16"        path="icons/fan.png"        format="RGB565A8" />
     <image name="heat16"       path="icons/heat.png"       format="RGB565A8" />
     <image name="humidity16"   path="icons/humidity.png"   format="RGB565A8" />
+    <image name="arrow-up"     path="icons/arrow_up.png"    format="RGB565A8" />
+    <image name="arrow-down"   path="icons/arrow_down.png"  format="RGB565A8" />
   </resources>
 
   <components>
@@ -38,8 +40,8 @@
           <image name="statusIcon" src="power16" width="16px" height="16px" />
           <label name="statusText" text="OFF" />
         </container>
-        <label name="screenTitle" text="FERMENTATION" flex-grow="1" text-align="center" text-color="#AAB8C0" />
-        <label name="menuHint" text="15-50 C" width="82px" text-align="right" text-color="#60717B" />
+        <label name="sensorStatus" text="SENSOR WAIT" flex-grow="1" text-align="center" text-color="#D1B254" />
+        <label name="fanModeLabel" text="AUTO FAN" width="82px" text-align="right" text-color="#60717B" />
       </container>
 
       <container name="content" width="100%" flex-grow="1" layout="flex" flex-flow="row" pad-gap="7px">
@@ -82,7 +84,11 @@
               <label name="targetValue" text="32.0" />
               <label name="targetUnit" text="°C" pad-bottom="2px" />
             </container>
-            <label name="targetHint" text="TURN TO SET" text-color="#60717B" />
+            <container name="targetRotateHint" width="content" height="content" layout="flex" flex-flow="row" flex-align="center center center" pad-gap="3px">
+              <image name="targetRotateUp" src="arrow-up" width="11px" height="6px" />
+              <label name="targetHint" text="ROTATE" text-color="#60717B" />
+              <image name="targetRotateDown" src="arrow-down" width="11px" height="6px" />
+            </container>
           </container>
 
           <MetricCard name="humidity" $icon="humidity16" $label="HUMIDITY" $value="--.-%" />

@@ -37,6 +37,11 @@ public:
     RowIndex onButtonInput();
     void onEncoderInput(int32_t steps);
 
+    bool isEditing() const;
+    RowIndex getSelectedRow() const;
+    bool selectedRowIsToggle() const;
+    bool selectedRowIsAction() const;
+
     void setPowerEnabled(bool enabled);
     void setTargetTemperatureCelsius(float temperature);
     void setHistoryIndex(uint8_t index);

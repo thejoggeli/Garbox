@@ -65,8 +65,9 @@
           <label name="systemState" align="center" text="READY" text-color="#071008" />
         </container>
 
-        <container name="controlHeader" width="100%" height="14px" layout="flex" flex-flow="row">
-          <label name="controlsTitle" text="CONTROLS" text-color="#778791" />
+        <container name="controlHeader" width="100%" height="14px" layout="flex" flex-flow="row" flex-align="space-between center center">
+          <label name="controlsTitle" text="MENU" text-color="#778791" />
+          <label name="modeLabel" text="BROWSE" text-color="#8AB4F4" />
         </container>
 
         <container name="menuContainer" width="100%" flex-grow="1" layout="flex" flex-flow="column" flex-align="center">

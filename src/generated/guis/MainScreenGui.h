@@ -77,6 +77,7 @@ public:
         LvLabel systemState;
         LvObject controlHeader;
         LvLabel controlsTitle;
+        LvLabel modeLabel;
         LvObject menuContainer;
         LvImage menuArrUp;
         LvObject menuRows;

@@ -10,6 +10,8 @@ RowMenu::RowMenu(
     uint32_t activeTextColor,
     uint32_t normalBgColor,
     uint32_t activeBgColor,
+    uint32_t editTextColor,
+    uint32_t editBgColor,
     uint8_t totalRowCount,
     uint8_t visibleRowCount,
     void* callbackCtx,
@@ -22,6 +24,8 @@ RowMenu::RowMenu(
     mActiveTextColor(lv_color_hex(activeTextColor)),
     mNormalBgColor(lv_color_hex(normalBgColor)),
     mActiveBgColor(lv_color_hex(activeBgColor)),
+    mEditTextColor(lv_color_hex(editTextColor)),
+    mEditBgColor(lv_color_hex(editBgColor)),
     mVisibleRowCount(visibleRowCount),
     mCallbackCtx(callbackCtx),
     mValueToTextCallback(valueToTextCallback),
@@ -125,6 +129,13 @@ void RowMenu::previousValue(){
         return;
     }
     mRows[mActiveRowIndex].changeValue(-1);
+}
+
+void RowMenu::changeSelectedValue(int32_t delta){
+    if(!mHasSelection){
+        return;
+    }
+    mRows[mActiveRowIndex].changeValue(delta);
 }
 
 void RowMenu::clearSelection(){

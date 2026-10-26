@@ -52,8 +52,8 @@ void RowMenuRow::setActive(bool rowActive, bool valueActive){
     if(valueActive){
         mNameLabel.setTextColor(mMenu.mNormalTextColor);
         mContainer.setBgColor(mMenu.mNormalBgColor);
-        mValueLabel.setTextColor(mMenu.mActiveTextColor);
-        mValueLabel.setBgColor(mMenu.mActiveBgColor);
+        mValueLabel.setTextColor(mMenu.mEditTextColor);
+        mValueLabel.setBgColor(mMenu.mEditBgColor);
     }
     else if(rowActive){
         mNameLabel.setTextColor(mMenu.mActiveTextColor);

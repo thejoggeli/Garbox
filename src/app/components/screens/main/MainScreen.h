@@ -38,6 +38,7 @@ private:
     ChartGridRenderer mPowerGrid;
 
     void initChart(MultiSeriesChart& chart, int32_t yMin, int32_t yMax);
+    void updateMenuChrome();
 
     bool isSensorOk();
     const char* resovleEngineStateText();

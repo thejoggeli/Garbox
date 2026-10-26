@@ -18,7 +18,7 @@ static constexpr uint32_t ColorTarget = 0xD1B254;
 static constexpr uint32_t ChartSeriesLineWidth = 2;
 static constexpr uint32_t GridTicksCountX = 5;
 static constexpr uint32_t GridTicksCountY = 3;
-static constexpr uint32_t GridLineColor = 0x101010;
+static constexpr uint32_t GridLineColor = 0x26343D;
 static constexpr uint32_t GridLineWidth = 1;
 
 static constexpr uint32_t ChartsPointCount = GarboxHistory::SampleCount;
@@ -70,6 +70,7 @@ void MainScreen::onInit(){
     gui().trendsTitle.setFont(&lv_font_montserrat_12);
     gui().windowLabel.setFont(&lv_font_unscii_8);
     gui().controlsTitle.setFont(&lv_font_unscii_8);
+    gui().modeLabel.setFont(&lv_font_unscii_8);
     ConfigureScreenCommandBar(
         gui().footer,
         gui().pressHint,
@@ -94,6 +95,8 @@ void MainScreen::onInit(){
     // setup menu
     const lv_font_t* menuFont = &lv_font_montserrat_10;
     gui().menuContainer.setFont(menuFont);
+    gui().menuArrUp.setOpa(LV_OPA_COVER);
+    gui().menuArrDown.setOpa(LV_OPA_COVER);
 
     // init charts
     initChart(mTempChart, TempChartYMin, TempChartYMax);
@@ -137,6 +140,32 @@ void MainScreen::initChart(MultiSeriesChart& chart, int32_t yMin, int32_t yMax){
 
     // refresh chart
     lvChart.refresh();
+}
+
+void MainScreen::updateMenuChrome(){
+    const bool editing = mMenu.isEditing();
+    const uint32_t accent = editing ? ColorTarget : ColorBlue;
+
+    gui().modeLabel.setText(editing ? "EDIT" : "BROWSE");
+    gui().modeLabel.setTextColor(lv_color_hex(accent));
+
+    gui().menuArrUp.setStyleImageRecolor(lv_color_hex(accent), LV_PART_MAIN);
+    gui().menuArrUp.setStyleImageRecolorOpa(LV_OPA_COVER, LV_PART_MAIN);
+    gui().menuArrDown.setStyleImageRecolor(lv_color_hex(accent), LV_PART_MAIN);
+    gui().menuArrDown.setStyleImageRecolorOpa(LV_OPA_COVER, LV_PART_MAIN);
+
+    if(editing){
+        gui().pressHint.setText("PRESS: DONE");
+    }
+    else if(mMenu.selectedRowIsToggle()){
+        gui().pressHint.setText("PRESS: TOGGLE");
+    }
+    else if(mMenu.selectedRowIsAction()){
+        gui().pressHint.setText("PRESS: OPEN");
+    }
+    else {
+        gui().pressHint.setText("PRESS: EDIT");
+    }
 }
 
 void MainScreen::onStart(){
@@ -369,6 +398,7 @@ void MainScreen::onRenderMenu(){
     mMenu.setBrightness(states().displayStatus.getBrightness());
     gui().timeInfo.value.setTextFormatted("%.1f°", states().fermentationStatus.getTargetTemperature());
     mMenu.render();
+    updateMenuChrome();
 }
 
 void MainScreen::onDisplayStatusStateChanged(const DisplayStatusState& state){

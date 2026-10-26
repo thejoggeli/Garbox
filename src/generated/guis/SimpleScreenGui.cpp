@@ -50,14 +50,14 @@ void SimpleScreenGui::init(){
     mObjects.statusIcon.setWidth(16);                                           // width="16px"
     mObjects.statusIcon.setHeight(16);                                          // height="16px"
     mObjects.statusText.setText("OFF");                                         // text="OFF"
-    mObjects.screenTitle.setText("FERMENTATION");                               // text="FERMENTATION"
-    mObjects.screenTitle.setFlexGrow(1);                                        // flex-grow="1"
-    mObjects.screenTitle.setTextAlign(LV_TEXT_ALIGN_CENTER);                    // text-align="center"
-    mObjects.screenTitle.setTextColor(lv_color_hex(0xaab8c0));                  // text-color="#AAB8C0"
-    mObjects.menuHint.setText("15-50 C");                                       // text="15-50 C"
-    mObjects.menuHint.setWidth(82);                                             // width="82px"
-    mObjects.menuHint.setTextAlign(LV_TEXT_ALIGN_RIGHT);                        // text-align="right"
-    mObjects.menuHint.setTextColor(lv_color_hex(0x60717b));                     // text-color="#60717B"
+    mObjects.sensorStatus.setText("SENSOR WAIT");                               // text="SENSOR WAIT"
+    mObjects.sensorStatus.setFlexGrow(1);                                       // flex-grow="1"
+    mObjects.sensorStatus.setTextAlign(LV_TEXT_ALIGN_CENTER);                   // text-align="center"
+    mObjects.sensorStatus.setTextColor(lv_color_hex(0xd1b254));                 // text-color="#D1B254"
+    mObjects.fanModeLabel.setText("AUTO FAN");                                  // text="AUTO FAN"
+    mObjects.fanModeLabel.setWidth(82);                                         // width="82px"
+    mObjects.fanModeLabel.setTextAlign(LV_TEXT_ALIGN_RIGHT);                    // text-align="right"
+    mObjects.fanModeLabel.setTextColor(lv_color_hex(0x60717b));                 // text-color="#60717B"
     mObjects.content.setWidth(LV_PCT(100));                                     // width="100%"
     mObjects.content.setFlexGrow(1);                                            // flex-grow="1"
     mObjects.content.setLayout(LV_LAYOUT_FLEX);                                 // layout="flex"
@@ -144,8 +144,20 @@ void SimpleScreenGui::init(){
     mObjects.targetValue.setText("32.0");                                       // text="32.0"
     mObjects.targetUnit.setText("°C");                                          // text="°C"
     mObjects.targetUnit.setPadBottom(2);                                        // pad-bottom="2px"
-    mObjects.targetHint.setText("TURN TO SET");                                 // text="TURN TO SET"
+    mObjects.targetRotateHint.setWidthContent();                                // width="content"
+    mObjects.targetRotateHint.setHeightContent();                               // height="content"
+    mObjects.targetRotateHint.setLayout(LV_LAYOUT_FLEX);                        // layout="flex"
+    mObjects.targetRotateHint.setFlexFlow(LV_FLEX_FLOW_ROW);                    // flex-flow="row"
+    mObjects.targetRotateHint.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
+    mObjects.targetRotateHint.setPadGap(3);                                     // pad-gap="3px"
+    mObjects.targetRotateUp.setSource(&SimpleScreen_image_arrow_up);            // src="arrow-up"
+    mObjects.targetRotateUp.setWidth(11);                                       // width="11px"
+    mObjects.targetRotateUp.setHeight(6);                                       // height="6px"
+    mObjects.targetHint.setText("ROTATE");                                      // text="ROTATE"
     mObjects.targetHint.setTextColor(lv_color_hex(0x60717b));                   // text-color="#60717B"
+    mObjects.targetRotateDown.setSource(&SimpleScreen_image_arrow_down);        // src="arrow-down"
+    mObjects.targetRotateDown.setWidth(11);                                     // width="11px"
+    mObjects.targetRotateDown.setHeight(6);                                     // height="6px"
     mObjects.humidity.body.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.humidity.body.setFlexFlow(LV_FLEX_FLOW_ROW);                       // flex-flow="row"
     mObjects.humidity.body.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
@@ -269,8 +281,8 @@ SimpleScreenGui::Objects::Objects():
     statusPill(header),
     statusIcon(statusPill),
     statusText(statusPill),
-    screenTitle(header),
-    menuHint(header),
+    sensorStatus(header),
+    fanModeLabel(header),
     content(wrapper),
     gaugePanel(content),
     arcContainer(gaugePanel),
@@ -289,7 +301,10 @@ SimpleScreenGui::Objects::Objects():
     _namelessContainer_2(targetCard),
     targetValue(_namelessContainer_2),
     targetUnit(_namelessContainer_2),
-    targetHint(targetCard),
+    targetRotateHint(targetCard),
+    targetRotateUp(targetRotateHint),
+    targetHint(targetRotateHint),
+    targetRotateDown(targetRotateHint),
     humidity(sidePanel),
     heater(sidePanel),
     fan(sidePanel),
