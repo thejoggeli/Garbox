@@ -31,6 +31,7 @@ private:
 
     LvLabel mHeaderLabel;
     LvLabel mViewHint;
+    LvObject mScrollViewport;
     LvObject mFooter;
     LvLabel mFooterPressHint;
     LvLabel mFooterHoldHint;

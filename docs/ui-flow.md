@@ -33,7 +33,7 @@ Main also has an explicit Home row. Diagnostics, Event Log, and State Log each h
 | Home | Adjust target by 0.1 °C | Start/stop fermentation | Open Main |
 | Main, browsing | Move selection | Toggle binary value, enter edit mode, or open selected screen | Return Home |
 | Main, editing | Change the selected value | Accept value and leave edit mode | Return Home |
-| Diagnostics | Previous/next advanced view | Open Event Log | Return Main |
+| Diagnostics | Scroll the report vertically | Open Event Log | Return Main |
 | Event Log | Previous/next advanced view | Open State Log | Return Main |
 | State Log | Previous/next advanced view | Open Diagnostics | Return Main |
 
@@ -56,7 +56,7 @@ Home answers the questions that matter during normal use, in visual priority ord
 3. What target am I controlling toward?
 4. What are humidity, heater duty, and fan speed doing?
 
-The large chamber value and outer measured arc dominate the screen. The thinner amber target arc provides a stable reference, while the measured arc changes color according to error relative to the target. The text below the value reports the signed error. A separate outlined target card uses the same blue rotation arrows as the Main menu, making adjustment discoverable without a sentence of instruction.
+The large chamber value and outer measured arc dominate the screen. The thinner amber target arc provides a stable reference, while the measured arc changes color according to error relative to the target. The text below the value reports the signed error. A separate outlined target card uses blue left/right arrows that mirror encoder rotation, making adjustment discoverable without a sentence of instruction.
 
 The header now uses its limited space for live status: sensor readiness in the
 middle and automatic/manual fan policy on the right. These replace the redundant
@@ -103,13 +103,16 @@ Manual fan control deliberately does not mean “override safety.” Invalid sen
 ## Advanced screens
 
 Diagnostics retains the complete engineering data set but groups it into four
-bordered cards: System, Memory, Climate, and Outputs. It shows time and the raw
+full-width cards: System, Climate, Outputs, and Memory. It shows time and the raw
 microsecond clock, active behavior/screen, event and state counts, heap data,
 display status, fermentation state/target, SHT31 status and sample, fan
 state/RPM, heater state/electrical measurements, and PWM duty/period. A fill bar
-at the bottom of Outputs visualizes heater PWM cycle progress.
+at the bottom of Outputs visualizes heater PWM cycle progress. The report is
+intentionally taller than the display: rotating scrolls it vertically while the
+header and command bar remain fixed, leaving room to add future diagnostics
+without compressing the existing data.
 
-Event Log is a rolling view of routed event ID, sender, and event type. State Log is a rolling view of state-publication sequence and state type. Both retain a marker on the newest entry. Rotation moves backward or forward through the three advanced views; short press remains a convenient next-view action. These remain intentionally dense engineering views rather than consumer screens.
+Event Log is a rolling view of routed event ID, sender, and event type. State Log is a rolling view of state-publication sequence and state type. Both retain a marker on the newest entry. Short press moves from Diagnostics to Event Log and onward to State Log; long press returns to Main. Rotation navigates between the two compact log views, while Diagnostics reserves it for scrolling.
 
 ## Desktop verification
 
@@ -126,8 +129,8 @@ The verifier drives typed `EncoderStep` and `Button` events through the real scr
 - Main power off/on editing;
 - Main target editing and restoration;
 - switching fan mode to Manual, selecting 35%, and observing a 35% behavior output;
-- direct entry to Diagnostics and the complete advanced-screen loop;
-- forward and backward rotation through the advanced-screen carousel;
+- direct entry to Diagnostics and rotation-driven diagnostic scrolling;
+- the complete short-press advanced-screen loop and log-view navigation;
 - return through Main to Home without losing power or target state;
 - a correctly sized framebuffer for every captured screen.
 

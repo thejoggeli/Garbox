@@ -11,13 +11,14 @@ DebugScreen::DebugScreen():
     DebugScreenAbs(),
     mHeaderLabel(mRoot),
     mViewHint(mRoot),
+    mScrollViewport(mRoot),
     mFooter(mRoot),
     mFooterPressHint(mFooter),
     mFooterHoldHint(mFooter),
-    mSystemCard(mRoot),
-    mMemoryCard(mRoot),
-    mClimateCard(mRoot),
-    mOutputsCard(mRoot),
+    mSystemCard(mScrollViewport),
+    mMemoryCard(mScrollViewport),
+    mClimateCard(mScrollViewport),
+    mOutputsCard(mScrollViewport),
     mProgressTrack(mOutputsCard.body),
     mProgressBox(static_cast<LvObject&>(mProgressTrack)),
     mMicrosLabel(mSystemCard.body),
@@ -57,7 +58,7 @@ void DebugScreen::initCard(
     lv_obj_set_scrollbar_mode(card.body.raw(), LV_SCROLLBAR_MODE_OFF);
 
     card.title.setText(title);
-    card.title.setPosition(7, 4);
+    card.title.setPosition(10, 7);
     card.title.setFont(&lv_font_unscii_8);
     card.title.setTextColor(lv_color_hex(accentColor));
 }
@@ -66,18 +67,19 @@ void DebugScreen::initLabel(LvLabel& label, int16_t x, int16_t y, const char* te
     label.setText(text);
     label.setPosition(x, y);
     label.setTextColor(lv_color_hex(0xFFFFFF));
-    label.setFont(&lv_font_montserrat_10);
+    label.setFont(&lv_font_unscii_8);
+    label.setTextLineSpace(3);
 }
 
 void DebugScreen::onInit(){
     mHeaderLabel.setText("DIAGNOSTICS");
-    mHeaderLabel.setPosition(8, 6);
+    mHeaderLabel.setPosition(10, 7);
     mHeaderLabel.setFont(&lv_font_montserrat_12);
     mHeaderLabel.setTextColor(lv_color_hex(0x8AB4F4));
 
-    mViewHint.setText("ROTATE VIEWS 1/3");
-    mViewHint.setPosition(176, 9);
-    mViewHint.setWidth(136);
+    mViewHint.setText("ROTATE: SCROLL");
+    mViewHint.setPosition(170, 9);
+    mViewHint.setWidth(140);
     mViewHint.setTextAlign(LV_TEXT_ALIGN_RIGHT);
     mViewHint.setFont(&lv_font_unscii_8);
     mViewHint.setTextColor(lv_color_hex(0x8AB4F4));
@@ -90,43 +92,56 @@ void DebugScreen::onInit(){
         "HOLD: MAIN"
     );
 
-    initCard(mSystemCard,  6,   29, 151, 104, "SYSTEM",  0x8AB4F4);
-    initCard(mMemoryCard,  6,  137, 151,  77, "MEMORY",  0xBDA7FF);
-    initCard(mClimateCard, 163, 29, 151,  77, "CLIMATE", 0x75C8C8);
-    initCard(mOutputsCard, 163, 110, 151, 104, "OUTPUTS", 0xD1B254);
+    mScrollViewport.setPosition(0, 27);
+    mScrollViewport.setRawSize(AppConfig::DisplayWidth, 193);
+    mScrollViewport.setBgOpa(LV_OPA_TRANSP);
+    mScrollViewport.setBorderWidth(0);
+    mScrollViewport.setPadAll(0);
+    mScrollViewport.setScrollable(true);
+    mScrollViewport.setScrollDirection(LV_DIR_VER);
+    mScrollViewport.setScrollMomentum(false);
+    mScrollViewport.setScrollElastic(false);
+    lv_obj_set_scrollbar_mode(mScrollViewport.raw(), LV_SCROLLBAR_MODE_ON);
+    lv_obj_set_style_width(mScrollViewport.raw(), 3, LV_PART_SCROLLBAR);
+    lv_obj_set_style_bg_color(mScrollViewport.raw(), lv_color_hex(0x8AB4F4), LV_PART_SCROLLBAR);
+    lv_obj_set_style_bg_opa(mScrollViewport.raw(), LV_OPA_70, LV_PART_SCROLLBAR);
+    lv_obj_set_style_radius(mScrollViewport.raw(), LV_RADIUS_CIRCLE, LV_PART_SCROLLBAR);
 
-    initLabel(mTimeLabel,                7, 20, "UP");
-    initLabel(mMicrosLabel,              7, 35, "CLOCK");
-    initLabel(mAppInfoLabel,             7, 50, "APP");
-    initLabel(mDisplayStatusLabel,       7, 87, "LCD");
-    initLabel(mHeapBytesLabel,           7, 18, "FREE");
-    initLabel(mHeapMinimumLabel,         7, 36, "MIN");
-    initLabel(mHeapBlocksLabel,          7, 59, "BLOCKS");
-    initLabel(mFermentationStatusLabel,  7, 20, "ENGINE");
-    initLabel(mTemperatureStateLabel,    7, 38, "SENSOR");
-    initLabel(mTemperatureSampleLabel,   7, 56, "TEMP");
-    initLabel(mFanStateLabel,            7, 18, "FAN");
-    initLabel(mFanMeasuredRpmLabel,      7, 33, "RPM");
-    initLabel(mHeatpadStateLabel,        7, 48, "HEATER");
-    initLabel(mHeatpadSenseLabel,        7, 63, "SENSE");
-    initLabel(mHeatpadDutyLabel,         7, 78, "PWM");
+    // Full-width, vertically stacked cards trade density for a stable label
+    // column and leave room for future diagnostic fields.
+    initCard(mSystemCard,   6,   4, 304, 143, "SYSTEM",  0x8AB4F4);
+    initCard(mClimateCard,  6, 153, 304, 118, "CLIMATE", 0x75C8C8);
+    initCard(mOutputsCard,  6, 277, 304, 180, "OUTPUTS", 0xD1B254);
+    initCard(mMemoryCard,   6, 463, 304, 126, "MEMORY",  0xBDA7FF);
 
-    mAppInfoLabel.setFont(&lv_font_unscii_8);
-    mHeapBytesLabel.setFont(&lv_font_unscii_8);
-    mHeapMinimumLabel.setFont(&lv_font_unscii_8);
-    mHeatpadDutyLabel.setFont(&lv_font_unscii_8);
+    initLabel(mTimeLabel,               10,  29, "UPTIME");
+    initLabel(mMicrosLabel,             10,  44, "CLOCK");
+    initLabel(mAppInfoLabel,            10,  59, "BEHAVIOR");
+    initLabel(mDisplayStatusLabel,      10, 105, "BRIGHTNESS");
+    initLabel(mFermentationStatusLabel, 10,  29, "MODE");
+    initLabel(mTemperatureStateLabel,   10,  54, "POWER");
+    initLabel(mTemperatureSampleLabel,  10,  89, "TEMPERATURE");
+    initLabel(mFanStateLabel,           10,  29, "FAN STATE");
+    initLabel(mFanMeasuredRpmLabel,     10,  54, "FAN SPEED");
+    initLabel(mHeatpadStateLabel,       10,  69, "HEATER");
+    initLabel(mHeatpadSenseLabel,       10,  84, "VOLTAGE");
+    initLabel(mHeatpadDutyLabel,        10, 109, "DUTY NOW");
+    initLabel(mHeapBytesLabel,          10,  29, "FREE");
+    initLabel(mHeapMinimumLabel,        10,  54, "MIN FREE");
+    initLabel(mHeapBlocksLabel,         10,  79, "FREE BLOCKS");
 
-    mProgressTrack.setPosition(7, 98);
-    mProgressTrack.setRawSize(137, 3);
+    mProgressTrack.setPosition(10, 165);
+    mProgressTrack.setRawSize(284, 4);
     mProgressTrack.setBgColor(lv_color_hex(0x26343D));
     mProgressTrack.setBgOpa(LV_OPA_COVER);
 
     mProgressBox.setPosition(0, 0);
-    mProgressBox.setRawSize(1, 3);
+    mProgressBox.setRawSize(1, 4);
     mProgressBox.setBgColor(lv_color_hex(0xD1B254));
     mProgressBox.setBgOpa(LV_OPA_COVER);
 
     setBackgroundColor(0x070B0E);
+    mRoot.setScrollable(false);
 }
 
 void DebugScreen::onStart(){
@@ -151,11 +166,15 @@ void DebugScreen::onButtonEvent(const ButtonEvent& event){
 }
 
 void DebugScreen::onEncoderStepEvent(const EncoderStepEvent& event){
-    if(event->steps > 0){
-        host()->requestChangeScreen(ScreenId::EventLog);
-    }
-    else if(event->steps < 0){
-        host()->requestChangeScreen(ScreenId::StateLog);
+    if(event->steps != 0){
+        static constexpr int32_t ScrollPixelsPerStep = 28;
+        const int32_t targetY = lv_obj_get_scroll_y(mScrollViewport.raw())
+            + event->steps * ScrollPixelsPerStep;
+        lv_obj_scroll_to_y(
+            mScrollViewport.raw(),
+            targetY,
+            LV_ANIM_OFF
+        );
     }
 }
 
@@ -202,26 +221,26 @@ void DebugScreen::onRender(){
 
 void DebugScreen::onRenderFanState(){
     mFanStateLabel.setTextFormatted(
-        "FAN %s  SET %.0f%%",
+        "FAN STATE     %s\nFAN TARGET    %.0f %%",
         FanStateToString(states().fanStatus.getState()),
         states().fanStatus.getTargetSpeed()*100.0f
     );
 }
 
 void DebugScreen::onRenderFanMeasuredRpm(){
-    mFanMeasuredRpmLabel.setTextFormatted("RPM %.0f", states().fanSample.getMeasuredRpm());
+    mFanMeasuredRpmLabel.setTextFormatted("FAN SPEED     %.0f RPM", states().fanSample.getMeasuredRpm());
 }
 
 void DebugScreen::onRenderHeatpadState(){
     mHeatpadStateLabel.setTextFormatted(
-        "HEATER %s",
+        "HEATER        %s",
         HeatpadStateToString(states().heatpadStatus.getState())
     );
 }
 
 void DebugScreen::onRenderHeatpadDuty(){
     mHeatpadDutyLabel.setTextFormatted(
-        "DUTY %.0f>%.0f%%\nPER %u>%ums",
+        "DUTY NOW      %.0f %%\nDUTY NEXT     %.0f %%\nPERIOD NOW    %u ms\nPERIOD NEXT   %u ms",
         states().heatpadStatus.getCurrentDutyCycle()*100.0f,
         states().heatpadStatus.getNextDutyCycle()*100.0f,
         states().heatpadStatus.getCurrentPeriodMicros()/1000,
@@ -231,7 +250,7 @@ void DebugScreen::onRenderHeatpadDuty(){
 
 void DebugScreen::onRenderHeatpadSense(){
     mHeatpadSenseLabel.setTextFormatted(
-        "SENSE %.1fV  %.1fA",
+        "VOLTAGE       %.1f V\nCURRENT       %.1f A",
         states().heatpadSample.getMeasuredVoltage(), 
         states().heatpadSample.getMeasuredCurrent()
     );
@@ -239,7 +258,7 @@ void DebugScreen::onRenderHeatpadSense(){
 
 void DebugScreen::onRenderDisplayStatus(){
     mDisplayStatusLabel.setTextFormatted(
-        "LCD %.0f%% SKIP %u DIRTY %u",
+        "BRIGHTNESS    %.0f %%\nSKIPPED       %u\nDIRTY         %u",
         states().displayStatus.getBrightness()*100.0f, 
         states().displayDiagnostics.getSkippedFrames(), 
         getDispatchedCount()
@@ -250,7 +269,7 @@ void DebugScreen::onRenderHeatpadProgress(){
     float progress = states().heatpadProgress.getPwmProgressMicros();
     float period = states().heatpadStatus.getCurrentPeriodMicros();
     float position = period > 0.0f ? progress / period : 0.0f;
-    static constexpr int32_t width = 137;
+    static constexpr int32_t width = 284;
     const float clamped = std::clamp(position, 0.0f, 1.0f);
     const int32_t fillWidth = static_cast<int32_t>(clamped * width + 0.5f);
     mProgressBox.setHidden(fillWidth == 0);
@@ -259,16 +278,16 @@ void DebugScreen::onRenderHeatpadProgress(){
 
 void DebugScreen::onRenderTemperatureState(){
     mTemperatureStateLabel.setTextFormatted(
-        "SENSOR P%u D%u RESET%u",
-        states().temperatureStatus.getPowerEnabled(),
-        states().temperatureStatus.getDriverEnabled(),
-        states().temperatureStatus.getResetting()
+        "POWER         %s\nDRIVER        %s\nRESET         %s",
+        states().temperatureStatus.getPowerEnabled() ? "ON" : "OFF",
+        states().temperatureStatus.getDriverEnabled() ? "ON" : "OFF",
+        states().temperatureStatus.getResetting() ? "YES" : "NO"
     );
 }
 
 void DebugScreen::onRenderTemperatureSample(){
     mTemperatureSampleLabel.setTextFormatted(
-        "%.2f C  RH %.2f%%",
+        "TEMPERATURE   %.2f C\nHUMIDITY      %.2f %%",
         states().temperatureSample.getTemperatureCelcius(),
         states().temperatureSample.getHumidityRelative()
     );
@@ -277,7 +296,7 @@ void DebugScreen::onRenderTemperatureSample(){
 void DebugScreen::onRenderTime(){
     static char buffer[32];
     StringUtils::FormatDurationDHMS(mLastTimeSeconds, buffer, 32);
-    mTimeLabel.setTextFormatted("UP %s", buffer);
+    mTimeLabel.setTextFormatted("UPTIME        %s", buffer);
 }
 
 void DebugScreen::onRenderMicros(){
@@ -285,13 +304,13 @@ void DebugScreen::onRenderMicros(){
     uint32_t t1 = (Time::GetTickMicros() / 1000) % 1000;
     uint32_t t2 = (Time::GetTickMicros() / 1000000) % 1000;
     uint32_t t3 = (Time::GetTickMicros() / 1000000000);
-    mMicrosLabel.setTextFormatted("CLOCK %03u'%03u'%03u'%03u", t3, t2, t1, t0);
+    mMicrosLabel.setTextFormatted("CLOCK         %03u'%03u'%03u'%03u", t3, t2, t1, t0);
 }
 
 void DebugScreen::onRenderHeapBlocks(){
     const uint32_t integer = mHeapInfo.largest_free_block/1000;
     const uint32_t fraction = mHeapInfo.largest_free_block%1000;
-    mHeapBlocksLabel.setTextFormatted("BLK F%u A%u MAX %u.%03uk",
+    mHeapBlocksLabel.setTextFormatted("FREE BLOCKS   %u\nUSED BLOCKS   %u\nLARGEST       %u.%03u kB",
         mHeapInfo.free_blocks,
         mHeapInfo.allocated_blocks,
         integer, fraction
@@ -303,7 +322,7 @@ void DebugScreen::onRenderHeapBytes(){
     const uint32_t frac1 = mHeapInfo.total_free_bytes%1000;
     const uint32_t int2 = mHeapInfo.total_allocated_bytes/1000;
     const uint32_t frac2 = mHeapInfo.total_allocated_bytes%1000;
-    mHeapBytesLabel.setTextFormatted("FREE %u.%03uk\nUSED %u.%03uk",
+    mHeapBytesLabel.setTextFormatted("FREE          %u.%03u kB\nUSED          %u.%03u kB",
         int1, frac1,
         int2, frac2
     );
@@ -314,14 +333,14 @@ void DebugScreen::onRenderHeapMinimum(){
     const uint32_t frac1 = mHeapInfo.minimum_free_bytes%1000;
     static char buffer[32];
     StringUtils::FormatDurationDHMS(mHeapMinimumTime, buffer, 32);
-    mHeapMinimumLabel.setTextFormatted("MIN %u.%03uk\n%s",
+    mHeapMinimumLabel.setTextFormatted("MIN FREE      %u.%03u kB\nMIN AT        %s",
         int1, frac1, buffer
     );
 }
 
 void DebugScreen::onRenderAppInfo(){
     mAppInfoLabel.setTextFormatted(
-        "APP %s\nVIEW %s\nEVT %u  STATE %u",
+        "BEHAVIOR      %s\nSCREEN        %s\nEVENTS        %u\nSTATE CHG     %u",
         BehaviourIdToString(states().activeBehaviour.getBehaviour()), 
         ScreenIdToString(states().activeScreen.getScreen()),
         mLastEventCount, mLastStateChangesCount
@@ -330,7 +349,7 @@ void DebugScreen::onRenderAppInfo(){
 
 void DebugScreen::onRenderFermentationStatus(){
     mFermentationStatusLabel.setTextFormatted(
-        "%s  SET %.1f C",
+        "MODE          %s\nTARGET        %.1f C",
         FermentationStateToString(states().fermentationStatus.getState()),
         states().fermentationStatus.getTargetTemperature()
     );

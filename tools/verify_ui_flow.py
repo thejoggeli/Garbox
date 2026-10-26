@@ -102,11 +102,16 @@ def verify(output_dir: Path | None) -> None:
         short_press(simulator)
         capture(simulator, "Debug", "04-diagnostics", output_dir)
 
-        simulator.command("encoder 1")
-        capture(simulator, "EventLog", "04a-rotate-event-log", output_dir)
+        # Diagnostics is a vertically scrollable report; rotation must not
+        # unexpectedly switch screens.
+        simulator.command("encoder 7")
+        capture(simulator, "Debug", "04a-diagnostics-middle", output_dir)
 
-        simulator.command("encoder -1")
-        capture(simulator, "Debug", "04b-rotate-diagnostics", output_dir)
+        simulator.command("encoder 13")
+        capture(simulator, "Debug", "04b-diagnostics-bottom", output_dir)
+
+        simulator.command("encoder -20")
+        capture(simulator, "Debug", "04c-diagnostics-top", output_dir)
 
         short_press(simulator)
         capture(simulator, "EventLog", "05-event-log", output_dir)
