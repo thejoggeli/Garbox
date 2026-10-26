@@ -66,6 +66,7 @@ public:
         LvLabel targetLabel;
         LvObject _namelessContainer_2;
         LvLabel targetRotateLeft;
+        LvObject _namelessContainer_3;
         LvLabel targetValue;
         LvLabel targetUnit;
         LvLabel targetRotateRight;

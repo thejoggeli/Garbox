@@ -76,11 +76,13 @@
             bg-color="#13202B" bg-opa="100%" radius="9px"
             border-color="#8AB4F4" border-width="1px" border-side="full">
             <label name="targetLabel" text="TARGET" text-color="#8AB4F4" />
-            <container layout="flex" flex-flow="row" flex-align="center end end" width="content" height="content" pad-gap="3px">
-              <label name="targetRotateLeft" text="" />
-              <label name="targetValue" text="32.0" />
-              <label name="targetUnit" text="°C" pad-bottom="2px" />
-              <label name="targetRotateRight" text="" />
+            <container layout="flex" flex-flow="row" flex-align="center center center" width="100%" height="content" pad-left="5px" pad-right="5px">
+              <label name="targetRotateLeft" width="12px" text-align="center" text="" />
+              <container flex-grow="1" height="content" layout="flex" flex-flow="row" flex-align="center end end" pad-gap="3px">
+                <label name="targetValue" text="32.0" />
+                <label name="targetUnit" text="°C" pad-bottom="2px" />
+              </container>
+              <label name="targetRotateRight" width="12px" text-align="center" text="" />
             </container>
           </container>
 

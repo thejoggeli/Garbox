@@ -129,14 +129,25 @@ void SimpleScreenGui::init(){
     mObjects.targetLabel.setTextColor(lv_color_hex(0x8ab4f4));                  // text-color="#8AB4F4"
     mObjects._namelessContainer_2.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
     mObjects._namelessContainer_2.setFlexFlow(LV_FLEX_FLOW_ROW);                // flex-flow="row"
-    mObjects._namelessContainer_2.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END); // flex-align="center end end"
-    mObjects._namelessContainer_2.setWidthContent();                            // width="content"
+    mObjects._namelessContainer_2.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // flex-align="center center center"
+    mObjects._namelessContainer_2.setWidth(LV_PCT(100));                        // width="100%"
     mObjects._namelessContainer_2.setHeightContent();                           // height="content"
-    mObjects._namelessContainer_2.setPadGap(3);                                 // pad-gap="3px"
+    mObjects._namelessContainer_2.setPadLeft(5);                                // pad-left="5px"
+    mObjects._namelessContainer_2.setPadRight(5);                               // pad-right="5px"
+    mObjects.targetRotateLeft.setWidth(12);                                     // width="12px"
+    mObjects.targetRotateLeft.setTextAlign(LV_TEXT_ALIGN_CENTER);               // text-align="center"
     mObjects.targetRotateLeft.setText("");                                      // text=""
+    mObjects._namelessContainer_3.setFlexGrow(1);                               // flex-grow="1"
+    mObjects._namelessContainer_3.setHeightContent();                           // height="content"
+    mObjects._namelessContainer_3.setLayout(LV_LAYOUT_FLEX);                    // layout="flex"
+    mObjects._namelessContainer_3.setFlexFlow(LV_FLEX_FLOW_ROW);                // flex-flow="row"
+    mObjects._namelessContainer_3.setFlexAlign(LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END); // flex-align="center end end"
+    mObjects._namelessContainer_3.setPadGap(3);                                 // pad-gap="3px"
     mObjects.targetValue.setText("32.0");                                       // text="32.0"
     mObjects.targetUnit.setText("°C");                                          // text="°C"
     mObjects.targetUnit.setPadBottom(2);                                        // pad-bottom="2px"
+    mObjects.targetRotateRight.setWidth(12);                                    // width="12px"
+    mObjects.targetRotateRight.setTextAlign(LV_TEXT_ALIGN_CENTER);              // text-align="center"
     mObjects.targetRotateRight.setText("");                                     // text=""
     mObjects.humidity.body.setLayout(LV_LAYOUT_FLEX);                           // layout="flex"
     mObjects.humidity.body.setFlexFlow(LV_FLEX_FLOW_ROW);                       // flex-flow="row"
@@ -278,8 +289,9 @@ SimpleScreenGui::Objects::Objects():
     targetLabel(targetCard),
     _namelessContainer_2(targetCard),
     targetRotateLeft(_namelessContainer_2),
-    targetValue(_namelessContainer_2),
-    targetUnit(_namelessContainer_2),
+    _namelessContainer_3(_namelessContainer_2),
+    targetValue(_namelessContainer_3),
+    targetUnit(_namelessContainer_3),
     targetRotateRight(_namelessContainer_2),
     humidity(sidePanel),
     heater(sidePanel),
