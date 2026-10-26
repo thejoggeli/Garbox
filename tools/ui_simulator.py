@@ -39,12 +39,12 @@ PAGE = r"""<!doctype html>
     #status { color: #8ea0ac; font: 12px ui-monospace, SFMono-Regular, monospace; text-align: right; }
     .unit { padding: clamp(12px, 2vw, 24px); border: 1px solid #3b444c; border-radius: 24px;
       background: linear-gradient(145deg, #22292f, #11161a); box-shadow: 0 28px 80px #0009, inset 0 1px #ffffff15; }
-    .display-bezel { max-width: 970px; margin: auto; padding: 9px; border: 1px solid #53616a; border-radius: 12px;
-      background: #252d33; box-shadow: inset 0 1px #ffffff12, 0 8px 24px #0007; }
+    .display-bezel { max-width: 970px; margin: auto; padding: 9px; border-radius: 12px;
+      background: #252d33; box-shadow: 0 8px 24px #0007; }
     .display-caption { display: flex; justify-content: space-between; padding: 0 2px 7px;
       color: #9baab3; font: 10px ui-monospace, SFMono-Regular, monospace; letter-spacing: .12em; }
     .display-frame { border: 2px solid #8296a1; border-radius: 5px; overflow: hidden;
-      background: #070b0e; box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #ffffff12; }
+      background: #070b0e; }
     canvas { display: block; width: 100%; aspect-ratio: 4 / 3; background: #000; image-rendering: pixelated;
       touch-action: none; }
     .controls { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(14px, 4vw, 48px);

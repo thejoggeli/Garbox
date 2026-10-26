@@ -35,6 +35,11 @@ inline void ConfigureScreenCommandBar(
     bar.setBgOpa(LV_OPA_COVER);
     bar.setBorder(1, lv_color_hex(0x26343D));
     bar.setBorderSide(LV_BORDER_SIDE_TOP);
+    // The labels deliberately fill the complete command bar. Depending on
+    // font rounding LVGL can otherwise decide that the bar overflows by one
+    // pixel and draw a scrollbar over the right-hand hint.
+    bar.setScrollable(false);
+    lv_obj_set_scrollbar_mode(bar.raw(), LV_SCROLLBAR_MODE_OFF);
 
     pressHint.setWidth(LV_PCT(50));
     pressHint.setFont(&lv_font_unscii_8);
