@@ -1,6 +1,7 @@
 #include "DebugScreen.h"
 
 #include <algorithm>
+#include <cmath>
 #include "app/components/screens/ScreenCommandBar.h"
 #include "core/log/Log.h"
 #include "core/util/helpers/StringUtils.h"
@@ -239,13 +240,29 @@ void DebugScreen::onRenderHeatpadState(){
 }
 
 void DebugScreen::onRenderHeatpadDuty(){
-    mHeatpadDutyLabel.setTextFormatted(
-        "DUTY NOW      %.0f %%\nDUTY NEXT     %.0f %%\nPERIOD NOW    %u ms\nPERIOD NEXT   %u ms",
-        states().heatpadStatus.getCurrentDutyCycle()*100.0f,
-        states().heatpadStatus.getNextDutyCycle()*100.0f,
-        states().heatpadStatus.getCurrentPeriodMicros()/1000,
-        states().heatpadStatus.getNextPeriodMicros()/1000
-    );
+    const float appliedDuty = states().heatpadStatus.getCurrentDutyCycle() * 100.0f;
+    const float queuedDuty = states().heatpadStatus.getNextDutyCycle() * 100.0f;
+    const uint32_t appliedPeriod = states().heatpadStatus.getCurrentPeriodMicros() / 1000;
+    const uint32_t queuedPeriod = states().heatpadStatus.getNextPeriodMicros() / 1000;
+
+    const bool dutyIsQueued = std::fabs(appliedDuty - queuedDuty) >= 0.05f;
+    const bool periodIsQueued = appliedPeriod != queuedPeriod;
+    if(dutyIsQueued || periodIsQueued){
+        mHeatpadDutyLabel.setTextFormatted(
+            "DUTY         %.1f -> %.1f %%\nPERIOD       %u -> %u ms",
+            appliedDuty,
+            queuedDuty,
+            appliedPeriod,
+            queuedPeriod
+        );
+    }
+    else {
+        mHeatpadDutyLabel.setTextFormatted(
+            "DUTY         %.1f %%\nPERIOD       %u ms",
+            appliedDuty,
+            appliedPeriod
+        );
+    }
 }
 
 void DebugScreen::onRenderHeatpadSense(){
