@@ -136,6 +136,7 @@ Runtime::Runtime():
 
     // bind 'MainScreen' states
     mMainScreen.mStates.emplace(
+        mStateRegistry.getDisplayStatus(),
         mStateRegistry.getFanStatus(),
         mStateRegistry.getFanSample(),
         mStateRegistry.getHeatpadStatus(),
@@ -279,6 +280,7 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     case StateType::DisplayStatus: {
         const DisplayStatusState& displayStatus = static_cast<const DisplayStatusState&>(state);
         switch(mActiveScreen->getScreenId()){
+            case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onDisplayStatusStateChanged(displayStatus); break;
             case ScreenId::Debug: static_cast<DebugScreen*>(mActiveScreen)->onDisplayStatusStateChanged(displayStatus); break;
             default: break; // active screen does not read state 
         }

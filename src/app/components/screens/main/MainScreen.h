@@ -84,6 +84,7 @@ public:
     void onEncoderStepEvent(const EncoderStepEvent& event) final;
 
     // generated state changed handlers
+    void onDisplayStatusStateChanged(const DisplayStatusState& state) final;
     void onFanStatusStateChanged(const FanStatusState& state) final;
     void onFanSampleStateChanged(const FanSampleState& state) final;
     void onHeatpadStatusStateChanged(const HeatpadStatusState& state) final;

@@ -57,12 +57,22 @@ void FermentationBehaviour::onLogicTick(){
     // send actuator commands
     const FermentationEngine::Output& output = mFermentationEngine.getOutput();
     const bool autoFan = states().fermentationStatus.getFanAuto();
+    const float manualFanSpeed = MathUtils::Clamp(
+        states().fermentationStatus.getFanManualSpeed(), 0.0f, 1.0f);
     const FermentationState engineState = mFermentationEngine.getState();
     const bool safetyFanRequired = engineState == FermentationState::InvalidInput
         || engineState == FermentationState::OverTemperature
         || engineState == FermentationState::Cooldown;
     sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
-    sendFanCommand(output.fanEnabled && (autoFan || safetyFanRequired), output.fanTargetSpeed);
+    if(safetyFanRequired){
+        sendFanCommand(true, output.fanTargetSpeed);
+    }
+    else if(autoFan){
+        sendFanCommand(output.fanEnabled, output.fanTargetSpeed);
+    }
+    else {
+        sendFanCommand(manualFanSpeed > 0.0f, manualFanSpeed);
+    }
     updateFermentationStatus();
     
     mFirstTick = false;
@@ -115,6 +125,8 @@ void FermentationBehaviour::onRequestTargetTemperatureEvent(const RequestTargetT
 
 void FermentationBehaviour::onRequestFanModeEvent(const RequestFanModeEvent& event){
     states().fermentationStatus.setFanAuto(event->autoFan);
+    states().fermentationStatus.setFanManualSpeed(
+        MathUtils::Clamp(event->manualSpeed, 0.0f, 1.0f));
 }
 
 bool FermentationBehaviour::checkTemperatureStatus(){

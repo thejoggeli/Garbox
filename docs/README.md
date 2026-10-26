@@ -7,9 +7,10 @@ This documentation is a snapshot of the repository as reviewed on 2026-10-19. It
 1. [Project overview](project-overview.md) — what the device and every major repository area can do.
 2. [Architecture and code generation](architecture.md) — how control, state, events, generated routing, hardware, tasks, and UI fit together.
 3. [Custom LVGL stack](lvgl-stack.md) — the XML UI compiler, typed C++ view layer, dirty rendering, widgets, buffering, tasks, panel driver, and SPI-DMA pipeline.
-4. [Engineering review](review.md) — strengths, risks, concrete defects, and maintainability assessment.
-5. [Finishing plan](finishing-plan.md) — a staged path from the current prototype to a dependable fermentation box.
-6. [Framework stabilization program](framework/README.md) — verified baseline, ownership contracts, target architecture, and executable task plan for reuse in future ESP32 projects.
+4. [UI flow and controls](ui-flow.md) — the current five-screen design, physical-control contract, settings, safety precedence, and simulator verification.
+5. [Engineering review](review.md) — strengths, risks, concrete defects, and maintainability assessment.
+6. [Finishing plan](finishing-plan.md) — a staged path from the current prototype to a dependable fermentation box.
+7. [Framework stabilization program](framework/README.md) — verified baseline, ownership contracts, target architecture, and executable task plan for reuse in future ESP32 projects.
 
 ## Executive summary
 

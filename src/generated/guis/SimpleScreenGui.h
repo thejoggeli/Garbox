@@ -9,9 +9,9 @@
 #include "core/lvgl/objects/LvLabel.h"
 
 LV_IMAGE_DECLARE(SimpleScreen_image_power16);
-LV_IMAGE_DECLARE(SimpleScreen_image_temperature16);
 LV_IMAGE_DECLARE(SimpleScreen_image_humidity16);
 LV_IMAGE_DECLARE(SimpleScreen_image_heat16);
+LV_IMAGE_DECLARE(SimpleScreen_image_fan16);
 
 namespace Garbox {
 
@@ -22,17 +22,19 @@ public:
     // === Component Structs ======================================
     // ============================================================
 
-    struct InfoTile {
-        InfoTile(LvObject& parent);
+    struct MetricCard {
+        MetricCard(LvObject& parent);
         LvObject body;
         LvImage icon;
+        LvObject _namelessContainer_0;
+        LvLabel label;
         LvLabel value;
 
-        InfoTile(const InfoTile&) = delete;
-        InfoTile& operator=(const InfoTile&) = delete;
-        InfoTile(InfoTile&&) = delete;
-        InfoTile& operator=(InfoTile&&) = delete;
-        ~InfoTile() = default;
+        MetricCard(const MetricCard&) = delete;
+        MetricCard& operator=(const MetricCard&) = delete;
+        MetricCard(MetricCard&&) = delete;
+        MetricCard& operator=(MetricCard&&) = delete;
+        ~MetricCard() = default;
     };
 
     // ============================================================
@@ -43,24 +45,37 @@ public:
         Objects();
         LvObject root;
         LvObject wrapper;
-        LvObject _namelessContainer_0;
+        LvObject header;
+        LvObject statusPill;
+        LvImage statusIcon;
+        LvLabel statusText;
+        LvLabel screenTitle;
+        LvLabel menuHint;
+        LvObject content;
+        LvObject gaugePanel;
         LvObject arcContainer;
         LvArc arcBg;
         LvArc arcMeasured;
-        LvArc arcMeasuredEnd;
-        LvArc arcMeasuredBorder;
         LvArc arcTarget;
-        LvArc arcTargetEnd;
-        LvArc arcTargetBorder;
+        LvObject _namelessContainer_0;
+        LvLabel measuredLabel;
         LvObject _namelessContainer_1;
-        LvLabel tempLabel;
-        LvLabel tempValue;
-        LvLabel tempUnit;
-        LvObject infoTiles;
-        InfoTile fermentationStatus;
-        InfoTile measuredTemperature;
-        InfoTile measuredHumidity;
-        InfoTile heaterPower;
+        LvLabel measuredValue;
+        LvLabel measuredUnit;
+        LvLabel temperatureDelta;
+        LvObject sidePanel;
+        LvObject targetCard;
+        LvLabel targetLabel;
+        LvObject _namelessContainer_2;
+        LvLabel targetValue;
+        LvLabel targetUnit;
+        LvLabel targetHint;
+        MetricCard humidity;
+        MetricCard heater;
+        MetricCard fan;
+        LvObject footer;
+        LvLabel powerHint;
+        LvLabel rangeHint;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

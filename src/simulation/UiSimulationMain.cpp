@@ -191,13 +191,17 @@ int runInteractive(SimulationRuntime& runtime, ThermalPlant& plant, lv_display_t
         else if(std::strcmp(command, "frame\n") == 0){
             renderFrame(runtime, display);
             const std::vector<uint8_t> rgb = rgbFrame();
-            std::printf("FRAME %zu %s %.3f %.3f %u %u\n",
+            std::printf("FRAME %zu %s %.3f %.3f %u %u %u %.3f %.3f %.3f\n",
                 rgb.size(),
                 ScreenIdToString(runtime.getActiveScreenId()),
                 runtime.temperatureSample().getTemperatureCelcius(),
                 runtime.fermentationStatus().getTargetTemperature(),
                 runtime.fermentationStatus().getPowerOn() ? 1U : 0U,
-                runtime.tickCount());
+                runtime.tickCount(),
+                runtime.fermentationStatus().getFanAuto() ? 1U : 0U,
+                runtime.fermentationStatus().getFanManualSpeed(),
+                runtime.outputs().fan.targetSpeed,
+                runtime.outputs().display.brightness);
             std::fwrite(rgb.data(), rgb.size(), 1, stdout);
         }
         else if(std::strcmp(command, "quit\n") == 0){

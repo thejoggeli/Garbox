@@ -50,6 +50,7 @@ struct EncoderStepPayload {
 
 struct RequestFanModePayload {
     bool autoFan;
+    float manualSpeed;
 };
 
 struct RequestFermentationModePayload {

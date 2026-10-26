@@ -13,7 +13,7 @@ LV_IMAGE_DECLARE(MainScreen_image_arrow_down);
 LV_IMAGE_DECLARE(MainScreen_image_fan16);
 LV_IMAGE_DECLARE(MainScreen_image_humidity16);
 LV_IMAGE_DECLARE(MainScreen_image_power16);
-LV_IMAGE_DECLARE(MainScreen_image_heat16);
+LV_IMAGE_DECLARE(MainScreen_image_temperature16);
 
 namespace Garbox {
 
@@ -60,7 +60,10 @@ public:
         Objects();
         LvObject root;
         LvObject wrapper;
-        LvObject _namelessContainer_0;
+        LvObject chartsPanel;
+        LvObject chartsHeader;
+        LvLabel trendsTitle;
+        LvLabel windowLabel;
         GraphComponent tempGraph;
         GraphComponent powerGraph;
         LvObject timeAxis;
@@ -69,20 +72,22 @@ public:
         LvLabel t2;
         LvLabel t1;
         LvLabel t0;
-        LvObject _namelessContainer_1;
+        LvObject controlPanel;
         LvObject systemStateBg;
         LvLabel systemState;
+        LvObject controlHeader;
+        LvLabel controlsTitle;
+        LvLabel editHint;
         LvObject menuContainer;
         LvImage menuArrUp;
-        LvObject _namelessContainer_2;
         LvObject menuRows;
-        LvObject _namelessContainer_3;
         LvImage menuArrDown;
         LvObject infoTiles;
         InfoTile fanInfo;
         InfoTile humidInfo;
         InfoTile powerInfo;
         InfoTile timeInfo;
+        LvLabel homeHint;
 
         Objects(const Objects&) = delete;
         Objects& operator=(const Objects&) = delete;

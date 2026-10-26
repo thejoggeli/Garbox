@@ -43,6 +43,7 @@ screens:
       - TimeSeries
       - Menu
     read_states: 
+      - DisplayStatus
       - FanStatus
       - FanSample
       - HeatpadStatus
@@ -51,6 +52,7 @@ screens:
       - TemperatureSample
       - FermentationStatus
     send_events:
+      - DisplayCommand
       - RequestFermentationMode
       - RequestTargetTemperature
       - RequestFanMode

@@ -76,6 +76,7 @@ SimulationRuntime::SimulationRuntime(): RuntimeAbs(MakeConfig()){
         mFermentationStatus
     );
     mMainScreen.mStates.emplace(
+        mDisplayStatus,
         mFanStatus,
         mFanSample,
         mHeatpadStatus,
@@ -155,15 +156,20 @@ void SimulationRuntime::requestTargetTemperature(float temperatureCelcius){
     dispatch();
 }
 
-void SimulationRuntime::requestAutomaticFan(bool enabled){
+void SimulationRuntime::requestFanControl(bool automatic, float manualSpeed){
     RequestFanModeEvent event =
         getEventFactory().make<EventType::RequestFanMode>(SimulationSender);
     if(!event){
         return;
     }
-    event->autoFan = enabled;
+    event->autoFan = automatic;
+    event->manualSpeed = manualSpeed;
     receiveEvent(event.header());
     dispatch();
+}
+
+void SimulationRuntime::requestAutomaticFan(bool enabled){
+    requestFanControl(enabled, 0.0f);
 }
 
 const FermentationStatusState& SimulationRuntime::fermentationStatus() const {
@@ -306,7 +312,10 @@ void SimulationRuntime::onRouteStateChanged(const StateAbs& state){
         }
         break;
     case StateType::DisplayStatus:
-        if(getActiveScreenId() == ScreenId::Debug){
+        if(getActiveScreenId() == ScreenId::Main){
+            mMainScreen.onDisplayStatusStateChanged(mDisplayStatus);
+        }
+        else if(getActiveScreenId() == ScreenId::Debug){
             mDebugScreen.onDisplayStatusStateChanged(mDisplayStatus);
         }
         break;

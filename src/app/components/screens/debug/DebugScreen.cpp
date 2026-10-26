@@ -7,6 +7,8 @@ namespace Garbox {
 
 DebugScreen::DebugScreen():
     DebugScreenAbs(),
+    mHeaderLabel(mRoot),
+    mFooterLabel(mRoot),
     mProgressBox(mRoot),
     mMicrosLabel(mRoot),
     mTimeLabel(mRoot),
@@ -30,13 +32,25 @@ void DebugScreen::initLabel(LvLabel& label, int16_t x, int16_t y, const char* te
     label.setText(text);
     label.setPosition(x, y);
     label.setTextColor(lv_color_hex(0xFFFFFF));
-    label.setFont(&lv_font_montserrat_12);
+    label.setFont(&lv_font_montserrat_10);
 }
 
 void DebugScreen::onInit(){
-    const int16_t startXPx = 10;
-    const int16_t startYPx = 10;
-    const int16_t deltaYPx = 15;
+    mHeaderLabel.setText("DIAGNOSTICS");
+    mHeaderLabel.setPosition(8, 6);
+    mHeaderLabel.setFont(&lv_font_montserrat_12);
+    mHeaderLabel.setTextColor(lv_color_hex(0x8AB4F4));
+
+    mFooterLabel.setText("PRESS: EVENT LOG     HOLD: BACK");
+    mFooterLabel.setPosition(0, 222);
+    mFooterLabel.setWidth(mScreenWidth);
+    mFooterLabel.setTextAlign(LV_TEXT_ALIGN_CENTER);
+    mFooterLabel.setFont(&lv_font_unscii_8);
+    mFooterLabel.setTextColor(lv_color_hex(0x60717B));
+
+    const int16_t startXPx = 9;
+    const int16_t startYPx = 29;
+    const int16_t deltaYPx = 12;
     int16_t currentYPx = startYPx;
 
     initLabel(mMicrosLabel,             startXPx, currentYPx, "us");
@@ -57,17 +71,18 @@ void DebugScreen::onInit(){
 
     mMicrosLabel.setTextAlign(LV_TEXT_ALIGN_RIGHT);
     mMicrosLabel.setPositionX(0);
+    mMicrosLabel.setPositionY(8);
     mMicrosLabel.setWidth(mScreenWidth);
     mMicrosLabel.setFont(&lv_font_unscii_8);
     mMicrosLabel.setPadRight(startXPx);
 
     mTimeLabel.setFont(&lv_font_unscii_8);
 
-    mProgressBox.setRawSize(48, 8);
-    mProgressBox.setBgColor(lv_color_hex(0xFFFFFF));
+    mProgressBox.setRawSize(48, 3);
+    mProgressBox.setBgColor(lv_color_hex(0x8AB4F4));
     mProgressBox.setBgOpa(LV_OPA_COVER);
 
-    setBackgroundColor(0x0);
+    setBackgroundColor(0x070B0E);
 }
 
 void DebugScreen::onStart(){
@@ -83,7 +98,10 @@ void DebugScreen::onBecomeDisabled(){
 }
 
 void DebugScreen::onButtonEvent(const ButtonEvent& event){
-    if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
+    if(event->newState == ButtonState::PressedLong){
+        host()->requestChangeScreen(ScreenId::Main);
+    }
+    else if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
         host()->requestChangeScreen(ScreenId::EventLog);
     }
 }
@@ -178,8 +196,8 @@ void DebugScreen::onRenderDisplayStatus(){
 void DebugScreen::onRenderHeatpadProgress(){
     float progress = states().heatpadProgress.getPwmProgressMicros();
     float period = states().heatpadStatus.getCurrentPeriodMicros();
-    float position = progress / period;
-    static constexpr uint32_t y = 240-4;
+    float position = period > 0.0f ? progress / period : 0.0f;
+    static constexpr uint32_t y = 217;
     static constexpr float wDisplay = 320.0f; 
     static constexpr float wBox = 48.0f;
     static constexpr float left = -wBox;
@@ -252,8 +270,9 @@ void DebugScreen::onRenderHeapMinimum(){
 
 void DebugScreen::onRenderAppInfo(){
     mAppInfoLabel.setTextFormatted(
-        "Beha=%s, events=%u, states=%u",
+        "App: %s / %s, events=%u, states=%u",
         BehaviourIdToString(states().activeBehaviour.getBehaviour()), 
+        ScreenIdToString(states().activeScreen.getScreen()),
         mLastEventCount, mLastStateChangesCount
     );
 }
@@ -310,7 +329,7 @@ void DebugScreen::onActiveBehaviourStateChanged(const ActiveBehaviourState& stat
 }
 
 void DebugScreen::onActiveScreenStateChanged(const ActiveScreenState& state){
-    // add label for active screen
+    markDirty(RenderFn::AppInfo);
 }
 
 void DebugScreen::onFermentationStatusStateChanged(const FermentationStatusState& state){

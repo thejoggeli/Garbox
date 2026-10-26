@@ -106,6 +106,9 @@ pio run -e ui-simulator
 # Interactive real LVGL UI (also works when `pio` is not on PATH)
 python3 tools/ui_simulator.py
 
+# Automated physical-control flow plus optional screen captures
+python3 tools/verify_ui_flow.py --capture-dir /tmp/garbox-ui-flow
+
 # Target compilation remains a separate evidence class
 pio run -e esp32-s3-devkitc-1
 ```
@@ -125,22 +128,24 @@ reimplement any screen. Its controls are:
 - click, Space, or Enter: short encoder-button press;
 - hold the on-screen encoder, Space, or Enter for 0.7 seconds: long press.
 
-Long presses navigate `Simple → Main → Debug`; short presses then navigate
-`Debug → EventLog → StateLog → Simple`. In `Main`, encoder rotation and short
+Home uses rotation for the target, short press for start/stop, and hold for
+Main. Main provides explicit rows for Diagnostics, Event Log, State Log, and
+Home. Short presses cycle `Debug → EventLog → StateLog → Debug`; a hold from
+any of those screens returns to Main. In Main, encoder rotation and short
 presses operate the actual menu.
 
-## Current verification record (2026-10-25)
+## Current verification record (2026-10-26)
 
-- Native ASan/UBSan suite: 63/63 tests passed.
+- Native ASan/UBSan suite: 64/64 tests passed, including manual-fan behavior
+  and safety override coverage.
 - Standalone simulator: builds and runs a one-minute deterministic trace with
   all step invariants satisfied.
-- Headless LVGL 9.4.0: 320x240 RGB565 render with the shared embedded theme
-  succeeded; disabled checksum `62a1bc832670339f`, enabled checksum
-  `e6a84a9fcba3a912`.
-- Interactive protocol: all five screens rendered and completed the full input
-  navigation cycle. The local HTTP page, 230,400-byte RGB frame endpoint, and
-  encoder input endpoint were exercised successfully.
-- ESP32-S3 firmware: builds successfully; 30,408 bytes RAM and 863,089 bytes
+- Headless LVGL 9.4.0: 320x240 RGB565 rendering with the shared embedded theme
+  succeeds and responds to application input.
+- Automated interactive protocol: all five screens render; Home start/stop and
+  target adjustment work; Main power, target, and 35% manual-fan editing reach
+  application outputs; the complete navigation loop returns with state intact.
+- ESP32-S3 firmware: builds successfully; 30,296 bytes RAM and 884,217 bytes
   flash. `src/simulation` is excluded from this build.
 - No hardware evidence was produced. Sensor behavior, actuator polarity,
   thermal response, display transport/DMA, and timing remain target-gated.

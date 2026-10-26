@@ -52,6 +52,10 @@ public:
 
     void clearSelection();
 
+    bool hasSelection() const;
+    bool isLocked() const;
+    uint8_t getSelectedRow() const;
+
     int32_t getValue(uint8_t rowIndex) const;
     void setValue(uint8_t rowIndex, int32_t value);
 

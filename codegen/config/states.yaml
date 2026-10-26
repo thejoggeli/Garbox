@@ -25,6 +25,7 @@ states:
       - { name: State, type: FermentationState }
       - { name: TargetTemperature, type: float }
       - { name: FanAuto, type: bool, default: true }
+      - { name: FanManualSpeed, type: float, default: 0.0 }
       - { name: PowerOn, type: bool, default: false }
 
   HeatpadStatus:

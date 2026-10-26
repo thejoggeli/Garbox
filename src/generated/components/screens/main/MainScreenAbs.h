@@ -3,9 +3,9 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
-#include <optional>
 #include "core/application/screen/ScreenAbs.h"
 #include "generated/guis/MainScreenGui.h"
+#include <optional>
 #include "generated/components/screens/main/MainScreenStates.h"
 
 namespace Garbox {
@@ -38,6 +38,7 @@ public:
     virtual void onEncoderStepEvent(const EncoderStepEvent& event) = 0;
 
     // state change handlers (to be implmeneted by user)
+    virtual void onDisplayStatusStateChanged(const DisplayStatusState& state) = 0;
     virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
     virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
     virtual void onHeatpadStatusStateChanged(const HeatpadStatusState& state) = 0;
@@ -49,11 +50,13 @@ public:
 protected:
 
     // make typed events 
+    DisplayCommandEvent makeDisplayCommandEvent();
     RequestFermentationModeEvent makeRequestFermentationModeEvent();
     RequestTargetTemperatureEvent makeRequestTargetTemperatureEvent();
     RequestFanModeEvent makeRequestFanModeEvent();
 
     // send typed events
+    void sendEvent(const DisplayCommandEvent& event);
     void sendEvent(const RequestFermentationModeEvent& event);
     void sendEvent(const RequestTargetTemperatureEvent& event);
     void sendEvent(const RequestFanModeEvent& event);

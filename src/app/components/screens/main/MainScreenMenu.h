@@ -13,11 +13,14 @@ public:
     enum RowIndex : uint8_t {
         Power = 0,
         Target,
+        FanMode,
+        FanSpeed,
+        Brightness,
         History,
-        Fan,
-        Calibrate,
-        About,
-        Debug,
+        Diagnostics,
+        EventLog,
+        StateLog,
+        Home,
         Count
     };
 
@@ -31,18 +34,22 @@ public:
     MainScreenMenu(LvObject& container, void* callbackCtx, ValueChangedCallback valueChangedCallback);
 
     void render();
-    void onButtonInput();
+    RowIndex onButtonInput();
     void onEncoderInput(int32_t steps);
 
     void setPowerEnabled(bool enabled);
     void setTargetTemperatureCelsius(float temperature);
     void setHistoryIndex(uint8_t index);
     void setFanAuto(bool isAuto);
+    void setFanManualSpeed(float speed);
+    void setBrightness(float brightness);
 
     bool isPowerEnabled() const;
     float getTargetTemperatureCelsius() const;
     uint32_t getHistoryIndex() const;
     bool isFanAuto() const;
+    float getFanManualSpeed() const;
+    float getBrightness() const;
 
 private:
 

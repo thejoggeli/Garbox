@@ -15,9 +15,18 @@ StateLogScreen::LogRow::LogRow(LvObject& parent):
 
 StateLogScreen::StateLogScreen(): 
     StateLogScreenAbs(), 
-    mRows(mRoot){}
+    mHeader(mRoot),
+    mRows(mRoot),
+    mFooter(mRoot){}
 
 void StateLogScreen::onInit(){
+    mHeader.setText("STATE LOG");
+    mHeader.setWidth(LV_PCT(100));
+    mHeader.setHeight(22);
+    mHeader.setPad(6, 6, 4, 2);
+    mHeader.setFont(&lv_font_montserrat_12);
+    mHeader.setTextColor(lv_color_hex(0xBDA7FF));
+
     for(uint32_t i = 0; i < NumRows; i++){
         LogRow& row = mRows[i];
 
@@ -36,7 +45,7 @@ void StateLogScreen::onInit(){
         row.marker.setFont(&lv_font_montserrat_14);
 
         // setup id
-        row.id.setWidth(50);
+        row.id.setWidth(42);
         row.id.setText("");
         row.id.setTextAlign(LV_TEXT_ALIGN_CENTER);
 
@@ -44,7 +53,14 @@ void StateLogScreen::onInit(){
         row.text.setText("...");
     }
 
-    setBackgroundColor(0x120034);
+    mFooter.setText("PRESS: DIAGNOSTICS     HOLD: BACK");
+    mFooter.setWidth(LV_PCT(100));
+    mFooter.setHeight(17);
+    mFooter.setTextAlign(LV_TEXT_ALIGN_CENTER);
+    mFooter.setFont(&lv_font_unscii_8);
+    mFooter.setTextColor(lv_color_hex(0x756A94));
+
+    setBackgroundColor(0x0C0918);
     mRoot.setLayout(LV_LAYOUT_FLEX);
     mRoot.setFlexFlow(LV_FLEX_FLOW_COLUMN);
     mRoot.setFlexAlign(LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
@@ -63,8 +79,11 @@ void StateLogScreen::onBecomeDisabled(){
 }
 
 void StateLogScreen::onButtonEvent(const ButtonEvent& event){
-    if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
-        host()->requestChangeScreen(ScreenId::Simple);
+    if(event->newState == ButtonState::PressedLong){
+        host()->requestChangeScreen(ScreenId::Main);
+    }
+    else if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
+        host()->requestChangeScreen(ScreenId::Debug);
     }
 }
 

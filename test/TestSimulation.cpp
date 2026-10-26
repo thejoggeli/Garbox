@@ -196,6 +196,29 @@ void test_simulation_safety_fan_overrides_manual_off_preference(){
     TEST_ASSERT_NO_ASSERTS();
 }
 
+void test_simulation_manual_fan_speed_is_independent_of_regulation_power(){
+    TEST_RESET_ASSERTS();
+    SimulationRuntime& runtime = makeRuntime();
+    runtime.setInputs(validInputs(20.0f));
+    runtime.requestFanControl(false, 0.35f);
+    step(runtime);
+
+    TEST_ASSERT_FALSE(runtime.fermentationStatus().getPowerOn());
+    TEST_ASSERT_FALSE(runtime.fermentationStatus().getFanAuto());
+    TEST_ASSERT_FLOAT_WITHIN(
+        0.0001f, 0.35f, runtime.fermentationStatus().getFanManualSpeed());
+    TEST_ASSERT_TRUE(runtime.outputs().fan.enabled);
+    TEST_ASSERT_FLOAT_WITHIN(0.0001f, 0.35f, runtime.outputs().fan.targetSpeed);
+
+    runtime.requestAutomaticFan(true);
+    step(runtime);
+
+    TEST_ASSERT_TRUE(runtime.fermentationStatus().getFanAuto());
+    TEST_ASSERT_FALSE(runtime.outputs().fan.enabled);
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, runtime.outputs().fan.targetSpeed);
+    TEST_ASSERT_NO_ASSERTS();
+}
+
 void test_closed_loop_plant_runs_faster_than_real_time_with_safe_outputs(){
     TEST_RESET_ASSERTS();
     SimulationRuntime& runtime = makeRuntime();
@@ -246,5 +269,6 @@ void RegisterSimulationTests(){
     RUN_TEST(test_simulation_sensor_loss_and_fan_stall_force_safe_commands);
     RUN_TEST(test_simulation_hot_disable_cools_down_before_reset);
     RUN_TEST(test_simulation_safety_fan_overrides_manual_off_preference);
+    RUN_TEST(test_simulation_manual_fan_speed_is_independent_of_regulation_power);
     RUN_TEST(test_closed_loop_plant_runs_faster_than_real_time_with_safe_outputs);
 }

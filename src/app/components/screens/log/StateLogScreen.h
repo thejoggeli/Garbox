@@ -29,8 +29,10 @@ private:
         LogRow(LvObject& parent);
     };
 
-    static constexpr size_t NumRows = 22;
+    static constexpr size_t NumRows = 17;
+    LvLabel mHeader;
     ArrayStatic<LogRow, NumRows> mRows;
+    LvLabel mFooter;
     size_t mNextLabelIndex = 0;
     size_t mCurrentLabelIndex = static_cast<size_t>(-1);
     RingBufferStatic<StateEntry, NumRows> mBuffer;

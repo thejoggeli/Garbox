@@ -21,6 +21,7 @@ private:
     bool mFermentationStatusGlow = false;
 
     void initArc(LvArc& arc);
+    bool isSensorOk();
     
     void setArcTemperature(ArcIndex index, float temperature);
     void updateArcColor();

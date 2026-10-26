@@ -7,6 +7,7 @@
 namespace Garbox {
 
 MainScreenStates::MainScreenStates(
+    const DisplayStatusState& displayStatusState, // read
     const FanStatusState& fanStatusState, // read
     const FanSampleState& fanSampleState, // read
     const HeatpadStatusState& heatpadStatusState, // read
@@ -15,6 +16,7 @@ MainScreenStates::MainScreenStates(
     const TemperatureSampleState& temperatureSampleState, // read
     const FermentationStatusState& fermentationStatusState // read
 ):
+    displayStatus(displayStatusState),
     fanStatus(fanStatusState),
     fanSample(fanSampleState),
     heatpadStatus(heatpadStatusState),

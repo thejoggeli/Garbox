@@ -21,6 +21,10 @@ bool FermentationStatusState::getFanAuto() const {
     return mCurrent.fanAuto;
 }
 
+float FermentationStatusState::getFanManualSpeed() const {
+    return mCurrent.fanManualSpeed;
+}
+
 bool FermentationStatusState::getPowerOn() const {
     return mCurrent.powerOn;
 }
@@ -37,6 +41,10 @@ bool FermentationStatusState::nextFanAuto() const {
     return mNext.fanAuto;
 }
 
+float FermentationStatusState::nextFanManualSpeed() const {
+    return mNext.fanManualSpeed;
+}
+
 bool FermentationStatusState::nextPowerOn() const {
     return mNext.powerOn;
 }
@@ -51,6 +59,10 @@ float FermentationStatusState::lastTargetTemperature() const {
 
 bool FermentationStatusState::lastFanAuto() const {
     return mLast.fanAuto;
+}
+
+float FermentationStatusState::lastFanManualSpeed() const {
+    return mLast.fanManualSpeed;
 }
 
 bool FermentationStatusState::lastPowerOn() const {
@@ -78,6 +90,14 @@ void FermentationStatusState::setFanAuto(bool value){
         return;
     }
     mNext.fanAuto = value;
+    markDirty();
+}
+
+void FermentationStatusState::setFanManualSpeed(float value){
+    if (mNext.fanManualSpeed == value) {
+        return;
+    }
+    mNext.fanManualSpeed = value;
     markDirty();
 }
 

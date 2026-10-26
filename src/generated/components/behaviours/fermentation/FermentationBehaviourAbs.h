@@ -3,8 +3,8 @@
 // * THIS IS GENERATED CODE. DO NOT MODIFY *
 // *****************************************
 
-#include <optional>
 #include "core/application/behaviour/BehaviourAbs.h"
+#include <optional>
 #include "generated/components/behaviours/fermentation/FermentationBehaviourStates.h"
 
 namespace Garbox {

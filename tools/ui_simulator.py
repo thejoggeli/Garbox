@@ -160,8 +160,9 @@ PAGE = r"""<!doctype html>
       }
       ctx.putImageData(image, 0, 0);
       const power = response.headers.get('X-Garbox-Power') === '1' ? 'ON' : 'OFF';
+      const fan = Math.round(Number(response.headers.get('X-Garbox-Fan-Output')) * 100);
       status.textContent = `${response.headers.get('X-Garbox-Screen')} · ${response.headers.get('X-Garbox-Temperature')} °C` +
-        ` → ${response.headers.get('X-Garbox-Target')} °C · ${power}`;
+        ` → ${response.headers.get('X-Garbox-Target')} °C · ${power} · fan ${fan}%`;
       status.classList.remove('error');
     } catch (error) { showError(error); }
     finally { framePending = false; }
@@ -207,7 +208,7 @@ class Simulator:
         with self._lock:
             self._write("frame")
             header = self._readline().split()
-            if len(header) != 7 or header[0] != "FRAME":
+            if len(header) != 11 or header[0] != "FRAME":
                 raise RuntimeError("invalid frame response: " + " ".join(header))
             length = int(header[1])
             assert self._process.stdout is not None
@@ -223,6 +224,10 @@ class Simulator:
                 "target": header[4],
                 "power": header[5],
                 "tick": header[6],
+                "fan_auto": header[7],
+                "fan_manual": header[8],
+                "fan_output": header[9],
+                "brightness": header[10],
             }
 
     def _write(self, command: str) -> None:

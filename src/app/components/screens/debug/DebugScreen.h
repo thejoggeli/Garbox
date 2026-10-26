@@ -19,9 +19,11 @@ private:
     uint32_t mLastEventCount = 0;
     uint32_t mLastStateChangesCount = 0;
 
-    multi_heap_info_t mHeapInfo;
+    multi_heap_info_t mHeapInfo {};
     uint32_t mHeapMinimumTime = 0;
 
+    LvLabel mHeaderLabel;
+    LvLabel mFooterLabel;
     LvBox mProgressBox;
     LvLabel mMicrosLabel;
     LvLabel mTimeLabel;

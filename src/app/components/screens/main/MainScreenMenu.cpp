@@ -12,11 +12,11 @@ static const char* HistoryLabels[] = {
 
 static constexpr uint32_t HistoryCount = sizeof(HistoryLabels) / sizeof(HistoryLabels[0]);
 
-static constexpr uint32_t VisibleRows = 5;
-static constexpr uint32_t ColorTextDefault = 0xFFFFFF;
-static constexpr uint32_t ColorTextActive = 0x0;
-static constexpr uint32_t ColorBgDefault = 0x0;
-static constexpr uint32_t ColorBgActive = 0xFFFFFF;
+static constexpr uint32_t VisibleRows = 6;
+static constexpr uint32_t ColorTextDefault = 0xD9E2E8;
+static constexpr uint32_t ColorTextActive = 0x081018;
+static constexpr uint32_t ColorBgDefault = 0x0D141A;
+static constexpr uint32_t ColorBgActive = 0x8AB4F4;
 
 MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChangedCallback valueChangedCallback):
     mMenu(
@@ -36,11 +36,14 @@ MainScreenMenu::MainScreenMenu(LvObject& container, void* callbackCtx, ValueChan
 
     mMenu.addRow("Power", 0);
     mMenu.addRow("Target", 0);
+    mMenu.addRow("Fan mode", 0);
+    mMenu.addRow("Fan speed", 0);
+    mMenu.addRow("Brightness", 50);
     mMenu.addRow("History", 0);
-    mMenu.addRow("Fan", 0);
-    mMenu.addRow("Calibrate", 0);
-    mMenu.addRow("About", 0);
-    mMenu.addRow("Debug", 0);
+    mMenu.addRow("Diagnostics", 0);
+    mMenu.addRow("Event log", 0);
+    mMenu.addRow("State log", 0);
+    mMenu.addRow("Home", 0);
     mMenu.setSelectedRow(0);
     mMenu.setPad(1,1,1,1);
 }
@@ -49,8 +52,16 @@ void MainScreenMenu::render(){
     mMenu.render();
 }
 
-void MainScreenMenu::onButtonInput(){
+MainScreenMenu::RowIndex MainScreenMenu::onButtonInput(){
+    if(!mMenu.hasSelection()){
+        return RowIndex::Count;
+    }
+    const RowIndex selected = static_cast<RowIndex>(mMenu.getSelectedRow());
+    if(!mMenu.isLocked() && selected >= RowIndex::Diagnostics){
+        return selected;
+    }
     mMenu.toggleLock();
+    return RowIndex::Count;
 }
 
 void MainScreenMenu::onEncoderInput(int32_t steps){
@@ -75,13 +86,17 @@ int32_t MainScreenMenu::changeValue(void* callbackCtx, uint8_t rowIndex, int32_t
             newValue = MathUtils::Wrap<int32_t>(currentValue + delta, 0, 2);
             break;
         case Target:
-            newValue = MathUtils::Clamp<int32_t>(currentValue + delta, 200, 400);
+            newValue = MathUtils::Clamp<int32_t>(currentValue + delta, 150, 500);
+            break;
+        case FanMode:
+            newValue = MathUtils::Wrap<int32_t>(currentValue + delta, 0, 2);
+            break;
+        case FanSpeed:
+        case Brightness:
+            newValue = MathUtils::Clamp<int32_t>(currentValue + delta * 5, 0, 100);
             break;
         case History:
             newValue = MathUtils::Wrap<int32_t>(currentValue + delta, 0, static_cast<int32_t>(HistoryCount));
-            break;
-        case Fan:
-            newValue = MathUtils::Wrap<int32_t>(currentValue + delta, 0, 2);
             break;
         default:
             newValue = currentValue;
@@ -108,14 +123,23 @@ void MainScreenMenu::valueToText(void* callbackCtx, uint8_t rowIndex, int32_t va
             std::snprintf(outText, maxLen, "%s", HistoryLabels[value]);
             break;
 
-        case Fan:
-            std::snprintf(outText, maxLen, value ? "Auto" : "Off");
+        case FanMode:
+            std::snprintf(outText, maxLen, value ? "Auto" : "Manual");
             break;
 
-        case Calibrate:
-        case About:
-        case Debug:
-            std::snprintf(outText, maxLen, "Open");
+        case FanSpeed:
+        case Brightness:
+            std::snprintf(outText, maxLen, "%d%%", value);
+            break;
+
+        case Diagnostics:
+        case EventLog:
+        case StateLog:
+            std::snprintf(outText, maxLen, ">");
+            break;
+
+        case Home:
+            std::snprintf(outText, maxLen, "BACK");
             break;
 
         default:
@@ -137,7 +161,15 @@ void MainScreenMenu::setHistoryIndex(uint8_t index){
 }
 
 void MainScreenMenu::setFanAuto(bool isAuto){
-    mMenu.setValue(RowIndex::Fan, isAuto ? 1 : 0);
+    mMenu.setValue(RowIndex::FanMode, isAuto ? 1 : 0);
+}
+
+void MainScreenMenu::setFanManualSpeed(float speed){
+    mMenu.setValue(RowIndex::FanSpeed, static_cast<int32_t>(speed * 100.0f + 0.5f));
+}
+
+void MainScreenMenu::setBrightness(float brightness){
+    mMenu.setValue(RowIndex::Brightness, static_cast<int32_t>(brightness * 100.0f + 0.5f));
 }
 
 bool MainScreenMenu::isPowerEnabled() const{
@@ -153,7 +185,15 @@ uint32_t MainScreenMenu::getHistoryIndex() const{
 }
 
 bool MainScreenMenu::isFanAuto() const{
-    return mMenu.getValue(RowIndex::Fan) != 0;
+    return mMenu.getValue(RowIndex::FanMode) != 0;
+}
+
+float MainScreenMenu::getFanManualSpeed() const{
+    return static_cast<float>(mMenu.getValue(RowIndex::FanSpeed)) * 0.01f;
+}
+
+float MainScreenMenu::getBrightness() const{
+    return static_cast<float>(mMenu.getValue(RowIndex::Brightness)) * 0.01f;
 }
 
 } // namespace Garbox

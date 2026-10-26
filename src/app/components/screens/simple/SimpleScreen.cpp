@@ -10,6 +10,9 @@ namespace Garbox {
 
 static constexpr uint32_t ColorRed = 0xB85450;
 static constexpr uint32_t ColorGreen = 0x7BBF56;
+static constexpr uint32_t ColorBlue = 0x5B8FC9;
+static constexpr uint32_t ColorAmber = 0xD1B254;
+static constexpr uint32_t ColorMuted = 0x60717B;
 
 static constexpr float ArcTempMin = 15.0f;
 static constexpr float ArcTempMax = 50.0f;
@@ -21,24 +24,42 @@ SimpleScreen::SimpleScreen() : SimpleScreenAbs(){
 }
 
 void SimpleScreen::onInit(){
-    gui().tempLabel.setFont(&lv_font_montserrat_12);
-    gui().tempValue.setFont(&lv_font_montserrat_30);
-    gui().tempUnit.setFont(&lv_font_montserrat_20);
-    gui().infoTiles.setFont(&lv_font_montserrat_12);
+    gui().statusText.setFont(&lv_font_montserrat_12);
+    gui().screenTitle.setFont(&lv_font_montserrat_10);
+    gui().menuHint.setFont(&lv_font_unscii_8);
+    gui().measuredLabel.setFont(&lv_font_montserrat_10);
+    gui().measuredValue.setFont(&lv_font_montserrat_36);
+    gui().measuredUnit.setFont(&lv_font_montserrat_20);
+    gui().temperatureDelta.setFont(&lv_font_montserrat_10);
+    gui().targetLabel.setFont(&lv_font_montserrat_10);
+    gui().targetValue.setFont(&lv_font_montserrat_20);
+    gui().targetUnit.setFont(&lv_font_montserrat_12);
+    gui().targetHint.setFont(&lv_font_unscii_8);
+    gui().humidity.label.setFont(&lv_font_unscii_8);
+    gui().heater.label.setFont(&lv_font_unscii_8);
+    gui().fan.label.setFont(&lv_font_unscii_8);
+    gui().humidity.value.setFont(&lv_font_montserrat_12);
+    gui().heater.value.setFont(&lv_font_montserrat_12);
+    gui().fan.value.setFont(&lv_font_montserrat_12);
+    gui().footer.setFont(&lv_font_unscii_8);
 
     initArc(gui().arcBg);
     initArc(gui().arcMeasured);
-    initArc(gui().arcMeasuredEnd);
-    initArc(gui().arcMeasuredBorder);
     initArc(gui().arcTarget);
-    initArc(gui().arcTargetEnd);
-    initArc(gui().arcTargetBorder);
 }
 
 void SimpleScreen::initArc(LvArc& arc){
     arc.removeKnob();
     arc.setClickable(false);
     arc.setArcRotation(90);
+}
+
+bool SimpleScreen::isSensorOk(){
+    const TemperatureStatusState& status = states().temperatureStatus;
+    return status.getPowerEnabled()
+        && status.getDriverEnabled()
+        && !status.getResetting()
+        && status.getHasFirstSample();
 }
 
 void SimpleScreen::setArcTemperature(ArcIndex index, float temperature){
@@ -56,13 +77,9 @@ void SimpleScreen::setArcTemperature(ArcIndex index, float temperature){
     switch(index){
         case ArcIndex::MeasuredTemperature:
             gui().arcMeasured.setArcEndAngle(angle);
-            gui().arcMeasuredEnd.setArcAngles(angle, angle+1);
-            gui().arcMeasuredBorder.setArcEndAngle(angle);
             break;
         case ArcIndex::TargetTemperature:
             gui().arcTarget.setArcEndAngle(angle);
-            gui().arcTargetEnd.setArcAngles(angle, angle+1);
-            gui().arcTargetBorder.setArcEndAngle(angle);
             break;
         default: TriggerExit("SimpleScreen", "unhandled arc index");
     }
@@ -70,10 +87,10 @@ void SimpleScreen::setArcTemperature(ArcIndex index, float temperature){
 
 void SimpleScreen::updateArcColor(){
     const ColorMap& cm = ColorMaps::GetCoolWarm();
-    const float tempMeasured = states().fermentationStatus.getTargetTemperature(); 
-    const float tempTarget = states().temperatureSample.getTemperatureCelcius();
+    const float tempMeasured = states().temperatureSample.getTemperatureCelcius();
+    const float tempTarget = states().fermentationStatus.getTargetTemperature();
     const float range = 5.0f;
-    const float t = (tempMeasured - tempTarget) / range + 0.5f;
+    const float t = (tempTarget - tempMeasured) / range + 0.5f;
     LabColor lab = cm.interpolateLab(t);
     uint32_t hex = lab.hexStandard();
     gui().arcMeasured.setArcColor(lv_color_hex(hex));
@@ -138,55 +155,82 @@ void SimpleScreen::onRender(){
 
 void SimpleScreen::onRenderEngineStatus(){
     const FermentationStatusState& status = states().fermentationStatus;
-
-    // set text
+    const char* text = "OFF";
+    uint32_t color = 0x3A2528;
     if(status.getPowerOn()){
-        gui().fermentationStatus.value.setText("On");
+        switch(status.getState()){
+        case FermentationState::Ready: text = "READY"; color = ColorAmber; break;
+        case FermentationState::Regulating:
+            text = states().heatpadStatus.getNextDutyCycle() > 0.01f ? "HEATING" : "HOLDING";
+            color = ColorGreen;
+            break;
+        case FermentationState::Cooldown: text = "COOLING"; color = ColorBlue; break;
+        case FermentationState::OverTemperature: text = "TOO HOT"; color = ColorRed; break;
+        case FermentationState::InvalidInput: text = "SENSOR"; color = ColorRed; break;
+        default: text = "STARTING"; color = ColorAmber; break;
+        }
     }
-    else {
-        gui().fermentationStatus.value.setText("Off");
-    }
-    
-    // set color
+    gui().statusText.setText(text);
     if(mFermentationStatusGlow){
-        gui().fermentationStatus.body.setBorderColor(lv_color_hex(0xAAAAAA));
-        gui().fermentationStatus.body.setBgColor(lv_color_hex(0xAAAAAA));     
-    }
-    else if(status.getPowerOn()){
-        gui().fermentationStatus.body.setBorderColor(lv_color_hex(ColorGreen));
-        gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorGreen));
+        gui().statusPill.setBgColor(lv_color_hex(0x52616A));
     }
     else {
-        gui().fermentationStatus.body.setBorderColor(lv_color_hex(ColorRed));
-        gui().fermentationStatus.body.setBgColor(lv_color_hex(ColorRed));
+        gui().statusPill.setBgColor(lv_color_hex(color));
     }
 }
 
 void SimpleScreen::onRenderTargetTemperature(){
     const float targetTemperature = states().fermentationStatus.getTargetTemperature();
-    gui().tempValue.setTextFormatted("%.1f", targetTemperature);
+    gui().targetValue.setTextFormatted("%.1f", targetTemperature);
     setArcTemperature(ArcIndex::TargetTemperature, targetTemperature);
 }
 
 void SimpleScreen::onRenderMeasuredTemperature(){
+    if(!isSensorOk()){
+        gui().measuredValue.setText("--.-");
+        gui().temperatureDelta.setText("WAITING FOR SENSOR");
+        gui().temperatureDelta.setTextColor(lv_color_hex(ColorMuted));
+        setArcTemperature(ArcIndex::MeasuredTemperature, ArcTempMin);
+        return;
+    }
     const float measuredTemperature = states().temperatureSample.getTemperatureCelcius();
-    gui().measuredTemperature.value.setTextFormatted("%.1f°C", measuredTemperature);
+    const float delta = measuredTemperature - states().fermentationStatus.getTargetTemperature();
+    gui().measuredValue.setTextFormatted("%.1f", measuredTemperature);
+    gui().temperatureDelta.setTextFormatted("TARGET %+.1f°C", delta);
+    const uint32_t deltaColor = delta > 0.5f ? ColorRed : (delta < -0.5f ? ColorBlue : ColorGreen);
+    gui().temperatureDelta.setTextColor(lv_color_hex(deltaColor));
     setArcTemperature(ArcIndex::MeasuredTemperature, measuredTemperature);
     updateArcColor();
 }
 
 void SimpleScreen::onRenderMeasuredHumidity(){
+    if(!isSensorOk()){
+        gui().humidity.value.setText("--.-%");
+        return;
+    }
     const float measuredHumidity = states().temperatureSample.getHumidityRelative();
-    gui().measuredHumidity.value.setTextFormatted("%.1f%%", measuredHumidity);
+    gui().humidity.value.setTextFormatted("%.1f%%", measuredHumidity);
 }
 
 void SimpleScreen::onRenderHeaterPower(){
     const float heaterPowerPercent = states().heatpadStatus.getNextDutyCycle() * 100.0f;
-    gui().heaterPower.value.setTextFormatted("%.1f%%", heaterPowerPercent);
+    gui().heater.value.setTextFormatted("%.0f%%", heaterPowerPercent);
 }
 
 void SimpleScreen::onRenderFanStatus(){
-    // nothing to do
+    if(states().fanStatus.getState() == FanState::Stalled){
+        gui().fan.value.setText("STALLED");
+        gui().fan.value.setTextColor(lv_color_hex(ColorRed));
+        return;
+    }
+    const float rpm = states().fanSample.getMeasuredRpm();
+    if(states().fanStatus.getTargetSpeed() <= 0.0f && rpm < 1.0f){
+        gui().fan.value.setText("OFF");
+    }
+    else {
+        gui().fan.value.setTextFormatted("%.0f RPM", rpm);
+    }
+    gui().fan.value.setTextColor(lv_color_hex(0xFFFFFF));
 }
 
 void SimpleScreen::onFanStatusStateChanged(const FanStatusState& state){
@@ -199,6 +243,7 @@ void SimpleScreen::onFanSampleStateChanged(const FanSampleState& state){
 
 void SimpleScreen::onHeatpadStatusStateChanged(const HeatpadStatusState& state){
     markDirty(RenderFn::HeaterPower);
+    markDirty(RenderFn::EngineStatus);
 }
 
 void SimpleScreen::onHeatpadSampleStateChanged(const HeatpadSampleState& state){

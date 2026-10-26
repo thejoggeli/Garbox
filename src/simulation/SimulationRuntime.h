@@ -65,6 +65,7 @@ public:
 
     void requestFermentationEnabled(bool enabled);
     void requestTargetTemperature(float temperatureCelcius);
+    void requestFanControl(bool automatic, float manualSpeed);
     void requestAutomaticFan(bool enabled);
 
     const FermentationStatusState& fermentationStatus() const;

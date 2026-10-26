@@ -33,7 +33,7 @@ The current generated application contains:
 | `res/` | Ignored source images consumed by the GUI generator. |
 | `data/` | PlatformIO filesystem payload; currently contains two fan images and a test XML file. |
 | `utility/thermal_simulation/` | Python/Jupyter thermal network models, simulator, and experimental controllers. |
-| `test/` | Native Unity test suite; currently only exercises `ColorMap`. |
+| `test/` | Native Unity suite for utilities, runtime/event/state contracts, task and display ownership, timers/PWM, and closed-loop fermentation simulation. |
 | `include/lv_conf.h` | LVGL feature, allocator, color, font, widget, logging, and driver configuration. |
 
 The project is roughly 30,000 lines of C/C++ and 38,000 lines including generator/config sources. `src/core` is the largest area, followed by generated code, the app, and hardware modules.
@@ -108,7 +108,7 @@ The fermentation behavior currently sends duty-style speed commands and does not
 
 The heater PID constants are currently `Kp=0.05`, `Ki=0.02`, `Kd=0`, with output clamped to 0–100%. The engine delays exit from over-temperature for ten seconds unless the target is changed so the reading is no longer over target.
 
-`FermentationBehaviour` translates shared states into engine inputs and translates engine outputs into fan/heater command events. It also accepts UI requests to toggle power, change the target, and change automatic fan mode.
+`FermentationBehaviour` translates shared states into engine inputs and translates engine outputs into fan/heater command events. It also accepts UI requests to toggle power, change the target, and choose automatic or manual fan control. Manual fan output is allowed during normal/off operation, while invalid-input, over-temperature, and cooldown states always override it with the engine's full safety-cooling request.
 
 ### Input and feedback
 
@@ -122,29 +122,13 @@ The device uses a rotary encoder plus push button:
 
 ### Screens
 
-The initial screen is `SimpleScreen`:
+The initial `SimpleScreen` is the appliance Home screen. It gives measured chamber temperature the strongest visual weight, surrounds it with measured/target arcs, and shows the target, humidity, heater duty, fan speed, regulation state, and control hints at a glance. Encoder rotation changes the target by 0.1 °C from 15–50 °C, a short press starts/stops regulation, and a long press opens the Main screen.
 
-- target temperature in large type;
-- measured temperature and humidity;
-- heater output;
-- circular target/measured temperature arcs with color interpolation;
-- short press toggles fermentation power;
-- encoder adjusts the target in 0.1 °C steps between 15 and 50 °C;
-- long press opens the main dashboard.
+`MainScreen` combines trends and settings. It shows measured and target temperature, heater duty, fan, electrical power, humidity, target, system state, and a history window from one minute through four days. Its menu edits power, target, automatic/manual fan mode, manual fan speed, brightness, and the history window; dedicated rows open Diagnostics, Event Log, State Log, or Home. Press enters/exits editing, rotation changes the selected value, and hold returns Home.
 
-`MainScreen` is a dashboard and menu:
+`DebugScreen` shows live runtime, heap, display, sensor, fan, heater, and fermentation diagnostics. `EventLogScreen` records every routed event, and `StateLogScreen` records every published state change. Short presses cycle `Diagnostics → Event Log → State Log → Diagnostics`; a hold from any advanced screen returns to Main.
 
-- measured and target temperature chart;
-- heater-power chart;
-- fan, heater power, humidity, and system-state tiles;
-- selectable history windows from one minute through four days;
-- editable power, target temperature, history window, and fan-auto values;
-- menu placeholders for calibration, about, and debug;
-- long press opens the debug screen.
-
-`DebugScreen` shows live runtime, heap, display, sensor, fan, heater, and fermentation diagnostics.
-
-`EventLogScreen` records every routed event. `StateLogScreen` records every published state change. Button presses cycle `Debug → EventLog → StateLog → Simple`.
+The complete interaction model and desktop verification procedure are documented in [UI flow and controls](ui-flow.md).
 
 ### History and charts
 

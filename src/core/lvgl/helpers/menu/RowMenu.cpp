@@ -57,12 +57,12 @@ void RowMenu::setSelectedRow(uint8_t index){
     if(mHasSelection && index == mActiveRowIndex){
         return;
     }
+    AssertExit((index < mRows.size()), "RowMenu", "row index out of range");
     if(mLocked){
         toggleLock();
     }
-    if(mActiveRowIndex >= mRows.size()){
-        mActiveRowIndex = mRows.size() - 1;
-    }
+    mActiveRowIndex = index;
+    mHasSelection = true;
     mNeedsRenderWindow = true;
     mNeedsRenderActive = true;
 }
@@ -131,6 +131,19 @@ void RowMenu::clearSelection(){
     mHasSelection = false;
     mLocked = false;
     mNeedsRenderActive = true;
+}
+
+bool RowMenu::hasSelection() const {
+    return mHasSelection;
+}
+
+bool RowMenu::isLocked() const {
+    return mLocked;
+}
+
+uint8_t RowMenu::getSelectedRow() const {
+    AssertExit(mHasSelection, "RowMenu", "menu has no selection");
+    return mActiveRowIndex;
 }
 
 int32_t RowMenu::getValue(uint8_t rowIndex) const{

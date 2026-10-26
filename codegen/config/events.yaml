@@ -37,6 +37,7 @@ events:
   RequestFanMode:
     fields:
       - { name: autoFan, type: bool }
+      - { name: manualSpeed, type: float }
 
   RequestFermentationMode:
     fields:
@@ -45,4 +46,4 @@ events:
   RequestTargetTemperature:
     fields:
       - { name: targetTemperature, type: float }
-    
+

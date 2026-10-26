@@ -66,6 +66,12 @@ MainScreen::MainScreen() :
 
 void MainScreen::onInit(){
 
+    gui().trendsTitle.setFont(&lv_font_montserrat_12);
+    gui().windowLabel.setFont(&lv_font_unscii_8);
+    gui().controlsTitle.setFont(&lv_font_unscii_8);
+    gui().editHint.setFont(&lv_font_unscii_8);
+    gui().homeHint.setFont(&lv_font_unscii_8);
+
     // setup time axis labels
     const lv_font_t* timeAxisFont = &lv_font_montserrat_10; 
     gui().timeAxis.setFont(timeAxisFont);
@@ -80,7 +86,7 @@ void MainScreen::onInit(){
     gui().infoTiles.setFont(infoLabelFont);
 
     // setup menu
-    const lv_font_t* menuFont = &lv_font_montserrat_12;
+    const lv_font_t* menuFont = &lv_font_montserrat_10;
     gui().menuContainer.setFont(menuFont);
 
     // init charts
@@ -99,9 +105,9 @@ void MainScreen::onInit(){
     mTempGrid.setYTickLabel(2, "40°C");
 
     // power horizontal grid
-    mPowerGrid.setYTickPosition(0, MathUtils::Normalize(0   * TempChartYScale, PowerChartYMin, PowerChartYMax));
-    mPowerGrid.setYTickPosition(1, MathUtils::Normalize(50  * TempChartYScale, PowerChartYMin, PowerChartYMax));
-    mPowerGrid.setYTickPosition(2, MathUtils::Normalize(100 * TempChartYScale, PowerChartYMin, PowerChartYMax));
+    mPowerGrid.setYTickPosition(0, MathUtils::Normalize(0   * PowerChartYScale, PowerChartYMin, PowerChartYMax));
+    mPowerGrid.setYTickPosition(1, MathUtils::Normalize(50  * PowerChartYScale, PowerChartYMin, PowerChartYMax));
+    mPowerGrid.setYTickPosition(2, MathUtils::Normalize(100 * PowerChartYScale, PowerChartYMin, PowerChartYMax));
     mPowerGrid.setYTickLabel(0, "0%");
     mPowerGrid.setYTickLabel(1, "50%");
     mPowerGrid.setYTickLabel(2, "100%");
@@ -146,21 +152,23 @@ void MainScreen::onUserInputTick(){
 
 void MainScreen::onButtonEvent(const ButtonEvent& event){
     if(event->newState == ButtonState::PressedLong){
-        host()->requestChangeScreen(ScreenId::Debug);
+        host()->requestChangeScreen(ScreenId::Simple);
     }
     else if(event->newState == ButtonState::Released && event->oldState == ButtonState::Pressed){
-        mMenu.onButtonInput();
+        switch(mMenu.onButtonInput()){
+        case MenuRowIndex::Diagnostics: host()->requestChangeScreen(ScreenId::Debug); break;
+        case MenuRowIndex::EventLog: host()->requestChangeScreen(ScreenId::EventLog); break;
+        case MenuRowIndex::StateLog: host()->requestChangeScreen(ScreenId::StateLog); break;
+        case MenuRowIndex::Home: host()->requestChangeScreen(ScreenId::Simple); break;
+        default: break;
+        }
         markDirty(RenderFn::Menu);
     }
 }
 
 void MainScreen::onEncoderStepEvent(const EncoderStepEvent& event){
-    if(event->steps > 0){
-        mMenu.onEncoderInput(1);
-        markDirty(RenderFn::Menu);
-    }
-    else if(event->steps < 0){
-        mMenu.onEncoderInput(-1);
+    if(event->steps != 0){
+        mMenu.onEncoderInput(event->steps);
         markDirty(RenderFn::Menu);
     }
 }
@@ -179,16 +187,29 @@ void MainScreen::handleMenuValueChanged(MenuRowIndex index, int32_t oldValue, in
             sendEvent(event);
             break;
         }  
-        case MenuRowIndex::History: {
-            setHistoryIndex(static_cast<HistoryIndex>(newValue));
-            break;
-        }  
-        case MenuRowIndex::Fan: {
+        case MenuRowIndex::FanMode: {
             RequestFanModeEvent event = makeRequestFanModeEvent();
             event->autoFan = newValue != 0;
+            event->manualSpeed = mMenu.getFanManualSpeed();
             sendEvent(event);
             break;
-        }  
+        }
+        case MenuRowIndex::FanSpeed: {
+            RequestFanModeEvent event = makeRequestFanModeEvent();
+            event->autoFan = mMenu.isFanAuto();
+            event->manualSpeed = static_cast<float>(newValue) * 0.01f;
+            sendEvent(event);
+            break;
+        }
+        case MenuRowIndex::Brightness: {
+            DisplayCommandEvent event = makeDisplayCommandEvent();
+            event->brightness = static_cast<float>(newValue) * 0.01f;
+            sendEvent(event);
+            break;
+        }
+        case MenuRowIndex::History:
+            setHistoryIndex(static_cast<HistoryIndex>(newValue));
+            break;
         default: break;
     }
 }
@@ -275,8 +296,7 @@ void MainScreen::onRenderFanInfo(){
 void MainScreen::onRenderPowerInfo(){
     const float voltage = states().heatpadSample.getMeasuredVoltage();
     const float current = states().heatpadSample.getMeasuredCurrent();
-    const float duty = states().heatpadStatus.getNextDutyCycle();
-    const float power = voltage * current * duty;
+    const float power = voltage * current;
     gui().powerInfo.value.setTextFormatted("%.1fW", power);
 }
 
@@ -317,18 +337,20 @@ void MainScreen::onRenderHeatpadPowerLabel(){
 void MainScreen::onRenderTimeAxis(){
     static const char* t1_arr[] = {"15s", "1m", "4m",  "15m", "1h", "3h",  "6h",  "1d"};
     static const char* t2_arr[] = {"30s", "2m", "8m",  "30m", "2h", "4h",  "12h", "2d"};
-    static const char* t3_arr[] = {"45s", "3m", "12n", "45m", "3h", "9h",  "18h", "3d"};
-    static const char* t4_arr[] = {"60s", "4m", "16n", "60m", "4h", "12h", "24h", "4d"};
+    static const char* t3_arr[] = {"45s", "3m", "12m", "45m", "3h", "9h",  "18h", "3d"};
+    static const char* t4_arr[] = {"60s", "4m", "16m", "60m", "4h", "12h", "24h", "4d"};
+    static const char* window_arr[] = {"1 MIN", "4 MIN", "16 MIN", "1 HOUR", "4 HOURS", "12 HOURS", "1 DAY", "4 DAYS"};
     gui().t1.setText(t1_arr[static_cast<uint8_t>(mHistoryIndex)]);
     gui().t2.setText(t2_arr[static_cast<uint8_t>(mHistoryIndex)]);
     gui().t3.setText(t3_arr[static_cast<uint8_t>(mHistoryIndex)]);
     gui().t4.setText(t4_arr[static_cast<uint8_t>(mHistoryIndex)]);
+    gui().windowLabel.setText(window_arr[static_cast<uint8_t>(mHistoryIndex)]);
 }
 
 void MainScreen::onRenderTimeSeries(){
     GarboxHistory& history = GarboxHistory::Instance();
-    mTempChart.attach(0, history.getTargetTemperatureSeries(mHistoryIndex));
-    mTempChart.attach(1, history.getMeasuredTemperatureSeries(mHistoryIndex));
+    mTempChart.attach(0, history.getMeasuredTemperatureSeries(mHistoryIndex));
+    mTempChart.attach(1, history.getTargetTemperatureSeries(mHistoryIndex));
     mPowerChart.attach(0, history.getPowerSeries(mHistoryIndex));
 }
 
@@ -337,7 +359,14 @@ void MainScreen::onRenderMenu(){
     mMenu.setTargetTemperatureCelsius(states().fermentationStatus.getTargetTemperature());
     mMenu.setHistoryIndex(mHistoryIndex);
     mMenu.setFanAuto(states().fermentationStatus.getFanAuto());
+    mMenu.setFanManualSpeed(states().fermentationStatus.getFanManualSpeed());
+    mMenu.setBrightness(states().displayStatus.getBrightness());
+    gui().timeInfo.value.setTextFormatted("%.1f°", states().fermentationStatus.getTargetTemperature());
     mMenu.render();
+}
+
+void MainScreen::onDisplayStatusStateChanged(const DisplayStatusState& state){
+    markDirty(RenderFn::Menu);
 }
 
 void MainScreen::onFanStatusStateChanged(const FanStatusState& state){
