@@ -30,16 +30,14 @@
       width="100%" height="220px"
       pad-left="8px" pad-right="8px" pad-top="7px" pad-bottom="5px" pad-gap="6px">
 
-      <container name="header" width="100%" height="25px" layout="flex" flex-flow="row" flex-align="center center center" pad-gap="6px">
+      <container name="header" width="100%" height="25px" layout="flex" flex-flow="row" flex-align="center center center">
         <container
-          name="statusPill" width="92px" height="25px"
+          name="statusPill" width="100%" height="25px"
           layout="flex" flex-flow="row" flex-align="center center center" pad-gap="5px"
           bg-color="#16241B" bg-opa="100%" radius="12px">
           <image name="statusIcon" src="power16" width="16px" height="16px" />
-          <label name="statusText" text="OFF" />
+          <label name="statusText" text="CONTROL OFF" />
         </container>
-        <label name="sensorStatus" text="SENSOR WAIT" flex-grow="1" text-align="center" text-color="#D1B254" />
-        <label name="fanModeLabel" text="AUTO FAN" width="82px" text-align="right" text-color="#60717B" />
       </container>
 
       <container name="content" width="100%" flex-grow="1" layout="flex" flex-flow="row" pad-gap="7px">
@@ -78,13 +76,10 @@
             bg-color="#13202B" bg-opa="100%" radius="9px"
             border-color="#8AB4F4" border-width="1px" border-side="full">
             <label name="targetLabel" text="TARGET" text-color="#8AB4F4" />
-            <container layout="flex" flex-flow="row" flex-align="center end end" width="content" height="content">
+            <container layout="flex" flex-flow="row" flex-align="center end end" width="content" height="content" pad-gap="3px">
+              <label name="targetRotateLeft" text="" />
               <label name="targetValue" text="32.0" />
               <label name="targetUnit" text="°C" pad-bottom="2px" />
-            </container>
-            <container name="targetRotateHint" width="content" height="content" layout="flex" flex-flow="row" flex-align="center center center" pad-gap="3px">
-              <label name="targetRotateLeft" text="" />
-              <label name="targetHint" text="ROTATE" text-color="#60717B" />
               <label name="targetRotateRight" text="" />
             </container>
           </container>

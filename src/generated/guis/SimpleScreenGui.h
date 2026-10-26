@@ -49,8 +49,6 @@ public:
         LvObject statusPill;
         LvImage statusIcon;
         LvLabel statusText;
-        LvLabel sensorStatus;
-        LvLabel fanModeLabel;
         LvObject content;
         LvObject gaugePanel;
         LvObject arcContainer;
@@ -67,11 +65,9 @@ public:
         LvObject targetCard;
         LvLabel targetLabel;
         LvObject _namelessContainer_2;
+        LvLabel targetRotateLeft;
         LvLabel targetValue;
         LvLabel targetUnit;
-        LvObject targetRotateHint;
-        LvLabel targetRotateLeft;
-        LvLabel targetHint;
         LvLabel targetRotateRight;
         MetricCard humidity;
         MetricCard heater;

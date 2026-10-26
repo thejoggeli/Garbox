@@ -25,9 +25,7 @@ SimpleScreen::SimpleScreen() : SimpleScreenAbs(){
 }
 
 void SimpleScreen::onInit(){
-    gui().statusText.setFont(&lv_font_montserrat_12);
-    gui().sensorStatus.setFont(&lv_font_unscii_8);
-    gui().fanModeLabel.setFont(&lv_font_unscii_8);
+    gui().statusText.setFont(&lv_font_montserrat_14);
     gui().measuredLabel.setFont(&lv_font_montserrat_10);
     gui().measuredValue.setFont(&lv_font_montserrat_36);
     gui().measuredUnit.setFont(&lv_font_montserrat_20);
@@ -35,7 +33,6 @@ void SimpleScreen::onInit(){
     gui().targetLabel.setFont(&lv_font_montserrat_10);
     gui().targetValue.setFont(&lv_font_montserrat_20);
     gui().targetUnit.setFont(&lv_font_montserrat_12);
-    gui().targetHint.setFont(&lv_font_unscii_8);
     gui().targetRotateLeft.setText(LV_SYMBOL_LEFT);
     gui().targetRotateLeft.setFont(&lv_font_montserrat_12);
     gui().targetRotateLeft.setTextColor(lv_color_hex(ColorBlue));
@@ -181,18 +178,18 @@ void SimpleScreen::onRender(){
 
 void SimpleScreen::onRenderEngineStatus(){
     const FermentationStatusState& status = states().fermentationStatus;
-    const char* text = "OFF";
+    const char* text = "CONTROL OFF";
     uint32_t color = 0x3A2528;
     if(status.getPowerOn()){
         switch(status.getState()){
-        case FermentationState::Ready: text = "READY"; color = ColorAmber; break;
+        case FermentationState::Ready: text = "CONTROL READY"; color = ColorAmber; break;
         case FermentationState::Regulating:
             text = states().heatpadStatus.getNextDutyCycle() > 0.01f ? "HEATING" : "HOLDING";
             color = ColorGreen;
             break;
         case FermentationState::Cooldown: text = "COOLING"; color = ColorBlue; break;
-        case FermentationState::OverTemperature: text = "TOO HOT"; color = ColorRed; break;
-        case FermentationState::InvalidInput: text = "SENSOR"; color = ColorRed; break;
+        case FermentationState::OverTemperature: text = "OVER TEMPERATURE"; color = ColorRed; break;
+        case FermentationState::InvalidInput: text = "SENSOR FAULT"; color = ColorRed; break;
         default: text = "STARTING"; color = ColorAmber; break;
         }
     }
@@ -212,24 +209,6 @@ void SimpleScreen::onRenderTargetTemperature(){
 }
 
 void SimpleScreen::onRenderMeasuredTemperature(){
-    const TemperatureStatusState& sensor = states().temperatureStatus;
-    if(isSensorOk()){
-        gui().sensorStatus.setText("SENSOR OK");
-        gui().sensorStatus.setTextColor(lv_color_hex(ColorGreen));
-    }
-    else if(sensor.getResetting() || (sensor.getPowerEnabled() && sensor.getDriverEnabled())){
-        gui().sensorStatus.setText("SENSOR WAIT");
-        gui().sensorStatus.setTextColor(lv_color_hex(ColorAmber));
-    }
-    else if(!sensor.getPowerEnabled()){
-        gui().sensorStatus.setText("SENSOR OFF");
-        gui().sensorStatus.setTextColor(lv_color_hex(ColorMuted));
-    }
-    else {
-        gui().sensorStatus.setText("SENSOR FAULT");
-        gui().sensorStatus.setTextColor(lv_color_hex(ColorRed));
-    }
-
     if(!isSensorOk()){
         gui().measuredValue.setText("--.-");
         gui().temperatureDelta.setText("WAITING FOR SENSOR");
@@ -262,9 +241,6 @@ void SimpleScreen::onRenderHeaterPower(){
 }
 
 void SimpleScreen::onRenderFanStatus(){
-    gui().fanModeLabel.setText(
-        states().fermentationStatus.getFanAuto() ? "AUTO FAN" : "MANUAL FAN"
-    );
     if(states().fanStatus.getState() == FanState::Stalled){
         gui().fan.value.setText("STALLED");
         gui().fan.value.setTextColor(lv_color_hex(ColorRed));
