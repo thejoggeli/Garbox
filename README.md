@@ -1,9 +1,61 @@
 # Garbox
 
-Garbox is ESP32-S3 firmware for a temperature-controlled fermentation box. See
-[the project overview](docs/project-overview.md) for the architecture and
-[the desktop simulation plan](docs/framework/desktop-simulation-plan.md) for
-the verification boundary.
+Garbox is ESP32-S3 firmware for a temperature-controlled fermentation box. It
+includes a typed application framework/code generator, a custom LVGL UI stack,
+host-side control and thermal simulation, and the actual appliance firmware.
+
+Start with the [project overview](docs/project-overview.md),
+[engineering review](docs/review.md), and [custom LVGL stack](docs/lvgl-stack.md).
+
+## Setup
+
+PlatformIO is required for C++ builds. The generator uses a small pinned Python
+environment:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r codegen/requirements.txt
+```
+
+Source PNGs in `res/`, generated image arrays in `src/bin/`, and generated C++
+are tracked deliberately. A clean checkout therefore builds without first
+running the generator, while `--check` proves that all generated artifacts still
+match their declarative inputs.
+
+## Code generation
+
+The command is independent of the current working directory:
+
+```bash
+.venv/bin/python codegen/src/main.py
+.venv/bin/python codegen/src/main.py --check --quiet
+```
+
+Generation is transactional: configuration, handwritten section markers,
+templates, and image conversion are completed in a staging tree before any
+project output is replaced. `--check` never writes project files and exits
+nonzero with a diff when output is stale.
+
+Configuration lives in `codegen/config`, GUI XML in `codegen/config/gui`, and
+templates in `codegen/templates`. Do not hand-edit `src/generated` or `src/bin`.
+
+## Build and verification
+
+Run the complete software gate with:
+
+```bash
+.venv/bin/python tools/verify_project.py
+```
+
+Use `--skip-target` when the ESP32 toolchain is unavailable and `--skip-ui` for
+a faster non-visual pass. Individual commands are:
+
+```bash
+~/.platformio/penv/bin/pio test -e native
+~/.platformio/penv/bin/pio run -e ui-simulator
+.venv/bin/python tools/verify_ui_flow.py
+~/.platformio/penv/bin/pio run -e esp32-s3-devkitc-1
+```
 
 ## Interactive desktop UI
 
@@ -21,7 +73,7 @@ encoder for a short press, or hold it for 0.7 seconds for a long press. Use
 `--no-build` to reuse the current binary and `--no-browser` to suppress opening
 the browser.
 
-# Model Field Specification (Quick Reference)
+## Model field specification (legacy quick reference)
 
 Each entry in `model.fields` describes one model value. Valid keys:
 

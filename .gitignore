@@ -5,8 +5,7 @@
 .vscode/launch.json
 .vscode/ipch
 __pycache__
+.codegen-stage-*
 
 codegen/output/
-res/
-src/bin/
 

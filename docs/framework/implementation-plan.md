@@ -56,12 +56,12 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
-| GEN-01 | TODO | BUILD-01 | Add minimal generator dependency manifest and root-independent command. | Clean virtual environment can install requirements and generate. |
-| ASSET-01 | TODO | GEN-01 | Track source GUI assets and define generated-image policy. | Fresh checkout has everything needed to generate and link images. |
-| GEN-02 | TODO | GEN-01 | Validate then generate into staging; atomically apply outputs. | Injected template/resource failure leaves tracked outputs byte-identical. |
-| GEN-03 | TODO | GEN-02 | Add `--check`/diff mode and deterministic fixtures. | CI-style command exits zero when clean, nonzero with readable diff when stale. |
-| GEN-04 | TODO | GEN-03 | Test/fix GUI preprocessing, mappings, resources, and malformed config. | Golden/negative tests cover current DSL subset and known dormant defects. |
-| FLOW-01 | TODO | ASSET-01, GEN-03 | Add one documented checkout → generate/check → host test → firmware build command sequence. | Sequence succeeds without relying on undocumented local state. |
+| GEN-01 | SOFTWARE VERIFIED | BUILD-01 | Add minimal generator dependency manifest and root-independent command. | Clean virtual environment can install requirements and generate. |
+| ASSET-01 | SOFTWARE VERIFIED | GEN-01 | Track source GUI assets and define generated-image policy. | Fresh checkout has everything needed to generate and link images. |
+| GEN-02 | SOFTWARE VERIFIED | GEN-01 | Validate then generate into staging; atomically apply outputs. | Injected template/resource failure leaves tracked outputs byte-identical. |
+| GEN-03 | SOFTWARE VERIFIED | GEN-02 | Add `--check`/diff mode and deterministic fixtures. | CI-style command exits zero when clean, nonzero with readable diff when stale. |
+| GEN-04 | SOFTWARE VERIFIED | GEN-03 | Test/fix GUI preprocessing, mappings, resources, and malformed config. | Golden/negative tests cover current DSL subset and known dormant defects. |
+| FLOW-01 | SOFTWARE VERIFIED | ASSET-01, GEN-03 | Add one documented checkout → generate/check → host test → firmware build command sequence. | Sequence succeeds without relying on undocumented local state. |
 
 ## Milestone 6 — Display correctness before restructuring
 

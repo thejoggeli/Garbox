@@ -75,7 +75,7 @@ INITIALIZER_MAP = {
         "border-color":     lambda v: f"setBorderColor({render_color(v)})",
         "border-opa":       lambda v: f"setBorderOpa({render_opa(v)})",
         "border-side":      lambda v: f"setBorderSide({render_border_side(v)})",
-        "border-post":      lambda v: f"setBorderPost({render_color(v)})",
+        "border-post":      lambda v: f"setBorderPost({render_bool(v)})",
 
         # layout
         "align":            lambda v: f"setAlign({render_align(v)})",
@@ -95,7 +95,7 @@ INITIALIZER_MAP = {
         "transform-scale":      lambda v: f"setTransformScale({render_transform_zoom(v)})",
         "transform-scale-x":    lambda v: f"setTransformScaleX({render_zoom(v)})",
         "transform-scale-y":    lambda v: f"setTransformScaleY({render_zoom(v)})",
-        "transform-skew":       lambda v: f"setTransformSkewX({render_transform_skew(v)})",
+        "transform-skew":       lambda v: f"setTransformSkew({render_transform_skew(v)})",
         "transform-skew-x":     lambda v: f"setTransformSkewX({render_angle(v)})",
         "transform-skew-y":     lambda v: f"setTransformSkewY({render_angle(v)})",
 

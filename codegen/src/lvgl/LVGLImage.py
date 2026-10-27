@@ -49,6 +49,13 @@ def color_pre_multiply(r, g, b, a, background):
             (b * a + (255 - a) * bb) >> 8, a)
 
 
+def read_png_rgba(filename):
+    """Read PNG rows eagerly so pypng never retains an unclosed input file."""
+    with open(filename, "rb") as source:
+        width, height, rows, info = png.Reader(file=source).asRGBA8()
+        return width, height, list(rows), info
+
+
 class Error(Exception):
 
     def __str__(self):
@@ -903,8 +910,11 @@ class LVGLImage:
         auto_cf = cf is None
 
         # read the image data to get the metadata
-        reader = png.Reader(filename=filename)
-        w, h, rows, metadata = reader.read()
+        with open(filename, "rb") as source:
+            reader = png.Reader(file=source)
+            w, h, rows, metadata = reader.read()
+            rows = list(rows)
+            palette = reader.palette(alpha="force") if "palette" in metadata else None
 
         # to preserve original palette data only convert the image if needed. For this
         # check if image has a palette and the requested palette size equals the existing one
@@ -913,8 +923,8 @@ class LVGLImage:
             reader = png.Reader(
                 bytes=PngQuant(256 if auto_cf else cf.ncolors).convert(filename))
             w, h, rows, _ = reader.read()
-
-        palette = reader.palette(alpha="force")  # always return alpha
+            rows = list(rows)
+            palette = reader.palette(alpha="force")
 
         palette_len = len(palette)
         if auto_cf:
@@ -954,8 +964,7 @@ class LVGLImage:
         self.set_data(cf, w, h, rawdata)
 
     def _png_to_alpha_only(self, cf: ColorFormat, filename: str):
-        reader = png.Reader(str(filename))
-        w, h, rows, info = reader.asRGBA8()
+        w, h, rows, info = read_png_rgba(filename)
         if not info['alpha']:
             raise FormatError(f"{filename} has no alpha channel")
 
@@ -985,8 +994,7 @@ class LVGLImage:
         return 1.055 * pow(y, 1 / 2.4) - 0.055
 
     def _png_to_luma_only(self, cf: ColorFormat, filename: str):
-        reader = png.Reader(str(filename))
-        w, h, rows, info = reader.asRGBA8()
+        w, h, rows, info = read_png_rgba(filename)
         rawdata = bytearray()
         for row in rows:
             R = row[0::4]
@@ -1063,8 +1071,7 @@ class LVGLImage:
         else:
             raise FormatError(f"Invalid color format: {cf.name}")
 
-        reader = png.Reader(str(filename))
-        w, h, rows, _ = reader.asRGBA8()
+        w, h, rows, _ = read_png_rgba(filename)
         rawdata = bytearray()
         alpha = bytearray()
         for y, row in enumerate(rows):

@@ -65,13 +65,13 @@ def parse_resources(gui_name: str, resources_node):
         if name is None:
             raise ValueError(f"resource tag '{res_node.tag}' requires attribute 'name'")
 
-        if name in resources:
+        resource_name = make_resource_name(gui_name, res_node.tag, name)
+        if resource_name in resources[dict_key]:
             raise ValueError(f"duplicate resource name type='{res_node.tag}' name='{name}'")
         
         attrs = dict(res_node.attrib)
         attrs["original_name"] = name
 
-        resource_name = make_resource_name(gui_name, res_node.tag, name)
         attrs["name"] = resource_name
 
         resources[dict_key][resource_name] = attrs
@@ -87,6 +87,8 @@ def parse_components(comps_node):
         return components
 
     for comp_node in comps_node.findall("*"):
+        if comp_node.tag in components:
+            raise ValueError(f"duplicate component definition '{comp_node.tag}'")
         components[comp_node.tag] = parse_component(comp_node)
 
     return components
@@ -171,12 +173,13 @@ def parse_object_tree(root_node, components={}):
         if name is None:
             name = f"_nameless-{node.tag}_{counters.get_next(node.tag)}"
 
-        # handle duplicate name
-        elif name in objects:
-            raise ValueError(f"duplicate name '{name}'")
-        
         # convert 'to-camel-case' = 'toCamelCase'
         name = to_camel_case(name, "-")
+
+        # Check after normalization: foo-bar and fooBar become the same C++
+        # member and must not silently overwrite one another.
+        if name in objects:
+            raise ValueError(f"duplicate object name '{name}' after normalization")
         
         # remember name for child nodes
         node.set("name", name)

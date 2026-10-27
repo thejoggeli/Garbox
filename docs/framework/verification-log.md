@@ -151,3 +151,14 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Native ASan/UBSan coverage uses a zero-byte pool and a one-entry queue, and also tests direct null submission. The full suite passed 56 of 56 tests in 3.354 seconds with no sanitizer diagnostics.
 - ESP32-S3 firmware built successfully in 47.493 seconds: 30,408 bytes RAM and 862,945 bytes flash.
 - EVT-02 is therefore **SOFTWARE VERIFIED**. As before, fatal-handler continuation exists only to make failure aftermath testable; the target fatal handler does not return.
+
+## 2026-10-27 — GEN-01 through GEN-04, ASSET-01, and FLOW-01
+
+- Added pinned generator dependencies and made the entry point independent of the caller's working directory.
+- YAML/config loading is deterministically ordered and rejects duplicate keys/definitions. Pre-generation validation covers identifiers, duplicate fields/components, event/state/tick references, initial modes, LEDC timer bindings, GUI component parameters, and image paths.
+- Generation now renders into a same-filesystem staging tree. The checkout is updated only after configuration parsing, validation, template rendering, generated-section replacement, and PNG conversion all succeed; application includes rollback if an apply operation fails.
+- Added non-mutating `--check` mode with readable file/diff output. It passes against the current checkout and detects deliberately stale output without repairing it.
+- Added nine generator/GUI compiler regressions, including injected malformed-template failure that leaves generated, shared, binary-resource, and handwritten overlay files byte-identical.
+- Fixed comma/repeated-space tokenization, `transform-skew`, `border-post`, duplicate GUI resource/component/normalized-object detection, unknown/missing component parameters, and leaked PNG file handles.
+- Source PNGs and the deterministic generated C arrays are now tracked. The README documents setup/generation, and `tools/verify_project.py` provides one software gate.
+- Verification: generator tests pass with `ResourceWarning` promoted to an error; generated-output check is clean; 64/64 native ASan/UBSan tests pass; the full desktop UI flow passes; ESP32-S3 firmware builds at 30,440 bytes RAM and 889,697 bytes flash.

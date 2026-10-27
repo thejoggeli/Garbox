@@ -31,6 +31,20 @@ def resolve_component(obj_data):
     attrs_for_body  = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "attr"}
     param_attrs     = {k: v for k, v in obj_data["attrs"].items()    if v["type"] == "p-attr"}
     optional_params = {k: v for k, v in comp_def["params"].items()   if v["required"] == False}
+    required_params = {k for k, v in comp_def["params"].items() if v["required"]}
+
+    unknown_params = sorted(set(param_attrs) - set(comp_def["params"]))
+    if unknown_params:
+        raise ValueError(
+            f"component '{obj_type}' received unknown parameter(s): "
+            + ", ".join(unknown_params)
+        )
+    missing_params = sorted(required_params - set(param_attrs))
+    if missing_params:
+        raise ValueError(
+            f"component '{obj_type}' is missing required parameter(s): "
+            + ", ".join(missing_params)
+        )
 
     objects = {}
 

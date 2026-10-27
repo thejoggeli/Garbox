@@ -8,9 +8,9 @@ def prep_val(val):
 
 
 def split_attr(val):
-    split = val.replace(",", " ")
-    split = val.split(" ")
-    return split
+    if not isinstance(val, str):
+        raise ValueError(f"attribute list must be a string, got {type(val).__name__}")
+    return val.replace(",", " ").split()
 
 
 def render_color(val):

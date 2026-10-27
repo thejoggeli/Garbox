@@ -365,24 +365,22 @@ The main dashboard demonstrates reusable XML components, images, flex compositio
 
 ## 11. Risks and defects
 
-### UI source and generated assets are absent from a fresh clone
+### Generator/asset reproducibility is now software-verified
 
-Both `res/` and `src/bin/` are ignored and currently untracked. The generated GUI C++ references image symbols from `src/bin`, while regeneration needs PNGs from `res`. A fresh checkout therefore has neither side of the resource pipeline and cannot reproduce/link the current image-using UI.
+Source PNGs under `res/`, generated C arrays under `src/bin/`, and generated
+C++ are tracked. Generator dependencies are pinned, generation is performed in
+a staging tree, and `--check` detects stale output without modifying the
+checkout. Failure-injection tests prove a template error leaves all products
+unchanged.
 
-This is the most immediate reproducibility problem in the display stack. Source assets should normally be tracked; generated image arrays can then either be tracked or deterministically built.
+Focused Python tests now cover duplicate YAML/config/resource/component/object
+definitions, unknown references, comma and whitespace parsing, the previously
+incorrect `transform-skew` and `border-post` mappings, deterministic output,
+and transactional failure behavior. The image reader also closes PNG handles
+eagerly and is tested with `ResourceWarning` promoted to an error.
 
-### The DSL has no automated tests
-
-There are no focused tests for preprocessing, component expansion, attribute rendering, invalid input, resource resolution, or generated C++ snapshots. Several dormant defects are visible:
-
-- `split_attr()` computes a comma-normalized value and then accidentally splits the original string, so documented-looking comma-separated inputs do not work;
-- repeated spaces can create empty tokens;
-- `transform-skew` maps a two-value result to `setTransformSkewX(...)` rather than `setTransformSkew(...)`;
-- `border-post` renders its value as a color even though the wrapper expects a boolean;
-- duplicate resource validation checks the wrong dictionary level;
-- fonts and resize metadata are parsed but not implemented.
-
-The current XML happens not to exercise these paths. Golden generation tests would catch them cheaply.
+Fonts and resize metadata remain parsed-but-unimplemented DSL surface. They
+should either gain explicit validation/implementation before use or be removed.
 
 ### Resource symbols duplicate identical images per GUI
 
@@ -433,13 +431,12 @@ The render-ready handshake makes the existing path safe, but it is possible for 
 
 The stack does not need replacement. It needs to be recognized as a project of its own and given the same engineering treatment as the control engine.
 
-### First: make it reproducible
+### First: preserve reproducibility
 
-1. Track all source icons under `res/`.
-2. Add a generator dependency lock or requirements file and document the command.
-3. Decide whether `src/bin` is checked in or always generated before PlatformIO builds.
-4. Add an explicit build target that runs GUI generation before firmware compilation.
-5. Pin the LVGL version precisely enough that wrapper/internal-structure changes are intentional.
+The source/generated assets, pinned Python requirements, transactional command,
+stale-output check, and unified verification entry point now exist. Keep
+`python tools/verify_project.py` as a required software gate and pin LVGL
+changes deliberately.
 
 ### Second: test the compile-time stack
 
