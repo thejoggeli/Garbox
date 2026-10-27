@@ -10,14 +10,18 @@ def parse_events(config: dict):
     includes_set = SortedSet()
 
     for event_name, event_data in events.items():
+        if(event_data is None):
+            events[event_name] = {
+                "name": event_name,
+                "name_with_suffix": ensure_suffix(event_name, "Event"),
+                "meta": {},
+                "fields": {},
+            }
+            continue
 
         includes_list = ensure_list(event_data.get("include", []))
         for include in includes_list:
             includes_set.add(include)
-
-        if(event_data is None):
-            events[event_name] = {"meta": {}, "fields": {}}
-            continue
     
         event_meta = event_data.get("meta", {})
         event_fields = event_data.get("fields", [])

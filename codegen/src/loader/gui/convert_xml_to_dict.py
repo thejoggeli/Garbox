@@ -2,6 +2,7 @@ from common.str_filters import to_camel_case
 from lxml import etree
 from pathlib import Path
 from loader.gui.resources import make_resource_name
+from loader.validate_config import _validate_identifier
 
 class Counters:
 
@@ -18,8 +19,18 @@ class Counters:
 
 def xml_to_dict(gui_name: str, xml_text: str):
 
+    _validate_identifier(gui_name, "GUI name")
+    if "<!DOCTYPE" in xml_text.upper():
+        raise ValueError("GUI XML document types and entities are not supported")
+
     # <gui> node
-    gui_node = etree.fromstring(xml_text)
+    parser = etree.XMLParser(
+        resolve_entities=False,
+        no_network=True,
+        load_dtd=False,
+        huge_tree=False,
+    )
+    gui_node = etree.fromstring(xml_text.encode("utf-8"), parser=parser)
 
     # <resources> node
     resources_node = gui_node.find("resources")
@@ -66,6 +77,7 @@ def parse_resources(gui_name: str, resources_node):
             raise ValueError(f"resource tag '{res_node.tag}' requires attribute 'name'")
 
         resource_name = make_resource_name(gui_name, res_node.tag, name)
+        _validate_identifier(resource_name, f"GUI '{gui_name}' resource name")
         if resource_name in resources[dict_key]:
             raise ValueError(f"duplicate resource name type='{res_node.tag}' name='{name}'")
         
@@ -87,6 +99,7 @@ def parse_components(comps_node):
         return components
 
     for comp_node in comps_node.findall("*"):
+        _validate_identifier(comp_node.tag, "GUI component name")
         if comp_node.tag in components:
             raise ValueError(f"duplicate component definition '{comp_node.tag}'")
         components[comp_node.tag] = parse_component(comp_node)
@@ -164,6 +177,8 @@ def parse_object_tree(root_node, components={}):
     
     def process_node(node):
 
+        _validate_identifier(node.tag, "GUI object type")
+
         attrs = dict(node.attrib)
 
         # get name
@@ -175,6 +190,7 @@ def parse_object_tree(root_node, components={}):
 
         # convert 'to-camel-case' = 'toCamelCase'
         name = to_camel_case(name, "-")
+        _validate_identifier(name, "GUI object name")
 
         # Check after normalization: foo-bar and fooBar become the same C++
         # member and must not silently overwrite one another.

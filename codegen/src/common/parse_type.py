@@ -1,3 +1,8 @@
+import json
+import math
+import re
+
+
 INT_TYPES = {
     "int8_t", "uint8_t",
     "int16_t", "uint16_t",
@@ -15,6 +20,9 @@ INT_TYPES = {
 
 TRUE_SET  = {"1", "yes", "true",  "on",  "enable",  "enabled"}
 FALSE_SET = {"0", "no",  "false", "off", "disable", "disabled", "none", "null", "undefined"}
+CPP_QUALIFIED_IDENTIFIER = re.compile(
+    r"^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$"
+)
 
 
 def preprocess_type(type_name: str):
@@ -174,6 +182,8 @@ def render_value(value, type_name):
             num = float(value)
         except Exception:
             raise ValueError(f"Invalid float literal: {value!r}")
+        if not math.isfinite(num):
+            raise ValueError(f"Float literal must be finite: {value!r}")
         # 1f or 1.5f
         if num.is_integer():
             return f"{int(num)}.0f"
@@ -187,11 +197,11 @@ def render_value(value, type_name):
     if type_name == "string":
         if not isinstance(value, str):
             raise ValueError(f"String literal required, got {value!r}")
-        return f"\"{value}\""
+        return json.dumps(value, ensure_ascii=False)
 
     # enum (anything not primitive)
     if type_name not in ("float", "bool", "string") and type_name not in INT_TYPES:
-        if not isinstance(value, str) or not value:
+        if not isinstance(value, str) or not CPP_QUALIFIED_IDENTIFIER.fullmatch(value):
             raise ValueError(f"Invalid enum literal {value!r} for type {type_name}")
         return value
 

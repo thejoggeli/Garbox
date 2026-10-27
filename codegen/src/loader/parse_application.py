@@ -138,10 +138,18 @@ def process_tick_phases(config):
                     phases[idx[phase]][type_key][comp_key] = comp_data
 
     # order tick phases
+    used_orders = {
+        tick_dict["order"]
+        for tick_dict in config["application"]["tick_phases"]
+        if "order" in tick_dict
+    }
     next_order = 0
     for tick_dict in config["application"]["tick_phases"]:
         if("order" not in tick_dict):
+            while next_order in used_orders:
+                next_order += 1
             tick_dict["order"] = next_order
+            used_orders.add(next_order)
             next_order += 1
 
     config["application"]["tick_phases"] = sorted(config["application"]["tick_phases"], key=lambda x: x["order"])

@@ -216,3 +216,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Direct tests cover transient recovery, absolute-limit latching, timed mismatch latching, and invalid-command veto. End-to-end simulation proves both latch classes control the real command route and persist across otherwise-valid inputs.
 - Verification: generated-output check is clean; 86/86 native ASan/UBSan tests pass; complete desktop LVGL flow passes and refreshed diagnostics captures were visually reviewed; ESP32-S3 firmware builds at 30,512 bytes RAM and 894,157 bytes flash.
 - Electrical thresholds, ADC behavior, actual off polarity, cooling policy, and the independent physical cutoff remain hardware-gated under APP-04/SAFE-01.
+
+## 2026-10-27 — generator input-boundary hardening
+
+- Configuration-controlled component subdirectories are now constrained to normalized relative paths inside the staging tree, closing a path-escape hole in the otherwise transactional workflow.
+- Event, state, component, hardware, tick, field, and GUI identifiers reject suffix collisions and reserved C++ keywords before rendering. Reference lists reject duplicates, invalid sentinel use, and malformed values.
+- Literal rendering rejects non-finite floats and unsafe enum expressions, while C++ strings are escaped without changing valid UTF-8 UI text. Empty event/state declarations now receive complete parsed metadata.
+- XML parsing disables networking, DTD loading, and entity resolution and rejects document types explicitly. XML-derived object, component, GUI, and resource names must be valid generated C++ identifiers.
+- Explicit tick orders can safely coexist with implicit orders, hardware sections are shape-checked, renderer and include values are validated, and absent LEDC configuration no longer crashes preprocessing.
+- Verification: 16 generator regressions pass, including path traversal, XML entity, invalid literal/name, sentinel, and mixed tick-order cases; generated-output check is clean.

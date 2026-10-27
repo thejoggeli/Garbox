@@ -9,7 +9,20 @@ def parse_states(config: dict):
     for state_name, state_data in states.items():
 
         if(state_data is None):
-            states[state_name] = {"meta": {}, "fields": {}}
+            states[state_name] = {
+                "name": state_name,
+                "name_with_suffix": ensure_suffix(state_name, "State"),
+                "include": [],
+                "meta": {},
+                "fields": {},
+                "writer": None,
+                "readers": {
+                    "components": {},
+                    "controllers": {},
+                    "behaviours": {},
+                    "screens": {},
+                },
+            }
             continue
     
         state_meta = state_data.get("meta", {})
