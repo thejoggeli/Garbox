@@ -12,9 +12,6 @@ namespace Garbox {
  * Lightweight, non-owning view of an event.
  * Holds pointers to header and payload; no data is copied.
  *
- * Always stores mutable pointers. Passing a const EventHeader* drops constness;
- * callers must ensure the underlying memory is safe to modify.
- *
  * - operator-> accesses the payload
  * - header() returns the header pointer
  * - payload() returns the payload pointer
@@ -43,10 +40,22 @@ public:
     bool valid() const { return mHeader != nullptr; }
     explicit operator bool() const { return valid(); }
 
-    // non-const access
-    EventHeader* header() { return mHeader; }
-    EventPayload<E>* payload() { return mPayload; }
-    EventPayload<E>* operator->() { return mPayload; }
+    // Event metadata can be configured only before submission. The raw header
+    // is exposed as const so callers cannot bypass the lifetime guard.
+    void setSendToInactiveComponents(bool enabled) {
+        if(EventHeader* header = mutableHeader()){
+            header->sendToInactiveComponents = enabled;
+        }
+    }
+    void setBypassQueue(bool enabled) {
+        if(EventHeader* header = mutableHeader()){
+            header->bypassQueue = enabled;
+        }
+    }
+
+    // non-const payload access is valid only while constructing the event.
+    EventPayload<E>* payload() { return mutablePayload(); }
+    EventPayload<E>* operator->() { return mutablePayload(); }
 
     // const access
     const EventHeader* header() const { return mHeader; }
@@ -58,14 +67,40 @@ private:
     EventHeader* mHeader;
     EventPayload<E>* mPayload;
 
+    static EventPayload<E>* invalidPayload(){
+        static EventPayload<E> payload {};
+        return &payload;
+    }
+
+    EventHeader* mutableHeader(){
+        if(!mHeader){
+            return nullptr;
+        }
+        if(mHeader->submitted){
+            TriggerExit("EventView", "cannot modify submitted event header");
+            return nullptr;
+        }
+        return mHeader;
+    }
+
+    EventPayload<E>* mutablePayload(){
+        if(!mHeader){
+            return invalidPayload();
+        }
+        if(mHeader->submitted){
+            TriggerExit("EventView", "cannot modify submitted event payload");
+            return invalidPayload();
+        }
+        return mPayload;
+    }
+
     static EventPayload<E>* extractPayload(EventHeader* header){
 
         // Allocation failure is fatal. Host test handlers may nevertheless
         // return, so provide writable discard storage for normal payload setup
         // while preserving a null header that cannot be submitted.
         if(!header){
-            static EventPayload<E> invalidPayload {};
-            return &invalidPayload;
+            return invalidPayload();
         }
 
         // verify type consistency.

@@ -62,6 +62,11 @@ void RuntimeAbs::run(const TaskStopToken& stopToken){
 }
 
 void RuntimeAbs::setQueuedBehaviour(BehaviourAbs* behaviour){
+    if(behaviour == mActiveBehaviour){
+        mQueuedBehaviour = nullptr;
+        TriggerDebug("RuntimeAbs", "requested behaviour is already active");
+        return;
+    }
     mQueuedBehaviour = behaviour;
     if(mActiveBehaviour == nullptr){
         applyQueuedBehaviour();
@@ -75,6 +80,7 @@ void RuntimeAbs::applyQueuedBehaviour() {
     }
 
     if(mQueuedBehaviour == mActiveBehaviour){
+        mQueuedBehaviour = nullptr;
         TriggerDebug("RuntimeAbs", "queued behaviour is already active");
         return;
     }
@@ -104,6 +110,11 @@ void RuntimeAbs::applyQueuedBehaviour() {
 }
 
 void RuntimeAbs::setQueuedScreen(ScreenAbs* screen){
+    if(screen == mActiveScreen){
+        mQueuedScreen = nullptr;
+        TriggerDebug("RuntimeAbs", "requested screen is already active");
+        return;
+    }
     mQueuedScreen = screen;
     if(mActiveScreen == nullptr){
         applyQueuedScreen();
@@ -117,7 +128,8 @@ void RuntimeAbs::applyQueuedScreen() {
     }
 
     if(mQueuedScreen == mActiveScreen){
-        TriggerDebug("RuntimeAbs", "queued behaviour is already active");
+        mQueuedScreen = nullptr;
+        TriggerDebug("RuntimeAbs", "queued screen is already active");
         return;
     }
 
@@ -166,6 +178,11 @@ void RuntimeAbs::receiveEvent(const EventHeader* header){
         TriggerExit("RuntimeAbs", "cannot receive invalid event");
         return;
     }
+    if(header->submitted){
+        TriggerExit("RuntimeAbs", "event was already submitted");
+        return;
+    }
+    const_cast<EventHeader*>(header)->submitted = true;
 #if GarboxRuntimeAbsPrintEvents
     LogDebug("Event", "[%u] %s: %s", header->id, ComponentIdToString(header->sender.id), EventTypeToString(header->type));
 #endif

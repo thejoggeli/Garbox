@@ -89,8 +89,8 @@ void FermentationBehaviour::sendHeatpadCommand(bool enabled, float dutyCycle, ui
     event->enabled = enabled;
     event->dutyCycle = dutyCycle;
     event->periodMicros = periodMicros;
-    sendEvent(event);
     mLastHeatpadCommand = *event.payload();
+    sendEvent(event);
 }
 
 void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
@@ -100,8 +100,8 @@ void FermentationBehaviour::sendFanCommand(bool enabled, float speed){
     FanCommandEvent event = makeFanCommandEvent();
     event->enabled = enabled;
     event->targetSpeed = speed;
-    sendEvent(event);
     mLastFanCommand = *event.payload();
+    sendEvent(event);
 }
 
 void FermentationBehaviour::updateFermentationStatus(){

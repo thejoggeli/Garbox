@@ -162,3 +162,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Fixed comma/repeated-space tokenization, `transform-skew`, `border-post`, duplicate GUI resource/component/normalized-object detection, unknown/missing component parameters, and leaked PNG file handles.
 - Source PNGs and the deterministic generated C arrays are now tracked. The README documents setup/generation, and `tools/verify_project.py` provides one software gate.
 - Verification: generator tests pass with `ResourceWarning` promoted to an error; generated-output check is clean; 64/64 native ASan/UBSan tests pass; the full desktop UI flow passes; ESP32-S3 firmware builds at 30,440 bytes RAM and 889,697 bytes flash.
+
+## 2026-10-27 — EVT-03, STATE-02, and MODE-01
+
+- Event submission now seals both event metadata and payload. Mutable access after submission and duplicate submission are fatal contract violations; recovery-capable host handlers receive discard storage instead of being able to alter queued data.
+- The raw event header is exposed as const. Explicit pre-submit setters retain the supported metadata configuration path without allowing callers to bypass the lifetime guard.
+- The two application call sites that cached command payloads after submission now copy before transferring ownership.
+- Re-requesting the active behaviour or screen clears any older pending switch immediately. Defensive apply paths also consume redundant requests.
+- Runtime tests prove submitted payload immutability, duplicate-submit rejection, cancellation of pending mode switches, coalescing of multiple state writes, and callback-generated publication in a later dispatch pass with correct pending/current/last values.
+- Verification: generated-output check is clean; 67/67 native ASan/UBSan tests pass; ESP32-S3 firmware builds at 30,432 bytes RAM and 890,765 bytes flash.

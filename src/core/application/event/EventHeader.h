@@ -23,6 +23,10 @@ struct EventHeader {
     // if set, the event will not be queued and instead the handlers will be called immediately
     bool bypassQueue = false;
 
+    // Set exactly once by RuntimeAbs when ownership is submitted. EventView
+    // uses this to reject payload/header mutation after queueing.
+    bool submitted = false;
+
 };
 
 } // namespace

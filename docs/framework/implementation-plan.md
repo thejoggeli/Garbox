@@ -30,9 +30,9 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 | STATE-01 | SOFTWARE VERIFIED | BUILD-01 | Fix pending getters in the state template and regenerate. | Generated fixture proves pending/current/last before and after publication; generator output clean. |
 | EVT-01 | SOFTWARE VERIFIED | CNT-01, TEST-01 | Prevent pool release with queued events; define dispatch-limit behavior. | Cascade tests cover exact limit, one beyond limit, stable completion, and no dangling queue pointers. |
 | EVT-02 | SOFTWARE VERIFIED | EVT-01 | Define allocation/queue exhaustion and invalid-view behavior. | Tiny pool/queue tests produce one documented deterministic outcome without null dereference. |
-| EVT-03 | TODO | EVT-01 | Enforce post-submit immutability and payload lifetime restrictions. | Routed handlers receive const payloads; compile-time or runtime tests cover prohibited retention/type. |
-| STATE-02 | TODO | STATE-01, TEST-01 | Test coalescing, callback-generated state changes, initialization, and visibility boundaries. | Contract tests exercise pending/current/last and multi-pass publication. |
-| MODE-01 | TODO | TEST-01 | Clear/reject redundant screen and behaviour requests. | Repeated same-mode request is consumed once and does not log/apply forever. |
+| EVT-03 | SOFTWARE VERIFIED | EVT-01 | Enforce post-submit immutability and payload lifetime restrictions. | Routed handlers receive const payloads; compile-time or runtime tests cover prohibited retention/type. |
+| STATE-02 | SOFTWARE VERIFIED | STATE-01, TEST-01 | Test coalescing, callback-generated state changes, initialization, and visibility boundaries. | Contract tests exercise pending/current/last and multi-pass publication. |
+| MODE-01 | SOFTWARE VERIFIED | TEST-01 | Clear/reject redundant screen and behaviour requests. | Repeated same-mode request is consumed once and does not log/apply forever. |
 
 ## Milestone 3 — Time, PWM, and history
 
