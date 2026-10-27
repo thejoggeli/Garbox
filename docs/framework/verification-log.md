@@ -242,3 +242,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Software PWM rejects NaN/infinite duty values and places invalid constructor values into a deterministic heater-off fallback instead of converting NaN to an integer threshold.
 - LED and piezo task startup now returns after invalid initialization/frequency contracts, and tick delays have a one-tick floor so frequencies above the RTOS tick rate cannot create a zero-delay busy loop. Stop-handler registration similarly rejects null/capacity failures without writing past its fixed array.
 - Verification: 98/98 native ASan/UBSan tests pass. The ESP32-S3 firmware builds successfully at 30,600 bytes RAM and 895,581 bytes flash. Physical task cadence remains hardware-gated.
+
+## 2026-10-27 — final software hardening gate
+
+- Ran the repository-level verification command from the project virtual environment after all generator, runtime, container, history, UI, control, safety, utility, scheduler, dispatch, and PWM hardening commits.
+- Generated output is current and all 16 generator boundary/transaction tests pass with resource warnings treated as errors.
+- All 98 native tests pass under AddressSanitizer and UndefinedBehaviorSanitizer.
+- The desktop LVGL target builds and all 19 scripted UI flow checkpoints pass through the production screen, event, state, and input paths.
+- The ESP32-S3 firmware builds successfully at 30,600 bytes RAM (9.3%) and 895,581 bytes flash (14.2%).
+- No physical hardware was available. Display timing, DMA behavior on target, sensor and tachometer behavior, heater-off polarity/electrical thresholds, independent cutoff behavior, and fatal-fault fan policy remain explicitly hardware- or product-decision-gated.

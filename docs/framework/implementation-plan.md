@@ -78,7 +78,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
 | APP-01 | SOFTWARE VERIFIED | STATE-01, PWM-01 | Add host tests for fermentation state/output transitions and startup-disabled policy. | Deterministic tests cover invalid input, overtemperature, cooldown, enable/disable, target changes, and a closed-loop plant. |
-| APP-02 | SOFTWARE VERIFIED | APP-01 | Correct safety-fan precedence, sensor freshness/validity, and PID anti-windup. | Safety-fan precedence is fixed and covered. Sensor freshness and PID recovery remain. |
+| APP-02 | SOFTWARE VERIFIED | APP-01 | Correct safety-fan precedence, sensor freshness/validity, and PID anti-windup. | Safety-fan precedence, sample freshness/plausibility, bounded targets, and PID saturation recovery are covered. |
 | APP-03 | SOFTWARE VERIFIED | SAFE-01, APP-02 | Add independent software safety supervisor contract. | Tests cover absolute limit, stale/implausible sensor, and command/measurement mismatch; physical protection remains documented. |
 | APP-04 | HARDWARE BLOCKED | APP-03 | Validate real sensor, fan tachometer, heater-off path, electrical limits, and failure behavior without uncontrolled heating. | Coordinated hardware checklist completed. |
 
@@ -103,7 +103,7 @@ The detailed design and acceptance criteria live in [desktop-simulation-plan.md]
 | SIM-03 | SOFTWARE VERIFIED | SIM-01 | Script semantic user and mode requests. | Direct typed requests and UI-generated requests exercise real routing and publish expected state. |
 | SIM-04 | SOFTWARE VERIFIED | SIM-01, UI-01 | Run generated UI and custom LVGL stack against a host framebuffer. | All five real screens construct, render, and navigate using the shared embedded theme and generated state/event contracts. |
 | SIM-05 | SOFTWARE VERIFIED | SIM-04 | Interactive desktop frontend. | A dependency-free local browser frontend streams the live framebuffer and maps encoder rotation plus short/long button presses to real input events. |
-| SIM-06 | SOFTWARE VERIFIED | SIM-02, SIM-04 | Reproducible simulator workflow. | Commands and evidence are documented; generator check/CI integration remains tracked by GEN-03. |
+| SIM-06 | SOFTWARE VERIFIED | SIM-02, SIM-04 | Reproducible simulator workflow. | Commands and evidence are documented; the generator freshness check is part of the project verification gate. |
 
 ## Optional refactoring, explicitly deferred
 
@@ -117,12 +117,12 @@ These are not required unless measurements or a real second application justify 
 - generalized multi-core application-state mutation;
 - cross-MCU hardware abstraction.
 
-## Immediate execution sequence
+## Remaining execution sequence
 
-The first implementation slice is:
+The software hardening path through `APP-03` is verified. The remaining reusable-framework delivery path is:
 
 ```text
-BUILD-01 → CNT-01 → TEST-01
+EXAMPLE-01 → CLEAN-01 → DOC-01
 ```
 
-This slice is software-verified and remains hardware-neutral. It unlocks reliable host tests without changing application behavior or touching the protected hardware bring-up files. The next slice is `STATE-01` followed by the event cascade tests/fix.
+`SAFE-01` still needs a product decision and target evidence for fatal-fault fan behavior. `DISP-04` and `APP-04` require the physical display, sensors, fan, and heater path. `FINAL-01` remains blocked until those hardware gates and the final documentation pass are complete.
