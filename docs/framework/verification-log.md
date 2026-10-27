@@ -225,3 +225,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - XML parsing disables networking, DTD loading, and entity resolution and rejects document types explicitly. XML-derived object, component, GUI, and resource names must be valid generated C++ identifiers.
 - Explicit tick orders can safely coexist with implicit orders, hardware sections are shape-checked, renderer and include values are validated, and absent LEDC configuration no longer crashes preprocessing.
 - Verification: 16 generator regressions pass, including path traversal, XML entity, invalid literal/name, sentinel, and mixed tick-order cases; generated-output check is clean.
+
+## 2026-10-27 — reusable function and lightweight-wrapper hardening
+
+- Moving-average, composite, lookup, and sampled functions now release owned storage normally and cannot be copied or moved into aliased ownership. `ColorMap` remains explicitly non-owning and no longer raises a fatal error at ordinary teardown.
+- Moving-average accumulation uses 64 bits; fixed-point conversion, rescaling, sample domains, interpolation data, calibration points, thresholds, and filter inputs reject non-finite or unrepresentable values without continuing into undefined arithmetic.
+- Fixed dormant math defects: constant functions now retain their constructor value, square root no longer calls cube root, and 90/180/270-degree sine factories use the advertised phase offsets.
+- Removed destructor failures whose only rationale was that `std::function` may allocate. Component bases now have a virtual normal destructor; FSM buttons, FSM storage, and the ST7789 callback wrapper tear down normally.
+- RGB LED wrappers now own and release their NeoPixel allocations, reject use before successful initialization, retain the current single-pixel color correctly, avoid filling an entire strip once per pixel, and reject non-finite brightness conversion.
+- Verification: 94/94 native ASan/UBSan tests pass; the desktop LVGL simulator and complete 19-step UI flow pass; the ESP32-S3 firmware builds successfully at 30,608 bytes RAM and 895,217 bytes flash. Task/DMA/display objects with asynchronous hardware ownership remain process-lifetime and require coordinated target teardown work rather than speculative destructors.

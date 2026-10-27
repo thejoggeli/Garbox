@@ -10,11 +10,6 @@ FiniteStateMachine<StateType, NumStates>::FiniteStateMachine(){
 }
 
 template<typename StateType, StateType NumStates>
-FiniteStateMachine<StateType, NumStates>::~FiniteStateMachine(){
-    AssertExit(static_cast<size_t>(NumStates) > 0, "FiniteStateMachine", "std::function might use heap");
-}
-
-template<typename StateType, StateType NumStates>
 void FiniteStateMachine<StateType, NumStates>::init(StateType initialState){
     AssertExit(!mInitialized, "FiniteStateMachine", "already initialized");
     mInitialState = initialState;

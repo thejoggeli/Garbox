@@ -16,7 +16,7 @@ public:
     using StateChangedCallback = std::function<void(StateType oldState, StateType newState)>;
 
     FiniteStateMachine();
-    ~FiniteStateMachine();
+    ~FiniteStateMachine() = default;
 
     // initialize with initial optional state
     void init(StateType initialState = 0);

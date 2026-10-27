@@ -15,7 +15,7 @@ public:
     using SendAsyncHandler = std::function<void(const uint8_t* data, size_t numBytes)>;
 
     St7789v(Gpio& gpioRst, Gpio& gpioDc, Gpio& gpioCs, LedcChannel& pwmBlk);
-    ~St7789v();
+    ~St7789v() = default;
 
     void init(uint16_t width, uint16_t height);
 

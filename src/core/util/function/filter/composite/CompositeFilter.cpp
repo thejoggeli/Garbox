@@ -14,6 +14,15 @@ CompositeFilter::CompositeFilter(FunctionIfc** transforms, float* results, uint3
     
     AssertExit((mTransforms != nullptr), "CompositeFilter", "null transform list");
     AssertExit((mCount > 0), "CompositeFilter", "no transforms provided");
+    if(mTransforms == nullptr || mCount == 0){
+        mTransforms = nullptr;
+        mResults = nullptr;
+        mCount = 0;
+        return;
+    }
+    for(uint32_t index = 0; index < mCount; ++index){
+        AssertExit(mTransforms[index] != nullptr, "CompositeFilter", "null transform");
+    }
     mHeapAllocated = false;
 }
 
@@ -24,25 +33,35 @@ CompositeFilter::CompositeFilter(std::initializer_list<FunctionIfc*> transforms,
 
     // constructor body
     AssertExit((mCount > 0), "CompositeFilter", "empty transform list");
+    if(mCount == 0){
+        return;
+    }
 
     mTransforms = static_cast<FunctionIfc**>(std::calloc(mCount, sizeof(FunctionIfc*)));
     AssertExit((mTransforms != nullptr), "CompositeFilter", "heap allocation failed");
+    if(mTransforms == nullptr){
+        mCount = 0;
+        return;
+    }
+
+    mHeapAllocated = true;
 
     uint32_t i = 0;
     for(FunctionIfc* t : transforms){
+        AssertExit(t != nullptr, "CompositeFilter", "null transform");
         mTransforms[i++] = t;
     }
 
     if(storeResults){
         mResults = static_cast<float*>(std::calloc(mCount, sizeof(float)));
+        AssertExit(mResults != nullptr, "CompositeFilter", "result allocation failed");
     }
-
-    mHeapAllocated = true;
 }
 
 CompositeFilter::~CompositeFilter(){
     if(mHeapAllocated){
-        TriggerExit("CompositeFilter", "heap using classes must not be deconstructed");
+        std::free(mResults);
+        std::free(mTransforms);
     }
 }
 
@@ -55,9 +74,17 @@ float CompositeFilter::onProcess(float value){
 
     float result = value;
 
+    if(mCount == 0 || mTransforms == nullptr){
+        return result;
+    }
+
     // traverse transforms and store results in array
     if(mResults != nullptr){
         for(uint32_t i = 0; i < mCount; ++i){
+            if(mTransforms[i] == nullptr){
+                AssertExit(false, "CompositeFilter", "null transform");
+                continue;
+            }
             result = mTransforms[i]->apply(result);
             mResults[i] = result;
         }
@@ -65,6 +92,10 @@ float CompositeFilter::onProcess(float value){
     // traverse transforms without storing
     else {
         for(uint32_t i = 0; i < mCount; ++i){
+            if(mTransforms[i] == nullptr){
+                AssertExit(false, "CompositeFilter", "null transform");
+                continue;
+            }
             result = mTransforms[i]->apply(result);
         }
     }
@@ -73,7 +104,11 @@ float CompositeFilter::onProcess(float value){
 }
 
 void CompositeFilter::setInputThreshold(float threshold){
-    mInputThreshold = std::max(0.0f, threshold);
+    const bool valid = std::isfinite(threshold) && threshold >= 0.0f;
+    AssertExit(valid, "CompositeFilter", "invalid input threshold");
+    if(valid){
+        mInputThreshold = threshold;
+    }
 }
 
 float CompositeFilter::getInputThreshold() const {

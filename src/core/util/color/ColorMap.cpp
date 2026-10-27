@@ -57,16 +57,29 @@ ColorMap::ColorMap(const Span<const Entry> entries) : mEntries(entries){
     init();
 }
 
-ColorMap::~ColorMap(){
-    TriggerExit("ColorMap", "heap using classes must not be deconstructed");
-}
-
 void ColorMap::init(){
     AssertExit(!mInitialized, "ColorMap", "already initialized");
+    if(mInitialized){
+        return;
+    }
 
     const size_t numEntries = mEntries.size();
-    AssertExit((numEntries >= 2u), "ColorMap", "need at least two entries");
-    AssertExit((numEntries <= 256U), "ColorMap", "max 256 entries allowed");
+    const bool validSize = numEntries >= 2u && numEntries <= 256U;
+    AssertExit(validSize, "ColorMap", "entry count must be between 2 and 256");
+    if(!validSize){
+        return;
+    }
+    for(size_t index = 0; index < numEntries; ++index){
+        const bool finite =
+            std::isfinite(mEntries[index].t) &&
+            std::isfinite(mEntries[index].standardRgb.r) &&
+            std::isfinite(mEntries[index].standardRgb.g) &&
+            std::isfinite(mEntries[index].standardRgb.b);
+        AssertExit(finite, "ColorMap", "entries must be finite");
+        if(!finite){
+            return;
+        }
+    }
 
     // check if t uniform
     mUniform = checkUniform();
@@ -78,12 +91,19 @@ void ColorMap::init(){
     // handle non-uniform
     else {
 
-        AssertExit(mEntries[0].t == 0.0f, "ColorMap", "first t must to 0.0");
-        AssertExit((mEntries.end()-1)->t == 1.0f, "ColorMap", "last t must be 1.0");
+        const bool validBounds = mEntries[0].t == 0.0f && mEntries.back().t == 1.0f;
+        AssertExit(validBounds, "ColorMap", "non-uniform entries must span 0.0 to 1.0");
+        if(!validBounds){
+            return;
+        }
 
         // check if t is strictly monotonic 
         for(size_t i = 1u; i < numEntries; ++i){
-            AssertExit((mEntries[i].t > mEntries[i - 1].t), "ColorMap", "t values must be monotonic");
+            const bool monotonic = mEntries[i].t > mEntries[i - 1].t;
+            AssertExit(monotonic, "ColorMap", "t values must be monotonic");
+            if(!monotonic){
+                return;
+            }
         }
 
         // build lookup buckets 
@@ -230,6 +250,16 @@ void ColorMap::resolveSegmentNonUniform(float tClamped, SegmentInfo* segmentInfo
 
 
 void ColorMap::resolveSegment(float t, SegmentInfo* segmentInfo) const {
+    static const Entry FallbackEntry(0.0f, RgbFloat());
+    if(!mInitialized || !std::isfinite(t) || segmentInfo == nullptr){
+        AssertExit(false, "ColorMap", "cannot resolve invalid interpolation request");
+        if(segmentInfo != nullptr){
+            segmentInfo->a = &FallbackEntry;
+            segmentInfo->b = &FallbackEntry;
+            segmentInfo->frac = 0.0f;
+        }
+        return;
+    }
     float tClamped = std::clamp(t, 0.0f, 1.0f);
 
     if(mUniform){
@@ -241,6 +271,12 @@ void ColorMap::resolveSegment(float t, SegmentInfo* segmentInfo) const {
 }
 
 const ColorMap::Entry& ColorMap::getEntry(size_t index) const {
+    static const Entry FallbackEntry(0.0f, RgbFloat());
+    if(mEntries.empty()){
+        AssertExit(false, "ColorMap", "getEntry on empty map");
+        return FallbackEntry;
+    }
+    AssertExit(index < mEntries.size(), "ColorMap", "entry index out of range");
     const size_t lastIndex = mEntries.size() - 1u;
     const size_t clamped = (index < mEntries.size() ? index : lastIndex);
     return mEntries[clamped];

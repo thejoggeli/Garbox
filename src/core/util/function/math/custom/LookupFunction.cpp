@@ -1,12 +1,23 @@
 #include "LookupFunction.h"
 
 #include <cstring>
+#include <cmath>
+#include <limits>
+#include <new>
 #include "core/assert/Assert.h"
 
 namespace {
 
 // checks if x-values are strictly increasing
 bool isMonotonicIncreasing(const Garbox::LookupFunction::Point* points, uint32_t count){
+    if(points == nullptr){
+        return false;
+    }
+    for(uint32_t i = 0; i < count; ++i){
+        if(!std::isfinite(points[i].x) || !std::isfinite(points[i].y)){
+            return false;
+        }
+    }
     for(uint32_t i = 1; i < count; ++i){
         if(points[i].x <= points[i - 1].x){
             return false;
@@ -25,16 +36,21 @@ LookupFunction::LookupFunction(){
 
 LookupFunction::~LookupFunction(){
     if(mHeapAllocated){
-        // runtime destruction of heap-based lookup tables is not allowed
-        TriggerExit("LookupFunction", "heap using classes must not be deconstructed");
+        delete[] mPoints;
     }
 }
 
-void LookupFunction::init(Point* points, bool copy, uint32_t pointCount, Mode mode){
+void LookupFunction::init(const Point* points, bool copy, uint32_t pointCount, Mode mode){
     AssertExit(!mInitialized, "LookupFunction", "already initialized");
+    if(mInitialized){
+        return;
+    }
     AssertExit(points != nullptr, "LookupFunction", "null point buffer");
     AssertExit(pointCount >= 2, "LookupFunction", "at least two points required");
     AssertExit(isMonotonicIncreasing(points, pointCount), "LookupFunction", "x-values must be strictly increasing");
+    if(points == nullptr || pointCount < 2 || !isMonotonicIncreasing(points, pointCount)){
+        return;
+    }
 
     mPointCount = pointCount;
     mLastIndex = mPointCount - 1;
@@ -42,8 +58,14 @@ void LookupFunction::init(Point* points, bool copy, uint32_t pointCount, Mode mo
     mMode = mode;
 
     if(copy){
-        mPoints = new Point[mPointCount];
-        std::memcpy(mPoints, points, mPointCount * sizeof(Point));
+        Point* ownedPoints = new (std::nothrow) Point[mPointCount];
+        AssertExit(ownedPoints != nullptr, "LookupFunction", "point allocation failed");
+        if(ownedPoints == nullptr){
+            mHeapAllocated = false;
+            return;
+        }
+        std::memcpy(ownedPoints, points, mPointCount * sizeof(Point));
+        mPoints = ownedPoints;
     }
     else {
         mPoints = points;
@@ -54,18 +76,33 @@ void LookupFunction::init(Point* points, bool copy, uint32_t pointCount, Mode mo
 
 void LookupFunction::init(std::initializer_list<Point> points, Mode mode){
     AssertExit(!mInitialized, "LookupFunction", "already initialized");
-    AssertExit(points.size() >= 2, "LookupFunction", "at least two points required");
-    AssertExit(isMonotonicIncreasing(points.begin(), points.size()), "LookupFunction", "x-values must be strictly increasing");
+    if(mInitialized){
+        return;
+    }
+    const bool sizeFits = points.size() <= std::numeric_limits<uint32_t>::max();
+    const uint32_t pointCount = sizeFits ? static_cast<uint32_t>(points.size()) : 0;
+    AssertExit(sizeFits, "LookupFunction", "too many points");
+    AssertExit(pointCount >= 2, "LookupFunction", "at least two points required");
+    AssertExit(isMonotonicIncreasing(points.begin(), pointCount), "LookupFunction", "x-values must be finite and strictly increasing");
+    if(!sizeFits || pointCount < 2 || !isMonotonicIncreasing(points.begin(), pointCount)){
+        return;
+    }
 
-    mPointCount = static_cast<uint32_t>(points.size());
+    mPointCount = pointCount;
     mLastIndex = mPointCount - 1;
     mHeapAllocated = true;
     mMode = mode;
 
-    mPoints = new Point[mPointCount];
+    Point* ownedPoints = new (std::nothrow) Point[mPointCount];
+    AssertExit(ownedPoints != nullptr, "LookupFunction", "point allocation failed");
+    if(ownedPoints == nullptr){
+        mHeapAllocated = false;
+        return;
+    }
+    mPoints = ownedPoints;
     uint32_t index = 0;
     for(const Point& p : points){
-        mPoints[index++] = p;
+        ownedPoints[index++] = p;
     }
 
     mInitialized = true;
@@ -75,6 +112,10 @@ float LookupFunction::evaluate(float x) const {
     if(!mInitialized){
         TriggerDebug("LookupFunction", "evaluate() called before init()");
         return 0.0f;
+    }
+    if(!std::isfinite(x)){
+        AssertExit(false, "LookupFunction", "input must be finite");
+        return mPoints[0].y;
     }
 
     // clamp to range edges

@@ -35,7 +35,7 @@ public:
     };
 
     ColorMap(const Span<const Entry> entries);
-    ~ColorMap();
+    ~ColorMap() = default;
 
     const Entry& getEntry(size_t index) const;
     size_t size() const;

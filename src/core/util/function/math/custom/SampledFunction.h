@@ -28,11 +28,16 @@ public:
     SampledFunction();
     ~SampledFunction();
 
+    SampledFunction(const SampledFunction&) = delete;
+    SampledFunction& operator=(const SampledFunction&) = delete;
+    SampledFunction(SampledFunction&&) = delete;
+    SampledFunction& operator=(SampledFunction&&) = delete;
+
     // initialize from function pointer (samples are generated)
     void init(FuncPtr func, uint32_t sampleCount, float xMin, float xMax);
 
     // initialize from external sample buffer
-    void init(float* samples, bool copy, uint32_t sampleCount, float xMin, float xMax);
+    void init(const float* samples, bool copy, uint32_t sampleCount, float xMin, float xMax);
 
     // initialize from initializer list (copied into internal buffer)
     void init(std::initializer_list<float> samples, float xMin, float xMax);
@@ -41,7 +46,7 @@ public:
     float evaluate(float x) const final;
 
 private:
-    float* mSamples = nullptr;
+    const float* mSamples = nullptr;
     uint32_t mSampleCount = 0;
     uint32_t mLastIndex = 0;
     float mLastIndexF = 0.0f;

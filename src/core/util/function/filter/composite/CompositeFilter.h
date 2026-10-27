@@ -34,6 +34,11 @@ public:
 
     ~CompositeFilter();
 
+    CompositeFilter(const CompositeFilter&) = delete;
+    CompositeFilter& operator=(const CompositeFilter&) = delete;
+    CompositeFilter(CompositeFilter&&) = delete;
+    CompositeFilter& operator=(CompositeFilter&&) = delete;
+
     // configuration
     void setInputThreshold(float epsilon);
     float getInputThreshold() const;

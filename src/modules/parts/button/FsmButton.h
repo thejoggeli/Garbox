@@ -18,7 +18,7 @@ public:
     using HoldCallback = std::function<void(uint32_t counter, uint32_t holdTimeMicros, void* userData)>;
 
     FsmButton();
-    ~FsmButton();
+    ~FsmButton() = default;
 
     void init() final;
     void tick() final;

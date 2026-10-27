@@ -1,6 +1,7 @@
 #include "QuadraticFunction.h"
 
 #include "core/assert/Assert.h"
+#include <cmath>
 
 namespace Garbox {
 
@@ -13,6 +14,11 @@ QuadraticFunction::QuadraticFunction(float a, float b, float c):
 }
 
 void QuadraticFunction::setCoefficients(float a, float b, float c){
+    const bool valid = std::isfinite(a) && std::isfinite(b) && std::isfinite(c);
+    AssertExit(valid, "QuadraticFunction", "coefficients must be finite");
+    if(!valid){
+        return;
+    }
     m_a = a;
     m_b = b;
     m_c = c;
@@ -24,11 +30,23 @@ void QuadraticFunction::setPoints(const Point& p1, const Point& p2, const Point&
 
 void QuadraticFunction::setPoints(float x1, float y1, float x2, float y2, float x3, float y3){
     // ensure unique x-values
-    AssertExit(((x1 != x2) && (x1 != x3) && (x2 != x3)), "QuadraticFunction", "duplicate x values in calibration points");
+    const bool finite =
+        std::isfinite(x1) && std::isfinite(y1) &&
+        std::isfinite(x2) && std::isfinite(y2) &&
+        std::isfinite(x3) && std::isfinite(y3);
+    const bool unique = (x1 != x2) && (x1 != x3) && (x2 != x3);
+    AssertExit(finite && unique, "QuadraticFunction", "invalid calibration points");
+    if(!finite || !unique){
+        return;
+    }
 
     // solve system of equations for a, b, c
     const float denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
-    AssertExit((denom != 0.0f), "QuadraticFunction", "invalid denominator (points too close)");
+    const bool validDenominator = std::isfinite(denom) && denom != 0.0f;
+    AssertExit(validDenominator, "QuadraticFunction", "invalid denominator");
+    if(!validDenominator){
+        return;
+    }
 
     m_a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
     m_b = (x3*x3 * (y1 - y2) + x2*x2 * (y3 - y1) + x1*x1 * (y2 - y3)) / denom;

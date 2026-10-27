@@ -13,10 +13,6 @@ FsmButton::FsmButton(){
     setLongPressMicros(InitialLongPressMicros);
 }
 
-FsmButton::~FsmButton(){
-    TriggerExit("FsmButton", "heap using classes must not be deconstructed");
-}
-
 void FsmButton::init(){
     AssertExit(!mInitialized, "FsmButton", "already initialized");
 

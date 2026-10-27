@@ -18,7 +18,7 @@ class ComponentAbs {
 public:
 
     ComponentAbs(ComponentType type, ComponentId id);
-    ~ComponentAbs();
+    virtual ~ComponentAbs() = default;
 
     // setup methhods
     virtual void init(ComponentHostIfc& host);

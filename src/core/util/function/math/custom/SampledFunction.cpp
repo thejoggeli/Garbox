@@ -2,9 +2,31 @@
 
 #include <cmath>
 #include <cstring>
+#include <limits>
+#include <new>
 #include "core/assert/Assert.h"
 
 namespace Garbox {
+
+namespace {
+
+bool validDomain(uint32_t sampleCount, float xMin, float xMax){
+    return sampleCount >= 2 && std::isfinite(xMin) && std::isfinite(xMax) && xMax > xMin;
+}
+
+bool validSamples(const float* samples, uint32_t sampleCount){
+    if(samples == nullptr){
+        return false;
+    }
+    for(uint32_t index = 0; index < sampleCount; ++index){
+        if(!std::isfinite(samples[index])){
+            return false;
+        }
+    }
+    return true;
+}
+
+} // namespace
 
 SampledFunction::SampledFunction(){
     // nothing to do
@@ -12,14 +34,20 @@ SampledFunction::SampledFunction(){
 
 SampledFunction::~SampledFunction(){
     if(mHeapAllocated){
-        // runtime destruction of heap-based lookup tables is not allowed
-        TriggerExit("SampledFunction", "heap using classes must not be deconstructed");
+        delete[] mSamples;
     }
 }
 
 void SampledFunction::init(FuncPtr func, uint32_t sampleCount, float xMin, float xMax){
     AssertExit(!mInitialized, "SampledFunction", "already initialized");
+    if(mInitialized){
+        return;
+    }
     AssertExit(func != nullptr, "SampledFunction", "null function pointer");
+    AssertExit(validDomain(sampleCount, xMin, xMax), "SampledFunction", "invalid sample domain");
+    if(func == nullptr || !validDomain(sampleCount, xMin, xMax)){
+        return;
+    }
 
     mSampleCount = sampleCount;
     mHeapAllocated = true;
@@ -30,19 +58,40 @@ void SampledFunction::init(FuncPtr func, uint32_t sampleCount, float xMin, float
     mLastIndexF = static_cast<float>(mLastIndex);
 
     // allocate and compute samples
-    mSamples = new float[mSampleCount];
+    float* ownedSamples = new (std::nothrow) float[mSampleCount];
+    AssertExit(ownedSamples != nullptr, "SampledFunction", "sample allocation failed");
+    if(ownedSamples == nullptr){
+        mHeapAllocated = false;
+        return;
+    }
+    mSamples = ownedSamples;
     const float step = (m_xMax - m_xMin) / static_cast<float>(mLastIndex);
     for(uint32_t i = 0; i < mSampleCount; ++i){
         const float x = m_xMin + step * static_cast<float>(i);
-        mSamples[i] = func(x);
+        ownedSamples[i] = func(x);
+        if(!std::isfinite(ownedSamples[i])){
+            AssertExit(false, "SampledFunction", "function produced a non-finite sample");
+            delete[] ownedSamples;
+            mSamples = nullptr;
+            mHeapAllocated = false;
+            return;
+        }
     }
 
     mInitialized = true;
 }
 
-void SampledFunction::init(float* samples, bool copy, uint32_t sampleCount, float xMin, float xMax){
+void SampledFunction::init(const float* samples, bool copy, uint32_t sampleCount, float xMin, float xMax){
     AssertExit(!mInitialized, "SampledFunction", "already initialized");
+    if(mInitialized){
+        return;
+    }
     AssertExit(samples != nullptr, "SampledFunction", "null sample buffer");
+    AssertExit(validDomain(sampleCount, xMin, xMax), "SampledFunction", "invalid sample domain");
+    AssertExit(validSamples(samples, sampleCount), "SampledFunction", "samples must be finite");
+    if(!validDomain(sampleCount, xMin, xMax) || !validSamples(samples, sampleCount)){
+        return;
+    }
 
     mSampleCount = sampleCount;
     mHeapAllocated = copy;
@@ -54,8 +103,14 @@ void SampledFunction::init(float* samples, bool copy, uint32_t sampleCount, floa
 
     // allocate internal buffer and copy samples
     if(copy){
-        mSamples = new float[mSampleCount];
-        std::memcpy(mSamples, samples, mSampleCount * sizeof(float));
+        float* ownedSamples = new (std::nothrow) float[mSampleCount];
+        AssertExit(ownedSamples != nullptr, "SampledFunction", "sample allocation failed");
+        if(ownedSamples == nullptr){
+            mHeapAllocated = false;
+            return;
+        }
+        std::memcpy(ownedSamples, samples, mSampleCount * sizeof(float));
+        mSamples = ownedSamples;
     }
     // use passed buffer (must be kept in memory by user)
     else {
@@ -67,9 +122,20 @@ void SampledFunction::init(float* samples, bool copy, uint32_t sampleCount, floa
 
 void SampledFunction::init(std::initializer_list<float> samples,  float xMin, float xMax){
     AssertExit(!mInitialized, "SampledFunction", "already initialized");
-    AssertExit(samples.size() > 0, "SampledFunction", "empty initializer list");
+    if(mInitialized){
+        return;
+    }
+    const bool sizeFits = samples.size() <= std::numeric_limits<uint32_t>::max();
+    AssertExit(sizeFits, "SampledFunction", "too many samples");
+    const uint32_t sampleCount = sizeFits ? static_cast<uint32_t>(samples.size()) : 0;
+    AssertExit(validDomain(sampleCount, xMin, xMax), "SampledFunction", "invalid sample domain");
+    AssertExit(validSamples(samples.begin(), sampleCount), "SampledFunction", "samples must be finite");
+    if(!sizeFits || !validDomain(sampleCount, xMin, xMax) ||
+       !validSamples(samples.begin(), sampleCount)){
+        return;
+    }
 
-    mSampleCount = static_cast<uint32_t>(samples.size());
+    mSampleCount = sampleCount;
     mHeapAllocated = true;
     m_xMin = xMin;
     m_xMax = xMax;
@@ -78,10 +144,16 @@ void SampledFunction::init(std::initializer_list<float> samples,  float xMin, fl
     mLastIndexF = static_cast<float>(mLastIndex);
 
     // allocate internal buffer and copy from list
-    mSamples = new float[mSampleCount];
+    float* ownedSamples = new (std::nothrow) float[mSampleCount];
+    AssertExit(ownedSamples != nullptr, "SampledFunction", "sample allocation failed");
+    if(ownedSamples == nullptr){
+        mHeapAllocated = false;
+        return;
+    }
+    mSamples = ownedSamples;
     uint32_t index = 0;
     for(float value : samples){
-        mSamples[index++] = value;
+        ownedSamples[index++] = value;
     }
 
     mInitialized = true;
@@ -91,6 +163,10 @@ float SampledFunction::evaluate(float x) const {
     if(!mInitialized){
         TriggerDebug("SampledFunction", "evaluate() called before init()");
         return 0.0f;
+    }
+    if(!std::isfinite(x)){
+        AssertExit(false, "SampledFunction", "input must be finite");
+        return mSamples[0];
     }
 
     if(x <= m_xMin){

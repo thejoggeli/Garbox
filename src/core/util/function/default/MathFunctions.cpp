@@ -39,15 +39,15 @@ const MathFunctionIfc& MathFunctions::GetSin(){
 }
 
 const MathFunctionIfc& MathFunctions::GetSin90(){
-    return GetSampled([](float x){ return sinf(x + 0.5f * MathConstants::TwoPi); }, Samples::Sine);
+    return GetSampled([](float x){ return sinf(x + 0.25f * MathConstants::TwoPi); }, Samples::Sine);
 }
 
 const MathFunctionIfc& MathFunctions::GetSin180(){
-    return GetSampled([](float x){ return sinf(x + 1.0f * MathConstants::TwoPi); }, Samples::Sine);
+    return GetSampled([](float x){ return sinf(x + 0.5f * MathConstants::TwoPi); }, Samples::Sine);
 }
 
 const MathFunctionIfc& MathFunctions::GetSin270(){
-    return GetSampled([](float x){ return sinf(x + 1.5f * MathConstants::TwoPi); }, Samples::Sine);
+    return GetSampled([](float x){ return sinf(x + 0.75f * MathConstants::TwoPi); }, Samples::Sine);
 }
 
 const MathFunctionIfc& MathFunctions::GetSinNorm(){
@@ -55,15 +55,15 @@ const MathFunctionIfc& MathFunctions::GetSinNorm(){
 }
 
 const MathFunctionIfc& MathFunctions::GetSinNorm90(){
-    return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 0.5f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
+    return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 0.25f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
 }
 
 const MathFunctionIfc& MathFunctions::GetSinNorm180(){
-    return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 1.0f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
+    return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 0.5f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
 }
 
 const MathFunctionIfc& MathFunctions::GetSinNorm270(){
-    return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 1.5f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
+    return GetSampled([](float x){ return 0.5f * (sinf(x * MathConstants::TwoPi + 0.75f * MathConstants::TwoPi) + 1.0f); }, Samples::Sine);
 }
 
 const MathFunctionIfc& MathFunctions::GetSinAnim(){
@@ -79,7 +79,7 @@ const MathFunctionIfc& MathFunctions::GetGamma22Inverse(){
 }
 
 const MathFunctionIfc& MathFunctions::GetSqrt(){
-    return GetSampled([](float x){ return cbrtf(x); }, Samples::Sqrt);
+    return GetSampled([](float x){ return sqrtf(x); }, Samples::Sqrt);
 }
 
 const MathFunctionIfc& MathFunctions::GetCbrt(){

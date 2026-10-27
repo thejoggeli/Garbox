@@ -27,10 +27,6 @@ St7789v::St7789v(Gpio& gpioRst, Gpio& gpioDc, Gpio& gpioCs, LedcChannel& pwmBlk)
     // constructor body
 }
 
-St7789v::~St7789v(){
-    TriggerExit("St7789v", "std::function may be using heap");
-}
-
 void St7789v::init(uint16_t width, uint16_t height){
     AssertExit(!mInitialized, "St7789v", "already initialized");
     AssertExit(width > 0, "St7789v", "invalid width");

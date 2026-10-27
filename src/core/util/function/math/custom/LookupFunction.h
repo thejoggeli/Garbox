@@ -31,13 +31,18 @@ public:
     LookupFunction();
     ~LookupFunction();
 
-    void init(Point* points, bool copy, uint32_t pointCount, Mode mode = Mode::Linear);
+    LookupFunction(const LookupFunction&) = delete;
+    LookupFunction& operator=(const LookupFunction&) = delete;
+    LookupFunction(LookupFunction&&) = delete;
+    LookupFunction& operator=(LookupFunction&&) = delete;
+
+    void init(const Point* points, bool copy, uint32_t pointCount, Mode mode = Mode::Linear);
     void init(std::initializer_list<Point> points, Mode mode = Mode::Linear);
 
     float evaluate(float x) const;
 
 private:
-    Point* mPoints = nullptr;
+    const Point* mPoints = nullptr;
     uint32_t mPointCount = 0;
     uint32_t mLastIndex = 0;
     bool mHeapAllocated = false;

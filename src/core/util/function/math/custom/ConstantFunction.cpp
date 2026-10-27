@@ -4,9 +4,7 @@
 
 namespace Garbox {
 
-ConstantFunction::ConstantFunction(float value){
-    // nothing to do
-}
+ConstantFunction::ConstantFunction(float value) : mValue(value){}
 
 float ConstantFunction::evaluate(float x) const {
     return mValue;

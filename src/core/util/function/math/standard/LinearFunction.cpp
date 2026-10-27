@@ -1,6 +1,7 @@
 #include "LinearFunction.h"
 
 #include "core/assert/Assert.h"
+#include <cmath>
 
 namespace Garbox {
 
@@ -12,6 +13,11 @@ LinearFunction::LinearFunction(float a, float b):
 }
 
 void LinearFunction::setCoefficients(float a, float b){
+    const bool valid = std::isfinite(a) && std::isfinite(b);
+    AssertExit(valid, "LinearFunction", "coefficients must be finite");
+    if(!valid){
+        return;
+    }
     m_a = a;
     m_b = b;
 }
@@ -21,7 +27,13 @@ void LinearFunction::setPoints(const Point& p1, const Point& p2){
 }
 
 void LinearFunction::setPoints(float x1, float y1, float x2, float y2){
-    AssertExit((x1 != x2), "LinearFunction", "invalid calibration points (identical x)");
+    const bool valid =
+        std::isfinite(x1) && std::isfinite(y1) &&
+        std::isfinite(x2) && std::isfinite(y2) && x1 != x2;
+    AssertExit(valid, "LinearFunction", "invalid calibration points");
+    if(!valid){
+        return;
+    }
     m_a = (y2 - y1) / (x2 - x1);
     m_b = y1 - (m_a * x1);
 }

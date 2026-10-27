@@ -33,6 +33,11 @@ public:
 
     ~MovingAverageFilter();
 
+    MovingAverageFilter(const MovingAverageFilter&) = delete;
+    MovingAverageFilter& operator=(const MovingAverageFilter&) = delete;
+    MovingAverageFilter(MovingAverageFilter&&) = delete;
+    MovingAverageFilter& operator=(MovingAverageFilter&&) = delete;
+
     void setScaleFactor(float scaleFactor);
 
 protected:
@@ -44,10 +49,13 @@ private:
     uint32_t mSize = 0;
     uint32_t mIndex = 0;
     uint32_t mCount = 0;
-    int32_t mSum = 0;
+    int64_t mSum = 0;
     float mCountFloat = 0.0f;
     float mScaleFactor = 1000.0f;
     bool mHeapAllocated = false;
+    int32_t mFallbackBuffer = 0;
+
+    bool quantize(float value, int32_t& quantized) const;
 };
 
 } // namespace Garbox

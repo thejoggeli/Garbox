@@ -49,6 +49,8 @@ private:
     uint16_t mCount;
     bool mInitialized = false;
     bool mNeedsUpdate = false;
+
+    bool ready() const;
 };
 
 } // namespace

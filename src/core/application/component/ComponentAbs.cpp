@@ -10,10 +10,6 @@ ComponentAbs::ComponentAbs(ComponentType type, ComponentId id) : mComponentDescr
     LogDebug("ComponentAbs", "ctor id=%s", ComponentIdToString(id));
 }
 
-ComponentAbs::~ComponentAbs(){
-    TriggerExit("ComponentAbs", "components must not be destroyed");
-}
-
 void ComponentAbs::init(ComponentHostIfc& host){
     AssertExit(!mInitialized, "ComponentAbs", "already initialized");
     mHost = &host;

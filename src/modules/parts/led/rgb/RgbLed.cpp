@@ -18,13 +18,19 @@ RgbLed::RgbLed(Gpio& gpio):
 }
 
 RgbLed::~RgbLed(){
-    TriggerExit("RgbLed", "heap using classes must not be deconstructed");
+    delete mRgbLed;
 }
 
 void RgbLed::init(){
     AssertExit(!mInitialized, "RgbLed", "already initialized");
+    if(mInitialized){
+        return;
+    }
     mRgbLed = new Adafruit_NeoPixel(1, mGpio.getPinNumber(), NEO_GRB + NEO_KHZ800);
     AssertExit(mRgbLed != nullptr, "RgbLed", "allocation failed");
+    if(mRgbLed == nullptr){
+        return;
+    }
     mRgbLed->begin();
     mRgbLed->show();
     mInitialized = true;
@@ -43,6 +49,11 @@ void RgbLed::setColor(const Rgb888& color){
 }
 
 void RgbLed::setColor(uint8_t r, uint8_t g, uint8_t b){
+
+    if(!mInitialized || mRgbLed == nullptr){
+        TriggerDebug("RgbLed", "setColor before init");
+        return;
+    }
 
     // check if needs update
     if(!mNeedsUpdate){
@@ -64,6 +75,9 @@ void RgbLed::setColor(uint8_t r, uint8_t g, uint8_t b){
     // write color to rgb led
     mRgbLed->setPixelColor(0, r, g, b);
     mRgbLed->show();
+    mCurrentRed = r;
+    mCurrentGreen = g;
+    mCurrentBlue = b;
 }
 
 bool RgbLed::isInitialized() const {

@@ -11,6 +11,9 @@ AnalyticFunction::AnalyticFunction(){
 void AnalyticFunction::init(FuncPtr func){
     AssertExit(!mInitialized, "AnalyticFunction", "already initialized");
     AssertExit(func != nullptr, "AnalyticFunction", "null function pointer");
+    if(mInitialized || func == nullptr){
+        return;
+    }
 
     mFunc = func;
     mInitialized = true;
