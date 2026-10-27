@@ -55,6 +55,17 @@ public:
         initLinks(defaultEnabled);
     }
 
+    ~MaskedArrayBase(){
+        for(std::size_t i = 0; i < capacity(); i++){
+            Storage::elementPtr(i)->~T();
+        }
+    }
+
+    MaskedArrayBase(const MaskedArrayBase&) = delete;
+    MaskedArrayBase& operator=(const MaskedArrayBase&) = delete;
+    MaskedArrayBase(MaskedArrayBase&&) = delete;
+    MaskedArrayBase& operator=(MaskedArrayBase&&) = delete;
+
     Iterator begin(){
         return Iterator(Storage::elementPtr(0), mNext.data(), mHead);
     }
@@ -80,11 +91,16 @@ public:
     }
 
     bool isIndexEnabled(std::size_t index) const {
+        if(index >= capacity()){
+            TriggerDebug("MaskedArrayBase", "index out of range");
+            return false;
+        }
         return mEnabled[index];
     }
 
     void setIndexEnabled(std::size_t index, bool enable){
         AssertDebug(index < capacity(), "MaskedArrayBase", "index out of range");
+        if(index >= capacity()) return;
 
         if(enable){
             if(mEnabled[index]) return;

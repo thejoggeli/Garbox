@@ -77,6 +77,15 @@ public:
     ArrayBase(with_count_t, std::size_t elementCount, Args&&... args) : Storage(elementCount){
         constructAllWith(std::forward<Args>(args)...);
     }
+
+    ~ArrayBase(){
+        destroyAll();
+    }
+
+    ArrayBase(const ArrayBase&) = delete;
+    ArrayBase& operator=(const ArrayBase&) = delete;
+    ArrayBase(ArrayBase&&) = delete;
+    ArrayBase& operator=(ArrayBase&&) = delete;
         
     T& at(std::size_t index) {
         return *Storage::elementPtr(index);
@@ -135,6 +144,13 @@ public:
     }
 
 private:
+
+    void destroyAll() noexcept {
+        const std::size_t n = Storage::capacityElements();
+        for(std::size_t i = 0; i < n; i++) {
+            Storage::elementPtr(i)->~T();
+        }
+    }
 
     void constructAll() {
         const std::size_t n = Storage::capacityElements();

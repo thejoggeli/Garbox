@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <new>
+#include <type_traits>
 #include <utility>
 #include "core/assert/Assert.h"
 
@@ -42,6 +43,15 @@ public:
         // nothing to do
     }
 
+    ~RingBufferBase(){
+        destroyAll();
+    }
+
+    RingBufferBase(const RingBufferBase&) = delete;
+    RingBufferBase& operator=(const RingBufferBase&) = delete;
+    RingBufferBase(RingBufferBase&&) = delete;
+    RingBufferBase& operator=(RingBufferBase&&) = delete;
+
     // Get number of elements stored
     std::size_t size() const {
         return mCount;
@@ -69,6 +79,10 @@ public:
 
     // Reset without calling destructors
     void releaseAll(){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "releaseAll() is only supported for trivially destructible types; use destroyAll otherwise"
+        );
         mFront = 0;
         mBack = 0;
         mCount = 0;
@@ -149,7 +163,7 @@ public:
 
     // Construct with args at front
     template<typename... Args>
-    T* emplaceFront(Args... args){
+    T* emplaceFront(Args&&... args){
         T* slot = allocateFront();
         if(slot != 0){
             new(slot) T(std::forward<Args>(args)...);
@@ -159,7 +173,7 @@ public:
 
     // Construct with args at back
     template<typename... Args>
-    T* emplaceBack(Args... args){
+    T* emplaceBack(Args&&... args){
         T* slot = allocateBack();
         if(slot != 0){
             new (slot) T(std::forward<Args>(args)...);
@@ -199,6 +213,7 @@ public:
 
     // Pop from front without destructor
     bool releaseFront(){
+        requireTrivialRelease();
         if(isEmpty()){
             return false;
         }
@@ -210,6 +225,7 @@ public:
 
     // Pop from front without destructor and provide pointer to (still valid) element
     bool releaseFront(T*& ptr){
+        requireTrivialRelease();
         if(isEmpty()){
             return false;
         }
@@ -223,6 +239,7 @@ public:
     }
 
     bool releaseFront(T& out){
+        requireTrivialRelease();
         if(isEmpty()){
             return false;
         }
@@ -269,6 +286,7 @@ public:
 
     // Pop from back without destructor
     bool releaseBack(){
+        requireTrivialRelease();
         if(isEmpty()){
             return false;
         }
@@ -280,6 +298,7 @@ public:
 
     // Pop from back without destructor and provide pointer to (still valid) element
     bool releaseBack(T*& ptr){
+        requireTrivialRelease();
         if(isEmpty()){
             return false;
         }
@@ -294,6 +313,7 @@ public:
     }
 
     bool releaseBack(T& out){
+        requireTrivialRelease();
         if(isEmpty()){
             return false;
         }
@@ -352,6 +372,13 @@ public:
     }
 
 private:
+
+    static constexpr void requireTrivialRelease(){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "release operations are only supported for trivially destructible types; use destroy otherwise"
+        );
+    }
 
     std::size_t nextIndex(std::size_t index) const {
         index++;

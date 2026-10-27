@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    alignas(T) uint8_t mBytes[N * sizeof(T)];
+    alignas(T) uint8_t mBytes[(N > 0 ? N : 1) * sizeof(T)];
 };
 
 } // namespace Garbox

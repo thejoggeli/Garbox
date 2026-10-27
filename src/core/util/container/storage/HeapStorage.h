@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <new>
 
 #include "core/assert/Assert.h"
@@ -11,24 +13,47 @@ template <typename T>
 class HeapStorage {
 public:
 
+    static_assert(
+        alignof(T) <= alignof(std::max_align_t),
+        "HeapStorage does not support over-aligned element types"
+    );
+
     HeapStorage(std::size_t elementCount):
         // initialize members
-        mBytes(0),
-        mCapacity(elementCount),
-        mCapacityBytes(elementCount * sizeof(T)){
+        mBytes(nullptr),
+        mCapacity(0),
+        mCapacityBytes(0){
+
+        const bool sizeOverflow =
+            elementCount > (std::numeric_limits<std::size_t>::max() / sizeof(T));
+        if(sizeOverflow){
+            TriggerExit("HeapStorage", "allocation size overflow");
+            return;
+        }
+
+        mCapacity = elementCount;
+        mCapacityBytes = elementCount * sizeof(T);
 
         // allocate aligned raw storage on heap
-        if(elementCount > 0){
-            mBytes = new (std::nothrow) uint8_t[elementCount * sizeof(T)];
-            const bool allocFailed = (mBytes == 0);
+        if(mCapacityBytes > 0){
+            mBytes = static_cast<uint8_t*>(::operator new(mCapacityBytes, std::nothrow));
+            const bool allocFailed = (mBytes == nullptr);
             AssertExit(!allocFailed, "HeapStorage", "failed to allocate heap memory");
+            if(allocFailed){
+                mCapacity = 0;
+                mCapacityBytes = 0;
+            }
         }
     }
 
     ~HeapStorage(){
-        // heap-using class must never be destructed at runtime
-        TriggerExit("HeapStorage", "heap using classes must not be deconstructed");
+        ::operator delete(mBytes);
     }
+
+    HeapStorage(const HeapStorage&) = delete;
+    HeapStorage& operator=(const HeapStorage&) = delete;
+    HeapStorage(HeapStorage&&) = delete;
+    HeapStorage& operator=(HeapStorage&&) = delete;
 
     uint8_t* dataBytes() {
         return mBytes;

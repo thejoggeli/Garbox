@@ -2,7 +2,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <new>
+#include <type_traits>
 #include <utility>
 
 #include "core/assert/Assert.h"
@@ -13,9 +15,9 @@ namespace Garbox {
  * DataPoolBase<Storage> is a simple bump allocator on top of a Storage
  * that provides raw byte memory and a fixed capacity in bytes.
  *
- * It is intended primarily for simple POD types. Allocations only move
- * an internal offset forward; releaseAll() just resets the offset without
- * calling destructors.
+ * Constructed values must be trivially destructible. Allocations only move an
+ * internal offset forward; releaseAll() resets the offset without walking an
+ * object registry.
  */
 template <typename Storage>
 class DataPoolBase : private Storage {
@@ -28,6 +30,11 @@ public:
     template<typename... Args>
     DataPoolBase(Args&&... storageArgs) : Storage(std::forward<Args>(storageArgs)...) , mOffsetBytes(0){}
 
+    DataPoolBase(const DataPoolBase&) = delete;
+    DataPoolBase& operator=(const DataPoolBase&) = delete;
+    DataPoolBase(DataPoolBase&&) = delete;
+    DataPoolBase& operator=(DataPoolBase&&) = delete;
+
     // Reset the allocation offset (does not destruct objects)
     void releaseAll(){
         mOffsetBytes = 0;
@@ -35,10 +42,23 @@ public:
 
     // Allocate a raw aligned memory block from the pool
     void* allocateRaw(std::size_t sizeBytes, std::size_t alignmentBytes){
+        const bool validAlignment = alignmentBytes != 0
+            && (alignmentBytes & (alignmentBytes - 1)) == 0
+            && alignmentBytes <= alignof(std::max_align_t);
+        if(!validAlignment){
+            TriggerDebug("DataPool", "invalid or unsupported alignment");
+            return nullptr;
+        }
+
         const std::size_t mask = alignmentBytes - 1;
+        if(mOffsetBytes > std::numeric_limits<std::size_t>::max() - mask){
+            TriggerDebug("DataPool", "alignment overflow");
+            return nullptr;
+        }
         const std::size_t alignedOffset = (mOffsetBytes + mask) & ~mask;
 
-        const bool enoughSpace = (alignedOffset + sizeBytes) <= Storage::capacityBytes();
+        const bool enoughSpace = alignedOffset <= Storage::capacityBytes()
+            && sizeBytes <= (Storage::capacityBytes() - alignedOffset);
         if(!enoughSpace){
             TriggerDebug("DataPool", "insufficient space");
             return 0;
@@ -61,6 +81,7 @@ public:
     // Default member initializers are applied; otherwise POD members are zero-initialized.
     template<typename T>
     T* construct(){
+        requireTriviallyDestructible<T>();
         void* rawPtr = allocateRaw(sizeof(T), alignof(T));
         if(rawPtr == 0){
             return 0;
@@ -71,6 +92,7 @@ public:
     // Copy-construct T into storage using placement new
     template<typename T>
     T* push(const T& value){
+        requireTriviallyDestructible<T>();
         void* rawPtr = allocateRaw(sizeof(T), alignof(T));
         if(rawPtr == 0){
             return 0;
@@ -81,6 +103,7 @@ public:
     // Construct T in-place with arbitrary constructor arguments
     template<typename T, typename... Args>
     T* emplace(Args&&... args){
+        requireTriviallyDestructible<T>();
         void* rawPtr = allocateRaw(sizeof(T), alignof(T));
         if(rawPtr == 0){
             return 0;
@@ -99,6 +122,14 @@ public:
     }
 
 private:
+    template<typename T>
+    static constexpr void requireTriviallyDestructible(){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "DataPool cannot release non-trivially destructible objects"
+        );
+    }
+
     std::size_t mOffsetBytes;
 };
 

@@ -19,8 +19,8 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 |---|---|---|---|---|
 | BUILD-01 | SOFTWARE VERIFIED | M0 | Make public headers self-contained and add a header-compilation check. | Native environment compiles; representative public headers compile alone. |
 | CNT-01 | SOFTWARE VERIFIED | BUILD-01 | Correct static byte capacity and test element/byte capacities across element sizes. | Tests fail on old expression and pass with `N*sizeof(T)`; sanitizer run has no OOB. |
-| CNT-02 | TODO | BUILD-01 | Audit vector/array/ring/pool construction, release, copying, alignment, and destruction. | Boundary and non-trivial probe tests define supported behavior; unsupported types get `static_assert`. |
-| LIFE-01 | TODO | CNT-02 | Replace fatal heap-storage/container destruction with RAII in reusable core. | Host teardown succeeds under ASan/UBSan with no leak attributable to tested types. |
+| CNT-02 | SOFTWARE VERIFIED | BUILD-01 | Audit vector/array/ring/pool construction, release, copying, alignment, and destruction. | Boundary and non-trivial probe tests define supported behavior; unsupported types get `static_assert`. |
+| LIFE-01 | SOFTWARE VERIFIED | CNT-02 | Replace fatal heap-storage/container destruction with RAII in reusable core. | Host teardown succeeds under ASan/UBSan with no leak attributable to tested types. |
 | TEST-01 | SOFTWARE VERIFIED | BUILD-01 | Add fake-clock and assertion test support usable by time/runtime tests. | Tests control time deterministically and can observe expected contract failures. |
 
 ## Milestone 2 — State and event contracts

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <new>
+#include <type_traits>
 #include <utility>
 #include "core/assert/Assert.h"
 
@@ -69,8 +70,21 @@ public:
         // nothing to do
     }
 
+    ~VectorBase(){
+        destroyAll();
+    }
+
+    VectorBase(const VectorBase&) = delete;
+    VectorBase& operator=(const VectorBase&) = delete;
+    VectorBase(VectorBase&&) = delete;
+    VectorBase& operator=(VectorBase&&) = delete;
+
     // Allocate uninitialized slot
     T* allocate(){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "allocate() is only supported for trivially destructible types; use construct/emplace otherwise"
+        );
         const bool full = (mSize >= Storage::capacityElements());
         AssertDebug(!full, "VectorBase", "allocate called when full");
         if(full){
@@ -82,12 +96,14 @@ public:
         return ptr;
     }
 
-    // Copy into uninitialized slot (no ctor)
+    // Copy-construct into the next slot.
     T* assign(const T& value){
-        T* ptr = allocate();
-        if(ptr != nullptr){
-            *ptr = value;
-        }
+        const bool full = (mSize >= Storage::capacityElements());
+        AssertDebug(!full, "VectorBase", "assign called when full");
+        if(full) return nullptr;
+        T* ptr = Storage::elementPtr(mSize);
+        new(ptr) T(value);
+        mSize++;
         return ptr;
     }
 
@@ -173,6 +189,10 @@ public:
 
     // Drop everything without destruction
     void releaseAll(){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "releaseAll() is only supported for trivially destructible types; use destroyAll otherwise"
+        );
         mSize = 0;
     }
 
@@ -203,6 +223,10 @@ public:
 
     // Release last element (no destructor)
     bool releaseLast(){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "releaseLast() is only supported for trivially destructible types; use destroyLast otherwise"
+        );
         if(mSize == 0){
             return false;
         }
@@ -213,6 +237,10 @@ public:
 
     // Release last element, copy it out
     bool releaseLast(T& out){
+        static_assert(
+            std::is_trivially_destructible<T>::value,
+            "releaseLast() is only supported for trivially destructible types; use destroyLast otherwise"
+        );
         if(mSize == 0){
             return false;
         }

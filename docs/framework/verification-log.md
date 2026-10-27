@@ -171,3 +171,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Re-requesting the active behaviour or screen clears any older pending switch immediately. Defensive apply paths also consume redundant requests.
 - Runtime tests prove submitted payload immutability, duplicate-submit rejection, cancellation of pending mode switches, coalescing of multiple state writes, and callback-generated publication in a later dispatch pass with correct pending/current/last values.
 - Verification: generated-output check is clean; 67/67 native ASan/UBSan tests pass; ESP32-S3 firmware builds at 30,432 bytes RAM and 890,765 bytes flash.
+
+## 2026-10-27 — CNT-02 and LIFE-01
+
+- Heap storage now owns and frees aligned raw allocations. Size multiplication is overflow-checked, allocation failure leaves an empty safe object, and copy/move operations cannot alias ownership.
+- Arrays, vectors, ring buffers, and masked arrays destroy every live object during normal teardown. Raw-storage containers are non-copyable/non-movable so object lifetimes cannot be duplicated with a bytewise copy.
+- Non-destructing vector/ring release operations and bump-pool construction are restricted at compile time to trivially destructible values. Vector `assign()` now copy-constructs rather than assigning into storage before object lifetime begins.
+- Pool alignment is checked for nonzero power-of-two fundamental alignment, and its offset/size arithmetic cannot wrap. Static zero-capacity storage retains a legal aligned backing byte without claiming capacity.
+- Lifetime probes cover arrays, masked arrays, partially populated vectors, and wrapped ring ownership. Tests also cover alignment, invalid pool alignment, and non-copyable ownership contracts.
+- Verification: 71/71 native ASan/UBSan tests pass; ESP32-S3 firmware builds at 30,432 bytes RAM and 891,317 bytes flash.
