@@ -40,8 +40,8 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 |---|---|---|---|---|
 | TIME-01 | SOFTWARE VERIFIED | TEST-01 | Specify/test modular timer wrap, zero duration, missed periods, and long stall behavior. | Boundary tests cross `UINT32_MAX`; no unbounded catch-up loop for supported inputs. |
 | PWM-01 | SOFTWARE VERIFIED | TIME-01 | Fix pre-start/first-cycle and immediate/deferred PWM reconfiguration. | Fake-clock tests cover 0%, 100%, both phase modes, pre-start changes, mid-cycle changes, and restart. |
-| HIST-01 | TODO | TIME-01, CNT-02 | Use safe interval, sum, and count widths for every advertised window. | Four-day simulated test at maximum configured input avoids overflow and samples at expected boundaries. |
-| HIST-02 | TODO | HIST-01 | Fix since-sequence overrun and sequence wrap semantics. | Tests cover empty/partial/full ring, consumer overrun, ring wrap, and sequence wrap. |
+| HIST-01 | SOFTWARE VERIFIED | TIME-01, CNT-02 | Use safe interval, sum, and count widths for every advertised window. | Four-day simulated test at maximum configured input avoids overflow and samples at expected boundaries. |
+| HIST-02 | SOFTWARE VERIFIED | HIST-01 | Fix since-sequence overrun and sequence wrap semantics. | Tests cover empty/partial/full ring, consumer overrun, ring wrap, and sequence wrap. |
 
 ## Milestone 4 — Synchronization and shutdown
 

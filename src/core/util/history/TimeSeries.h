@@ -28,12 +28,13 @@ public:
     uint16_t getTotalSize() const;
     uint16_t getAvailableSize() const;
     uint32_t getWriteSequence() const;
+    uint64_t getSampleIntervalMicros() const;
 
 private:
 
     // configuration
     const uint32_t mWindowSeconds;
-    const uint32_t mSampleIntervalMicros;
+    const uint64_t mSampleIntervalMicros;
     const SamplingMode mSamplingMode;
 
     // state
@@ -41,11 +42,11 @@ private:
     uint16_t mWriteIndex = 0;
     uint16_t mAvailableSize = 0;
     uint32_t mWriteSequence = 0;
-    uint32_t mLastSampleMicros = 0;
+    uint64_t mLastSampleMicros = 0;
 
     // average sampling mode
-    int32_t mAccumulatedValue = 0;
-    uint16_t mAccumulatedCount = 0;
+    int64_t mAccumulatedValue = 0;
+    uint64_t mAccumulatedCount = 0;
 
 public:
 
@@ -88,7 +89,7 @@ public:
 
         const TimeSeries& mSeries;
         uint32_t mTargetWriteSequence = 0;
-        uint32_t mCurrentWriteSequence = 0;
+        uint16_t mRemaining = 0;
         uint16_t mReadIndex = 0;
     };
 

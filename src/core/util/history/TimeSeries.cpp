@@ -1,5 +1,6 @@
 #include "TimeSeries.h"
 
+#include <limits>
 #include <new>
 
 #include "core/assert/Assert.h"
@@ -14,10 +15,16 @@ TimeSeries::TimeSeries(
     SamplingMode samplingMode):
     // initialize members
     mWindowSeconds(windowSeconds),
-    mSampleIntervalMicros(static_cast<uint64_t>(windowSeconds) * 1000000ull / static_cast<uint64_t>(sampleCount)),
+    mSampleIntervalMicros(
+        (windowSeconds > 0 && sampleCount > 0)
+            ? (static_cast<uint64_t>(windowSeconds) * 1000000ULL / sampleCount)
+            : 1ULL
+    ),
     mSamplingMode(samplingMode),
-    mBuffer(sampleCount){
+    mBuffer(sampleCount > 0 ? sampleCount : 1){
     // constructor body
+    AssertExit(windowSeconds > 0, "TimeSeries", "window must be positive");
+    AssertExit(sampleCount > 0, "TimeSeries", "sample count must be positive");
 }
 
 void TimeSeries::reset(){
@@ -31,21 +38,33 @@ void TimeSeries::reset(){
 
 void TimeSeries::tick(int32_t value){
 
-    const uint32_t nowMicros = Time::GetTickMicros();
+    const uint64_t nowMicros = Time::GetTickMicros64();
 
     // accumulate value if needed
     if(mSamplingMode == SamplingMode::Average){
+        const bool sumWouldOverflow =
+            (value > 0 && mAccumulatedValue > std::numeric_limits<int64_t>::max() - value)
+            || (value < 0 && mAccumulatedValue < std::numeric_limits<int64_t>::min() - value);
+        const bool countWouldOverflow = mAccumulatedCount == std::numeric_limits<uint64_t>::max();
+        if(sumWouldOverflow || countWouldOverflow){
+            TriggerExit("TimeSeries", "average accumulator overflow");
+            mAccumulatedValue = 0;
+            mAccumulatedCount = 0;
+        }
         mAccumulatedValue += value;
         mAccumulatedCount++;
     }
 
-    const uint32_t elapsedMicros = nowMicros - mLastSampleMicros;
+    const uint64_t elapsedMicros = nowMicros - mLastSampleMicros;
+    const bool firstSample = (mAvailableSize == 0);
 
-    if((elapsedMicros >= mSampleIntervalMicros) || (mWriteSequence == 0)){
+    if((elapsedMicros >= mSampleIntervalMicros) || firstSample){
 
         // write to ring buffer
         if(mSamplingMode == SamplingMode::Average){
-            const int32_t averagedValue = mAccumulatedValue / static_cast<int32_t>(mAccumulatedCount);
+            const int32_t averagedValue = static_cast<int32_t>(
+                mAccumulatedValue / static_cast<int64_t>(mAccumulatedCount)
+            );
 
             mBuffer[mWriteIndex] = averagedValue;
             mAccumulatedValue = 0;
@@ -62,11 +81,12 @@ void TimeSeries::tick(int32_t value){
             mAvailableSize++;
         }
 
-        if(mWriteSequence == 0){
+        if(firstSample){
             mLastSampleMicros = nowMicros;
         }
         else {
-            mLastSampleMicros += mSampleIntervalMicros;
+            const uint64_t elapsedPeriods = elapsedMicros / mSampleIntervalMicros;
+            mLastSampleMicros += elapsedPeriods * mSampleIntervalMicros;
         }
 
         mWriteSequence++;
@@ -90,6 +110,10 @@ uint16_t TimeSeries::getAvailableSize() const {
 
 uint32_t TimeSeries::getWriteSequence() const {
     return mWriteSequence;
+}
+
+uint64_t TimeSeries::getSampleIntervalMicros() const {
+    return mSampleIntervalMicros;
 }
 
 // ==============================================================================
@@ -128,11 +152,11 @@ int32_t TimeSeries::IteratorOldestToNewest::next(){
 TimeSeries::IteratorSinceSequence::IteratorSinceSequence(const TimeSeries& series, uint32_t lastSeenWriteSequence):
     // initialize members
     mSeries(series),
-    mTargetWriteSequence(series.mWriteSequence),
-    mCurrentWriteSequence(lastSeenWriteSequence){
+    mTargetWriteSequence(series.mWriteSequence){
     // constructor body
     const uint32_t unseenCount = mTargetWriteSequence - lastSeenWriteSequence;
     const uint32_t readableCount = (unseenCount < series.getAvailableSize()) ? unseenCount : series.getAvailableSize();
+    mRemaining = static_cast<uint16_t>(readableCount);
     if(series.mWriteIndex >= readableCount){
         mReadIndex = series.mWriteIndex - readableCount;
     }
@@ -142,14 +166,15 @@ TimeSeries::IteratorSinceSequence::IteratorSinceSequence(const TimeSeries& serie
 }
 
 bool TimeSeries::IteratorSinceSequence::hasNext() const {
-    return (mCurrentWriteSequence < mTargetWriteSequence);
+    return (mRemaining > 0);
 }
 
 int32_t TimeSeries::IteratorSinceSequence::next(){
-    AssertDebug((mCurrentWriteSequence < mTargetWriteSequence), "TimeSeries", "iterator exhausted");
+    AssertDebug((mRemaining > 0), "TimeSeries", "iterator exhausted");
+    if(mRemaining == 0) return 0;
     const int32_t value = mSeries.mBuffer[mReadIndex];
     mReadIndex = MathUtils::Wrap<uint16_t>(mReadIndex + 1, mSeries.getTotalSize());
-    mCurrentWriteSequence++;
+    mRemaining--;
     return value;
 }
 

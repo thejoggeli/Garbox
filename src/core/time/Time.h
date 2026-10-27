@@ -15,6 +15,10 @@ public:
     // wraps every ~71.6 minutes (32-bit)
     static uint32_t GetMicros();
 
+    // monotonic microsecond timer for long-duration scheduling
+    // not safe to call in ISR
+    static uint64_t GetMicros64();
+
     // millisecond timer
     // not safe to call in ISR 
     // wraps every ~49.7 days (32-bit)
@@ -37,6 +41,7 @@ public:
 
     // last tick time snapshot accessors
     static uint32_t GetTickMicros();
+    static uint64_t GetTickMicros64();
     static uint32_t GetTickMillis();
     static uint32_t GetTickSeconds();
 

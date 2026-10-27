@@ -6,6 +6,7 @@ namespace {
 
 uint64_t gMicros = 0;
 uint32_t gTickMicros = 0;
+uint64_t gTickMicros64 = 0;
 uint32_t gTickMillis = 0;
 uint32_t gTickSeconds = 0;
 uint32_t gTickDeltaMicros = 0;
@@ -18,6 +19,7 @@ namespace GarboxTest::FakeTime {
 void Reset(uint64_t micros){
     gMicros = micros;
     gTickMicros = static_cast<uint32_t>(micros);
+    gTickMicros64 = micros;
     gTickMillis = static_cast<uint32_t>(micros / 1000ULL);
     gTickSeconds = static_cast<uint32_t>(micros / 1000000ULL);
     gTickDeltaMicros = 0;
@@ -41,24 +43,31 @@ uint64_t GetMicros64(){
 namespace Garbox {
 
 void Time::Start(){
-    gTickMicros = GetMicros();
-    gTickMillis = GetMillis();
-    gTickSeconds = GetSeconds();
+    gTickMicros64 = GetMicros64();
+    gTickMicros = static_cast<uint32_t>(gTickMicros64);
+    gTickMillis = static_cast<uint32_t>(gTickMicros64 / 1000ULL);
+    gTickSeconds = static_cast<uint32_t>(gTickMicros64 / 1000000ULL);
     gTickDeltaMicros = 0;
     gTickDeltaSeconds = 0.0f;
 }
 
 void Time::Tick(){
-    const uint32_t nowMicros = GetMicros();
+    const uint64_t nowMicros64 = GetMicros64();
+    const uint32_t nowMicros = static_cast<uint32_t>(nowMicros64);
     gTickDeltaMicros = nowMicros - gTickMicros;
     gTickDeltaSeconds = static_cast<float>(gTickDeltaMicros) * 1e-6f;
     gTickMicros = nowMicros;
-    gTickMillis = GetMillis();
-    gTickSeconds = GetSeconds();
+    gTickMicros64 = nowMicros64;
+    gTickMillis = static_cast<uint32_t>(nowMicros64 / 1000ULL);
+    gTickSeconds = static_cast<uint32_t>(nowMicros64 / 1000000ULL);
 }
 
 uint32_t Time::GetMicros(){
     return static_cast<uint32_t>(gMicros);
+}
+
+uint64_t Time::GetMicros64(){
+    return gMicros;
 }
 
 uint32_t Time::GetMillis(){
@@ -79,6 +88,10 @@ uint32_t Time::CpuCyclesToMicros(uint32_t cycles){
 
 uint32_t Time::GetTickMicros(){
     return gTickMicros;
+}
+
+uint64_t Time::GetTickMicros64(){
+    return gTickMicros64;
 }
 
 uint32_t Time::GetTickMillis(){

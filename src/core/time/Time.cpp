@@ -11,6 +11,7 @@ namespace Garbox {
 static constexpr uint32_t CpuFreqMhz = static_cast<uint32_t>(F_CPU / 1000000UL);
 
 static volatile uint32_t gTickMicros = 0;
+static volatile uint64_t gTickMicros64 = 0;
 static volatile uint32_t gTickMillis = 0;
 static volatile uint32_t gTickSeconds = 0;
 
@@ -28,27 +29,33 @@ static inline uint32_t IRAM_ATTR readCycleCount(){
 
 void Time::Start(){
     taskENTER_CRITICAL(&gTimeMux);
-    gTickMicros = GetMicros();
-    gTickMillis = GetMillis();
-    gTickSeconds = GetSeconds();
+    const uint64_t nowMicros = GetMicros64();
+    gTickMicros64 = nowMicros;
+    gTickMicros = static_cast<uint32_t>(nowMicros);
+    gTickMillis = static_cast<uint32_t>(nowMicros / 1000ULL);
+    gTickSeconds = static_cast<uint32_t>(nowMicros / 1000000ULL);
     taskEXIT_CRITICAL(&gTimeMux);
 }
 
 void Time::Tick(){
     taskENTER_CRITICAL(&gTimeMux);
-    const uint32_t nowMicros = GetMicros();
-    const uint32_t nowMillis = GetMillis();
-    const uint32_t newSeconds = GetSeconds();
+    const uint64_t nowMicros64 = GetMicros64();
+    const uint32_t nowMicros = static_cast<uint32_t>(nowMicros64);
     gTickDeltaMicros = nowMicros - gTickMicros;
     gTickDeltaSeconds = static_cast<float>(gTickDeltaMicros) * 1e-6f;
+    gTickMicros64 = nowMicros64;
     gTickMicros = nowMicros;
-    gTickMillis = nowMillis;
-    gTickSeconds = newSeconds;
+    gTickMillis = static_cast<uint32_t>(nowMicros64 / 1000ULL);
+    gTickSeconds = static_cast<uint32_t>(nowMicros64 / 1000000ULL);
     taskEXIT_CRITICAL(&gTimeMux);
 }
 
 uint32_t Time::GetMicros(){
-    return static_cast<uint32_t>(esp_timer_get_time());
+    return static_cast<uint32_t>(GetMicros64());
+}
+
+uint64_t Time::GetMicros64(){
+    return static_cast<uint64_t>(esp_timer_get_time());
 }
 
 uint32_t Time::GetMillis(){
@@ -69,6 +76,13 @@ uint32_t Time::CpuCyclesToMicros(uint32_t cycles){
 
 uint32_t Time::GetTickMicros()  { 
     return gTickMicros; 
+}
+
+uint64_t Time::GetTickMicros64(){
+    taskENTER_CRITICAL(&gTimeMux);
+    const uint64_t result = gTickMicros64;
+    taskEXIT_CRITICAL(&gTimeMux);
+    return result;
 }
 
 uint32_t Time::GetTickMillis(){ 

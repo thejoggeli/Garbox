@@ -16,6 +16,7 @@ void test_fake_time_controls_tick_snapshots(){
     Time::Start();
 
     TEST_ASSERT_EQUAL_UINT32(1'250'000U, Time::GetTickMicros());
+    TEST_ASSERT_EQUAL_UINT64(1'250'000ULL, Time::GetTickMicros64());
     TEST_ASSERT_EQUAL_UINT32(1'250U, Time::GetTickMillis());
     TEST_ASSERT_EQUAL_UINT32(1U, Time::GetTickSeconds());
     TEST_ASSERT_EQUAL_UINT32(0U, Time::GetTickDeltaMicros());
@@ -38,6 +39,7 @@ void test_fake_time_exposes_modular_microsecond_wrap(){
     Time::Tick();
 
     TEST_ASSERT_EQUAL_UINT32(15U, Time::GetTickMicros());
+    TEST_ASSERT_EQUAL_UINT64(start + 25U, Time::GetTickMicros64());
     TEST_ASSERT_EQUAL_UINT32(25U, Time::GetTickDeltaMicros());
 }
 

@@ -180,3 +180,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Pool alignment is checked for nonzero power-of-two fundamental alignment, and its offset/size arithmetic cannot wrap. Static zero-capacity storage retains a legal aligned backing byte without claiming capacity.
 - Lifetime probes cover arrays, masked arrays, partially populated vectors, and wrapped ring ownership. Tests also cover alignment, invalid pool alignment, and non-copyable ownership contracts.
 - Verification: 71/71 native ASan/UBSan tests pass; ESP32-S3 firmware builds at 30,432 bytes RAM and 891,317 bytes flash.
+
+## 2026-10-27 — HIST-01 and HIST-02
+
+- Added a coherent 64-bit monotonic microsecond snapshot alongside the existing 32-bit modular clock. Multi-day history no longer depends on a counter that wraps every 71.6 minutes.
+- History sample intervals, last-boundary timestamps, average sums, and counts now use widths suitable for every configured window. Invalid zero-sized configurations and accumulator overflow are explicit contract failures with safe post-failure state.
+- Late ticks advance directly to the most recent sample boundary instead of creating a prolonged synthetic catch-up sequence.
+- Since-sequence iteration tracks a bounded readable count rather than comparing wrapped sequence numbers. An overrun returns the retained ring exactly once, and `UINT32_MAX` sequence wrap remains valid.
+- Tests cover the exact four-day/65-point interval, a 70,001-value high-rate average bucket, partial/full/overrun reads, and write-sequence wrap.
+- Verification: generated-output check is clean; 75/75 native ASan/UBSan tests pass; ESP32-S3 firmware builds at 30,448 bytes RAM and 891,977 bytes flash.
