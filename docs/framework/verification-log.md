@@ -234,3 +234,11 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Removed destructor failures whose only rationale was that `std::function` may allocate. Component bases now have a virtual normal destructor; FSM buttons, FSM storage, and the ST7789 callback wrapper tear down normally.
 - RGB LED wrappers now own and release their NeoPixel allocations, reject use before successful initialization, retain the current single-pixel color correctly, avoid filling an entire strip once per pixel, and reject non-finite brightness conversion.
 - Verification: 94/94 native ASan/UBSan tests pass; the desktop LVGL simulator and complete 19-step UI flow pass; the ESP32-S3 firmware builds successfully at 30,608 bytes RAM and 895,217 bytes flash. Task/DMA/display objects with asynchronous hardware ownership remain process-lifetime and require coordinated target teardown work rather than speculative destructors.
+
+## 2026-10-27 — scheduler, dirty-dispatch, and PWM boundaries
+
+- Dirty-dispatch registration and indexing now reject null, exhausted, and out-of-range requests without continuing into storage. Dispatch processes a bounded snapshot, so callback-generated dirtiness is deferred to the next pass instead of being lost or forming an unbounded self-requeue loop.
+- Empty time-slot schedulers are inert after reporting their invalid configuration; diagnostic indexing has a safe recovery result, slot indexes no longer truncate at 255, timing maxima are unsigned, and reported frequency is normalized by the actual elapsed measurement window.
+- Software PWM rejects NaN/infinite duty values and places invalid constructor values into a deterministic heater-off fallback instead of converting NaN to an integer threshold.
+- LED and piezo task startup now returns after invalid initialization/frequency contracts, and tick delays have a one-tick floor so frequencies above the RTOS tick rate cannot create a zero-delay busy loop. Stop-handler registration similarly rejects null/capacity failures without writing past its fixed array.
+- Verification: 98/98 native ASan/UBSan tests pass. The ESP32-S3 firmware builds successfully at 30,600 bytes RAM and 895,581 bytes flash. Physical task cadence remains hardware-gated.

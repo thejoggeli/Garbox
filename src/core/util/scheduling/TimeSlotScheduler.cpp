@@ -8,6 +8,9 @@ namespace Garbox {
 TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
 
     AssertExit(configs.size() > 0, "TimeSlotScheduler", "minimum one slot required");
+    if(configs.size() == 0){
+        return;
+    }
 
     // determine maximum index to size mDiagnostics
     uint8_t maxIndex = 0;
@@ -22,6 +25,7 @@ TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
     for (Diagnostics& diagnostics : mDiagnostics){
         diagnostics.maxTimeMicros = 0;
         diagnostics.maxTimeAllMicros = 0;
+        diagnostics.maxDurationMicros = 0;
         diagnostics.frequencyCount = 0;
         diagnostics.frequencyHz = 0;
         diagnostics.minDurationMicros = UINT32_MAX; // start large so we can find min
@@ -54,6 +58,10 @@ TimeSlotScheduler::TimeSlotScheduler(std::initializer_list<SlotConfig> configs){
 }
 
 void TimeSlotScheduler::run(){
+
+    if(mSlots.empty()){
+        return;
+    }
 
     uint32_t currentTickTimeMicros = Time::GetMicros();
 
@@ -97,8 +105,9 @@ void TimeSlotScheduler::run(){
         mNextSlotIndex = 0;
 
         // once per second snapshot and reset frequency counts
-        if ((currentTickTimeMicros - mLastFrequencyTimeMicros) >= 1'000'000){
-            updateDiagnosticsFrequencies();
+        const uint32_t frequencyElapsedMicros = currentTickTimeMicros - mLastFrequencyTimeMicros;
+        if (frequencyElapsedMicros >= 1'000'000){
+            updateDiagnosticsFrequencies(frequencyElapsedMicros);
             mLastFrequencyTimeMicros = currentTickTimeMicros;
         }
     }
@@ -108,15 +117,19 @@ void TimeSlotScheduler::run(){
     mLastSlotDurationMicros = slot.durationMicros;
 }
 
-void TimeSlotScheduler::updateDiagnosticsFrequencies(){
+void TimeSlotScheduler::updateDiagnosticsFrequencies(uint32_t elapsedMicros){
     for (Diagnostics& diag : mDiagnostics){
-        diag.frequencyHz = diag.frequencyCount;
+        const uint64_t scaledCount = static_cast<uint64_t>(diag.frequencyCount) * 1'000'000ULL;
+        diag.frequencyHz = static_cast<uint32_t>(scaledCount / elapsedMicros);
         diag.frequencyCount = 0;
     }
 }
 
 const TimeSlotScheduler::Diagnostics& TimeSlotScheduler::getDiagnostics(uint8_t index) const {
-    return mDiagnostics[index];
+    static const Diagnostics EmptyDiagnostics {};
+    const bool validIndex = index < mDiagnostics.size();
+    AssertExit(validIndex, "TimeSlotScheduler", "diagnostics index out of range");
+    return validIndex ? mDiagnostics[index] : EmptyDiagnostics;
 }
 
 std::size_t TimeSlotScheduler::getSlotCount() const {

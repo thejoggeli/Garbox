@@ -15,7 +15,11 @@ static std::array<TaskManager::StopHandler, MaxStopHandlersCount> sStopHandlers;
 static uint32_t sStopHandlersCount = 0;
 
 void TaskManager::RegisterStopHandler(StopHandler handler){
-    AssertExit(sStopHandlersCount < MaxStopHandlersCount, "TaskManager", "max tasks count exceeded");
+    const bool valid = handler && sStopHandlersCount < MaxStopHandlersCount;
+    AssertExit(valid, "TaskManager", "invalid handler or max tasks count exceeded");
+    if(!valid){
+        return;
+    }
     sStopHandlers[sStopHandlersCount++] = handler;
 }
 

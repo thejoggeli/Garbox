@@ -1,5 +1,6 @@
 #include "AnimatedLedGroup.h"
 
+#include <algorithm>
 #include "core/assert/Assert.h"
 #include "core/diagnostics/Profiler.h"
 #include "core/log/Log.h"
@@ -39,6 +40,9 @@ void AnimatedLedGroup::startTask(const char* taskName, uint32_t frequencyHz, uin
     // check state
     AssertExit(mInitialized, "AnimatedLedGroup", "not initialized");
     AssertExit(frequencyHz > 0, "AnimatedLedGroup", "task frequency must be > 0");
+    if(!mInitialized || frequencyHz == 0){
+        return;
+    }
     
     // set before task starts!
     mTaskFrequencyHz = frequencyHz;
@@ -63,8 +67,8 @@ const Task& AnimatedLedGroup::getTask() const {
 void AnimatedLedGroup::handleTask(const TaskStopToken& stopToken){
     
     // task timing
-    const uint32_t periodMillis = 1000.0f / mTaskFrequencyHz;
-    const TickType_t periodTicks = pdMS_TO_TICKS(periodMillis);
+    const uint32_t periodMillis = 1000U / mTaskFrequencyHz;
+    const TickType_t periodTicks = std::max<TickType_t>(1, pdMS_TO_TICKS(periodMillis));
     TickType_t lastWake = xTaskGetTickCount();
 
     // loop task forever

@@ -1,5 +1,6 @@
 #include "SoftwarePwm.h"
 
+#include <cmath>
 #include "core/assert/Assert.h"
 
 namespace Garbox {
@@ -12,9 +13,18 @@ SoftwarePwm::SoftwarePwm(float duty, uint32_t periodMicros):
     mCurrentDutyCycle(duty),
     mNextDutyCycle(duty){
     // constructor body
-    AssertExit(periodMicros > 0, "SoftwarePwm", "invalid period value");
-    AssertExit(duty >= 0.0f, "SoftwarePwm", "invalid duty value < 0");
-    AssertExit(duty <= 1.0f, "SoftwarePwm", "invalid duty value > 1");
+    const bool validPeriod = periodMicros > 0;
+    const bool validDuty = std::isfinite(duty) && duty >= 0.0f && duty <= 1.0f;
+    AssertExit(validPeriod, "SoftwarePwm", "invalid period value");
+    AssertExit(validDuty, "SoftwarePwm", "invalid duty value");
+    if(!validPeriod){
+        mCurrentPeriodDurationMicros = 1;
+        mNextPeriodDurationMicros = 1;
+    }
+    if(!validDuty){
+        mCurrentDutyCycle = 0.0f;
+        mNextDutyCycle = 0.0f;
+    }
     updateThreshold();
 }
 
@@ -159,7 +169,7 @@ void SoftwarePwm::setPeriodDurationMicros(uint32_t durationMicros, bool finishCu
 
 void SoftwarePwm::setDutyCycle(float duty, bool finishCurrent){
     // duty cycle must be between 0 and 1
-    if(duty < 0.0f || duty > 1.0f){
+    if(!std::isfinite(duty) || duty < 0.0f || duty > 1.0f){
         TriggerDebug("SoftwarePwm", "invalid duty value");
         return; 
     }

@@ -26,11 +26,10 @@ public:
     void clearAllDirty();
     void dispatch();
 
-    bool isMarkedDirty(uint32_t index) const { return mHandlers[index].dirty; }
+    bool isMarkedDirty(uint32_t index) const;
     uint32_t getDirtyCount() const { return mQueue.size(); }
 
 private:
-    bool mInitialized = false;
     VectorHeap<HandlerEntry> mHandlers;
     RingBufferHeap<HandlerEntry*> mQueue;
 };

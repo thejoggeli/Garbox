@@ -1,5 +1,6 @@
 #include "PiezoPlayer.h"
 
+#include <algorithm>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -55,6 +56,9 @@ void PiezoPlayer::startTask(const char* name, uint32_t frequencyHz, uint32_t sta
     // check state
     AssertExit(mInitialized, "PiezoPlayer", "not initialized");
     AssertExit(frequencyHz > 0, "PiezoPlayer", "task frequency must be > 0");
+    if(!mInitialized || frequencyHz == 0){
+        return;
+    }
     
     // set before task starts!
     mTaskFrequencyHz = frequencyHz;
@@ -80,8 +84,8 @@ void PiezoPlayer::stopTask(){
 void PiezoPlayer::handleTask(const TaskStopToken& stopToken){
 
     // task timing
-    const uint32_t periodMillis = static_cast<uint32_t>(1000.0f / mTaskFrequencyHz);
-    const TickType_t periodTicks = pdMS_TO_TICKS(periodMillis);
+    const uint32_t periodMillis = 1000U / mTaskFrequencyHz;
+    const TickType_t periodTicks = std::max<TickType_t>(1, pdMS_TO_TICKS(periodMillis));
     TickType_t lastWake = xTaskGetTickCount();
 
     // loop forever

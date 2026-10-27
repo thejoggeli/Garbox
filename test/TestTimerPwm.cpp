@@ -5,6 +5,7 @@
 
 #include "core/time/SoftwarePwm.h"
 #include "core/time/SoftwareTimer.h"
+#include "helpers/AssertHelper.h"
 #include "helpers/FakeTime.h"
 
 using namespace Garbox;
@@ -238,6 +239,21 @@ void test_pwm_silent_stop_resets_without_invoking_handler(){
     TEST_ASSERT_EQUAL_UINT32(1U, callbackCount);
 }
 
+void test_pwm_rejects_nonfinite_duty_and_recovers_invalid_constructor_values(){
+    TEST_RESET_ASSERTS();
+    SoftwarePwm recovered(std::numeric_limits<float>::quiet_NaN(), 0U);
+    TEST_ASSERT_EXIT_CALLED();
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, recovered.getCurrentDutyCycle());
+    TEST_ASSERT_EQUAL_UINT32(1U, recovered.getCurrentPeriodDurationMicros());
+
+    TEST_RESET_ASSERTS();
+    SoftwarePwm pwm(0.5f, 100U);
+    pwm.setDutyCycle(std::numeric_limits<float>::infinity());
+    TEST_ASSERT_DEBUG_CALLED();
+    TEST_ASSERT_EQUAL_FLOAT(0.5f, pwm.getCurrentDutyCycle());
+    TEST_ASSERT_EQUAL_FLOAT(0.5f, pwm.getNextDutyCycle());
+}
+
 } // namespace
 
 void RegisterTimerPwmTests(){
@@ -253,4 +269,5 @@ void RegisterTimerPwmTests(){
     RUN_TEST(test_pwm_deferred_and_immediate_period_changes_have_distinct_boundaries);
     RUN_TEST(test_pwm_stop_reconfigure_and_restart);
     RUN_TEST(test_pwm_silent_stop_resets_without_invoking_handler);
+    RUN_TEST(test_pwm_rejects_nonfinite_duty_and_recovers_invalid_constructor_values);
 }
