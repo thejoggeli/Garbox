@@ -117,6 +117,7 @@ void I2cPartsController::updateTemperatureStatus(){
 void I2cPartsController::updateTemperatureSample(){
     states().temperatureSample.setTemperatureCelcius(mTemperatureSensor.getTemperatureCelcius());
     states().temperatureSample.setHumidityRelative(mTemperatureSensor.getHumidityRelative());
+    states().temperatureSample.setSampleMicros(Time::GetTickMicros64());
     states().temperatureSample.markDirty();
 }
 

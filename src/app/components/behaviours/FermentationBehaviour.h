@@ -13,6 +13,14 @@ class FermentationBehaviour : public FermentationBehaviourAbs {
 
 private:
 
+    static constexpr uint64_t MaxTemperatureSampleAgeMicros = 3'000'000ULL;
+    static constexpr float MinPlausibleTemperatureCelcius = -20.0f;
+    static constexpr float MaxPlausibleTemperatureCelcius = 80.0f;
+    static constexpr float MinPlausibleHumidityRelative = 0.0f;
+    static constexpr float MaxPlausibleHumidityRelative = 100.0f;
+    static constexpr float MinTargetTemperatureCelcius = 15.0f;
+    static constexpr float MaxTargetTemperatureCelcius = 50.0f;
+
     HeatpadCommandPayload mLastHeatpadCommand; 
     FanCommandPayload mLastFanCommand;
 

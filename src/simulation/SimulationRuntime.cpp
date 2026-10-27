@@ -469,8 +469,11 @@ void SimulationRuntime::publishInputs(){
     mTemperatureStatus.setHasFirstSample(mInputs.sensorAvailable);
     mTemperatureStatus.setIsRunning(mInputs.sensorAvailable);
 
-    mTemperatureSample.setTemperatureCelcius(mInputs.temperatureCelcius);
-    mTemperatureSample.setHumidityRelative(mInputs.humidityRelative);
+    if(mInputs.sensorAvailable && mInputs.sensorSampleUpdated){
+        mTemperatureSample.setTemperatureCelcius(mInputs.temperatureCelcius);
+        mTemperatureSample.setHumidityRelative(mInputs.humidityRelative);
+        mTemperatureSample.setSampleMicros(Time::GetTickMicros64());
+    }
 
     mFanStatus.setState(mInputs.fanStalled ? FanState::Stalled : FanState::Enabled);
     mFanStatus.setTargetSpeed(mOutputs.fan.targetSpeed);

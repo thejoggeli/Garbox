@@ -39,6 +39,7 @@ class SimulationRuntime final : public RuntimeAbs {
 public:
     struct Inputs {
         bool sensorAvailable = false;
+        bool sensorSampleUpdated = true;
         float temperatureCelcius = 20.0f;
         float humidityRelative = 50.0f;
         bool fanStalled = false;

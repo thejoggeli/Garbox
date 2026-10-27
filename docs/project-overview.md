@@ -106,9 +106,9 @@ The fermentation behavior currently sends duty-style speed commands and does not
 | `OverTemperature` | Off | 100% | Measured temperature is more than 2 °C above target. |
 | `Cooldown` | Off | 100% | Regulation was disabled above 30 °C. |
 
-The heater PID constants are currently `Kp=0.05`, `Ki=0.02`, `Kd=0`, with output clamped to 0–100%. The engine delays exit from over-temperature for ten seconds unless the target is changed so the reading is no longer over target.
+The heater PID constants are currently `Kp=0.05`, `Ki=0.02`, `Kd=0`, with output clamped to 0–100% and conditional integration that can unwind saturation. Invalid/non-positive time steps and non-finite inputs retain the last bounded output. The engine delays exit from over-temperature for ten seconds unless the target is changed so the reading is no longer over target.
 
-`FermentationBehaviour` translates shared states into engine inputs and translates engine outputs into fan/heater command events. It also accepts UI requests to toggle power, change the target, and choose automatic or manual fan control. Manual fan output is allowed during normal/off operation, while invalid-input, over-temperature, and cooldown states always override it with the engine's full safety-cooling request.
+`FermentationBehaviour` translates shared states into engine inputs and translates engine outputs into fan/heater command events. A usable temperature sample requires powered/running sensor status, a first sample no older than three seconds, finite temperature/humidity, and plausible bounds. Target requests are finite and clamped to 15–50 °C. The behavior also accepts requests to toggle power and choose automatic or manual fan control. Manual fan output is allowed during normal/off operation, while invalid-input, over-temperature, and cooldown states always override it with the engine's full safety-cooling request.
 
 ### Input and feedback
 

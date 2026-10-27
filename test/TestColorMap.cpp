@@ -16,6 +16,7 @@ void RegisterSimulationTests();
 void RegisterSafeOutputRegistryTests();
 void RegisterLvglGeometryTests();
 void RegisterHistoryTests();
+void RegisterPidControlTests();
 void RegisterStateTests();
 void RegisterSynchronizationTests();
 void RegisterTaskTests();
@@ -465,6 +466,7 @@ int main(int argc, char **argv){
     RegisterSafeOutputRegistryTests();
     RegisterLvglGeometryTests();
     RegisterHistoryTests();
+    RegisterPidControlTests();
     RegisterStateTests();
     RegisterSynchronizationTests();
     RegisterTaskTests();

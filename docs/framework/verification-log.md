@@ -197,3 +197,12 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Chart catch-up inherits the bounded overrun and wrap-correct iterator proven under HIST-02; the complete flow exercises attachment, periodic updates, and history-window changes through the production adapter.
 - Rebuilt and exercised all home, trend/menu, diagnostics-scroll, event-log, and state-log paths. Nineteen fresh 320x240 frames were reviewed together; no clipping, unintended scrollbar, padding, border, or chart-grid regression was found.
 - Verification: desktop LVGL build and complete UI flow pass; ESP32-S3 firmware builds at 30,448 bytes RAM and 892,317 bytes flash.
+
+## 2026-10-27 — APP-02 and input fail-safe cleanup
+
+- Temperature samples now carry a generated 64-bit acquisition timestamp written by the physical controller. Regulation requires power, running/first-sample status, age at most three seconds, finite values, temperature from -20 to 80 °C, and humidity from 0 to 100%.
+- The simulator can independently hold sensor transport status active while withholding new samples. Regression scenarios prove stale, NaN, and implausible readings force `InvalidInput`, heater off, and full safety fan.
+- Target requests reject NaN/infinity and clamp to the supported 15–50 °C range. Non-finite manual fan speed becomes zero rather than entering actuator state.
+- PID steps reject non-finite/non-positive timing without corrupting state. Conditional integration now discards only changes that drive farther into the active limit, so opposite-sign error can unwind a saturated controller.
+- Removed the deliberate fatal assertion reached by a long encoder-button hold. Audible repeat feedback now saturates safely at 3 kHz, including counter arithmetic overflow protection.
+- Verification: all nine generator regressions pass with resource warnings fatal; generated-output check is clean; 80/80 native ASan/UBSan tests pass; complete desktop UI flow passes; ESP32-S3 firmware builds at 30,480 bytes RAM and 893,273 bytes flash.

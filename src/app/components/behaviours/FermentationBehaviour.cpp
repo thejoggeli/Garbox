@@ -1,6 +1,9 @@
 #include "FermentationBehaviour.h"
 
+#include <cmath>
+
 #include "core/log/Log.h"
+#include "core/time/Time.h"
 #include "core/time/TimeLiterals.h"
 #include "core/util/math/MathUtils.h"
 
@@ -120,18 +123,50 @@ void FermentationBehaviour::onRequestFermentationModeEvent(const RequestFermenta
 }
 
 void FermentationBehaviour::onRequestTargetTemperatureEvent(const RequestTargetTemperatureEvent& event){
-    states().fermentationStatus.setTargetTemperature(event->targetTemperature);
+    if(!std::isfinite(event->targetTemperature)){
+        TriggerDebug("FermentationBehaviour", "ignored non-finite target temperature");
+        return;
+    }
+    states().fermentationStatus.setTargetTemperature(MathUtils::Clamp(
+        event->targetTemperature,
+        MinTargetTemperatureCelcius,
+        MaxTargetTemperatureCelcius
+    ));
 }
 
 void FermentationBehaviour::onRequestFanModeEvent(const RequestFanModeEvent& event){
     states().fermentationStatus.setFanAuto(event->autoFan);
+    const float manualSpeed = std::isfinite(event->manualSpeed) ? event->manualSpeed : 0.0f;
     states().fermentationStatus.setFanManualSpeed(
-        MathUtils::Clamp(event->manualSpeed, 0.0f, 1.0f));
+        MathUtils::Clamp(manualSpeed, 0.0f, 1.0f));
 }
 
 bool FermentationBehaviour::checkTemperatureStatus(){
     const TemperatureStatusState& status = states().temperatureStatus;
-    return status.getPowerEnabled() && status.getDriverEnabled() && !status.getResetting();
+    const TemperatureSampleState& sample = states().temperatureSample;
+    if(!status.getPowerEnabled()
+        || !status.getDriverEnabled()
+        || status.getResetting()
+        || !status.getHasFirstSample()
+        || !status.getIsRunning()){
+        return false;
+    }
+
+    const uint64_t nowMicros = Time::GetTickMicros64();
+    const uint64_t sampleMicros = sample.getSampleMicros();
+    if(sampleMicros > nowMicros
+        || (nowMicros - sampleMicros) > MaxTemperatureSampleAgeMicros){
+        return false;
+    }
+
+    const float temperature = sample.getTemperatureCelcius();
+    const float humidity = sample.getHumidityRelative();
+    return std::isfinite(temperature)
+        && temperature >= MinPlausibleTemperatureCelcius
+        && temperature <= MaxPlausibleTemperatureCelcius
+        && std::isfinite(humidity)
+        && humidity >= MinPlausibleHumidityRelative
+        && humidity <= MaxPlausibleHumidityRelative;
 }
 
 void FermentationBehaviour::onFanSampleStateChanged(const FanSampleState& state){

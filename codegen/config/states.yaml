@@ -58,3 +58,4 @@ states:
     fields:
       - { name: temperatureCelcius, type: float }
       - { name: humidityRelative, type: float }
+      - { name: sampleMicros, type: uint64_t }

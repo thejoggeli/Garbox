@@ -78,7 +78,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 | ID | Status | Depends on | Work | Acceptance and verification |
 |---|---|---|---|---|
 | APP-01 | SOFTWARE VERIFIED | STATE-01, PWM-01 | Add host tests for fermentation state/output transitions and startup-disabled policy. | Deterministic tests cover invalid input, overtemperature, cooldown, enable/disable, target changes, and a closed-loop plant. |
-| APP-02 | IN PROGRESS | APP-01 | Correct safety-fan precedence, sensor freshness/validity, and PID anti-windup. | Safety-fan precedence is fixed and covered. Sensor freshness and PID recovery remain. |
+| APP-02 | SOFTWARE VERIFIED | APP-01 | Correct safety-fan precedence, sensor freshness/validity, and PID anti-windup. | Safety-fan precedence is fixed and covered. Sensor freshness and PID recovery remain. |
 | APP-03 | TODO | SAFE-01, APP-02 | Add independent software safety supervisor contract. | Tests cover absolute limit, stale/implausible sensor, and command/measurement mismatch; physical protection remains documented. |
 | APP-04 | HARDWARE BLOCKED | APP-03 | Validate real sensor, fan tachometer, heater-off path, electrical limits, and failure behavior without uncontrolled heating. | Coordinated hardware checklist completed. |
 

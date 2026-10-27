@@ -1,5 +1,7 @@
 #include "FermentationEngine.h"
 
+#include <cmath>
+
 #include "core/assert/Assert.h"
 #include "core/log/Log.h"
 #include "core/time/Time.h"
@@ -211,7 +213,12 @@ bool FermentationEngine::isInOverTemperatureZone() const {
 }
 
 bool FermentationEngine::isInputInvalid() const {
-    return !mInput.measuredTemperatureValid || !mInput.measuredHumidityValid || mInput.fanStalled; 
+    return !mInput.measuredTemperatureValid
+        || !mInput.measuredHumidityValid
+        || !std::isfinite(mInput.measuredTemperature)
+        || !std::isfinite(mInput.measuredHumidity)
+        || !std::isfinite(mInput.targetTemperature)
+        || mInput.fanStalled;
 }
 
 } // namespace

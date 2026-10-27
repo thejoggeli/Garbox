@@ -1,5 +1,7 @@
 #include "InputController.h"
 
+#include <algorithm>
+
 #include "app/providers/PartsProvider.h"
 #include "app/providers/PiezoSequences.h"
 #include "core/assert/Assert.h"
@@ -78,12 +80,12 @@ void InputController::handleButtonStateChanged(ButtonState oldState, ButtonState
 }
 
 void InputController::handleButtonHold(uint32_t counter, uint32_t holdTimeMicros){
-    const uint32_t frequency = 300 + counter * 100;
+    constexpr uint32_t MaximumFeedbackFrequency = 3000;
+    const uint64_t requestedFrequency = 300ULL + static_cast<uint64_t>(counter) * 100ULL;
+    const uint32_t frequency = static_cast<uint32_t>(
+        std::min<uint64_t>(requestedFrequency, MaximumFeedbackFrequency));
     const uint32_t deadTime = 0;
-    if(frequency > 3000){
-        TriggerExit("InputController", "Testing");
-    }
-    else if(!mPiezoPlayer.isPlaying()){
+    if(!mPiezoPlayer.isPlaying()){
         mPiezoPlayer.playTone(Tone(100_ms, frequency), deadTime);
     }
     // send button repeat event
