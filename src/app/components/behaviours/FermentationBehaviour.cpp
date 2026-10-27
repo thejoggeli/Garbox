@@ -40,8 +40,17 @@ void FermentationBehaviour::onBecomeDisabled(){
 }
 
 void FermentationBehaviour::onLogicTick(){
-    
-    const bool temperatureStatusValid = checkTemperatureStatus();
+    const TemperatureSampleState& temperatureSample = states().temperatureSample;
+    mSafetySupervisor.update(FermentationSafetySupervisor::Input {
+        .regulationRequested = states().fermentationStatus.getPowerOn(),
+        .sensorAvailable = checkTemperatureStatus(),
+        .sampleMicros = temperatureSample.getSampleMicros(),
+        .temperatureCelcius = temperatureSample.getTemperatureCelcius(),
+        .humidityRelative = temperatureSample.getHumidityRelative(),
+        .heaterMeasuredVoltage = states().heatpadSample.getMeasuredVoltage(),
+        .heaterMeasuredCurrent = states().heatpadSample.getMeasuredCurrent(),
+        .nowMicros = Time::GetTickMicros64(),
+    });
 
     // set control engine input
     FermentationEngine::Input& input = mFermentationEngine.getInput();
@@ -49,25 +58,34 @@ void FermentationBehaviour::onLogicTick(){
     input.regulationEnabled          = states().fermentationStatus.getPowerOn();
     input.fanMeasuredRpm             = states().fanSample.getMeasuredRpm();
     input.fanStalled                 = states().fanStatus.getState() == FanState::Stalled;
-    input.measuredHumidity           = states().temperatureSample.getHumidityRelative();
-    input.measuredTemperature        = states().temperatureSample.getTemperatureCelcius();
-    input.measuredHumidityValid      = temperatureStatusValid;
-    input.measuredTemperatureValid   = temperatureStatusValid;
+    input.measuredHumidity           = temperatureSample.getHumidityRelative();
+    input.measuredTemperature        = temperatureSample.getTemperatureCelcius();
+    input.measuredHumidityValid      = mSafetySupervisor.sensorValid();
+    input.measuredTemperatureValid   = mSafetySupervisor.sensorValid();
 
     // perform control engine step
     mFermentationEngine.step();
     
     // send actuator commands
     const FermentationEngine::Output& output = mFermentationEngine.getOutput();
+    const bool heaterPermitted = mSafetySupervisor.permitHeater(
+        output.heaterEnabled,
+        output.heaterPwmDuty
+    );
+    const float permittedDuty = heaterPermitted ? output.heaterPwmDuty : 0.0f;
+    mSafetySupervisor.recordFinalHeaterCommand(heaterPermitted, permittedDuty);
     const bool autoFan = states().fermentationStatus.getFanAuto();
     const float manualFanSpeed = MathUtils::Clamp(
         states().fermentationStatus.getFanManualSpeed(), 0.0f, 1.0f);
     const FermentationState engineState = mFermentationEngine.getState();
-    const bool safetyFanRequired = engineState == FermentationState::InvalidInput
+    const bool engineSafetyFanRequired = engineState == FermentationState::InvalidInput
         || engineState == FermentationState::OverTemperature
         || engineState == FermentationState::Cooldown;
-    sendHeatpadCommand(output.heaterEnabled, output.heaterPwmDuty, output.heaterPwmPeriodMicros);
-    if(safetyFanRequired){
+    sendHeatpadCommand(heaterPermitted, permittedDuty, output.heaterPwmPeriodMicros);
+    if(mSafetySupervisor.fanRequired()){
+        sendFanCommand(true, 1.0f);
+    }
+    else if(engineSafetyFanRequired){
         sendFanCommand(true, output.fanTargetSpeed);
     }
     else if(autoFan){
@@ -111,6 +129,7 @@ void FermentationBehaviour::updateFermentationStatus(){
     FermentationStatusState& status = states().fermentationStatus;
     const FermentationEngine::Input& input = mFermentationEngine.getInput();
     status.setState(mFermentationEngine.getState());
+    status.setSafetyFault(mSafetySupervisor.fault());
     status.setTargetTemperature(input.targetTemperature);
 }
 
@@ -143,30 +162,11 @@ void FermentationBehaviour::onRequestFanModeEvent(const RequestFanModeEvent& eve
 
 bool FermentationBehaviour::checkTemperatureStatus(){
     const TemperatureStatusState& status = states().temperatureStatus;
-    const TemperatureSampleState& sample = states().temperatureSample;
-    if(!status.getPowerEnabled()
-        || !status.getDriverEnabled()
-        || status.getResetting()
-        || !status.getHasFirstSample()
-        || !status.getIsRunning()){
-        return false;
-    }
-
-    const uint64_t nowMicros = Time::GetTickMicros64();
-    const uint64_t sampleMicros = sample.getSampleMicros();
-    if(sampleMicros > nowMicros
-        || (nowMicros - sampleMicros) > MaxTemperatureSampleAgeMicros){
-        return false;
-    }
-
-    const float temperature = sample.getTemperatureCelcius();
-    const float humidity = sample.getHumidityRelative();
-    return std::isfinite(temperature)
-        && temperature >= MinPlausibleTemperatureCelcius
-        && temperature <= MaxPlausibleTemperatureCelcius
-        && std::isfinite(humidity)
-        && humidity >= MinPlausibleHumidityRelative
-        && humidity <= MaxPlausibleHumidityRelative;
+    return status.getPowerEnabled()
+        && status.getDriverEnabled()
+        && !status.getResetting()
+        && status.getHasFirstSample()
+        && status.getIsRunning();
 }
 
 void FermentationBehaviour::onFanSampleStateChanged(const FanSampleState& state){
@@ -175,6 +175,10 @@ void FermentationBehaviour::onFanSampleStateChanged(const FanSampleState& state)
 
 void FermentationBehaviour::onFanStatusStateChanged(const FanStatusState& state){
     // nothing to do
+}
+
+void FermentationBehaviour::onHeatpadSampleStateChanged(const HeatpadSampleState& state){
+    // sampled on the next logic tick by the independent safety supervisor
 }
 
 void FermentationBehaviour::onTemperatureSampleStateChanged(const TemperatureSampleState& state){

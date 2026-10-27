@@ -18,4 +18,4 @@ behaviours:
     send_events: [FanCommand, DisplayCommand, HeatpadCommand]
 
     write_states: [FermentationStatus]
-    read_states: [FanSample, FanStatus, TemperatureSample, TemperatureStatus]
+    read_states: [FanSample, FanStatus, HeatpadSample, TemperatureSample, TemperatureStatus]

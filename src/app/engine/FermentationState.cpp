@@ -16,4 +16,18 @@ const char* FermentationStateToString(FermentationState id){
     return "Invalid";
 }
 
+const char* SafetyFaultToString(SafetyFault fault){
+    switch(fault){
+        case SafetyFault::None: return "None";
+        case SafetyFault::SensorUnavailable: return "SensorUnavailable";
+        case SafetyFault::SensorStale: return "SensorStale";
+        case SafetyFault::SensorImplausible: return "SensorImplausible";
+        case SafetyFault::AbsoluteOverTemperature: return "AbsoluteOverTemperature";
+        case SafetyFault::UnexpectedHeaterOutput: return "UnexpectedHeaterOutput";
+        case SafetyFault::InvalidHeaterCommand: return "InvalidHeaterCommand";
+        case SafetyFault::Count: return "Count";
+    }
+    return "Invalid";
+}
+
 } // namespace Garbox

@@ -110,6 +110,8 @@ The heater PID constants are currently `Kp=0.05`, `Ki=0.02`, `Kd=0`, with output
 
 `FermentationBehaviour` translates shared states into engine inputs and translates engine outputs into fan/heater command events. A usable temperature sample requires powered/running sensor status, a first sample no older than three seconds, finite temperature/humidity, and plausible bounds. Target requests are finite and clamped to 15–50 °C. The behavior also accepts requests to toggle power and choose automatic or manual fan control. Manual fan output is allowed during normal/off operation, while invalid-input, over-temperature, and cooldown states always override it with the engine's full safety-cooling request.
 
+A separate `FermentationSafetySupervisor` owns final heater permission after the normal engine decision. It independently enforces the sensor contract, latches at an absolute 60 °C limit, and latches if voltage of at least 1.0 V or current of at least 0.1 A persists for two seconds while the final heater command is off. Latched faults survive UI power toggles and require a process/power restart; they force heater off and request full fan cooling. The electrical thresholds are conservative software defaults and must be calibrated against real ADC noise, filter decay, and power-stage behavior before unattended use.
+
 ### Input and feedback
 
 The device uses a rotary encoder plus push button:

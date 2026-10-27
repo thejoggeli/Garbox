@@ -19,7 +19,7 @@ RuntimeAbs::Config MakeConfig(){
         .numStates = 12,
 #else
         .numComponents = 1,
-        .numStates = 5,
+        .numStates = 6,
 #endif
         .eventPoolSizeBytes = 1024,
         .eventQueueLength = 32,
@@ -40,11 +40,11 @@ SimulationRuntime::SimulationRuntime(): RuntimeAbs(MakeConfig()){
     registerState(&mFanStatus);
     registerState(&mTemperatureSample);
     registerState(&mTemperatureStatus);
+    registerState(&mHeatpadSample);
     registerComponent(&mFermentationBehaviour);
 
 #if defined(GARBOX_SIMULATION_UI)
     registerState(&mHeatpadStatus);
-    registerState(&mHeatpadSample);
     registerState(&mHeatpadProgress);
     registerState(&mDisplayStatus);
     registerState(&mDisplayDiagnostics);
@@ -61,6 +61,7 @@ SimulationRuntime::SimulationRuntime(): RuntimeAbs(MakeConfig()){
         mFermentationStatus,
         mFanSample,
         mFanStatus,
+        mHeatpadSample,
         mTemperatureSample,
         mTemperatureStatus
     );
@@ -257,6 +258,17 @@ void SimulationRuntime::onRouteStateChanged(const StateAbs& state){
         }
 #endif
         break;
+    case StateType::HeatpadSample:
+        mFermentationBehaviour.onHeatpadSampleStateChanged(mHeatpadSample);
+#if defined(GARBOX_SIMULATION_UI)
+        switch(getActiveScreenId()){
+        case ScreenId::Simple: mSimpleScreen.onHeatpadSampleStateChanged(mHeatpadSample); break;
+        case ScreenId::Main: mMainScreen.onHeatpadSampleStateChanged(mHeatpadSample); break;
+        case ScreenId::Debug: mDebugScreen.onHeatpadSampleStateChanged(mHeatpadSample); break;
+        default: break;
+        }
+#endif
+        break;
     case StateType::TemperatureSample:
         mFermentationBehaviour.onTemperatureSampleStateChanged(mTemperatureSample);
 #if defined(GARBOX_SIMULATION_UI)
@@ -295,14 +307,6 @@ void SimulationRuntime::onRouteStateChanged(const StateAbs& state){
         case ScreenId::Simple: mSimpleScreen.onHeatpadStatusStateChanged(mHeatpadStatus); break;
         case ScreenId::Main: mMainScreen.onHeatpadStatusStateChanged(mHeatpadStatus); break;
         case ScreenId::Debug: mDebugScreen.onHeatpadStatusStateChanged(mHeatpadStatus); break;
-        default: break;
-        }
-        break;
-    case StateType::HeatpadSample:
-        switch(getActiveScreenId()){
-        case ScreenId::Simple: mSimpleScreen.onHeatpadSampleStateChanged(mHeatpadSample); break;
-        case ScreenId::Main: mMainScreen.onHeatpadSampleStateChanged(mHeatpadSample); break;
-        case ScreenId::Debug: mDebugScreen.onHeatpadSampleStateChanged(mHeatpadSample); break;
         default: break;
         }
         break;
@@ -480,6 +484,15 @@ void SimulationRuntime::publishInputs(){
     mFanStatus.setRpmControl(mOutputs.fan.enableRpmControl);
     mFanSample.setMeasuredRpm(mInputs.fanMeasuredRpm);
 
+    const float simulatedVoltage = mInputs.heaterMeasurementOverride
+        ? mInputs.heaterMeasuredVoltage
+        : (mOutputs.heatpad.enabled ? 17.0f * mOutputs.heatpad.dutyCycle : 0.0f);
+    const float simulatedCurrent = mInputs.heaterMeasurementOverride
+        ? mInputs.heaterMeasuredCurrent
+        : (mOutputs.heatpad.enabled ? 1.0f * mOutputs.heatpad.dutyCycle : 0.0f);
+    mHeatpadSample.setMeasuredVoltage(simulatedVoltage);
+    mHeatpadSample.setMeasuredCurrent(simulatedCurrent);
+
 #if defined(GARBOX_SIMULATION_UI)
     mHeatpadStatus.setState(mOutputs.heatpad.enabled
         ? HeatpadState::Heating
@@ -488,12 +501,6 @@ void SimulationRuntime::publishInputs(){
     mHeatpadStatus.setNextDutyCycle(mOutputs.heatpad.dutyCycle);
     mHeatpadStatus.setCurrentPeriodMicros(mOutputs.heatpad.periodMicros);
     mHeatpadStatus.setNextPeriodMicros(mOutputs.heatpad.periodMicros);
-    mHeatpadSample.setMeasuredVoltage(mOutputs.heatpad.enabled
-        ? 17.0f * mOutputs.heatpad.dutyCycle
-        : 0.0f);
-    mHeatpadSample.setMeasuredCurrent(mOutputs.heatpad.enabled
-        ? 1.0f * mOutputs.heatpad.dutyCycle
-        : 0.0f);
     const uint32_t period = mOutputs.heatpad.periodMicros;
     mHeatpadProgress.setPwmProgressMicros(period > 0
         ? static_cast<float>(Time::GetTickMicros() % period)

@@ -17,4 +17,17 @@ enum class FermentationState : uint8_t {
 
 const char* FermentationStateToString(FermentationState id);
 
+enum class SafetyFault : uint8_t {
+    None = 0,
+    SensorUnavailable,
+    SensorStale,
+    SensorImplausible,
+    AbsoluteOverTemperature,
+    UnexpectedHeaterOutput,
+    InvalidHeaterCommand,
+    Count
+};
+
+const char* SafetyFaultToString(SafetyFault fault);
+
 } // namespace

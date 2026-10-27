@@ -14,6 +14,7 @@ void RegisterDisplayBufferTrackerTests();
 void RegisterRuntimeTests();
 void RegisterSimulationTests();
 void RegisterSafeOutputRegistryTests();
+void RegisterSafetySupervisorTests();
 void RegisterLvglGeometryTests();
 void RegisterHistoryTests();
 void RegisterPidControlTests();
@@ -464,6 +465,7 @@ int main(int argc, char **argv){
     RegisterRuntimeTests();
     RegisterSimulationTests();
     RegisterSafeOutputRegistryTests();
+    RegisterSafetySupervisorTests();
     RegisterLvglGeometryTests();
     RegisterHistoryTests();
     RegisterPidControlTests();

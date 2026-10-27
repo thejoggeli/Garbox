@@ -20,9 +20,9 @@ constexpr uint64_t TickMicros = 33'000ULL;
 SimulationRuntime& makeRuntime(){
     // Runtime/container destruction is tracked by LIFE-01. Keep test instances
     // process-owned until that contract is converted to RAII.
-    static SimulationRuntime* runtimes[12] {};
+    static SimulationRuntime* runtimes[16] {};
     static std::size_t runtimeCount = 0;
-    TEST_ASSERT_LESS_THAN_UINT32(12U, runtimeCount);
+    TEST_ASSERT_LESS_THAN_UINT32(16U, runtimeCount);
 
     FakeTime::Reset();
     auto* runtime = new SimulationRuntime();
@@ -321,6 +321,47 @@ void test_target_requests_are_finite_and_bounded(){
     TEST_ASSERT_EQUAL_FLOAT(50.0f, runtime.fermentationStatus().getTargetTemperature());
 }
 
+void test_absolute_temperature_supervisor_latches_heater_off(){
+    TEST_RESET_ASSERTS();
+    SimulationRuntime& runtime = makeRuntime();
+    runtime.setInputs(validInputs(65.0f));
+    runtime.requestFermentationEnabled(true);
+    step(runtime, 2);
+
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(SafetyFault::AbsoluteOverTemperature),
+                            static_cast<uint8_t>(runtime.fermentationStatus().getSafetyFault()));
+    TEST_ASSERT_FALSE(runtime.outputs().heatpad.enabled);
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, runtime.outputs().heatpad.dutyCycle);
+    TEST_ASSERT_TRUE(runtime.outputs().fan.enabled);
+    TEST_ASSERT_EQUAL_FLOAT(1.0f, runtime.outputs().fan.targetSpeed);
+
+    runtime.setInputs(validInputs(20.0f));
+    step(runtime, 2);
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(SafetyFault::AbsoluteOverTemperature),
+                            static_cast<uint8_t>(runtime.fermentationStatus().getSafetyFault()));
+    TEST_ASSERT_FALSE(runtime.outputs().heatpad.enabled);
+    TEST_ASSERT_NO_ASSERTS();
+}
+
+void test_unexpected_heater_output_latches_while_control_is_off(){
+    TEST_RESET_ASSERTS();
+    SimulationRuntime& runtime = makeRuntime();
+    SimulationRuntime::Inputs inputs = validInputs(20.0f);
+    inputs.heaterMeasurementOverride = true;
+    inputs.heaterMeasuredVoltage = 2.0f;
+    inputs.heaterMeasuredCurrent = 0.2f;
+    runtime.setInputs(inputs);
+    step(runtime, 62);
+
+    TEST_ASSERT_FALSE(runtime.fermentationStatus().getPowerOn());
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(SafetyFault::UnexpectedHeaterOutput),
+                            static_cast<uint8_t>(runtime.fermentationStatus().getSafetyFault()));
+    TEST_ASSERT_FALSE(runtime.outputs().heatpad.enabled);
+    TEST_ASSERT_TRUE(runtime.outputs().fan.enabled);
+    TEST_ASSERT_EQUAL_FLOAT(1.0f, runtime.outputs().fan.targetSpeed);
+    TEST_ASSERT_NO_ASSERTS();
+}
+
 } // namespace
 
 void RegisterSimulationTests(){
@@ -335,4 +376,6 @@ void RegisterSimulationTests(){
     RUN_TEST(test_stale_temperature_sample_forces_safe_commands);
     RUN_TEST(test_nonfinite_and_implausible_sensor_values_are_rejected);
     RUN_TEST(test_target_requests_are_finite_and_bounded);
+    RUN_TEST(test_absolute_temperature_supervisor_latches_heater_off);
+    RUN_TEST(test_unexpected_heater_output_latches_while_control_is_off);
 }

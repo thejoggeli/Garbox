@@ -206,3 +206,13 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - PID steps reject non-finite/non-positive timing without corrupting state. Conditional integration now discards only changes that drive farther into the active limit, so opposite-sign error can unwind a saturated controller.
 - Removed the deliberate fatal assertion reached by a long encoder-button hold. Audible repeat feedback now saturates safely at 3 kHz, including counter arithmetic overflow protection.
 - Verification: all nine generator regressions pass with resource warnings fatal; generated-output check is clean; 80/80 native ASan/UBSan tests pass; complete desktop UI flow passes; ESP32-S3 firmware builds at 30,480 bytes RAM and 893,273 bytes flash.
+
+## 2026-10-27 — APP-03 independent safety supervisor
+
+- Added a separate final heater-permission layer after the normal fermentation PID/FSM. Transient sensor availability/freshness/plausibility faults veto heat; an absolute 60 °C reading and persistent electrical output while commanded off latch until process restart.
+- The command/measurement check compares the previous final heat command with measured heater voltage/current. Provisional thresholds are 1.0 V or 0.1 A continuously for two seconds, allowing filtered measurements to decay after a legitimate off transition.
+- Any supervisor fault forces heater duty to zero and requests full fan cooling, including an electrical mismatch detected while regulation is already off. Invalid/non-finite/out-of-range heater commands are also vetoed.
+- Generated behavior bindings now expose `HeatpadSample` to the supervisor. Generated `FermentationStatus` publishes a typed `SafetyFault`, and the scrollable diagnostics climate card displays it without dropping existing fields.
+- Direct tests cover transient recovery, absolute-limit latching, timed mismatch latching, and invalid-command veto. End-to-end simulation proves both latch classes control the real command route and persist across otherwise-valid inputs.
+- Verification: generated-output check is clean; 86/86 native ASan/UBSan tests pass; complete desktop LVGL flow passes and refreshed diagnostics captures were visually reviewed; ESP32-S3 firmware builds at 30,512 bytes RAM and 894,157 bytes flash.
+- Electrical thresholds, ADC behavior, actual off polarity, cooling policy, and the independent physical cutoff remain hardware-gated under APP-04/SAFE-01.

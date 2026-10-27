@@ -5,6 +5,7 @@
 // ==== GENERATED END: include ====================================================
 
 #include "app/engine/FermentationEngine.h"
+#include "app/safety/FermentationSafetySupervisor.h"
 #include "shared/types/EventAlias.h"
 
 namespace Garbox {
@@ -13,11 +14,6 @@ class FermentationBehaviour : public FermentationBehaviourAbs {
 
 private:
 
-    static constexpr uint64_t MaxTemperatureSampleAgeMicros = 3'000'000ULL;
-    static constexpr float MinPlausibleTemperatureCelcius = -20.0f;
-    static constexpr float MaxPlausibleTemperatureCelcius = 80.0f;
-    static constexpr float MinPlausibleHumidityRelative = 0.0f;
-    static constexpr float MaxPlausibleHumidityRelative = 100.0f;
     static constexpr float MinTargetTemperatureCelcius = 15.0f;
     static constexpr float MaxTargetTemperatureCelcius = 50.0f;
 
@@ -27,6 +23,7 @@ private:
     bool mFirstTick = true;
 
     FermentationEngine mFermentationEngine;
+    FermentationSafetySupervisor mSafetySupervisor;
 
     bool checkTemperatureStatus();
     
@@ -59,6 +56,7 @@ public:
     // generated state changed handlers
     void onFanSampleStateChanged(const FanSampleState& state) final;
     void onFanStatusStateChanged(const FanStatusState& state) final;
+    void onHeatpadSampleStateChanged(const HeatpadSampleState& state) final;
     void onTemperatureSampleStateChanged(const TemperatureSampleState& state) final;
     void onTemperatureStatusStateChanged(const TemperatureStatusState& state) final;
 

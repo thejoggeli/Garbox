@@ -23,6 +23,7 @@ states:
     include: "app/engine/FermentationState.h"
     fields:
       - { name: State, type: FermentationState }
+      - { name: SafetyFault, type: SafetyFault }
       - { name: TargetTemperature, type: float }
       - { name: FanAuto, type: bool, default: true }
       - { name: FanManualSpeed, type: float, default: 0.0 }

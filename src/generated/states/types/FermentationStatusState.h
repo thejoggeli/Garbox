@@ -14,6 +14,7 @@ public:
 
     // read access (published state)
     FermentationState getState() const;
+    SafetyFault getSafetyFault() const;
     float getTargetTemperature() const;
     bool getFanAuto() const;
     float getFanManualSpeed() const;
@@ -21,6 +22,7 @@ public:
 
     // read access (next state)
     FermentationState nextState() const;
+    SafetyFault nextSafetyFault() const;
     float nextTargetTemperature() const;
     bool nextFanAuto() const;
     float nextFanManualSpeed() const;
@@ -28,6 +30,7 @@ public:
 
     // read access (last state)
     FermentationState lastState() const;
+    SafetyFault lastSafetyFault() const;
     float lastTargetTemperature() const;
     bool lastFanAuto() const;
     float lastFanManualSpeed() const;
@@ -35,6 +38,7 @@ public:
 
     // write access (next state)
     void setState(FermentationState value);
+    void setSafetyFault(SafetyFault value);
     void setTargetTemperature(float value);
     void setFanAuto(bool value);
     void setFanManualSpeed(float value);
@@ -44,6 +48,7 @@ private:
 
     struct Data {
         FermentationState state;
+        SafetyFault safetyFault;
         float targetTemperature;
         bool fanAuto = true;
         float fanManualSpeed = 0.0f;

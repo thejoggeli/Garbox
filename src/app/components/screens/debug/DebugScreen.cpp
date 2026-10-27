@@ -111,17 +111,17 @@ void DebugScreen::onInit(){
     // Full-width, vertically stacked cards trade density for a stable label
     // column and leave room for future diagnostic fields.
     initCard(mSystemCard,   6,   4, 304, 143, "SYSTEM",  0x8AB4F4);
-    initCard(mClimateCard,  6, 153, 304, 118, "CLIMATE", 0x75C8C8);
-    initCard(mOutputsCard,  6, 277, 304, 150, "OUTPUTS", 0xD1B254);
-    initCard(mMemoryCard,   6, 433, 304, 120, "MEMORY",  0xBDA7FF);
+    initCard(mClimateCard,  6, 153, 304, 143, "CLIMATE", 0x75C8C8);
+    initCard(mOutputsCard,  6, 302, 304, 150, "OUTPUTS", 0xD1B254);
+    initCard(mMemoryCard,   6, 458, 304, 120, "MEMORY",  0xBDA7FF);
 
     initLabel(mTimeLabel,               10,  29, "UPTIME");
     initLabel(mMicrosLabel,             10,  44, "CLOCK");
     initLabel(mAppInfoLabel,            10,  59, "BEHAVIOR");
     initLabel(mDisplayStatusLabel,      10, 105, "BRIGHTNESS");
     initLabel(mFermentationStatusLabel, 10,  29, "MODE");
-    initLabel(mTemperatureStateLabel,   10,  54, "POWER");
-    initLabel(mTemperatureSampleLabel,  10,  89, "TEMPERATURE");
+    initLabel(mTemperatureStateLabel,   10,  69, "POWER");
+    initLabel(mTemperatureSampleLabel,  10, 104, "TEMPERATURE");
     initLabel(mFanStateLabel,           10,  29, "FAN STATE");
     initLabel(mFanMeasuredRpmLabel,     10,  54, "FAN SPEED");
     initLabel(mHeatpadStateLabel,       10,  69, "HEATER");
@@ -366,8 +366,9 @@ void DebugScreen::onRenderAppInfo(){
 
 void DebugScreen::onRenderFermentationStatus(){
     mFermentationStatusLabel.setTextFormatted(
-        "MODE          %s\nTARGET        %.1f C",
+        "MODE          %s\nSAFETY        %s\nTARGET        %.1f C",
         FermentationStateToString(states().fermentationStatus.getState()),
+        SafetyFaultToString(states().fermentationStatus.getSafetyFault()),
         states().fermentationStatus.getTargetTemperature()
     );
 }

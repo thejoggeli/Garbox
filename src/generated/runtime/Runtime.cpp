@@ -86,6 +86,7 @@ Runtime::Runtime():
         mStateRegistry.getFermentationStatus(),
         mStateRegistry.getFanSample(),
         mStateRegistry.getFanStatus(),
+        mStateRegistry.getHeatpadSample(),
         mStateRegistry.getTemperatureSample(),
         mStateRegistry.getTemperatureStatus()
     );
@@ -348,6 +349,10 @@ void Runtime::onRouteStateChanged(const StateAbs& state){
     }
     case StateType::HeatpadSample: {
         const HeatpadSampleState& heatpadSample = static_cast<const HeatpadSampleState&>(state);
+        switch(mActiveBehaviour->getBehaviourId()){
+            case BehaviourId::Fermentation: static_cast<FermentationBehaviour*>(mActiveBehaviour)->onHeatpadSampleStateChanged(heatpadSample); break;
+            default: break; // active behaviour does not read state
+        }
         switch(mActiveScreen->getScreenId()){
             case ScreenId::Simple: static_cast<SimpleScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;
             case ScreenId::Main: static_cast<MainScreen*>(mActiveScreen)->onHeatpadSampleStateChanged(heatpadSample); break;

@@ -5,6 +5,7 @@
 #include "generated/states/types/FermentationStatusState.h"
 #include "generated/states/types/FanSampleState.h"
 #include "generated/states/types/FanStatusState.h"
+#include "generated/states/types/HeatpadSampleState.h"
 #include "generated/states/types/TemperatureSampleState.h"
 #include "generated/states/types/TemperatureStatusState.h"
 
@@ -17,6 +18,7 @@ public:
         FermentationStatusState& fermentationStatusState, // write
         const FanSampleState& fanSampleState, // read
         const FanStatusState& fanStatusState, // read
+        const HeatpadSampleState& heatpadSampleState, // read
         const TemperatureSampleState& temperatureSampleState, // read
         const TemperatureStatusState& temperatureStatusState // read
     );
@@ -33,6 +35,7 @@ public:
     // readable states
     const FanSampleState& fanSample;
     const FanStatusState& fanStatus;
+    const HeatpadSampleState& heatpadSample;
     const TemperatureSampleState& temperatureSample;
     const TemperatureStatusState& temperatureStatus;
 

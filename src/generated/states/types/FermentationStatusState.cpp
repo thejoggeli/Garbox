@@ -13,6 +13,10 @@ FermentationState FermentationStatusState::getState() const {
     return mCurrent.state;
 }
 
+SafetyFault FermentationStatusState::getSafetyFault() const {
+    return mCurrent.safetyFault;
+}
+
 float FermentationStatusState::getTargetTemperature() const {
     return mCurrent.targetTemperature;
 }
@@ -33,6 +37,10 @@ FermentationState FermentationStatusState::nextState() const {
     return mNext.state;
 }
 
+SafetyFault FermentationStatusState::nextSafetyFault() const {
+    return mNext.safetyFault;
+}
+
 float FermentationStatusState::nextTargetTemperature() const {
     return mNext.targetTemperature;
 }
@@ -51,6 +59,10 @@ bool FermentationStatusState::nextPowerOn() const {
 
 FermentationState FermentationStatusState::lastState() const {
     return mLast.state;
+}
+
+SafetyFault FermentationStatusState::lastSafetyFault() const {
+    return mLast.safetyFault;
 }
 
 float FermentationStatusState::lastTargetTemperature() const {
@@ -74,6 +86,14 @@ void FermentationStatusState::setState(FermentationState value){
         return;
     }
     mNext.state = value;
+    markDirty();
+}
+
+void FermentationStatusState::setSafetyFault(SafetyFault value){
+    if (mNext.safetyFault == value) {
+        return;
+    }
+    mNext.safetyFault = value;
     markDirty();
 }
 

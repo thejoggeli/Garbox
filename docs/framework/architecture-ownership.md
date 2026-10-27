@@ -189,6 +189,8 @@ Fatal handling now calls a fixed-capacity, allocation-free `SafeOutputRegistry` 
 
 The fatal fan policy is intentionally unresolved: maximum cooling and power-off are both plausible depending on the enclosure, power stage, and failure model. Until the owner confirms the policy, SAFE-01 remains in progress and the registry does not alter the fan.
 
+Normal application operation now also has a policy-independent final heater gate. `FermentationSafetySupervisor` consumes raw sensor status/timestamps and the previous final heater command plus measured voltage/current. Recoverable sensor faults veto heat while active; absolute over-temperature and persistent electrical output while commanded off latch for the process lifetime. The supervisor's decision is applied after the PID/FSM output and before the typed heater command is sent, and its fault is published in `FermentationStatus` for diagnostics. This is software defense in depth, not a substitute for a thermal fuse or independently powered cutoff.
+
 Target ordering for fatal shutdown is:
 
 1. atomically latch fatal state and prevent new application/output commands;

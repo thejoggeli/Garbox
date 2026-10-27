@@ -30,6 +30,7 @@ public:
     // state change handlers (to be implmeneted by user)
     virtual void onFanSampleStateChanged(const FanSampleState& state) = 0;
     virtual void onFanStatusStateChanged(const FanStatusState& state) = 0;
+    virtual void onHeatpadSampleStateChanged(const HeatpadSampleState& state) = 0;
     virtual void onTemperatureSampleStateChanged(const TemperatureSampleState& state) = 0;
     virtual void onTemperatureStatusStateChanged(const TemperatureStatusState& state) = 0;
 

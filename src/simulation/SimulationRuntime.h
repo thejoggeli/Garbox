@@ -7,6 +7,7 @@
 #include "generated/states/types/FanSampleState.h"
 #include "generated/states/types/FanStatusState.h"
 #include "generated/states/types/FermentationStatusState.h"
+#include "generated/states/types/HeatpadSampleState.h"
 #include "generated/states/types/TemperatureSampleState.h"
 #include "generated/states/types/TemperatureStatusState.h"
 #include "shared/types/EventPayload.h"
@@ -44,6 +45,9 @@ public:
         float humidityRelative = 50.0f;
         bool fanStalled = false;
         float fanMeasuredRpm = 0.0f;
+        bool heaterMeasurementOverride = false;
+        float heaterMeasuredVoltage = 0.0f;
+        float heaterMeasuredCurrent = 0.0f;
     };
 
     struct Outputs {
@@ -103,11 +107,11 @@ private:
     FanStatusState mFanStatus;
     TemperatureSampleState mTemperatureSample;
     TemperatureStatusState mTemperatureStatus;
+    HeatpadSampleState mHeatpadSample;
     FermentationBehaviour mFermentationBehaviour;
 
 #if defined(GARBOX_SIMULATION_UI)
     HeatpadStatusState mHeatpadStatus;
-    HeatpadSampleState mHeatpadSample;
     HeatpadProgressState mHeatpadProgress;
     DisplayStatusState mDisplayStatus;
     DisplayDiagnosticsState mDisplayDiagnostics;
