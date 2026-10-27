@@ -71,7 +71,7 @@ The order below is dependency-driven. Necessary correctness/reproducibility work
 | DISP-02 | SOFTWARE VERIFIED | DISP-01, TEST-01 | Model buffer identity/state transitions and validate queue/DMA ownership. | Host model covers partial flushes, three in flight, ordered completion, duplicate/wrong completion, and reuse. |
 | DISP-03 | SOFTWARE VERIFIED | DISP-02, SYNC-01, TASK-01 | Propagate transport failure; define screen-change and shutdown behavior. | Failure injection reaches defined fault state, releases/invalidates ownership safely, and does not deadlock. |
 | DISP-04 | HARDWARE BLOCKED | DISP-03 | Benchmark unchanged architecture and corrected implementation. | Full/small/chart/load metrics plus CPU, skipped frames, heap, stack, and main latency are recorded comparably. |
-| UI-01 | TODO | BUILD-01 | Fix/test row-menu selection and chart adapter edge cases. | Host tests cover selection/window/lock and history catch-up. |
+| UI-01 | SOFTWARE VERIFIED | BUILD-01 | Fix/test row-menu selection and chart adapter edge cases. | Host tests cover selection/window/lock and history catch-up. |
 
 ## Milestone 7 — Garbox safety/correctness retention
 

@@ -189,3 +189,11 @@ No sanitizer diagnostics were emitted. The firmware footprint is unchanged from 
 - Since-sequence iteration tracks a bounded readable count rather than comparing wrapped sequence numbers. An overrun returns the retained ring exactly once, and `UINT32_MAX` sequence wrap remains valid.
 - Tests cover the exact four-day/65-point interval, a 70,001-value high-rate average bucket, partial/full/overrun reads, and write-sequence wrap.
 - Verification: generated-output check is clean; 75/75 native ASan/UBSan tests pass; ESP32-S3 firmware builds at 30,448 bytes RAM and 891,977 bytes flash.
+
+## 2026-10-27 — UI-01
+
+- Row-menu invalid capacity/name/index inputs now stop safely after reporting the contract failure. Empty menus cannot underflow selection, invalid reads return a safe value for recovery-capable host handlers, and null callbacks are replaced by inert fallbacks after assertion.
+- Added real-LVGL simulator contract checks for direct selection, centered/clamped window movement, wraparound navigation, edit locking, value changes, and selection clearing.
+- Chart catch-up inherits the bounded overrun and wrap-correct iterator proven under HIST-02; the complete flow exercises attachment, periodic updates, and history-window changes through the production adapter.
+- Rebuilt and exercised all home, trend/menu, diagnostics-scroll, event-log, and state-log paths. Nineteen fresh 320x240 frames were reviewed together; no clipping, unintended scrollbar, padding, border, or chart-grid regression was found.
+- Verification: desktop LVGL build and complete UI flow pass; ESP32-S3 firmware builds at 30,448 bytes RAM and 892,317 bytes flash.

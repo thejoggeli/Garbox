@@ -26,10 +26,14 @@ RowMenu::RowMenu(
     mActiveBgColor(lv_color_hex(activeBgColor)),
     mEditTextColor(lv_color_hex(editTextColor)),
     mEditBgColor(lv_color_hex(editBgColor)),
-    mVisibleRowCount(visibleRowCount),
+    mVisibleRowCount(visibleRowCount > 0 ? visibleRowCount : 1),
     mCallbackCtx(callbackCtx),
-    mValueToTextCallback(valueToTextCallback),
-    mChangeValueCallback(changeValueCallback){
+    mValueToTextCallback(valueToTextCallback ? valueToTextCallback : fallbackValueToText),
+    mChangeValueCallback(changeValueCallback ? changeValueCallback : fallbackChangeValue){
+
+    AssertExit(visibleRowCount > 0, "RowMenu", "visible row count must be positive");
+    AssertExit(valueToTextCallback != nullptr, "RowMenu", "value-to-text callback is required");
+    AssertExit(changeValueCallback != nullptr, "RowMenu", "change-value callback is required");
 
     mContainer.setLayout(LV_LAYOUT_FLEX);
     mContainer.setFlexFlow(LV_FLEX_FLOW_COLUMN);
@@ -41,7 +45,14 @@ RowMenu::RowMenu(
 }
 
 void RowMenu::addRow(const char* name, int32_t initialValue){
-    AssertExit((mRows.size() < mRows.capacity()), "RowMenu", "row capacity exceeded");
+    if(mRows.full()){
+        TriggerExit("RowMenu", "row capacity exceeded");
+        return;
+    }
+    if(name == nullptr){
+        TriggerExit("RowMenu", "row name is nullptr");
+        return;
+    }
 
     const uint8_t rowIndex = static_cast<uint8_t>(mRows.size());
 
@@ -62,6 +73,7 @@ void RowMenu::setSelectedRow(uint8_t index){
         return;
     }
     AssertExit((index < mRows.size()), "RowMenu", "row index out of range");
+    if(index >= mRows.size()) return;
     if(mLocked){
         toggleLock();
     }
@@ -73,6 +85,9 @@ void RowMenu::setSelectedRow(uint8_t index){
 
 void RowMenu::selectNextRow(){
     if(mLocked){
+        return;
+    }
+    if(mRows.empty()){
         return;
     }
 
@@ -92,6 +107,9 @@ void RowMenu::selectNextRow(){
 
 void RowMenu::selectPreviousRow(){
     if(mLocked){
+        return;
+    }
+    if(mRows.empty()){
         return;
     }
 
@@ -154,23 +172,29 @@ bool RowMenu::isLocked() const {
 
 uint8_t RowMenu::getSelectedRow() const {
     AssertExit(mHasSelection, "RowMenu", "menu has no selection");
-    return mActiveRowIndex;
+    return mHasSelection ? mActiveRowIndex : 0;
+}
+
+uint8_t RowMenu::getWindowStartRow() const {
+    return mWindowStartIndex;
 }
 
 int32_t RowMenu::getValue(uint8_t rowIndex) const{
     AssertExit((rowIndex < mRows.size()), "RowMenu", "row index out of range");
+    if(rowIndex >= mRows.size()) return 0;
     return mRows[rowIndex].getValue();
 }
 
 void RowMenu::setValue(uint8_t rowIndex, int32_t value){
     AssertExit((rowIndex < mRows.size()), "RowMenu", "row index out of range");
+    if(rowIndex >= mRows.size()) return;
     mRows[rowIndex].setValue(value);
 }
 
 void RowMenu::render(){
     renderWindow();
     renderActive();
-    for(int i = 0; i < mRows.size(); i++){
+    for(std::size_t i = 0; i < mRows.size(); i++){
         mRows[i].render();
     }
 }
@@ -231,6 +255,16 @@ void RowMenu::setPad(int32_t left, int32_t right, int32_t top, int32_t bottom){
     for(uint8_t i = 0; i < mRows.size(); i++){
         mRows[i].setPad(left, right, top, bottom);
     }
+}
+
+void RowMenu::fallbackValueToText(
+    void*, uint8_t, int32_t, char* outText, uint32_t maxLen){
+    if(outText != nullptr && maxLen > 0) outText[0] = '\0';
+}
+
+int32_t RowMenu::fallbackChangeValue(
+    void*, uint8_t, int32_t currentValue, int32_t){
+    return currentValue;
 }
 
 } // namespace Garbox

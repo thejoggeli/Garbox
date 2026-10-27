@@ -13,6 +13,7 @@
 #include "core/assert/AssertHandler.h"
 #include "core/lvgl/LvglProvider.h"
 #include "core/lvgl/LvglTheme.h"
+#include "core/lvgl/helpers/menu/RowMenu.h"
 #include "helpers/FakeTime.h"
 #include "shared/types/ScreenId.h"
 #include "simulation/SimulationRuntime.h"
@@ -32,6 +33,58 @@ constexpr float TickSeconds = static_cast<float>(TickMicros) / 1'000'000.0f;
 std::vector<uint8_t> Framebuffer(Width * Height * BytesPerPixel, 0);
 std::vector<uint8_t> DrawBuffer(Width * Height * BytesPerPixel, 0);
 bool FatalTriggered = false;
+
+void menuValueToText(void*, uint8_t, int32_t value, char* outText, uint32_t maxLen){
+    std::snprintf(outText, maxLen, "%d", value);
+}
+
+int32_t menuChangeValue(void*, uint8_t, int32_t currentValue, int32_t delta){
+    return currentValue + delta;
+}
+
+bool runRowMenuContractChecks(){
+    LvObject container;
+    bool passed = true;
+    {
+        RowMenu menu(
+            container,
+            0xffffff, 0x000000, 0x000000, 0xffffff, 0x000000, 0xffcc00,
+            5, 3, nullptr, menuValueToText, menuChangeValue
+        );
+        menu.addRow("0", 0);
+        menu.addRow("1", 10);
+        menu.addRow("2", 20);
+        menu.addRow("3", 30);
+        menu.addRow("4", 40);
+
+        menu.setSelectedRow(4);
+        menu.render();
+        passed = passed && menu.getSelectedRow() == 4 && menu.getWindowStartRow() == 2;
+
+        menu.toggleLock();
+        menu.selectPreviousRow();
+        passed = passed && menu.isLocked() && menu.getSelectedRow() == 4;
+
+        menu.setSelectedRow(1);
+        menu.render();
+        passed = passed && !menu.isLocked() && menu.getSelectedRow() == 1
+            && menu.getWindowStartRow() == 0;
+
+        menu.selectPreviousRow();
+        menu.selectPreviousRow();
+        menu.render();
+        passed = passed && menu.getSelectedRow() == 4 && menu.getWindowStartRow() == 2;
+
+        menu.setSelectedRow(2);
+        menu.toggleLock();
+        menu.nextValue();
+        passed = passed && menu.getValue(2) == 21;
+        menu.clearSelection();
+        passed = passed && !menu.hasSelection() && !menu.isLocked();
+    }
+    container.free();
+    return passed;
+}
 
 struct Options {
     const char* outputPath = nullptr;
@@ -250,6 +303,11 @@ int main(int argc, char** argv){
     LvglTheme::Install(display);
     LvglProvider::Init(Width, Height);
 
+    if(!runRowMenuContractChecks()){
+        std::fprintf(stderr, "row-menu contract checks failed\n");
+        return 1;
+    }
+
     static SimulationRuntime* runtime = new SimulationRuntime();
     runtime->boot();
     ThermalPlant::Config plantConfig;
@@ -312,9 +370,8 @@ int main(int argc, char** argv){
         std::fprintf(stderr, "simulated input did not reach application state\n");
     }
 
-    // Several existing framework objects intentionally have fatal destructors
-    // until LIFE-01 converts them to RAII. Keep the simulator process-owned,
-    // exactly like the firmware lifetime, and avoid misleading teardown noise.
+    // The runtime and LVGL global context intentionally live for the process,
+    // matching firmware lifetime and avoiding shutdown work after output closes.
     std::fflush(nullptr);
     std::_Exit(ok ? 0 : 1);
 }

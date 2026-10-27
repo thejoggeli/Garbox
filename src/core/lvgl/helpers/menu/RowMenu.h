@@ -58,6 +58,7 @@ public:
     bool hasSelection() const;
     bool isLocked() const;
     uint8_t getSelectedRow() const;
+    uint8_t getWindowStartRow() const;
 
     int32_t getValue(uint8_t rowIndex) const;
     void setValue(uint8_t rowIndex, int32_t value);
@@ -70,6 +71,12 @@ private:
 
     void renderWindow();
     void renderActive();
+    static void fallbackValueToText(
+        void*, uint8_t, int32_t, char* outText, uint32_t maxLen
+    );
+    static int32_t fallbackChangeValue(
+        void*, uint8_t, int32_t currentValue, int32_t
+    );
 
 private:
 
